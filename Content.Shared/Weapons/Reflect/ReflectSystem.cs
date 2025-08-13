@@ -106,7 +106,9 @@ public sealed class ReflectSystem : EntitySystem
             return false;
         }
 
-        var rotation = _random.NextAngle(-reflector.Comp.Spread / 2, reflector.Comp.Spread / 2).Opposite();
+        var rotation = reflector.Comp.LockReflectionAngle
+            ? reflector.Comp.Spread
+            : _random.NextAngle(-reflector.Comp.Spread / 2, reflector.Comp.Spread / 2).Opposite();
         var existingVelocity = _physics.GetMapLinearVelocity(projectile, component: physics);
         var relativeVelocity = existingVelocity - _physics.GetMapLinearVelocity(user);
         var newVelocity = rotation.RotateVec(relativeVelocity);
@@ -156,7 +158,9 @@ public sealed class ReflectSystem : EntitySystem
 
         PlayAudioAndPopup(reflector.Comp, user);
 
-        var spread = _random.NextAngle(-reflector.Comp.Spread / 2, reflector.Comp.Spread / 2);
+        var spread = reflector.Comp.LockReflectionAngle
+            ? reflector.Comp.Spread
+            : _random.NextAngle(-reflector.Comp.Spread / 2, reflector.Comp.Spread / 2);
         newDirection = -spread.RotateVec(direction);
 
         if (shooter != null)
