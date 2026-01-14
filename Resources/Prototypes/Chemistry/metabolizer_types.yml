@@ -49,4 +49,8 @@
 - type: metabolizerType
   id: Demon
   name: metabolizer-type-demon
+
+- type: metabolizerType
+  id: Katunian
+  name: metabolizer-type-katunian
 # Horizon end

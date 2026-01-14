@@ -8,7 +8,7 @@
     CrateMaterialSteel: 1.0
     # things the station might want
     CrateEngineeringAMEJar: 0.25
-    CrateFoodPizzaLarge: 0.25
+    CrateFoodPizza: 0.25
     CrateFoodSoftdrinks: 0.25
     CrateFunInstrumentsVariety: 0.25
     CrateSalvageEquipment: 0.25
@@ -30,6 +30,19 @@
     CratePartsT3: 1.0
     CratePartsT3T4: 0.5
     TechnologyDiskRare: 0.5
+    # technology discs (very rare)
+    TechnologyDiscAdvancedPKAModules: 0.05
+    TechnologyDiscDurandTechnology: 0.05
+    TechnologyDiscPhazonTechnology: 0.05
+    TechnologyDiscArsenalAmmoModules: 0.05
+    TechnologyDiscArsenalAmmunition: 0.05
+    TechnologyDiscHydroponicsDNAManip: 0.05
+    TechnologyDiscUniversalTranslator: 0.05
+    TechnologyDiscCombatCybernetics: 0.05
+    TechnologyDiscCombatCyborgs: 0.05
+    CytologyDiskHealthSpeed: 0.05
+    CytologyDiskMeleeDamage: 0.05
+    CytologyDiskSpeedHunger: 0.05
     # cloning boards
     CloningPodMachineCircuitboard: 0.5
     MedicalScannerMachineCircuitboard: 0.5
@@ -69,6 +82,19 @@
     # rare chemicals
     ChemistryBottleCognizine: 1.0
     ChemistryBottleOmnizine: 1.0
+    # technology discs (very rare)
+    TechnologyDiscAdvancedPKAModules: 0.1
+    TechnologyDiscDurandTechnology: 0.1
+    TechnologyDiscPhazonTechnology: 0.1
+    TechnologyDiscArsenalAmmoModules: 0.1
+    TechnologyDiscArsenalAmmunition: 0.1
+    TechnologyDiscHydroponicsDNAManip: 0.1
+    TechnologyDiscUniversalTranslator: 0.1
+    TechnologyDiscCombatCybernetics: 0.1
+    TechnologyDiscCombatCyborgs: 0.1
+    CytologyDiskHealthSpeed: 0.1
+    CytologyDiskMeleeDamage: 0.1
+    CytologyDiskSpeedHunger: 0.1
     # money
     SpaceCash2500: 1.0
     SpaceCash5000: 0.75

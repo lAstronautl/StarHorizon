@@ -1,0 +1,49 @@
+# Информация об авторе шаттла
+# GitHub/Gitea: ???
+# Discord: amir7036
+
+# Информация об сопровождающем
+# GitHub/Gitea: https://git.starhorizon.ru/Astrolaris
+# Discord: astr0laris
+
+# Прототип аванпоста:
+#
+- type: pointOfInterest
+  id: SindiOutpost
+  parent: BasePOI
+  name: "Syndicate Outpost"
+  minimumDistance: 10000
+  maximumDistance: 20000
+  spawnGroup: Required
+  gridPath: /Maps/_Horizon/POI/sindioupost.yml
+  hideWarp: true
+  addComponents:
+  - type: IFF
+    color: "#C83737"
+    flags: [HideLabel, Hide]
+    readOnly: false
+
+- type: gameMap
+  id: SindiOutpost
+  mapName: "Syndicate Outpost"
+  mapPath: /Maps/_Horizon/POI/sindioupost.yml
+  minPlayers: 0
+  stations:
+    SindiOutpost:
+      stationProto: StandardFrontierOutpost
+      components:
+        - type: StationNameSetup
+          mapNameTemplate: "Syndicate Outpost"
+        - type: ExtraStationInformation
+          iconPath: /Textures/_Horizon/Interface/banner_syndicate_red.png
+          stationSubtext: 'frontier-lobby-syndicate-subtext'
+          stationDescription: 'frontier-lobby-syndicate-description'
+          lobbySortOrder: 7
+        - type: StationJobs
+          availableJobs:
+            SyndicateOfficerTeleCommunication: [ 1, 1 ]
+            SyndicateOperative: [ 3, 3 ]
+            SyndicateCargo: [ 4, 4 ]
+        - type: StationDeadDropHintExempt
+        - type: BindToStationVariationPassExemption
+        - type: NoMailStation # Horizon: Disable mail for Syndicate

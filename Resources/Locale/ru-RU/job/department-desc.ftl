@@ -2,7 +2,6 @@ department-Cargo-description = Покупайте и доставляйте эк
 department-Civilian-description = Выполняйте небольшие полезные задания для поддержания нормальной работы станции.
 department-Command-description = Управляйте экипажем и обеспечивайте его эффективную работу.
 department-CentralCommand-description = Отвечайте на факсы и стреляйте из БСА по карго.
-department-Engineering-description = Поддерживайте станцию в рабочем состоянии.
 department-Medical-description = Поддерживайте здоровье экипажа.
 department-Security-description = Поддерживайте порядок на станции.
 department-Science-description = Изучайте артефакты и аномалии, обеспечивайте членов экипажа новыми продвинутыми устройствами.

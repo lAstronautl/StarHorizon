@@ -1,7 +1,7 @@
 - type: entity
   id: Base40mmGrenade
   name: base 40 mm grenade
-  parent: BaseItem
+  parent: [BaseItem, BaseC3Contraband] # Frontier: BaseMajorContraband<BaseC3Contraband
   abstract: true
   components:
   - type: Tag
@@ -12,6 +12,8 @@
   - type: Sprite
   - type: CartridgeAmmo
     deleteOnSpawn: true
+  - type: StaticPrice
+    price: 100
 
 - type: entity
   id: 40mmGrenadeBaton

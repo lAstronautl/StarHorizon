@@ -4,10 +4,11 @@
   description: Переключает ваше ПНВ
   categories: [ HideSpawnMenu ]
   components:
-  - type: InstantAction
+  - type: Action
     icon:
       sprite: _Horizon/Clothing/Eyes/ninjavisor.rsi
       state: icon
+  - type: InstantAction
     event: !type:NVInstantActionEvent
 
 - type: entity
@@ -16,8 +17,9 @@
   description: Переключает ночное зрение
   categories: [ HideSpawnMenu ]
   components:
-  - type: InstantAction
+  - type: Action
     icon:
       sprite: _Horizon/Interface/Actions/nv.rsi
       state: nv
+  - type: InstantAction
     event: !type:NVInstantActionEvent

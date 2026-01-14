@@ -18,30 +18,34 @@ public sealed class MechSoundboardSystem : EntitySystem
         base.Initialize();
 
         SubscribeLocalEvent<MechSoundboardComponent, MechEquipmentUiStateReadyEvent>(OnUiStateReady);
-        SubscribeLocalEvent<MechSoundboardComponent, MechEquipmentUiMessageRelayEvent>(OnSoundboardMessage);
+        SubscribeLocalEvent<MechSoundboardComponent, MechEquipmentUiMessageRelayEvent<MechSoundboardPlayMessage>>(OnSoundboardMessage);
     }
 
     private void OnUiStateReady(EntityUid uid, MechSoundboardComponent comp, MechEquipmentUiStateReadyEvent args)
     {
         // you have to specify a collection so it must exist probably
         var sounds = comp.Sounds.Select(sound => sound.Collection!);
-        var state = new MechSoundboardUiState
+
+        // Horizon - изменение передачи состояний интерфейса
+        /*var state = new MechSoundboardUiState
         {
             Sounds = sounds.ToList()
         };
-        args.States.Add(GetNetEntity(uid), state);
+        args.States.Add(GetNetEntity(uid), state);*/
+
+        args.State = new MechSoundboardUiState
+        {
+            Sounds = sounds.ToList()
+        };
     }
 
-    private void OnSoundboardMessage(EntityUid uid, MechSoundboardComponent comp, MechEquipmentUiMessageRelayEvent args)
+    private void OnSoundboardMessage(EntityUid uid, MechSoundboardComponent comp, MechEquipmentUiMessageRelayEvent<MechSoundboardPlayMessage> args)
     {
-        if (args.Message is not MechSoundboardPlayMessage msg)
-            return;
-
         if (!TryComp<MechEquipmentComponent>(uid, out var equipment) ||
             equipment.EquipmentOwner == null)
             return;
 
-        if (msg.Sound >= comp.Sounds.Count)
+        if (args.Message.Sound >= comp.Sounds.Count)
             return;
 
         if (TryComp(uid, out UseDelayComponent? useDelay)
@@ -49,6 +53,6 @@ public sealed class MechSoundboardSystem : EntitySystem
             return;
 
         // honk!!!!!
-        _audio.PlayPredicted(comp.Sounds[msg.Sound], uid, GetEntity(args.Pilot));   // Horizon Mech
+        _audio.PlayPredicted(comp.Sounds[args.Message.Sound], uid, GetEntity(args.Pilot));   // Horizon Mech
     }
 }

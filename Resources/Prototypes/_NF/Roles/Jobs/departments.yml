@@ -3,10 +3,9 @@
   name: department-Frontier
   description: department-NF-description
   color: "#334E6D"
-  weight: 50 # accounted for in jobs
+  weight: 90 # accounted for in jobs
   roles:
   - StationRepresentative
-  - DirectorOfCare
   - StationTrafficController
   - Valet # nyano
   - NFJanitor
@@ -18,9 +17,24 @@
   name: department-Antag
   description: department-NFAntag-description
   color: "#DE3A3A"
-  weight: -20 # accounted for in jobs
+  weight: 50 # accounted for in jobs
   roles:
   - NFPirateCaptain
   - NFPirateFirstMate
   - NFPirate
   - Prisoner #nyano
+
+- type: department
+  id: Syndicate
+  name: department-Syndicate
+  description: Одна из многочисленных ячеек Синдиката
+  color: "#920506"
+  weight: 80
+  primary: false
+  # Horizon start
+  # editorHidden: true # Frontier
+  roles:
+  - SyndicateOfficerTeleCommunication
+  - SyndicateOperative
+  - SyndicateCargo
+  # Horizon end

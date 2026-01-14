@@ -23,3 +23,5 @@ ent-PresentRandomCash = { ent-PresentBase }
     .desc = { ent-PresentBase.desc }
 ent-PresentTrash = обёрточная бумага
     .desc = Аккуратно сложенная, заклеенная и завязанная бантиком. Затем торжественно разорванная на части и выброшенная.
+ent-PresentTechDisk = технологический подарок
+    .desc = Маленькая коробочка с ценным диском технологий внутри.

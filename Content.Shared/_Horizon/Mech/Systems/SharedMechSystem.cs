@@ -12,6 +12,7 @@ public abstract partial class SharedMechSystem
     private void InitializeADT()
     {
         SubscribeLocalEvent<MechComponent, MechGunReloadMessage>(ReceiveEquipmentUiMesssages);
+        SubscribeLocalEvent<MechComponent, MechToolSetMessage>(ReceiveEquipmentUiMesssages);
         SubscribeLocalEvent<MechComponent, StorageInteractAttemptEvent>(OnStorageInteract);
     }
 
@@ -30,32 +31,47 @@ public abstract partial class SharedMechSystem
         if (!TryComp<MechComponent>(mechUid, out var mech))
             return;
 
-        if (ev.Equipment == null)
+        var entity = GetEntity(ev.Equipment);
+
+        var mechEv = new MechEquipmentSelectedEvent(entity);
+        RaiseLocalEvent(mechUid, ref mechEv);
+
+        if (entity.HasValue)
+        {
+            var equipEv = new MechEquipmentGotSelectedEvent(mechUid);
+            RaiseLocalEvent(entity.Value, ref equipEv);
+        }
+
+        if (mech.CurrentSelectedEquipment.HasValue)
+        {
+            var equipEv = new MechEquipmentGotDeselectedEvent(mechUid);
+            RaiseLocalEvent(mech.CurrentSelectedEquipment.Value, ref equipEv);
+        }
+
+        if (entity == null)
         {
             mech.CurrentSelectedEquipment = null;
 
             var popup = Loc.GetString("mech-equipment-select-none-popup");
 
-            if (_timing.IsFirstTimePredicted)
-                _popup.PopupEntity(popup, uid, uid);
+            _popup.PopupPredicted(popup, null, uid, uid);
 
             if (_net.IsServer)
                 Dirty(mechUid, mech);
+
             return;
         }
 
-        var entity = GetEntity(ev.Equipment.Value);
-
-        if (!mech.EquipmentContainer.Contains(entity))
+        if (!mech.EquipmentContainer.Contains(entity.Value))
             Log.Error("Mech does not have selected equipment");
+
         mech.CurrentSelectedEquipment = entity;
 
         var popupString = mech.CurrentSelectedEquipment != null
             ? Loc.GetString("mech-equipment-select-popup", ("item", mech.CurrentSelectedEquipment))
             : Loc.GetString("mech-equipment-select-none-popup");
 
-        if (_timing.IsFirstTimePredicted)
-            _popup.PopupEntity(popupString, uid, uid);
+        _popup.PopupPredicted(popupString, null, uid, uid);
 
         if (_net.IsServer)
             Dirty(mechUid, mech);
@@ -72,9 +88,7 @@ public abstract partial class SharedMechSystem
 
     private void ReceiveEquipmentUiMesssages<T>(EntityUid uid, MechComponent component, T args) where T : MechEquipmentUiMessage
     {
-        if (!_timing.IsFirstTimePredicted)
-            return;
-        var ev = new MechEquipmentUiMessageRelayEvent(args, GetNetEntity(component.PilotSlot.ContainedEntity));
+        var ev = new MechEquipmentUiMessageRelayEvent<T>(args, GetNetEntity(component.PilotSlot.ContainedEntity));
         var allEquipment = new List<EntityUid>(component.EquipmentContainer.ContainedEntities);
         var argEquip = GetEntity(args.Equipment);
 

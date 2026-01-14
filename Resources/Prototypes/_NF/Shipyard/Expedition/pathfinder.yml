@@ -22,13 +22,28 @@
   - Expedition
   engine:
   - AME
+  # Horizon start
+  costModifiers:
+    - !type:RoleModifier
+      role: "Pilot"
+      costMultiplier: 0.8
+    - !type:RoleModifier
+      role: "Mercenary"
+      costMultiplier: 1.2
+    - !type:FactionCostModifier
+      faction: "FactionSIU"
+      costMultiplier: 0.9
+    - !type:FactionCostModifier
+      faction: "FactionArcadia"
+      costMultiplier: 0.9
+  # Horizon end
 
 - type: gameMap
   id: Pathfinder
   mapName: 'KC Pathfinder'
   mapPath: /Maps/_NF/Shuttles/Expedition/pathfinder.yml
   minPlayers: 0
-  stations: 
+  stations:
     Pathfinder:
       stationProto: StandardFrontierExpeditionVessel
       components:

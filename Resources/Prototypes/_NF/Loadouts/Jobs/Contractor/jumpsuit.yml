@@ -197,6 +197,18 @@
     jumpsuit: ClothingUniformJumpskirtColorRed
 
 - type: loadout
+  id: ContractorClothingUniformJumpsuitColorMaroon
+  price: 200
+  equipment:
+    jumpsuit: ClothingUniformJumpsuitColorMaroon
+
+- type: loadout
+  id: ContractorClothingUniformJumpskirtColorMaroon
+  price: 200
+  equipment:
+    jumpsuit: ClothingUniformJumpskirtColorMaroon
+
+- type: loadout
   id: ContractorClothingUniformJumpsuitColorPurple
   price: 200
   equipment:
@@ -298,6 +310,24 @@
   price: 500
   equipment:
     jumpsuit: ClothingUniformJumpskirtColorTeal
+
+- type: loadout
+  id: ContractorClothingUniformColorRainbow
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: ContractorT1
+  price: 500
+  equipment:
+    jumpsuit: ClothingUniformColorRainbow
+
+- type: loadout
+  id: ContractorClothingUniformJumpskirtColorRainbow
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: ContractorT1
+  price: 500
+  equipment:
+    jumpsuit: ClothingUniformJumpskirtColorRainbow
 
 - type: loadout
   id: ContractorClothingUniformJumpsuitHawaiBlack
@@ -1087,6 +1117,18 @@
   price: 500
   equipment:
     jumpsuit: ClothingSkirtUniformRandomShirt
+
+# Horizon start
+# Expedition RND stuff
+- type: loadout
+  id: ContractorClothingUniformJumpsuitExpeditorExtra
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: ContractorT1
+  price: 800
+  equipment:
+    jumpsuit: ClothingUniformJumpsuitExpeditorExtra
+# Horizon end
 
 #T2 Head and Senior drip, theater and elite service drip
 - type: loadout

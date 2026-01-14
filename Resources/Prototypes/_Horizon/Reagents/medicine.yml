@@ -104,7 +104,7 @@
   color: "#ebbce9"
   metabolisms:
     Medicine:
-      metabolismRate : 0.03
+      metabolismRate : 0.3
       effects:
       - !type:PopupMessage
         type: Local
@@ -148,7 +148,7 @@
   color: "#382f6b"
   metabolisms:
     Medicine:
-      metabolismRate : 0.02
+      metabolismRate : 0.2
       effects:
       - !type:PopupMessage
         type: Local
@@ -214,7 +214,7 @@
   color: "#f2ff00"
   metabolisms:
     Medicine:
-      metabolismRate : 0.01
+      metabolismRate : 0.1
       effects:
       - !type:PopupMessage
         type: Local
@@ -359,7 +359,7 @@
   color: "#634e3a"
   metabolisms:
     Medicine:
-      metabolismRate : 0.03
+      metabolismRate : 0.3
       effects:
       - !type:PopupMessage
         type: Local
@@ -398,7 +398,7 @@
   color: "#2e3b52"
   metabolisms:
     Medicine:
-      metabolismRate : 0.02
+      metabolismRate : 0.2
       effects:
       - !type:PopupMessage
         type: Local
@@ -484,7 +484,7 @@
   color: "#291816"
   metabolisms:
     Medicine:
-      metabolismRate : 0.01
+      metabolismRate : 0.1
       effects:
       - !type:PopupMessage
         type: Local
@@ -561,7 +561,7 @@
   physicalDesc: reagent-physical-desc-refreshing
   metabolisms:
     Poison:
-      metabolismRate : 0.01
+      metabolismRate : 0.1
       effects:
       - !type:PopupMessage
         type: Local
@@ -668,8 +668,17 @@
   color: "#6bb3b5"
   metabolisms:
     Medicine:
-      metabolismRate : 0.02
+      metabolismRate : 0.2
       effects:
+      - !type:PainFadeEffect
+        fade:
+          types:
+            Slash: -1
+            Blunt: -1
+            Piercing: -1
+            Shock: -1
+            Cold: -1
+            Caustic: -1
       - !type:PopupMessage
         type: Local
         visualType: Medium
@@ -722,8 +731,17 @@
   color: "#2e2c2c"
   metabolisms:
     Medicine:
-      metabolismRate : 0.01
+      metabolismRate : 0.1
       effects:
+      - !type:PainFadeEffect
+        fade:
+          types:
+            Slash: -1
+            Blunt: -1
+            Piercing: -1
+            Shock: -1
+            Cold: -1
+            Caustic: -1
       - !type:PopupMessage
         type: Local
         visualType: Large
@@ -790,8 +808,17 @@
   color: "#ffc7c7"
   metabolisms:
     Medicine:
-      metabolismRate : 0.01
+      metabolismRate : 0.1
       effects:
+      - !type:PainFadeEffect
+        fade:
+          types:
+            Slash: -2
+            Blunt: -2
+            Piercing: -2
+            Shock: -2
+            Cold: -2
+            Caustic: -2
       - !type:PopupMessage
         type: Local
         visualType: Large

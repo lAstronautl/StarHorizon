@@ -1,6 +1,7 @@
 - type: species
   id: Oni
   name: species-name-oni
+  description: "/ServerInfo/_Horizon/SpeciesDesc/Oni.xml" # Horizon
   roundStart: true
   prototype: MobOni
   dollPrototype: MobOniDummy
@@ -11,6 +12,14 @@
   femaleFirstNames: NamesOniFemale
   lastNames: NamesOniLocation
   naming: LastNoFirst
+  # Horizon start
+  defaultLanguages:
+  - GalacticCommon
+  - Nekomimetic
+  prosCount: 2
+  specialCount: 1
+  consCount: 1
+  # Horizon end
 
 - type: markingPoints
   id: MobOniMarkingLimits
@@ -37,11 +46,13 @@
     Arms:
       points: 8 # Frontier 2<8
       required: false
-    # Frontier: apparently these don't exist on Delta
-    UndergarmentTop:
-      points: 1
-      required: false
-    UndergarmentBottom:
-      points: 1
-      required: false
-    # End Frontier
+# Horizon start
+    # # Frontier: apparently these don't exist on Delta
+    # UndergarmentTop:
+    #   points: 1
+    #   required: false
+    # UndergarmentBottom:
+    #   points: 1
+    #   required: false
+    # # End Frontier
+# Horizon end

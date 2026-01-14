@@ -27,3 +27,32 @@
     factions:
     - NanoTrasen
     - Harpy # Frontier
+  # Horizon
+  - type: SampleSource
+    availableCellSamples:
+    - protoID: CellSampleHarpy
+
+# Cytology
+- type: entity
+  name: Urist Grown Harpy
+  parent: MobHarpy
+  id: MobHarpyGrown
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 2500
+  - type: RandomMetadata
+    nameSegments:
+      - NamesFirst
+      - NamesLast
+  - type: RandomHumanoidAppearance
+    randomizeName: false
+  - type: GhostRole
+    makeSentient: true
+    allowSpeech: true
+    allowMovement: true
+    name: ghost-role-information-grown-harpy-name
+    description: Вы гарпия, выращенная в цитологической ванне. Крылья позволяют вам парить над окружающим миром. Исследуйте небеса!
+    raffle:
+      settings: short
+  - type: GhostTakeoverAvailable

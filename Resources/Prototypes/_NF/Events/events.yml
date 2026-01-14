@@ -19,10 +19,10 @@
   parent: BaseGameRule
   components:
   - type: StationEvent
-    weight: 7
-    earliestStart: 15 # Frontier
+    weight: 2 # Horizon
+    earliestStart: 120 # Horizon
     duration: 1
-    minimumPlayers: 1 # Horizon TempTweak
+    minimumPlayers: 20 # Horizon
   - type: BreakerFlipRule
 
 - type: entity
@@ -30,8 +30,8 @@
   parent: BaseStationEventShortDelay
   components:
   - type: StationEvent
-    weight: 5
-    earliestStart: 15 # Frontier
+    weight: 2 # Horizon
+    earliestStart: 120 # Horizon
     startAnnouncement: station-event-power-grid-check-nf-start-announcement # Frontier: add nf-
     endAnnouncement: station-event-power-grid-check-nf-end-announcement # Frontier: add nf-
     startAudio:
@@ -40,6 +40,7 @@
         volume: -4
     duration: 60
     maxDuration: 120
+    minimumPlayers: 20 # Horizon
   - type: PowerGridCheckRule
 
 - type: entity

@@ -29,7 +29,7 @@
         startValue: 0.1 # Wizden#37444
         endValue: 2.0 # Wizden#37444
         isLooped: true
-  - type: ToggleableLightVisuals
+  - type: ToggleableVisuals
     spriteLayer: light
     inhandVisuals:
       left:
@@ -38,6 +38,7 @@
       right:
       - state: inhand-right-light
         shader: unshaded
+  - type: ItemTogglePointLight
   - type: PowerCellSlot
     cellSlotId: cell_slot
   - type: ContainerContainer
@@ -94,7 +95,7 @@
   - type: HandheldLight
     addPrefix: false
     wattage: 0.5
-  - type: ToggleableLightVisuals
+  - type: ToggleableVisuals
     inhandVisuals:
       left:
       - state: inhand-left-light

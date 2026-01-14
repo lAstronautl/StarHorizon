@@ -53,13 +53,53 @@
       "name": "energy_pulse"
     },
     {
-      "name": "energy_taser"
+      "name": "energy_taser",
+      "delays": [
+        [
+          0.3,
+          0.225,
+          0.2,
+          0.175,
+          0.15,
+          0.1,
+          0.075,
+          0.075,
+          0.075,
+          0.075,
+          0.075,
+          0.1,
+          0.15,
+          0.125,
+          0.2
+        ]
+      ]
     },
     {
-      "name": "energy_tesla"
+      "name": "energy_tesla",
+      "delays": [
+        [
+          2.5,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1
+        ]
+      ]
     },
     {
       "name": "energy_xray"
+    },
+    {
+      "name": "energy_cryogun"
+    },
+    {
+      "name": "energy_pyrogun"
     },
     {
       "name": "engi_exting"
@@ -145,6 +185,9 @@
       "name": "medi_gun_green"
     },
     {
+      "name": "medi_gun_red"
+    },
+    {
       "name": "medi_gun_yellow"
     },
     {
@@ -152,6 +195,12 @@
     },
     {
       "name": "medi_syringe_gun"
+    },
+    {
+      "name": "medi_syringe_gun_advanced"
+    },
+    {
+      "name": "medi_syringe_gun_toxic"
     },
     {
       "name": "mining_analyzer"

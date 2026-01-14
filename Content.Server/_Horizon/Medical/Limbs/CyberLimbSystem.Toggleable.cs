@@ -1,5 +1,5 @@
 using Content.Shared._Horizon.Medical.Limbs;
-using Content.Shared.Actions;
+using Content.Shared.Actions.Components;
 using Content.Shared.Body.Components;
 
 namespace Content.Server._Horizon.Medical.Limbs;

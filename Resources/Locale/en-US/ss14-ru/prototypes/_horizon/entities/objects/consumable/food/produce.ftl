@@ -165,3 +165,6 @@ ent-TrashCherryBluePit = cherryblue pit
 ent-FoodDiamondCarrot = diamondcarrot
     .desc = It's good for the eyes!
     .suffix = Horizon
+ent-FoodBluespaceTomato = bluespacetomato
+    .desc = Be careful with it.
+    .suffix = Horizon

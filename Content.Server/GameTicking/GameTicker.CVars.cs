@@ -1,6 +1,7 @@
 using Content.Server.Discord;
 using Content.Shared.CCVar;
 using Content.Shared.GameTicking;
+using Content.Shared._Horizon.CCVar;
 
 namespace Content.Server.GameTicking
 {
@@ -73,6 +74,15 @@ namespace Content.Server.GameTicking
                 }
             }, true);
             Subs.CVar(_cfg, CCVars.RoundEndSoundCollection, value => RoundEndSoundCollection = value, true);
+            // // Horizon start
+            // Subs.CVar(_cfg, HorizonCCVars.DiscordBanWebhook, value =>
+            // {
+            //     if (!string.IsNullOrWhiteSpace(value))
+            //     {
+            //         _discord.GetWebhook(value, data => _webhookIdentifier = data.ToIdentifier());
+            //     }
+            // }, true);
+            // // Horizon end
 #if EXCEPTION_TOLERANCE
             Subs.CVar(_cfg, CCVars.RoundStartFailShutdownCount, value => RoundStartFailShutdownCount = value, true);
 #endif

@@ -1,6 +1,7 @@
 - type: species
   id: SlimePerson
   name: species-name-slime
+  description: "/ServerInfo/_Horizon/SpeciesDesc/Slime.xml" # Horizon
   roundStart: true
   prototype: MobSlimePerson
   sprites: MobSlimeSprites
@@ -8,6 +9,15 @@
   markingLimits: MobSlimeMarkingLimits
   dollPrototype: MobSlimePersonDummy
   skinColoration: Hues
+  # Horizon start
+  defaultLanguages:
+  - GalacticCommon
+  - Bubblish
+  uniqueLanguages: [Bubblish]
+  prosCount: 1
+  specialCount: 3
+  consCount: 2
+  # Horizon end
 
 - type: speciesBaseSprites
   id: MobSlimeSprites
@@ -15,8 +25,10 @@
     Head: MobSlimeHead
     Hair: MobSlimeMarkingFollowSkin
     FacialHair: MobSlimeMarkingFollowSkin
-    UndergarmentTop: MobHumanoidAnyMarking
-    UndergarmentBottom: MobHumanoidAnyMarking
+# Horizon start
+    # UndergarmentTop: MobHumanoidAnyMarking
+    # UndergarmentBottom: MobHumanoidAnyMarking
+# Horizon end
     Chest: MobSlimeTorso
     Eyes: MobHumanoidEyes
     LArm: MobSlimeLArm

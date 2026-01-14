@@ -122,6 +122,21 @@ public sealed partial class SingleMarkingPicker : BoxContainer
 
     private int PointsUsed => _markings?.Count ?? 0;
 
+    // _Horizon scroller change min height start
+    public float MarkingScrollerMinHeight
+    {
+        get => MarkingScroller.MinHeight;
+        set => MarkingScroller.MinHeight = value;
+    }
+
+    public float CollorScrollerMinHeight
+    {
+        get => MarkingScroller.MinHeight;
+        set => MarkingScroller.MinHeight = value;
+    }
+
+    // _Horizon scroller change min height end
+
     public SingleMarkingPicker()
     {
         RobustXamlLoader.Load(this);

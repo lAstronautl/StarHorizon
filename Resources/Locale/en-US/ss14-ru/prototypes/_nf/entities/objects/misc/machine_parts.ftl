@@ -1,3 +1,9 @@
+ent-CapacitorStockPart = capacitor
+    .desc = A basic capacitor used in the construction of a variety of devices.
+    .suffix = Rating 1
+ent-MatterBinStockPart = matter bin
+    .desc = A basic matter bin used in the construction of a variety of devices.
+    .suffix = Rating 1
 ent-AdvancedCapacitorStockPart = advanced capacitor
     .desc = An advanced capacitor used in the construction of a variety of devices.
     .suffix = Rating 2

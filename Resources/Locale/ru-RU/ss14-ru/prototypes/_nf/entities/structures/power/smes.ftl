@@ -1,2 +1,2 @@
-ent-SMESBig = BLES
-    .desc = A bluespace-leveraged energy storage (BLES) unit.
+ent-SMESBig = БЛЭС
+    .desc = Блок накопления энергии с использованием блюспейс-технологий (БХН).

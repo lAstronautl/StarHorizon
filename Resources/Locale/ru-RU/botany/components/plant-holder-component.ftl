@@ -34,3 +34,5 @@ plant-holder-component-heat-improper-warning = Мигает [color=orange]пре
 plant-holder-component-ligneous-cant-harvest-message = Растение слишком жесткое, чтобы собирать его голыми руками.
 plant-holder-component-pressure-improper-warning = Мигает [color=lightblue]предупреждение о неподходящем атмосферном давлении[/color].
 plant-holder-component-gas-missing-warning = Мигает [color=cyan]предупреждение о неподходящем атмосферном составе[/color].
+plant-holder-component-age-message = Возраст растения: [color=red]{ $age }[/color].
+plant-holder-component-health-message = Здоровье растения: [color=red]{ $health }[/color].

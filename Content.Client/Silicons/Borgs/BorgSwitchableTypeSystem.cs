@@ -14,6 +14,7 @@ public sealed class BorgSwitchableTypeSystem : SharedBorgSwitchableTypeSystem
 {
     [Dependency] private readonly BorgSystem _borgSystem = default!;
     [Dependency] private readonly AppearanceSystem _appearance = default!;
+    [Dependency] private readonly SpriteSystem _sprite = default!;
 
     public override void Initialize()
     {
@@ -33,22 +34,23 @@ public sealed class BorgSwitchableTypeSystem : SharedBorgSwitchableTypeSystem
         UpdateEntityAppearance(ent);
     }
 
-    protected override void UpdateEntityAppearance(
+    // Horizon - changed from prototype to skins
+    public override void UpdateEntityAppearance(
         Entity<BorgSwitchableTypeComponent> entity,
         BorgTypePrototype prototype)
     {
         if (TryComp(entity, out SpriteComponent? sprite))
         {
-            sprite.LayerSetState(BorgVisualLayers.Body, prototype.SpriteBodyState);
-            sprite.LayerSetState(BorgVisualLayers.LightStatus, prototype.SpriteToggleLightState);
+            _sprite.LayerSetRsiState((entity, sprite), BorgVisualLayers.Body, entity.Comp.SelectedBorgSkin.SpriteBodyState);
+            _sprite.LayerSetRsiState((entity, sprite), BorgVisualLayers.LightStatus, entity.Comp.SelectedBorgSkin.SpriteToggleLightState);
         }
 
         if (TryComp(entity, out BorgChassisComponent? chassis))
         {
             _borgSystem.SetMindStates(
                 (entity.Owner, chassis),
-                prototype.SpriteHasMindState,
-                prototype.SpriteNoMindState);
+                entity.Comp.SelectedBorgSkin.SpriteHasMindState,
+                entity.Comp.SelectedBorgSkin.SpriteNoMindState);
 
             if (TryComp(entity, out AppearanceComponent? appearance))
             {
@@ -57,13 +59,13 @@ public sealed class BorgSwitchableTypeSystem : SharedBorgSwitchableTypeSystem
             }
         }
 
-        if (prototype.SpriteBodyMovementState is { } movementState)
+        if (entity.Comp.SelectedBorgSkin.SpriteBodyMovementState is { } movementState)
         {
             var spriteMovement = EnsureComp<SpriteMovementComponent>(entity);
             spriteMovement.NoMovementLayers.Clear();
             spriteMovement.NoMovementLayers["movement"] = new PrototypeLayerData
             {
-                State = prototype.SpriteBodyState,
+                State = entity.Comp.SelectedBorgSkin.SpriteBodyState,
             };
             spriteMovement.MovementLayers.Clear();
             spriteMovement.MovementLayers["movement"] = new PrototypeLayerData

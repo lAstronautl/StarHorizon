@@ -6,3 +6,5 @@ ent-GasSalePoint = пункт продажи газа
 ent-GasSalePort = порт продажи газа
     .desc = { ent-GasSalePoint.desc }
     .suffix = Стыкуемый
+ent-EnergyAirConverter = конвертер энергии в газ
+    .desc = Машина, преобразующая огромное количество энергии в перегретый воздух.

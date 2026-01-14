@@ -1,4 +1,7 @@
+using Content.Shared.Alert;
+using Content.Shared.Whitelist;
 using Robust.Shared.GameStates;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared.Pinpointer;
@@ -11,9 +14,14 @@ namespace Content.Shared.Pinpointer;
 [Access(typeof(SharedPinpointerSystem))]
 public sealed partial class PinpointerComponent : Component
 {
-    // TODO: Type serializer oh god
-    [DataField("component"), ViewVariables(VVAccess.ReadWrite)]
-    public string? Component;
+    /// <summary>
+    /// Goob edit: pinpointer now works on EntityWhitelist (actually only on components but nvm)
+    /// </summary>
+    [DataField]
+    public EntityWhitelist? Whitelist;
+
+    [DataField]
+    public EntityWhitelist? Blacklist;
 
     [DataField("mediumDistance"), ViewVariables(VVAccess.ReadWrite)]
     public float MediumDistance = 16f;
@@ -43,15 +51,48 @@ public sealed partial class PinpointerComponent : Component
     public bool UpdateTargetName;
 
     /// <summary>
+    ///     Goob edit: pinpointer can retarget only whitelisted entities if specified.
+    /// </summary>
+    [DataField]
+    public EntityWhitelist? RetargetingWhitelist;
+
+    [DataField]
+    public EntityWhitelist? RetargetingBlacklist;
+
+    /// <summary>
     ///     Whether or not the target can be reassigned.
     /// </summary>
     [DataField("canRetarget"), ViewVariables(VVAccess.ReadWrite)]
     public bool CanRetarget;
 
-    [ViewVariables]
-    public EntityUid? Target = null;
+    /// <summary>
+    ///     Goob edit: if true, this pinpointer will automatically track ANY nearest entity of a specified type.
+    ///     Doesn't work with retargeting, it will always left only one entity in target list.
+    /// </summary>
+    [DataField]
+    public bool CanTargetMultiple = true;
 
-    [ViewVariables, AutoNetworkedField]
+    /// <summary>
+    /// Goob edit: many targets instead of just one
+    /// </summary>
+    [ViewVariables]
+    public List<EntityUid> Targets = new();
+
+    // WD EDIT START
+    [DataField]
+    public ProtoId<AlertPrototype>? Alert;
+
+    [DataField]
+    public bool CanToggle = true;
+
+    [DataField]
+    public bool CanEmag = true;
+
+    [DataField]
+    public bool CanExamine = true;
+    // WD EDIT END
+
+    [DataField, AutoNetworkedField] // WD EDIT: ViewVariables -> DataField
     public bool IsActive = false;
 
     [ViewVariables, AutoNetworkedField]
@@ -62,24 +103,6 @@ public sealed partial class PinpointerComponent : Component
 
     [ViewVariables]
     public bool HasTarget => DistanceToTarget != Distance.Unknown;
-
-    // Frontier: Frontier-specific fields
-    // If greater than 0, the pinpointer stops pointing to its target when it's further away than this many meters.
-    [DataField]
-    public float MaxRange = -1;
-
-    // Time in seconds to retarget.
-    [DataField]
-    public float RetargetDoAfter = 15f;
-
-    // Whether this pinpointer can target mobs.
-    [DataField]
-    public bool CanTargetMobs = false;
-
-    // Whether this pinpointer's target knows about the pinpointer using the PinpointerTargetComponent.
-    [DataField]
-    public bool SetsTarget = false;
-    // End Frontier: extra pinpointer fields
 }
 
 [Serializable, NetSerializable]

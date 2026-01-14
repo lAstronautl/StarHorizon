@@ -3,10 +3,12 @@
   name: job-name-plant-manager
   description: job-description-plant-manager
   playTimeTracker: JobPlantManager
+  salary: 60000 # Horizon
+  forceFaction: FactionEdison # Horizon
   requirements:
     - !type:OverallPlaytimeRequirement
       time: 72000 # Frontier - 20 hrs (the real condition here is the whitelist)
-  whitelisted: false # Horizon
+  whitelisted: true
   startingGear: PlantManagerGear
   alwaysUseSpawner: true
   icon: "JobIconPlantManager"
@@ -20,6 +22,9 @@
   special:
   - !type:AddImplantSpecial
     implants: [ MindShieldImplant, TrackingImplant ]
+  - !type:AddComponentSpecial
+    components:
+      - type: PreventShipyardTitleOverwrite
   - !type:GiveItemOnHolidaySpecial
     holiday: FrontierBirthday
     prototype: FrontierBirthdayGift
@@ -33,3 +38,15 @@
     back:
     - RubberStampPlantManager
     - HandheldSecurityMonitor
+
+- type: chameleonOutfit
+  id: PlantManagerChameleonOutfit
+  job: PlantManager
+  hasMindShield: true
+  equipment:
+    head: ClothingHeadHatBeretEngineering
+    mask: ClothingMaskBreath
+    neck: ClothingNeckCloakCe
+    outerClothing: ClothingOuterWinterCE
+    gloves: ClothingHandsGlovesColorYellow
+    shoes: ClothingShoesBootsMagAdv

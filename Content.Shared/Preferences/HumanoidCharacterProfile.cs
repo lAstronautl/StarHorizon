@@ -1,6 +1,8 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using Content.Shared._Horizon.Bark;
+using Content.Shared._Horizon.Language;
+using Content.Shared._Horizon.FlavorText;
 using Content.Shared._NF.Bank;
 using Content.Shared.CCVar;
 using Content.Shared.GameTicking;
@@ -30,15 +32,7 @@ namespace Content.Shared.Preferences
         private static readonly Regex RestrictedNameRegex = new(@"[^A-Z,a-z,А-Я,а-я,0-9, -, ']"); // Horizon
         private static readonly Regex ICNameCaseRegex = new(@"^(?<word>\w)|\b(?<word>\w)(?=\w*$)");
 
-        public const int MaxNameLength = 32;
-        public const int MaxLoadoutNameLength = 32;
-        public const int MaxDescLength = 1024; // Horizon
-
-        public const int DefaultBalance = 30000;
-
-        //private readonly Dictionary<string, JobPriority> _jobPriorities; // Frontier: commented out during merge.
-        //private readonly List<string> _antagPreferences; // Frontier: commented out during merge.
-        //private readonly List<string> _traitPreferences; // Frontier: commented out during merge.
+        public const int DefaultBalance = 30000; // Frontier
 
         /// <summary>
         /// Job preferences for initial spawn.
@@ -115,7 +109,22 @@ namespace Content.Shared.Preferences
         [DataField]
         public SpawnPriorityPreference SpawnPriority { get; private set; } = SpawnPriorityPreference.None;
 
-        public BarkData Bark = new(); // _Horizon
+        // Horizon start
+        public BarkData Bark = new();
+
+        public ErpStatus ErpStat = ErpStatus.No;
+
+        public ProtoId<CharacterFactionPrototype> Faction = "None";
+
+        [DataField]
+        public string OOCFlavorText { get; set; } = string.Empty;
+
+        [DataField]
+        private HashSet<ProtoId<LanguagePrototype>> _languages = new();
+
+        public IReadOnlySet<ProtoId<LanguagePrototype>> Languages => _languages;
+        // Horizon end
+
 
         /// <summary>
         /// <see cref="_jobPriorities"/>
@@ -154,7 +163,12 @@ namespace Content.Shared.Preferences
             HashSet<ProtoId<AntagPrototype>> antagPreferences,
             HashSet<ProtoId<TraitPrototype>> traitPreferences,
             Dictionary<string, RoleLoadout> loadouts,
-            BarkData bark) // _Horizon
+            // Horizon start
+            ErpStatus erp,
+            ProtoId<CharacterFactionPrototype> faction,
+            string oocFlavor,
+            BarkData bark,
+            HashSet<ProtoId<LanguagePrototype>> languages) // Horizon end
         {
             Name = name;
             FlavorText = flavortext;
@@ -170,7 +184,13 @@ namespace Content.Shared.Preferences
             _antagPreferences = antagPreferences;
             _traitPreferences = traitPreferences;
             _loadouts = loadouts;
-            Bark = bark; // _Horizon
+            // Horizon start
+            ErpStat = erp;
+            Faction = faction;
+            OOCFlavorText = oocFlavor;
+            Bark = bark;
+            _languages = languages;
+            // Horizon end
         }
 
         /// <summary>Copy constructor but with overridable references (to prevent useless copies)</summary>
@@ -194,7 +214,12 @@ namespace Content.Shared.Preferences
                 antagPreferences,
                 traitPreferences,
                 loadouts,
-                other.Bark) // _Horizon
+                // Horizon start
+                other.ErpStat,
+                other.Faction,
+                other.OOCFlavorText,
+                other.Bark,
+                other.Languages.ToHashSet()) // Horizon end
         {
         }
 
@@ -214,7 +239,12 @@ namespace Content.Shared.Preferences
                 new HashSet<ProtoId<AntagPrototype>>(other.AntagPreferences),
                 new HashSet<ProtoId<TraitPrototype>>(other.TraitPreferences),
                 new Dictionary<string, RoleLoadout>(other.Loadouts),
-                other.Bark) // _Horizon
+                // Horizon start
+                other.ErpStat,
+                other.Faction,
+                other.OOCFlavorText,
+                other.Bark,
+                other.Languages.ToHashSet()) // Horizon end
         {
         }
 
@@ -234,9 +264,11 @@ namespace Content.Shared.Preferences
         /// <returns>Humanoid character profile with default settings.</returns>
         public static HumanoidCharacterProfile DefaultWithSpecies(string species = SharedHumanoidAppearanceSystem.DefaultSpecies)
         {
+            var proto = IoCManager.Resolve<IPrototypeManager>();    // Horizon Languages
             return new()
             {
                 Species = species,
+                _languages = proto.Index<SpeciesPrototype>(species).DefaultLanguages.ToHashSet()    // Horizon Languages
             };
         }
 
@@ -262,10 +294,12 @@ namespace Content.Shared.Preferences
 
             var sex = Sex.Unsexed;
             var age = 18;
+            HashSet<ProtoId<LanguagePrototype>> languages = new();  // Horizon Languages
             if (prototypeManager.TryIndex<SpeciesPrototype>(species, out var speciesPrototype))
             {
                 sex = random.Pick(speciesPrototype.Sexes);
                 age = random.Next(speciesPrototype.MinAge, speciesPrototype.OldAge); // people don't look and keep making 119 year old characters with zero rp, cap it at middle aged
+                languages = speciesPrototype.DefaultLanguages.ToHashSet();  // Horizon Languages
             }
 
             var gender = Gender.Epicene;
@@ -289,6 +323,7 @@ namespace Content.Shared.Preferences
                 Gender = gender,
                 Species = species,
                 Appearance = HumanoidCharacterAppearance.Random(species, sex),
+                _languages = languages  // Horizon Languages
             };
         }
 
@@ -510,7 +545,13 @@ namespace Content.Shared.Preferences
             if (!_traitPreferences.SequenceEqual(other._traitPreferences)) return false;
             if (!Loadouts.SequenceEqual(other.Loadouts)) return false;
             if (FlavorText != other.FlavorText) return false;
-            if (!Bark.MemberwiseEquals(other.Bark)) return false; // _Horizon
+            // Horizon start
+            if (!Bark.MemberwiseEquals(other.Bark)) return false;
+            if (ErpStat != other.ErpStat) return false;
+            if (Faction != other.Faction) return false;
+            if (OOCFlavorText != other.OOCFlavorText) return false;
+            if (!_languages.SequenceEqual(other._languages)) return false;
+            // Horizon end
             return Appearance.MemberwiseEquals(other.Appearance);
         }
 
@@ -549,13 +590,14 @@ namespace Content.Shared.Preferences
             };
 
             string name;
+            var maxNameLength = configManager.GetCVar(CCVars.MaxNameLength);
             if (string.IsNullOrEmpty(Name))
             {
                 name = GetName(Species, gender);
             }
-            else if (Name.Length > MaxNameLength)
+            else if (Name.Length > maxNameLength)
             {
-                name = Name[..MaxNameLength];
+                name = Name[..maxNameLength];
             }
             else
             {
@@ -589,9 +631,10 @@ namespace Content.Shared.Preferences
             }
 
             string flavortext;
-            if (FlavorText.Length > MaxDescLength)
+            var maxFlavorTextLength = configManager.GetCVar(CCVars.MaxFlavorTextLength);
+            if (FlavorText.Length > maxFlavorTextLength)
             {
-                flavortext = FormattedMessage.RemoveMarkupOrThrow(FlavorText)[..MaxDescLength];
+                flavortext = FormattedMessage.RemoveMarkupOrThrow(FlavorText)[..maxFlavorTextLength];
             }
             else
             {
@@ -695,6 +738,25 @@ namespace Content.Shared.Preferences
             {
                 _loadouts.Remove(value);
             }
+
+            // Horizon start
+            if (!prototypeManager.HasIndex(Faction))
+                Faction = "None";
+
+            if (_languages.Count <= 0)
+                _languages = new(speciesPrototype.DefaultLanguages);
+            List<ProtoId<LanguagePrototype>> langsInvalid = new();
+            foreach (var language in _languages)
+            {
+                if (!prototypeManager.Index(language).Roundstart && !speciesPrototype.UniqueLanguages.Contains(language))
+                    langsInvalid.Add(language);
+            }
+            foreach (var lang in langsInvalid)
+            {
+                _languages.Remove(lang);
+            }
+
+            // Horizon end
         }
 
         /// <summary>
@@ -851,8 +913,72 @@ namespace Content.Shared.Preferences
                 Bark = Bark.WithMaxVar(variation),
             };
         }
-        // _Horizon end
+
+        public HumanoidCharacterProfile WithErpStatus(ErpStatus erp)
+        {
+            return new(this)
+            {
+                ErpStat = erp
+            };
+        }
+
+        public HumanoidCharacterProfile WithFaction(ProtoId<CharacterFactionPrototype> faction)
+        {
+            return new(this)
+            {
+                Faction = faction
+            };
+        }
+
+        public HumanoidCharacterProfile WithOOCFlavorText(string flavorText)
+        {
+            return new(this) { OOCFlavorText = flavorText };
+        }
 
         #endregion
+
+        #region Languages
+        public HumanoidCharacterProfile WithLanguage(ProtoId<LanguagePrototype> language)
+        {
+            var proto = IoCManager.Resolve<IPrototypeManager>();
+            var species = proto.Index(Species);
+            if (!proto.Index(language).Roundstart && !species.UniqueLanguages.Contains(language))
+                return new(this);
+            if (_languages.Contains(language))
+                return new(this);
+            if (_languages.Count >= species.MaxLanguages)
+                return new(this);
+
+            HashSet<ProtoId<LanguagePrototype>> list = new(_languages);
+            list.Add(language);
+
+            return new(this)
+            {
+                _languages = list,
+            };
+        }
+
+        public HumanoidCharacterProfile WithoutLanguage(ProtoId<LanguagePrototype> language)
+        {
+            var proto = IoCManager.Resolve<IPrototypeManager>();
+            var species = proto.Index(Species);
+            if (!proto.Index(language).Roundstart && !species.UniqueLanguages.Contains(language))
+                return new(this);
+            if (!_languages.Contains(language))
+                return new(this);
+            if (_languages.Count <= 1)
+                return new(this);
+
+            HashSet<ProtoId<LanguagePrototype>> list = new(_languages);
+            list.Remove(language);
+
+            return new(this)
+            {
+                _languages = list,
+            };
+        }
+        #endregion
+
+        // _Horizon end
     }
 }

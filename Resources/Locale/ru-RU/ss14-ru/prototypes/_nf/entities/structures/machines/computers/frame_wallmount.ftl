@@ -1,10 +1,8 @@
 ent-BaseStructureComputerWallmount = { ent-BaseStructureComputerTabletop }
-    .desc =
-        { ent-BaseStructureComputerTabletop.desc }
-        ent-ComputerWallmountBroken = { ent-ComputerBroken }
+    .desc = { ent-BaseStructureComputerTabletop.desc }
+    .suffix = Wallmount
+ent-ComputerWallmountFrame = каркас консоли
+    .desc = Консоль в строительстве.
+ent-ComputerWallmountBroken = { ent-BaseStructureWallmount }
     .suffix = Настенный
-    .desc =
-        { ent-ComputerBroken.desc }
-        ent-ComputerWallmountFrame = { ent-ComputerTabletopFrame }
-    .suffix = Настенный
-    .desc = { ent-ComputerTabletopFrame.desc }
+    .desc = { ent-BaseStructureWallmount.desc }

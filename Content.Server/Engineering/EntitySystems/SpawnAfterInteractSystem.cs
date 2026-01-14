@@ -6,6 +6,7 @@ using Content.Shared.Interaction;
 using Content.Shared.Maps;
 using Content.Shared.Physics;
 using Content.Shared.Stacks;
+using Content.Server.Explosion.EntitySystems; // StarHorizon
 using JetBrains.Annotations;
 using Robust.Shared.Map.Components;
 
@@ -18,6 +19,8 @@ namespace Content.Server.Engineering.EntitySystems
         [Dependency] private readonly StackSystem _stackSystem = default!;
         [Dependency] private readonly TurfSystem _turfSystem = default!;
         [Dependency] private readonly SharedTransformSystem _transform = default!;
+        [Dependency] private readonly SharedMapSystem _maps = default!;
+        [Dependency] private readonly TriggerSystem _triggerSystem = default!; // StarHorizon
 
         public override void Initialize()
         {
@@ -32,9 +35,11 @@ namespace Content.Server.Engineering.EntitySystems
                 return;
             if (string.IsNullOrEmpty(component.Prototype))
                 return;
-            if (!TryComp<MapGridComponent>(_transform.GetGrid(args.ClickLocation), out var grid))
+
+            var gridUid = _transform.GetGrid(args.ClickLocation);
+            if (!TryComp<MapGridComponent>(gridUid, out var grid))
                 return;
-            if (!grid.TryGetTileRef(args.ClickLocation, out var tileRef))
+            if (!_maps.TryGetTileRef(gridUid.Value, grid, args.ClickLocation, out var tileRef))
                 return;
 
             bool IsTileClear()
@@ -44,6 +49,8 @@ namespace Content.Server.Engineering.EntitySystems
 
             if (!IsTileClear())
                 return;
+
+            _triggerSystem.Trigger(uid, args.User); // StarHorizon
 
             if (component.DoAfterTime > 0)
             {

@@ -68,6 +68,8 @@ namespace Content.Client.Inventory
             _strippingMenu = this.CreateWindowCenteredLeft<StrippingMenu>();
             _strippingMenu.OnDirty += UpdateMenu;
             _strippingMenu.Title = Loc.GetString("strippable-bound-user-interface-stripping-menu-title", ("ownerName", Identity.Name(Owner, EntMan)));
+
+            _strippingMenu?.OpenCenteredAt(new Vector2(0.25f, 0.25f)); // Horizon tweak
         }
 
         protected override void Dispose(bool disposing)
@@ -153,9 +155,7 @@ namespace Content.Client.Inventory
             // TODO allow windows to resize based on content's desired size
 
             // for now: shit-code
-            // this breaks for drones (too many hands, lots of empty vertical space), and looks shit for monkeys and the like.
-            // but the window is realizable, so eh.
-            _strippingMenu.SetSize = new Vector2(220, snare?.IsEnsnared == true ? 550 : 530);
+            _strippingMenu.SetSize = new Vector2(220, snare?.IsEnsnared == true ? 620 : 600); //Horizon Tweak
         }
 
         private void AddHandButton(Hand hand)
@@ -170,7 +170,6 @@ namespace Content.Client.Inventory
                 if (EntMan.TryGetComponent<CuffableComponent>(Owner, out var cuff) && _cuffable.GetAllCuffs(cuff).Contains(virt.BlockingEntity))
                     button.BlockedRect.MouseFilter = MouseFilterMode.Ignore;
             }
-
             // Goobstation: use virtual entity if hidden
             UpdateEntityIcon(button, EntMan.HasComponent<StripMenuHiddenComponent>(hand.HeldEntity) ? _virtualHiddenEntity : hand.HeldEntity);
             // End Goobstation

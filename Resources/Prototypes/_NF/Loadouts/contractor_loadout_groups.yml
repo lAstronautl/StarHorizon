@@ -37,6 +37,8 @@
   - ContractorClothingUniformJumpskirtColorOrange
   - ContractorClothingUniformJumpsuitColorRed
   - ContractorClothingUniformJumpskirtColorRed
+  - ContractorClothingUniformJumpsuitColorMaroon
+  - ContractorClothingUniformJumpskirtColorMaroon
   - ContractorClothingUniformJumpsuitColorPurple
   - ContractorClothingUniformJumpskirtColorPurple
   - ContractorClothingUniformJumpsuitColorLightBrown
@@ -51,6 +53,8 @@
   - ContractorClothingUniformJumpskirtColorDarkGreen
   - ContractorClothingUniformJumpsuitColorTeal
   - ContractorClothingUniformJumpskirtColorTeal
+  - ContractorClothingUniformColorRainbow
+  - ContractorClothingUniformJumpskirtColorRainbow
   - ContractorClothingUniformJumpsuitHawaiBlack
   - ContractorClothingUniformJumpsuitHawaiBlue
   - ContractorClothingUniformJumpsuitHawaiRed
@@ -119,6 +123,7 @@
   - ContractorClothingSkirtUniformRandomBra
   - ContractorClothingSkirtUniformRandomShorts
   - ContractorClothingSkirtUniformRandomShirt
+  - ContractorClothingUniformJumpsuitExpeditorExtra # Horizon [ специальная униформа экспедитора ] by Serafim547
   - ContractorClothingUniformJumpsuitMonasticRobeDark
   - ContractorClothingUniformJumpsuitMonasticRobeLight
   - ContractorClothingUniformJumpsuitChaplainPilgrimVest
@@ -307,7 +312,6 @@
   name: loadout-group-contractor-outerclothing
   minLimit: 0
   loadouts:
-  - ContractorClothingOuterHardsuitBasic
   - ContractorClothingOuterHardsuitVoidParamed
   - ContractorClothingOuterHoodieGrey
   - ContractorClothingOuterVestHazard
@@ -817,6 +821,30 @@
   - ContractorRubberStampTrader
   - ContractorRubberStampClown
   - ContractorRubberStampMime
+    # Towels
+  - ContractorTowelColorGreen
+  - ContractorTowelColorDarkGreen
+  - ContractorTowelColorLightBlue
+  - ContractorTowelColorBlue
+  - ContractorTowelColorDarkBlue
+  - ContractorTowelColorTeal
+  - ContractorTowelColorWhite
+  - ContractorTowelColorPurple
+  - ContractorTowelColorBlack
+  - ContractorTowelColorMaroon
+  - ContractorTowelColorYellow
+  - ContractorTowelColorLightBrown
+  - ContractorTowelColorBrown
+  - ContractorTowelColorRed
+  - ContractorTowelColorOrange
+  - ContractorTowelColorPink
+  - ContractorTowelColorGray
+  - ContractorTowelColorMime
+  - ContractorTowelColorGold
+  - ContractorTowelColorSilver
+  - ContractorTowelColorNT
+  - ContractorTowelColorCentcom
+  - ContractorTowelColorSyndicate
 
 - type: loadoutGroup
   id: ContractorHandItems
@@ -882,12 +910,12 @@
   - ContractorNFBoxSurvivalNitrogen
   - ContractorNFBoxSurvivalExtended
   - ContractorNFBoxSurvivalExtendedNitrogen
-  - ContractorNFBoxSurvivalSheleg
-  - ContractorNFBoxSurvivalExtendedSheleg
+  - ContractorNFBoxSurvivalSheleg # Horizon Survival box
+  - ContractorNFBoxSurvivalExtendedSheleg # Horizon Survival box
   fallbacks:
   - ContractorNFBoxSurvival
   - ContractorNFBoxSurvivalNitrogen
-  - ContractorNFBoxSurvivalSheleg
+  - ContractorNFBoxSurvivalSheleg # Horizon Survival box
 
 - type: loadoutGroup
   id: ContractorEncryptionKey

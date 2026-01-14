@@ -17,6 +17,8 @@ using Content.Shared.Interaction;
 using Content.Shared.Inventory;
 using Content.Shared.Inventory.VirtualItem;
 using Content.Shared.Item.ItemToggle.Components;
+using Content.Shared.Mech.Components;
+using Content.Shared.Mech.Equipment.Components;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Physics;
@@ -62,7 +64,32 @@ public abstract class SharedMeleeWeaponSystem : EntitySystem
     [Dependency] protected readonly SharedTransformSystem TransformSystem = default!;
     [Dependency] private   readonly SharedStaminaSystem _stamina = default!;
 
-    private const int AttackMask = (int) (CollisionGroup.MobMask | CollisionGroup.Opaque);
+	/*
+    //Goob - Shove
+    private float _shoveRange;
+    private float _shoveSpeed;
+    private float _shoveMass;
+    //Goob - Shove
+
+    // Goobstation - Shove
+    private void SetShoveRange(float value)
+    {
+        _shoveRange = value;
+    }
+
+    private void SetShoveSpeed(float value)
+    {
+        _shoveSpeed = value;
+    }
+
+    private void SetShoveMass(float value)
+    {
+        _shoveMass = value;
+    }
+    //Goob - Shove
+	*/
+
+    public const int AttackMask = (int) (CollisionGroup.MobMask | CollisionGroup.Opaque); // WD EDIT: private -> public
 
     /// <summary>
     /// Maximum amount of targets allowed for a wide-attack.
@@ -357,6 +384,17 @@ public abstract class SharedMeleeWeaponSystem : EntitySystem
 
         if (!CombatMode.IsInCombatMode(user))
             return false;
+
+        // Если у оружия есть MechEquipmentComponent, атака невозможна.
+        if (HasComp<MechEquipmentComponent>(weaponUid))
+        {
+            // Проверяем, является ли пользователь пилотом меха.
+            if (!TryComp<MechPilotComponent>(user, out var mechPilot) || mechPilot.Mech == null)
+            {
+                PopupSystem.PopupClient("Это оружие слишком большое для вас.", user);
+                return false;
+            }
+        }
 
         EntityUid? target = null;
         switch (attack)
@@ -685,6 +723,12 @@ public abstract class SharedMeleeWeaponSystem : EntitySystem
 
             if (damageResult != null && damageResult.GetTotal() > FixedPoint2.Zero)
             {
+                // _Horizon
+                var dir = TransformSystem.GetWorldPosition(entity) - TransformSystem.GetWorldPosition(user);
+                var bodyEv = new MeleeHeavyHitBodyAttackEvent(dir.Normalized(), damageResult);
+                RaiseLocalEvent(entity, ref bodyEv);
+                // _Horizon
+
                 // If the target has stamina and is taking blunt damage, they should also take stamina damage based on their blunt to stamina factor
                 if (damageResult.DamageDict.TryGetValue("Blunt", out var bluntDamage))
                 {

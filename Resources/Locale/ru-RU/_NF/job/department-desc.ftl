@@ -1,3 +1,4 @@
+department-Engineering-description = Генерируйте энергию, превращайте ее в полезные вещи и ремонтируйте станцию в случае катастрофы.
 department-NF-description = Сделайте все возможное, чтобы помочь сектору и его обитателям.
 department-NFAntag-description = Подрывать усилия Nanotrasen в этом секторе и вообще быть помехой обществу.
 department-NFCivilian-description = Объединитесь с командой и отправляйтесь навстречу приключениям!

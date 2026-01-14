@@ -347,6 +347,13 @@
   parent: NFBaseJumpsuitRecipe
   result: ClothingUniformJumpsuitMonasticRobeLight
 
+# Horizon start
+- type: latheRecipe
+  id: ClothingUniformJumpsuitExpeditorExtra
+  parent: NFBaseJumpsuitRecipe
+  result: ClothingUniformJumpsuitExpeditorExtra
+# Horizon end
+
 - type: latheRecipe
   id: ClothingUniformJumpsuitMonasticRobeDark
   parent: NFBaseJumpsuitRecipe

@@ -36,9 +36,11 @@ namespace Content.Shared.Input
         public static readonly BoundKeyFunction OpenBelt = "OpenBelt";
         public static readonly BoundKeyFunction OpenWallet = "OpenWallet"; // Frontier
         public static readonly BoundKeyFunction OpenAHelp = "OpenAHelp";
+        public static readonly BoundKeyFunction OpenSponsorShop = "OpenSponsorShop"; // _Horizon
         public static readonly BoundKeyFunction Laying = "Laying"; // Horizon
+        public static readonly BoundKeyFunction OpenLanguagesMenu = "OpenLanguagesMenu";    // Horizon
         public static readonly BoundKeyFunction SwapHands = "SwapHands";
-        public static readonly BoundKeyFunction SwapHandsPrevious = "SwapHandsPrevious"; // Frontier
+        public static readonly BoundKeyFunction SwapHandsReverse = "SwapHandsReverse";
         public static readonly BoundKeyFunction MoveStoredItem = "MoveStoredItem";
         public static readonly BoundKeyFunction RotateStoredItem = "RotateStoredItem";
         public static readonly BoundKeyFunction SaveItemLocation = "SaveItemLocation";

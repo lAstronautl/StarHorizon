@@ -433,7 +433,7 @@
         minRange: 2.5
         maxRange: 4.5
       spawns:
-      - CrystalGreen
+      - RandomGreenCrystal
     - settings:
         spawnOnSuperCritical: true
         minAmount: 30
@@ -441,7 +441,7 @@
         minRange: 5
         maxRange: 15
       spawns:
-      - CrystalGreen
+      - RandomGreenCrystal
       - WallSpawnAsteroid
       - WallSpawnAsteroid
       - NFWallSpawnAsteroidUraniumCrab # Frontier: use NF variant
@@ -452,6 +452,56 @@
         maxRange: 5
       spawns:
       - NFMobSpawnCrabUranium # Frontier: use NF variant
+
+- type: entity
+  id: AnomalyRockBananium
+  parent: AnomalyRockBase
+  suffix: Rock, Bananium
+  components:
+  - type: Sprite
+    color: "#ddde40"
+  - type: PointLight
+    radius: 2.0
+    energy: 7.5
+    color: "#ddde40"
+  - type: EntitySpawnAnomaly
+    entries:
+    - settings:
+        spawnOnPulse: true
+        minAmount: 8
+        maxAmount: 15
+        minRange: 4.5
+        maxRange: 7.5
+      spawns:
+      - WallSpawnAsteroid
+      - WallSpawnAsteroid
+      - WallSpawnAsteroidBananium
+      - NFWallSpawnAsteroidBananiumCrab # Frontier: use NF prefix
+    - settings:
+        spawnOnPulse: true
+        maxAmount: 3
+        minRange: 2.5
+        maxRange: 4.5
+      spawns:
+      - CrystalYellow
+    - settings:
+        spawnOnSuperCritical: true
+        minAmount: 30
+        maxAmount: 40
+        minRange: 5
+        maxRange: 15
+      spawns:
+      - CrystalYellow
+      - WallSpawnAsteroid
+      - WallSpawnAsteroid
+      - NFWallSpawnAsteroidBananiumCrab # Frontier: use NF prefix
+    - settings:
+        spawnOnSuperCritical: true
+        minAmount: 3
+        maxAmount: 6
+        maxRange: 5
+      spawns:
+      - NFMobSpawnCrabBananium # Frontier: use NF prefix
 
 - type: entity
   id: AnomalyRockQuartz
@@ -483,7 +533,7 @@
         minRange: 2.5
         maxRange: 4.5
       spawns:
-      - CrystalGrey
+      - RandomRedCrystal
     - settings:
         spawnOnSuperCritical: true
         minAmount: 30
@@ -491,7 +541,7 @@
         minRange: 5
         maxRange: 15
       spawns:
-      - CrystalGrey
+      - RandomRedCrystal
       - WallSpawnAsteroid
       - WallSpawnAsteroid
       - NFWallSpawnAsteroidQuartzCrab # Frontier: use NF variant
@@ -533,7 +583,7 @@
         minRange: 2.5
         maxRange: 4.5
       spawns:
-      - CrystalCyan
+      - RandomCyanCrystal
     - settings:
         spawnOnSuperCritical: true
         minAmount: 30
@@ -541,7 +591,7 @@
         minRange: 5
         maxRange: 15
       spawns:
-      - CrystalCyan
+      - RandomCyanCrystal
       - WallSpawnAsteroid
       - WallSpawnAsteroid
       - NFWallSpawnAsteroidSilverCrab # Frontier: use NF variant
@@ -583,7 +633,7 @@
         minRange: 2.5
         maxRange: 4.5
       spawns:
-      - CrystalYellow
+      - RandomYellowCrystal
     - settings:
         spawnOnSuperCritical: true
         minAmount: 30
@@ -591,7 +641,7 @@
         minRange: 5
         maxRange: 15
       spawns:
-      - CrystalYellow
+      - RandomYellowCrystal
       - WallSpawnAsteroid
       - WallSpawnAsteroid
       - NFWallSpawnAsteroidGoldCrab # Frontier: use NF variant
@@ -633,7 +683,7 @@
         minRange: 2.5
         maxRange: 4.5
       spawns:
-      - CrystalOrange
+      - RandomOrangeCrystal
     - settings:
         spawnOnSuperCritical: true
         minAmount: 30
@@ -641,7 +691,7 @@
         minRange: 5
         maxRange: 15
       spawns:
-      - CrystalOrange
+      - RandomOrangeCrystal
       - WallSpawnAsteroid
       - WallSpawnAsteroid
       - NFWallSpawnAsteroidIronCrab # Frontier: use NF variant
@@ -683,7 +733,7 @@
         minRange: 2.5
         maxRange: 4.5
       spawns:
-      - CrystalBlack
+      - RandomBlackCrystal
     - settings:
         spawnOnSuperCritical: true
         minAmount: 30
@@ -691,7 +741,7 @@
         minRange: 5
         maxRange: 15
       spawns:
-      - CrystalBlack
+      - RandomBlackCrystal
       - WallSpawnAsteroid
       - WallSpawnAsteroid
       - NFWallSpawnAsteroidCoalCrab # Frontier: use NF variant

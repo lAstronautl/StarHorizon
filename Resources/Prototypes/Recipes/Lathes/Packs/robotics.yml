@@ -12,6 +12,7 @@
   id: BorgModulesStatic
   recipes:
   - BorgModuleTool
+  - BorgModuleCable
   - BorgModuleFireExtinguisher
 
 - type: latheRecipePack
@@ -40,6 +41,16 @@
   - BorgModuleAdvancedMining
   - BorgModuleAdvancedParamedic # Frontier
   - BorgModuleRCD # Frontier
+  - CyborgCombatEndoskeleton
+  - BorgModuleCombatPKA
+  - BorgModuleCombatEchis
+  - BorgModuleCombatLaserAdvanced
+  - BorgModuleCombatPKAHeavy
+  - BorgModuleCombatPKARailgun
+  - BorgModuleCombatPKARepeater
+  - BorgModuleCombatPKAShotgun
+  - BorgModuleCombatL6C
+  - BorgModuleCombatLaserHeavy
 
 - type: latheRecipePack
   id: MechParts

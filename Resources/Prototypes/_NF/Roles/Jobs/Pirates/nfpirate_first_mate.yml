@@ -3,13 +3,14 @@
   name: job-name-nf-pirate-first-mate
   description: job-description-nf-pirate-first-mate
   playTimeTracker: JobPirateFirstMate
+  forceFaction: FactionPirate # Horizon
   requirements:
     - !type:OverallPlaytimeRequirement
-      time: 129600 # 36 hours
+      time: 216000 # 60 hours # Horizon
     - !type:DepartmentTimeRequirement
       department: Security
       time: 10800 # 3 hours
-  whitelisted: false
+  whitelisted: true
   startingGear: NFPirateFirstMateGear
   alwaysUseSpawner: true
   hideConsoleVisibility: true
@@ -19,6 +20,7 @@
   weight: 30
   displayWeight: 30
   setPreference: true
+  newPlayerMessage: false
   access:
   - Pirate
   accessGroups:
@@ -44,3 +46,7 @@
   storage:
     back:
     - AppraisalTool
+
+- type: chameleonOutfit
+  id: NFPirateFirstMateChameleonOutfit
+  job: NFPirateFirstMate

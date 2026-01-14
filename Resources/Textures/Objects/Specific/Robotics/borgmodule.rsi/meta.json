@@ -14,6 +14,9 @@
             "name": "engineering"
         },
         {
+            "name": "combat"
+        },
+        {
             "name": "generic"
         },
         {
@@ -144,6 +147,18 @@
         },
         {
             "name": "icon-xenoborg-tools"
+        },
+        {
+            "name": "icon-syndicate-laser"
+        },
+        {
+            "name": "icon-syndicate-laser2"
+        },
+        {
+            "name": "icon-syndicate-projector"
+        },
+        {
+            "name": "icon-syndicate-cloak"
         },
         {
             "name": "icon-syndicate"

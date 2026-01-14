@@ -9,6 +9,12 @@
     damage:
       types:
         Piercing: 10
+  - type: ProjectileHitEffect
+    gunshots: 4
+    push: true
+    effectDuration: 1
+    effectCooldown: 6
+    bulletId: shotgunBullet
 
 - type: entity
   categories: [ HideSpawnMenu ]

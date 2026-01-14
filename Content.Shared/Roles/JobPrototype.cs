@@ -1,3 +1,4 @@
+using Content.Shared._Horizon.FlavorText;
 using Content.Shared.Access;
 using Content.Shared.Guidebook;
 using Content.Shared.Players.PlayTimeTracking;
@@ -63,6 +64,14 @@ namespace Content.Shared.Roles
         /// </summary>
         [DataField("joinNotifyCrew")]
         public bool JoinNotifyCrew { get; private set; } = false;
+
+        // Frontier: new player greetings
+        /// <summary>
+        /// When true, new players joining this role will have a radio message sent off (if enabled through cvars).
+        /// </summary>
+        [DataField]
+        public bool NewPlayerMessage { get; private set; } = true;
+        // End Frontier: new player greetings
 
         /// <summary>
         ///     When true - the player will recieve a message about importancy of their job.
@@ -174,6 +183,16 @@ namespace Content.Shared.Roles
         /// </summary>
         [DataField]
         public List<ProtoId<GuideEntryPrototype>>? Guides;
+
+        // Lua start
+        [DataField("salary")]
+        public int Salary = 0;
+        // Lua end
+
+        // Horizon start
+        [DataField]
+        public ProtoId<CharacterFactionPrototype>? ForceFaction = null;
+        // Horizon end
     }
 
     /// <summary>

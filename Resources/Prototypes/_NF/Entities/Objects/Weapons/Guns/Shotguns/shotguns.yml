@@ -150,6 +150,10 @@
     size: Normal
   - type: BallisticAmmoProvider
     capacity: 2
+  - type: Gun
+    minAngle: 12.1
+    maxAngle: 40.5
+    fireRate: 2
   - type: NFWeaponDetails
     manufacturer: weapon-details-manufacturer-custom-made
 

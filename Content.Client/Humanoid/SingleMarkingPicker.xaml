@@ -13,12 +13,12 @@
 
     <!-- Item list -->
     <BoxContainer Name="MarkingSelectorContainer" Orientation="Vertical" HorizontalExpand="True" VerticalExpand="True">
-        <ScrollContainer MinHeight="500" VerticalExpand="True" HorizontalExpand="True">
+        <ScrollContainer Name="MarkingScroller" MinHeight="500" VerticalExpand="True" HorizontalExpand="True"> <!-- _Horizon add Name="MarkingScroller" -->
             <ItemList Name="MarkingList" VerticalExpand="True" />
         </ScrollContainer>
 
         <!-- Color sliders -->
-        <ScrollContainer MinHeight="200" HorizontalExpand="True">
+        <ScrollContainer Name="CollorScroller" MinHeight="200" HorizontalExpand="True"> <!-- _Horizon add Name="CollorScroller" -->
             <BoxContainer Name="ColorSelectorContainer" HorizontalExpand="True" />
         </ScrollContainer>
     </BoxContainer>

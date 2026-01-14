@@ -19,7 +19,7 @@
   components:
   - type: MaterialStorage
     storage:
-      FuelGradePlasma: 1000
+      FuelGradeUnstablePlasma: 1000
 
 - type: entity
   parent:
@@ -30,7 +30,7 @@
   components:
   - type: MaterialStorage
     storage:
-      FuelGradeUranium: 1000
+      FuelGradeUnstableUranium: 1000
 
 - type: entity
   parent:
@@ -84,15 +84,15 @@
       maxTargetPower: 120000 # 12 rad/s at full output, _just_ safe directly behind a reinforced wall
       targetPower: 60000
       optimalPower: 60000
-      # ~22 minutes per stack at full power - 80 kJ per stack, 240 kJ per 30 units
-      optimalBurnRate: 0.0075
+      # ~44 minutes per stack at full power - 80 kJ per stack, 240 kJ per 30 units # Horizon
+      optimalBurnRate: 0.0037 # Horizon
       # leaky, worse power curve
       fuelEfficiencyConstant: 0.5
       radiationColor: "#00bfff"
     - type: SolidFuelGeneratorAdapter
-      fuelMaterial: FuelGradeBananium
+      fuelMaterial: FuelGradeUnstableBananium # Horizon
     - type: MaterialStorage
-      materialWhiteList: [Bananium, FuelGradeBananium, RawBananium, Skrungle]
+      materialWhiteList: [RawBananium, Skrungle, Bananium, FuelGradeBananium, FuelGradeUnstableBananium, FuelGradePureBananium] # Horizon # Frontier: add FuelGradeBananium, RawBananium, Skrungle
     - type: PowerMonitoringDevice
       sprite: _NF/Structures/Power/Generation/portable_generator.rsi
       state: portgen1
@@ -101,17 +101,25 @@
     - type: PowerSupplier
       supplyRampRate: 10000
       supplyRampTolerance: 3000
+    # Horizon # Frontier: magnet pickup, fuel adapter
     - type: FuelGradeAdapter
       conversions:
-      - input: Bananium
-        output: FuelGradeBananium
-        rate: 1
       - input: RawBananium
-        output: FuelGradeBananium
-        rate: 0.5
+        output: FuelGradeUnstableBananium
+        rate: 0.125
       - input: Skrungle
-        output: FuelGradeBananium
+        output: FuelGradeUnstableBananium
+        rate: 0.05
+      - input: Bananium
+        output: FuelGradeUnstableBananium
         rate: 0.25
+      - input: FuelGradeBananium
+        output: FuelGradeUnstableBananium
+        rate: 0.5
+      - input: FuelGradePureBananium
+        output: FuelGradeUnstableBananium
+        rate: 1
+    # Horizon # End Frontier: magnet pickup, fuel adapter
     - type: Geiger
       showExamine: true
       broadcastAudio: true
@@ -129,7 +137,7 @@
   components:
     - type: MaterialStorage
       storage:
-        FuelGradeBananium: 1000
+        FuelGradeUnstableBananium: 1000
 
 - type: entity
   name: D-K Jr. portable generator
@@ -181,4 +189,4 @@
   components:
     - type: MaterialStorage
       storage:
-        FuelGradeBananium: 1000
+        FuelGradeUnstableBananium: 1000

@@ -450,7 +450,7 @@
       allowedTiles:
         - FloorChromite
       entities:
-        - CrystalPink
+        - RandomPinkCrystal
     - !type:BiomeEntityLayer
       threshold: 0.97
       noise:
@@ -510,13 +510,13 @@
       allowedTiles:
         - FloorAsteroidSand
       entities:
-        - CrystalGreen
-        - CrystalPink
-        - CrystalOrange
-        - CrystalBlack
-        - CrystalBlue
-        - CrystalYellow
-        - CrystalCyan
+        - RandomGreenCrystal
+        - RandomPinkCrystal
+        - RandomOrangeCrystal
+        - RandomBlackCrystal
+        - RandomBlueCrystal
+        - RandomYellowCrystal
+        - RandomCyanCrystal
     - !type:BiomeEntityLayer
       threshold: 0.95
       noise:
@@ -560,13 +560,13 @@
       allowedTiles:
         - FloorAsteroidSand
       entities:
-        - CrystalGreen
-        - CrystalPink
-        - CrystalOrange
-        - CrystalBlack
-        - CrystalBlue
-        - CrystalYellow
-        - CrystalCyan
+        - RandomGreenCrystal
+        - RandomPinkCrystal
+        - RandomOrangeCrystal
+        - RandomBlackCrystal
+        - RandomBlueCrystal
+        - RandomYellowCrystal
+        - RandomCyanCrystal
     - !type:BiomeEntityLayer
       threshold: 0.95
       noise:

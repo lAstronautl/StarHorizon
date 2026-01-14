@@ -3,6 +3,8 @@
   name: job-name-nf-detective
   description: job-description-nf-detective
   playTimeTracker: JobDetective
+  salary: 40000 # Horizon
+  forceFaction: FactionNFSD # Horizon
   requirements:
     - !type:OverallPlaytimeRequirement
       time: 43200 # 12 hours
@@ -46,3 +48,17 @@
     - LogProbeCartridge
     - RubberStampDetective
     - ContrabandForensicsModule
+
+- type: chameleonOutfit
+  id: NFDetectiveChameleonOutfit
+  job: NFDetective
+  hasMindShield: true
+  equipment:
+    head: ClothingHeadHatFedoraBrown
+    mask: ClothingMaskGasSecurity
+    eyes: ClothingEyesGlassesNfsd
+    neck: ClothingNeckNfsdBadgeDetective
+    gloves: ClothingHandsGlovesForensic
+    shoes: ClothingShoesBootsNfsdBrownFilled
+    belt: ClothingBeltNfsdFilled
+    outerClothing: ClothingOuterCoatTrench

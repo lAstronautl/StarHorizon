@@ -2,6 +2,7 @@ using System.Numerics;
 using Content.Shared.Damage;
 using Content.Shared.FixedPoint;
 using Robust.Shared.Audio;
+using Robust.Shared.Map;
 
 namespace Content.Shared.Weapons.Melee.Events;
 
@@ -93,3 +94,6 @@ public record struct GetMeleeAttackRateEvent(EntityUid Weapon, float Rate, float
 /// </summary>
 [ByRefEvent]
 public record struct GetHeavyDamageModifierEvent(EntityUid Weapon, FixedPoint2 DamageModifier, float Multipliers, EntityUid User);
+
+[ByRefEvent]
+public record struct MeleeHeavyHitBodyAttackEvent(Vector2 Direction, DamageSpecifier Damage);

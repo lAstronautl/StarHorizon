@@ -12,7 +12,8 @@
     weight: 5
     duration: 1350
     maxDuration: 1560
-    reoccurrenceDelay: 90 # 1,5 hours # Horizon TempTweak
+    minimumPlayers: 20 # Horizon
+    reoccurrenceDelay: 180 # 3 hours # Horizon TempTweak
 #    requiredJobs: # Horizon TempTweak
 #      Sheriff: 1 # Horizon TempTweak
   - type: BluespaceErrorRule
@@ -49,13 +50,12 @@
       path: /Audio/Announcements/attention.ogg
     warningAnnouncement: station-event-bluespace-vault-warning-announcement
     endAnnouncement: station-event-bluespace-vault-end-announcement
-    earliestStart:  30 # 0,5 hours # Horizon TempTweak
+    earliestStart: 30 # 0,5 hours # Horizon TempTweak
     weight: 5
     duration: 1020
     maxDuration: 1350
-    reoccurrenceDelay: 90 # 1,5 hours # Horizon TempTweak
-  #    requiredJobs: # Horizon TempTweak
-  #      Sheriff: 1 # Horizon TempTweak
+    minimumPlayers: 20 # Horizon
+    reoccurrenceDelay: 180 # 3 hours # Horizon TempTweak
   - type: BluespaceErrorRule
     groups:
       grid: !type:GridSpawnGroup
@@ -77,7 +77,9 @@
         paths:
         - /Maps/_NF/Bluespace/vault.yml
     rewardAccounts:
-      Nfsd: 1.0
+      Nfsd: 0.33
+      Frontier: 0.33
+      Medical: 0.33
 
 - type: entity
   id: BluespaceVaultSmallError
@@ -94,9 +96,7 @@
     weight: 5
     duration: 590
     maxDuration: 780
-    reoccurrenceDelay: 90 # 1,5 hours # Horizon TempTweak
-    requiredJobs:
-      Sheriff: 1
+    reoccurrenceDelay: 180 # 3 hours # Horizon TempTweak
   - type: BluespaceErrorRule
     groups:
       grid: !type:GridSpawnGroup
@@ -118,7 +118,10 @@
         paths:
         - /Maps/_NF/Bluespace/vaultsmall.yml
     rewardAccounts:
-      Nfsd: 1.0
+      Nfsd: 0.25
+      Frontier: 0.25
+      Medical: 0.25
+      Edison: 0.25
 
 - type: entity
   id: BluespaceSyndicateFTLInterception
@@ -131,11 +134,11 @@
     warningAnnouncement: station-event-bluespace-generic-ftl-warning-announcement
     endAnnouncement: station-event-bluespace-generic-ftl-end-announcement
     earliestStart: 30 # 0,5 hours # Horizon TempTweak
-    minimumPlayers: 1 # Horizon TempTweak
+    minimumPlayers: 20 # Horizon
     weight: 1
     duration: 1800
     maxDuration: 2400
-    reoccurrenceDelay: 90 # 1,5 hours # Horizon TempTweak
+    reoccurrenceDelay: 180 # 3 hours # Horizon TempTweak
   - type: BluespaceErrorRule
     groups:
       grid: !type:GridSpawnGroup
@@ -168,11 +171,11 @@
     warningAnnouncement: station-event-bluespace-generic-ftl-warning-announcement
     endAnnouncement: station-event-bluespace-generic-ftl-end-announcement
     earliestStart: 30 # 0,5 hours # Horizon TempTweak
-    minimumPlayers: 1 # Horizon TempTweak
+    minimumPlayers: 20 # Horizon
     weight: 1
     duration: 900
     maxDuration: 1200
-    reoccurrenceDelay: 90 # 1,5 hours # Horizon TempTweak
+    reoccurrenceDelay: 180 # 3 hours # Horizon TempTweak
   - type: BluespaceErrorRule
     groups:
       grid: !type:GridSpawnGroup
@@ -205,11 +208,11 @@
     warningAnnouncement: station-event-bluespace-generic-ftl-warning-announcement
     endAnnouncement: station-event-bluespace-generic-ftl-end-announcement
     earliestStart: 30 # 0,5 hours # Horizon TempTweak
-    minimumPlayers: 1 # Horizon TempTweak
+    minimumPlayers: 20 # Horizon
     weight: 1
     duration: 1800
     maxDuration: 2400
-    reoccurrenceDelay: 90 # 1,5 hours # Horizon TempTweak
+    reoccurrenceDelay: 180 # 3 hours # Horizon TempTweak
   - type: BluespaceErrorRule
     groups:
       grid: !type:GridSpawnGroup
@@ -281,7 +284,7 @@
     weight: 5
     duration: 900
     maxDuration: 1800
-    reoccurrenceDelay: 90 # 1,5 hours # Horizon TempTweak
+    reoccurrenceDelay: 180 # 3 hours # Horizon TempTweak
   - type: BluespaceErrorRule
     groups:
       grid: !type:GridSpawnGroup

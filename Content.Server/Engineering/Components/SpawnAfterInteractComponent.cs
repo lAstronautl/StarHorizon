@@ -17,5 +17,8 @@ namespace Content.Server.Engineering.Components
 
         [DataField("removeOnInteract")]
         public bool RemoveOnInteract = false;
+
+        [DataField("triggerOnUse")]
+        public bool TriggerOnUse = false; // StarHorizon
     }
 }

@@ -338,6 +338,10 @@
     containers:
       storagebase: !type:NestedSelector
         tableId: NFStorageFillGearChemistry
+  - type: Storage 
+    grid:
+    - 0,0,5,8    
+    maxItemSize: Ginormous
 # endregion
 
 # region Departments

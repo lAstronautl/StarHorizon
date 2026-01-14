@@ -7,7 +7,7 @@
     proto: NFOxygenBreather
   storage:
     back:
-    - NFBoxSurvival
+    - BoxSurvivalSlots # Horizon Survival box
 
 - type: loadout
   id: ContractorNFBoxSurvivalNitrogen
@@ -17,9 +17,9 @@
     proto: NFNitrogenBreather
   storage:
     back:
-    - NFBoxSurvivalNitrogen
+    - BoxSurvivalSlotsNitrogen # Horizon Survival box
 
-- type: loadout
+- type: loadout # Horizon Survival box
   id: ContractorNFBoxSurvivalSheleg
   name: oxygen survival box
   hideEffects:
@@ -27,7 +27,7 @@
     proto: NFSheleg
   storage:
     back:
-    - NFBoxSurvivalSheleg
+    - BoxSurvivalSlots # Horizon Survival box
 
 #T1
 - type: loadout
@@ -42,7 +42,7 @@
   price: 1000
   storage:
     back:
-    - NFBoxSurvivalExtended
+    - BoxSurvivalSlotsOxygenExtended # Horizon Survival box
 
 - type: loadout
   id: ContractorNFBoxSurvivalExtendedNitrogen
@@ -56,9 +56,9 @@
   price: 1000
   storage:
     back:
-    - NFBoxSurvivalExtendedNitrogen
+    - BoxSurvivalSlotsNitrogenExtended # Horizon Survival box
 
-- type: loadout
+- type: loadout # Horizon Survival box
   id: ContractorNFBoxSurvivalExtendedSheleg
   name: extended-oxygen survival box
   effects:
@@ -70,4 +70,4 @@
   price: 1000
   storage:
     back:
-    - NFBoxSurvivalExtendedSheleg
+    - BoxSurvivalSlotsOxygenExtended # Horizon Survival box

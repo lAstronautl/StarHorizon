@@ -20,11 +20,16 @@
     - map: [ "enum.HumanoidVisualLayers.LArm" ]
     - map: [ "enum.HumanoidVisualLayers.RLeg" ]
     - map: [ "enum.HumanoidVisualLayers.LLeg" ]
-    - map: [ "enum.HumanoidVisualLayers.UndergarmentBottom" ]
-    - map: [ "enum.HumanoidVisualLayers.UndergarmentTop" ]
-    - map: ["jumpsuit"]
+    - map: [ "underwearb" ]
+    - map: [ "underweart" ]
     - map: ["enum.HumanoidVisualLayers.LFoot"]
     - map: ["enum.HumanoidVisualLayers.RFoot"]
+    - map: [ "socks" ]
+# Horizon start
+    #- map: [ "enum.HumanoidVisualLayers.UndergarmentBottom" ]    #Horizon underwear
+    #- map: [ "enum.HumanoidVisualLayers.UndergarmentTop" ]       #Horizon underwear
+# Horizon end
+    - map: ["jumpsuit"]
     - map: ["enum.HumanoidVisualLayers.LHand"]
     - map: ["enum.HumanoidVisualLayers.RHand"]
     - map: [ "gloves" ]
@@ -289,6 +294,16 @@
         Asphyxiation: -1.0
   - type: FireVisuals
     alternateState: Standing
+  - type: Pain
+    painThresholds:
+      Nothing: 0
+      MildPain: 50
+      AveragePain: 100
+      SeverePain: 200
+      UnbeatablePain: 250
+      DeadPain: 500
+    screamPrototype: screamHuman
+    converterPrototype: human
 
 - type: entity
   save: false
@@ -315,11 +330,17 @@
     - map: [ "enum.HumanoidVisualLayers.LArm" ]
     - map: [ "enum.HumanoidVisualLayers.RLeg" ]
     - map: [ "enum.HumanoidVisualLayers.LLeg" ]
-    - map: [ "enum.HumanoidVisualLayers.UndergarmentBottom" ]
-    - map: [ "enum.HumanoidVisualLayers.UndergarmentTop" ]
-    - map: ["jumpsuit"]
+
+    - map: [ "underwearb" ]
+    - map: [ "underweart" ]
     - map: ["enum.HumanoidVisualLayers.LFoot"]
     - map: ["enum.HumanoidVisualLayers.RFoot"]
+    - map: [ "socks" ]
+# Horizon start
+    #- map: [ "enum.HumanoidVisualLayers.UndergarmentBottom" ]     # Horizon underwear
+    #- map: [ "enum.HumanoidVisualLayers.UndergarmentTop" ]        # Horizon underwear
+# Horizon end
+    - map: ["jumpsuit"]
     - map: ["enum.HumanoidVisualLayers.LHand"]
     - map: ["enum.HumanoidVisualLayers.RHand"]
     - map: ["enum.HumanoidVisualLayers.Handcuffs"]

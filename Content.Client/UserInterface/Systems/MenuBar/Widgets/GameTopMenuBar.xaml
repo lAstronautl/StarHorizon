@@ -6,7 +6,7 @@
            xmlns:xe="clr-namespace:Content.Client.UserInterface.XamlExtensions"
            xmlns:ui="clr-namespace:Content.Client.UserInterface.Controls"
            xmlns:widgets="clr-namespace:Content.Client.UserInterface.Systems.MenuBar.Widgets"
-           Name = "MenuButtons"
+           Name="MenuButtons"
            VerticalExpand="False"
            Orientation="Horizontal"
            HorizontalAlignment="Stretch"
@@ -23,6 +23,19 @@
         HorizontalExpand="True"
         AppendStyleClass="{x:Static style:StyleBase.ButtonOpenRight}"
         />
+    <!-- Horizon start -->
+    <ui:MenuButton
+        Name="SponsorShop"
+        Access="Internal"
+        Icon="{xe:Tex '/Textures/Interface/info.mag.192dpi.png'}"
+        BoundKey = "{x:Static is:ContentKeyFunctions.OpenSponsorShop}"
+        ToolTip="{Loc 'game-hud-open-sponsor-shop-button-tooltip'}"
+        MinSize="42 64"
+        HorizontalExpand="True"
+        AppendStyleClass="{x:Static style:StyleBase.ButtonOpenLeft}"
+        Visible="False"
+        />
+    <!-- Horizon end -->
     <ui:MenuButton
         Name="GuidebookButton"
         Access="Internal"
@@ -53,6 +66,18 @@
         HorizontalExpand="True"
         AppendStyleClass="{x:Static style:StyleBase.ButtonSquare}"
         />
+    <!--Horizon Languages start-->
+    <ui:MenuButton
+        Name="LanguagesButton"
+        Access="Internal"
+        Icon="{xe:Tex '/Textures/Interface/emotes.svg.192dpi.png'}"
+        ToolTip="{Loc 'game-hud-open-languages-menu-button-tooltip'}"
+        BoundKey = "{x:Static is:ContentKeyFunctions.OpenLanguagesMenu}"
+        MinSize="42 64"
+        HorizontalExpand="True"
+        AppendStyleClass="{x:Static style:StyleBase.ButtonSquare}"
+        />
+    <!--Horizon Languages end-->
     <ui:MenuButton
         Name="CraftingButton"
         Access="Internal"

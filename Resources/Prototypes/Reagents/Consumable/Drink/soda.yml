@@ -97,6 +97,52 @@
   physicalDesc: reagent-physical-desc-fizzy
   flavor: grapesoda
   color: "#ae94a6"
+  metabolisms:
+    Poison:
+      effects:
+      - !type:HealthChange
+        conditions:
+        - !type:OrganType
+          type: Katunian
+        damage:
+          types:
+            Poison: 4
+      - !type:PopupMessage
+        conditions:
+        - !type:OrganType
+          type: Katunian
+        type: Local
+        messages: [ "histamine-effect-light-itchiness" ]
+        probability: 0.2
+      - !type:PopupMessage
+        conditions:
+        - !type:OrganType
+          type: Katunian
+        - !type:ReagentThreshold
+          min: 45
+        type: Local
+        visualType: Medium
+        messages: [ "histamine-effect-heavy-itchiness" ]
+        probability: 0.3
+      - !type:Emote
+        conditions:
+        - !type:OrganType
+          type: Katunian
+        emote: Sneeze
+        showInChat: true
+        showInGuidebook: true
+        force: true
+        probability: 0.3
+      - !type:Emote
+        conditions:
+        - !type:OrganType
+          type: Katunian
+        emote: Cough
+        showInChat: true
+        showInGuidebook: true
+        force: true
+        probability: 0.2
+
 
 - type: reagent
   id: IceCream
@@ -261,7 +307,7 @@
     state: icon_empty
   metamorphicMaxFillLevels: 5
   metamorphicFillBaseName: fill-
-  metamorphicChangeColor: false  
+  metamorphicChangeColor: false
   metabolisms:
     Drink:
       effects:

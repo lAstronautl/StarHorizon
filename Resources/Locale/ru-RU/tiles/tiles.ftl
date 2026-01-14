@@ -112,6 +112,7 @@ tiles-asteroid-ironsand = астероидный железный песок
 tiles-asteroid-ironsand-borderless = астероидный железный песок без границ
 tiles-cave = пещера
 tiles-cave-drought = сухая пещера
+tiles-cave-shadow = тенекамень
 tiles-flesh-floor = мясистый пол
 tiles-techmaint3-floor = решётчатый технический пол
 tiles-techmaint2-floor = стальной технический пол

@@ -41,6 +41,14 @@
       - Cigar
       - Trash
       - Burnt
+  - type: CytologyDirt
+    possibleCellSamples:
+    - protoID: CellSampleMurine
+    - protoID: CellSampleCat
+    - protoID: CellSampleCorgi
+    - protoID: CellSampleCockroach
+    - protoID: CellSampleFrog
+    - protoID: CellSampleSlime
 
 - type: entity
   id: CigarGold

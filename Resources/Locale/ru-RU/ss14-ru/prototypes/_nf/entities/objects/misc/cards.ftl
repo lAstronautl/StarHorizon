@@ -1,4 +1,4 @@
-ent-NFBusinessCardBlank = business card
-    .desc = A business card. For the consummate professional.
-ent-PowerForkCertification = power fork certification
-    .desc = A certificate for the operation of heavy machinery.
+ent-NFBusinessCardBlank = визитная карточка
+    .desc = Визитная карточка. Для настоящих профессионалов.
+ent-PowerForkCertification = сертификат на силовые вилы
+    .desc = Сертификат на управление тяжелой техникой.

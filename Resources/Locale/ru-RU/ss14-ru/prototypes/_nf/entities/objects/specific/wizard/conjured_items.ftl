@@ -1,6 +1,8 @@
 ent-ConjuredObject10 = { "" }
     .desc = Магически созданный объект, который рано или поздно исчезнет.
     .suffix = Наколдованный
+ent-BluntObject = ТупойПредмет
+    .desc = Если ты это видишь — ты, вероятно, уже мёртв!
 ent-SoapConjured = мыло
     .desc = { ent-Soap.desc }
 ent-SoapletBloodCult = мыльница
@@ -9,3 +11,7 @@ ent-SoapConjuredBloodCultCluster = мыло
     .desc = { ent-Soap.desc }
 ent-ShellSoapConjuredBloodCultCluster = { ent-SoapConjured }
     .desc = { ent-SoapConjured.desc }
+ent-SoapletBloodCultSpread = { ent-SoapletBloodCult }
+    .desc = { ent-SoapletBloodCult.desc }
+ent-BrickConjured = кирпич
+    .desc = { ent-BluntObject.desc }

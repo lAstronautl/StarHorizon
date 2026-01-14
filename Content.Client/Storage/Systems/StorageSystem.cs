@@ -63,19 +63,22 @@ public sealed class StorageSystem : SharedStorageSystem
             component.SavedLocations[loc.Key] = new(loc.Value);
         }
 
+        UpdateOccupied((uid, component));
+
         var uiDirty = !component.StoredItems.SequenceEqual(_oldStoredItems);
 
         if (uiDirty && UI.TryGetOpenUi<StorageBoundUserInterface>(uid, StorageComponent.StorageUiKey.Key, out var storageBui))
         {
             storageBui.Refresh();
             // Make sure nesting still updated.
-            var player = _player.LocalEntity;
+            //var player = _player.LocalEntity;
 
-            if (NestedStorage && player != null && ContainerSystem.TryGetContainingContainer((uid, null, null), out var container) &&
-                UI.TryGetOpenUi<StorageBoundUserInterface>(container.Owner, StorageComponent.StorageUiKey.Key, out var containerBui))
-            {
-                _queuedBuis.Add((containerBui, false));
-            }
+            //if (NestedStorage && player != null && ContainerSystem.TryGetContainingContainer((uid, null, null), out var container) &&
+            //    UI.TryGetOpenUi<StorageBoundUserInterface>(container.Owner, StorageComponent.StorageUiKey.Key, out var containerBui))
+            //{
+            //    _queuedBuis.Add((containerBui, false));
+            //}
+            // Horizon: Removed hiding parent storage window - allow multiple nested storage windows to be open simultaneously
         }
     }
 

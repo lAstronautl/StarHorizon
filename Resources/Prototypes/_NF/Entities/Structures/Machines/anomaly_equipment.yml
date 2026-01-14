@@ -31,6 +31,15 @@
       map: ["enum.AnomalyGeneratorVisualLayers.Base"]
   - type: ApcPowerReceiver
     powerLoad: 500
+  - type: MaterialStorage
+    whitelist:
+      tags:
+        - RawMaterial
+    materialWhiteList:
+    - Anomalite
+    storage:
+      Anomalite: 0 # StarHorizon-RND-debuff
+    storageLimit: 300
   - type: StaticPrice
     price: 1500
   - type: Transform

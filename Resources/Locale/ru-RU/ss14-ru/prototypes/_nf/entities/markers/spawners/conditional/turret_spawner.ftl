@@ -1,3 +1,6 @@
+ent-NFSpawnMobWeaponTurretLaserSyndicate = спавнер лазерной турели синдиката
+    .suffix = Фронтир, Враждебная
+    .desc = { ent-MarkerBase.desc }
 ent-SpawnMobWeaponTurretLaserSyndicateNF = спавнер лазерной турели синдиката
     .suffix = Фронтир, Враждебная
     .desc = { ent-MarkerBase.desc }

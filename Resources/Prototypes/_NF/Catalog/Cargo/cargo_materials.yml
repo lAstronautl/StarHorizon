@@ -1,17 +1,17 @@
 - type: cargoProduct
   id: MaterialUranium
-  abstract: true
+#  abstract: true
   icon:
     sprite: Objects/Materials/Sheets/other.rsi
     state: uranium_3
   product: CrateMaterialUranium
-  cost: 7000 # TODO: Lower the cost back when possible
+  cost: 17000 # TODO: Lower the cost back when possible # Horizon
   category: cargoproduct-category-name-materials
   group: market
 
 - type: cargoProduct
   id: MaterialWood
-  abstract: true
+#  abstract: true
   icon:
     sprite: Objects/Materials/materials.rsi
     state: wood_3
@@ -22,7 +22,7 @@
 
 - type: cargoProduct
   id: MaterialFuelTankHighCapacity
-  abstract: true
+#  abstract: true
   icon:
     sprite: Structures/Storage/tanks.rsi
     state: highfueltank
@@ -33,7 +33,7 @@
 
 - type: cargoProduct
   id: MaterialWaterTankHighCapacity
-  abstract: true
+#  abstract: true
   icon:
     sprite: Structures/Storage/tanks.rsi
     state: highwatertank-2

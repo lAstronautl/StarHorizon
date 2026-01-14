@@ -1,7 +1,7 @@
 - type: gameMap
   id: Frontier
   mapName: 'Frontier Outpost'
-  mapPath: /Maps/_NF/Outpost/frontier.yml
+  mapPath: /Maps/_Horizon/Outpost/frontier.yml #Horizon-Maps
   minPlayers: 0
   maxPlayers: 100
   randomRotation: false
@@ -16,7 +16,7 @@
 #            !type:NanotrasenNameGenerator
 #            prefixCreator: '14'
         - type: ExtraStationInformation
-          iconPath: /Textures/_NF/Logo/icon/icon-256x256.png # used the biggest one, looks better when downscaling than upscaling
+          iconPath: /Textures/_Horizon/Interface/banner_frontier.png # Horizon
           stationSubtext: 'frontier-lobby-frontier-subtext'
           stationDescription: 'frontier-lobby-frontier-description'
           lobbySortOrder: 1
@@ -28,10 +28,10 @@
             Borg: [ -1, -1 ]
             StationRepresentative: [ 1, 1 ]
             StationTrafficController: [ 1, 1 ]
-            SecurityGuard: [ 1, 1 ]
-            Valet: [ 1, 1 ]
-            NFJanitor: [ 1, 1 ]
-            MailCarrier: [ 1, 1 ]
+            SecurityGuard: [ 3, 3 ]
+            Valet: [ 2, 2 ]
+            NFJanitor: [ 2, 2 ]
+            MailCarrier: [ 3, 3 ]
           tags:
           - HeadOfPersonnel
           - HeadOfSecurity

@@ -509,6 +509,14 @@
   - type: SpaceGarbage
   - type: Food
     requiresSpecialDigestion: true
+  - type: CytologyDirt
+    possibleCellSamples:
+    - protoID: CellSampleMurine
+    - protoID: CellSampleCat
+    - protoID: CellSampleCorgi
+    - protoID: CellSampleCockroach
+    - protoID: CellSampleFrog
+    - protoID: CellSampleSlime
 
 - type: entity
   name: baked banana peel
@@ -1463,6 +1471,7 @@
   - type: Tag
     tags:
     - Vegetable
+    - Mushroom
 
 # Slices
 
@@ -1815,11 +1824,10 @@
     entries:
       Taco: Lingzhi
       Burger: Lingzhi
-  # Horizon Bothany start
   - type: Tag
     tags:
-    - Vegetable
-  # Horizon Bothany end
+    - Mushroom
+    - Vegetable # Horizon Bothany
 
 - type: entity
   name: ambrosia vulgaris
@@ -2061,11 +2069,10 @@
     entries:
       Taco: FlyAmanita
       Burger: FlyAmanita
-  # Horizon Bothany start
   - type: Tag
     tags:
-    - Vegetable
-  # Horizon Bothany end
+    - Mushroom
+    - Vegetable # Horizon Bothany
 
 - type: entity
   name: gatfruit
@@ -2528,8 +2535,12 @@
   - type: SolutionContainerManager
     solutions:
       food:
-        maxVol: 9
+        maxVol: 14
         reagents:
+        - ReagentId: JuiceGrape
+          Quantity: 5
+        - ReagentId: JuiceGrape
+          Quantity: 5
         - ReagentId: Nutriment
           Quantity: 5
         - ReagentId: Vitamin

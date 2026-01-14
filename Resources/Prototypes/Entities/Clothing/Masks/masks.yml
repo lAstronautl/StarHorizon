@@ -39,6 +39,11 @@
         Slash: 0.95
         Piercing: 0.95
         Heat: 0.95
+  - type: Tag # Goobstation - For survial boxes
+    tags:
+    - PetWearable
+    - WhitelistChameleon
+    - SecurityBreathMask
 
 - type: entity
   parent: [ClothingMaskGas, BaseC3SyndicateContraband, ContrabandClothing] # Frontier: BaseSyndicateContraband<BaseC3SyndicateContraband, added ContrabandClothing as parent
@@ -59,6 +64,11 @@
         Slash: 0.95
         Piercing: 0.95
         Heat: 0.95
+  - type: Tag  # Goobstation - For survial boxes
+    tags:
+    - PetWearable
+    - WhitelistChameleon
+    - SyndicateBreathMask
 
 - type: entity
   parent: ClothingMaskGas
@@ -137,6 +147,7 @@
     tags:
     - PetWearable
     - WhitelistChameleon
+    - BreathMask  # Goobstation - For survial boxes
   - type: PhysicalComposition
     materialComposition:
       Steel: 50
@@ -180,6 +191,7 @@
     tags:
     - PetWearable
     - WhitelistChameleon
+    - BreathMask # Goobstation - For survial boxes
   - type: PhysicalComposition
     materialComposition:
       Steel: 50
@@ -378,6 +390,8 @@
     slots:
     - Hair
     - Snout
+    - HeadTop
+    - HeadSide
     hideOnToggle: true
   - type: Armor
     modifiers:
@@ -445,6 +459,11 @@
     sprite: Clothing/Mask/squadron.rsi
   - type: Clothing
     sprite: Clothing/Mask/squadron.rsi
+  - type: HideLayerClothing
+    slots:
+    - Hair
+    - HeadTop
+    - HeadSide
   - type: Armor
     modifiers:
       coefficients:

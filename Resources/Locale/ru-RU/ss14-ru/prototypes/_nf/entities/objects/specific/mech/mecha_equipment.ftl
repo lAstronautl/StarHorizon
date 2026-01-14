@@ -1,2 +1,2 @@
-ent-MechEquipmentFork = power fork
-    .desc = Gives a mech the ability to pick up crates and insert them onto racks.
+ent-MechEquipmentFork = силовые вилы
+    .desc = Даёт меху способность поднимать ящики и устанавливать их на стеллажи.

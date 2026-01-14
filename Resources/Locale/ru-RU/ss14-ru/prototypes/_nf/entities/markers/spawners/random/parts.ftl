@@ -1,10 +1,12 @@
-ent-SalvagePartsT2Spawner = Спавнер деталей T2
+ent-SalvagePartsT2Spawner = спавнер деталей T2
     .desc = { ent-MarkerBase.desc }
-ent-SalvagePartsT3T4Spawner = Спавнер делалей Т3/4
+    .suffix = Спавнер
+ent-SalvagePartsT3T4Spawner = спавнер деталей Т3/4
     .desc = { ent-MarkerBase.desc }
-ent-SalvagePartsT3Spawner = Спавнер деталей Т3
+    .suffix = Спавнер
+ent-SalvagePartsT3Spawner = спавнер деталей Т3
     .suffix = Спавнер
     .desc = { ent-MarkerBase.desc }
-ent-SalvagePartsT4Spawner = Спавнер деталей Т4
+ent-SalvagePartsT4Spawner = спавнер деталей Т4
     .suffix = Спавнер
     .desc = { ent-MarkerBase.desc }

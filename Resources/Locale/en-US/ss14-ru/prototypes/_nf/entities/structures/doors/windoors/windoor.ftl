@@ -13,3 +13,6 @@ ent-WindoorSecureHeadOfSecurityLocked = { ent-WindoorSecure }
 ent-WindoorSecureBrigmedicLocked = { ent-WindoorSecure }
     .suffix = Brigmedic, Locked
     .desc = { ent-WindoorSecure.desc }
+ent-WindoorSecurePirateLocked = { ent-WindoorSecure }
+    .suffix = Pirate, Locked
+    .desc = { ent-WindoorSecure.desc }

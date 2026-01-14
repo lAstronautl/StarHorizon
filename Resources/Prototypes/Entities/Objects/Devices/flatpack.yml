@@ -36,7 +36,8 @@
   - type: StaticPrice
     price: 250
   - type: Rotatable # Frontier
-  - type: BindToStation # Frontier
+  - type: BindToStation # Horizon
+    enabled: false # Horizon - should be draggable between stations
 
 - type: entity
   parent: BaseFlatpack

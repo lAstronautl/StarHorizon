@@ -3,6 +3,7 @@
 petting-failure-mistake = Фхтагн мглв'нафх { $target }, гладить, Й'а Й'а кхтулху фхтагн н'гха.
 petting-success-artifact = Вы гладите { $target } по { POSS-ADJ($target) } причудливой поверхности.
 petting-failure-artifact = Вы протягиваете руку, чтобы погладить { $target }, но голос в голове подсказывает, что этого делать не стоит.
+petting-failure-pibble = Вы протягиваете руку, чтобы погладить { $target }, но думаете об этом получше.
 
 ## Patting players
 

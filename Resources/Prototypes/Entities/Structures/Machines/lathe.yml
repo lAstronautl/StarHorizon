@@ -306,6 +306,9 @@
     - NFEngineeringBoards # Frontier
     - NFMedicalBoards # Frontier
     - NFServiceBoards # Frontier
+    - SHEngineeringBoards # Horizon
+    - MonoAdvancedShuttleComponents # Horizon
+    - CytologyBoards # Horizon
   - type: EmagLatheRecipes
     emagDynamicPacks: [] # Frontier: empty list
     # - SecurityBoards # Frontier
@@ -490,6 +493,9 @@
       runningState: icon
       staticPacks:
       - NfsdAmmoStatic # Frontier: SecurityAmmoStatic<NfsdAmmoStatic
+      dynamicPacks:
+      - HRZNAmmo # Horizon
+      - ShipgunAmmo # Horizon
     - type: MaterialStorage
       whitelist:
         tags:
@@ -542,6 +548,7 @@
     - SyringeGuns # DeltaV
     - NFMedical # Frontier
     - Chemistry # Frontier
+    - CytologyEquipment # Frontier
   - type: Machine
     board: MedicalTechFabCircuitboard
   - type: StealTarget
@@ -606,7 +613,7 @@
         - Sheet
         - RawMaterial
         - Ingot
-  - type: OreSiloClient # Frontier
+  - type: OreSiloClient
 
 - type: entity
   id: Biogenerator
@@ -812,4 +819,4 @@
         - RawMaterial
         - Plastic
         - Ingot # Frontier
-  - type: OreSiloClient # Frontier
+  - type: OreSiloClient

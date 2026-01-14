@@ -24,7 +24,7 @@
   - type: UserInterface
     interfaces:
       enum.SurgeryUIKey.Key:
-        type: SurgeryBui
+        type: SurgeryBui #WTF?
 
 - type: entity
   id: BaseTorso

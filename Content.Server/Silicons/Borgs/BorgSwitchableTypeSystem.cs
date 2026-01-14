@@ -16,7 +16,7 @@ public sealed class BorgSwitchableTypeSystem : SharedBorgSwitchableTypeSystem
     [Dependency] private readonly BorgSystem _borgSystem = default!;
     [Dependency] private readonly ServerInventorySystem _inventorySystem = default!;
 
-    protected override void SelectBorgModule(Entity<BorgSwitchableTypeComponent> ent, ProtoId<BorgTypePrototype> borgType)
+    protected override void SelectBorgModule(Entity<BorgSwitchableTypeComponent> ent, ProtoId<BorgTypePrototype> borgType, int skin)    // Horizon borg skins
     {
         var prototype = Prototypes.Index(borgType);
 
@@ -33,7 +33,7 @@ public sealed class BorgSwitchableTypeSystem : SharedBorgSwitchableTypeSystem
         {
             _borgSystem.SetTransponderSprite(
                 (ent.Owner, transponder),
-                new SpriteSpecifier.Rsi(new ResPath("Mobs/Silicon/chassis.rsi"), prototype.SpriteBodyState));
+                new SpriteSpecifier.Rsi(new ResPath("Mobs/Silicon/chassis.rsi"), prototype.Skins[skin].SpriteBodyState));   // Horizon borg skins
 
             _borgSystem.SetTransponderName(
                 (ent.Owner, transponder),
@@ -71,12 +71,19 @@ public sealed class BorgSwitchableTypeSystem : SharedBorgSwitchableTypeSystem
             EntityManager.AddComponents(ent, addComponents);
         }
 
+        // Horizon borg skins start
+        if (prototype.Skins[skin].AddComponents is { } skinComponents)
+        {
+            EntityManager.AddComponents(ent, skinComponents);
+        }
+        // Horizon borg skins end
+
         // Configure inventory template (used for hat spacing)
         if (TryComp(ent, out InventoryComponent? inventory))
         {
             _inventorySystem.SetTemplateId((ent.Owner, inventory), prototype.InventoryTemplateId);
         }
 
-        base.SelectBorgModule(ent, borgType);
+        base.SelectBorgModule(ent, borgType, skin); // Horizon borg skins
     }
 }

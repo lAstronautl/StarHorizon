@@ -1,7 +1,7 @@
 using Content.Server.Administration.Logs;
 using Content.Server.Body.Components;
 using Content.Server.Body.Systems;
-using Content.Server.EntityEffects.Effects;
+using Content.Shared.EntityEffects.Effects;
 using Content.Server.Spreader;
 using Content.Shared.Chemistry;
 using Content.Shared.Chemistry.Components;
@@ -21,7 +21,9 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
 using System.Linq;
-
+using Content.Server.Nutrition.Components;
+using Content.Shared.Inventory;
+using Content.Shared.Nutrition.Components;
 using TimedDespawnComponent = Robust.Shared.Spawners.TimedDespawnComponent;
 
 namespace Content.Server.Fluids.EntitySystems;

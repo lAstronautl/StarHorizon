@@ -1,6 +1,4 @@
-using System.Globalization;
-using System.Linq;
-using System.Numerics;
+using Content.Server._Corvax.Respawn; // Frontier
 using Content.Server.Administration.Managers;
 using Content.Server.Administration.Systems;
 using Content.Server.GameTicking.Events;
@@ -9,6 +7,8 @@ using Content.Server.Spawners.Components;
 using Content.Server.Speech.Components;
 using Content.Server.Station.Components;
 using Content.Shared.CCVar;
+using Content.Server._Lua.AutoSalarySystem; // Lua
+using Content.Shared._NF.Roles.Components; // Frontier
 using Content.Shared.Database;
 using Content.Shared.GameTicking;
 using Content.Shared.Humanoid;
@@ -27,8 +27,9 @@ using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Utility;
-using Content.Server._Corvax.Respawn; // Frontier
-using Content.Shared._NF.Roles.Components; // Frontier
+using System.Globalization;
+using System.Linq;
+using System.Numerics;
 
 namespace Content.Server.GameTicking
 {
@@ -217,6 +218,16 @@ namespace Content.Server.GameTicking
 
                 character = HumanoidCharacterProfile.RandomWithSpecies(speciesId);
             }
+            // Horizon start
+            if (_mind.TryGetMind(player.UserId, out var oldMindId, out var oldMind) &&
+                oldMind.OwnedEntity is { } oldEntity)
+            {
+                if (TryComp<JobTrackingComponent>(oldEntity, out var oldJobTracking))
+                {
+                    _stationJobs.ClearOriginalJob(oldJobTracking.SpawnStation, player.UserId);
+                }
+            }
+            // Horizon end
 
             // We raise this event to allow other systems to handle spawning this player themselves. (e.g. late-join wizard, etc)
             var bev = new PlayerBeforeSpawnEvent(player, character, jobId, lateJoin, station);
@@ -289,12 +300,17 @@ namespace Content.Server.GameTicking
             // Frontier: ensure jobs are tracked
             var jobComp = EnsureComp<JobTrackingComponent>(mob);
             jobComp.Job = jobId;
+            // Horizon start
+            var salary = EnsureComp<SalaryTrackingComponent>(mob);
+            salary.Station = station;
+            salary.JobId = jobId;
+            // Horizon end
             jobComp.SpawnStation = station;
             jobComp.Active = true;
             Dirty(mob, jobComp);
             // End Frontier
 
-            _roles.MindAddJobRole(newMind, silent: silent, jobPrototype:jobId);
+            _roles.MindAddJobRole(newMind, silent: silent, jobPrototype: jobId);
             var jobName = _jobs.MindTryGetJobName(newMind);
             _admin.UpdatePlayerList(player);
 
@@ -321,6 +337,13 @@ namespace Content.Server.GameTicking
                         Loc.GetString("latejoin-arrival-sender"),
                         playDefaultSound: false);
                 }
+
+                // Frontier: send new player message if the player is new.
+                if (jobPrototype.NewPlayerMessage)
+                {
+                    HandleGreetingMessage(player, mob, station);
+                }
+                // End Frontier
             }
 
             // who tf is perma oWo
@@ -372,6 +395,18 @@ namespace Content.Server.GameTicking
 
         public void Respawn(ICommonSession player)
         {
+            // Horizon start
+            if (_mind.TryGetMind(player.UserId, out var mindId, out var mind))
+            {
+                if (mind.OwnedEntity is { } ownedEntity)
+                {
+                    if (TryComp<JobTrackingComponent>(ownedEntity, out var jobTracking))
+                    {
+                        _stationJobs.ClearOriginalJob(jobTracking.SpawnStation, player.UserId);
+                    }
+                }
+            }
+            // Horizon end
             _mind.WipeMind(player);
             _adminLogger.Add(LogType.Respawn, LogImpact.Medium, $"Player {player} was respawned.");
 
@@ -497,17 +532,17 @@ namespace Content.Server.GameTicking
                 return spawn;
             }
 
-            if (_mapManager.MapExists(DefaultMap))
+            if (_map.MapExists(DefaultMap))
             {
-                var mapUid = _mapManager.GetMapEntityId(DefaultMap);
+                var mapUid = _map.GetMapOrInvalid(DefaultMap);
                 if (!TerminatingOrDeleted(mapUid))
                     return new EntityCoordinates(mapUid, Vector2.Zero);
             }
 
             // Just pick a point at this point I guess.
-            foreach (var map in _mapManager.GetAllMapIds())
+            foreach (var map in _map.GetAllMapIds())
             {
-                var mapUid = _mapManager.GetMapEntityId(map);
+                var mapUid = _map.GetMapOrInvalid(map);
 
                 if (!metaQuery.TryGetComponent(mapUid, out var meta)
                     || meta.EntityPaused

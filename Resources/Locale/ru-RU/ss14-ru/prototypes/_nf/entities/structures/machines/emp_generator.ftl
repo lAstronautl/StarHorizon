@@ -1,2 +1,2 @@
-ent-MobileEmpGenerator = mobile EMP generator
-    .desc = Creates giant EMP blasts to disable shuttles.
+ent-MobileEmpGenerator = мобильный ЭМИ генератор
+    .desc = Создает гигантские ЭМИ взрывы, чтобы отключать шаттлы.

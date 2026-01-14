@@ -1,3 +1,3 @@
 ent-AirlockExternalGlassNfsd = { ent-AirlockExternalGlass }
-    .suffix = ДСБФ, Стеклянный
+    .suffix = ДШНФ, Стеклянный
     .desc = { ent-AirlockExternalGlass.desc }

@@ -44,6 +44,8 @@
         type: MechBoundUserInterface
       enum.StorageUiKey.Key: # Horizon Mech
         type: StorageBoundUserInterface
+      enum.RcdUiKey.Key:
+        type: RCDMenuBoundUserInterface
   - type: MeleeWeapon
     hidden: true
     attackRate: 0.75
@@ -165,6 +167,8 @@
   - type: Construction
     graph: UpgradeMechRipley
     node: start
+  - type: CanBeTakenUnderControl # Horizon Remote control
+    remotePilot: MobRemotePilot
   # Horizon end
 
 - type: entity

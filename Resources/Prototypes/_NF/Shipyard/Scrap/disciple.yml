@@ -16,18 +16,27 @@
   price: 15000 # Appraises at 12179, ~25% margin - TODO: fix this value, getting tests to pass - Whatstone
   category: Small
   group: Scrap
-  shuttlePath: /Maps/_NF/Shuttles/Scrap/disciple.yml
+  shuttlePath: /Maps/_Horizon/Shuttles/Shipyard/Scrap/disciple.yml  # Horizon - замена карты
   guidebookPage: Null
   class:
   - Scrapyard
   - Civilian
   engine:
   - Plasma
+  # Horizon start
+  costModifiers:
+    - !type:RoleModifier
+      role: "Pilot"
+      costMultiplier: 0.8
+    - !type:RoleModifier
+      role: "Mercenary"
+      costMultiplier: 1.2
+  # Horizon end
 
 - type: gameMap
   id: Disciple
   mapName: 'NSV Disciple'
-  mapPath: /Maps/_NF/Shuttles/Scrap/disciple.yml
+  mapPath: /Maps/_Horizon/Shuttles/Shipyard/Scrap/disciple.yml  # Horizon - замена карты
   minPlayers: 0
   stations:
     Disciple:

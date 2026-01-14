@@ -1,16 +1,9 @@
 MIT License
-
-<<<<<<<< HEAD:LICENSE.TXT
-Copyright (c) 2017-2024 Space Wizards Federation
-Copyright (c) 2021-2024 Corvax
-Copyright (c) 2024 Aavikko Avaruus
-========
 Copyright (c) 2017-2025 Space Wizards Federation
 Copyright (c) 2021-2025 Corvax
 Copyright (c) 2022-2024 Nyanotrasen
 Copyright (c) 2023-2025 Cosmatic Drift
 Copyright (c) 2024-2025 emberfall 14
->>>>>>>> Frontier/master:LICENSE-MIT.txt
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

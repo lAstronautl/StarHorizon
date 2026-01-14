@@ -126,6 +126,7 @@
   - ClothingOuterFlannelRed
   - ClothingOuterFlannelBlue
   - ClothingOuterFlannelGreen
+  - ClothingUniformJumpsuitExpeditorExtra # Horizon [ специальная униформа экспедитора ] by Serafim547
 
 - type: latheRecipePack
   id: NFUniformCloaks

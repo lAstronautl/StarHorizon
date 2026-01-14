@@ -84,6 +84,23 @@
     - Belt
 
 - type: entity
+  id: WeaponProtoKineticRepeaterBorg
+  parent: WeaponProtoKineticRepeater
+  components:
+  - type: Gun
+    resetOnHandSelected: false
+    burstCooldown: 2
+    fireRate: 0.5
+    selectedMode: Burst
+    angleDecay: 20
+    minAngle: 20
+    maxAngle: 25
+    availableModes:
+    - Burst
+    soundGunshot:
+      path: /Audio/Weapons/Guns/Gunshots/kinetic_accel.ogg
+
+- type: entity
   name: proto-kinetic railgun
   id: WeaponProtoKineticRailgun
   parent: [WeaponProtoKineticAcceleratorBase, BaseC1Contraband]
@@ -126,6 +143,20 @@
     slots:
     - suitStorage
     - Belt
+
+- type: entity
+  id: WeaponProtoKineticRailgunBorg
+  parent: WeaponProtoKineticRailgun
+  components:
+  - type: Gun
+    resetOnHandSelected: false
+    fireRate: 0.3
+    angleDecay: 10
+    minAngle: 10
+    maxAngle: 15
+    cameraRecoilScalar: 6
+    soundGunshot:
+      path: /Audio/Weapons/Guns/Gunshots/kinetic_accel.ogg
 
 - type: entity
   name: proto-kinetic shotgun

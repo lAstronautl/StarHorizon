@@ -10,6 +10,7 @@ ent-GasVolumePumpOn = { ent-GasVolumePump }
 ent-BasePressurePumpGaslock = внешний газовый шлюз
     .desc = Соединяет газовые трубы на отдельных шаттлах или станциях вместе, чтобы обеспечить транспортировку газа. Для обеспечения подачи газа оба борта должны быть состыкованы и работать в одном направлении.
 ent-BaseGaslock = газовый шлюз
+    .desc = { ent-BaseStructure.desc }
 ent-Gaslock = { ent-BasePressurePumpGaslock }
     .desc = { ent-BasePressurePumpGaslock.desc }
 ent-GaslockFrame = переносной газовый шлюз

@@ -13,19 +13,20 @@ public enum MechUiKey : byte
 /// </summary>
 public sealed class MechEquipmentUiStateReadyEvent : EntityEventArgs
 {
-    public Dictionary<NetEntity, BoundUserInterfaceState?> States = new();  // Horizon Mech
+    public BoundUserInterfaceState? State;  // Horizon Mech
 }
 
 /// <summary>
 /// Event raised to relay an equipment ui message
+/// Horizon - считайте что ивент полностью переписан
 /// </summary>
-[Serializable, NetSerializable] // Horizon Mech
-public sealed class MechEquipmentUiMessageRelayEvent : EntityEventArgs
+//[Serializable, NetSerializable] // Horizon Mech
+public sealed class MechEquipmentUiMessageRelayEvent<T> : EntityEventArgs where T : MechEquipmentUiMessage
 {
-    public MechEquipmentUiMessage Message;
+    public T Message;
     public NetEntity? Pilot;    // Horizon Mech
 
-    public MechEquipmentUiMessageRelayEvent(MechEquipmentUiMessage message, NetEntity? pilot) // Horizon Mech
+    public MechEquipmentUiMessageRelayEvent(T message, NetEntity? pilot) // Horizon Mech
     {
         Message = message;
         Pilot = pilot;  // Horizon Mech

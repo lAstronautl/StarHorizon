@@ -12,3 +12,7 @@ ui-options-function-cm-holster-primary = Вытащить из кобуры ор
 ui-options-function-cm-holster-secondary = Вытащить из кобуры, второе оружие
 ui-options-function-cm-holster-tertiary = Вытащить из кобуры, третье оружие
 ui-options-function-cm-holster-quaternary = Вытащить из кобуры, четвертое оружие
+
+## Кнопки перемещения
+
+ui-options-function-laying = Лечь

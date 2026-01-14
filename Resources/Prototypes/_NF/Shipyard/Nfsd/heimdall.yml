@@ -7,7 +7,7 @@
 # Discord: Tych0
 
 # Shuttle Notes:
-# Keeping watch for Ragnarök. As soon as someone adds ship horns they better make a Gjallarhorn for this thing. 
+# Keeping watch for Ragnarök. As soon as someone adds ship horns they better make a Gjallarhorn for this thing.
 - type: vessel
   id: Heimdall
   name: NSF Heimdall
@@ -23,6 +23,18 @@
   - Detective
   engine:
   - Plasma
+  # Horizon start
+  costModifiers:
+    - !type:RoleModifier
+      role: "Pilot"
+      costMultiplier: 0.8
+    - !type:RoleModifier
+      role: "Mercenary"
+      costMultiplier: 1.2
+    - !type:FactionCostModifier
+      faction: "FactionNFSD"
+      costMultiplier: 0.9
+  # Horizon end
 
 - type: gameMap
   id: Heimdall

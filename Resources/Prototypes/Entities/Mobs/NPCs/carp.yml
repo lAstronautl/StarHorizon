@@ -91,6 +91,9 @@
       isToggle: true
       color: "#808080"
     # Horizon end
+    - type: SampleSource # Horizon cytology
+      availableCellSamples:
+      - protoID: CellSampleSpaceCarp
 
 - type: entity
   parent: BaseMobCarp
@@ -122,6 +125,10 @@
       sprite: Mobs/Aliens/Carps/magic.rsi
     - type: TypingIndicator
       proto: guardian
+    # Horizon
+    - type: SampleSource
+      availableCellSamples:
+      - protoID: CellSampleCarpMagic
 
 - type: entity
   name: holocarp
@@ -146,6 +153,10 @@
             - Opaque
     - type: TypingIndicator
       proto: robot
+    # Horizon
+    - type: SampleSource
+      availableCellSamples:
+      - protoID: CellSampleCarpHolo
 
 - type: entity
   parent: MobCarp
@@ -159,6 +170,10 @@
     energy: 0.5
   - type: RgbLightController
     layers: [ 0 ]
+  # Horizon
+  - type: SampleSource
+    availableCellSamples:
+    - protoID: CellSampleCarpRainbow
 
 - type: entity
   id: MobCarpSalvage
@@ -257,8 +272,7 @@
         - id: FoodMeatFish
           amount: 4
         - id: MaterialToothSharkminnow1
-          amount: 1
-          maxAmount: 3
+          amount: 3
     - type: MeleeWeapon
       damage:
         types:
@@ -272,3 +286,6 @@
   categories: [ HideSpawnMenu ] # Frontier
   components:
     - type: NFSalvageMobRestrictions # Frontier: SalvageMobRestrictions<NFSalvageMobRestrictions
+    - type: SampleSource # Horizon cytology
+      availableCellSamples:
+      - protoID: CellSampleMegaSpaceCarp

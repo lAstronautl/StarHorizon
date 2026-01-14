@@ -10,7 +10,7 @@
   - IngotGold1
   - IngotSilver1
   - MaterialBananium1
-  - MaterialDiamond
+#  - MaterialDiamond # Horizon
   - BluespaceCrystal # Frontier
 
 - type: latheRecipePack
@@ -26,3 +26,13 @@
   - SheetPlasteel1
   - SheetUGlass1
   - SheetRUGlass1
+  - MaterialDiamond # Horizon
+  - MaterialEmerald # Horizon
+  - MaterialRuby # Horizon
+  - MaterialSapphire # Horizon
+  - MaterialTopaz # Horizon
+  - IngotTitan1 # Horizon
+  - IngotPsycore1 # Horizon
+  - SheetPlutonium1 # Horizon
+  - SheetNeptunium1 # Horizon
+  - SheetTorium1 # Horizon

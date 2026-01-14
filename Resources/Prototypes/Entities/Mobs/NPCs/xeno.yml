@@ -129,6 +129,13 @@
   - type: NightVision
     isToggle: true
     color: "#808080"
+  - type: SampleSource
+    availableCellSamples:
+    - protoID: CellSampleXeno
+  - type: CanBeTakenUnderControl # Horizon
+    remotePilot: MobRemotePilot
+  - type: StaticPrice
+    price: 4000
   # Horizon end
 
 
@@ -176,6 +183,13 @@
         - MobMask
         layer:
         - MobLayer
+  - type: SampleSource
+    availableCellSamples:
+    - protoID: CellSampleXenoPraetorian
+  - type: CanBeTakenUnderControl # Horizon
+    remotePilot: MobRemotePilot
+  - type: StaticPrice
+    price: 6000
 
 - type: entity
   name: drone
@@ -214,6 +228,13 @@
         - MobMask
         layer:
         - MobLayer
+  - type: SampleSource
+    availableCellSamples:
+    - protoID: CellSampleXenoDrone
+  - type: CanBeTakenUnderControl # Horizon
+    remotePilot: MobRemotePilot
+  - type: StaticPrice
+    price: 4000
 
 - type: entity
   name: queen
@@ -308,6 +329,13 @@
         - MobMask
         layer:
         - MobLayer
+  - type: SampleSource
+    availableCellSamples:
+    - protoID: CellSampleXenoRavager
+  - type: CanBeTakenUnderControl # Horizon
+    remotePilot: MobRemotePilot
+  - type: StaticPrice
+    price: 4000
 
 - type: entity
   name: runner
@@ -339,6 +367,13 @@
         - MobMask
         layer:
         - MobLayer
+  - type: SampleSource
+    availableCellSamples:
+    - protoID: CellSampleXenoRunner
+  - type: CanBeTakenUnderControl # Horizon
+    remotePilot: MobRemotePilot
+  - type: StaticPrice
+    price: 1600
 
 - type: entity
   name: rouny
@@ -355,6 +390,13 @@
     spawned:
     - id: FoodMeatRouny
       amount: 3
+  - type: SampleSource
+    availableCellSamples:
+    - protoID: CellSampleXenoRouny
+  - type: CanBeTakenUnderControl # Horizon
+    remotePilot: MobRemotePilot
+  - type: StaticPrice
+    price: 3000
 
 - type: entity
   name: spitter
@@ -403,6 +445,13 @@
         - MobMask
         layer:
         - MobLayer
+  - type: SampleSource
+    availableCellSamples:
+    - protoID: CellSampleXenoSpitter
+  - type: CanBeTakenUnderControl # Horizon
+    remotePilot: MobRemotePilot
+  - type: StaticPrice
+    price: 1400
 
 - type: entity
   name: space adder
@@ -473,6 +522,13 @@
     tags:
     - DoorBumpOpener
     - FootstepSound
+  - type: SampleSource # Horizon
+    availableCellSamples:
+    - protoID: CellSampleSpaceViper
+  - type: CanBeTakenUnderControl # Horizon
+    remotePilot: MobRemotePilot
+  - type: StaticPrice
+    price: 1600
 
 - type: entity
   name: space adder

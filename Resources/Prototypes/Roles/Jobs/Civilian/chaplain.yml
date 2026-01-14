@@ -3,6 +3,7 @@
   name: job-name-chaplain
   description: job-description-chaplain
   playTimeTracker: JobChaplain
+  salary: 25000 # Horizon
   setPreference: false # Frontier
   requirements:
     - !type:OverallPlaytimeRequirement
@@ -27,3 +28,15 @@
     back:
     - Bible
     - RubberStampChaplain
+
+- type: chameleonOutfit
+  id: ChaplainChameleonOutfit
+  job: Chaplain
+  equipment:
+    head: ClothingHeadHatPlaguedoctor
+    eyes: ClothingEyesGlasses
+    mask: ClothingMaskPlague
+    neck: ClothingNeckStoleChaplain
+    outerClothing: ClothingOuterPlagueSuit
+    gloves: ClothingHandsGlovesColorBlack
+

@@ -21,3 +21,4 @@ borg-placeholder-display-name-smokes = курительные
 borg-placeholder-display-name-spray-bottle = распылитель
 borg-placeholder-display-name-topical-medication = актуальные
 borg-placeholder-display-name-trading-crate = ящик для обмена
+borg-placeholder-display-name-translator = продвинутый переводчик

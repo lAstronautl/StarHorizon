@@ -86,3 +86,18 @@
   - type: ContainerContainer
     containers:
       ballistic-ammo: !type:Container
+
+- type: entity
+  parent: BaseItem
+  id: BoxChemBox
+  name: chemical ammo box
+  components:
+  - type: BallisticAmmoProvider
+  - type: Sprite
+    sprite: _Horizon/Objects/Weapons/Guns/Ammunition/Magazine/Mech/plasma_box.rsi
+    state: icon
+  - type: MechMagazine
+    magazinetype: chemical
+  - type: ContainerContainer
+    containers:
+      ballistic-ammo: !type:Container

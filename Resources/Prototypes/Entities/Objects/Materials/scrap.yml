@@ -26,6 +26,17 @@
   - type: Tag
     tags:
     - Recyclable
+    - SalvageScrap
+  - type: CytologyDirt
+    possibleCellSamples:
+    - protoID: CellSampleWyvernIce
+    - protoID: CellSampleCarpMagic
+    - protoID: CellSampleSpaceViper
+    - protoID: CellSampleCockroach
+    - protoID: CellSampleXenomorphLarva
+    - protoID: CellSampleXenomorphDrone
+    - protoID: CellSampleXenomorphHunter
+    - protoID: CellSampleXenomorphSentinel
 
 - type: entity
   parent: BaseStructure

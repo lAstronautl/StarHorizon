@@ -54,6 +54,10 @@
         orGroup: PSB
     sound:
       path: /Audio/Effects/unwrap.ogg
+  - type: Tag
+    tags:
+    - Meat
+    - FoodSnack
 
 - type: entity
   parent: FoodSnackBase
@@ -74,6 +78,7 @@
   - type: Tag
     tags:
     - Meat
+    - FoodSnack
 
 - type: entity
   name: soy sustenance bar

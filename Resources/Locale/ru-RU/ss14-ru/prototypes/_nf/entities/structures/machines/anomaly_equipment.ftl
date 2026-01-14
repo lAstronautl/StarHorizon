@@ -1,2 +1,2 @@
-ent-MachineMiniAnomalyGenerator = mini anomaly generator
-    .desc = The peak of pseudoscientific technology.
+ent-MachineMiniAnomalyGenerator = портативный генератор аномалий
+    .desc = Вершина псевдонаучной технологии.

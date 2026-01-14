@@ -1,4 +1,4 @@
-﻿- type: entity
+- type: entity
   parent: GasPressurePump
   id: GasPressurePumpOn
   suffix: On
@@ -147,6 +147,12 @@
   - type: RadiationBlocker
     resistance: 3
   - type: Occluder
+  
+  # Icon для призрака
+  - type: Icon
+    sprite: _NF/Structures/Piping/Atmospherics/gaslock.rsi
+    state: closed
+  
   - type: Sprite
     sprite: _NF/Structures/Piping/Atmospherics/gaslock.rsi
     drawdepth: Doors
@@ -164,6 +170,12 @@
       shader: unshaded
     - state: panel_open
       map: ["enum.WiresVisualLayers.MaintenancePanel"]
+  
+  # Construction компонент ДОЛЖЕН быть здесь!
+  - type: Construction
+    graph: GaslockConstruction
+    node: building
+  
   - type: GenericVisualizer
     visuals:
       enum.PumpVisuals.Enabled:
@@ -182,7 +194,7 @@
     price: 350
   - type: BlockWeather
   - type: PlacementReplacement
-    key: walls # For construction if this eventually supports it.
+    key: walls
   - type: IconSmooth
     key: walls
     mode: NoSprite

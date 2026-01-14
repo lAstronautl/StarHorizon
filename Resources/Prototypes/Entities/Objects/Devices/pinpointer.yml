@@ -45,7 +45,9 @@
   parent: [ BaseC2ContrabandUnredeemable, PinpointerBase ] # Frontier: BaseCommandContraband<BaseC2ContrabandUnredeemable
   components:
   - type: Pinpointer
-    component: NukeDisk
+    whitelist: # Goob edit: pinpointer whitelist
+      components:
+      - NukeDisk
     targetName: nuclear authentication disk
 
 - type: entity
@@ -65,7 +67,9 @@
   - type: Icon
     state: pinpointer-syndicate
   - type: Pinpointer
-    component: NukeDisk
+    whitelist: # Goob edit: pinpointer whitelist
+      components:
+      - NukeDisk
     targetName: nuclear authentication disk
 
 - type: entity
@@ -111,8 +115,10 @@
   - type: Icon
     state: pinpointer-station
   - type: Pinpointer
-    component: ResearchServer
-    targetName: the station
+    whitelist: # Goob edit: pinpointer whitelist
+      components:
+      - ResearchServer
+    targetName: research servers # Goob edit
 
 - type: entity
   parent: [ PinpointerBase, BaseXenoborgContraband ]
@@ -132,5 +138,7 @@
   - type: Icon
     state: pinpointer-station
   - type: Pinpointer
-    component: XenoborgMothership
-    targetName: the mothership
+    whitelist: # Goob edit: pinpointer whitelist
+      components:
+      - XenoborgMothership
+    targetName: the mothership # Goob edit

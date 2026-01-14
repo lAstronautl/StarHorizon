@@ -656,6 +656,8 @@
   - type: Sprite
     layers:
     - state: syndie
+  - type: PresetIdCard
+    job: SyndicateOperative
   - type: Access
     tags:
     - NuclearOperative
@@ -796,6 +798,7 @@
     - state: idcluwne
   - type: IdCard
     jobTitle: job-title-cluwne
+    jobIcon: JobIconCluwne
   - type: Unremoveable
 
 - type: entity

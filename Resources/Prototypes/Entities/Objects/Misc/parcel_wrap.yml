@@ -130,3 +130,13 @@
     - ParcelWrapBlacklist # No exponential wrapper trash-splosions.
     - Recyclable
   - type: SpaceGarbage
+  - type: CytologyDirt
+    possibleCellSamples:
+    - protoID: CellSampleMurine
+    - protoID: CellSampleCat
+    - protoID: CellSampleCorgi
+    - protoID: CellSampleCockroach
+    - protoID: CellSampleXenomorphLarva
+    - protoID: CellSampleXenomorphDrone
+    - protoID: CellSampleXenomorphHunter
+    - protoID: CellSampleXenomorphSentinel

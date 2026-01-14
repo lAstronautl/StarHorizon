@@ -326,6 +326,8 @@
         orGroup: GiftPool
       - id: ClothingUniformColorRainbow
         orGroup: GiftPool
+      - id: ClothingUniformJumpskirtColorRainbow
+        orGroup: GiftPool
       - id: ClothingUniformOveralls
         orGroup: GiftPool
       - id: ClothingUniformJumpskirtDetectiveGrey
@@ -376,6 +378,10 @@
         orGroup: GiftPool
       - id: RGBStaff
         orGroup: GiftPool
+      # WD EDIT START
+      - id: FaceHuggerToys
+        orGroup: GiftPool
+      # WD EDIT END
     sound:
       path: /Audio/Effects/unwrap.ogg
 
@@ -453,3 +459,42 @@
     tags:
     - Trash
   - type: SpaceGarbage
+
+# Horizon start
+
+- type: entity
+  id: PresentTechDisk
+  parent: [PresentBase, BaseItem]
+  name: technological present
+  description: A little box with a valuable technology disk inside.
+  components:
+  - type: SpawnItemsOnUse
+    items:
+      - id: TechnologyDiscAdvancedPKAModules
+        orGroup: TechDiskPool
+      - id: TechnologyDiscDurandTechnology
+        orGroup: TechDiskPool
+      - id: TechnologyDiscPhazonTechnology
+        orGroup: TechDiskPool
+      - id: TechnologyDiscArsenalAmmoModules
+        orGroup: TechDiskPool
+      - id: TechnologyDiscArsenalAmmunition
+        orGroup: TechDiskPool
+      - id: TechnologyDiscHydroponicsDNAManip
+        orGroup: TechDiskPool
+      - id: TechnologyDiscUniversalTranslator
+        orGroup: TechDiskPool
+      - id: TechnologyDiscCombatCybernetics
+        orGroup: TechDiskPool
+      - id: TechnologyDiskCombatCyborgs
+        orGroup: TechDiskPool
+      - id: CytologyDiskHealthSpeed
+        orGroup: TechDiskPool
+      - id: CytologyDiskMeleeDamage
+        orGroup: TechDiskPool
+      - id: CytologyDiskSpeedHunger
+        orGroup: TechDiskPool
+    sound:
+      path: /Audio/Effects/unwrap.ogg
+
+# Horizon end

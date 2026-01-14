@@ -25,6 +25,17 @@ public sealed class BorgSelectTypeUserInterface : BoundUserInterface
         base.Open();
 
         _menu = this.CreateWindow<BorgSelectTypeMenu>();
-        _menu.ConfirmedBorgType += prototype => SendPredictedMessage(new BorgSelectTypeMessage(prototype));
+
+        // Get the category filter from the borg component if available
+        var entityManager = IoCManager.Resolve<IEntityManager>();
+        string? categoryFilter = null;
+
+        if (entityManager.TryGetComponent<BorgSwitchableTypeComponent>(Owner, out var comp) && comp.BorgTypeCategory != null)
+        {
+            categoryFilter = comp.BorgTypeCategory;
+        }
+
+        _menu.Initialize(categoryFilter);
+        _menu.ConfirmedBorgType += (prototype, skin) => SendPredictedMessage(new BorgSelectTypeMessage(prototype, skin));   // Horizon borg skins
     }
 }

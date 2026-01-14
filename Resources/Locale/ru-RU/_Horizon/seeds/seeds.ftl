@@ -103,3 +103,5 @@ seeds-cherryblue-name = голубая вишня
 seeds-cherryblue-display-name = голубая вишня
 seeds-diamondcarrot-name = алмазная морковь
 seeds-diamondcarrot-display-name = алмазная морковь
+seeds-bluespace-tomato-name = блюспейс томат
+seeds-bluespace-tomato-display-name = блюспейс томат

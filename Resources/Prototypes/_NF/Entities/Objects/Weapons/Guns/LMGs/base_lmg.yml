@@ -7,10 +7,10 @@
   components:
   - type: Wieldable
     unwieldOnUse: false
-  - type: GunRequiresWield
+#  - type: GunRequiresWield
   - type: GunWieldBonus
-    minAngle: -0 # Set to 0 because GunRequiresWield
-    maxAngle: -0
+    minAngle: -10 # Set to 0 because GunRequiresWield
+    maxAngle: -10
   - type: Gun
     projectileSpeed: 30
     minAngle: 3.1

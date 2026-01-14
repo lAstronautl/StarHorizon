@@ -236,17 +236,17 @@ public sealed class StorageWindow : BaseWindow
         };
         exitButton.OnPressed += _ =>
         {
-            // Close ourselves and all parent BUIs.
+            // Horizon: Only close this storage window, not parent windows
+            // Parent windows should remain open when closing child windows
             Close();
-            CloseParent();
         };
         exitButton.OnKeyBindDown += args =>
         {
             // it just makes sense...
             if (!args.Handled && args.Function == ContentKeyFunctions.ActivateItemInWorld)
             {
+                // Horizon: Only close this storage window, not parent windows
                 Close();
-                CloseParent();
                 args.Handle();
             }
         };

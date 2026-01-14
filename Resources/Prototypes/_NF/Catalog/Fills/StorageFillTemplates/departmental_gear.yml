@@ -33,7 +33,11 @@
     - id: ClothingEyesGlassesChemical
     - id: PlasmaChemistryVial
     - id: HandLabeler
-
+    - id: BoxSyringe
+    - id: BoxBottle
+    - id: BoxBeaker
+    - id: BoxBeaker
+  
 - type: entityTable
   id: NFStorageFillGearParamedic
   table: !type:AllSelector

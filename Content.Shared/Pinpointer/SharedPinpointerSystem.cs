@@ -1,13 +1,12 @@
-using Content.Shared._NF.Pinpointer;
+using System.Linq;
 using Content.Shared.Administration.Logs;
 using Content.Shared.Database;
-using Content.Shared.DoAfter;
 using Content.Shared.Emag.Systems;
 using Content.Shared.Examine;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Interaction;
-using Content.Shared.Mobs.Components;
-using Robust.Shared.Serialization;
+using Content.Shared.Popups;
+using Content.Shared.Whitelist;
 
 namespace Content.Shared.Pinpointer;
 
@@ -15,16 +14,15 @@ public abstract class SharedPinpointerSystem : EntitySystem
 {
     [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
     [Dependency] private readonly EmagSystem _emag = default!;
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!; // Frontier
+    [Dependency] protected readonly EntityWhitelistSystem Whitelist = default!; // Goob edit
+    [Dependency] private readonly SharedPopupSystem _popup = default!; // Goob edit
 
     public override void Initialize()
     {
         base.Initialize();
         SubscribeLocalEvent<PinpointerComponent, GotEmaggedEvent>(OnEmagged);
-        SubscribeLocalEvent<PinpointerComponent, GotUnEmaggedEvent>(OnUnemagged); // Frontier
         SubscribeLocalEvent<PinpointerComponent, AfterInteractEvent>(OnAfterInteract);
         SubscribeLocalEvent<PinpointerComponent, ExaminedEvent>(OnExamined);
-        SubscribeLocalEvent<PinpointerComponent, PinpointerDoAfterEvent>(OnPinpointerDoAfter); // Frontier
     }
 
     /// <summary>
@@ -32,100 +30,89 @@ public abstract class SharedPinpointerSystem : EntitySystem
     /// </summary>
     private void OnAfterInteract(EntityUid uid, PinpointerComponent component, AfterInteractEvent args)
     {
-        if (!args.CanReach || args.Target is not { } target)
+        if (!args.CanReach || args.Target is not { } target || args.Handled)
             return;
 
         if (!component.CanRetarget || component.IsActive)
             return;
 
-        // Frontier: disallow pinpointing mobs
-        if (!component.CanTargetMobs && HasComp<MobStateComponent>(args.Target))
-            return;
-
-        // TODO add doafter once the freeze is lifted
+        // Goob edit start: retargeting has a whitelist
         args.Handled = true;
 
-        // Frontier: the below was made into a do-after, see OnPinpointerDoAfter.
-        // component.Target = args.Target;
-        // _adminLogger.Add(LogType.Action, LogImpact.Low, $"{ToPrettyString(args.User):player} set target of {ToPrettyString(uid):pinpointer} to {ToPrettyString(component.Target.Value):target}");
-        // if (component.UpdateTargetName)
-        //     component.TargetName = component.Target == null ? null : Identity.Name(component.Target.Value, EntityManager);
-
-        var daArgs = new DoAfterArgs(EntityManager, args.User, TimeSpan.FromSeconds(component.RetargetDoAfter),
-            new PinpointerDoAfterEvent(), uid, args.Target, uid)
+        if (Whitelist.IsWhitelistFail(component.RetargetingWhitelist, target) ||
+            Whitelist.IsBlacklistPass(component.RetargetingBlacklist, target))
         {
-            BreakOnDamage = true,
-            BreakOnWeightlessMove = true,
-            CancelDuplicate = true,
-            BreakOnHandChange = true,
-            NeedHand = true,
-            BreakOnMove = true,
-        };
-        _doAfter.TryStartDoAfter(daArgs);
-        // End Frontier
-    }
-
-    private void OnPinpointerDoAfter(EntityUid uid, PinpointerComponent component, PinpointerDoAfterEvent args)
-    {
-        if (args.Cancelled)
             return;
-
-        // Frontier: two-way pinpointer tracking
-        if (component.SetsTarget)
-        {
-            if (TryComp<PinpointerTargetComponent>(component.Target, out var pinpointerTarget))
-            {
-                pinpointerTarget.Entities.Remove(uid);
-                if (pinpointerTarget.Entities.Count <= 0)
-                    RemComp<PinpointerTargetComponent>(component.Target.Value);
-            }
-            if (args.Target != null)
-            {
-                pinpointerTarget = EnsureComp<PinpointerTargetComponent>(args.Target.Value);
-                pinpointerTarget.Entities.Add(uid);
-            }
         }
-        // End Frontier: two-way pinpointer tracking
 
-        component.Target = args.Target;
-        _adminLogger.Add(LogType.Action, LogImpact.Low, $"{ToPrettyString(args.User):player} set target of {ToPrettyString(uid):pinpointer} to {ToPrettyString(component.Target):target}");
+        // TODO add doafter once the freeze is lifted
+        // ignore can target multiple, because too hard to support
+        component.Targets.Clear();
+        component.Targets.Add(target);
+        _adminLogger.Add(LogType.Action, LogImpact.Low, $"{ToPrettyString(args.User):player} set target of {ToPrettyString(uid):pinpointer} to {ToPrettyString(target):target}");
         if (component.UpdateTargetName)
-            component.TargetName = component.Target == null ? null : Identity.Name(component.Target.Value, EntityManager);
+            component.TargetName = Identity.Name(target, EntityManager);
+
+        _popup.PopupPredicted(Loc.GetString("pinpointer-link-success"), uid, args.User);
+        // Goob edit end
     }
 
     /// <summary>
     ///     Set pinpointers target to track
+    ///     Goob edit: If CanTargetMultiple is true in Pinpointer component, then it will be ADDED, not set
     /// </summary>
     public virtual void SetTarget(EntityUid uid, EntityUid? target, PinpointerComponent? pinpointer = null)
     {
         if (!Resolve(uid, ref pinpointer))
             return;
 
-        if (pinpointer.Target == target)
+        if (target == null || pinpointer.Targets.Contains(target.Value))
+        {
+            return;
+        }
+
+        if (!pinpointer.CanTargetMultiple)
+        {
+            pinpointer.Targets.Clear();
+        }
+
+        if (TerminatingOrDeleted(target.Value))
+        {
+            TrySetArrowAngle(uid, Angle.Zero, pinpointer);
+            return;
+        }
+
+        pinpointer.Targets.Add(target.Value);
+
+        if (pinpointer.UpdateTargetName)
+            pinpointer.TargetName = Identity.Name(target.Value, EntityManager);
+        // WD EDIT START - UpdateDirectionToTarget is triggered when updating, no need to run it again
+        // if (pinpointer.IsActive)
+        //    UpdateDirectionToTarget(uid, pinpointer);
+        // WD EDIT END
+    }
+
+    /// <summary>
+    /// Goob edit: sets a list of targets for a pinpointer.
+    /// </summary>
+    public virtual void SetTargets(EntityUid uid, List<EntityUid> targets, PinpointerComponent? pinpointer = null)
+    {
+        if (!Resolve(uid, ref pinpointer))
             return;
 
-        // Frontier: two-way pinpointer tracking
-        if (pinpointer.SetsTarget)
+        if (!pinpointer.CanTargetMultiple)
         {
-            if (TryComp<PinpointerTargetComponent>(pinpointer.Target, out var pinpointerTarget))
-            {
-                pinpointerTarget.Entities.Remove(uid);
-                if (pinpointerTarget.Entities.Count <= 0)
-                    RemComp<PinpointerTargetComponent>(pinpointer.Target.Value);
-            }
-            if (target != null)
-            {
-                pinpointerTarget = EnsureComp<PinpointerTargetComponent>(target.Value);
-                pinpointerTarget.Entities.Add(uid);
-            }
+            return; // No.
         }
-        // End Frontier: two-way pinpointer tracking
 
-        pinpointer.Target = target;
-        if (pinpointer.UpdateTargetName)
-            pinpointer.TargetName = target == null ? null : Identity.Name(target.Value, EntityManager);
-        if (pinpointer.IsActive)
-            UpdateDirectionToTarget(uid, pinpointer);
+        var targetsList = targets.Where(Exists).ToList();
+
+        pinpointer.Targets = targetsList;
+
+        // WD EDIT START - UpdateDirectionToTarget is triggered when updating, no need to run it again
+        // if (pinpointer.IsActive)
+        //    UpdateDirectionToTarget(uid, pinpointer);
+        // WD EDIT END
     }
 
     /// <summary>
@@ -138,7 +125,7 @@ public abstract class SharedPinpointerSystem : EntitySystem
 
     private void OnExamined(EntityUid uid, PinpointerComponent component, ExaminedEvent args)
     {
-        if (!args.IsInDetailsRange || component.TargetName == null)
+        if (!component.CanExamine || !args.IsInDetailsRange || component.TargetName == null) // WD EDIT
             return;
 
         args.PushMarkup(Loc.GetString("examine-pinpointer-linked", ("target", component.TargetName)));
@@ -209,38 +196,25 @@ public abstract class SharedPinpointerSystem : EntitySystem
 
     private void OnEmagged(EntityUid uid, PinpointerComponent component, ref GotEmaggedEvent args)
     {
+        // WD EDIT START
+        if (!component.CanEmag)
+            return;
+        // WD EDIT END
+
         if (!_emag.CompareFlag(args.Type, EmagType.Interaction))
             return;
 
         if (_emag.CheckFlag(uid, EmagType.Interaction))
             return;
 
-        if (component.CanRetarget)
-            return;
-
         args.Handled = true;
+
+        if (component.CanRetarget)
+        {
+            component.RetargetingWhitelist = null; // Can target anything
+            return;
+        }
+
         component.CanRetarget = true;
     }
-
-    // Frontier: demag
-    private void OnUnemagged(EntityUid uid, PinpointerComponent component, ref GotUnEmaggedEvent args)
-    {
-        if (!_emag.CompareFlag(args.Type, EmagType.Interaction))
-            return;
-
-        if (!_emag.CheckFlag(uid, EmagType.Interaction))
-            return;
-
-        if (component.CanRetarget)
-            component.CanRetarget = false;
-
-        args.Handled = true;
-    }
-    // End Frontier: demag
-}
-
-// Frontier - do-after
-[Serializable, NetSerializable]
-public sealed partial class PinpointerDoAfterEvent : SimpleDoAfterEvent
-{
 }

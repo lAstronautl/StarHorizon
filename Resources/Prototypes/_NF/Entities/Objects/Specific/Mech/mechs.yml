@@ -37,6 +37,8 @@
   - type: MovementSpeedModifier
     baseWalkSpeed: 3
     baseSprintSpeed: 5
+  - type: CanBeTakenUnderControl # Horizon Remote control
+    remotePilot: MobRemotePilot
 
 - type: entity
   id: MechEmuBattery

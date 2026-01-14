@@ -3007,13 +3007,6 @@ entities:
     - type: Transform
       pos: 2.5,-7.5
       parent: 1
-- proto: MercenaryTechFab
-  entities:
-  - uid: 410
-    components:
-    - type: Transform
-      pos: 3.5,8.5
-      parent: 1
 - proto: NFClosetBombFilled
   entities:
   - uid: 411

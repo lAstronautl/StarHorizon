@@ -392,6 +392,7 @@ namespace Content.Server.Database
         public Guid UserId { get; set; }
         public int SelectedCharacterSlot { get; set; }
         public string AdminOOCColor { get; set; } = null!;
+        public List<string> ConstructionFavorites { get; set; } = new();
         public List<Profile> Profiles { get; } = new();
     }
 
@@ -421,6 +422,7 @@ namespace Content.Server.Database
         public List<Job> Jobs { get; } = new();
         public List<Antag> Antags { get; } = new();
         public List<Trait> Traits { get; } = new();
+        public List<Language> Languages { get; } = new(); // Horizon Languages
 
         public List<ProfileRoleLoadout> Loadouts { get; } = new();
 
@@ -428,6 +430,9 @@ namespace Content.Server.Database
 
         public int PreferenceId { get; set; }
         public Preference Preference { get; set; } = null!;
+        public int ErpStatus { get; set; } // _Horizon
+        public string Faction { get; set; } = null!; // _Horizon
+        public string OOCFlavorText { get; set; } = null!; // _Horizon
     }
 
     public class Job
@@ -466,6 +471,17 @@ namespace Content.Server.Database
 
         public string TraitName { get; set; } = null!;
     }
+
+    // Horizon languages start
+    public class Language
+    {
+        public int Id { get; set; }
+        public Profile Profile { get; set; } = null!;
+        public int ProfileId { get; set; }
+
+        public string LanguageName { get; set; } = null!;
+    }
+    // Horizon languages end
 
     #region Loadouts
 

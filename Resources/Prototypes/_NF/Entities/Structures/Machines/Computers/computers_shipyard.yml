@@ -17,6 +17,9 @@
     - map: ["computerLayerKeys"]
       state: telesci_key
   - type: ShipyardConsole
+    taxAccounts:
+      Invalid: 0.40
+    ignoreBaseSaleRate: true
     targetIdSlot:
       name: id-card-console-target-id
       ejectSound: /Audio/Machines/id_swipe.ogg

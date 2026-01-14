@@ -1,6 +1,6 @@
 using Content.Shared.Actions;
 using Content.Shared._EE.CCVar; // EE
-using Content.Shared._NF.Radar; // Frontier
+using Content.Shared._Mono.Radar; // Horizon
 using Content.Shared.Gravity;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Movement.Components;
@@ -246,4 +246,5 @@ public abstract partial class SharedJetpackSystem : EntitySystem // Frontier: ad
 public enum JetpackVisuals : byte
 {
     Enabled,
+    Layer
 }

@@ -1,10 +1,16 @@
 # region Civilian
+
 - type: roleLoadout
   id: JobContractor
   groups:
   - ContractorHead
   - ContractorNeck
   - ContractorJumpsuit
+  # Horizon start
+  - Top
+  - Bottom
+  - Socks
+  # Horizon end
   - ContractorGloves
   - ContractorBackpack
   - ContractorOuterClothing
@@ -30,6 +36,11 @@
   - PilotHead
   - PilotNeck
   - PilotJumpsuit
+  # Horizon start
+  - Top
+  - Bottom
+  - Socks
+  # Horizon end
   - PilotGloves
   - PilotBackpack
   - PilotOuterClothing
@@ -55,6 +66,11 @@
   - MercenaryHead
   - ContractorNeck
   - MercenaryJumpsuit
+  # Horizon start
+  - Top
+  - Bottom
+  - Socks
+  # Horizon end
   - MercenaryGloves
   - MercenaryBackpack
   - MercenaryOuterClothing
@@ -75,11 +91,17 @@
   - NFSpeciesSpecific
 
 # region Frontier
+
 - type: roleLoadout
   id: JobValet
   groups:
   - ContractorNeck
   - ValetJumpsuit
+  # Horizon start
+  - Top
+  - Bottom
+  - Socks
+  # Horizon end
   - ContractorBackpack
   - ValetOuterClothing
   - ValetForcedOuterClothing
@@ -102,6 +124,11 @@
   groups:
   - JanitorNFHead
   - JanitorNFJumpsuit
+  # Horizon start
+  - Top
+  - Bottom
+  - Socks
+  # Horizon end
   - JanitorNFGloves
   - JanitorBackpack
   - JanitorNFOuterClothing
@@ -123,6 +150,11 @@
   groups:
   - ContractorNeck
   - MailCarrierJumpsuit
+  # Horizon start
+  - Top
+  - Bottom
+  - Socks
+  # Horizon end
   - ContractorGloves
   - MailCarrierBackpack
   - MailCarrierOuterClothing
@@ -145,6 +177,11 @@
   - StcHead
   - ContractorNeck
   - StcJumpsuit
+  # Horizon start
+  - TopHOP
+  - BottomHOP
+  - SocksHOP
+  # Horizon end
   - ContractorGloves
   - ContractorBackpack
   - ContractorOuterClothing
@@ -168,6 +205,11 @@
   - StationRepHead
   - StationRepNeck
   - StationRepJumpsuit
+  # Horizon start
+  - TopHOP
+  - BottomHOP
+  - SocksHOP
+  # Horizon end
   - StationRepGloves
   - StationRepBackpack
   - StationRepOuterClothing
@@ -191,6 +233,11 @@
   groups:
   - SecurityGuardHead
   - SecurityGuardJumpsuit
+  # Horizon start
+  - TopHOS
+  - BottomHOS
+  - Socks
+  # Horizon end
   - SecurityGuardGloves
   - SecurityGuardBackpack
   - SecurityGuardOuterClothing
@@ -216,6 +263,11 @@
   - DocHead
   - DocNeck
   - DocJumpsuit
+  # Horizon start
+  - TopCMO
+  - BottomCMO
+  - Socks
+  # Horizon end
   - DocGloves
   - DocBackpack
   - ContractorOuterClothing
@@ -241,6 +293,11 @@
   - PlantManagerHead
   - PlantManagerNeck
   - PlantManagerJumpsuit
+  # Horizon start
+  - TopCE
+  - BottomCE
+  - Socks
+  # Horizon end
   - EngineeringGloves
   - PlantManagerBackpack
   - PlantManagerOuterClothing
@@ -265,6 +322,11 @@
   groups:
   - EngineeringHead
   - EngineeringJumpsuit
+  # Horizon start
+  - TopCE
+  - BottomCE
+  - Socks
+  # Horizon end
   - EngineeringGloves
   - EngineeringBackpack
   - EngineeringOuterClothing
@@ -291,6 +353,11 @@
   - CadetHead
   - CadetNeck
   - CadetJumpsuit
+  # Horizon start
+  - TopHOS
+  - BottomHOS
+  - Socks
+  # Horizon end
   - NfsdGlovesBrown
   - NfsdBackpackBrown
   - CadetOuterClothing
@@ -316,6 +383,11 @@
   - DeputyHead
   - DeputyNeck
   - DeputyJumpsuit
+  # Horizon start
+  - TopHOS
+  - BottomHOS
+  - Socks
+  # Horizon end
   - NfsdGlovesBrown
   - NfsdBackpackBrown
   - DeputyOuterClothing
@@ -341,6 +413,11 @@
   - BrigmedicHead
   - BrigmedicNeck
   - BrigmedicJumpsuit
+  # Horizon start
+  - TopHOS
+  - BottomHOS
+  - Socks
+  # Horizon end
   - BrigmedicGloves
   - NfsdBackpackCream
   - BrigmedicOuterClothing
@@ -366,6 +443,11 @@
   - NFDetectiveHead
   - NFDetectiveNeck
   - NFDetectiveJumpsuit
+  # Horizon start
+  - TopHOS
+  - BottomHOS
+  - Socks
+  # Horizon end
   - NFDetectiveGloves
   - NfsdBackpackBrown
   - NFDetectiveOuterClothing
@@ -391,6 +473,11 @@
   - ContractorHead
   - PalNeck
   - PalJumpsuit
+  # Horizon start
+  - TopHOS
+  - BottomHOS
+  - Socks
+  # Horizon end
   - PalGloves
   - NfsdBackpackBrown
   - NfsdForcedOuterClothing
@@ -440,6 +527,11 @@
   - BailiffHead
   - BailiffNeck
   - BailiffJumpsuit
+  # Horizon start
+  - TopHOS
+  - BottomHOS
+  - Socks
+  # Horizon end
   - NfsdGlovesCream
   - NfsdBackpackBrown
   - BailiffOuterClothing
@@ -465,6 +557,11 @@
   - SeniorOfficerHead
   - SeniorOfficerNeck
   - SeniorOfficerJumpsuit
+  # Horizon start
+  - TopHOS
+  - BottomHOS
+  - Socks
+  # Horizon end
   - NfsdGlovesCream
   - NfsdBackpackBrown
   - SeniorOfficerOuterClothing
@@ -490,6 +587,11 @@
   - SheriffHead
   - SheriffNeck
   - SheriffJumpsuit
+  # Horizon start
+  - TopHOS
+  - BottomHOS
+  - Socks
+  # Horizon end
   - NfsdGlovesCream
   - NfsdBackpackBrown
   - SheriffOuterClothing
@@ -507,7 +609,6 @@
   - SeniorOfficerBackpackItems
   - ContractorHandItems
   - NfsdSpeciesSpecific
-
 # region NFPirate
 
 - type: roleLoadout
@@ -516,6 +617,11 @@
   - NFPirateHead
 #  - NFPirateNeck
   - NFPirateJumpsuit
+  # Horizon start
+  - Top
+  - Bottom
+  - Socks
+  # Horizon end
 #  - NFPirateGloves
   - ContractorBackpack
   - NFPirateForcedOuterClothing
@@ -536,6 +642,11 @@
   - NFPirateFirstMateHead
 #  - NFPirateNeck
   - NFPirateJumpsuit
+  # Horizon start
+  - Top
+  - Bottom
+  - Socks
+  # Horizon end
 #  - NFPirateGloves
   - ContractorBackpack
   - NFPirateFirstMateOuterClothing
@@ -557,6 +668,11 @@
   - NFPirateCaptainHead
 #  - NFPirateNeck
   - NFPirateJumpsuit
+  # Horizon start
+  - Top
+  - Bottom
+  - Socks
+  # Horizon end
 #  - NFPirateGloves
   - ContractorBackpack
   - NFPirateCaptainOuterClothing
@@ -580,6 +696,11 @@
 #  - PrisonerHead
 #  - PrisonerNeck
   - PrisonerJumpsuit
+  # Horizon start
+  - Top
+  - Bottom
+  - Socks
+  # Horizon end
 #  - PrisonerGloves
 #  - PrisonerBackpack
   - PrisonerForcedOuterClothing
@@ -589,3 +710,48 @@
   - PrisonerPDA
   - PrisonerWallet
   - NFSpeciesSpecific
+
+- type: roleLoadout
+  id: JobSyndicateOfficerTeleCommunication
+  groups:
+  - Top
+  - Bottom
+  - Socks
+  - SyndicateJumpsuit
+  - SyndicateBack
+  - SyndicatePDA
+  - SyndicateHead
+  - SyndicateOuterClothing
+  - SyndicateEars
+  - SyndicateBoots
+  - ContractorWallet
+
+- type: roleLoadout
+  id: JobSyndicateOperative
+  groups:
+  - Top
+  - Bottom
+  - Socks
+  - SyndicateJumpsuit
+  - SyndicateBack
+  - SyndicatePDA
+  - SyndicateHead
+  - SyndicateOuterClothing
+  - SyndicateEars
+  - SyndicateBoots
+  - ContractorWallet
+
+- type: roleLoadout
+  id: JobSyndicateCargo
+  groups:
+  - Top
+  - Bottom
+  - Socks
+  - SyndicateJumpsuit
+  - SyndicateBack
+  - SyndicatePDA
+  - SyndicateHead
+  - SyndicateOuterClothing
+  - SyndicateEars
+  - SyndicateBoots
+  - ContractorWallet

@@ -46,7 +46,7 @@ public sealed class MechForkSystem : EntitySystem
     /// <inheritdoc/>
     public override void Initialize()
     {
-        SubscribeLocalEvent<MechForkComponent, MechEquipmentUiMessageRelayEvent>(OnGrabberMessage);
+        SubscribeLocalEvent<MechForkComponent, MechEquipmentUiMessageRelayEvent<MechGrabberEjectMessage>>(OnGrabberMessage);
         SubscribeLocalEvent<MechForkComponent, ComponentStartup>(OnStartup);
         SubscribeLocalEvent<MechForkComponent, MechEquipmentUiStateReadyEvent>(OnUiStateReady);
         SubscribeLocalEvent<MechForkComponent, MechEquipmentRemovedEvent>(OnEquipmentRemoved);
@@ -60,11 +60,8 @@ public sealed class MechForkSystem : EntitySystem
         SubscribeLocalEvent<MechForkComponent, ForkRemoveDoAfterEvent>(OnMechRemoveFromStorage);
     }
 
-    private void OnGrabberMessage(EntityUid uid, MechForkComponent component, MechEquipmentUiMessageRelayEvent args)
+    private void OnGrabberMessage(EntityUid uid, MechForkComponent component, MechEquipmentUiMessageRelayEvent<MechGrabberEjectMessage> args)
     {
-        if (args.Message is not MechGrabberEjectMessage msg)
-            return;
-
         if (!TryComp<MechEquipmentComponent>(uid, out var equipmentComponent) ||
             equipmentComponent.EquipmentOwner == null)
             return;
@@ -74,7 +71,7 @@ public sealed class MechForkSystem : EntitySystem
         if (!_interaction.InRangeUnobstructed(mech, targetCoords))
             return;
 
-        var item = GetEntity(msg.Item);
+        var item = GetEntity(args.Message.Item);
 
         if (!component.ItemContainer.Contains(item))
             return;
@@ -131,12 +128,11 @@ public sealed class MechForkSystem : EntitySystem
 
     private void OnUiStateReady(EntityUid uid, MechForkComponent component, MechEquipmentUiStateReadyEvent args)
     {
-        var state = new MechGrabberUiState
+        args.State = new MechGrabberUiState
         {
             Contents = GetNetEntityList(component.ItemContainer.ContainedEntities.ToList()),
             MaxContents = component.MaxContents
         };
-        args.States[GetNetEntity(uid)] = state;
     }
 
     private void OnEquipped(EntityUid uid, MechForkComponent component, MechEquipmentEquippedAction args)

@@ -1,10 +1,11 @@
+using Content.Shared._Horizon.Language;
 using Content.Shared.Chat;
 using Content.Shared.Radio;
 
 namespace Content.Server.Radio;
 
 [ByRefEvent]
-public readonly record struct RadioReceiveEvent(string Message, EntityUid MessageSource, RadioChannelPrototype Channel, EntityUid RadioSource, MsgChatMessage ChatMsg);
+public readonly record struct RadioReceiveEvent(string Message, EntityUid MessageSource, RadioChannelPrototype Channel, EntityUid RadioSource, MsgChatMessage ChatMsg, MsgChatMessage UnknownLanguageChatMsg, LanguagePrototype Language);  // Horizon Languages
 
 /// <summary>
 /// Use this event to cancel sending message per receiver

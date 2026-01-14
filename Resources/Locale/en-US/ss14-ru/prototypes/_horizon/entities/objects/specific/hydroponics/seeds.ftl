@@ -154,3 +154,6 @@ ent-CherryblueSeeds = пакет семян (голубая вишня)
 ent-DiamondcarrotSeeds = пакет семян (алмазная морковь)
     .suffix = Horizon
     .desc = { ent-SeedBase.desc }
+ent-BluespaceTomatoSeeds = пакет семян (блюспейс томат)
+    .suffix = Horizon
+    .desc = Будь осторожен с этим.

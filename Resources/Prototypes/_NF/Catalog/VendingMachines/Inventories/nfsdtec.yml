@@ -31,6 +31,25 @@
     BoxForensicPad: 3 # Frontier
     LogProbeCartridge: 3 # Frontier
     TrackingImplanter: 5 # Frontier
+  # Horizon start
+  # Attachements rail
+    AttachmentT2Miniscope: 5
+    AttachmentMagneticHarness: 5
+    AttachmentLaserSight: 5
+  # Attachements barrel
+    AttachmentSuppressor: 5
+    AttachmentAntiLyingWarrior: 5
+  # Attachements under
+    AttachmentVerticalGrip: 5
+    AttachmentReflexSight: 5
+    AttachmentM90UnderbarrelShotgun: 5
+    AttachmentM90GrenadeLauncher: 5
+  # Attachements grenades
+    40mmGrenadeBaton: 10
+    40mmGrenadeEMP: 10
+    40mmGrenadeFlash: 10
+    40mmGrenadeSmoke: 10
+  # Horizon end
 #    MindShieldImplanter: 5 # Frontier
   # security officers need to follow a diet regimen!
 #  contrabandInventory:

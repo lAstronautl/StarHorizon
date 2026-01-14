@@ -1,2 +1,2 @@
-entity-spawn-power-consumer-examine = The machine is consuming [color=lightblue]{ POWERWATTS($actual) }[/color]/[color=lightblue]{ POWERWATTS($requested) }[/color] of power.
-entity-spawn-power-consumer-estimated-time = Estimated time to produce one unit: [color=yellow]{ $time }[/color]
+entity-spawn-power-consumer-examine = Машина потребляет [color=lightblue]{ POWERWATTS($actual) }[/color]/[color=lightblue]{ POWERWATTS($requested) }[/color] энергии.
+entity-spawn-power-consumer-estimated-time = Расчетное время производства одной единицы: [color=yellow]{ $time }[/color]

@@ -88,11 +88,11 @@
   loadouts:
   - NfsdBoxSurvivalNfsdOxygen
   - NfsdBoxSurvivalNfsdNitrogen
-  - NfsdBoxSurvivalNfsdSheleg
+#  - NfsdBoxSurvivalNfsdSheleg # Horizon Survival box
   fallbacks:
   - NfsdBoxSurvivalNfsdOxygen
   - NfsdBoxSurvivalNfsdNitrogen
-  - NfsdBoxSurvivalNfsdSheleg
+#  - NfsdBoxSurvivalNfsdSheleg # Horizon Survival box
 
 - type: loadoutGroup
   id: NfsdFace

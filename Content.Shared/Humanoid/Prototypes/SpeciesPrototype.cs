@@ -1,7 +1,9 @@
+using Content.Shared._Horizon.Language;
 using Content.Shared.Dataset;
 using Content.Shared.Humanoid.Markings;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
+using Robust.Shared.Utility;
 
 namespace Content.Shared.Humanoid.Prototypes;
 
@@ -136,6 +138,37 @@ public sealed partial class SpeciesPrototype : IPrototype
     /// </summary>
     [DataField]
     public Color ForcedMarkingColor { get; private set; } = new();
+
+    // Horizon start
+
+    /// <summary>
+    /// Особые языки, которые не могут выбрать представители других рас.
+    /// Уникальные языки не должны быть раундстартовыми.
+    /// </summary>
+    [DataField]
+    public List<ProtoId<LanguagePrototype>> UniqueLanguages = new();
+
+    [DataField]
+    public List<ProtoId<LanguagePrototype>> DefaultLanguages = new() { "GalacticCommon" };
+
+    [DataField]
+    public int MaxLanguages = 3;
+
+    [DataField]
+    public List<ProtoId<LanguagePrototype>> ForceLanguages = new();
+
+    [DataField]
+    public ResPath? Description = new("/ServerInfo/_Horizon/SpeciesDesc/NoDesc.xml");
+
+    [DataField]
+    public int ProsCount = 0;
+
+    [DataField]
+    public int ConsCount = 0;
+
+    [DataField]
+    public int SpecialCount = 0;
+    // Horizon end
 }
 
 public enum SpeciesNaming : byte

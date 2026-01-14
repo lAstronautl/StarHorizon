@@ -161,16 +161,16 @@
       maxTargetPower: 25000
       targetPower: 15000
       optimalPower: 15000
-      # 45 minutes at max output
-      optimalBurnRate: 0.011111
+      # 90 minutes at max output # Horizon
+      optimalBurnRate: 0.0055551 # Horizon
       # a decent curve
       fuelEfficiencyConstant: 0.95
     - type: SolidFuelGeneratorAdapter
-      fuelMaterial: FuelGradePlasma # Frontier: Plasma<FuelGradePlasma
+      fuelMaterial: FuelGradeUnstablePlasma # Horizon # Frontier: Plasma<FuelGradePlasma
       multiplier: 0.01
     - type: MaterialStorage
       storageLimit: 3000
-      materialWhiteList: [Plasma, FuelGradePlasma, RawPlasma, Skrungle] # Frontier: add FuelGradePlasma, RawPlasma, Scrungle
+      materialWhiteList: [RawPlasma, Skrungle, Plasma, FuelGradePlasma, FuelGradeUnstablePlasma, FuelGradePurePlasma] # Horizon # Frontier: add FuelGradePlasma, RawPlasma, Skrungle
     - type: PortableGenerator
       startChance: 0.8
     - type: UpgradePowerSupplier
@@ -190,21 +190,27 @@
     - type: PowerSupplier
       supplyRampRate: 5000
       supplyRampTolerance: 1500
-    # Frontier: magnet pickup, fuel adapter
+    # Horizon # Frontier: magnet pickup, fuel adapter
     - type: MaterialStorageMagnetPickup
       range: 0.30
     - type: FuelGradeAdapter
       conversions:
-      - input: Plasma
-        output: FuelGradePlasma
-        rate: 1
       - input: RawPlasma
-        output: FuelGradePlasma
-        rate: 0.5
+        output: FuelGradeUnstablePlasma
+        rate: 0.125
       - input: Skrungle
-        output: FuelGradePlasma
+        output: FuelGradeUnstablePlasma
+        rate: 0.125
+      - input: Plasma
+        output: FuelGradeUnstablePlasma
+        rate: 0.25
+      - input: FuelGradePlasma
+        output: FuelGradeUnstablePlasma
+        rate: 0.5
+      - input: FuelGradePurePlasma
+        output: FuelGradeUnstablePlasma
         rate: 1
-    # End Frontier: magnet pickup, fuel adapter
+    # Horizon # End Frontier: magnet pickup, fuel adapter
 
 - type: entity
   name: S.U.P.E.R.P.A.C.M.A.N. portable generator # Frontier: no -type
@@ -240,16 +246,16 @@
       maxTargetPower: 50000
       targetPower: 30000
       optimalPower: 30000
-      # 45 minutes at full power
-      optimalBurnRate: 0.0111111
+      # 90 minutes at full power # Horizon
+      optimalBurnRate: 0.0055551 # Horizon
       # still decent power curve
       fuelEfficiencyConstant: 0.75
     - type: SolidFuelGeneratorAdapter
-      fuelMaterial: FuelGradeUranium # Frontier: Uranium<FuelGradeUranium
+      fuelMaterial: FuelGradeUnstableUranium # Horizon # Frontier: Uranium<FuelGradeUranium
       multiplier: 0.01
     - type: MaterialStorage
       storageLimit: 3000
-      materialWhiteList: [Uranium, FuelGradeUranium, RawUranium, Skrungle] # Frontier: add FuelGradeUranium, RawUranium, Skrungle
+      materialWhiteList: [RawUranium, Skrungle, Uranium, FuelGradeUranium, FuelGradeUnstableUranium, FuelGradePureUranium] # Horizon # Frontier: add FuelGradeUranium, RawUranium, Skrungle
     - type: PortableGenerator
     - type: UpgradePowerSupplier
       powerSupplyMultiplier: 1.25
@@ -264,21 +270,27 @@
     - type: PowerSupplier
       supplyRampRate: 7500
       supplyRampTolerance: 2500
-    # Frontier: magnet pickup, fuel adapter
+    # Horizon # Frontier: magnet pickup, fuel adapter
     - type: MaterialStorageMagnetPickup
       range: 0.30
     - type: FuelGradeAdapter
       conversions:
-      - input: Uranium
-        output: FuelGradeUranium
-        rate: 1
       - input: RawUranium
-        output: FuelGradeUranium
-        rate: 0.5
+        output: FuelGradeUnstableUranium
+        rate: 0.125
       - input: Skrungle
-        output: FuelGradeUranium
+        output: FuelGradeUnstableUranium
+        rate: 0.125
+      - input: Uranium
+        output: FuelGradeUnstableUranium
+        rate: 0.25
+      - input: FuelGradeUranium
+        output: FuelGradeUnstableUranium
         rate: 0.5
-    # End Frontier: magnet pickup, fuel adapter
+      - input: FuelGradePureUranium
+        output: FuelGradeUnstableUranium
+        rate: 1
+    # Horizon # End Frontier: magnet pickup, fuel adapter
 
 - type: entity
   name: J.R.P.A.C.M.A.N. portable generator # Frontier: no -type

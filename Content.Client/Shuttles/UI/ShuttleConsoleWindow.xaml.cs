@@ -19,10 +19,10 @@ public sealed partial class ShuttleConsoleWindow : FancyWindow,
 
     public event Action<MapCoordinates, Angle>? RequestFTL;
     public event Action<NetEntity, Angle>? RequestBeaconFTL;
-    public event Action<NetEntity?, NetEntity>? RequestTrackEntity; // Frontier
 
     public event Action<NetEntity, NetEntity>? DockRequest;
     public event Action<NetEntity>? UndockRequest;
+    public event Action<List<NetEntity>>? UndockAllRequest;
 
     public ShuttleConsoleWindow()
     {
@@ -69,6 +69,11 @@ public sealed partial class ShuttleConsoleWindow : FancyWindow,
         DockContainer.UndockRequest += entity =>
         {
             UndockRequest?.Invoke(entity);
+        };
+
+        DockContainer.UndockAllRequest += dockEntities =>
+        {
+            UndockAllRequest?.Invoke(dockEntities);
         };
 
         NfInitialize(); // Frontier Initialization for the ShuttleConsoleWindow
@@ -153,7 +158,16 @@ public sealed partial class ShuttleConsoleWindow : FancyWindow,
         MapContainer.SetConsole(owner);
 
         NavContainer.UpdateState(cState.NavState);
-        MapContainer.UpdateState(cState.MapState);
+        // MapContainer.UpdateState(cState.MapState);
         DockContainer.UpdateState(coordinates?.EntityId, cState.DockState);
+        // Horizon start
+        if (cState.Broken)
+        {
+            SwitchMode(ShuttleConsoleMode.Dock);
+            DockModeButton.Pressed = true;
+            NavModeButton.Disabled = true;
+            MapModeButton.Disabled = true;
+        }
+        // Horizon end
     }
 }

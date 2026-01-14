@@ -1,8 +1,8 @@
-ent-MechEmu = Emu PLU
-    .desc = An older model of cargo hauler mech, the Emu Power Loading Unit has a single integral power fork module.
+ent-MechEmu = Эму АСПЮ
+    .desc = Более старая модель грузового меха, Автономный Силовой Погрузочный Юнит «Эму». Имеет один встроенный модуль силовых вил.
 ent-MechEmuBattery = { ent-MechEmu }
-    .suffix = Battery
+    .suffix = Батарея
     .desc = { ent-MechEmu.desc }
 ent-MechEmuCargo = { ent-MechEmu }
-    .suffix = Cargo, Med Battery
+    .suffix = Груз, Сред. Батарея
     .desc = { ent-MechEmu.desc }

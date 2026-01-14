@@ -111,6 +111,7 @@ tiles-asteroid-ironsand = asteroid ironsand
 tiles-asteroid-ironsand-borderless = borderless asteroid ironsand
 tiles-cave = cave
 tiles-cave-drought = cave drought
+tiles-cave-shadow = cave shadow
 tiles-flesh-floor = flesh floor
 tiles-techmaint3-floor = grated maintenance floor
 tiles-techmaint2-floor = steel maintenance floor

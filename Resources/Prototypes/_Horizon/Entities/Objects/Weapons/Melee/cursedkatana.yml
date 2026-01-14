@@ -24,3 +24,7 @@
   - type: Tag
     tags:
     - CursedKatana
+  - type: DamageOtherOnHit
+    damage:
+      types:
+        Slash: 15

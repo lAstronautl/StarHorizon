@@ -1,4 +1,31 @@
-﻿# Tier 2
+# Tier 2
+
+- type: technology
+  id: AdvancedShuttlecraft
+  name: research-technology-advanced-shuttlecraft
+  entityIcon: ComputerAdvancedRadar
+  discipline: NFEngineering
+  tier: 1
+  cost: 15000
+  recipeUnlocks:
+  - AdvancedRadarConsoleCircuitboard
+  technologyPrerequisites:
+  - NFShuttlecraft
+  position: 2, 72
+
+- type: technology
+  id: OreDrilling
+  name: research-technology-ore-drilling
+  entityIcon: OreMiningDrill
+  discipline: NFEngineering
+  tier: 1
+  cost: 10000
+  recipeUnlocks:
+  - OreMiningDrillMachineCircuitboard
+  technologyPrerequisites:
+  - NFAtmosphericTech
+  - NFExcavation
+  position: 1, 55
 
 - type: technology
   id: RipleyMKIITechnology
@@ -47,7 +74,7 @@
     - BoxPlasmaBox
   technologyPrerequisites:
   - ClarkeTechnology
-  position: 4, 26
+  position: 4, 27
 
 - type: technology
   id: MechGunPKA
@@ -60,8 +87,39 @@
   - MechGunPKA
   - MechGunPKAHeavy
   technologyPrerequisites:
+  - MechTechnologyMining
+  prerequisiteLineType: Tree
+  position: 5, 27
+
+- type: technology
+  id: MechJets
+  name: research-technology-mech-jets
+  entityIcon: MechEquipmentJet
+  discipline: NFEngineering
+  tier: 2
+  cost: 5000
+  recipeUnlocks:
+  - MechEquipmentJet
+  technologyPrerequisites:
   - ClarkeTechnology
-  position: 4, 27
+  prerequisiteLineType: Tree
+  position: 4, 26
+
+- type: technology
+  id: MechEngineeringEquipment
+  name: research-technology-mech-engineering-equipment
+  entityIcon: MechEquipmentWire
+  discipline: NFEngineering
+  tier: 2
+  cost: 10000
+  recipeUnlocks:
+  - MechEquipmentRCD
+  - MechEquipmentWire
+  technologyPrerequisites:
+  - ClarkeTechnology
+  prerequisiteLineType: Tree
+  position: 4, 25
+
 
 # Tier 3
 
@@ -71,7 +129,7 @@
   entityIcon: MechReactorTesla
   discipline: NFEngineering
   tier: 3
-  cost: 7500
+  cost: 15000
   recipeUnlocks:
   - MechReactorPlasma
   - MechReactorUranium
@@ -91,7 +149,7 @@
   - MechHarsonUpgradeKit
   - MechHarsonSpiderUpgradeKit
   technologyPrerequisites:
-  - ClarkeTechnology
+  - ClarkeMechPaint
 #  recipeUnlocks: - WIP - кратко - я манал щас пилить меха с нуля, пусть улучшают Кларка
 #  - HarsonHarness
 #  - HarsonLArm
@@ -101,7 +159,7 @@
 #  - HarsonHead
 #  - HarsonCentralElectronics
 #  - HarsonPeripheralsElectronics
-  position: 4, 25
+  position: 5, 28
 
 - type: technology
   id: RipleyMKIIMechPaint
@@ -115,7 +173,7 @@
   - MechRipleyCombatUpgradeKit
   - MechRipleyEarthUpgradeKit
   - MechRipleyFlamesredUpgradeKit
-  - MechRipleyTitanUpgradeKit
+#  - MechRipleyTitanUpgradeKit
   - MechRipleyZairjahUpgradeKit
   - MechRipleyFirefighterUpgradeKit
   - MechRipleyHaulerUpgradeKit
@@ -137,3 +195,62 @@
   technologyPrerequisites:
   - ClarkeTechnology
   position: 4, 28
+
+- type: technology
+  id: FuelGeneration
+  name: research-technology-fuel
+  entityIcon: OreProcessorFuel
+  discipline: NFEngineering
+  tier: 2
+  cost: 5000
+  recipeUnlocks:
+  - OreProcessorFuelMachineCircuitboard
+  - EnergoTovar
+  technologyPrerequisites:
+  - NFPowerGeneration
+  position: 3, 50
+
+- type: technology
+  id: FuelGenerationUnstable
+  name: research-technology-fuel-unstable
+  entityIcon: FuelPlasmaUnstable1
+  discipline: NFEngineering
+  tier: 2
+  cost: 10000
+  recipeUnlocks:
+  - FuelPlasmaUnstable1
+  - FuelUraniumUnstable1
+  - FuelBananiumUnstable1
+  - FuelPlutoniumUnstable1
+  technologyPrerequisites:
+  - FuelGeneration
+  position: 4, 50
+
+- type: technology
+  id: FuelGenerationPure
+  name: research-technology-fuel-pure
+  entityIcon: FuelPlasmaPure1
+  discipline: NFEngineering
+  tier: 2
+  cost: 10000
+  recipeUnlocks:
+  - FuelPlasmaPure1
+  - FuelUraniumPure1
+  - FuelBananiumPure1
+  - FuelPlutoniumPure1
+  technologyPrerequisites:
+  - FuelGenerationUnstable
+  position: 5, 50
+
+- type: technology
+  id: NFExperimentalPowerGeneration
+  name: research-technology-experimental-generators
+  entityIcon: PortableGeneratorStarPacman
+  discipline: NFEngineering
+  tier: 3
+  cost: 10000
+  recipeUnlocks:
+  - PortableGeneratorStarPacmanMachineCircuitboard
+  technologyPrerequisites:
+  - NFAdvancedPowerGeneration
+  position: 5, 49

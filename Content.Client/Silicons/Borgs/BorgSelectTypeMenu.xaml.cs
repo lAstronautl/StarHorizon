@@ -20,10 +20,14 @@ namespace Content.Client.Silicons.Borgs;
 public sealed partial class BorgSelectTypeMenu : FancyWindow
 {
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly IEntityManager _entMan = default!;    // Horizon
+    private readonly BorgSwitchableTypeSystem _borg;
 
     private BorgTypePrototype? _selectedBorgType;
+    private int _selectedSkin;  // Horizon borg skins
+    private string? _categoryFilter;  // Filter by category
 
-    public event Action<ProtoId<BorgTypePrototype>>? ConfirmedBorgType;
+    public event Action<ProtoId<BorgTypePrototype>, int>? ConfirmedBorgType;    // Horizon borg skins
 
     [ValidatePrototypeId<GuideEntryPrototype>]
     private static readonly List<ProtoId<GuideEntryPrototype>> GuidebookEntries = new() { "Cyborgs", "Robotics" };
@@ -33,8 +37,28 @@ public sealed partial class BorgSelectTypeMenu : FancyWindow
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);
 
+        _borg = _entMan.System<BorgSwitchableTypeSystem>(); // Horizon
+    }
+
+    /// <summary>
+    /// Initializes the menu with an optional category filter.
+    /// If a category is specified, only borg types with that category will be shown.
+    /// </summary>
+    /// <param name="categoryFilter">The category to filter by, or null to show all types</param>
+    public void Initialize(string? categoryFilter = null)
+    {
+        _categoryFilter = categoryFilter;
         var group = new ButtonGroup();
-        foreach (var borgType in _prototypeManager.EnumeratePrototypes<BorgTypePrototype>().OrderBy(PrototypeName))
+
+        var borgTypes = _prototypeManager.EnumeratePrototypes<BorgTypePrototype>();
+
+        // Filter by category if specified
+        if (categoryFilter != null)
+        {
+            borgTypes = borgTypes.Where(b => b.Category == categoryFilter);
+        }
+
+        foreach (var borgType in borgTypes.OrderBy(PrototypeName))
         {
             var button = new Button
             {
@@ -64,6 +88,42 @@ public sealed partial class BorgSelectTypeMenu : FancyWindow
         NameLabel.Text = PrototypeName(prototype);
         DescriptionLabel.Text = Loc.GetString($"borg-type-{prototype.ID}-desc");
         ChassisView.SetPrototype(prototype.DummyPrototype);
+
+        // Horizon start
+        var group = new ButtonGroup(false);
+        SkinsContainer.RemoveAllChildren();
+        for (var i = 0; i < prototype.Skins.Count; i++)
+        {
+            SpriteView sprite = new()
+            {
+                Scale = new(2),
+                SetSize = new(48),
+                HorizontalAlignment = HAlignment.Center,
+                VerticalAlignment = VAlignment.Center
+            };
+
+            var ent = _entMan.Spawn(prototype.DummyPrototype);
+            var comp = _entMan.EnsureComponent<BorgSwitchableTypeComponent>(ent);
+            comp.SelectedBorgSkin = prototype.Skins[i];
+            _borg.UpdateEntityAppearance((ent, comp), prototype);
+
+            sprite.SetEntity(ent);
+
+            Button button = new()
+            {
+                SetSize = new(72, 64),
+                Group = group,
+                ToolTip = Loc.GetString(prototype.Skins[i].Name),
+                Margin = new(8, 4),
+                Children = { sprite }
+            };
+
+            var idx = i;
+            button.OnPressed += args => _selectedSkin = idx;
+
+            SkinsContainer.AddChild(button);
+        }
+        // Horizon end
     }
 
     private void ConfirmButtonPressed(BaseButton.ButtonEventArgs obj)
@@ -71,7 +131,7 @@ public sealed partial class BorgSelectTypeMenu : FancyWindow
         if (_selectedBorgType == null)
             return;
 
-        ConfirmedBorgType?.Invoke(_selectedBorgType);
+        ConfirmedBorgType?.Invoke(_selectedBorgType, _selectedSkin);    // Horizon borg skins
     }
 
     private static string PrototypeName(BorgTypePrototype prototype)

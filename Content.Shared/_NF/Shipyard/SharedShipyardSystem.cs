@@ -32,20 +32,23 @@ public abstract class SharedShipyardSystem : EntitySystem
         base.Initialize();
         SubscribeLocalEvent<ShipyardConsoleComponent, ComponentInit>(OnComponentInit);
         SubscribeLocalEvent<ShipyardConsoleComponent, ComponentRemove>(OnComponentRemove);
-        SubscribeLocalEvent<ShipyardConsoleComponent, ComponentGetState>(OnGetState);
-        SubscribeLocalEvent<ShipyardConsoleComponent, ComponentHandleState>(OnHandleState);
+
+        // Horizon commented
+        //SubscribeLocalEvent<ShipyardConsoleComponent, ComponentGetState>(OnGetState);
+        // SubscribeLocalEvent<ShipyardConsoleComponent, ComponentHandleState>(OnHandleState);
     }
 
-    private void OnHandleState(EntityUid uid, ShipyardConsoleComponent component, ref ComponentHandleState args)
-    {
-        if (args.Current is not ShipyardConsoleComponentState state) return;
+    // Horizon commented
+    // private void OnHandleState(EntityUid uid, ShipyardConsoleComponent component, ref ComponentHandleState args)
+    // {
+    //     if (args.Current is not ShipyardConsoleComponentState state) return;
 
-    }
+    // }
 
-    private void OnGetState(EntityUid uid, ShipyardConsoleComponent component, ref ComponentGetState args)
-    {
+    // private void OnGetState(EntityUid uid, ShipyardConsoleComponent component, ref ComponentGetState args)
+    // {
 
-    }
+    // }
 
     private void OnComponentInit(EntityUid uid, ShipyardConsoleComponent component, ComponentInit args)
     {

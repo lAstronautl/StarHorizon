@@ -22,3 +22,7 @@ ent-FoodDoughFlatPastry = pastry dough
     .desc = A buttery, rolled out pastry dough.
 ent-FoodBakedWaffleCone = waffle cone
     .desc = A sugary waffle cone. Top with ice cream!
+ent-FoodRiceNoodlesSheet = rice noodles sheet
+    .desc = A sheet of rice, ready to be chopped into noodles. Probably better cooked.
+ent-FoodRiceNoodles = rice noodles
+    .desc = A nest of delicate rice noodles. Probably better cooked.

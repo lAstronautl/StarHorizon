@@ -1,10 +1,10 @@
 ent-FillNfsdForms = { "" }
     .desc = { "" }
-ent-BoxFolderNfsdForms = папка форм ДСБФ
-    .desc = Папка, заполненная шаблонами документов ДСБФ.
+ent-BoxFolderNfsdForms = папка форм ДШНФ
+    .desc = Папка, заполненная шаблонами документов ДШНФ.
     .suffix = Формы, Зеленая
-ent-BoxFolderNfsdFormsBrown = папка форм ДСБФ
-    .desc = Папка, заполненная шаблонами документов ДСБФ.
+ent-BoxFolderNfsdFormsBrown = папка форм ДШНФ
+    .desc = Папка, заполненная шаблонами документов ДШНФ.
     .suffix = Формы, Коричневая
 ent-PaperWrittenNfsdWarrant = search ордер на обыск
     .desc = { ent-Paper.desc }

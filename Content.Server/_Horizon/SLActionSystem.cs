@@ -3,6 +3,7 @@ using System.Reflection;
 using Content.Server.Actions;
 using Content.Shared._Horizon.Medical.Limbs;
 using Content.Shared.Actions;
+using Content.Shared.Actions.Components;
 using Robust.Shared.Reflection;
 
 namespace Content.Server._Horizon;
@@ -34,7 +35,7 @@ public sealed partial class SLActionSystem : EntitySystem
         var actionEnt = ent.Comp.ActionEntity; // (╯‵□′)╯︵┻━┻
 
         if (_actionContainer.EnsureAction(ent, ref actionEnt, out var action, ent.Comp.Action) && ent.Comp.EntityIcon)
-            _actions.SetEntityIcon(actionEnt!.Value, ent, action);
+            _actions.SetEntityIcon(new Entity<ActionComponent?>(actionEnt.Value, action), ent); // (╯‵□′)╯︵┻━┻ ┻━┻ ┻━┻
 
         ent.Comp.ActionEntity = actionEnt; //(ヘ･_･)ヘ┳━┳
     }

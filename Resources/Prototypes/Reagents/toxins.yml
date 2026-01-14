@@ -37,10 +37,18 @@
     Poison:
       effects:
       - !type:HealthChange
+        conditions:
+        - !type:OrganType
+          type: Katunian
+          shouldHave: false
         damage:
           types:
             Poison: 4
       - !type:PopupMessage
+        conditions:
+        - !type:OrganType
+          type: Katunian
+          shouldHave: false
         type: Local
         visualType: MediumCaution
         messages: [ "generic-reagent-effect-burning-insides" ]
@@ -386,8 +394,9 @@
         damage:
           groups:
             Brute: 2
-            Toxin: 2
             Airloss: 2
+          types:
+            Poison: 2
       - !type:PopupMessage
         type: Local
         messages: [ "histamine-effect-light-itchiness" ]
@@ -413,7 +422,7 @@
   boilingPoint: 554 # I'm not a chemist, but it boils at 295, lower than melting point, idk how it works so I gave it higher value
   metabolisms:
     Poison:
-      metabolismRate: 0.05
+      metabolismRate: 0.04 # DeltaV - Slowed to allow coffee/etc to build up theobromine
       effects:
       - !type:HealthChange
         conditions:
@@ -421,12 +430,14 @@
           type: Animal # Applying damage to the mobs with lower metabolism capabilities
         damage:
           types:
-            Poison: 0.4
+            Poison: 0.3 # DeltaV - slightly reduced to account for slowed metabolism rate
       - !type:ChemVomit
-        probability: 0.04 #Scaled for time, not metabolismrate.
+        probability: 0.1 #Scaled for time, not metabolismrate. # DeltaV - Increased from .04 Vomit more when there is a lot of it
         conditions:
           - !type:OrganType
             type: Animal
+            reagent: Theobromine
+            min: 0.5
   pricePerUnit: 1 # Horizon
 
 - type: reagent
@@ -503,6 +514,9 @@
           - !type:OrganType
             type: Demon
             shouldHave: false
+          - !type:OrganType
+            type: Katunian
+            shouldHave: false
         type: Local
         visualType: MediumCaution
         messages: [ "generic-reagent-effect-sick" ]
@@ -519,6 +533,9 @@
           - !type:OrganType
             type: Vox
             shouldHave: false
+          - !type:OrganType
+            type: Katunian
+            shouldHave: false
       - !type:HealthChange
         conditions:
         - !type:OrganType
@@ -529,6 +546,9 @@
           shouldHave: false
         - !type:OrganType
           type: Demon
+          shouldHave: false
+        - !type:OrganType
+          type: Katunian
           shouldHave: false
         damage:
           types:
@@ -541,6 +561,9 @@
         - !type:OrganType
           type: Demon
           shouldHave: true
+        - !type:OrganType
+           type: Katunian
+           shouldHave: true
         reagent: Protein
         amount: 0.5
       - !type:AdjustReagent
@@ -614,6 +637,7 @@
       - !type:Emote
         emote: Honk
         showInChat: true
+        showInGuidebook: true
         force: true
         probability: 0.2
       - !type:HealthChange

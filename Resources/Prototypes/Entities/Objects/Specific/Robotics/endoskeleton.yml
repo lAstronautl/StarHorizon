@@ -79,3 +79,26 @@
     guides:
     - Cyborgs
     - Robotics
+
+- type: entity
+  id: CyborgCombatEndoskeleton
+  parent: CyborgEndoskeleton
+  name: combat endoskeleton
+  description: A reinforced combat-grade endoskeleton with titanium and psycory alloys. Significantly more threatening than a standard frame.
+  components:
+  - type: PartAssembly
+    parts:
+      combat:
+      - BorgLArm
+      - BorgRArm
+      - BorgLLeg
+      - BorgRLeg
+      - BorgHead
+      - BorgTorso
+  - type: Construction
+    graph: Cyborg
+    node: combat_start
+    defaultTarget: combat_cyborg
+    containers:
+    - part-container
+    - cell_slot

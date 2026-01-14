@@ -63,6 +63,16 @@
     Steel: 1500
 
 - type: latheRecipe
+  parent: BaseRoboticsRecipe
+  id: CyborgCombatEndoskeleton
+  result: CyborgCombatEndoskeleton
+  completetime: 3
+  materials:
+    Steel: 1500
+    Titan: 500
+    Psycore: 300
+
+- type: latheRecipe
   parent: BaseBorgLimbRecipe
   id: LeftArmBorg
   result: LeftArmBorg
@@ -126,6 +136,11 @@
   parent: BaseBorgModuleRecipe
   id: BorgModuleTool
   result: BorgModuleTool
+
+- type: latheRecipe
+  parent: BaseBorgModuleRecipe
+  id: BorgModuleCable
+  result: BorgModuleCable
 
 - type: latheRecipe
   parent: BaseBorgModuleRecipe

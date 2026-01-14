@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "license": "CLA with hosting restrictions",
+  "copyright": "By Xigovir",
+  "size": {
+    "x": 32,
+    "y": 32
+  },
+  "states": [
+    {
+      "name": "SyndicateOfficerTeleCommunication"
+    },
+    {
+      "name": "SyndicateOperative"
+    },
+    {
+      "name": "SyndicateCargo"
+    },
+    {
+      "name": "green"
+    }
+  ]
+}

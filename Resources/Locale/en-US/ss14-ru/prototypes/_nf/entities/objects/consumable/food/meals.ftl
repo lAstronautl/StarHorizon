@@ -37,3 +37,5 @@ ent-FoodTofuSliceBattered = battered tofu slice
     .desc = A slice of tofu, dredged in a gloopy flour and egg mixture. Arguably better in this form.
 ent-FoodSlicedTofuFried = fried tofu
     .desc = This once healthy slice of tofu has been fried to cispy perfection.
+ent-FoodMealChickenParmesan = chicken parmesan
+    .desc = The highest-rated method to taming an Australian. Just be sure to call it "chicken parm"...

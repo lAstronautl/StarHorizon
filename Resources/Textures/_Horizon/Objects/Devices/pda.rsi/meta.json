@@ -426,6 +426,17 @@
       ]
     },
     {
+      "name": "pda-wizard",
+      "delays": [
+        [
+          0.3,
+          0.3,
+          0.3,
+          0.3
+        ]
+      ]
+    },
+    {
       "name": "pda-medical",
       "delays": [
         [
@@ -926,6 +937,9 @@
     },
     {
       "name": "pda-library_world"
+    },
+    {
+      "name": "pda-wizard_world"
     },
     {
       "name": "pda-medical_world"

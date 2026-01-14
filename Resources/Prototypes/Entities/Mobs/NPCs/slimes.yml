@@ -32,9 +32,7 @@
     baseSprintSpeed: 4
   - type: FootstepModifier
     footstepSoundCollection:
-      path: /Audio/Effects/Footsteps/slime1.ogg
-      params:
-        volume: 3
+      collection: FootstepSlime
   - type: Tag
     tags:
     - FootstepSound
@@ -113,6 +111,9 @@
     speechSounds: Slime
   - type: TypingIndicator
     proto: slime
+  - type: SampleSource # Horizon cytology
+    availableCellSamples:
+    - protoID: CellSampleSlime
 
 - type: entity
   name: basic slime

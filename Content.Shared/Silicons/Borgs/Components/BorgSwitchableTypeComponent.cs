@@ -1,4 +1,5 @@
-﻿using Content.Shared.Actions;
+﻿using Content.Shared._Horizon.Silicon;
+using Content.Shared.Actions;
 using Content.Shared.Radio;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
@@ -22,7 +23,7 @@ namespace Content.Shared.Silicons.Borgs.Components;
 /// <seealso cref="SharedBorgSwitchableTypeSystem"/>
 [RegisterComponent, NetworkedComponent]
 [AutoGenerateComponentState(raiseAfterAutoHandleState: true)]
-[Access(typeof(SharedBorgSwitchableTypeSystem))]
+//[Access(typeof(SharedBorgSwitchableTypeSystem))]  // Horizon tweak
 public sealed partial class BorgSwitchableTypeComponent : Component
 {
     /// <summary>
@@ -45,6 +46,17 @@ public sealed partial class BorgSwitchableTypeComponent : Component
     /// </summary>
     [DataField]
     public ProtoId<RadioChannelPrototype>[] InherentRadioChannels = [];
+
+    /// <summary>
+    /// The category of borg types available for selection. If set, only borg types with matching category will be shown.
+    /// </summary>
+    [DataField]
+    public string? BorgTypeCategory;
+
+    // Horizon start
+    [DataField, AutoNetworkedField]
+    public BorgSkin SelectedBorgSkin = new();
+    // Horizon end
 }
 
 /// <summary>
@@ -57,9 +69,10 @@ public sealed partial class BorgToggleSelectTypeEvent : InstantActionEvent;
 /// </summary>
 /// <param name="prototype">The borg type prototype that the user selected.</param>
 [Serializable, NetSerializable]
-public sealed class BorgSelectTypeMessage(ProtoId<BorgTypePrototype> prototype) : BoundUserInterfaceMessage
+public sealed class BorgSelectTypeMessage(ProtoId<BorgTypePrototype> prototype, int skin) : BoundUserInterfaceMessage   // Horizon borg skins
 {
     public ProtoId<BorgTypePrototype> Prototype = prototype;
+    public int Skin = skin; // Horizon borg skins
 }
 
 /// <summary>

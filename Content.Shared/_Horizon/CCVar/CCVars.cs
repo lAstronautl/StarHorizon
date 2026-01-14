@@ -1,5 +1,6 @@
 using Robust.Shared;
 using Robust.Shared.Configuration;
+using Robust.Shared.Utility;
 
 namespace Content.Shared._Horizon.CCVar
 {
@@ -7,7 +8,7 @@ namespace Content.Shared._Horizon.CCVar
     public sealed class HorizonCCVars : CVars
     {
         /*
-         * Barks
+         * Barks (Звуки речи)
          */
         public static readonly CVarDef<bool> BarksEnabled =
             CVarDef.Create("barks.enabled", true, CVar.SERVER | CVar.REPLICATED | CVar.ARCHIVE);
@@ -29,5 +30,45 @@ namespace Content.Shared._Horizon.CCVar
 
         public static readonly CVarDef<float> BarksVolume =
             CVarDef.Create("barks.volume", 1f, CVar.CLIENTONLY | CVar.ARCHIVE);
+
+        /// <summary>
+        ///     URL of the Discord webhook which will relay bans.
+        /// </summary>
+        public static readonly CVarDef<string> DiscordBanWebhook =
+            CVarDef.Create("discord.ban_webhook", string.Empty, CVar.SERVERONLY | CVar.CONFIDENTIAL);
+
+        public static readonly CVarDef<bool> EnableCustomFonts =
+            CVarDef.Create("lang.enable_fonts", true, CVar.CLIENTONLY | CVar.ARCHIVE);
+
+        /// <summary>
+        ///     Paths to data
+        /// </summary>
+        public static readonly CVarDef<string> ShutdownTimersPath =
+            CVarDef.Create("paths.default_shutdown_path", "shutdown_timers.yml", CVar.SERVERONLY | CVar.CONFIDENTIAL);
+
+        public static readonly CVarDef<bool> ShutdownEnabled =
+            CVarDef.Create("paths.shutdown_enabled", false, CVar.SERVERONLY);
+
+        /*
+         * Очистка мусора (Trash Cleanup)
+         */
+
+        /// <summary>
+        /// Включена ли автоматическая очистка мусора.
+        /// </summary>
+        public static readonly CVarDef<bool> TrashCleanupEnabled =
+            CVarDef.Create("trash.cleanup_enabled", true, CVar.SERVERONLY);
+
+        /// <summary>
+        /// Интервал в секундах между очистками мусора.
+        /// </summary>
+        public static readonly CVarDef<float> TrashCleanupInterval =
+            CVarDef.Create("trash.cleanup_interval", 600f, CVar.SERVERONLY);
+
+        /// <summary>
+        /// Задержка в секундах после начала раунда перед активацией очистки мусора.
+        /// </summary>
+        public static readonly CVarDef<float> TrashCleanupStartDelay =
+            CVarDef.Create("trash.cleanup_start_delay", 600f, CVar.SERVERONLY);
     }
 }

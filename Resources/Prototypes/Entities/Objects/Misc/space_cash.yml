@@ -64,6 +64,14 @@
   - type: CargoSellBlacklist
   - type: ShipyardSellCondition # Frontier: Teleport to shipyard console on sale
     preserveOnSale: true
+  - type: CytologyDirt
+    possibleCellSamples:
+    - protoID: CellSampleMurine
+    - protoID: CellSampleCat
+    - protoID: CellSampleCorgi
+    - protoID: CellSampleCockroach
+    - protoID: CellSampleFrog
+    - protoID: CellSampleSlime
 
 - type: material
   id: Credit

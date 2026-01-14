@@ -58,11 +58,14 @@ public sealed partial class ImplanterSystem : SharedImplanterSystem
                 return;
             }
 
+            // Horizon start
+            // Horizon correction - удаляем проверку для себя, теперь все импланты должны
             //Implant self instantly, otherwise try to inject the target.
-            if (args.User == target)
-                Implant(target, target, uid, component);
-            else
-                TryImplant(component, args.User, target, uid);
+            //if (args.User == target)
+            //    Implant(target, target, uid, component);
+            //else
+            // Horizon end
+            TryImplant(component, args.User, target, uid);
         }
 
         args.Handled = true;

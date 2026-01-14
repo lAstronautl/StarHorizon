@@ -20,3 +20,5 @@
           type: MediaPlayerBoundUserInterface
         enum.WiresUiKey.Key:
           type: WiresBoundUserInterface
+  - type: StaticPrice
+    price: 200

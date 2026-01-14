@@ -15,7 +15,7 @@
   minimumDistance: 1650
   maximumDistance: 3400
   spawnGroup: Required
-  gridPath: /Maps/_NF/POI/lodge.yml
+  gridPath: /Maps/_Horizon/POI/lodge.yml # Horizon-Maps
   addComponents:
   - type: IFF
     color: "#3737F8"
@@ -26,7 +26,7 @@
 - type: gameMap
   id: Lodge
   mapName: 'Expeditionary Lodge'
-  mapPath: /Maps/_NF/POI/lodge.yml
+  mapPath: /Maps/_Horizon/POI/lodge.yml # Horizon-Maps
   minPlayers: 0
   stations:
     Lodge:
@@ -35,7 +35,7 @@
         - type: StationNameSetup
           mapNameTemplate: 'Expeditionary Lodge'
         - type: ExtraStationInformation
-          iconPath: /Textures/_NF/Markers/jobs.rsi/mercenary.png
+          iconPath: /Textures/_Horizon/Interface/banner_merc_two.png # Horizon
           stationSubtext: 'frontier-lobby-exped-subtext'
           stationDescription: 'frontier-lobby-exped-description'
           lobbySortOrder: 3

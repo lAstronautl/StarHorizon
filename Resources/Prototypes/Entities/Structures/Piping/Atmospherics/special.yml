@@ -25,6 +25,15 @@
   - type: Tag
     tags:
       - SpreaderIgnore
+  - type: Construction
+    graph: FanTiny
+    node: fantiny
+  - type: ContainerFill
+    containers:
+      board: [ FanTinyElectronics ]
+  - type: ContainerContainer
+    containers:
+      board: !type:Container
 
 - type: entity
   id: AtmosDeviceFanDirectional
@@ -54,3 +63,12 @@
   - type: Tag
     tags:
       - SpreaderIgnore
+  - type: Construction
+    graph: fandirectional
+    node: fandirectional
+  - type: ContainerFill
+    containers:
+      board: [ FanTinyElectronics ]
+  - type: ContainerContainer
+    containers:
+      board: !type:Container

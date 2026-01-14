@@ -1,3 +1,4 @@
+emp-generator-window-title = Мобильный генератор ЭМИ
 m_emp-system-announcement-source = Генератор Б_ЭМИ
 m_emp-system-announcement-active = Включение в { $grid }. Б_ЭМИ: { $timeLeft } секунд.
 m_emp-system-announcement-cooling-down = ЭМИ эффект больше не активен. Расчетное время перезагрузки: { $timeLeft } секунд.

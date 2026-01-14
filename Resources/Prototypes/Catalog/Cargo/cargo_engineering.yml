@@ -77,23 +77,21 @@
 
 - type: cargoProduct
   id: EngineeringJetpack
-  abstract: true # Frontier
   icon:
     sprite: Objects/Tanks/Jetpacks/blue.rsi
     state: icon
   product: CrateEngineeringJetpack
-  cost: 1000
+  cost: 10000 # Horizon
   category: cargoproduct-category-name-engineering
   group: market
 
 - type: cargoProduct
   id: EngineeringMiniJetpack
-  abstract: true # Frontier
   icon:
     sprite: Objects/Tanks/Jetpacks/mini.rsi
     state: icon
   product: CrateEngineeringMiniJetpack
-  cost: 750
+  cost: 3000 # Horizon
   category: cargoproduct-category-name-engineering
   group: market
 

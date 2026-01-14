@@ -1,4 +1,4 @@
-# Gygax mech
+# region Gygax mech
 
 - type: entity
   id: MechGygax
@@ -19,18 +19,18 @@
   - type: Mech
     modifiers:
       coefficients:
-        Blunt: 0.5
-        Slash: 0.5
-        Piercing: 0.5
-        Heat: 0.6
-        Radiation: 0
+        Blunt: 0.6
+        Slash: 0.6
+        Piercing: 0.6
+        Heat: 0.5
+        Radiation: 0.5
         Caustic: 0.9
-        Structural: 0.5
-    maxintegrity: 200
+        Structural: 0.7
+    maxintegrity: 150
     baseState: gygax
     openState: gygax-open
     brokenState: gygax-broken
-    mechToPilotDamageMultiplier: 0.2
+    mechToPilotDamageMultiplier: 0.5
     pilotWhitelist:
       components:
         - HumanoidAppearance
@@ -74,7 +74,7 @@
       mech-battery-slot:
       - PowerCellHigh
 
-# Clarke mech
+# region Clarke mech
 
 - type: entity
   id: MechClarke
@@ -132,6 +132,8 @@
   - type: Construction
     graph: UpgradeMechClarke
     node: start
+  - type: CanBeTakenUnderControl # Horizon Remote control
+    remotePilot: MobRemotePilot
 
 - type: entity
   id: MechClarkeBattery
@@ -143,7 +145,7 @@
       mech-battery-slot:
       - PowerCellHigh
 
-# Durand mech
+# region Durand mech
 
 - type: entity
   id: MechDurand
@@ -220,7 +222,7 @@
       mech-battery-slot:
       - PowerCellHigh
 
-# Odysseys mech
+# region Odysseys mech
 
 - type: entity
   id: MechOdysseus
@@ -239,6 +241,7 @@
     footstepSoundCollection:
       path: /Audio/_Horizon/Mecha/sound_mecha_powerloader_step.ogg
   - type: Mech
+    maxEquipmentAmount: 4
     modifiers:
       coefficients:
         Blunt: 0.75
@@ -272,6 +275,12 @@
   - type: Construction
     graph: UpgradeMechOdysseus
     node: start
+  - type: CanBeTakenUnderControl # Horizon Remote control
+    remotePilot: MobRemotePilot
+  - type: Storage
+    grid:
+    - 0,0,6,3
+    clickInsert: false
 
 - type: entity
   id: MechOdysseusBattery
@@ -283,7 +292,7 @@
       mech-battery-slot:
       - PowerCellHigh
 
-# Phazon mech
+# region Phazon mech
 
 - type: entity
   id: MechPhazon
@@ -361,7 +370,7 @@
       mech-battery-slot:
       - PowerCellHigh
 
-# Мехи ОБР
+# region Мехи ОБР
 
 - type: entity
   id: MechMarauder
@@ -494,7 +503,7 @@
       mech-battery-slot:
       - PowerCellHigh
 
-# Мехи Синдиката
+# region Мехи Синдиката
 
 - type: entity
   id: MechDarkGygax
@@ -651,7 +660,7 @@
       - MechEquipmentSecMissile
     maxEquipmentAmount: 5
 
-# Ripley mkII mech
+# region Ripley mkII mech
 
 - type: entity
   id: MechRipleyMk2
@@ -709,6 +718,8 @@
   - type: Construction
     graph: UpgradeMechRipleyMk2
     node: start
+  - type: CanBeTakenUnderControl # Horizon Remote control
+    remotePilot: MobRemotePilot
 
 - type: entity
   id: MechRipleyMk2Battery
@@ -720,7 +731,7 @@
       mech-battery-slot:
       - PowerCellHigh
 
-# Ripley upgraded
+# region Ripley upgraded
 
 - type: entity
   id: MechRipleyMk2Aluminizer
@@ -839,37 +850,6 @@
 - type: entity
   id: MechRipleyMk2FlamesredBattery
   parent: MechRipleyMk2Flamesred
-  suffix: Battery
-  components:
-  - type: ContainerFill
-    containers:
-      mech-battery-slot:
-      - PowerCellHigh
-
-- type: entity
-  id: MechRipleyMk2Titan
-  parent: MechRipleyMk2
-  name: Рипли "Кулак Титана"
-  description: "Это обычный Рипли, который был настроен так, чтобы выглядеть как мех Кулака Титана."
-  components:
-  - type: Sprite
-    sprite: _Horizon/Objects/Specific/Mech/mecha.rsi
-    layers:
-    - map: [ "enum.MechVisualLayers.Base" ]
-      state: ripleytitan
-  - type: Mech
-    maxintegrity: 250
-    baseState: ripleytitan
-    openState: ripleytitan-open
-    brokenState: ripleytitan-broken
-    mechToPilotDamageMultiplier: 0.4
-  - type: MovementSpeedModifier
-    baseWalkSpeed: 2.5
-    baseSprintSpeed: 3.5
-
-- type: entity
-  id: MechRipleyMk2TitanBattery
-  parent: MechRipleyMk2Titan
   suffix: Battery
   components:
   - type: ContainerFill
@@ -1007,7 +987,7 @@
       mech-battery-slot:
       - PowerCellHigh
 
-# Gygax mech upgraded
+# region Gygax upgraded
 
 - type: entity
   id: MechGygaxGrey
@@ -1021,14 +1001,14 @@
     - map: [ "enum.MechVisualLayers.Base" ]
       state: gygaxgrey
   - type: Mech
-    maxintegrity: 250
+    maxintegrity: 180
     baseState: gygaxgrey
     openState: gygaxgrey-open
     brokenState: gygaxgrey-broken
-    mechToPilotDamageMultiplier: 0.2
+    mechToPilotDamageMultiplier: 0.5
   - type: MovementSpeedModifier
-    baseWalkSpeed: 5.0
-    baseSprintSpeed: 6.0
+    baseWalkSpeed: 4.5
+    baseSprintSpeed: 5.5
 
 - type: entity
   parent: MechGygaxGrey
@@ -1140,7 +1120,7 @@
       mech-battery-slot:
       - PowerCellHigh
 
-# Durand mech upgraded
+# region Durand upgraded
 
 - type: entity
   id: MechDurDollhouse
@@ -1248,7 +1228,7 @@
       mech-battery-slot:
       - PowerCellHigh
 
-# Clarke mech upgraded
+# region Clarke upgraded
 
 - type: entity
   id: MechClarkeOrangey
@@ -1371,13 +1351,13 @@
       mech-battery-slot:
       - PowerCellHigh
 
-# Odysseus mech upgraded
+# region Odysseus upgraded
 
 - type: entity
   id: MechOdysseusHermes
   parent: MechOdysseus
   name: Одиссей "Гермес"
-  description: Сверхпрочный водолазный мех, разработанный и произведённый для узкоспециализированных подводных операций. "Как он здесь оказался?"
+  description: "Сверхпрочный водолазный мех, разработанный и произведённый для узкоспециализированных подводных операций. Как он здесь оказался? На внешней стороне видны надписи О,М,Ш,П."
   components:
   - type: Sprite
     sprite: _Horizon/Objects/Specific/Mech/mecha.rsi
@@ -1385,10 +1365,24 @@
     - map: [ "enum.MechVisualLayers.Base" ]
       state: odysseushermes
   - type: Mech
-    maxintegrity: 130
+    modifiers:
+      coefficients:
+        Blunt: 0.5
+        Slash: 0.5
+        Piercing: 0.8
+        Shock: 0.7
+        Structural: 0.75
+        Heat: 0.7
+    maxintegrity: 150
     baseState: odysseushermes
     openState: odysseushermes-open
     brokenState: odysseushermes-broken
+    equipmentWhitelist:
+      tags:
+      - MechEquipmentGeneral
+      - MechEquipmentMed
+      - MechEquipmentMining
+      - MechEquipmentSecProt
   - type: MovementSpeedModifier
     baseWalkSpeed: 3.5
     baseSprintSpeed: 4.5
@@ -1407,16 +1401,32 @@
   id: MechOdysseusMurdy
   parent: MechOdysseusHermes
   name: Одиссей "Рипер"
-  description: "О ЧЕРТ, ЭТО ТОЧНО ОТРЯД СМЕРТИ, МЫ ВСЕ... получим плохое лечение?"
+  description: "О ЧЕРТ, ЭТО ТОЧНО ОТРЯД СМЕРТИ, МЫ ВСЕ... получим плохое лечение? На внешней стороне видны надписи О,М,ЛК,ЛЛ"
   components:
   - type: Sprite
     layers:
     - map: [ "enum.MechVisualLayers.Base" ]
       state: odysseusmurdy
   - type: Mech
+    modifiers:
+      coefficients:
+        Blunt: 0.6
+        Slash: 0.6
+        Piercing: 0.5
+        Shock: 0.6
+        Structural: 0.75
+        Heat: 0.7
+    maxintegrity: 140
     baseState: odysseusmurdy
     openState: odysseusmurdy-open
     brokenState: odysseusmurdy-broken
+    equipmentWhitelist:
+      tags:
+      - MechEquipmentGeneral
+      - MechEquipmentMed
+      - MechEquipmentSecCC
+      - MechEquipmentSecLKinetic
+      - MechEquipmentSecLLazer
 
 - type: entity
   parent: MechOdysseusMurdy
@@ -1428,7 +1438,7 @@
       mech-battery-slot:
       - PowerCellHigh
 
-# Phazon mech upgraded
+# region Phazon upgraded
 
 - type: entity
   id: MechPhazonBlanco
@@ -1553,3 +1563,251 @@
     containers:
       mech-battery-slot:
       - PowerCellHigh
+
+
+# region NFSD
+
+- type: entity
+  id: MechGygaxHermesBattery
+  suffix: Battery
+  parent: MechGygaxGrey
+  name: Гигакс Гермес
+  description: "Вариант Гигакса, предназначенный для нужд Департамента Шерифа. Обладает особенно теплыми сидениями и запасом пончиков."
+  components:
+  - type: ContainerFill
+    containers:
+      mech-battery-slot:
+      - PowerCellHigh
+  - type: Sprite
+    sprite: _Horizon/Objects/Specific/Mech/mecha.rsi
+    layers:
+    - map: [ "enum.MechVisualLayers.Base" ]
+      state: gygaxhermes
+  - type: Mech
+    baseState: gygaxhermes
+    openState: gygaxhermes-open
+    brokenState: gygaxhermes-broken
+
+- type: entity
+  id: MechDurAresBattery
+  suffix: Battery
+  parent: MechDurDollhouse
+  name: Дюранд Арес
+  description: "Вариант Дюранда, предназначенный для нужд Департамента Шерифа. Обладает особенно теплыми сидениями и запасом пончиков."
+  components:
+  - type: ContainerFill
+    containers:
+      mech-battery-slot:
+      - PowerCellHigh
+  - type: Sprite
+    sprite: _Horizon/Objects/Specific/Mech/mecha.rsi
+    layers:
+    - map: [ "enum.MechVisualLayers.Base" ]
+      state: durares
+  - type: Mech
+    baseState: durares
+    openState: durares-open
+    brokenState: durares-broken
+
+
+# region Pirate
+
+- type: entity
+  id: MechRipleyMk2TitanBattery
+  parent: MechRipleyMk2
+  name: Пиратский Рипли
+  description: "Стоп... почему у этого Рипли боевого вооружение и что... это попугай?"
+  components:
+  - type: Sprite
+    sprite: _Horizon/Objects/Specific/Mech/mecha.rsi
+    layers:
+    - map: [ "enum.MechVisualLayers.Base" ]
+      state: ripleytitan
+  - type: Mech
+    maxintegrity: 250
+    baseState: ripleytitan
+    openState: ripleytitan-open
+    brokenState: ripleytitan-broken
+    mechToPilotDamageMultiplier: 0.4
+    equipmentWhitelist:
+      tags:
+      - MechEquipmentGeneral
+      - MechEquipmentMining
+      - MechEquipmentSecProt
+      - MechEquipmentSecLKinetic
+      - MechEquipmentSecLLazer
+  - type: MovementSpeedModifier
+    baseWalkSpeed: 2.5
+    baseSprintSpeed: 3.5
+  - type: ContainerFill
+    containers:
+      mech-battery-slot:
+      - PowerCellHigh
+
+- type: entity
+  id: MechClarkeVeteranBattery
+  parent: MechClarke
+  name: Пиратский Кларк
+  description: "Стоп... почему у этого Кларка боевого вооружение и что... это попугай?"
+  components:
+  - type: Sprite
+    sprite: _Horizon/Objects/Specific/Mech/mecha.rsi
+    layers:
+    - map: [ "enum.MechVisualLayers.Base" ]
+      state: clarkeveteran
+  - type: Mech
+    baseState: clarkeveteran
+    openState: clarkeveteran-open
+    brokenState: clarkeveteran-broken
+    maxintegrity: 250
+    mechToPilotDamageMultiplier: 0.3
+    equipmentWhitelist:
+      tags:
+      - MechEquipmentGeneral
+      - MechEquipmentMining
+      - MechEquipmentSecProt
+      - MechEquipmentSecLKinetic
+      - MechEquipmentSecLLazer
+  - type: MovementSpeedModifier
+    baseWalkSpeed: 5.0
+    baseSprintSpeed: 6.0
+  - type: ContainerFill
+    containers:
+      mech-battery-slot:
+      - PowerCellHigh
+
+# region Tournament
+
+- type: entity
+  id: MechGygaxGreenBattery
+  suffix: Battery
+  parent: MechGygaxGrey
+  name: Турнирный Гигакс (зеленый)
+  description: "Вариант Гигакса, предназначенный для турниров. Окрашен в тактический зеленый цвет."
+  components:
+  - type: ContainerFill
+    containers:
+      mech-battery-slot:
+      - PowerCellHigh
+  - type: Sprite
+    sprite: _Horizon/Objects/Specific/Mech/mecha.rsi
+    layers:
+    - map: [ "enum.MechVisualLayers.Base" ]
+      state: gygaxgreen
+  - type: Mech
+    baseState: gygaxgreen
+    openState: gygaxgreen-open
+    brokenState: gygaxgreen-broken
+  - type: CanBeTakenUnderControl
+    remotePilot: MobRemotePilot
+
+- type: entity
+  id: MechGygaxRedBattery
+  suffix: Battery
+  parent: MechGygaxGrey
+  name: Турнирный Гигакс (красный)
+  description: "Вариант Гигакса, предназначенный для турниров. Окрашен в агрессивный красный цвет."
+  components:
+  - type: ContainerFill
+    containers:
+      mech-battery-slot:
+      - PowerCellHigh
+  - type: Sprite
+    sprite: _Horizon/Objects/Specific/Mech/mecha.rsi
+    layers:
+    - map: [ "enum.MechVisualLayers.Base" ]
+      state: gygaxred
+  - type: Mech
+    baseState: gygaxred
+    openState: gygaxred-open
+    brokenState: gygaxred-broken
+  - type: CanBeTakenUnderControl
+    remotePilot: MobRemotePilot
+
+- type: entity
+  id: MechDurandRedBattery
+  parent: MechDurDollhouse
+  name: Турнирный Дюранд (красный)
+  description: "Вариант Дюранда, предназначенный для турниров. Окрашен в агрессивный красный цвет."
+  components:
+  - type: ContainerFill
+    containers:
+      mech-battery-slot:
+      - PowerCellHigh
+  - type: Sprite
+    sprite: _Horizon/Objects/Specific/Mech/mecha.rsi
+    layers:
+    - map: [ "enum.MechVisualLayers.Base" ]
+      state: durred
+  - type: Mech
+    baseState: durred
+    openState: durred-open
+    brokenState: durred-broken
+  - type: CanBeTakenUnderControl
+    remotePilot: MobRemotePilot
+
+- type: entity
+  id: MechDurandGreenBattery
+  parent: MechDurDollhouse
+  name: Турнирный Дюранд (зеленый)
+  description: "Вариант Дюранда, предназначенный для турниров. Окрашен в тактический зеленый цвет."
+  components:
+  - type: ContainerFill
+    containers:
+      mech-battery-slot:
+      - PowerCellHigh
+  - type: Sprite
+    sprite: _Horizon/Objects/Specific/Mech/mecha.rsi
+    layers:
+    - map: [ "enum.MechVisualLayers.Base" ]
+      state: durgreen
+  - type: Mech
+    baseState: durgreen
+    openState: durgreen-open
+    brokenState: durgreen-broken
+  - type: CanBeTakenUnderControl
+    remotePilot: MobRemotePilot
+
+- type: entity
+  id: MechMarauderRedBattery
+  parent: MechMarauder
+  name: Турнирный Мародер (красный)
+  description: "Вариант Мароудера, предназначенный для турниров. Окрашен в агрессивный красный цвет."
+  components:
+  - type: ContainerFill
+    containers:
+      mech-battery-slot:
+      - PowerCellHigh
+  - type: Sprite
+    sprite: _Horizon/Objects/Specific/Mech/mecha.rsi
+    layers:
+    - map: [ "enum.MechVisualLayers.Base" ]
+      state: marauderred
+  - type: Mech
+    baseState: marauderred
+    openState: marauderred-open
+    brokenState: marauderred-broken
+  - type: CanBeTakenUnderControl
+    remotePilot: MobRemotePilot
+
+- type: entity
+  id: MechMarauderGreenBattery
+  parent: MechMarauder
+  name: Турнирный Мародер (зеленый)
+  description: "Вариант Мароудера, предназначенный для турниров. Окрашен в тактический зеленый цвет."
+  components:
+  - type: ContainerFill
+    containers:
+      mech-battery-slot:
+      - PowerCellHigh
+  - type: Sprite
+    sprite: _Horizon/Objects/Specific/Mech/mecha.rsi
+    layers:
+    - map: [ "enum.MechVisualLayers.Base" ]
+      state: maraudergreen
+  - type: Mech
+    baseState: maraudergreen
+    openState: maraudergreen-open
+    brokenState: maraudergreen-broken
+  - type: CanBeTakenUnderControl
+    remotePilot: MobRemotePilot

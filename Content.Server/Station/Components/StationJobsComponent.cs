@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using Content.Server.Station.Systems;
 using Content.Shared.Roles;
 using JetBrains.Annotations;
@@ -88,4 +88,6 @@ public sealed partial class StationJobsComponent : Component
     [DataField]
     public List<ProtoId<AccessLevelPrototype>> Tags = new();
     // End Frontier
+
+    public Dictionary<NetUserId, ProtoId<JobPrototype>> OriginalPlayerJobs = new(); // Horizon
 }

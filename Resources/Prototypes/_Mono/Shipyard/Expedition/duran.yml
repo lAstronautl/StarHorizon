@@ -1,3 +1,5 @@
+# Remap
+
 # Author Info
 # GitHub: starch70
 # Discord: _starch_
@@ -8,7 +10,7 @@
   id: Duran
   parent: BaseVessel
   name: SKR Duran
-  description: Легкий шатл,снабженный парочкой Фабов и небольшой кухней.
+  description: Легкий шатл, снабженный парочкой Фабов и небольшой кухней.
   price: 50000
   category: Medium
   group: Expedition
@@ -17,7 +19,22 @@
   class:
   - Expedition
   engine:
-  - Uranium
+  - AME
+  # Horizon start
+  costModifiers:
+    - !type:RoleModifier
+      role: "Pilot"
+      costMultiplier: 0.8
+    - !type:RoleModifier
+      role: "Mercenary"
+      costMultiplier: 1.2
+    - !type:FactionCostModifier
+      faction: "FactionSIU"
+      costMultiplier: 0.9
+    - !type:FactionCostModifier
+      faction: "FactionArcadia"
+      costMultiplier: 0.9
+  # Horizon end
 
 - type: gameMap
   id: Duran
@@ -35,6 +52,6 @@
             prefixCreator: '14'
         - type: StationJobs
           availableJobs:
-            Contractor: [ 0, 0 ]
-            Pilot: [ 0, 0 ]
-            Mercenary: [ 0, 0 ]
+            ContractorInterview: [ 0, 0 ]
+            PilotInterview: [ 0, 0 ]
+            MercenaryInterview: [ 0, 0 ]

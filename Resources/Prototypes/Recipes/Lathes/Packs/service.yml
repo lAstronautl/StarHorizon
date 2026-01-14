@@ -20,6 +20,7 @@
   - FoodPlateMuffinTin
   - FoodKebabSkewer
   - SprayBottle
+  - TrashBag
   - LightReplacer
   - MopItem
   - Holoprojector
@@ -52,6 +53,14 @@
   recipes:
   - SynthesizerInstrument
   - PushHorn
+
+  # Horizon start
+- type: latheRecipePack
+  id: Translators
+  recipes:
+  - UniversalTranslator
+  - RareTranslator
+  # Horizon end
 
 - type: latheRecipePack
   id: ServiceBoards

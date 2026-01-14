@@ -661,6 +661,30 @@ namespace Content.Server.Database.Migrations.Sqlite
                     b.ToTable("job", (string)null);
                 });
 
+            modelBuilder.Entity("Content.Server.Database.Language", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("language_id");
+
+                    b.Property<string>("LanguageName")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("language_name");
+
+                    b.Property<int>("ProfileId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("profile_id");
+
+                    b.HasKey("Id")
+                        .HasName("PK_language");
+
+                    b.HasIndex("ProfileId");
+
+                    b.ToTable("language", (string)null);
+                });
+
             modelBuilder.Entity("Content.Server.Database.PlayTime", b =>
                 {
                     b.Property<int>("Id")
@@ -749,6 +773,11 @@ namespace Content.Server.Database.Migrations.Sqlite
                         .HasColumnType("TEXT")
                         .HasColumnName("admin_ooc_color");
 
+                    b.PrimitiveCollection<string>("ConstructionFavorites")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("construction_favorites");
+
                     b.Property<int>("SelectedCharacterSlot")
                         .HasColumnType("INTEGER")
                         .HasColumnName("selected_character_slot");
@@ -781,7 +810,6 @@ namespace Content.Server.Database.Migrations.Sqlite
                         .HasColumnType("INTEGER")
                         .HasColumnName("bank_balance");
 
-                    // Horizon start
                     b.Property<float>("BarkPitch")
                         .HasColumnType("REAL")
                         .HasColumnName("bark_pitch");
@@ -790,12 +818,15 @@ namespace Content.Server.Database.Migrations.Sqlite
                         .IsRequired()
                         .HasColumnType("TEXT")
                         .HasColumnName("bark_proto");
-                    // Horizon end
 
                     b.Property<string>("CharacterName")
                         .IsRequired()
                         .HasColumnType("TEXT")
                         .HasColumnName("char_name");
+
+                    b.Property<int>("ErpStatus")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("erp_status");
 
                     b.Property<string>("EyeColor")
                         .IsRequired()
@@ -811,6 +842,11 @@ namespace Content.Server.Database.Migrations.Sqlite
                         .IsRequired()
                         .HasColumnType("TEXT")
                         .HasColumnName("facial_hair_name");
+
+                    b.Property<string>("Faction")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("faction");
 
                     b.Property<string>("FlavorText")
                         .IsRequired()
@@ -832,7 +868,6 @@ namespace Content.Server.Database.Migrations.Sqlite
                         .HasColumnType("TEXT")
                         .HasColumnName("hair_name");
 
-                    // Horizon start
                     b.Property<float>("HighBarkVar")
                         .HasColumnType("REAL")
                         .HasColumnName("high_bark_var");
@@ -840,11 +875,15 @@ namespace Content.Server.Database.Migrations.Sqlite
                     b.Property<float>("LowBarkVar")
                         .HasColumnType("REAL")
                         .HasColumnName("low_bark_var");
-                    // Horizon end
 
                     b.Property<byte[]>("Markings")
                         .HasColumnType("jsonb")
                         .HasColumnName("markings");
+
+                    b.Property<string>("OOCFlavorText")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("oocflavor_text");
 
                     b.Property<int>("PreferenceId")
                         .HasColumnType("INTEGER")
@@ -1655,6 +1694,18 @@ namespace Content.Server.Database.Migrations.Sqlite
                     b.Navigation("Profile");
                 });
 
+            modelBuilder.Entity("Content.Server.Database.Language", b =>
+                {
+                    b.HasOne("Content.Server.Database.Profile", "Profile")
+                        .WithMany("Languages")
+                        .HasForeignKey("ProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_language_profile_profile_id");
+
+                    b.Navigation("Profile");
+                });
+
             modelBuilder.Entity("Content.Server.Database.Player", b =>
                 {
                     b.OwnsOne("Content.Server.Database.TypedHwid", "LastSeenHWId", b1 =>
@@ -2016,6 +2067,8 @@ namespace Content.Server.Database.Migrations.Sqlite
                     b.Navigation("Antags");
 
                     b.Navigation("Jobs");
+
+                    b.Navigation("Languages");
 
                     b.Navigation("Loadouts");
 

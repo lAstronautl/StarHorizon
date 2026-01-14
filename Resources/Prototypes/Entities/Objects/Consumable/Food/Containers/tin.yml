@@ -74,6 +74,14 @@
     price: 6 # Frontier
   - type: NFIngredient # Frontier: just so borgs can clean up after themselves
   - type: GoblinPreciousTrash # Frontier
+  - type: CytologyDirt
+    possibleCellSamples:
+    - protoID: CellSampleMurine
+    - protoID: CellSampleCat
+    - protoID: CellSampleCorgi
+    - protoID: CellSampleCockroach
+    - protoID: CellSampleFrog
+    - protoID: CellSampleSlime
 
 # Tins
 

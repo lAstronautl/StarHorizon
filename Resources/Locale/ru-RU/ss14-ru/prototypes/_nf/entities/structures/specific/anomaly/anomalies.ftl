@@ -1,6 +1,3 @@
-ent-AnomalyRockBananium = { ent-AnomalyRockBase }
-    .suffix = Камень, Бананиум
-    .desc = { ent-AnomalyRockBase.desc }
 ent-AnomalyRockPlasma = { ent-AnomalyRockBase }
     .suffix = Камень, Плазма
     .desc = { ent-AnomalyRockBase.desc }

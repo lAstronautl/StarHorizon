@@ -1,49 +1,63 @@
 - type: technology
-  id: ArsenalBasicModules
-  name: research-technology-modules-based
-  entityIcon: AttachmentReflexSight
+  id: ArsenalUnderbarrelModules
+  name: research-technology-modules-underbarrel
+  entityIcon: TechUnder
   discipline: NFArsenalNfsd
-  tier: 1
-  cost: 5000
+  tier: 2
+  cost: 7500
   recipeUnlocks:
   - AttachmentVerticalGrip
   - AttachmentLaserSight
-  - AttachmentReflexSight
+  - AttachmentM90UnderbarrelShotgun
+  - AttachmentM90GrenadeLauncher
   technologyPrerequisites:
   - NFBasicAmmunitionProduction
-  position: 1, 66
+  position: 1, 59
 
 - type: technology
-  id: ArsenalExtendedModules
-  name: research-technology-modules-extended
-  entityIcon: AttachmentSuppressor
+  id: ArsenalUpperplankModules
+  name: research-technology-modules-upperplank
+  entityIcon: TechUpper
   discipline: NFArsenalNfsd
   tier: 2
-  cost: 5000
+  cost: 7500
   recipeUnlocks:
+  - AttachmentReflexSight
   - AttachmentMagneticHarness
+  - AttachmentT2Miniscope
+  technologyPrerequisites:
+  - NFBasicAmmunitionProduction
+  position: 1, 60
+
+- type: technology
+  id: ArsenalBarrelModules
+  name: research-technology-modules-barrel
+  entityIcon: TechRail
+  discipline: NFArsenalNfsd
+  tier: 2
+  cost: 7500
+  recipeUnlocks:
   - AttachmentSuppressor
   - AttachmentAntiLyingWarrior
   technologyPrerequisites:
-  - ArsenalBasicModules
-  position: 2, 66
+  - NFBasicAmmunitionProduction
+  position: 1, 61
 
 - type: technology
-  id: ArsenalAdvancedModules
-  name: research-technology-modules-advanced
-  entityIcon: AttachmentT2Miniscope
+  id: ArsenalAmmoModules
+  name: research-technology-modules-ammo
+  entityIcon: 40mmGrenadeBaton
   discipline: NFArsenalNfsd
-  tier: 3
-  cost: 5000
+  tier: 2
+  cost: 7500
   recipeUnlocks:
-  - AttachmentT2Miniscope
-  - AttachmentM90UnderbarrelShotgun
-  - AttachmentM90GrenadeLauncher
   - 40mmGrenadeHEAT
   - 40mmGrenadeBaton
   - 40mmGrenadeEMP
   - 40mmGrenadeFlash
   - 40mmGrenadeSmoke
   technologyPrerequisites:
-  - ArsenalExtendedModules
-  position: 3, 66
+  - ArsenalUnderbarrelModules
+  position: 2, 59
+  researchTargets:
+  - TechnologyDiscArsenalAmmoModules

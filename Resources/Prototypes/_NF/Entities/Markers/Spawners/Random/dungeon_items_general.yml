@@ -171,7 +171,6 @@
     - SuitStorageEVAPrivateSec
     - SuitStorageEVAHydro
     - SuitStorageEVAMail
-    - SuitStorageBasic
     - SuitStoragePilot
     - SuitStorageParamedic
     - SuitStorageEngi
@@ -490,6 +489,7 @@
     rarePrototypes:
     # - VendingMachineChemicalsSyndicate # A bit less Syndicate loot
     - VendingMachineArcadia
+    - AnCoVending # Horizon
     # - VendingMachineSyndieDrobe # A bit less Syndicate loot
     - VendingMachineSyndieContraband
     rareChance: 0.03 # actually rare vs. entry frequencies
@@ -535,6 +535,7 @@
     rarePrototypes:
     - VendingMachineMagivend
     - VendingMachineArcadia
+    - AnCoVending # Horizon
     - VendingMachineBountyVendPunk
     # - VendingMachineSyndieDrobe # A bit less Syndicate loot
     - VendingMachineSyndieContraband
@@ -572,6 +573,7 @@
     - VendingMachineSyndieContraband
     - VendingMachineSec
     - VendingMachineArcadia
+    - AnCoVending # Horizon
     - SpawnDungeonMachineFrame
     rareChance: 0.03
 

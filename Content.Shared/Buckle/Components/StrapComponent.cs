@@ -106,6 +106,26 @@ public sealed partial class StrapComponent : Component
     [DataField, Access(typeof(SharedBuckleSystem))]
     public bool MaintainSpriteLayers;
     // End Frontier: fix vehicles unbuckling
+	
+    [DataField]
+    public bool AllowOthersToUnbuckle = true;
+
+    // Goobstation
+    /// <summary>
+    /// Whether to block movement if buckled.
+    /// For use with other components that might want the buckled entity to still be able to move.
+    /// </summary>
+    [DataField]
+    public bool BlockMovement = true;
+    // </Goobstation>
+
+    // WD EDIT START
+    /// <summary>
+    /// Delay, that must occur, before user can unbuckle
+    /// </summary>
+    [DataField]
+    public TimeSpan SelfUnBuckleDelay = TimeSpan.Zero;
+    // WD EDIT END
 }
 
 public enum StrapPosition

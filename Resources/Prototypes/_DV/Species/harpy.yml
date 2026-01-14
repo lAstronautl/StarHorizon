@@ -1,12 +1,22 @@
 - type: species
   id: Harpy
   name: species-name-harpy
+  description: "/ServerInfo/_Horizon/SpeciesDesc/Harpy.xml" # Horizon
   roundStart: true
   prototype: MobHarpy
   sprites: MobHarpySprites
   markingLimits: MobHarpyMarkingLimits
   dollPrototype: MobHarpyDummy
   skinColoration: HumanToned
+  # Horizon start
+  prosCount: 2
+  specialCount: 3
+  consCount: 3
+  defaultLanguages:
+  - GalacticCommon
+  - Harpy
+  uniqueLanguages: [Harpy]
+  # Horizon end
 
 - type: speciesBaseSprites
   id: MobHarpySprites
@@ -15,8 +25,10 @@
     Hair: MobHumanoidAnyMarking
     FacialHair: MobHumanoidAnyMarking
     Snout: MobHumanoidAnyMarking
-    UndergarmentTop: MobHumanoidAnyMarking
-    UndergarmentBottom: MobHumanoidAnyMarking
+# Horizon start
+    # UndergarmentTop: MobHumanoidAnyMarking
+    # UndergarmentBottom: MobHumanoidAnyMarking
+# Horizon end
     Chest: MobHarpyTorso
     HeadTop: MobHumanoidAnyMarking
     HeadSide: MobHumanoidAnyMarking
@@ -50,14 +62,16 @@
       points: 1
       required: true
       defaultMarkings: [ HarpyEarsDefault ]
-    # Frontier: apparently these don't exist on Delta
-    UndergarmentTop:
-      points: 1
-      required: false
-    UndergarmentBottom:
-      points: 1
-      required: false
-    # End Frontier
+# Horizon start
+    # # Frontier: apparently these don't exist on Delta
+    # UndergarmentTop:
+    #   points: 1
+    #   required: false
+    # UndergarmentBottom:
+    #   points: 1
+    #   required: false
+    # # End Frontier
+# Horizon end
     Chest:
       points: 1
       required: true

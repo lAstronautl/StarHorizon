@@ -1,8 +1,8 @@
 using System.Linq;
 using System.Numerics;
 using Content.Server.Cargo.Systems;
-using Content.Server.Power.EntitySystems;
 using Content.Server.Weapons.Ranged.Components;
+using Content.Shared.Cargo;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Database;
@@ -22,7 +22,6 @@ using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 using Robust.Shared.Containers;
-using Content.Server.PowerCell;
 using Content.Shared.Interaction; // Frontier
 using Content.Shared.Examine; // Frontier
 using Content.Shared.Power; // Frontier
@@ -33,7 +32,6 @@ namespace Content.Server.Weapons.Ranged.Systems;
 
 public sealed partial class GunSystem : SharedGunSystem
 {
-    [Dependency] private readonly IComponentFactory _factory = default!;
     [Dependency] private readonly DamageExamineSystem _damageExamine = default!;
     [Dependency] private readonly PricingSystem _pricing = default!;
     [Dependency] private readonly SharedColorFlashEffectSystem _color = default!;
@@ -239,6 +237,9 @@ public sealed partial class GunSystem : SharedGunSystem
                         if (dmg != null)
                             dmg = Damageable.TryChangeDamage(hitEntity, dmg * Damageable.UniversalHitscanDamageModifier, origin: user);
 
+
+
+
                         // Horizon Mech start
                         if (hitscan.BloodlossModifier.HasValue)
                             _bloodstream.TryModifyBleedAmount(hitEntity, hitscan.BloodlossModifier.Value);
@@ -268,6 +269,11 @@ public sealed partial class GunSystem : SharedGunSystem
                                 Logs.Add(LogType.HitScanHit,
                                     $"{hitName:target} hit by hitscan dealing {dmg.GetTotal():damage} damage");
                             }
+
+                            // _Horizon start
+                            var bodyEv = new HitScanHitBodyEvent(dir, dmg);
+                            RaiseLocalEvent(hitEntity, ref bodyEv);
+                            // _Horizon end
                         }
                     }
                     else

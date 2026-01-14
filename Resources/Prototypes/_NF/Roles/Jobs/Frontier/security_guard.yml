@@ -3,6 +3,8 @@
   name: job-name-security-guard
   description: job-description-security-guard
   playTimeTracker: JobSecurityGuard
+  salary: 45000 # Horizon
+  forceFaction: FactionFrontier # Horizon
   requirements:
     - !type:OverallPlaytimeRequirement
       time: 36000 # Frontier - 10 hrs
@@ -43,3 +45,12 @@
     - NFMagazineHighCapacityPistol35
     - NFMagazineHighCapacityPistol35Rubber
     - ShipVoucherFrontierGuard
+
+- type: chameleonOutfit
+  id: SecurityGuardChameleonOutfit
+  job: SecurityGuard
+  hasMindShield: true
+  equipment:
+    head: ClothingHeadHatBeretSecurity
+    mask: ClothingMaskGasSecurity
+    gloves: ClothingHandsGlovesColorBlack

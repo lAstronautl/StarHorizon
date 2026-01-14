@@ -34,3 +34,32 @@
       damageRecovery:
         types:
           Asphyxiation: -1.0
+    # Horizon
+    - type: SampleSource
+      availableCellSamples:
+      - protoID: CellSampleTajaran
+
+# Cytology
+- type: entity
+  name: Urist Grown Tajaran
+  parent: MobTajaran
+  id: MobTajaranGrown
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 2500
+  - type: RandomMetadata
+    nameSegments:
+      - NamesFirst
+      - NamesLast
+  - type: RandomHumanoidAppearance
+    randomizeName: false
+  - type: GhostRole
+    makeSentient: true
+    allowSpeech: true
+    allowMovement: true
+    name: ghost-role-information-grown-tajaran-name
+    description: Вы таяр, выращенный в цитологической ванне. Ушастый кошко-человек со своей культурой. Исследуйте этот новый мир вокруг вас!
+    raffle:
+      settings: short
+  - type: GhostTakeoverAvailable

@@ -3,6 +3,8 @@
   name: job-name-bailiff
   description: job-description-bailiff
   playTimeTracker: JobWarden
+  salary: 65000 # Horizon
+  forceFaction: FactionNFSD # Horizon
   requirements:
     - !type:OverallPlaytimeRequirement
       time: 108000 # 30 hours
@@ -33,6 +35,8 @@
   - Sergeant
   - Bailiff
   - Brigmedic
+  - Medical # Horizon
+  - Chemistry # Horizon
   accessGroups:
   - GeneralNfsdAccess
   special:
@@ -55,3 +59,17 @@
     - BaseSecurityUplinkRadioOfficer
     - ShipVoucherNfsdBailiff
     - RubberStampBailiff
+
+- type: chameleonOutfit
+  id: BailiffChameleonOutfit
+  job: Bailiff
+  hasMindShield: true
+  equipment:
+    head: ClothingHeadHatNfsdBeretBrown
+    mask: ClothingMaskGasNfsd
+    eyes: ClothingEyesGlassesNfsd
+    outerClothing: ClothingOuterCoatNfsdFormal
+    neck: ClothingNeckNfsdBadgeWarden
+    belt: ClothingBeltNfsdFilled
+    gloves: ClothingHandsGlovesCombatNfsdCream
+    shoes: ClothingShoesBootsNfsdCreamFilled

@@ -20,3 +20,6 @@ ent-PresentRandomCash = { ent-PresentBase }
     .desc = { ent-PresentBase.desc }
 ent-PresentTrash = wrapping paper
     .desc = Carefully folded, taped, and tied with a bow. Then ceremoniously ripped apart and tossed on the floor.
+ent-PresentTechDisk = present
+    .desc = A little box with a valuable technology disk inside.
+    .suffix = Technology Disk

@@ -34,6 +34,9 @@
         - ToyMouse
         - PlushieDiona
         - PlushieArachind
+        # WD EDIT START
+        - FaceHuggerToys
+        # WD EDIT END
       chance: 0.5
       offset: 0.2
 

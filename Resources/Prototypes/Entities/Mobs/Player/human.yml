@@ -3,6 +3,11 @@
   name: Urist McHands
   parent: BaseMobHuman
   id: MobHuman
+  components:
+  # Horizon
+  - type: SampleSource
+    availableCellSamples:
+    - protoID: CellSampleHuman
 
 #Syndie
 - type: entity
@@ -115,3 +120,28 @@
   - type: NpcFactionMember
     factions:
     - Wizard
+
+# Cytology
+- type: entity
+  name: Urist Grown Human
+  parent: MobHuman
+  id: MobHumanGrown
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 2500
+  - type: RandomMetadata
+    nameSegments:
+      - NamesFirst
+      - NamesLast
+  - type: RandomHumanoidAppearance
+    randomizeName: false
+  - type: GhostRole
+    makeSentient: true
+    allowSpeech: true
+    allowMovement: true
+    name: ghost-role-information-grown-human-name
+    description: Вы человек, выращенный в цитологической ванне. Вы молоды и не знаете окружающий мир. Будьте осторожны и изучайте мир вокруг вас.
+    raffle:
+      settings: short
+  - type: GhostTakeoverAvailable

@@ -3,7 +3,7 @@ robotics-console-no-cyborgs = Киборги отсутствуют!
 robotics-console-select-cyborg = Выберите киборга из списка выше.
 robotics-console-model = [color=gray]Модель:[/color] { $name }
 # name is not formatted to prevent players trolling
-robotics-console-designation = [color=gray]Назначение:[/color]
+robotics-console-designation = [color=gray]Обозначение:[/color]
 robotics-console-battery = [color=gray]Заряд батареи:[/color] [color={ $color }]{ $charge }[/color]%
 robotics-console-modules = [color=gray]Установленные модули:[/color] { $count }
 robotics-console-brain =

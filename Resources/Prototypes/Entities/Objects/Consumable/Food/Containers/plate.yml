@@ -129,6 +129,14 @@
   - type: Item
     storedOffset: 0,-3
   - type: NFCookware # Frontier
+  - type: CytologyDirt
+    possibleCellSamples:
+    - protoID: CellSampleMurine
+    - protoID: CellSampleCat
+    - protoID: CellSampleCorgi
+    - protoID: CellSampleCockroach
+    - protoID: CellSampleFrog
+    - protoID: CellSampleSlime
 
 # Plastic Plate
 

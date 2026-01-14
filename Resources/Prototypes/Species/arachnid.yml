@@ -1,6 +1,7 @@
 - type: species
   id: Arachnid
   name: species-name-arachnid
+  description: "/ServerInfo/_Horizon/SpeciesDesc/Arachnid.xml" # Horizon
   roundStart: true
   prototype: MobArachnid
   sprites: MobArachnidSprites
@@ -13,14 +14,24 @@
   lastNames: NamesArachnidLast
   sexes:
   - Unsexed
+  # Horizon start
+  defaultLanguages:
+  - GalacticCommon
+  - Arachnid
+  prosCount: 1
+  specialCount: 2
+  consCount: 1
+  # Horizon end
 
 - type: speciesBaseSprites
   id: MobArachnidSprites
   sprites:
     Head: MobArachnidHead
     Snout: MobHumanoidAnyMarking
-    UndergarmentTop: MobHumanoidAnyMarking
-    UndergarmentBottom: MobHumanoidAnyMarking
+# Horizon start
+    # UndergarmentTop: MobHumanoidAnyMarking
+    # UndergarmentBottom: MobHumanoidAnyMarking
+# Horizon end
     Chest: MobArachnidTorso
     HeadTop: MobHumanoidAnyMarking
     HeadSide: MobHumanoidAnyMarking

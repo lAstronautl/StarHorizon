@@ -13,7 +13,7 @@
   parent: BaseVessel
   name: LVHI Searchlight
   description: A small vessel outfitted for the search and recovery of wounded NT personnel. Manufactured by Langstad-Voigt Heavy Industries.
-  price: 34000 # 28300 0.2 33960
+  price: 34500 # 28440 0.2 34128
   category: Small
   group: Medical
   shuttlePath: /Maps/_NF/Shuttles/searchlight.yml
@@ -22,6 +22,24 @@
   - Medical
   engine:
   - Uranium
+  # Horizon start
+  costModifiers:
+    - !type:RoleModifier
+      role: "Pilot"
+      costMultiplier: 0.8
+    - !type:RoleModifier
+      role: "Mercenary"
+      costMultiplier: 1.2
+    - !type:FactionCostModifier
+      faction: "FactionMed"
+      costMultiplier: 0.9
+    - !type:FactionCostModifier
+      faction: "FactionFSB"
+      costMultiplier: 0.9
+    - !type:FactionCostModifier
+      faction: "FactionCCC"
+      costMultiplier: 0.9
+  # Horizon end
 
 - type: gameMap
   id: Searchlight

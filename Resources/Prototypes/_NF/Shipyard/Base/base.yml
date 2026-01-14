@@ -11,6 +11,19 @@
   - type: IFF
     color: '#FFFFFFFF'
     flags: [IsPlayerShuttle]
+  costModifiers:
+    - !type:RoleModifier
+      role: "Pilot"
+      costMultiplier: 0.8
+    - !type:RoleModifier
+      role: "Mercenary"
+      costMultiplier: 1.2
+    - !type:RoleModifier
+      role: "PlantTechnician"
+      costMultiplier: 0.9
+    - !type:RoleModifier
+      role: "PlantManager"
+      costMultiplier: 0.9
 
 - type: vessel
   id: BaseVesselAntag

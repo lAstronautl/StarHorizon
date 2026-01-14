@@ -13,6 +13,24 @@
     - !type:TileNotBlocked
 
 - type: construction
+  id: GaslockRecipe
+  name: Gaslock
+  description: Connects gas pipes on separate ships or stations together.
+  graph: GaslockConstruction  
+  startNode: start
+  targetNode: building  
+  category: construction-category-structures
+  objectType: Structure
+  placementMode: SnapgridCenter
+  canRotate: true
+  canBuildInImpassable: true 
+  conditions:
+    - !type:TileNotBlocked
+  icon:
+    sprite: _NF/Structures/Piping/Atmospherics/gaslock.rsi
+    state: closed
+
+- type: construction
   id: WoodSecretDoorConstruction
   name: recipes-wood-secret-door-name
   description: recipes-secret-door-desc # reuse base

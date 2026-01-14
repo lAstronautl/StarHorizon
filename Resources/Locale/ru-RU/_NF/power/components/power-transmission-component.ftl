@@ -1,2 +1,2 @@
-power-transmission-examine = The machine is transmitting [color=lightblue]{ POWERWATTS($actual) }[/color]/[color=lightblue]{ POWERWATTS($requested) }[/color] of power.
-power-transmission-estimated-value = Estimated value: [color=yellow]{ $value }/s[/color]
+power-transmission-examine = Машина передает [color=lightblue]{ POWERWATTS($actual) }[/color]/[color=lightblue]{ POWERWATTS($requested) }[/color] энергии.
+power-transmission-estimated-value = Расчетное значение: [color=yellow]{ $value }/сек[/color]

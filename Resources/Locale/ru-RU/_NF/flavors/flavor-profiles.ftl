@@ -15,3 +15,7 @@ flavor-complex-tangy = терпко
 flavor-complex-spices = пряно
 flavor-complex-cinnamon = как корица
 flavor-complex-antiseptic = как химическая лаванда
+flavor-complex-hairy = волосистый и резкий
+flavor-complex-licorice = как лакрица
+flavor-complex-blueraspberry = как голубой
+flavor-complex-silence = как тишина

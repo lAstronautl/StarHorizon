@@ -47,7 +47,7 @@ public static class ServerPackaging
         // Python script had Npgsql. though we want Npgsql.dll as well soooo
         "Npgsql",
         "Microsoft",
-        "NAudio",
+        "Discord",
     };
 
     private static readonly List<string> ServerNotExtraAssemblies = new()
@@ -118,7 +118,8 @@ public static class ServerPackaging
                     $"/p:TargetOs={platform.TargetOs}",
                     "/t:Rebuild",
                     "/p:FullRelease=true",
-                    "/m"
+                    "/m",
+                    "/p:WarningLevel=0"
                 }
             });
 

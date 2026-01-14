@@ -56,4 +56,13 @@
   id: JobStc
 
 - type: playTimeTracker
+  id: JobSyndicateOfficerTeleCommunication
+
+- type: playTimeTracker
+  id: JobSyndicateOperative
+
+- type: playTimeTracker
+  id: JobSyndicateCargo
+
+- type: playTimeTracker
   id: JobValet

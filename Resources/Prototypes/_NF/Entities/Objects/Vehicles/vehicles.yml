@@ -206,6 +206,8 @@
   - type: MovementIgnoreGravity
   - type: MovementAlwaysTouching
   - type: CanMoveInAir
+  - type: Vehicle
+    requiredHands: 2 # StarHorizon
   - type: AmbientSound
     sound: /Audio/Effects/shuttle_thruster.ogg
     range: 8
@@ -517,6 +519,7 @@
     radius: 7
     energy: 3
   - type: Vehicle
+    requiredHands: 2 # StarHorizon
     hornSound:
       collection: NFVehicleHorn # resetting from the motorbike
       params:
@@ -860,7 +863,7 @@
     - sprite: _NF/Structures/Storage/magnetbox.rsi
       state: controller-on
       visible: False
-      map: [ "enum.ToggleVisuals.Layer" ]
+      map: [ "enum.ToggleableVisuals.Layer" ]
       shader: unshaded
     - sprite: _NF/Objects/Tools/goblin_tools/overlay_sparks.rsi
       state: overlay-icon

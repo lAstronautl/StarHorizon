@@ -36,7 +36,7 @@ public sealed class NFCCVars
     /// The time in seconds after which a cryosleeping body is considered expired and can be deleted from the storage map.
     /// </summary>
     public static readonly CVarDef<float> CryoExpirationTime =
-        CVarDef.Create("nf14.uncryo.maxtime", 180 * 60f, CVar.SERVER | CVar.REPLICATED);
+        CVarDef.Create("nf14.uncryo.maxtime", 1440 * 60f, CVar.SERVER | CVar.REPLICATED); // StarHorizon: Changed from 3 hours (180 minutes) to 24 hours (1440 minutes)
 
     /*
      *  Game
@@ -75,7 +75,7 @@ public sealed class NFCCVars
     /// The number of Optional Points Of Interest to spawn in every round
     /// </summary>
     public static readonly CVarDef<int> OptionalStations =
-        CVarDef.Create("nf14.worldgen.optional_stations", 6, CVar.SERVERONLY);
+        CVarDef.Create("nf14.worldgen.optional_stations", 7, CVar.SERVERONLY);
 
     /// <summary>
     /// The multiplier to add to distance spawning calculations for a smidge of server setting variance
@@ -264,4 +264,26 @@ public sealed class NFCCVars
     /// </summary>
     public static readonly CVarDef<bool> XenoarchSingleUseNodes =
         CVarDef.Create("nf14.xenoarch.single_use_nodes", true, CVar.REPLICATED);
+
+    /*
+     * Greeting
+     */
+
+    /// <summary>
+    /// If true, enables a radio greeting whenever a new player spawns.
+    /// </summary>
+    public static readonly CVarDef<bool> NewPlayerRadioGreetingEnabled =
+        CVarDef.Create("nf14.greeting.enabled", true, CVar.REPLICATED);
+
+    /// <summary>
+    /// The maximum playtime, in minutes, for a new player radio message to be sent.
+    /// </summary>
+    public static readonly CVarDef<int> NewPlayerRadioGreetingMaxPlaytime =
+        CVarDef.Create("nf14.greeting.max_playtime", 180, CVar.REPLICATED); // Three hours
+
+    /// <summary>
+    /// The channel the radio message should be sent off on.
+    /// </summary>
+    public static readonly CVarDef<string> NewPlayerRadioGreetingChannel =
+        CVarDef.Create("nf14.greeting.channel", "Service", CVar.REPLICATED);
 }

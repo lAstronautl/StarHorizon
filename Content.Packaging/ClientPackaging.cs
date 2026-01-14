@@ -31,7 +31,8 @@ public static class ClientPackaging
                     "/v:m",
                     "/t:Rebuild",
                     "/p:FullRelease=true",
-                    "/m"
+                    "/m",
+                    "/p:WarningLevel=0"
                 }
             });
         }

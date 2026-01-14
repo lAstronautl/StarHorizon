@@ -1,6 +1,7 @@
 - type: species
   id: DemonSpecies
   name: species-name-demon
+  description: "/ServerInfo/_Horizon/SpeciesDesc/Demon.xml" # Horizon
   roundStart: true
   prototype: MobDemon
   sprites: MobDemonSprites
@@ -12,6 +13,11 @@
   femaleFirstNames: NamesOniFemale
   lastNames: NamesOniLocation
   naming: LastNoFirst
+  # Horizon start
+  prosCount: 2
+  specialCount: 1
+  consCount: 1
+  # Horizon end
 
 - type: speciesBaseSprites
   id: MobDemonSprites

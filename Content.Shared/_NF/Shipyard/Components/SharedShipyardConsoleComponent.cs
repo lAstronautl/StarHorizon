@@ -9,7 +9,7 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
 namespace Content.Shared._NF.Shipyard.Components;
 
-[RegisterComponent, NetworkedComponent, Access(typeof(SharedShipyardSystem)), AutoGenerateComponentPause]
+[RegisterComponent, NetworkedComponent, Access(typeof(SharedShipyardSystem)), AutoGenerateComponentPause, AutoGenerateComponentState]
 public sealed partial class ShipyardConsoleComponent : Component
 {
     public static string TargetIdCardSlotId = "ShipyardConsole-targetId";
@@ -80,4 +80,7 @@ public sealed partial class ShipyardConsoleComponent : Component
     /// </summary>
     [DataField]
     public TimeSpan DenySoundDelay = TimeSpan.FromSeconds(2);
+
+    [AutoNetworkedField]
+    public NetEntity? CurIdCard;
 }

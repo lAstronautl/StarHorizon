@@ -580,7 +580,7 @@
     state: pda-bartender
 
 - type: entity
-  parent: BaseWidePDA
+  parent: BasePDA  # Horizon - замена "BaseWidePDA" на "BasePDA"
   id: LibrarianPDA
   name: librarian PDA
   description: Smells like books.
@@ -1539,7 +1539,7 @@
         type: ChameleonBoundUserInterface
 
 - type: entity
-  parent: BaseWidePDA
+  parent: BasePDA # Horizon - замена "BaseWidePDA" на "BasePDA"
   id: WizardPDA
   name: wizard PDA
   description: You hear faint whispers coming from it.

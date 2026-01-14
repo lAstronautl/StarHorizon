@@ -9,6 +9,7 @@ using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Prototypes;
 using static Robust.Client.UserInterface.Controls.BaseButton;
+using Robust.Client.Player;
 
 namespace Content.Client._NF.Shipyard.UI;
 
@@ -16,6 +17,8 @@ namespace Content.Client._NF.Shipyard.UI;
 public sealed partial class ShipyardConsoleMenu : FancyWindow
 {
     [Dependency] private readonly IPrototypeManager _protoManager = default!;
+    [Dependency] private readonly IEntityManager _entMan = default!;    // Horizon
+    [Dependency] private readonly IPlayerManager _player = default!;    // Horizon
 
     public event Action<ButtonEventArgs>? OnSellShip;
     public event Action<ButtonEventArgs>? OnOrderApproved;
@@ -31,6 +34,8 @@ public sealed partial class ShipyardConsoleMenu : FancyWindow
     private bool _freeListings = false;
     private bool _validId = false;
     private ConfirmButton? _currentlyConfirmingButton = null;
+
+    public EntityUid Owner = EntityUid.Invalid;   // Horizon
 
     public ShipyardConsoleMenu()
     {
@@ -137,7 +142,21 @@ public sealed partial class ShipyardConsoleMenu : FancyWindow
             if (free)
                 priceText = Loc.GetString("shipyard-console-menu-listing-free");
             else
-                priceText = BankSystemExtensions.ToSpesoString(prototype!.Price);
+            {
+                // Horizon tweak start
+                var cost = prototype!.Price;
+                foreach (var item in prototype!.CostModifiers)
+                    item.Modify(_player.LocalEntity, Owner, ref cost, _entMan);
+
+                priceText = BankSystemExtensions.ToSpesoString(cost);
+
+                var diff = cost - prototype.Price;
+                var percentage = (float)diff / (float)prototype.Price * 100.0f;
+
+                if (diff != 0)
+                    priceText += $" ({(diff > 0 ? "+" : "")}{percentage:F1}%)";
+                // Horizon tweak end
+            }
 
             var vesselEntry = new VesselRow
             {

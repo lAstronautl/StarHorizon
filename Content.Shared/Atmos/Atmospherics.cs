@@ -423,19 +423,19 @@ namespace Content.Shared.Atmos
         Ammonia = 6,
         NitrousOxide = 7,
         Frezon = 8,
-        Respiron = 9, // Frontier
         // Horizon start
-        BZ = 10,
-        Pluoxium = 11,
-        Hydrogen = 12,
-        Nitrium = 13,
-        Healium = 14,
-        HyperNoblium = 15,
-        ProtoNitrate = 16,
-        Zauker = 17,
-        Halon = 18,
-        Helium = 19,
-        AntiNoblium = 20
+        BZ = 9,
+        Pluoxium = 10,
+        Hydrogen = 11,
+        Nitrium = 12,
+        Healium = 13,
+        HyperNoblium = 14,
+        ProtoNitrate = 15,
+        Zauker = 16,
+        Halon = 17,
+        Helium = 18,
+        AntiNoblium = 19,
         // Horizon end
+        Respiron = 20 // Frontier
     }
 }

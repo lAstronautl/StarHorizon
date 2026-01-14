@@ -50,8 +50,6 @@ names-dog-dataset-49 = Гизмо
 names-dog-dataset-50 = Мокка
 names-dog-dataset-51 = Нала
 names-dog-dataset-52 = Реми
-
-
 names-dog-pug-dataset-1 = Белла
 names-dog-pug-dataset-2 = Лола
 names-dog-pug-dataset-3 = Луна
@@ -88,8 +86,6 @@ names-dog-pug-dataset-33 = Печенье
 names-dog-pug-dataset-34 = Рекс
 names-dog-pug-dataset-35 = Пагсли
 names-dog-pug-dataset-36 = Пагсворт
-
-
 names-dog-pitbull-dataset-1 = Зевс
 names-dog-pitbull-dataset-2 = Магнум
 names-dog-pitbull-dataset-3 = Дизель

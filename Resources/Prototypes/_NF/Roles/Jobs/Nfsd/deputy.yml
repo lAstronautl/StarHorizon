@@ -3,6 +3,8 @@
   name: job-name-deputy
   description: job-description-deputy
   playTimeTracker: JobSecurityOfficer
+  salary: 40000 # Horizon
+  forceFaction: FactionNFSD # Horizon
   requirements:
     - !type:OverallPlaytimeRequirement
       time: 43200 # 12 hours
@@ -19,6 +21,10 @@
   weight: 130
   displayWeight: 40
   canBeAntag: false
+  access: # Horizon
+  - Brigmedic # Horizon
+  - Medical # Horizon
+  - Chemistry # Horizon
   accessGroups:
   - GeneralNfsdAccess
   special:
@@ -38,3 +44,17 @@
     - NFMagazineHighCapacityPistol35Overpressure
     - NFMagazineHighCapacityPistol35Rubber
     - FrontierUplinkCoin10
+
+- type: chameleonOutfit
+  id: DeputyChameleonOutfit
+  job: Deputy
+  hasMindShield: true
+  equipment:
+    head: ClothingHeadHatNfsdBeretBrown
+    mask: ClothingMaskGasNfsd
+    eyes: ClothingEyesGlassesNfsd
+    outerClothing: ClothingOuterArmorNfsd
+    neck: ClothingNeckNfsdBadgeSecurity
+    belt: ClothingBeltNfsdFilled
+    gloves: ClothingHandsGlovesCombatNfsdBrown
+    shoes: ClothingShoesBootsNfsdBrownFilled

@@ -1,6 +1,7 @@
 - type: species
   id: Sheleg
   name: species-name-sheleg
+  description: "/ServerInfo/_Horizon/SpeciesDesc/Sheleg.xml" # Horizon
   roundStart: true
   prototype: MobSheleg
   dollPrototype: MobShelegDummy
@@ -15,6 +16,11 @@
   youngAge: 80
   oldAge: 400
   maxAge: 800
+  # Horizon start
+  prosCount: 4
+  specialCount: 3
+  consCount: 4
+  # Horizon end
 
 - type: speciesBaseSprites
   id: MobShelegSprites
@@ -24,8 +30,10 @@
     Hair: MobShelegHair
     FacialHair: MobShelegHair
     Snout: MobHumanoidAnyMarking
-    UndergarmentTop: MobHumanoidAnyMarking
-    UndergarmentBottom: MobHumanoidAnyMarking
+# Horizon start
+    # UndergarmentTop: MobHumanoidAnyMarking
+    # UndergarmentBottom: MobHumanoidAnyMarking
+# Horizon end
     Chest: MobShelegTorso
     Eyes: MobHumanoidEyes
     HeadTop: MobHumanoidAnyMarking
@@ -59,12 +67,14 @@
     HeadTop:
       points: 1
       required: false
-    UndergarmentTop:
-      points: 1
-      required: false
-    UndergarmentBottom:
-      points: 1
-      required: false
+# Horizon start
+    # UndergarmentTop:
+    #   points: 1
+    #   required: false
+    # UndergarmentBottom:
+    #   points: 1
+    #   required: false
+# Horizon end
     Chest:
       points: 4
       required: false

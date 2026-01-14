@@ -567,6 +567,8 @@
   packetPrototype: BlueTomatoSeeds
   productPrototypes:
   - FoodBlueTomato
+  mutationPrototypes: # Horizon-Add
+  - bluespaceTomato # Horizon-Add
   harvestRepeat: Repeat
   lifespan: 25
   maturation: 8

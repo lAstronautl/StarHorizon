@@ -1,6 +1,6 @@
 - type: cargoProduct
   id: LivestockEmotionalSupport
-  abstract: true
+  #  abstract: true # Horizon
   icon:
     sprite: Mobs/Pets/cat.rsi
     state: spacecat
@@ -11,7 +11,7 @@
 
 - type: cargoProduct
   id: LivestockPoultryCube
-  abstract: true
+#  abstract: true # Horizon
   icon:
     sprite: _NF/Objects/Misc/monkeycube.rsi
     state: box_poultry

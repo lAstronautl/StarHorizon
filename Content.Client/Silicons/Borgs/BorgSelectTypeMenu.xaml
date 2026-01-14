@@ -2,7 +2,7 @@
                       xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
                       xmlns:customControls="clr-namespace:Content.Client.Administration.UI.CustomControls"
                       Title="{Loc 'borg-select-type-menu-title'}"
-                      SetSize="550 300">
+                      SetSize="600 450">
     <BoxContainer Orientation="Vertical">
         <BoxContainer Orientation="Horizontal" VerticalExpand="True">
             <!-- Left pane: selection of borg type -->
@@ -26,7 +26,17 @@
                             <Label Name="NameLabel" HorizontalExpand="True" />
                         </BoxContainer>
 
-                        <RichTextLabel Name="DescriptionLabel" VerticalExpand="True" VerticalAlignment="Top" />
+                        <RichTextLabel Name="DescriptionLabel" VerticalExpand="True" VerticalAlignment="Top" Margin="4 4 0 0"/>
+
+                        <!-- Horizon start -->
+                        <Label Text="Выбрать скин:" HorizontalExpand="True" Margin="4 8 0 0"/>
+                        <Control MinHeight="78" VerticalExpand="True" HorizontalExpand="True">
+                            <controls:StripeBack Margin="4 0" VerticalExpand="True" HorizontalExpand="True" />
+                            <ScrollContainer HScrollEnabled="True" VScrollEnabled="False" MinHeight="78" VerticalExpand="True" HorizontalExpand="True" Margin="4 0" >
+                                <BoxContainer Name="SkinsContainer" Orientation="Horizontal" SetHeight="78" />
+                            </ScrollContainer>
+                        </Control>
+                        <!-- Horizon end -->
                     </BoxContainer>
                 </Control>
                 <controls:ConfirmButton Name="ConfirmTypeButton" Text="{Loc 'borg-select-type-menu-confirm'}"

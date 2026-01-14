@@ -1,5 +1,5 @@
-ent-ParcelDropoff = parcel dropoff box
-    .desc = Stores parcels and envelopes to be picked up by the mail carrier. Remember to write down who it's addressed to!
-ent-ParcelDropoffPOI = { ent-BaseStructureIndestructible }
+ent-ParcelDropoff = ящик для посылок
+    .desc = Хранит посылки и письма, которые заберёт почтальон. Не забудьте указать, кому они адресованы!
+ent-ParcelDropoffPOI = { ent-ParcelDropoff }
     .suffix = POI
-    .desc = { ent-BaseStructureIndestructible.desc }
+    .desc = { ent-ParcelDropoff.desc }

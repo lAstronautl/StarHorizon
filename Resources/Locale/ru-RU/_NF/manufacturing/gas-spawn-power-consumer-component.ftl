@@ -1,2 +1,2 @@
-gas-spawn-power-consumer-examine = The machine is consuming [color=lightblue]{ POWERWATTS($actual) }[/color]/[color=lightblue]{ POWERWATTS($requested) }[/color] of power.
-gas-spawn-power-consumer-value = Estimated gas output: [color=yellow]{ $value }/s[/color]
+gas-spawn-power-consumer-examine = Машина потребляет [color=lightblue]{ POWERWATTS($actual) }[/color]/[color=lightblue]{ POWERWATTS($requested) }[/color] энергии.
+gas-spawn-power-consumer-value = Расчетный выход газа: [color=yellow]{ $value }/сек[/color]

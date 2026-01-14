@@ -1,4 +1,4 @@
-advertisement-mailvend-1 = За ваши спесы? Почему бы и нет?
+advertisement-mailvend-1 = За ваши кредиты? Почему бы и нет?
 advertisement-mailvend-2 = Конверты! Бумага! Ручки!
 advertisement-mailvend-3 = Когда вы в последний раз писали родственникам?
 advertisement-mailvend-4 = Кому нужны телекоммуникации? Письменность в моде!

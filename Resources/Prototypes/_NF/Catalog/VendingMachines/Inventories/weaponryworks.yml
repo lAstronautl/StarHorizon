@@ -16,18 +16,8 @@
     NFAmmunitionBoxPistol35: 2
     NFAmmunitionBoxPistol45: 2
     NFAmmunitionBoxRifle20: 2
-  # Horizon start
-    AttachmentMagneticHarness: 1
-    AttachmentT2Miniscope: 1
-    AttachmentReflexSight: 1
-    AttachmentM90UnderbarrelShotgun: 1
-    AttachmentVerticalGrip: 1
-    AttachmentLaserSight: 1
-    AttachmentSuppressor: 1
-  # Horizon end
   emaggedInventory:
     NFWeaponPistolViper: 1
-    AttachmentAntiLyingWarrior: 1 # Horizon
 
 - type: vendingMachineInventory
   id: WeaponryWorksVendPOIInventory
@@ -49,14 +39,5 @@
     NFAmmunitionBoxRifle20: 4294967295
     NFAmmunitionBoxShellShotgunBuckshot: 4294967295
     NFAmmunitionBoxShellShotgunBeanbag: 4294967295
-  # Horizon start
-    AttachmentMagneticHarness: 4294967295
-    AttachmentT2Miniscope: 4294967295
-    AttachmentReflexSight: 4294967295
-    AttachmentM90UnderbarrelShotgun: 4294967295
-    AttachmentVerticalGrip: 4294967295
-    AttachmentLaserSight: 4294967295
-    AttachmentSuppressor: 4294967295
-  # Horizon end
   emaggedInventory:
     NFWeaponPistolViper: 1

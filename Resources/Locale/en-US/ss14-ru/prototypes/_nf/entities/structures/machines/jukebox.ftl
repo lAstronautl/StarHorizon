@@ -1,5 +1,5 @@
-ent-JukeboxShip = { ent-BaseStructureDisableToolUse }
-    .suffix = Ship
+ent-JukeboxPOI = { ent-BaseStructureDisableToolUse }
+    .suffix = POI
     .desc = { ent-BaseStructureDisableToolUse.desc }
 ent-JukeboxWallmount = { ent-BaseStructureWallmount }
     .suffix = Wallmount

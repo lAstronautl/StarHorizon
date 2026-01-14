@@ -7,7 +7,7 @@
 # Discord: erhardsteinhauer
 
 # Shuttle Notes:
-# 
+#
 - type: vessel
   id: Chisel
   parent: BaseVessel
@@ -23,6 +23,33 @@
   - Cargo #??? Smug
   engine:
   - Uranium
+  # Horizon start
+  costModifiers:
+    - !type:RoleModifier
+      role: "Pilot"
+      costMultiplier: 0.8
+    - !type:RoleModifier
+      role: "Mercenary"
+      costMultiplier: 1.2
+    - !type:RoleModifier
+      role: "PlantTechnician"
+      costMultiplier: 0.9
+    - !type:RoleModifier
+      role: "PlantManager"
+      costMultiplier: 0.9
+    - !type:FactionCostModifier
+      faction: "FactionEdison"
+      costMultiplier: 0.9
+    - !type:FactionCostModifier
+      faction: "FactionLVHI"
+      costMultiplier: 0.9
+    - !type:FactionCostModifier
+      faction: "FactionUAC"
+      costMultiplier: 0.9
+    - !type:FactionCostModifier
+      faction: "FactionNakamura"
+      costMultiplier: 0.9
+  # Horizon end
 
 - type: gameMap
   id: Chisel

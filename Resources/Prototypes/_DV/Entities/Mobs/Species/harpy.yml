@@ -44,8 +44,8 @@
       - map: [ "enum.HumanoidVisualLayers.LArm" ]
       - map: [ "enum.HumanoidVisualLayers.RLeg" ]
       - map: [ "enum.HumanoidVisualLayers.LLeg" ]
-      - map: [ "enum.HumanoidVisualLayers.UndergarmentBottom" ]
-      - map: [ "enum.HumanoidVisualLayers.UndergarmentTop" ]
+      - map: [ "underwearb" ]
+      - map: [ "underweart" ]
       - map: [ "socks" ]
       - map: [ "jumpsuit" ]
       - map: ["enum.HumanoidVisualLayers.LFoot"]
@@ -112,7 +112,7 @@
   - type: Speech
     speechSounds: Harpy
     speechVerb: Harpy
-    allowedEmotes: ['Meow', 'Hiss', 'Mew', 'Purr', 'Growl', 'Bark', 'Snarl', 'Whine', 'Howl', 'Awoo', 'HarpyHonk', 'HarpyRing', 'HarpyPew', 'HarpyBang', 'HarpyBeep', 'HarpyRev', 'HarpyCaw', 'Squish', 'Chitter', 'Squeak', 'Click', 'Belch', 'Squish'] # Frontier: add Belch, Squish
+    allowedEmotes: ['Meow', 'Hiss', 'Mew', 'Purr', 'Growl', 'Bark', 'Snarl', 'Whine', 'Howl', 'Awoo', 'HarpyHonk', 'HarpyRing', 'HarpyPew', 'HarpyBang', 'HarpyBeep', 'HarpyRev', 'HarpyCaw', 'Squish', 'Chitter', 'Squeak', 'Click', 'Belch', 'Squish', 'Bubble', 'Pop'] # Frontier: add Belch, Squish, Bubble, Pop
   - type: Vocal
     sounds:
       Male: SoundsHarpy
@@ -140,6 +140,16 @@
     femaleDisplacements: {} # Frontier: female jumpsuit displacement
   - type: HarpyVisuals
   - type: UltraVision
+  # Horizon: Height traits (harpy base scale 0.9, 0.9 - slightly small)
+  - type: TallWhitelist
+    scale: 1.0   # Normal human size
+    density: 110
+    cosmeticOnly: false
+  - type: ShortWhitelist
+    scale: 0.8   # Smaller than base 0.9
+    density: 70
+    cosmeticOnly: false
+  # Horizon end
 #  - type: Tag # Frontier
 #    tags: # Frontier
 #    - CanPilot # Frontier
@@ -176,8 +186,8 @@
       - map: [ "enum.HumanoidVisualLayers.LArm" ]
       - map: [ "enum.HumanoidVisualLayers.RLeg" ]
       - map: [ "enum.HumanoidVisualLayers.LLeg" ]
-      - map: [ "enum.HumanoidVisualLayers.UndergarmentBottom" ]
-      - map: [ "enum.HumanoidVisualLayers.UndergarmentTop" ]
+      - map: [ "underwearb" ]
+      - map: [ "underweart" ]
       - map: [ "socks" ]
       - map: [ "jumpsuit" ]
       - map: ["enum.HumanoidVisualLayers.LFoot"]
@@ -210,21 +220,25 @@
 
 - type: entity
   id: ActionHarpyPlayMidi
+  parent: BaseAction # Frontier, Wizden#27422 compliance
   name: Play MIDI
   description: Sing your heart out! Right click yourself to set an instrument.
   components:
-  - type: InstantAction
+  - type: Action # Frontier, Wizden#27422 compliance, InstantAction<Action
     checkCanInteract: false
     icon: _DV/Interface/Actions/harpy_sing.png
+  - type: InstantAction # Frontier, Wizden#27422 compliance
     event: !type:OpenUiActionEvent
       key: enum.InstrumentUiKey.Key
 
 - type: entity
   id: ActionSyrinxChangeVoiceMask
+  parent: BaseAction # Frontier, Wizden#27422 compliance
   name: Set name
   description: Change the name others hear to something else.
   components:
-  - type: InstantAction
+  - type: Action # Frontier, Wizden#27422 compliance, InstantAction<Action
     icon: _DV/Interface/Actions/harpy_syrinx.png
     itemIconStyle: BigAction
+  - type: InstantAction # Frontier, Wizden#27422 compliance
     event: !type:VoiceMaskSetNameEvent

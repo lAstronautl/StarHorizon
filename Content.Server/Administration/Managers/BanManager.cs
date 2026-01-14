@@ -6,12 +6,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using Content.Server.Chat.Managers;
 using Content.Server.Database;
+using Content.Server.Discord; // Horizon
 using Content.Server.GameTicking;
 using Content.Shared.CCVar;
 using Content.Shared.Database;
 using Content.Shared.Players;
 using Content.Shared.Players.PlayTimeTracking;
 using Content.Shared.Roles;
+using Content.Shared._Horizon.CCVar; // Horizon
+using Robust.Server; // Horizon
 using Robust.Server.Player;
 using Robust.Shared.Asynchronous;
 using Robust.Shared.Collections;
@@ -39,6 +42,10 @@ public sealed partial class BanManager : IBanManager, IPostInjectInit
     [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly ITaskManager _taskManager = default!;
     [Dependency] private readonly UserDbDataManager _userDbData = default!;
+    [Dependency] private readonly IBaseServer _baseServer = default!; // Horizon
+    [Dependency] private readonly DiscordWebhook _discord = default!; // Horizon
+    private WebhookIdentifier? _webhookId = null; // Horizon
+    private Color _webhookEmbedColor; // Horizon
 
     private ISawmill _sawmill = default!;
 
@@ -62,6 +69,14 @@ public sealed partial class BanManager : IBanManager, IPostInjectInit
 
         _userDbData.AddOnLoadPlayer(CachePlayerData);
         _userDbData.AddOnPlayerDisconnect(ClearPlayerData);
+        // Horizon start
+        _cfg.OnValueChanged(HorizonCCVars.DiscordBanWebhook,
+            value =>
+            {
+                if (!string.IsNullOrWhiteSpace(value))
+                    _discord.GetWebhook(value, data => _webhookId = data.ToIdentifier());
+            }, true);
+        // Horizon end
     }
 
     private async Task CachePlayerData(ICommonSession player, CancellationToken cancel)
@@ -193,6 +208,42 @@ public sealed partial class BanManager : IBanManager, IPostInjectInit
         _chat.SendAdminAlert(logMessage);
 
         KickMatchingConnectedPlayers(banDef, "newly placed ban");
+        // Horizon start
+        try
+        {
+            if (_webhookId == null)
+                return;
+            var bannedName = target is null ? "null" : $"{targetUsername}";
+            int color = 0x9C0000;
+            var embed = new WebhookEmbed
+            {
+                Title = Loc.GetString("discord-banned-title"),
+                Description = Loc.GetString(
+                    "discord-banned",
+                    ("admin", adminName),
+                    ("expires", expiresString),
+                    ("name", bannedName),
+                    ("reason", reason)
+                ),
+                Color = color,
+                Footer = new WebhookEmbedFooter
+                {
+                    Text = Loc.GetString(
+                        "discord-banned-footer",
+                        ("server", _baseServer.ServerName),
+                        ("round", roundId?.ToString() ?? "N/A")
+                    )
+                }
+            };
+
+            var payload = new WebhookPayload { Embeds = [embed] };
+            await _discord.CreateMessage(_webhookId.Value, payload);
+        }
+        catch (Exception e)
+        {
+            _sawmill.Error($"Error while sending discord ban message:\n{e}");
+        }
+        // Horizon end
     }
 
     private void KickMatchingConnectedPlayers(ServerBanDef def, string source)
@@ -281,6 +332,48 @@ public sealed partial class BanManager : IBanManager, IPostInjectInit
         {
             SendRoleBans(session);
         }
+        // Horizon start
+        var expiresString = expires == null ? Loc.GetString("server-ban-string-never") : $"{expires}";
+        var adminName = banningAdmin == null
+            ? Loc.GetString("system-user")
+            : (await _db.GetPlayerRecordByUserId(banningAdmin.Value))?.LastSeenUserName ?? Loc.GetString("system-user");
+
+        try
+        {
+            if (_webhookId == null)
+                return;
+            var bannedName = target is null ? "null" : $"{targetUsername}";
+            int color = 0x9C0000;
+            var embed = new WebhookEmbed
+            {
+                Title = Loc.GetString("discord-role-banned-title"),
+                Description = Loc.GetString(
+                    "discord-role-banned",
+                    ("admin", adminName),
+                    ("expires", expiresString),
+                    ("name", bannedName),
+                    ("role", role),
+                    ("reason", reason)
+                ),
+                Color = color,
+                Footer = new WebhookEmbedFooter
+                {
+                    Text = Loc.GetString(
+                        "discord-banned-footer",
+                        ("server", _baseServer.ServerName),
+                        ("round", roundId?.ToString() ?? "N/A")
+                    )
+                }
+            };
+
+            var payload = new WebhookPayload { Embeds = [embed] };
+            await _discord.CreateMessage(_webhookId.Value, payload);
+        }
+        catch (Exception e)
+        {
+            _sawmill.Error($"Error while sending discord role ban message:\n{e}");
+        }
+        // Horizon end
     }
 
     public async Task<string> PardonRoleBan(int banId, NetUserId? unbanningAdmin, DateTimeOffset unbanTime)

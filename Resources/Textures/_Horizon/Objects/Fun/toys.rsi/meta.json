@@ -204,6 +204,74 @@
     },
     {
       "name": "baloon18"
-    }
+    },
+    {
+      "name": "baloon1base"
+    },    
+    {
+      "name": "baloon2base"
+    },
+        {
+      "name": "baloon3base"
+    },
+        {
+      "name": "baloon4base"
+    },
+        {
+      "name": "baloon5base"
+    },
+        {
+      "name": "baloon6base"
+    },
+        {
+      "name": "baloon7base"
+    },
+        {
+      "name": "baloon8base"
+    },
+        {
+      "name": "baloon9base"
+    },
+        {
+      "name": "baloon10base"
+    },
+        {
+      "name": "baloon11base"
+    },
+        {
+      "name": "baloon12base"
+    },
+        {
+      "name": "baloon13base"
+    },
+        {
+      "name": "baloon14base"
+    },
+        {
+      "name": "baloon15base"
+    },
+        {
+      "name": "baloon16base"
+    },
+        {
+      "name": "baloon17base"
+    },
+        {
+      "name": "baloon18base"
+    },
+    {
+      "name": "box-inhand-left",
+      "directions": 4
+    },
+    {
+      "name": "box-inhand-right",
+      "directions": 4
+    },    
+    {
+      "name": "box"
+    },
+    {
+      "name": "box-open"
+    }       
   ]
 }

@@ -1,4 +1,5 @@
 using System.Numerics;
+using Content.Shared.Damage;
 using Content.Shared.Inventory;
 using Content.Shared.Weapons.Reflect;
 
@@ -13,3 +14,7 @@ public record struct HitScanReflectAttemptEvent(EntityUid? Shooter, EntityUid So
 {
     SlotFlags IInventoryRelayEvent.TargetSlots => SlotFlags.WITHOUT_POCKET;
 }
+
+// _Horizon
+[ByRefEvent]
+public record struct HitScanHitBodyEvent(Vector2 Direction, DamageSpecifier Damage);

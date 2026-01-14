@@ -1,7 +1,9 @@
 {
   "version": 1,
-  "license": "CC-BY-SA-3.0",
-  "copyright": "Taken from tgstation at commit https://github.com/tgstation/tgstation/commit/4f6190e2895e09116663ef282d3ce1d8b35c032e",
+  "license": "CC BY-NC-ND-4.0",
+    "copyright": [
+      "Malanisa (discord: ✦\uD835\uDD78\uD835\uDD86\uD835\uDD91\uD835\uDD86\uD835\uDD93\uD835\uDD8E\uD835\uDD98\uD835\uDD86✦#5800)"
+    ],
   "size": {
     "x": 32,
     "y": 32

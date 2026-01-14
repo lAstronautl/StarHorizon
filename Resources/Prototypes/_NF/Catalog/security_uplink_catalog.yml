@@ -143,7 +143,7 @@
       whitelist:
         - Sheriff
 
-#region weapons
+# region Weapons
 - type: listing
   id: UplinkSecurityMk32
   name:  uplink-security-mk32-name
@@ -409,6 +409,27 @@
   icon: { sprite: Objects/Weapons/Guns/Battery/disabler_smg.rsi, state: base }
   cost:
     FrontierUplinkCoin: 6
+  categories:
+    - UplinkSecurityWeapons
+  conditions:
+    - !type:StoreWhitelistCondition
+      whitelist:
+        tags:
+          - SecurityUplink
+    - !type:BuyerJobCondition
+      whitelist:
+        - Bailiff
+        - SeniorOfficer
+        - Sheriff
+
+- type: listing
+  id: UplinkSecurityLazerSword
+  name:  uplink-security-energysword-name
+  description: uplink-security-energysword-desc
+  productEntity: EnergySwordNfsd
+  icon: { sprite: Objects/Weapons/Melee/e_sword.rsi, state: icon }
+  cost:
+    FrontierUplinkCoin: 10
   categories:
     - UplinkSecurityWeapons
   conditions:

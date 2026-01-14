@@ -32,6 +32,8 @@
           Heat: 1
     - type: Damageable
       damageContainer: Shield
+    - type: StaminaResistance
+      damageCoefficient: 0.80
     - type: Destructible
       thresholds:
         - trigger:
@@ -113,6 +115,8 @@
       state: riot_bullet-icon
     - type: Item
       heldPrefix: riot_bullet
+    - type: StaminaResistance
+      damageCoefficient: 1
     - type: Blocking
       passiveBlockModifier:
         coefficients:
@@ -320,7 +324,7 @@
 
 - type: entity
   name: mirror shield
-  parent: BaseShield
+  parent: [ BaseShield, BaseC3WizardContraband] # Frontier: BaseMagicalContraband<BaseC3WizardContraband
   id: MirrorShield
   description: Eerily glows red... you hear the geometer whispering
   components:
@@ -401,7 +405,7 @@
       heldPrefix: eshield
     - type: UseDelay
       delay: 0.5
-    - type: ToggleableLightVisuals
+    - type: ToggleableVisuals
       spriteLayer: shield
       inhandVisuals:
         left:
@@ -515,7 +519,7 @@
       heldPrefix: teleriot
     - type: UseDelay
       delay: 0.5
-    - type: ToggleableLightVisuals
+    - type: ToggleableVisuals
       spriteLayer: shield
       inhandVisuals:
         left:

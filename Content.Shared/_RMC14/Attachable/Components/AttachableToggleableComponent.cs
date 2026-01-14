@@ -47,6 +47,18 @@ public sealed partial class AttachableToggleableComponent : Component
     public bool BreakOnFullRotate = false;
 
     /// <summary>
+    /// If set to true, the attachment will deactivate upon being dropped.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public bool BreakOnDrop = false;
+
+    /// <summary>
+    /// If set to true, the attachment will slow the user upon being toggled due to any source but toggling it manually.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public bool SlowOnBreak = false;
+
+    /// <summary>
     /// If set to true, the attachment can only be toggled when the holder is wielded.
     /// </summary>
     [DataField, AutoNetworkedField]
@@ -102,10 +114,10 @@ public sealed partial class AttachableToggleableComponent : Component
     public bool AttachedOnly = false;
 
     [DataField, AutoNetworkedField]
-    public SoundSpecifier? ActivateSound = new SoundPathSpecifier("/Audio/_RMC14/Attachments/attachment_activate.ogg");
+    public SoundSpecifier? ActivateSound = new SoundPathSpecifier("/Audio/_RMC14/Attachable/attachment_activate.ogg");
 
     [DataField, AutoNetworkedField]
-    public SoundSpecifier? DeactivateSound = new SoundPathSpecifier("/Audio/_RMC14/Attachments/attachment_deactivate.ogg");
+    public SoundSpecifier? DeactivateSound = new SoundPathSpecifier("/Audio/_RMC14/Attachable/attachment_deactivate.ogg");
 
     [DataField, AutoNetworkedField]
     public bool ShowTogglePopup = true;
@@ -120,7 +132,7 @@ public sealed partial class AttachableToggleableComponent : Component
     public EntityUid? Action;
 
     [DataField, AutoNetworkedField]
-    public string ActionId = "ActionToggleAttachable";
+    public string ActionId = "CMActionToggleAttachable";
 
     [DataField, AutoNetworkedField]
     public string ActionName = "Toggle Attachable";

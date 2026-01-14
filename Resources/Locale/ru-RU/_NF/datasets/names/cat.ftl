@@ -3,14 +3,10 @@ names-cat-clarpy-dataset-1 = Клярпи
 names-cat-clarpy-dataset-2 = Кляррпи
 names-cat-clarpy-dataset-3 = Клярррпи
 names-cat-clarpy-dataset-4 = Кляррррпи
-
-
 # Mistake Dataset
 names-cat-mistake-dataset-1 = ????
 names-cat-mistake-dataset-2 = ?????
 names-cat-mistake-dataset-3 = ??????
-
-
 # Cult Dataset (Towns & Witches)
 names-cat-cult-dataset-1 = Салем
 names-cat-cult-dataset-2 = Вале
@@ -43,8 +39,6 @@ names-cat-cult-dataset-28 = Барроуз
 names-cat-cult-dataset-29 = Уордвелл
 names-cat-cult-dataset-30 = Гийядо
 names-cat-cult-dataset-31 = Зенгер фон Моссау
-
-
 # Space Dataset
 names-cat-space-dataset-1 = Космо
 names-cat-space-dataset-2 = Звёздный Свет
@@ -89,8 +83,6 @@ names-cat-space-dataset-40 = Небесный
 names-cat-space-dataset-41 = Астро
 names-cat-space-dataset-42 = Фелисетта
 names-cat-space-dataset-43 = Феликс
-
-
 # Caracal Dataset
 names-cat-caracal-dataset-1 = Лео
 names-cat-caracal-dataset-2 = Луна
@@ -135,8 +127,6 @@ names-cat-caracal-dataset-40 = Майло
 names-cat-caracal-dataset-41 = Чарли
 names-cat-caracal-dataset-42 = Лили
 names-cat-caracal-dataset-43 = Роки
-
-
 # Bingus Dataset
 names-cat-bingus-dataset-1 = Клео
 names-cat-bingus-dataset-2 = Сфинкси
@@ -197,8 +187,6 @@ names-cat-bingus-dataset-56 = Мармелад
 names-cat-bingus-dataset-57 = Бонсай
 names-cat-bingus-dataset-58 = Гоблин
 names-cat-bingus-dataset-59 = Опал
-
-
 # Calico Dataset
 names-cat-calico-dataset-1 = Калли
 names-cat-calico-dataset-2 = Мармелад
@@ -260,8 +248,6 @@ names-cat-calico-dataset-57 = Сморы
 names-cat-calico-dataset-58 = Калико
 names-cat-calico-dataset-59 = Солнечная Капля
 names-cat-calico-dataset-60 = Марлоу
-
-
 # General Cat Dataset
 names-cat-dataset-1 = Полночь
 names-cat-dataset-2 = Тень

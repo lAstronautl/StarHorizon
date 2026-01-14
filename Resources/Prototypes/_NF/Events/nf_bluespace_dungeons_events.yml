@@ -11,10 +11,11 @@
     warningRadioAnnouncementChannel: Supply
     endRadioAnnouncement: station-event-bluespace-dungeon-end-announcement
     endRadioAnnouncementChannel: Supply
+    maximumPlayers: 20
     weight: 5
     duration: 1800 # 30 minutes
     maxDuration: 1800 # 30 minutes
-    reoccurrenceDelay: 40 # 40 minutes (some variety - at worst, alternates between four dungeon types) # Horizon TempTweak
+    reoccurrenceDelay: 180 # 3 hours (some variety - at worst, alternates between four dungeon types) # Horizon TempTweak
   - type: ActiveRadio
     channels:
     - Supply

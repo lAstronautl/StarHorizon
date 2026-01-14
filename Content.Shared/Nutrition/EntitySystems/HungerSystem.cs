@@ -111,6 +111,17 @@ public sealed class HungerSystem : EntitySystem
         UpdateCurrentThreshold(uid, component);
     }
 
+    // _Horizon start
+    public void SetBaseDecayRate(EntityUid uid, float amount, HungerComponent? component = null)
+    {
+        if (!Resolve(uid, ref component))
+            return;
+
+        component.BaseDecayRate = amount;
+        SetAuthoritativeHungerValue((uid, component), amount);
+    }
+    // _Horizon end
+
     /// <summary>
     /// Sets <see cref="HungerComponent.LastAuthoritativeHungerValue"/> and
     /// <see cref="HungerComponent.LastAuthoritativeHungerChangeTime"/>, and dirties this entity. This "resets" the

@@ -13,7 +13,7 @@
   parent: BaseVessel
   name: EIS Charon
   description: Originally built as a roll-on, roll-off transport for heavy terraforming equipment. Since its obsolescence and appearance on the secondary market, the Charon has become a favorite of upfitters for the broad possibilities afforded by its open equipment bay. A product of Endurance Industrial Shipyards.
-  price: 82000 #67630 0.2 81156  
+  price: 82000 #67630 0.2 81156
   category: Medium
   group: Expedition
   shuttlePath: /Maps/_NF/Shuttles/Expedition/charon.yml
@@ -22,13 +22,28 @@
   - Expedition
   engine:
   - AME
+  # Horizon start
+  costModifiers:
+    - !type:RoleModifier
+      role: "Pilot"
+      costMultiplier: 0.8
+    - !type:RoleModifier
+      role: "Mercenary"
+      costMultiplier: 1.2
+    - !type:FactionCostModifier
+      faction: "FactionSIU"
+      costMultiplier: 0.9
+    - !type:FactionCostModifier
+      faction: "FactionArcadia"
+      costMultiplier: 0.9
+  # Horizon end
 
 - type: gameMap
   id: Charon
   mapName: 'Charon'
   mapPath: /Maps/_NF/Shuttles/Expedition/charon.yml
   minPlayers: 0
-  stations: 
+  stations:
     Charon:
       stationProto: StandardFrontierExpeditionVessel
       components:

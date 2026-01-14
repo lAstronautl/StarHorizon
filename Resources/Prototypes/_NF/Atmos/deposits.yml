@@ -128,3 +128,145 @@
   -  1000,  2000  # ammonia
   -  2000,  4000  # n2o
   -     0,     0  # frezon
+
+# Horizon start
+
+- type: gasDeposit
+  id: MostlyFrezon
+  gases:
+  -     0,  2000  # oxygen 0
+  -     0,  2000  # nitrogen 1
+  -     0,   500  # carbon dioxide 2
+  -     0,   200  # plasma 3
+  -     0,    50  # tritium 4
+  -     0,   500  # water vapor 5
+  -     0,   500  # ammonia 6
+  -     0,   500  # n2o 7
+  -  1000,  5000  # frezon 8
+  -     0,     0  # bz 9
+  -     0,     0  # pluoxium 10
+  -     0,     0  # hydrogen 11
+  -     0,     0  # nitrium 12
+  -     0,     0  # healium 13
+  -     0,     0  # hyper-noblium 14
+  -     0,     0  # proto-nitrate 15
+  -     0,     0  # zauker 16
+  -     0,     0  # halon 17
+  -     0,     0  # helium 18
+
+- type: gasDeposit
+  id: MostlyBZ
+  gases:
+  -     0,  2000  # oxygen 0
+  -     0,  2000  # nitrogen 1
+  -     0,   500  # carbon dioxide 2
+  -     0,   200  # plasma 3
+  -     0,    50  # tritium 4
+  -     0,   500  # water vapor 5
+  -     0,   500  # ammonia 6
+  -     0,   500  # n2o 7
+  -     0,     0  # frezon 8
+  -  3000,  9000  # bz 9
+  -     0,     0  # pluoxium 10
+  -     0,     0  # hydrogen 11
+  -     0,     0  # nitrium 12
+  -     0,     0  # healium 13
+  -     0,     0  # hyper-noblium 14
+  -     0,     0  # proto-nitrate 15
+  -     0,     0  # zauker 16
+  -     0,     0  # halon 17
+  -     0,     0  # helium 18
+
+- type: gasDeposit
+  id: MostlyPluoxium
+  gases:
+  -     0,  2000  # oxygen 0
+  -     0,  2000  # nitrogen 1
+  -     0,   500  # carbon dioxide 2
+  -     0,   200  # plasma 3
+  -     0,    50  # tritium 4
+  -     0,   500  # water vapor 5
+  -     0,   500  # ammonia 6
+  -     0,   500  # n2o 7
+  -     0,     0  # frezon 8
+  -     0,     0  # bz 9
+  -  3000,  9000  # pluoxium 10
+  -     0,     0  # hydrogen 11
+  -     0,     0  # nitrium 12
+  -     0,     0  # healium 13
+  -     0,     0  # hyper-noblium 14
+  -     0,     0  # proto-nitrate 15
+  -     0,     0  # zauker 16
+  -     0,     0  # halon 17
+  -     0,     0  # helium 18
+
+- type: gasDeposit
+  id: MostlyHydrogen
+  gases:
+  -     0,  2000  # oxygen 0
+  -     0,  2000  # nitrogen 1
+  -     0,   500  # carbon dioxide 2
+  -     0,   200  # plasma 3
+  -     0,    50  # tritium 4
+  -     0,   500  # water vapor 5
+  -     0,   500  # ammonia 6
+  -     0,   500  # n2o 7
+  -     0,     0  # frezon 8
+  -     0,     0  # bz 9
+  -     0,     0  # pluoxium 10
+  -  3000,  9000  # hydrogen 11
+  -     0,     0  # nitrium 12
+  -     0,     0  # healium 13
+  -     0,     0  # hyper-noblium 14
+  -     0,     0  # proto-nitrate 15
+  -     0,     0  # zauker 16
+  -     0,     0  # halon 17
+  -     0,     0  # helium 18
+
+- type: gasDeposit
+  id: MostlyProtoNitrate
+  gases:
+  -     0,  2000  # oxygen 0
+  -     0,  2000  # nitrogen 1
+  -     0,   500  # carbon dioxide 2
+  -     0,   200  # plasma 3
+  -     0,    50  # tritium 4
+  -     0,   500  # water vapor 5
+  -     0,   500  # ammonia 6
+  -     0,   500  # n2o 7
+  -     0,     0  # frezon 8
+  -     0,     0  # bz 9
+  -     0,     0  # pluoxium 10
+  -     0,     0  # hydrogen 11
+  -     0,     0  # nitrium 12
+  -     0,     0  # healium 13
+  -     0,     0  # hyper-noblium 14
+  -  3000,  9000  # proto-nitrate 15
+  -     0,     0  # zauker 16
+  -     0,     0  # halon 17
+  -     0,     0  # helium 18
+
+- type: gasDeposit
+  id: MostlyHelium
+  gases:
+  -     0,  2000  # oxygen 0
+  -     0,  2000  # nitrogen 1
+  -     0,   500  # carbon dioxide 2
+  -     0,   200  # plasma 3
+  -     0,    50  # tritium 4
+  -     0,   500  # water vapor 5
+  -     0,   500  # ammonia 6
+  -     0,   500  # n2o 7
+  -     0,     0  # frezon 8
+  -     0,     0  # bz 9
+  -     0,     0  # pluoxium 10
+  -     0,     0  # hydrogen 11
+  -     0,     0  # nitrium 12
+  -     0,     0  # healium 13
+  -     0,     0  # hyper-noblium 14
+  -     0,     0  # proto-nitrate 15
+  -     0,     0  # zauker 16
+  -     0,     0  # halon 17
+  -  3000,  9000  # helium 18
+
+# Horizon end

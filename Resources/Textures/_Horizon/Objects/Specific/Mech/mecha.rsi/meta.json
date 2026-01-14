@@ -72,6 +72,38 @@
       "name": "clarkespider-broken"
     },
     {
+      "name": "clarkeveteran",
+      "directions": 4,
+      "delays": [
+        [
+          0.5,
+          0.5,
+          0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ]
+    },
+    {
+      "name": "clarkeveteran-open"
+    },
+    {
+      "name": "clarkeveteran-broken"
+    },
+    {
       "name": "harson",
       "directions": 4,
       "delays": [
@@ -134,6 +166,16 @@
     },
     {
       "name": "harsonspider-broken"
+    },
+    {
+      "name": "durares",
+      "directions": 4
+    },
+    {
+      "name": "durares-open"
+    },
+    {
+      "name": "durares-broken"
     },
     {
       "name": "durdollhouse",
@@ -265,6 +307,27 @@
     },
     {
       "name": "gygaxgrey-broken"
+    },
+    {
+      "name": "gygaxhermes",
+      "directions": 4
+    },
+    {
+      "name": "gygaxhermes-open",
+      "delays": [
+        [
+          0.3,
+          0.3,
+          0.3,
+          0.3,
+          0.3,
+          0.3,
+          0.3
+        ]
+      ]
+    },
+    {
+      "name": "gygaxhermes-broken"
     },
     {
       "name": "gygaxmed",

@@ -3,3 +3,5 @@ ent-ClothingBackpackChameleon = backpack
     .suffix = Chameleon
 ent-ClothingBackpackWaterTank = backpack water tank
     .desc = Holds a large amount of fluids. Supplies to spray nozzles in your hands, and has a slot on the side for said spray nozzles.
+ent-NFClothingBackpackElectropack = electropack backpack
+    .desc = A specialized backpack equipped with electrical systems for advanced purposes.

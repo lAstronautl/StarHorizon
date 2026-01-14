@@ -1,0 +1,35 @@
+# Информация об авторе шаттла
+# GitHub/Gitea: ???
+# Discord: amir7036
+
+# Информация об сопровождающем
+# GitHub/Gitea: https://git.starhorizon.ru/Astrolaris
+# Discord: astr0laris
+
+# Прототип аванпоста:
+#
+- type: pointOfInterest
+  id: NTDeport
+  parent: BasePOI
+  name: "NT Deport"
+  minimumDistance: 15000
+  maximumDistance: 20000
+  spawnGroup: Required
+  gridPath: /Maps/_Horizon/POI/nanotrasendeport.yml
+  addComponents:
+  - type: SolarPoweredGrid
+    trackOnInit: true
+    doNotCull: true
+
+- type: gameMap
+  id: NTDeport
+  mapName: "NT Deport"
+  mapPath: /Maps/_Horizon/POI/nanotrasendeport.yml
+  minPlayers: 0
+  stations:
+    NTDeport:
+      stationProto: StandardFrontierOutpost
+      components:
+        - type: StationNameSetup
+          mapNameTemplate: "NT Deport"
+        - type: BindToStationVariationPassExemption

@@ -9,3 +9,6 @@ ent-ShuttleIntercomSyndicate = { ent-BaseShuttleIntercom }
 ent-IntercomNfsd = { ent-IntercomSecurity }
     .suffix = NFSD
     .desc = { ent-IntercomSecurity.desc }
+ent-IntercomGreetingAlwaysOn = { ent-BaseStructureIndestructible }
+    .suffix = Greeting, Always On
+    .desc = { ent-BaseStructureIndestructible.desc }

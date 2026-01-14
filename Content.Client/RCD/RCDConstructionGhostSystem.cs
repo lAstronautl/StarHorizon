@@ -1,3 +1,4 @@
+using Content.Client._Horizon.RCD;
 using Content.Shared.Hands.Components;
 using Content.Shared.Interaction;
 using Content.Shared.RCD;
@@ -40,6 +41,17 @@ public sealed class RCDConstructionGhostSystem : EntitySystem
 
         var heldEntity = hands.ActiveHand?.HeldEntity;
 
+        // Horizon start
+        if (player.HasValue)
+        {
+            var ev = new GetRCDEntityEvent();
+            RaiseLocalEvent(player.Value, ref ev);
+
+            if (ev.Entity.HasValue)
+                heldEntity = ev.Entity.Value;
+        }
+        // Horizon end
+
         if (!TryComp<RCDComponent>(heldEntity, out var rcd))
         {
             // If the player was holding an RCD, but is no longer, cancel placement
@@ -67,7 +79,7 @@ public sealed class RCDConstructionGhostSystem : EntitySystem
             MobUid = heldEntity.Value,
             PlacementOption = _placementMode,
             EntityType = prototype.Prototype,
-            Range = (int) Math.Ceiling(SharedInteractionSystem.InteractionRange),
+            Range = (int) Math.Ceiling(rcd.Range),  // Horizon - custom rcd range
             IsTile = (prototype.Mode == RcdMode.ConstructTile),
             UseEditorContext = false,
         };

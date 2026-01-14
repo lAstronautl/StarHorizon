@@ -4,13 +4,14 @@
   description: Телепортирует проклятую катану назад к вам в руки.
   noSpawn: true
   components:
-  - type: InstantAction
+  - type: Action
     useDelay: 60
     icon:
       sprite: _Horizon/Interface/Actions/cursedactions.rsi
       state: katana-return
     itemIconStyle: NoItem
     priority: -11
+  - type: InstantAction
     event: !type:RecallCursedKatanaEvent {}
 
 - type: entity
@@ -19,12 +20,13 @@
   description: Активировать катану для получения сверхъестественных способностей.
   noSpawn: true
   components:
-  - type: InstantAction
+  - type: Action
     icon:
       sprite: _Horizon/Interface/Actions/cursedactions.rsi
       state: katana-on
     itemIconStyle: NoItem
     priority: -11
+  - type: InstantAction
     event: !type:ActivateCursedKatanaEvent {}
 
 - type: entity
@@ -33,12 +35,13 @@
   description: Отключить катану и скрыть её силу.
   noSpawn: true
   components:
-  - type: InstantAction
+  - type: Action
     icon:
       sprite: _Horizon/Interface/Actions/cursedactions.rsi
       state: katana-off
     itemIconStyle: NoItem
     priority: -11
+  - type: InstantAction
     event: !type:DeactivateCursedKatanaEvent {}
 
 - type: entity
@@ -47,10 +50,11 @@
   description: Вы получаете уникальную маску которая даёт вам лишь больше сил.
   noSpawn: true
   components:
-  - type: InstantAction
+  - type: Action
     icon:
       sprite: _Horizon/Clothing/Mask/demonmask.rsi
       state: icon
     itemIconStyle: NoItem
     priority: -11
+  - type: InstantAction
     event: !type:GetDemonMaskEvent {}

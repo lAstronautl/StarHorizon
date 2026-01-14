@@ -197,13 +197,14 @@
   - type: Projectile
     damage:
       types: # it's for mining hard things, not destroying critters
-        Blunt: 0.5
-        Structural: 1
+        Blunt: 30 # Horizon
+        Structural: 35 # Horizon
   - type: TimedDespawn
     lifetime: 1
   - type: PointLight
     color: "#FF8888"
-  - type: MiningGatheringHard # Frontier
+  - type: GatheringProjectile
+  - type: MiningGatheringSoft
 
 - type: entity
   parent: BulletCharge

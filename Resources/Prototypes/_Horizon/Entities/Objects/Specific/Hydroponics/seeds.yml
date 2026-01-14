@@ -569,3 +569,13 @@
     seedId: diamondcarrot
   - type: Sprite
     sprite: _Horizon/Objects/Specific/Hydroponics/diamondcarrot.rsi
+
+- type: entity
+  parent: SeedBase
+  name: packet of blue tomato seeds
+  id: BluespaceTomatoSeeds
+  components:
+  - type: Seed
+    seedId: bluespaceTomato
+  - type: Sprite
+    sprite: _Horizon/Objects/Specific/Hydroponics/bluespace_tomato.rsi

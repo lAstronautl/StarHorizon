@@ -1,3 +1,4 @@
+using Content.Shared._Horizon.FlavorText;
 using Content.Shared.Examine;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Verbs;
@@ -8,6 +9,7 @@ namespace Content.Shared.DetailExaminable;
 public sealed class DetailExaminableSystem : EntitySystem
 {
     [Dependency] private readonly ExamineSystemShared _examine = default!;
+    [Dependency] private readonly SharedHorizonFlavorTextSystem _horizonFlavor = default!;
 
     public override void Initialize()
     {
@@ -31,7 +33,10 @@ public sealed class DetailExaminableSystem : EntitySystem
             {
                 var markup = new FormattedMessage();
                 markup.AddMarkupPermissive(ent.Comp.Content);
-                _examine.SendExamineTooltip(user, ent, markup, false, false);
+
+                // Horizon - замена на меню
+                //_examine.SendExamineTooltip(user, ent, markup, false, false);
+                _horizonFlavor.OpenFlavorMenu(ent.Owner, user, ent.Comp.Content);
             },
             Text = Loc.GetString("detail-examinable-verb-text"),
             Category = VerbCategory.Examine,

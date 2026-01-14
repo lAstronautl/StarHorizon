@@ -9,7 +9,7 @@
   price: 51000 # 46016 0.1 50617.6
   category: Medium
   group: Scrap
-  shuttlePath: /Maps/_NF/Shuttles/Scrap/geode.yml
+  shuttlePath: /Maps/_Horizon/Shuttles/Shipyard/Scrap/geode.yml # Horizon - замена карты
   guidebookPage: ShipyardGeode
   class:
   - Scrapyard
@@ -17,11 +17,20 @@
   - Salvage
   engine:
   - Uranium
+  # Horizon start
+  costModifiers:
+    - !type:RoleModifier
+      role: "Pilot"
+      costMultiplier: 0.8
+    - !type:RoleModifier
+      role: "Mercenary"
+      costMultiplier: 1.2
+  # Horizon end
 
 - type: gameMap
   id: Geode
   mapName: 'CLU Geode'
-  mapPath: /Maps/_NF/Shuttles/Scrap/geode.yml
+  mapPath: /Maps/_Horizon/Shuttles/Shipyard/Scrap/geode.yml # Horizon - замена карты
   minPlayers: 0
   stations:
     Geode:

@@ -16,14 +16,16 @@
     # Randomly generated books
     - id: BookRandomStory
       amount: !type:RangeNumberSelector
-        range: 0, 4
+        range: 0, 8
     # Guidebooks
     - !type:NestedSelector
+      rolls: !type:RangeNumberSelector
+        range: 0, 2
       tableId: RandomGuidebookTable
     # Handwritten books
     - !type:NestedSelector
       rolls: !type:RangeNumberSelector
-        range: 0, 2
+        range: 0, 3
       tableId: RandomHandwrittenBookTable
 
 - type: entityTable
@@ -79,6 +81,40 @@
     - id: BookSpaceEncyclopedia
     - id: NFHyperlinkBookSpaceLaw # Frontier: BookSpaceLaw<NFHyperlinkBookSpaceLaw
     - id: BookTheBookOfControl
+    # Horizon start
+    - id: BookLanguageGalacticCommonBadSpeak
+    - id: BookLanguageArachnidBadSpeak
+    - id: BookLanguageNekomimeticBadSpeak
+    - id: BookLanguageDraconicBadSpeak
+    - id: BookLanguageCanilunztBadSpeak
+    - id: BookLanguageSikTajBadSpeak
+    - id: BookLanguageNianBadSpeak
+    - id: BookLanguageSolCommonBadSpeak
+    - id: BookLanguageDwarfBadSpeak
+    - id: BookLanguageCintaTajBadSpeak
+    - id: BookLanguageGutterBadSpeak
+    - id: BookLanguageNeoRusskiyaBadSpeak
+    - id: BookLanguageClownishBadSpeak
+    - id: BookLanguageGalacticCommonUnderstand
+    - id: BookLanguageArachnidUnderstand
+    - id: BookLanguageNekomimeticUnderstand
+    - id: BookLanguageDraconicUnderstand
+    - id: BookLanguageCanilunztUnderstand
+    - id: BookLanguageSikTajUnderstand
+    - id: BookLanguageNianUnderstand
+    - id: BookLanguageSolCommonUnderstand
+    - id: BookLanguageDwarfUnderstand
+    - id: BookLanguageCintaTajUnderstand
+    - id: BookLanguageGutterUnderstand
+    - id: BookLanguageNeoRusskiyaUnderstand
+    - id: BookLanguageClownishUnderstand
+    - id: BookLanguageSignLanguageUnderstand
+    - id: BookLanguageRootSpeakUnderstand
+    - id: BookLanguageBubblishUnderstand
+    - id: BookLanguageVoxPidginUnderstand
+    - id: BookLanguageGoblinUnderstand
+    - id: BookLanguageHarpyUnderstand
+    # Horizon end
 
 - type: entityTable
   id: RandomBookTable

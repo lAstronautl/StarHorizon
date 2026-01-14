@@ -1,17 +1,18 @@
+# Remap
+
 # Author Info
 # GitHub: cheackraze
 
 # Shuttle Notes:
-# a wooden pirate version of the classic Prospector
 - type: vessel
   id: Barnacle
   parent: BaseVesselAntag
   name: Barnacle
   description: 'Nobody expects the lowly barnacle'
-  price: 20000 # 14289 1.25 32150.25
+  price: 35000 # 26643, наценка верфи 25% = 33303,75
   category: Small
   group: BlackMarket
-  shuttlePath: /Maps/_NF/Shuttles/BlackMarket/barnacle.yml
+  shuttlePath: /Maps/_Horizon/Shuttles/Shipyard/BlackMarket/barnacle.yml
   guidebookPage: Null
   class:
   - Pirate
@@ -21,7 +22,7 @@
 - type: gameMap
   id: Barnacle
   mapName: 'Barnacle'
-  mapPath: /Maps/_NF/Shuttles/BlackMarket/barnacle.yml
+  mapPath: /Maps/_Horizon/Shuttles/Shipyard/BlackMarket/barnacle.yml
   minPlayers: 0
   stations:
     Barnacle:

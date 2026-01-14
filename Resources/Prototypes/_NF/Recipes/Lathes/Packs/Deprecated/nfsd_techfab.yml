@@ -48,22 +48,6 @@
   - SignalTrigger
   - TimerTrigger
   - VoiceTrigger
-  # Horizon Attachements start
-  - AttachmentVerticalGrip
-  - AttachmentLaserSight
-  - AttachmentReflexSight
-  - AttachmentT2Miniscope
-  - AttachmentM90UnderbarrelShotgun
-  - AttachmentM90GrenadeLauncher
-  - AttachmentMagneticHarness
-  - AttachmentSuppressor
-  - AttachmentAntiLyingWarrior
-  - 40mmGrenadeHEAT
-  - 40mmGrenadeBaton
-  - 40mmGrenadeEMP
-  - 40mmGrenadeFlash
-  - 40mmGrenadeSmoke
-# Horizon Attachements end
 
 # Practice ammo/mags and practice weapons
 - type: latheRecipePack

@@ -1,13 +1,17 @@
 using System.Numerics;
 using Content.Shared._RMC14.Attachable.Components;
 using Content.Shared._RMC14.Attachable.Events;
+// using Content.Shared._RMC14.Slow;
 using Content.Shared._RMC14.Weapons.Ranged;
 using Content.Shared.Actions;
+using Content.Shared.Actions.Components;
 using Content.Shared.Actions.Events;
 using Content.Shared.DoAfter;
+using Content.Shared.Fluids;
 using Content.Shared.Hands;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction;
+using Content.Shared.Interaction.Events;
 using Content.Shared.Light;
 using Content.Shared.Movement.Events;
 using Content.Shared.Physics;
@@ -21,7 +25,6 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.Map;
 using Robust.Shared.Physics;
 using Robust.Shared.Timing;
-using Content.Shared._RMC14.Weapons.Common;
 
 namespace Content.Shared._RMC14.Attachable.Systems;
 
@@ -40,6 +43,7 @@ public sealed class AttachableToggleableSystem : EntitySystem
     [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
     [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
     [Dependency] private readonly UseDelaySystem _useDelaySystem = default!;
+    // [Dependency] private readonly RMCSlowSystem _slow = default!;
 
     private const string attachableToggleUseDelayID = "RMCAttachableToggle";
 
@@ -48,7 +52,8 @@ public sealed class AttachableToggleableSystem : EntitySystem
 
     public override void Initialize()
     {
-        SubscribeLocalEvent<AttachableToggleableComponent, ActivateInWorldEvent>(OnActivateInWorld);
+        SubscribeLocalEvent<AttachableToggleableComponent, ActivateInWorldEvent>(OnActivateInWorld,
+            after: new[] { typeof(CMGunSystem) });
         SubscribeLocalEvent<AttachableToggleableComponent, AttachableAlteredEvent>(OnAttachableAltered,
             after: new[] { typeof(AttachableModifiersSystem) });
         SubscribeLocalEvent<AttachableToggleableComponent, AttachableToggleableInterruptEvent>(OnAttachableToggleableInterrupt);
@@ -60,12 +65,15 @@ public sealed class AttachableToggleableSystem : EntitySystem
         SubscribeLocalEvent<AttachableToggleableComponent, GunShotEvent>(OnGunShot);
         SubscribeLocalEvent<AttachableToggleableComponent, ToggleActionEvent>(OnToggleAction,
             before: new[] { typeof(SharedHandheldLightSystem) });
-        SubscribeLocalEvent<AttachableToggleableComponent, UniqueActionEvent>(OnUniqueAction);
+        //SubscribeLocalEvent<AttachableToggleableComponent, UniqueActionEvent>(OnUniqueAction);
         SubscribeLocalEvent<AttachableToggleableComponent, GrantAttachableActionsEvent>(OnGrantAttachableActions);
         SubscribeLocalEvent<AttachableToggleableComponent, RemoveAttachableActionsEvent>(OnRemoveAttachableActions);
         SubscribeLocalEvent<AttachableToggleableComponent, AttachableRelayedEvent<HandDeselectedEvent>>(OnHandDeselected);
         SubscribeLocalEvent<AttachableToggleableComponent, AttachableRelayedEvent<GotEquippedHandEvent>>(OnGotEquippedHand);
         SubscribeLocalEvent<AttachableToggleableComponent, AttachableRelayedEvent<GotUnequippedHandEvent>>(OnGotUnequippedHand);
+        SubscribeLocalEvent<AttachableToggleableComponent, SprayAttemptEvent>(OnSprayAttempt);
+        SubscribeLocalEvent<AttachableToggleableComponent, DroppedEvent>(OnDropped);
+        SubscribeLocalEvent<AttachableToggleableComponent, AttachableRelayedEvent<DroppedEvent>>(OnDropped);
 
         SubscribeLocalEvent<AttachableMovementLockedComponent, MoveInputEvent>(OnAttachableMovementLockedMoveInput);
 
@@ -78,7 +86,7 @@ public sealed class AttachableToggleableSystem : EntitySystem
         SubscribeLocalEvent<AttachableGunPreventShootComponent, AttemptShootEvent>(OnAttemptShoot);
     }
 
-#region AttachableAlteredEvent handling
+    #region AttachableAlteredEvent handling
     private void OnAttachableAltered(Entity<AttachableToggleableComponent> attachable, ref AttachableAlteredEvent args)
     {
         switch (args.Alteration)
@@ -115,13 +123,13 @@ public sealed class AttachableToggleableSystem : EntitySystem
         }
 
         if (attachable.Comp.Action == null ||
-            !TryComp(attachable.Comp.Action, out InstantActionComponent? actionComponent))
+            !TryComp(attachable.Comp.Action, out ActionComponent? actionComponent))
         {
             return;
         }
 
         _actionsSystem.SetToggled(attachable.Comp.Action, attachable.Comp.Active);
-        actionComponent.Enabled = attachable.Comp.Attached;
+        _actionsSystem.SetEnabled((attachable.Comp.Action.Value, actionComponent), attachable.Comp.Attached);
     }
 
     private void OnAttachableAltered(Entity<AttachableToggleableSimpleActivateComponent> attachable, ref AttachableAlteredEvent args)
@@ -231,13 +239,13 @@ public sealed class AttachableToggleableSystem : EntitySystem
     private void OnGunShot(Entity<AttachableToggleableComponent> attachable, ref AttachableRelayedEvent<GunShotEvent> args)
     {
         CheckUserBreakOnRotate(args.Args.User);
-        //CheckUserBreakOnFullRotate(args.Args.User, args.Args.FromCoordinates, args.Args.ToCoordinates);
+        CheckUserBreakOnFullRotate(args.Args.User, args.Args.FromCoordinates, args.Args.ToCoordinates);
     }
 
     private void OnGunShot(Entity<AttachableToggleableComponent> attachable, ref GunShotEvent args)
     {
         CheckUserBreakOnRotate(args.User);
-        //CheckUserBreakOnFullRotate(args.User, args.FromCoordinates, args.ToCoordinates);
+        CheckUserBreakOnFullRotate(args.User, args.FromCoordinates, args.ToCoordinates);
     }
 
     private void OnAttemptShoot(Entity<AttachableGunPreventShootComponent> gun, ref AttemptShootEvent args)
@@ -250,11 +258,11 @@ public sealed class AttachableToggleableSystem : EntitySystem
         _popupSystem.PopupClient(gun.Comp.Message, args.User, args.User);
     }
 
-    private void OnUniqueAction(Entity<AttachableToggleableComponent> attachable, ref UniqueActionEvent args)
+/*    private void OnUniqueAction(Entity<AttachableToggleableComponent> attachable, ref UniqueActionEvent args)
     {
         if (attachable.Comp.AttachedOnly && !attachable.Comp.Attached)
             args.Handled = true;
-    }
+    }*/
 
     private void OnHandDeselected(Entity<AttachableToggleableComponent> attachable, ref AttachableRelayedEvent<HandDeselectedEvent> args)
     {
@@ -284,12 +292,44 @@ public sealed class AttachableToggleableSystem : EntitySystem
 
         args.Args.Handled = true;
 
-        if (attachable.Comp.NeedHand && attachable.Comp.Active)
+        if ((attachable.Comp.NeedHand || attachable.Comp.BreakOnDrop) && attachable.Comp.Active)
+        {
             Toggle(attachable, args.Args.User, attachable.Comp.DoInterrupt);
-
+        }
 
         var removeEv = new RemoveAttachableActionsEvent(args.Args.User);
         RaiseLocalEvent(attachable, ref removeEv);
+    }
+
+    private void OnSprayAttempt(Entity<AttachableToggleableComponent> attachable, ref SprayAttemptEvent args)
+    {
+        if (args.Cancelled)
+            return;
+
+        if (attachable.Comp.AttachedOnly && !attachable.Comp.Attached)
+            args.Cancelled = true;
+    }
+
+    private void OnDropped(Entity<AttachableToggleableComponent> attachable, ref DroppedEvent args)
+    {
+        if (attachable.Comp.AttachedOnly && !attachable.Comp.Attached)
+            return;
+
+        if (!attachable.Comp.BreakOnDrop || !attachable.Comp.Active)
+            return;
+
+        Toggle(attachable, args.User);
+    }
+
+    private void OnDropped(Entity<AttachableToggleableComponent> attachable, ref AttachableRelayedEvent<DroppedEvent> args)
+    {
+        if (attachable.Comp.AttachedOnly && !attachable.Comp.Attached)
+            return;
+
+        if (!attachable.Comp.BreakOnDrop || !attachable.Comp.Active)
+            return;
+
+        Toggle(attachable, args.Args.User);
     }
 
     private void OnAttachableMovementLockedMoveInput(Entity<AttachableMovementLockedComponent> user, ref MoveInputEvent args)
@@ -297,8 +337,9 @@ public sealed class AttachableToggleableSystem : EntitySystem
         if (!args.HasDirectionalMovement)
             return;
 
-        foreach (var attachableUid in user.Comp.AttachableList)
+        for (var i = user.Comp.AttachableList.Count - 1; i >= 0; i--)
         {
+            var attachableUid = user.Comp.AttachableList[i];
             if (!TryComp(attachableUid, out AttachableToggleableComponent? toggleableComponent) ||
                 !toggleableComponent.Active ||
                 !toggleableComponent.BreakOnMove)
@@ -308,8 +349,6 @@ public sealed class AttachableToggleableSystem : EntitySystem
 
             Toggle((attachableUid, toggleableComponent), user.Owner, toggleableComponent.DoInterrupt);
         }
-
-        RemCompDeferred<AttachableMovementLockedComponent>(user);
     }
 
     private void CheckUserBreakOnRotate(Entity<AttachableDirectionLockedComponent?> user)
@@ -325,8 +364,9 @@ public sealed class AttachableToggleableSystem : EntitySystem
         if (Transform(user.Owner).LocalRotation.GetCardinalDir() == user.Comp.LockedDirection)
             return;
 
-        foreach (EntityUid attachableUid in user.Comp.AttachableList)
+        for (var i = user.Comp.AttachableList.Count - 1; i >= 0; i--)
         {
+            var attachableUid = user.Comp.AttachableList[i];
             if (!TryComp(attachableUid, out AttachableToggleableComponent? toggleableComponent) ||
                 !toggleableComponent.Active ||
                 !toggleableComponent.BreakOnRotate)
@@ -336,8 +376,6 @@ public sealed class AttachableToggleableSystem : EntitySystem
 
             Toggle((attachableUid, toggleableComponent), user.Owner, toggleableComponent.DoInterrupt);
         }
-
-        RemCompDeferred<AttachableDirectionLockedComponent>(user);
     }
 
     private void CheckUserBreakOnFullRotate(Entity<AttachableSideLockedComponent?> user, EntityCoordinates playerPos, EntityCoordinates targetPos)
@@ -363,8 +401,9 @@ public sealed class AttachableToggleableSystem : EntitySystem
         if (differenceFromLockedAngle > -90 && differenceFromLockedAngle < 90)
             return;
 
-        foreach (EntityUid attachableUid in user.Comp.AttachableList)
+        for (var i = user.Comp.AttachableList.Count - 1; i >= 0; i--)
         {
+            var attachableUid = user.Comp.AttachableList[i];
             if (!TryComp(attachableUid, out AttachableToggleableComponent? toggleableComponent) ||
                 !toggleableComponent.Active ||
                 !toggleableComponent.BreakOnFullRotate)
@@ -374,8 +413,6 @@ public sealed class AttachableToggleableSystem : EntitySystem
 
             Toggle((attachableUid, toggleableComponent), user.Owner, toggleableComponent.DoInterrupt);
         }
-
-        RemCompDeferred<AttachableSideLockedComponent>(user);
     }
 #endregion
 
@@ -471,7 +508,7 @@ public sealed class AttachableToggleableSystem : EntitySystem
                 {
                     foreach (var entity in ents)
                     {
-                        if (!TryComp(entity, out FixturesComponent? fixturesComponent))
+                        if (!TryComp(entity, out FixturesComponent? fixturesComponent) || !Transform(entity).Anchored)
                             continue;
 
                         foreach (var fixture in fixturesComponent.Fixtures.Values)
@@ -565,6 +602,33 @@ public sealed class AttachableToggleableSystem : EntitySystem
         Dirty(attachable);
     }
 
+    private void RemoveUnusedLocks(Entity<AttachableToggleableComponent> attachable, EntityUid? userUid)
+    {
+        if (userUid == null)
+            return;
+
+        if (attachable.Comp.BreakOnMove && TryComp<AttachableMovementLockedComponent>(userUid.Value, out var movementLockedComponent))
+        {
+            movementLockedComponent.AttachableList.Remove(attachable.Owner);
+            if (movementLockedComponent.AttachableList.Count == 0)
+                RemCompDeferred<AttachableMovementLockedComponent>(userUid.Value);
+        }
+
+        if (attachable.Comp.BreakOnRotate && TryComp<AttachableDirectionLockedComponent>(userUid.Value, out var directionLockedComponent))
+        {
+            directionLockedComponent.AttachableList.Remove(attachable.Owner);
+            if (directionLockedComponent.AttachableList.Count == 0)
+                RemCompDeferred<AttachableDirectionLockedComponent>(userUid.Value);
+        }
+
+        if (attachable.Comp.BreakOnFullRotate && TryComp<AttachableSideLockedComponent>(userUid.Value, out var sideLockedComponent))
+        {
+            sideLockedComponent.AttachableList.Remove(attachable.Owner);
+            if (sideLockedComponent.AttachableList.Count == 0)
+                RemCompDeferred<AttachableSideLockedComponent>(userUid.Value);
+        }
+    }
+
     private void FinishToggle(
         Entity<AttachableToggleableComponent> attachable,
         Entity<AttachableHolderComponent> holder,
@@ -600,6 +664,9 @@ public sealed class AttachableToggleableSystem : EntitySystem
         {
             if (attachable.Comp.SupercedeHolder && holder.Comp.SupercedingAttachable == attachable.Owner)
                 _attachableHolderSystem.SetSupercedingAttachable(holder, null);
+
+            RemoveUnusedLocks(attachable, userUid);
+
             return;
         }
 
@@ -703,13 +770,13 @@ public sealed class AttachableToggleableSystem : EntitySystem
         _metaDataSystem.SetEntityName(actionId, ent.Comp.ActionName);
         _metaDataSystem.SetEntityDescription(actionId, ent.Comp.ActionDesc);
 
-        if (_actionsSystem.TryGetActionData(actionId, out var action))
+        if (_actionsSystem.GetAction(actionId) is { } action)
         {
-            action.Icon = ent.Comp.Icon;
-            action.IconOn = ent.Comp.IconActive;
-            action.Enabled = ent.Comp.Attached;
-            action.UseDelay = ent.Comp.UseDelay;
-            Dirty(actionId, action);
+            var actionEnt = action.AsNullable();
+            _actionsSystem.SetIcon(actionEnt, ent.Comp.Icon);
+            _actionsSystem.SetIconOn(actionEnt, ent.Comp.IconActive);
+            _actionsSystem.SetEnabled(actionEnt, ent.Comp.Attached);
+            _actionsSystem.SetUseDelay(actionEnt, ent.Comp.UseDelay);
         }
 
         Dirty(ent);
@@ -740,8 +807,12 @@ public sealed class AttachableToggleableSystem : EntitySystem
         if (ent.Comp.Action is not { } action)
             return;
 
-        if (!TryComp(action, out InstantActionComponent? actionComponent) || actionComponent.AttachedEntity != user)
+        if (!HasComp<InstantActionComponent>(action) ||
+            !TryComp(action, out ActionComponent? actionComponent) ||
+            actionComponent.AttachedEntity != user)
+        {
             return;
+        }
 
         _actionsSystem.RemoveProvidedAction(user, ent, action);
     }

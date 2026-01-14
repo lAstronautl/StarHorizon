@@ -204,18 +204,19 @@
   name: Blink
   description: Teleport to the clicked location.
   components:
-  - type: WorldTargetAction
+  - type: Action
     useDelay: 5
-    range: 25 # default examine-range.
-    # ^ should probably add better validation that the clicked location is on the users screen somewhere,
+    itemIconStyle: BigAction
     sound: !type:SoundPathSpecifier
       path: /Audio/_Horizon/Magic/Eldritch/voidblink.ogg
-    itemIconStyle: BigAction
-    checkCanAccess: false
-    repeat: false
     icon:
       sprite: _Horizon/Objects/Magic/demon.rsi
       state: blink
+  - type: TargetAction
+    range: 25
+    repeat: false
+    checkCanAccess: false
+  - type: WorldTargetAction
     event: !type:TeleportSpellEvent
 
 #стена
@@ -224,7 +225,7 @@
   name: forcewall
   description: Creates a magical barrier.
   components:
-  - type: InstantAction
+  - type: Action
     useDelay: 4
     itemIconStyle: BigAction
     sound: !type:SoundPathSpecifier
@@ -232,6 +233,7 @@
     icon:
       sprite: _Horizon/Objects/Magic/demon.rsi
       state: shield
+  - type: InstantAction
     event: !type:InstantSpawnSpellEvent
       prototype: WallDemon
       posData: !type:TargetInFront
@@ -242,7 +244,7 @@
   name: "[color=red]Tentacle Slam[/color]"
   description: Use your tentacles to grab and stun a target player!
   components:
-  - type: EntityWorldTargetAction
+  - type: Action
     raiseOnUser: true
     icon:
       sprite: _Horizon/Objects/Magic/demon.rsi
@@ -252,9 +254,11 @@
       state: goliath_tentacle_wiggle
     sound:
       path: "/Audio/Magic/Demon/demon_consume.ogg"
-    event: !type:GoliathSummonTentacleAction
     useDelay: 5
+  - type: TargetAction
     range: 20
+  - type: WorldTargetAction
+    event: !type:GoliathSummonTentacleAction
 
 #инста гиб
 - type: entity
@@ -262,7 +266,7 @@
   name: Smite
   description: Instantly gibs a target.
   components:
-  - type: EntityTargetAction
+  - type: Action
     useDelay: 90
     itemIconStyle: BigAction
     whitelist:
@@ -275,9 +279,8 @@
     icon:
       sprite: _Horizon/Objects/Magic/demon.rsi
       state: gib
+  - type: EntityTargetAction
     event: !type:SmiteSpellEvent
-  - type: Magic
-    requiresClothes: false
 
 ###misc
 - type: inventoryTemplate

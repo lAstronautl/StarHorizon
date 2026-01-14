@@ -59,3 +59,25 @@
   - type: ShowJobIcons
   - type: ShowMindShieldIcons
   - type: ShowCriminalRecordIcons
+
+- type: entity
+  name: прибор ночного видения ОБР джаггернаута
+  id: ClothingEyesVisionERTJuggernaut
+  parent: ClothingEyesVision
+  description: Один его взгляд может убить тебя.
+  components:
+  - type: Item
+  - type: Sprite
+    sprite: _StarHorizon/Clothing/Eyes/nvgjugert.rsi
+    state: icon
+  - type: Clothing
+    sprite: _StarHorizon/Clothing/Eyes/nvgjugert.rsi
+  - type: ShowHealthBars
+    damageContainers:
+    - Biological
+  - type: FlashImmunity
+  - type: Unremoveable
+  - type: Tag
+    tags:
+    - HudMedical
+    - HudSecurity

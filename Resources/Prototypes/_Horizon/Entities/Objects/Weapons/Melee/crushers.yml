@@ -100,7 +100,7 @@
     wideAnimationRotation: -135
     damage:
       types:
-        Blunt: 30
+        Blunt: 25
     soundHit:
       collection: MetalThud
     angle: 0
@@ -110,13 +110,10 @@
     damage:
       types:
         Blunt: 10
-        Structural: 50
+        Structural: 45
   - type: Item
     size: Ginormous
     sprite: _Horizon/Objects/Weapons/Melee/crusher_hammer-inhands.rsi
-  - type: MeleeThrowOnHit
-    speed: 5
-    lifetime: 0.5
   - type: GunRequiresWield
   - type: Wieldable
   - type: PressureDamageModify

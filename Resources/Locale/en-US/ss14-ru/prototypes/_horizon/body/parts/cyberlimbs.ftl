@@ -40,7 +40,3 @@ ent-LeftArmCyberGarden = left garden arm
     .desc = { ent-PartCyber.desc }
 ent-RightArmCyberGarden = right garden arm
     .desc = { ent-PartCyber.desc }
-ent-LeftArmCyberLazer = left lazer arm
-    .desc = { ent-PartCyber.desc }
-ent-RightArmCyberLazer = right lazer arm
-    .desc = { ent-PartCyber.desc }

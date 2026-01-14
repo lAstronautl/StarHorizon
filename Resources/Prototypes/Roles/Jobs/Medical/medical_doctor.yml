@@ -3,26 +3,41 @@
   name: job-name-doctor
   description: job-description-doctor
   playTimeTracker: JobMedicalDoctor
-  setPreference: false # Frontier
+  salary: 40000 # Horizon
+  forceFaction: FactionMed # Horizon
+  setPreference: true # Lua
   requirements:
-    - !type:DepartmentTimeRequirement
-      department: Medical
-      time: 9000 #2.5 hrs
+  # Horizon start
+  - !type:OverallPlaytimeRequirement
+    time: 18000 # 5 hrs
   startingGear: DoctorGear
   icon: "JobIconMedicalDoctor"
-  supervisors: job-supervisors-hire # Frontier
-  accessGroups: # Frontier
-  - GeneralAccess # Frontier
-  # special: # Frontier
-  # - !type:GiveItemOnHolidaySpecial # Frontier
-  #   holiday: DoctorDay # Frontier
-  #   prototype: WehMedipen # Frontier
+  supervisors: job-supervisors-cmo # Horizon
+  weight: 80
+  displayWeight: 0
+  access:
+  - Medical
+  - Chemistry
+  accessGroups:
+  - GeneralAccess
+  # Horizon end
 
 - type: startingGear
   id: DoctorGear
   equipment:
-    ears: ClothingHeadsetMedical
+    # ears: ClothingHeadsetMedical # Horizon
     belt: ClothingBeltMedicalFilled
   #storage:
     #back:
     #- Stuff
+
+- type: chameleonOutfit
+  id: MedicalDoctorChameleonOutfit
+  job: MedicalDoctor
+  equipment:
+    head: ClothingHeadNurseHat
+    eyes: ClothingEyesHudMedical
+    mask: ClothingMaskSterile
+    neck: ClothingNeckStethoscope
+    outerClothing: ClothingOuterCoatLab
+    gloves: ClothingHandsGlovesLatex

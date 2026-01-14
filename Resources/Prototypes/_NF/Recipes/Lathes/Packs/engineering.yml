@@ -8,6 +8,8 @@
   - GasMiningDrillMachineCircuitboard
   - GaslockFrameMachineCircuitboard
   - MaterialSiloMachineCircuitboard
+  - PortableGeneratorStarPacmanMachineCircuitboard # Horizon
+  - OreMiningDrillMachineCircuitboard # Horizon
 
 - type: latheRecipePack
   id: NFEngineering
@@ -25,4 +27,4 @@
   - SuperCapacitorStockPart
   - SuperMatterBinStockPart
   - PicoManipulatorStockPart
-  # - NFWeaponParticleDecelerator # Placeholder for Edison
+  - NFWeaponParticleDecelerator

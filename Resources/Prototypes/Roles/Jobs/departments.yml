@@ -12,7 +12,7 @@
   name: department-Civilian
   description: department-NFCivilian-description # Frontier
   color: "#9FED58"
-  weight: -10
+  weight: 100
   roles:
   # - Bartender # Frontier
   # - Botanist # Frontier
@@ -81,6 +81,7 @@
   - Sheriff # Frontier
   - PlantManager # Frontier
   - StationTrafficController # Frontier
+  - DirectorOfCare # Horizon (FOK IT!!! CMO IS A COMMAND)
   primary: false
   weight: 100
   editorHidden: true # Frontier
@@ -90,7 +91,7 @@
   name: department-Engineering
   description: department-Engineering-description
   color: "#EFB341"
-  weight: -94
+  weight: 70
   primary: false
   roles:
   # - AtmosphericTechnician # Frontier
@@ -105,16 +106,23 @@
   name: department-Medical
   description: department-Medical-description
   color: "#52B4E9"
-  weight: -93
+  weight: 80
   primary: false
-  editorHidden: true # Frontier
+  # Horizon start
+  # editorHidden: true # Frontier
+  roles:
+  - DirectorOfCare
+  - Paramedic
+  - Chemist
+  - MedicalDoctor
+  # Horizon end
 
 - type: department
   id: Security
   name: department-Security
   description: department-NFSecurity-description # Frontier
   color: "#5C7D4D" # Frontier: DE3A3A<5C7D4D
-  weight: 1 # Frontier: 20<1 - accounted for in jobs
+  weight: 85 # Frontier: 20<1 - accounted for in jobs
   roles:
 #  - Detective # Frontier
 #  - HeadOfSecurity # Frontier

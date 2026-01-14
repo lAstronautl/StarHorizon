@@ -13,7 +13,7 @@
       chance: 0.7
       prototypes:
         - CrystalPink
-        - CrystalPink
+        - RandomPinkCrystal
         - ShadowPortal
         - ShadowTree #TODO: transform into EntityTable with weight
         - ShadowTree

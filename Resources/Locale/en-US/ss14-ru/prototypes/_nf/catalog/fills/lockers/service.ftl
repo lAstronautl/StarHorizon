@@ -4,3 +4,6 @@ ent-LockerJanitorFilled = { ent-LockerJanitor }
 ent-LockerClownFilled = { ent-LockerClown }
     .suffix = Filled
     .desc = { ent-LockerClown.desc }
+ent-NFClosetChefFilled = Chef Freezer
+    .suffix = Filled
+    .desc = { ent-LockerFreezer.desc }

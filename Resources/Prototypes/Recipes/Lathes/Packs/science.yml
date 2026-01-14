@@ -30,6 +30,7 @@
   - SignallerAdvanced
   # - DeviceQuantumSpinInverter # Frontier
   - DeviceDesynchronizer
+  - RemoteControlDevice # Horizon
 
 - type: latheRecipePack
   id: ScienceClothing
@@ -46,6 +47,7 @@
   recipes:
   - PowerCellMicroreactor
   - PowerCellHigh
+  - PowerCellHyper
 
 - type: latheRecipePack
   id: ScienceWeapons
@@ -99,6 +101,8 @@
   - ArtifactAnalyzerMachineCircuitboard
   - ArtifactCrusherMachineCircuitboard
   - ResearchComputerCircuitboard # Frontier: add research computer
+  - MachineBluespaceHarvesterCircuitboard # Horizon
+  - MachineBLESCircuitboard # Horizon
 
 - type: latheRecipePack
   id: CameraBoards
@@ -130,3 +134,4 @@
   - ThrusterMachineCircuitboard
   - GyroscopeMachineCircuitboard
   - MiniGravityGeneratorCircuitboard
+  - AdvancedRadarConsoleCircuitboard # Horizon

@@ -439,6 +439,7 @@ public sealed partial class MechSystem : SharedMechSystem
     //     }
     // }
 
+    // Horizon - поменял немного получение частей интерфейса
     public override void UpdateUserInterface(EntityUid uid, MechComponent? component = null)
     {
         if (!Resolve(uid, ref component))
@@ -446,15 +447,17 @@ public sealed partial class MechSystem : SharedMechSystem
 
         base.UpdateUserInterface(uid, component);
 
+        var states = new Dictionary<NetEntity, BoundUserInterfaceState?>();
         var ev = new MechEquipmentUiStateReadyEvent();
         foreach (var ent in component.EquipmentContainer.ContainedEntities)
         {
             RaiseLocalEvent(ent, ev);
+            states.Add(GetNetEntity(ent), ev.State);
         }
 
         var state = new MechBoundUiState
         {
-            EquipmentStates = ev.States
+            EquipmentStates = states
         };
         Dirty(uid, component);  // Horizon Mech
 

@@ -5,6 +5,7 @@ using Content.Shared.Mech.Components;
 using Robust.Server.GameObjects;
 using Content.Server.Emp;
 using Content.Shared.Mech.Equipment.Components;
+using Content.Server._Horizon.Mech.Components;
 
 namespace Content.Server.Mech.Systems;
 
@@ -18,6 +19,9 @@ public sealed partial class MechSystem
         SubscribeLocalEvent<MechComponent, MechEquipmentDestroyedEvent>(OnEquipmentDestroyed);
         SubscribeLocalEvent<MechComponent, MechTurnLightsEvent>(OnTurnLightsEvent);
         SubscribeLocalEvent<MechComponent, MechInhaleEvent>(OnToggleInhale);
+
+        SubscribeLocalEvent<MechEquipmentComponentsComponent, MechEquipmentGotSelectedEvent>(OnComponentSelected);
+        SubscribeLocalEvent<MechEquipmentComponentsComponent, MechEquipmentGotDeselectedEvent>(OnComponentDeselected);
     }
 
     private void OnToggleInhale(EntityUid uid, MechComponent component, MechInhaleEvent args)
@@ -63,6 +67,12 @@ public sealed partial class MechSystem
         TryChangeEnergy(uid, -FixedPoint2.Min(comp.Energy, damage), comp);
         Spawn("EffectEmpPulse", Transform(uid).Coordinates);
     }
+
+    private void OnComponentSelected(EntityUid uid, MechEquipmentComponentsComponent comp, ref MechEquipmentGotSelectedEvent args)
+        => EntityManager.AddComponents(args.Mech, comp.Components);
+
+    private void OnComponentDeselected(EntityUid uid, MechEquipmentComponentsComponent comp, ref MechEquipmentGotDeselectedEvent args)
+        => EntityManager.RemoveComponents(args.Mech, comp.Components);
 
     public override void UpdateUserInterfaceByEquipment(EntityUid equipmentUid)
     {

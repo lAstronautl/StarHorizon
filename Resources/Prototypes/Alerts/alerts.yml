@@ -24,7 +24,9 @@
     - category: Hunger
     - category: Thirst
     - alertType: Magboots
+    - alertType: Rooted
     - alertType: Pacified
+    - category: Counter # WD EDIT
 
 - type: entity
   id: AlertSpriteView

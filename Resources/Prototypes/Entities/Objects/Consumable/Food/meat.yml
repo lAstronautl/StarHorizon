@@ -149,6 +149,10 @@
         reagents:
         - ReagentId: CarpoToxin
           Quantity: 5
+        - ReagentId: UncookedAnimalProteins #Katunian
+          Quantity: 5
+        - ReagentId: Fat #Katunian
+          Quantity: 5
   - type: Extractable
     juiceSolution:
       reagents:

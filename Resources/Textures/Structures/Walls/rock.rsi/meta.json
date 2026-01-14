@@ -228,6 +228,33 @@
         },
         {
             "name": "gibtonite_inactive"
+        },
+        {
+            "name": "rock_emerald"
+        },
+        {
+            "name": "rock_ruby"
+        },
+        {
+            "name": "rock_saphire"
+        },
+        {
+            "name": "rock_topaz"
+        },
+        {
+            "name": "rock_psycore"
+        },
+        {
+            "name": "rock_titan"
+        },
+        {
+            "name": "rock_neptunium"
+        },
+        {
+            "name": "rock_torium"
+        },
+        {
+            "name": "rock_plutonium"
         }
     ]
 }

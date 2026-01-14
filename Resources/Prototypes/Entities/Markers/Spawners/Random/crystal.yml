@@ -11,12 +11,12 @@
           state: crystal_grey
     - type: RandomSpawner
       prototypes:
-        - CrystalGreen
-        - CrystalPink
-        - CrystalOrange
-        - CrystalBlue
-        - CrystalCyan
-        - CrystalYellow
-        - CrystalBlack
-        - CrystalGrey
+        - RandomGreenCrystal
+        - RandomPinkCrystal
+        - RandomOrangeCrystal
+        - RandomBlueCrystal
+        - RandomCyanCrystal
+        - RandomYellowCrystal
+        - RandomBlackCrystal
+        - RandomRedCrystal
       chance: 0.7

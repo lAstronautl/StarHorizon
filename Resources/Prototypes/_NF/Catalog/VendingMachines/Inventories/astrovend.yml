@@ -35,6 +35,18 @@
     ClothingOuterHardsuitPilot: 3
     ClothingShoesBootsPilot: 3
     MediaPlayer: 5 # Horizon
+    # Horizon start
+    ArachnidTranslator: 5
+    NekomimeticTranslator: 5
+    DraconicTranslator: 5
+    CanilunztTranslator: 5
+    SolCommonTranslator: 5
+    DwarfTranslator: 5
+    NianTranslator: 5
+    SikTajTranslator: 5
+    NeoRusskiyaTranslator: 5
+    ClownishTranslator: 5
+    # Horizon end
 
 - type: vendingMachineInventory
   id: AstroVendPOIInventory
@@ -73,3 +85,15 @@
     ClothingOuterHardsuitPilot: 3
     ClothingShoesBootsPilot: 3
     MediaPlayer: 4294967295 # Infinite # Horizon
+    # Horizon start
+    ArachnidTranslator: 4294967295
+    NekomimeticTranslator: 4294967295
+    DraconicTranslator: 4294967295
+    CanilunztTranslator: 4294967295
+    SolCommonTranslator: 4294967295
+    DwarfTranslator: 4294967295
+    NianTranslator: 4294967295
+    SikTajTranslator: 4294967295
+    NeoRusskiyaTranslator: 4294967295
+    ClownishTranslator: 4294967295
+    # Horizon end

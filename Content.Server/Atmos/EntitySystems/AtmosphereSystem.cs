@@ -1,6 +1,5 @@
 using Content.Server.Administration.Logs;
 using Content.Server.Atmos.Components;
-using Content.Server.Body.Systems;
 using Content.Server.Fluids.EntitySystems;
 using Content.Server.GameTicking; // Frontier
 using Content.Server.NodeContainer.EntitySystems;
@@ -16,6 +15,8 @@ using Robust.Shared.Map;
 using Robust.Shared.Physics.Systems;
 using Robust.Shared.Prototypes;
 using System.Linq;
+using Content.Shared.Damage;
+using Robust.Shared.Threading;
 
 namespace Content.Server.Atmos.EntitySystems;
 
@@ -28,6 +29,7 @@ public sealed partial class AtmosphereSystem : SharedAtmosphereSystem
     [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly ITileDefinitionManager _tileDefinitionManager = default!;
     [Dependency] private readonly IAdminLogManager _adminLog = default!;
+    [Dependency] private readonly IParallelManager _parallel = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly SharedContainerSystem _containers = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
@@ -39,6 +41,7 @@ public sealed partial class AtmosphereSystem : SharedAtmosphereSystem
     [Dependency] private readonly MapSystem _map = default!;
     [Dependency] public readonly PuddleSystem Puddle = default!;
     [Dependency] private readonly GameTicker _gameTicker = default!; // Frontier
+    [Dependency] private readonly DamageableSystem _damage = default!;
 
     private const float ExposedUpdateDelay = 1f;
     private float _exposedTimer = 0f;
@@ -83,7 +86,10 @@ public sealed partial class AtmosphereSystem : SharedAtmosphereSystem
 
     private void OnTileChanged(ref TileChangedEvent ev)
     {
-        InvalidateTile(ev.NewTile.GridUid, ev.NewTile.GridIndices);
+        foreach (var change in ev.Changes)
+        {
+            InvalidateTile(ev.Entity.Owner, change.GridIndices);
+        }
     }
 
     private void OnPrototypesReloaded(PrototypesReloadedEventArgs ev)

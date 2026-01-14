@@ -28,6 +28,7 @@ public sealed class ShipyardConsoleBoundUserInterface : BoundUserInterface
             _menu.OnOrderApproved += ApproveOrder;
             _menu.OnSellShip += SellShip;
             _menu.TargetIdButton.OnPressed += _ => SendMessage(new ItemSlotButtonPressedEvent("ShipyardConsole-targetId"));
+            _menu.Owner = Owner;    // Horizon
 
             // Disable the NFSD popup for now.
             // var rules = new FormattedMessage();

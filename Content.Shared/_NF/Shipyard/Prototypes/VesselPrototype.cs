@@ -1,3 +1,4 @@
+using Content.Shared._Horizon.Shipyard;
 using Content.Shared.Guidebook;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype.Array;
@@ -95,6 +96,11 @@ public sealed class VesselPrototype : IPrototype, IInheritingPrototype
     [DataField]
     [AlwaysPushInheritance]
     public ComponentRegistry AddComponents { get; set; } = new();
+
+    // Horizon start
+    [DataField]
+    public List<BaseVesselCostModifier> CostModifiers = new();
+    // Horizon end
 }
 
 public enum VesselSize : byte

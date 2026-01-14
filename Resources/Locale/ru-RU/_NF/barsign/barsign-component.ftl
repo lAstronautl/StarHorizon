@@ -5,6 +5,8 @@ barsign-prototype-description-little-treats = Уютная чайная для �
 
 ## Neon Flamingos
 
+barsign-prototype-name-nf-maltroach = Maltroach
+barsign-prototype-description-nf-maltroach = Mothroaches politely greet you into the bar, or are they greeting each other?
 barsign-prototype-name-neon-flamingos = Неоновые Фламинго
 barsign-prototype-description-neon-flamingos = Сомневаетесь, что сможете устоять на одной ноге после визита сюда.
 

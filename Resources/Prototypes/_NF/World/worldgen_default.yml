@@ -4,6 +4,12 @@
     - type: WorldController
     - type: BiomeSelection
       biomes:
-        - NFAsteroidsNear
-        - NFAsteroidsMid
-        - NFAsteroidsFar
+# Horizon start
+#        - NFAsteroidsNear
+#        - NFAsteroidsMid
+#        - NFAsteroidsFar
+        - HRZNYellowZone
+        - HRZNRedZone
+        - HRZNWhite
+        - HRZNVoid
+# Horizon end

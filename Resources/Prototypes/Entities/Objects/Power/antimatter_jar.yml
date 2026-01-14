@@ -11,9 +11,11 @@
     sprite: Objects/Power/AME/ame_jar.rsi
     state: jar
   - type: AmeFuelContainer
+    fuelAmount: 1000
+    fuelCapacity: 1000 # ~ 600 MJ
   - type: StaticPrice
-    price: 400
-    vendPrice: 4000 # Frontier: FuelVend price
+    price: 800 # Horizon
+    vendPrice: 8000 # Frontier: FuelVend price # Horizon
   - type: GuideHelp
     guides: [ AME, Power ]
   - type: Tag # Frontier

@@ -39,17 +39,17 @@
   name: store-category-weapons
   priority: 0
 
-- type: storeCategory
-  id: UplinkAmmo
-  name: store-category-ammo
-  priority: 1
-
-# Horizon Attachment start
+# Horizon start
 - type: storeCategory
   id: UplinkAttachments
   name: store-category-attachments
+  priority: 1
+# Horizon end
+
+- type: storeCategory
+  id: UplinkAmmo
+  name: store-category-ammo
   priority: 2
-# Horizon Attachment end
 
 - type: storeCategory
   id: UplinkExplosives
@@ -86,15 +86,57 @@
   name: store-category-allies
   priority: 9
 
+# Horizon start
+- type: storeCategory
+  id: UplinkSyndicateBorgs
+  name: store-category-syndicateborgs
+  priority: 10
+
+- type: storeCategory
+  id: UplinkSyndicateBorgsCombat
+  name: store-category-syndicateborgs-combat
+  priority: 11
+
+- type: storeCategory
+  id: UplinkSyndieMechas
+  name: store-category-syndicatemechas
+  priority: 12
+
+- type: storeCategory
+  id: UplinkSyndicateGunneryEnergy
+  name: store-category-syndicate-gunnery-energy
+  priority: 13
+
+- type: storeCategory
+  id: UplinkSyndicateGunneryKinetic
+  name: store-category-syndicate-gunnery-kinetic
+  priority: 14
+
+- type: storeCategory
+  id: UplinkSyndicateGunneryMissile
+  name: store-category-syndicate-gunnery-missile
+  priority: 15
+
+- type: storeCategory
+  id: UplinkSyndicateGunneryAmmo
+  name: store-category-syndicate-gunnery-ammo
+  priority: 16
+
+- type: storeCategory
+  id: UplinkSyndicateGunneryConsoles
+  name: store-category-syndicate-gunnery-consoles
+  priority: 17
+# Horizon end
+
 - type: storeCategory
   id: UplinkJob
   name: store-category-job
-  priority: 10
+  priority: 18
 
 - type: storeCategory
   id: UplinkPointless
   name: store-category-pointless
-  priority: 11
+  priority: 19
 
 #revenant
 - type: storeCategory

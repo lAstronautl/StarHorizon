@@ -22,6 +22,7 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Replays;
 using System.Linq;
+using Content.Shared._Horizon.Language;
 
 namespace Content.Server.Telephone;
 
@@ -89,7 +90,7 @@ public sealed class TelephoneSystem : SharedTelephoneSystem
         if (!_recentChatMessages.Add((args.Source, args.Message, entity)))
             return;
 
-        SendTelephoneMessage(args.Source, args.Message, entity);
+        SendTelephoneMessage(args.Source, args.Message, entity, args.Language); // Horizon languages
     }
 
     private void OnTelephoneMessageReceived(Entity<TelephoneComponent> entity, ref TelephoneMessageReceivedEvent args)
@@ -328,7 +329,7 @@ public sealed class TelephoneSystem : SharedTelephoneSystem
         SetTelephoneMicrophoneState(entity, false);
     }
 
-    private void SendTelephoneMessage(EntityUid messageSource, string message, Entity<TelephoneComponent> source, bool escapeMarkup = true)
+    private void SendTelephoneMessage(EntityUid messageSource, string message, Entity<TelephoneComponent> source, LanguagePrototype language, bool escapeMarkup = true) // Horizon languages
     {
         // This method assumes that you've already checked that this
         // telephone is able to transmit messages and that it can
@@ -371,7 +372,7 @@ public sealed class TelephoneSystem : SharedTelephoneSystem
         RaiseLocalEvent(source, ref evSentMessage);
         source.Comp.StateStartTime = _timing.CurTime;
 
-        var evReceivedMessage = new TelephoneMessageReceivedEvent(message, chatMsg, messageSource, source);
+        var evReceivedMessage = new TelephoneMessageReceivedEvent(message, chatMsg, messageSource, source, language);   // Horizon languages
 
         foreach (var receiver in source.Comp.LinkedTelephones)
         {

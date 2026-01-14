@@ -5,6 +5,8 @@
   startingGear: MailCarrierGear
   alwaysUseSpawner: true
   playTimeTracker: JobMailCarrier
+  salary: 45000 # Horizon
+  forceFaction: FactionFrontier # Horizon
   requirements:
     - !type:OverallPlaytimeRequirement
       time: 10800
@@ -40,3 +42,8 @@
     - HandheldCrewMonitor # Frontier
     - ShipVoucherFrontierMailCarrier # Frontier
     - MailMetricsCartridge # Frontier
+
+- type: chameleonOutfit
+  id: MailCarrierChameleonOutfit
+  job: MailCarrier
+  hasMindShield: true

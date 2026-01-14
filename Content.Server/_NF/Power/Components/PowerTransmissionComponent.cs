@@ -50,13 +50,13 @@ public sealed partial class PowerTransmissionComponent : Component
     /// The rate per joule to credit the account while in the linear mode.
     ///</summary>
     [DataField]
-    public float LinearRate = 0.00001f; // $1/100 kJ
+    public float LinearRate = 0.00006f; // $6/100 kJ // Horizon 0.00003>>0.00006
 
     ///<summary>
     /// The maximum value (inclusive) of the linear mode per deposit, in watts
     ///</summary>
     [DataField]
-    public float LinearMaxValue = 1_000_000; // 1 MW ($10/s)
+    public float LinearMaxValue = 5_000_000; // 5 MW ($300/s) // Horizon 1_000_000>>5_000_000
     #endregion Linear Rates
 
     // Logarithmic fields: at very high levels of power generation, incremental gains decrease logarithmically to prevent runaway cash generation
@@ -73,20 +73,20 @@ public sealed partial class PowerTransmissionComponent : Component
     /// Note: should be set to LinearRate*LinearMaxValue for a continuous function.
     ///</summary>
     [DataField]
-    public float LogarithmCoefficient = 10f;
+    public float LogarithmCoefficient = 300f; // Horizon 30>>300
 
     ///<summary>
     /// The exponential subtrahend of the logarithmic mode: R in Tk*a^(log10(x/T)-R)
     /// Note: should be set to log10(LinearMaxValue) for a continuous function.
     ///</summary>
     [DataField]
-    public float LogarithmSubtrahend = 6.0f; // log10(1_000_000)
+    public float LogarithmSubtrahend = 6.69f; // log10(5_000_000) // Horizon 6>>6.69
     #endregion Logarithmic Rates
 
     ///<summary>
     ///</summary>
     [DataField]
-    public float MaxValuePerSecond = 150.0f; // ~902 MW, ~$540k/h
+    public float MaxValuePerSecond = 450.0f; // ~57 MW, ~$540k/h // Horizon 150>>450
 
     ///<summary>
     /// True if the entity was powered last tick.

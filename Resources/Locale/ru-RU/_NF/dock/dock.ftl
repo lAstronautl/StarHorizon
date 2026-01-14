@@ -42,5 +42,5 @@ dock-label-trade-seven-c = Г7В
 dock-label-bus = Такси
 dock-label-janitor = Сервис
 dock-label-guard = Охрана
-dock-label-nfsd = ДСБФ
+dock-label-nfsd = ДШНФ
 dock-label-drive-thru = МакДрайв

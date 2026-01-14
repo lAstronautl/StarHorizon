@@ -12,6 +12,24 @@
   - Medical
   engine:
   - Uranium
+  # Horizon start
+  costModifiers:
+    - !type:RoleModifier
+      role: "Pilot"
+      costMultiplier: 0.8
+    - !type:RoleModifier
+      role: "Mercenary"
+      costMultiplier: 1.2
+    - !type:FactionCostModifier
+      faction: "FactionMed"
+      costMultiplier: 0.9
+    - !type:FactionCostModifier
+      faction: "FactionFSB"
+      costMultiplier: 0.9
+    - !type:FactionCostModifier
+      faction: "FactionCCC"
+      costMultiplier: 0.9
+  # Horizon end
 
 - type: gameMap
   id: Vitalis

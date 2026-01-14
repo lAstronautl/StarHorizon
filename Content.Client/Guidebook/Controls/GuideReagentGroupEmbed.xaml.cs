@@ -17,19 +17,23 @@ namespace Content.Client.Guidebook.Controls;
 [UsedImplicitly, GenerateTypedNameReferences]
 public sealed partial class GuideReagentGroupEmbed : BoxContainer, IDocumentTag
 {
+    [Dependency] private readonly ILogManager _logManager = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
+
+    private readonly ISawmill _sawmill;
 
     public GuideReagentGroupEmbed()
     {
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);
+        _sawmill = _logManager.GetSawmill("guidebook.reagent_group");
         MouseFilter = MouseFilterMode.Stop;
     }
 
     public GuideReagentGroupEmbed(string group) : this()
     {
         var prototypes = _prototype.EnumeratePrototypes<ReagentPrototype>()
-            .Where(p => p.Group.Equals(group)).OrderBy(p => p.LocalizedName);
+            .Where(p => ReagentBelongsToGroup(p, group)).OrderBy(p => p.LocalizedName);
         foreach (var reagent in prototypes)
         {
             var embed = new GuideReagentEmbed(reagent);
@@ -42,19 +46,62 @@ public sealed partial class GuideReagentGroupEmbed : BoxContainer, IDocumentTag
         control = null;
         if (!args.TryGetValue("Group", out var group))
         {
-            Logger.Error("Reagent group embed tag is missing group argument");
+            _sawmill.Error("Reagent group embed tag is missing group argument");
             return false;
         }
 
-        var prototypes = _prototype.EnumeratePrototypes<ReagentPrototype>()
-            .Where(p => p.Group.Equals(group)).OrderBy(p => p.LocalizedName);
-        foreach (var reagent in prototypes)
+        try
         {
-            var embed = new GuideReagentEmbed(reagent);
-            GroupContainer.AddChild(embed);
+            var prototypes = _prototype.EnumeratePrototypes<ReagentPrototype>()
+                .Where(p => ReagentBelongsToGroup(p, group)).OrderBy(p => p.LocalizedName).ToList();
+
+            foreach (var reagent in prototypes)
+            {
+                try
+                {
+                    var embed = new GuideReagentEmbed(reagent);
+                    GroupContainer.AddChild(embed);
+                }
+                catch (Exception e)
+                {
+                    _sawmill.Error($"Failed to create GuideReagentEmbed for reagent '{reagent.ID}': {e}");
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            _sawmill.Error($"Failed to enumerate reagents for group '{group}': {e}");
+            return false;
         }
 
         control = this;
         return true;
+    }
+
+    /// <summary>
+    ///     Horizon: Checks if a reagent belongs to a group, including inherited groups from parent prototypes.
+    /// </summary>
+    private bool ReagentBelongsToGroup(ReagentPrototype reagent, string group)
+    {
+        // Check direct group
+        if (reagent.Group.Equals(group))
+            return true;
+
+        // Check parent prototypes for inherited group
+        if (reagent.Parents == null || reagent.Parents.Length == 0)
+            return false;
+
+        foreach (var parentId in reagent.Parents)
+        {
+            // Use Index instead of TryIndex since abstract prototypes should still be accessible
+            if (!_prototype.HasIndex<ReagentPrototype>(parentId))
+                continue;
+
+            var parent = _prototype.Index<ReagentPrototype>(parentId);
+            if (ReagentBelongsToGroup(parent, group))
+                return true;
+        }
+
+        return false;
     }
 }

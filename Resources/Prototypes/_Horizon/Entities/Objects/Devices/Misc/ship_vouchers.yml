@@ -120,7 +120,7 @@
 # Кастомные шаттлы или шаттлы фракций
 - type: entity
   parent: ShipVoucherFrontierShipyard
-  id: ShipVoucherСustom
+  id: ShipVoucherCustom
   name: Ваучер на необычные шаттлы
   description: Позволяет бесплатно купить один любой шаттл на специальной консоли. Уничтожается при продаже шаттла.
   components:

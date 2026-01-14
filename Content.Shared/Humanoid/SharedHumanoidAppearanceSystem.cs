@@ -2,6 +2,7 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using Content.Shared._Horizon.Bark;
+using Content.Shared._Horizon.Language;
 using Content.Shared.CCVar;
 using Content.Shared.Decals;
 using Content.Shared.Examine;
@@ -41,6 +42,7 @@ public abstract class SharedHumanoidAppearanceSystem : EntitySystem
     [Dependency] private readonly MarkingManager _markingManager = default!;
     [Dependency] private readonly GrammarSystem _grammarSystem = default!;
     [Dependency] private readonly SharedIdentitySystem _identity = default!;
+    [Dependency] private readonly SharedLanguageSystem _language = default!;    // Horizon
 
     [ValidatePrototypeId<SpeciesPrototype>]
     public const string DefaultSpecies = "Human";
@@ -452,7 +454,17 @@ public abstract class SharedHumanoidAppearanceSystem : EntitySystem
         }
 
         EnsureDefaultMarkings(uid, humanoid);
-        SetBarkData(uid, profile.Bark, humanoid); // _Horizon Barks
+        // _Horizon start
+        SetBarkData(uid, profile.Bark, humanoid);
+        SetLanguages(uid, profile.Languages.ToList());
+        var species = _proto.Index(humanoid.Species);
+        species.ForceLanguages.ForEach(x =>
+        {
+            var lang = Comp<LanguageSpeakerComponent>(uid);
+            if (!lang.Languages.ContainsKey(x))
+                lang.Languages.Add(x, LanguageKnowledge.Speak);
+        });
+        // _Horizon end
 
         humanoid.Gender = profile.Gender;
         if (TryComp<GrammarComponent>(uid, out var grammar))
@@ -577,8 +589,17 @@ public abstract class SharedHumanoidAppearanceSystem : EntitySystem
             return;
 
         comp.Data = data;
-        comp.Data.Sound = _proto.Index(comp.Data.Proto).Sound;
         humanoid.Bark = data;
+    }
+
+    public void SetLanguages(EntityUid uid, List<ProtoId<LanguagePrototype>> languages)
+    {
+        var languageSpeaker = EnsureComp<LanguageSpeakerComponent>(uid);
+        languageSpeaker.Languages.Clear();
+
+        languages.ForEach(x => languageSpeaker.Languages.Add(x.ToString(), LanguageKnowledge.Speak));
+        _language.SelectDefaultLanguage(uid);
+        _language.UpdateUi(uid);
     }
     // _Horizon end
 }

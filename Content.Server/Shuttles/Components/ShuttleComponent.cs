@@ -17,10 +17,10 @@ namespace Content.Server.Shuttles.Components
         public const float BrakeCoefficient = 1.5f;
 
         /// <summary>
-        /// Maximum velocity assuming unupgraded, tier 1 thrusters
+        /// Maximum velocity.
         /// </summary>
         [ViewVariables(VVAccess.ReadWrite)]
-        public float BaseMaxLinearVelocity = 20f;
+        public float BaseMaxLinearVelocity = 23.07f;  //Frontier 60 - 23.07. Upstream has it set to 60 to test and for collisions currently. Also, for some reason this value is increased by 30%, not sure if parts related or otherwise, so we do a 23.07 to reach a tier 1 velocity of 30.
 
         public const float MaxAngularVelocity = 4f;
 
@@ -74,5 +74,31 @@ namespace Content.Server.Shuttles.Components
         /// </summary>
         [DataField]
         public float DampingModifier;
+
+        // <Mono>
+        /// <summary>
+        /// Limit to max velocity set by a shuttle console.
+        /// </summary>
+        [DataField]
+        public float SetMaxVelocity = 100f;
+
+        /// <summary>
+        /// At what Thrust-Weight-Ratio should this ship have the base max velocity as its maximum velocity.
+        /// </summary>
+        [DataField]
+        public float BaseMaxVelocityTWR = 2f;
+
+        /// <summary>
+        /// How much should TWR affect max velocity.
+        /// </summary>
+        [DataField]
+        public float MaxVelocityScalingExponent = 0.25f; // 16x thrust = 2x max speed
+
+        /// <summary>
+        /// Don't allow max velocity to go beyond this value.
+        /// </summary>
+        [DataField]
+        public float UpperMaxVelocity = 100f;
+        // </Mono>
     }
 }

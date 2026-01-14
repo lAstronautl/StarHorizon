@@ -87,6 +87,14 @@
   - type: StaticPrice
     price: 4 # Frontier 0<4 4 needed for arbitrage
   - type: NFCookware # Frontier
+  - type: CytologyDirt
+    possibleCellSamples:
+    - protoID: CellSampleMurine
+    - protoID: CellSampleCat
+    - protoID: CellSampleCorgi
+    - protoID: CellSampleCockroach
+    - protoID: CellSampleFrog
+    - protoID: CellSampleSlime
 
 - type: entity
   name: bowl

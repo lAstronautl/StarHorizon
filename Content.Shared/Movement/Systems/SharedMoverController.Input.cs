@@ -98,7 +98,7 @@ namespace Content.Shared.Movement.Systems
             RaiseLocalEvent(entity, ref moveEvent);
             Dirty(entity, entity.Comp);
 
-            var ev = new SpriteMoveEvent(entity.Comp.HeldMoveButtons != MoveButtons.None);
+            var ev = new SpriteMoveEvent(entity.Comp.HasDirectionalMovement);
             RaiseLocalEvent(entity, ref ev);
         }
 
@@ -124,7 +124,7 @@ namespace Content.Shared.Movement.Systems
                 entity.Comp.HeldMoveButtons = state.HeldMoveButtons;
                 RaiseLocalEvent(entity.Owner, ref moveEvent);
 
-                var ev = new SpriteMoveEvent(entity.Comp.HeldMoveButtons != MoveButtons.None);
+                var ev = new SpriteMoveEvent(entity.Comp.HasDirectionalMovement);
                 RaiseLocalEvent(entity, ref ev);
             }
         }
@@ -342,6 +342,7 @@ namespace Content.Shared.Movement.Systems
 
             entity.Comp.RelativeEntity = xform.GridUid ?? xform.MapUid;
             entity.Comp.TargetRelativeRotation = Angle.Zero;
+            RaiseLocalEvent(entity, new SprintingInputEvent(entity)); // WD EDIT
         }
 
         private void HandleRunChange(EntityUid uid, ushort subTick, bool walking)
@@ -354,6 +355,7 @@ namespace Content.Shared.Movement.Systems
                 if (moverComp != null)
                 {
                     SetMoveInput((uid, moverComp), MoveButtons.None);
+                    RaiseLocalEvent(uid, new SprintingInputEvent((uid, moverComp))); // WD EDIT
                 }
 
                 HandleRunChange(relayMover.RelayEntity, subTick, walking);

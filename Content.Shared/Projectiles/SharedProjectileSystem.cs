@@ -249,3 +249,6 @@ public record struct ProjectileReflectAttemptEvent(EntityUid ProjUid, Projectile
 /// </summary>
 [ByRefEvent]
 public record struct ProjectileHitEvent(DamageSpecifier Damage, EntityUid Target, EntityUid? Shooter = null);
+
+[ByRefEvent]
+public record struct ProjectileBodyHitEvent(DamageSpecifier Damage, EntityUid Target, EntityUid Bullet);

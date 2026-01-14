@@ -1,10 +1,12 @@
-﻿using Content.Shared.Actions;
+using Content.Shared._Horizon.Silicon;
+using Content.Shared.Actions;
 using Content.Shared.Interaction;
 using Content.Shared.Interaction.Components;
 using Content.Shared.Movement.Components;
 using Content.Shared.Silicons.Borgs.Components;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Utility;
 
 namespace Content.Shared.Silicons.Borgs;
 
@@ -50,13 +52,13 @@ public abstract class SharedBorgSwitchableTypeSystem : EntitySystem
 
         if (ent.Comp.SelectedBorgType != null)
         {
-            SelectBorgModule(ent, ent.Comp.SelectedBorgType.Value);
+            SelectBorgModule(ent, ent.Comp.SelectedBorgType.Value, 0);   // Horizon - skin index
         }
     }
 
     private void OnShutdown(Entity<BorgSwitchableTypeComponent> ent, ref ComponentShutdown args)
     {
-        _actionsSystem.RemoveAction(ent, ent.Comp.SelectTypeAction);
+        _actionsSystem.RemoveAction(ent.Owner, ent.Comp.SelectTypeAction);
     }
 
     private void OnSelectBorgTypeAction(Entity<BorgSwitchableTypeComponent> ent, ref BorgToggleSelectTypeEvent args)
@@ -74,10 +76,10 @@ public abstract class SharedBorgSwitchableTypeSystem : EntitySystem
         if (ent.Comp.SelectedBorgType != null)
             return;
 
-        if (!Prototypes.HasIndex(args.Prototype))
+        if (!Prototypes.TryIndex(args.Prototype, out var proto))    // Horizon borg skins - prototype resolving
             return;
 
-        SelectBorgModule(ent, args.Prototype);
+        SelectBorgModule(ent, args.Prototype, proto.Skins.TryGetValue(args.Skin, out _) ? args.Skin : 0);  // Horizon borg skins
     }
 
     //
@@ -86,11 +88,16 @@ public abstract class SharedBorgSwitchableTypeSystem : EntitySystem
 
     protected virtual void SelectBorgModule(
         Entity<BorgSwitchableTypeComponent> ent,
-        ProtoId<BorgTypePrototype> borgType)
+        ProtoId<BorgTypePrototype> borgType,
+        int skin)   // Horizon - borg skins
     {
+        // Horizon start
+        if (Prototypes.TryIndex(borgType, out var proto))
+            ent.Comp.SelectedBorgSkin = proto.Skins[skin];
+        // Horizon end
         ent.Comp.SelectedBorgType = borgType;
 
-        _actionsSystem.RemoveAction(ent, ent.Comp.SelectTypeAction);
+        _actionsSystem.RemoveAction(ent.Owner, ent.Comp.SelectTypeAction);
         ent.Comp.SelectTypeAction = null;
         Dirty(ent);
 
@@ -107,7 +114,7 @@ public abstract class SharedBorgSwitchableTypeSystem : EntitySystem
         UpdateEntityAppearance(entity, proto);
     }
 
-    protected virtual void UpdateEntityAppearance(
+    public virtual void UpdateEntityAppearance(
         Entity<BorgSwitchableTypeComponent> entity,
         BorgTypePrototype prototype)
     {

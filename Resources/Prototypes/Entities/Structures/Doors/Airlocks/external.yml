@@ -16,13 +16,24 @@
       path: /Audio/Machines/airlock_deny.ogg
   - type: Sprite
     sprite: Structures/Doors/Airlocks/Standard/external.rsi
-  # - type: PaintableAirlock # Upstream#37341
-  #   group: External # Upstream#37341
-  #   department: null # Upstream#37341
+  - type: Construction
+    graph: AirlockExternal
+    node: airlock
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.49,-0.49,0.49,0.49" # don't want this colliding with walls or they won't close
+        density: 100
+        mask:
+        - FullTileMask
+        layer:
+        - WallLayer
   - type: Wires
     layoutId: AirlockExternal
-  - type: Paintable # Upstream#37341
-    group: null # Upstream#37341
+  - type: Paintable
+    group: null
 
 - type: entity
   parent: AirlockExternal
@@ -35,8 +46,6 @@
     enabled: false
   - type: Sprite
     sprite: Structures/Doors/Airlocks/Glass/external.rsi
-  # - type: PaintableAirlock # Upstream#37341
-  #   group: ExternalGlass # Upstream#37341
   - type: Fixtures
     fixtures:
       fix1:
@@ -47,4 +56,25 @@
         mask:
         - FullTileMask
         layer:     #removed opaque from the layer, allowing lasers to pass through glass airlocks
-        - GlassAirlockLayer
+        - GlassLayer
+  - type: Construction
+    graph: AirlockExternal
+    node: airlockGlass
+
+- type: entity
+  id: AirlockExternalAssembly
+  parent: AirlockAssembly
+  name: каркас внешнего шлюза
+  suffix: External
+  description: Он пока не открывается, он пока не закрывается, и он пока не может вас раздавить.
+  components:
+  - type: Transform
+    anchored: true
+    noRot: false
+  - type: Rotatable
+  - type: Sprite
+    sprite: Structures/Doors/Airlocks/Standard/external.rsi
+    state: closed
+  - type: Construction
+    graph: AirlockExternal
+    node: assembly

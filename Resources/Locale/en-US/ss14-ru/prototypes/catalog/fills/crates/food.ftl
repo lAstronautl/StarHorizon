@@ -1,7 +1,5 @@
 ent-CrateFoodPizza = { ent-CratePlasticBiodegradable }
     .desc = { ent-CratePlasticBiodegradable.desc }
-ent-CrateFoodPizzaLarge = { ent-CratePlasticBiodegradable }
-    .desc = { ent-CratePlasticBiodegradable.desc }
 ent-CrateFoodMRE = MRE crate
     .desc = A military style meal fit to feed a whole department.
 ent-CrateFoodCooking = kitchen supplies crate

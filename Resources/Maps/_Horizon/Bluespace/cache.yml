@@ -2551,31 +2551,6 @@ entities:
     - type: Transform
       pos: -1.5,2.5
       parent: 1
-  - uid: 383
-    components:
-    - type: Transform
-      pos: 0.5,-1.5
-      parent: 1
-  - uid: 386
-    components:
-    - type: Transform
-      pos: -2.5,-0.5
-      parent: 1
-  - uid: 397
-    components:
-    - type: Transform
-      pos: 1.5,-1.5
-      parent: 1
-  - uid: 420
-    components:
-    - type: Transform
-      pos: 1.5,-0.5
-      parent: 1
-  - uid: 499
-    components:
-    - type: Transform
-      pos: -1.5,-2.5
-      parent: 1
   - uid: 528
     components:
     - type: Transform

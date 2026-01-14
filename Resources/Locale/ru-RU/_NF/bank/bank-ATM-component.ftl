@@ -30,7 +30,7 @@ station-bank-assets-sold = Проданные активы
 station-bank-required = { "(" }выбрать из списка{ ")" }
 station-bank-other = Другое
 station-bank-requires-reason = Требуются детали транзакции!
-station-bank-unauthorized = Неавторизованно!
+station-bank-unauthorized = Неавторизованн!
 bank-atm-menu-cash-error = ERR: ОШИБКА
 
 ## ATM entity

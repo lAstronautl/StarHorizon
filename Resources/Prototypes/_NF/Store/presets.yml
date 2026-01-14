@@ -34,6 +34,13 @@
     - UplinkSecurityUtility
     - UplinkSecurityExplosives
     - UplinkSecurityBundles
+    - UplinkSecurityGunneryMissile
+    - UplinkSecurityGunneryKinetic
+    - UplinkSecurityGunneryEnergy
+    - UplinkSecurityGunneryAmmo
+    - UplinkSecurityGunneryConsoles
+    - UplinkSecurityMechas
+    - UplinkSecurityBorges
     currencyWhitelist:
     - FrontierUplinkCoin
     balance:
@@ -51,6 +58,13 @@
     - UplinkPirateAmmo
     - UplinkPirateUtility
     - UplinkPirateExplosives
+    - UplinkPirateGunneryEnergy
+    - UplinkPirateGunneryKinetic
+    - UplinkPirateGunneryMissile
+    - UplinkPirateGunneryConsoles
+    - UplinkPirateGunneryAmmo
+    - UplinkPirateMechas
+    - UplinkPirateBorges
     currencyWhitelist:
     - Doubloon
     balance:

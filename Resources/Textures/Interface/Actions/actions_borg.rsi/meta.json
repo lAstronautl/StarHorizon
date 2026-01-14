@@ -152,6 +152,18 @@
             "name":"xenoborg-tool-module"
         },
         {
+            "name":"syndicate-projector-module"
+        },
+        {
+            "name":"syndicate-cloak-module"
+        },
+        {
+            "name":"syndicate-laser-module"
+        },
+        {
+            "name":"syndicate-laser2-module"
+        },
+        {
             "name": "select-type"
         }
     ]

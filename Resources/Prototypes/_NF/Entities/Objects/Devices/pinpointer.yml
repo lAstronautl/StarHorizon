@@ -16,7 +16,9 @@
   suffix: Syndicate FOB
   components:
   - type: Pinpointer
-    component: SyndicateFOB
+    whitelist: # Goob edit: pinpointer whitelist
+      components:
+      - SyndicateFOB
     targetName: unknown
 
 # Dead Drop
@@ -28,7 +30,9 @@
   suffix: DEBUG
   components:
   - type: Pinpointer
-    component: DeadDropHint
+    whitelist: # Goob edit: pinpointer whitelist
+      components:
+      - DeadDropHint
     targetName: DeadDropHint
 
 - type: entity

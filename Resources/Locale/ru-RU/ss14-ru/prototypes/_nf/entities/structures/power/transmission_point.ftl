@@ -1,2 +1,2 @@
-ent-PowerTransmissionPoint = power transmission point
-    .desc = A gargantuan machine for offsite power transmission using quantum entanglement.
+ent-PowerTransmissionPoint = точка передачи энергии
+    .desc = Громадная машина для передачи энергии на расстояние с использованием квантовой запутанности.

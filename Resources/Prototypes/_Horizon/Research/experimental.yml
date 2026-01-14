@@ -1,4 +1,32 @@
+# Tier 2
+
+- type: technology
+  id: Bluespace
+  name: research-technology-bluespace
+  entityIcon: MachineBLESCircuitboard
+  discipline: NFScience
+  tier: 2
+  cost: 25000
+  position: 3, 5
+  recipeUnlocks:
+  - MachineBLESCircuitboard
+  technologyPrerequisites:
+  - NFSuperParts
+
 # Tier 3
+
+- type: technology
+  id: BluespaceMining
+  name: research-technology-bluespace-mining
+  entityIcon: MachineBluespaceHarvesterCircuitboard
+  discipline: NFScience
+  tier: 3
+  cost: 30000
+  position: 4, 5
+  recipeUnlocks:
+  - MachineBluespaceHarvesterCircuitboard
+  technologyPrerequisites:
+  - Bluespace
 
 - type: technology
   id: PhazonTechnology
@@ -6,7 +34,7 @@
   entityIcon: MechPhazon
   discipline: NFScience
   tier: 3
-  cost: 10000
+  cost: 20000
   recipeUnlocks:
   - PhazonHarness
   - PhazonLArm
@@ -20,7 +48,9 @@
   - PhazonWeaponControlElectronics
   technologyPrerequisites:
   - RipleyMKIITechnology
-  position: 3, 29
+  position: 3, 34
+  researchTargets:
+  - TechnologyDiscPhazonTechnology
 
 - type: technology
   id: PhazonMechPaint
@@ -28,7 +58,7 @@
   entityIcon: MechPhazonBlanco
   discipline: NFScience
   tier: 3
-  cost: 10000
+  cost: 20000
   recipeUnlocks:
   - MechPhazonBlancoUpgradeKit
   - MechPhazonImperionUpgradeKit
@@ -36,4 +66,4 @@
   - MechPhazonPlazmusUpgradeKit
   technologyPrerequisites:
   - PhazonTechnology
-  position: 4, 29
+  position: 4, 34

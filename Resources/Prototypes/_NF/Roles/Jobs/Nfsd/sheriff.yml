@@ -3,6 +3,8 @@
   name: job-name-sheriff
   description: job-description-sheriff
   playTimeTracker: JobHeadOfSecurity
+  salary: 80000 # Horizon
+  forceFaction: FactionNFSD # Horizon
   requirements:
     - !type:OverallPlaytimeRequirement
       time: 129600 # 36 hours
@@ -25,7 +27,7 @@
     - !type:RoleTimeRequirement
       role: JobWarden
       time: 21600 # 6 hours
-  #  whitelisted: true # Horizon TempTweak
+  whitelisted: true
   startingGear: SheriffGear
   alwaysUseSpawner: true
   icon: JobIconSheriff
@@ -42,6 +44,7 @@
   - !type:AddComponentSpecial
     components:
       - type: CommandStaff
+      - type: PreventShipyardTitleOverwrite
   - !type:GiveItemOnHolidaySpecial
     holiday: FrontierBirthday
     prototype: FrontierBirthdayGift
@@ -59,3 +62,17 @@
     - DoorRemoteNfsd
     - BaseSecurityUplinkRadioSheriff
     - RubberStampSheriff
+
+- type: chameleonOutfit
+  id: SheriffChameleonOutfit
+  job: Sheriff
+  hasMindShield: true
+  equipment:
+    head: ClothingHeadHatNfsdCampaignFilled
+    mask: ClothingMaskGasSheriff
+    eyes: ClothingEyesGlassesNfsd
+    outerClothing: ClothingOuterCoatNfsdFormalSheriff
+    neck: ClothingNeckNfsdBadgeSheriff
+    belt: ClothingBeltNfsdFilled
+    gloves: ClothingHandsGlovesCombatNfsdCream
+    shoes: ClothingShoesBootsNfsdBrown

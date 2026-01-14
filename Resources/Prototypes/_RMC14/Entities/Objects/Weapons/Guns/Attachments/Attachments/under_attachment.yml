@@ -80,6 +80,8 @@
   - type: Item
     sprite: _RMC14/Objects/Weapons/Guns/Attachments/under.rsi
     storedRotation: -90
+  - type: StaticPrice
+    price: 200
 
 - type: entity
   parent: [ UnderAttachmentBase, AttachableToggleableBase ]
@@ -162,7 +164,7 @@
       scatterFlat: -4
       burstScatterAddMult: -4
   - type: StaticPrice
-    price: 100
+    price: 200
 
 - type: entity
   parent: UnderAttachmentBase

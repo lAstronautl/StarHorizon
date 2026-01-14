@@ -25,6 +25,8 @@
     speedModifierThresholds:
       19: 0.7
       26: 0.5
+  - type: StaticPrice
+    price: 2400
 
 - type: entity
   id: NFMobCarpMagic
@@ -50,6 +52,10 @@
     - map: [ "enum.DamageStateVisualLayers.BaseUnshaded" ]
       state: mouth
       shader: unshaded
+  # Horizon
+  - type: CanBeTakenUnderControl
+  - type: StaticPrice
+    price: 2400
 
 - type: entity
   id: NFMobCarpHolo
@@ -75,6 +81,10 @@
     - map: [ "enum.DamageStateVisualLayers.BaseUnshaded" ]
       state: mouth
       shader: unshaded
+  # Horizon
+  - type: CanBeTakenUnderControl
+  - type: StaticPrice
+    price: 2000
 
 - type: entity
   id: NFMobCarpRainbow
@@ -92,6 +102,10 @@
     speedModifierThresholds:
       28: 0.7
       38: 0.5
+  # Horizon
+  - type: CanBeTakenUnderControl
+  - type: StaticPrice
+    price: 3000
 
 - type: entity
   id: NFMobShark
@@ -114,6 +128,8 @@
       types:
         Slash: 7
         Bloodloss: 7
+  - type: StaticPrice
+    price: 1800
 
 #region Snakes
 - type: entity
@@ -178,6 +194,13 @@
         Piercing: 3
         Slash: 3
         Structural: 20
+  # Horizon
+  - type: SampleSource
+    availableCellSamples:
+    - protoID: CellSampleRainbowSnake
+  - type: CanBeTakenUnderControl
+  - type: StaticPrice
+    price: 1800
 
 #region Wyverns
 - type: entity
@@ -257,6 +280,13 @@
     availableModes:
     - SemiAuto
     soundGunshot: /Audio/Weapons/Xeno/alien_spitacid.ogg
+  # Horizon
+  - type: SampleSource
+    availableCellSamples:
+    - protoID: CellSampleWyvernIce
+  - type: CanBeTakenUnderControl
+  - type: StaticPrice
+    price: 3000
 
 - type: entity
   parent: NFMobRainbowWyvernIce
@@ -293,6 +323,13 @@
     proto: BulletFireBolt
     capacity: 1
     count: 1
+  # Horizon
+  - type: SampleSource
+    availableCellSamples:
+    - protoID: CellSampleWyvernFire
+  - type: CanBeTakenUnderControl
+  - type: StaticPrice
+    price: 3000
 
 - type: entity
   parent: NFMobRainbowWyvernIce
@@ -329,6 +366,13 @@
     proto: NFBulletAcid
     capacity: 1
     count: 1
+  # Horizon
+  - type: SampleSource
+    availableCellSamples:
+    - protoID: CellSampleWyvernCaustic
+  - type: CanBeTakenUnderControl
+  - type: StaticPrice
+    price: 3000
 
 #region boss
 - type: entity

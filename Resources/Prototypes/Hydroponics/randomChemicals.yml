@@ -1,8 +1,10 @@
+# Horizon start
+
 - type: weightedRandomFillSolution
   id: RandomPickBotanyReagent
   fills:
-  - quantity: 5
-    weight: 0.5
+  - quantity: 2
+    weight: 0.2
     reagents:
     - Omnizine
     - Nocturine
@@ -10,8 +12,8 @@
     - Honk
     - BuzzochloricBees
     - Stimulants
-  - quantity: 5
-    weight: 1
+  - quantity: 3
+    weight: 0.3
     reagents:
     - Cognizine
     - Toxin
@@ -32,7 +34,7 @@
     - CogChamp
     - JuiceThatMakesYouWeh
   - quantity: 5
-    weight: 2
+    weight: 0.5
     reagents:
     - Desoxyephedrine
     - ChloralHydrate
@@ -57,8 +59,8 @@
     - Cola
     - Diphenhydramine
     - Iron
-  - quantity: 10
-    weight: 3
+  - quantity: 7
+    weight: 1
     reagents:
     - Bicaridine
     - Dermaline
@@ -82,17 +84,14 @@
     - JuiceBerryPoison
     - Pilk
     - Posca
-    - Ethanol
     - FourteenLoko
     - LemonLime
     - LemonLimeCranberry
     - Enzyme
     - Vinegar
-    - Potassium
     - Fluorine
-    - Aluminium
   - quantity: 10
-    weight: 3.5
+    weight: 2
     reagents:
     - Vitamin
     - Kelotane
@@ -101,7 +100,6 @@
     - Slime
     - Fiber
     - Water
-    - Sugar
     - Cream
     - SodaWater
     - Ice
@@ -111,5 +109,28 @@
     - Flour
     - Soysauce
     - TableSalt
+  - quantity: 10
+    weight: 15
+    reagents:
+    - Aluminium
+    - Carbon
     - Chlorine
+    - Fluorine
+    - Iodine
+    - Phosphorus
+    - Sulfur
+    - Silicon
+    - Oxygen
+    - Nitrogen
+    - Hydrogen
+    - Lithium
+    - Sodium
+    - Potassium
+    - Radium
+    - Sugar
+    - Ethanol
+    - Iron
+    - Copper
     - Mercury
+
+# Horizon end

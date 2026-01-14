@@ -92,7 +92,7 @@
   - BaseMobDinosaurExpeditions
   name: compsognathus
   description: Compsognathus is a genus of small, bipedal, carnivorous theropods. They have long hind legs and longer tails, which they used for balance during locomotion. Their forelimbs are small but beware of their claws.
-  categories: [ HideSpawnMenu ]
+  # categories: [ HideSpawnMenu ]
   components:
   - type: Sprite
     drawdepth: Mobs
@@ -121,6 +121,13 @@
   - type: FootstepModifier
     footstepSoundCollection:
       collection: FootstepAsteroid
+  - type: SampleSource
+    availableCellSamples:
+    - protoID: CellSampleDinosaurCompy
+  - type: CanBeTakenUnderControl # Horizon
+    remotePilot: MobRemotePilot
+  - type: StaticPrice
+    price: 4000
 
 #region dilophosaurus
 - type: entity
@@ -130,7 +137,7 @@
   - BaseMobDinosaurExpeditions
   name: dilophosaurus
   description: With a name meaning "two-crested lizard", these measure in at about 7 m in length and 400 kg in weight. Slender and lightly built, these are very agile.
-  categories: [ HideSpawnMenu ]
+  # categories: [ HideSpawnMenu ]
   components:
   - type: Sprite
     drawdepth: Mobs
@@ -156,6 +163,13 @@
         Slash: 8
         Caustic: 2
         Structural: 25
+  - type: SampleSource
+    availableCellSamples:
+    - protoID: CellSampleDinosaurDilo
+  - type: CanBeTakenUnderControl # Horizon
+    remotePilot: MobRemotePilot
+  - type: StaticPrice
+    price: 1600
 
 #region velociraptor
 - type: entity
@@ -165,7 +179,7 @@
   - BaseMobDinosaurExpeditions
   name: velociraptor
   description: A bipedal, featherless carnivore with a long tail. Each of its hindfeet has an enlarged sickle-shaped claw, which is used to tackle and restrain prey. Very fast, exercise caution.
-  categories: [ HideSpawnMenu ]
+  # categories: [ HideSpawnMenu ]
   components:
   - type: Sprite
     drawdepth: Mobs
@@ -198,6 +212,13 @@
       types:
         Slash: 18
         Structural: 30
+  - type: SampleSource
+    availableCellSamples:
+    - protoID: CellSampleDinosaurRaptor
+  - type: CanBeTakenUnderControl # Horizon
+    remotePilot: MobRemotePilot
+  - type: StaticPrice
+    price: 2400
 
 #region parasaurolophus
 - type: entity
@@ -205,7 +226,7 @@
   id: MobDinosaurParaExpeditions
   name: parasaurolophus
   description: A large carnivore that can reach over 9 metres (30 ft) long and weigh over 5 metric tons (5.5 short tons), these can move on two legs or four. Reasonably fast for its size, but comparatively fragile and weak.
-  categories: [ HideSpawnMenu ]
+  # categories: [ HideSpawnMenu ]
   components:
   - type: Sprite
     drawdepth: Mobs
@@ -238,6 +259,13 @@
       types:
         Blunt: 6
         Structural: 20
+  - type: SampleSource
+    availableCellSamples:
+    - protoID: CellSampleDinosaurPara
+  - type: CanBeTakenUnderControl # Horizon
+    remotePilot: MobRemotePilot
+  - type: StaticPrice
+    price: 4000
 
 #region kentrosaurus
 - type: entity
@@ -247,7 +275,7 @@
   id: MobDinosaurKentroExpeditions
   name: kentrosaurus
   description: On the smaller side of dinosaurs, Kentrosaurus generally measure around 4–4.5 m, and weigh about 700–1,600 kg. Its elongated head and beak are used to bite off plant material or tear off limbs.
-  categories: [ HideSpawnMenu ]
+  # categories: [ HideSpawnMenu ]
   components:
   - type: Sprite
     drawdepth: Mobs
@@ -280,6 +308,13 @@
       types:
         Blunt: 10
         Structural: 20
+  - type: SampleSource
+    availableCellSamples:
+    - protoID: CellSampleDinosaurKentro
+  - type: CanBeTakenUnderControl # Horizon
+    remotePilot: MobRemotePilot
+  - type: StaticPrice
+    price: 3000
 
 #region triceratops
 - type: entity
@@ -289,7 +324,7 @@
   id: MobDinosaurTrikeExpeditions
   name: triceratops
   description: Bearing a large bony frill with three horns on its skull, this massive quadruped is one of the most recognizable of all dinosaurs and the best-known ceratopsian. Typically tries to gore whatever it attacks.
-  categories: [ HideSpawnMenu ]
+  # categories: [ HideSpawnMenu ]
   components:
   - type: Sprite
     drawdepth: Mobs
@@ -322,6 +357,13 @@
       types:
         Piercing: 12
         Structural: 20
+  - type: SampleSource
+    availableCellSamples:
+    - protoID: CellSampleDinosaurTrike
+  - type: CanBeTakenUnderControl # Horizon
+    remotePilot: MobRemotePilot
+  - type: StaticPrice
+    price: 4000
 
 #region ankylosaurus
 - type: entity
@@ -331,7 +373,7 @@
   id: MobDinosaurAnkiExpeditions
   name: ankylosaurus
   description: Typically between between 6 and 8 meters long and between 4.8 and 8 tons in weight, this lumbering beast shouldn't be underestimated. Its wide, low skull and robust body can take a beating and still survive, and the large club on the end of its tail can be used as a weapon.
-  categories: [ HideSpawnMenu ]
+  # categories: [ HideSpawnMenu ]
   components:
   - type: Sprite
     drawdepth: Mobs
@@ -364,6 +406,13 @@
       types:
         Blunt: 12
         Structural: 20
+  - type: SampleSource
+    availableCellSamples:
+    - protoID: CellSampleDinosaurAnki
+  - type: CanBeTakenUnderControl # Horizon
+    remotePilot: MobRemotePilot
+  - type: StaticPrice
+    price: 4400
 
 #region spinosaurus
 - type: entity
@@ -371,7 +420,7 @@
   id: MobDinosaurSpinoExpeditions
   name: spinosaurus
   description: With a typical length of 14 m and a mass of 7.4 tons, Spinosaurus has large, robust forelimbs. Each of its hands has three-fingers, with an enlarged claw on the first digit. Surprisingly quick for its size, this giant can take a lot of punishment.
-  categories: [ HideSpawnMenu ]
+  # categories: [ HideSpawnMenu ]
   components:
   - type: Sprite
     drawdepth: Mobs
@@ -404,6 +453,13 @@
       types:
         Blunt: 12
         Structural: 20
+  - type: SampleSource
+    availableCellSamples:
+    - protoID: CellSampleDinosaurSpino
+  - type: CanBeTakenUnderControl # Horizon
+    remotePilot: MobRemotePilot
+  - type: StaticPrice
+    price: 5000
 
 #region stegosaurus
 - type: entity
@@ -413,7 +469,7 @@
   id: MobDinosaurStegoExpeditions
   name: stegosaurus
   description: Large and heavily built, these herbivorous quadrupeds have rounded backs, short fore limbs, long hind limbs, and tails held high in the air. Lumbering, but lethal up close.
-  categories: [ HideSpawnMenu ]
+  # categories: [ HideSpawnMenu ]
   components:
   - type: Sprite
     drawdepth: Mobs
@@ -447,6 +503,13 @@
         Blunt: 12
         Piercing: 8
         Structural: 20
+  - type: SampleSource
+    availableCellSamples:
+    - protoID: CellSampleDinosaurStego
+  - type: CanBeTakenUnderControl # Horizon
+    remotePilot: MobRemotePilot
+  - type: StaticPrice
+    price: 3600
 
 #region tyrannosaurus (boss)
 - type: entity
@@ -456,7 +519,7 @@
   id: MobDinosaurTrexExpeditions
   name: tyrannosaurus
   description: A massive therapod, its giant thorax is balanced by a long, heavy tail. Relative to its large and powerful hind limbs, the forelimbs of Tyrannosaurus are short but incredible powerful for their size, and they have two clawed digits.
-  categories: [ HideSpawnMenu ]
+  # categories: [ HideSpawnMenu ]
   components:
   - type: Sprite
     drawdepth: Mobs
@@ -530,18 +593,21 @@
 
 - type: entity
   id: ActionTRexRoar
+  parent: BaseAction
   categories: [ HideSpawnMenu ]
   name: "[color=yellow]Roar[/color]"
   description: "Emits a powerful roar, intimidating and stunning nearby foe. [color=yellow]40 second cooldown.[/color]"
   components:
-  - type: WorldTargetAction
+  - type: Action
     icon: { sprite: _NF/Effects/sonic_wave.rsi, state: icon }
     iconColor: "#0099FF"
-    event: !type:ActionGunShootEvent
     priority: 2
-    checkCanAccess: false
-    range: 0
     itemIconStyle: BigAction
     useDelay: 40
     sound:
       path: /Audio/Animals/space_dragon_roar.ogg
+  - type: TargetAction
+    checkCanAccess: false
+    range: 0
+  - type: WorldTargetAction
+    event: !type:ActionGunShootEvent

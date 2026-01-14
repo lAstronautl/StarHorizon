@@ -65,6 +65,11 @@ public sealed class ProjectileSystem : SharedProjectileSystem
                 _color.RaiseEffect(Color.Red, new List<EntityUid> { target }, Filter.Pvs(target, entityManager: EntityManager));
             }
 
+            // _Horizon
+            var bodyEv = new ProjectileBodyHitEvent(modifiedDamage, target, Bullet: uid);
+            RaiseLocalEvent(target, ref bodyEv);
+            // _Horizon
+
             _adminLogger.Add(LogType.BulletHit,
                 LogImpact.Medium,
                 $"Projectile {ToPrettyString(uid):projectile} shot by {ToPrettyString(component.Shooter!.Value):user} hit {otherName:target} and dealt {modifiedDamage.GetTotal():damage} damage");

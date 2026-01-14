@@ -6,3 +6,5 @@ ent-ComputerTabletopFrame = компьютер
 ent-ComputerTabletopBroken = { ent-ComputerBroken }
     .suffix = Настольный
     .desc = { ent-ComputerBroken.desc }
+ent-ComputerTabletop = настольный компьютер
+    .desc = Это компьютер, который можно поставить на стол. Настольный компьютер. Не предназначен для использования на других поверхностях.

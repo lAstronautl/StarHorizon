@@ -160,9 +160,12 @@ public sealed class StationSpawningSystem : SharedStationSpawningSystem
             _humanoidSystem.LoadProfile(entity.Value, profile);
             _metaSystem.SetEntityName(entity.Value, profile.Name);
 
-            if (profile.FlavorText != "" && _configurationManager.GetCVar(CCVars.FlavorText))
+            // Horizon - немного переписал для флавора всё
+            if (/*profile.FlavorText != "" && */_configurationManager.GetCVar(CCVars.FlavorText))
             {
-                AddComp<DetailExaminableComponent>(entity.Value).Content = profile.FlavorText;
+                var examinable = AddComp<DetailExaminableComponent>(entity.Value);
+                examinable.Content = profile.FlavorText;
+                Dirty(entity.Value, examinable);
             }
         }
 

@@ -12,3 +12,5 @@ ent-TechnologyDisk = диск технологий
 ent-TechnologyDiskRare = { ent-TechnologyDisk }
     .suffix = Редкий
     .desc = { ent-TechnologyDisk.desc }
+ent-TechnologyDiskCombatCyborgs = диск технологий (боевые киборги)
+    .desc = Диск для сервера НИО содержащий технологию боевых киборгов.

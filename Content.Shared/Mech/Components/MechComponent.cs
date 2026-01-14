@@ -214,7 +214,9 @@ public sealed partial class MechComponent : Component
     public EntProtoId MechEjectAction = "ActionMechEject";
 
     // Horizon Mech start
+    [DataField]
     public EntProtoId MechTurnLightsAction = "ActionMechTurnLights";
+    [DataField]
     public EntProtoId MechInhaleAction = "ActionMechInhale";
     // Horizon Mech end
     #endregion

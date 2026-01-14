@@ -10,6 +10,7 @@ namespace Content.Client.Mech;
 public sealed partial class MechSystem : SharedMechSystem // Horizon Mech
 {
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly SpriteSystem _sprite = default!;
 
     /// <inheritdoc/>
     public override void Initialize()

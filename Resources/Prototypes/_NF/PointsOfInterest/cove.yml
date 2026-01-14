@@ -13,7 +13,7 @@
   parent: BasePOI
   name: Pirate Cove
   minimumDistance: 10000
-  maximumDistance: 15000
+  maximumDistance: 20000
   spawnGamePreset: [ NFPirate ]
   spawnGroup: Required
   gridPath: /Maps/_Horizon/POI/cove.yml # Horizon-Maps
@@ -36,7 +36,7 @@
         - type: StationNameSetup
           mapNameTemplate: 'Pirate Cove'
         - type: ExtraStationInformation
-          iconPath: /Textures/_NF/Interface/Pirate/piratelogo.png
+          iconPath: /Textures/_Horizon/Interface/banner_pirate_red.png # Horizon
           stationSubtext: 'frontier-lobby-pirate-subtext'
           stationDescription: 'frontier-lobby-pirate-description'
           lobbySortOrder: 6

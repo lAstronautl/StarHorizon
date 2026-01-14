@@ -6,7 +6,7 @@
   molarMass: 32
   color: 2887E8
   reagent: Oxygen
-  pricePerMole: 0.2 # Frontier: 0<0.2
+  pricePerMole: 0.3 # Horizon
 
 - type: gas
   id: 1
@@ -16,7 +16,7 @@
   molarMass: 28
   color: DA1010
   reagent: Nitrogen
-  pricePerMole: 0.2 # Frontier: 0<0.2
+  pricePerMole: 0.15 # Horizon
 
 - type: gas
   id: 2
@@ -26,7 +26,7 @@
   molarMass: 44
   color: 4e4e4e
   reagent: CarbonDioxide
-  pricePerMole: 0.5 # Frontier 0<0.5
+  pricePerMole: 0.4 # Horizon
 
 - type: gas
   id: 3
@@ -38,7 +38,7 @@
   gasOverlayState: plasma
   color: FF3300
   reagent: Plasma
-  pricePerMole: 1 # Frontier 0<1
+  pricePerMole: 1.5 # Horizon
 
 - type: gas
   id: 4
@@ -50,7 +50,7 @@
   gasOverlayState: tritium
   color: 13FF4B
   reagent: Tritium
-  pricePerMole: 4 # Frontier 2.5<4
+  pricePerMole: 3 # Horizon
 
 - type: gas
   id: 5
@@ -62,7 +62,7 @@
   gasOverlayState: water_vapor
   color: bffffd
   reagent: Water
-  pricePerMole: 1 # Horizon
+  pricePerMole: 0.8 # Horizon
 
 - type: gas
   id: 6
@@ -76,7 +76,7 @@
   gasVisbilityFactor: 3.5
   color: 56941E
   reagent: Ammonia
-  pricePerMole: 0.15
+  pricePerMole: 0.25 # Horizon
 
 - type: gas
   id: 7
@@ -86,7 +86,7 @@
   molarMass: 44
   color: 8F00FF
   reagent: NitrousOxide
-  pricePerMole: 1 # Horizon
+  pricePerMole: 2 # Horizon
 
 - type: gas
   id: 8
@@ -99,7 +99,7 @@
   gasMolesVisible: 0.6
   color: 3a758c
   reagent: Frezon
-  pricePerMole: 8 # Horizon
+  pricePerMole: 15 # Horizon
 
 # Horizon start
 - type: gas
@@ -110,7 +110,7 @@
   molarMass: 100
   color: e69edd
   reagent: BZ
-  pricePerMole: 3
+  pricePerMole: 5
 
 - type: gas
   id: 10
@@ -120,7 +120,7 @@
   molarMass: 40
   color: 0054AA
   reagent: Pluoxium
-  pricePerMole: 5
+  pricePerMole: 9
 
 - type: gas
   id: 11
@@ -130,7 +130,7 @@
   molarMass: 2
   color: FFFFFF
   reagent: Hydrogen
-  pricePerMole: 5
+  pricePerMole: 6
 
 - type: gas
   id: 12
@@ -144,7 +144,7 @@
   gasVisbilityFactor: 500
   color: 7E4732
   reagent: Nitrium
-  pricePerMole: 12
+  pricePerMole: 18
 
 - type: gas
   id: 13
@@ -158,7 +158,7 @@
   gasVisbilityFactor: 500
   color: d97e7e
   reagent: Healium
-  pricePerMole: 12
+  pricePerMole: 18
 
 - type: gas
   id: 14
@@ -172,7 +172,7 @@
   gasVisbilityFactor: 1000
   color: 33cccc
   reagent: Hyper-Noblium
-  pricePerMole: 15
+  pricePerMole: 27
 
 - type: gas
   id: 15
@@ -186,7 +186,7 @@
   gasVisbilityFactor: 1000
   color: 009933
   reagent: Proto-Nitrate
-  pricePerMole: 5
+  pricePerMole: 8
 
 - type: gas
   id: 16
@@ -200,7 +200,7 @@
   gasVisbilityFactor: 250
   color: 1c1a1a
   reagent: Zauker
-  pricePerMole: 15
+  pricePerMole: 18
 
 - type: gas
   id: 17
@@ -214,7 +214,7 @@
   gasVisbilityFactor: 500
   color: e3574d
   reagent: Halon
-  pricePerMole: 8
+  pricePerMole: 15
 
 - type: gas
   id: 18
@@ -224,7 +224,7 @@
   molarMass: 4
   color: 005959
   reagent: Helium
-  pricePerMole: 7
+  pricePerMole: 10
 
 - type: gas
   id: 19
@@ -238,5 +238,5 @@
   gasVisbilityFactor: 100
   color: 525151
   reagent: Anti-Noblium
-  pricePerMole: 20
+  pricePerMole: 35
 # Horizon end

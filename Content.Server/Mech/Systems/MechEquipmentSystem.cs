@@ -31,7 +31,6 @@ public sealed class MechEquipmentSystem : SharedMechEquipmentSystem // Horizon M
 
         // Horizon Mech start
         SubscribeLocalEvent<MechEquipmentComponent, EntityTerminatingEvent>(OnTerminating);
-        SubscribeLocalEvent<MechEquipmentComponent, MechEquipmentUiStateReadyEvent>(OnGetUIState);
         // Horizon Mech end
     }
 
@@ -81,16 +80,6 @@ public sealed class MechEquipmentSystem : SharedMechEquipmentSystem // Horizon M
     private void OnTerminating(EntityUid uid, MechEquipmentComponent comp, ref EntityTerminatingEvent args)
     {
         _mech.UpdateUserInterfaceByEquipment(uid);
-    }
-
-    private void OnGetUIState(EntityUid uid, MechEquipmentComponent component, MechEquipmentUiStateReadyEvent args)
-    {
-        if (HasComp<MechGrabberComponent>(uid)) // Мне лень делать нормальную проверку, как-нибудь потом будет.
-            return;
-        if (HasComp<BallisticMechAmmoProviderComponent>(uid))
-            return;
-
-        args.States.Add(GetNetEntity(uid), null);
     }
     // Horizon Mech end
 }

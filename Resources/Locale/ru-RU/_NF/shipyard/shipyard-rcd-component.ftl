@@ -1,6 +1,7 @@
 ## UI
 
 rcd-component-missing-id-deed = На этой ID карте не зарегистрировано ни одного шаттла
+rcd-component-unauthorized-ship = Может строить только на авторизованных шаттлах!
 rcd-component-can-only-build-authorized-ship = Строительство разрешено только на авторизованных шаттлах!
 rcd-component-no-id-swiped = Проведите идентификационной картой по РСУ для авторизации.
 rcd-component-use-blocked = РСУ жужжит, но ничего не происходит.

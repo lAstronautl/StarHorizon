@@ -1,3 +1,5 @@
+# region Base
+
 - type: entity
   id: BaseBorgModule
   parent: BaseItem
@@ -49,13 +51,15 @@
       provided_container: !type:Container { }
 
 - type: entity
+  parent: BaseAction
   id: ActionBorgSwapModule
   name: Swap Module
   description: Select this module, enabling you to use the tools it provides.
   components:
-  - type: InstantAction
+  - type: Action
     itemIconStyle: BigAction
     useDelay: 0.5
+  - type: InstantAction
     event: !type:BorgModuleActionSelectedEvent
 
 - type: entity
@@ -274,6 +278,33 @@
         color: "#7B0F12"
 
 - type: entity
+  id: BaseBorgModuleCombat
+  parent: BaseBorgModule
+  abstract: true
+  components:
+  - type: Tag
+    tags:
+    - BorgModuleCombat
+  - type: Item
+    inhandVisuals:
+      left:
+      - state: base-icon-inhand-left
+        color: "#FF0000"
+      - state: base-module-inhand-left
+        color: "#891417"
+      - state: base-part-inhand-left
+      - state: base-stripes-inhand-left
+        color: "#7B0F12"
+      right:
+      - state: base-icon-inhand-right
+        color: "#FF0000"
+      - state: base-module-inhand-right
+        color: "#891417"
+      - state: base-part-inhand-right
+      - state: base-stripes-inhand-right
+        color: "#7B0F12"
+
+- type: entity
   abstract: true
   parent: BaseBorgModule
   id: BaseXenoborgModuleGeneric
@@ -408,7 +439,8 @@
       - state: base-stripes-inhand-right
         color: "#FF00CC"
 
-# generic modules
+# region Generic
+
 - type: entity
   id: BorgModuleCable
   parent: [ BaseBorgModule, BaseProviderBorgModule ]
@@ -493,7 +525,7 @@
   - type: BorgModuleIcon
     icon: { sprite: Interface/Actions/actions_borg.rsi, state: tool-module }
 
-# cargo modules
+# region Cargo
 - type: entity
   id: BorgModuleAppraisal
   parent: [ BaseBorgModuleCargo, BaseProviderBorgModule ]
@@ -609,7 +641,8 @@
   - type: BorgModuleIcon
     icon: { sprite: Interface/Actions/actions_borg.rsi, state: grappling-module }
 
-# engineering modules
+# region Engineering
+
 - type: entity
   id: BorgModuleAdvancedTool
   parent: [ BaseBorgModuleEngineering, BaseProviderBorgModule ]
@@ -714,7 +747,8 @@
   - type: BorgModuleIcon
     icon: { sprite: Interface/Actions/actions_borg.rsi, state: rcd-module }
 
-# janitorial modules (this gets its own unique things because janis are epic)
+# region Janitorial
+
 - type: entity
   id: BorgModuleCustodial
   parent: [ BaseBorgModuleJanitor, BaseProviderBorgModule ]
@@ -839,7 +873,8 @@
   - type: BorgModuleIcon
     icon: { sprite: Interface/Actions/actions_borg.rsi, state: adv-cleaning-module }
 
-# medical modules
+# region Medical
+
 - type: entity
   id: BorgModuleDiagnosis # todo: reuse when med refractor is finished
   parent: [ BaseBorgModuleMedical, BaseProviderBorgModule ]
@@ -1009,7 +1044,8 @@
   - type: BorgModuleIcon
     icon: { sprite: Interface/Actions/actions_borg.rsi, state: adv-chem-module }
 
-# science modules
+# region Science
+
 # todo: if science ever gets their own custom robot, add more "sci" modules.
 - type: entity
   id: BorgModuleArtifact
@@ -1090,7 +1126,7 @@
   - type: BorgModuleIcon
     icon: { sprite: Interface/Actions/actions_borg.rsi, state: anomaly-module }
 
-# service modules
+# region Service
 - type: entity
   id: BorgModuleService
   parent: [ BaseBorgModuleService, BaseProviderBorgModule ]
@@ -1265,7 +1301,7 @@
   - type: BorgModuleIcon
     icon: { sprite: Interface/Actions/actions_borg.rsi, state: clowning-module }
 
-#syndicate modules
+# region Syndicate
 - type: entity
   id: BorgModuleSyndicateWeapon
   parent: [ BaseBorgModule, BaseProviderBorgModule, BaseC3SyndicateContraband ] # Frontier: BaseSyndicateContraband<BaseC3SyndicateContraband
@@ -1392,7 +1428,121 @@
         - state: base-stripes-inhand-right
           color: "#7B0F12"
 
-# xenoborg modules
+# Horizon start
+# region XenoSyndicate
+# Based on Xenoborg technology but adapted for Syndicate use
+
+- type: entity
+  parent: [ BaseBorgModuleSyndicateAssault, BaseProviderBorgModule, BaseC3SyndicateContraband ]
+  id: BorgModuleSyndicateLaser
+  name: syndicate laser module
+  description: Advanced laser module for Syndicate operatives. Highly effective weapon system.
+  components:
+  - type: Sprite
+    layers:
+    - state: syndicate
+    - state: icon-syndicate-laser
+  - type: ItemBorgModule
+    moduleId: SyndicateLaser
+    items:
+    - NFWeaponEnergyPistolLaserAdvanced
+    - PinpointerSyndicateNuclear
+  - type: BorgModuleIcon
+    icon: { sprite: Interface/Actions/actions_borg.rsi, state: syndicate-laser-module }
+  - type: Item
+    inhandVisuals:
+      left:
+      - state: base-icon-inhand-left
+        color: "#FF0000"
+      - state: base-module-inhand-left
+        color: "#891417"
+      - state: base-part-inhand-left
+      - state: base-stripes-inhand-left
+        color: "#7B0F12"
+      right:
+      - state: base-icon-inhand-right
+        color: "#FF0000"
+      - state: base-module-inhand-right
+        color: "#891417"
+      - state: base-part-inhand-right
+      - state: base-stripes-inhand-right
+        color: "#7B0F12"
+
+- type: entity
+  parent: [ BaseBorgModuleSyndicateAssault, BaseProviderBorgModule, BaseC3SyndicateContraband ]
+  id: BorgModuleSyndicateHeavyLaser
+  name: syndicate heavy laser module
+  description: Advanced heavy laser module with significantly increased firepower. Devastating against armored targets.
+  components:
+  - type: Sprite
+    layers:
+    - state: syndicate
+    - state: icon-syndicate-laser2
+  - type: ItemBorgModule
+    moduleId: SyndicateLaserHeavy
+    items:
+    - NFWeaponEnergyPistolLaserX01Multiphase
+    - NFWeaponEnergyPistolLaserX01Multiphase
+    - PinpointerSyndicateNuclear
+  - type: BorgModuleIcon
+    icon: { sprite: Interface/Actions/actions_borg.rsi, state: syndicate-laser2-module }
+  - type: Item
+    inhandVisuals:
+      left:
+      - state: base-icon-inhand-left
+        color: "#FF0000"
+      - state: base-module-inhand-left
+        color: "#891417"
+      - state: base-part-inhand-left
+      - state: base-stripes-inhand-left
+        color: "#7B0F12"
+      right:
+      - state: base-icon-inhand-right
+        color: "#FF0000"
+      - state: base-module-inhand-right
+        color: "#891417"
+      - state: base-part-inhand-right
+      - state: base-stripes-inhand-right
+        color: "#7B0F12"
+
+- type: entity
+  parent: [ BaseBorgModuleSyndicate, BaseProviderBorgModule, BaseC3SyndicateContraband ]
+  id: BorgModuleSyndicateCloakingDevice
+  name: syndicate cloaking device module
+  description: Integrated cloaking device for stealth operations. Renders the operative invisible for extended periods.
+  components:
+  - type: Sprite
+    layers:
+    - state: syndicate
+    - state: icon-syndicate-cloak
+  - type: ItemBorgModule
+    moduleId: SyndicateCloaking
+    items:
+    - CloakingDevice
+  - type: BorgModuleIcon
+    icon: { sprite: Interface/Actions/actions_borg.rsi, state: syndicate-cloak-module }
+  - type: Item
+    inhandVisuals:
+      left:
+      - state: base-icon-inhand-left
+        color: "#FF0000"
+      - state: base-module-inhand-left
+        color: "#891417"
+      - state: base-part-inhand-left
+      - state: base-stripes-inhand-left
+        color: "#7B0F12"
+      right:
+      - state: base-icon-inhand-right
+        color: "#FF0000"
+      - state: base-module-inhand-right
+        color: "#891417"
+      - state: base-part-inhand-right
+      - state: base-stripes-inhand-right
+        color: "#7B0F12"
+# Horizon end
+
+# region Xenoborg
+
 - type: entity
   parent: [ BaseXenoborgModuleGeneric, BaseProviderBorgModule, BaseXenoborgContraband ]
   id: XenoborgModuleBasic
@@ -1544,7 +1694,7 @@
   parent: [ BaseXenoborgModuleScout, BaseProviderBorgModule, BaseXenoborgContraband ]
   id: XenoborgModuleSword
   name: sword xenoborg module
-  description: Module with an energy dagger.
+  description: Module with a kukri knife.
   components:
   - type: Sprite
     layers:
@@ -1553,16 +1703,16 @@
   - type: ItemBorgModule
     moduleId: XenoborgSword # Frontier
     items:
-    - EnergyDaggerLoudBlue
+    - KukriKnife
     - JetpackXenoborg
   - type: BorgModuleIcon
     icon: { sprite: Interface/Actions/actions_borg.rsi, state: xenoborg-sword-module }
 
 - type: entity
   parent: [ BaseXenoborgModuleScout, BaseProviderBorgModule, BaseXenoborgContraband ]
-  id: XenoborgModuleFastSword
-  name: fast sword xenoborg module
-  description: Module with a crusher dagger.
+  id: XenoborgModuleEnergySword
+  name: energy sword xenoborg module
+  description: Module with an energy dagger.
   components:
   - type: Sprite
     layers:
@@ -1571,7 +1721,7 @@
   - type: ItemBorgModule
     moduleId: XenoborgSwordFast # Frontier
     items:
-    - WeaponCrusherDagger
+    - EnergyDaggerLoudBlue
     - JetpackXenoborg
   - type: BorgModuleIcon
     icon: { sprite: Interface/Actions/actions_borg.rsi, state: xenoborg-sword2-module }
@@ -1626,3 +1776,384 @@
     - CloakingDevice
   - type: BorgModuleIcon
     icon: { sprite: Interface/Actions/actions_borg.rsi, state: xenoborg-eye-module }
+
+# Horizon start
+
+# region Combat Modules
+
+- type: entity
+  id: BorgModuleCombatPKA
+  parent: [ BaseBorgModuleCombat, BaseProviderBorgModule ]
+  name: kinetic accelerator cyborg module
+  description: A module equipped with a kinetic accelerator for rapid fire combat.
+  components:
+  - type: Sprite
+    layers:
+    - state: combat
+    - state: icon-syndicate
+  - type: ItemBorgModule
+    moduleId: CombatPKA
+    items:
+    - NFWeaponPka
+    - WeaponCrusher
+  - type: BorgModuleIcon
+    icon: { sprite: Interface/Actions/actions_borg.rsi, state: syndicate-weapon-module }
+  - type: Item
+    inhandVisuals:
+      left:
+      - state: base-icon-inhand-left
+        color: "#FF0000"
+      - state: base-module-inhand-left
+        color: "#891417"
+      - state: base-part-inhand-left
+      - state: base-stripes-inhand-left
+        color: "#7B0F12"
+      right:
+      - state: base-icon-inhand-right
+        color: "#FF0000"
+      - state: base-module-inhand-right
+        color: "#891417"
+      - state: base-part-inhand-right
+      - state: base-stripes-inhand-right
+        color: "#7B0F12"
+
+- type: entity
+  id: BorgModuleCombatEchis
+  parent: [ BaseBorgModuleCombat, BaseProviderBorgModule ]
+  name: pistol cyborg module
+  description: A module equipped with a compact energy pistol for precise combat operations.
+  components:
+  - type: Sprite
+    layers:
+    - state: combat
+    - state: icon-syndicate
+  - type: ItemBorgModule
+    moduleId: CombatEchis
+    items:
+    - NFWeaponPistolEchis
+    - NFWeaponPistolEchis
+  - type: BorgModuleIcon
+    icon: { sprite: Interface/Actions/actions_borg.rsi, state: syndicate-weapon-module }
+  - type: Item
+    inhandVisuals:
+      left:
+      - state: base-icon-inhand-left
+        color: "#FF0000"
+      - state: base-module-inhand-left
+        color: "#891417"
+      - state: base-part-inhand-left
+      - state: base-stripes-inhand-left
+        color: "#7B0F12"
+      right:
+      - state: base-icon-inhand-right
+        color: "#FF0000"
+      - state: base-module-inhand-right
+        color: "#891417"
+      - state: base-part-inhand-right
+      - state: base-stripes-inhand-right
+        color: "#7B0F12"
+
+- type: entity
+  id: BorgModuleCombatLaserAdvanced
+  parent: [ BaseBorgModuleCombat, BaseProviderBorgModule ]
+  name: advanced laser pistol cyborg module
+  description: A module equipped with an advanced laser pistol for superior firepower.
+  components:
+  - type: Sprite
+    layers:
+    - state: combat
+    - state: icon-syndicate
+  - type: ItemBorgModule
+    moduleId: CombatLaserAdvanced
+    items:
+    - NFWeaponEnergyPistolLaserAdvanced
+    - NFWeaponEnergyPistolLaserAdvanced
+  - type: BorgModuleIcon
+    icon: { sprite: Interface/Actions/actions_borg.rsi, state: syndicate-laser-module }
+  - type: Item
+    inhandVisuals:
+      left:
+      - state: base-icon-inhand-left
+        color: "#FF0000"
+      - state: base-module-inhand-left
+        color: "#891417"
+      - state: base-part-inhand-left
+      - state: base-stripes-inhand-left
+        color: "#7B0F12"
+      right:
+      - state: base-icon-inhand-right
+        color: "#FF0000"
+      - state: base-module-inhand-right
+        color: "#891417"
+      - state: base-part-inhand-right
+      - state: base-stripes-inhand-right
+        color: "#7B0F12"
+
+- type: entity
+  id: BorgModuleCombatPKAHeavy
+  parent: [ BaseBorgModuleCombat, BaseProviderBorgModule ]
+  name: heavy kinetic cannon cyborg module
+  description: A module equipped with a heavy kinetic cannon for devastating close-range attacks.
+  components:
+  - type: Sprite
+    layers:
+    - state: combat
+    - state: icon-syndicate
+  - type: ItemBorgModule
+    moduleId: CombatPKAHeavy
+    items:
+    - NFWeaponPkaCannon
+    - WeaponCrusher
+  - type: BorgModuleIcon
+    icon: { sprite: Interface/Actions/actions_borg.rsi, state: syndicate-weapon-module }
+  - type: Item
+    inhandVisuals:
+      left:
+      - state: base-icon-inhand-left
+        color: "#FF0000"
+      - state: base-module-inhand-left
+        color: "#891417"
+      - state: base-part-inhand-left
+      - state: base-stripes-inhand-left
+        color: "#7B0F12"
+      right:
+      - state: base-icon-inhand-right
+        color: "#FF0000"
+      - state: base-module-inhand-right
+        color: "#891417"
+      - state: base-part-inhand-right
+      - state: base-stripes-inhand-right
+        color: "#7B0F12"
+
+- type: entity
+  id: BorgModuleCombatPKARailgun
+  parent: [ BaseBorgModuleCombat, BaseProviderBorgModule ]
+  name: kinetic railgun cyborg module
+  description: A module equipped with a kinetic railgun for armor-piercing attacks.
+  components:
+  - type: Sprite
+    layers:
+    - state: combat
+    - state: icon-syndicate
+  - type: ItemBorgModule
+    moduleId: CombatPKARailgun
+    items:
+    - WeaponProtoKineticRailgunBorg
+    - WeaponCrusher
+  - type: BorgModuleIcon
+    icon: { sprite: Interface/Actions/actions_borg.rsi, state: syndicate-laser-module }
+  - type: Item
+    inhandVisuals:
+      left:
+      - state: base-icon-inhand-left
+        color: "#FF0000"
+      - state: base-module-inhand-left
+        color: "#891417"
+      - state: base-part-inhand-left
+      - state: base-stripes-inhand-left
+        color: "#7B0F12"
+      right:
+      - state: base-icon-inhand-right
+        color: "#FF0000"
+      - state: base-module-inhand-right
+        color: "#891417"
+      - state: base-part-inhand-right
+      - state: base-stripes-inhand-right
+        color: "#7B0F12"
+
+- type: entity
+  id: BorgModuleCombatPKARepeater
+  parent: [ BaseBorgModuleCombat, BaseProviderBorgModule ]
+  name: kinetic repeater cyborg module
+  description: A module equipped with a kinetic repeater for sustained automatic fire.
+  components:
+  - type: Sprite
+    layers:
+    - state: combat
+    - state: icon-syndicate
+  - type: ItemBorgModule
+    moduleId: CombatPKARepeater
+    items:
+    - WeaponProtoKineticRepeaterBorg
+    - WeaponCrusher
+  - type: BorgModuleIcon
+    icon: { sprite: Interface/Actions/actions_borg.rsi, state: syndicate-l6c-module }
+  - type: Item
+    inhandVisuals:
+      left:
+      - state: base-icon-inhand-left
+        color: "#FF0000"
+      - state: base-module-inhand-left
+        color: "#891417"
+      - state: base-part-inhand-left
+      - state: base-stripes-inhand-left
+        color: "#7B0F12"
+      right:
+      - state: base-icon-inhand-right
+        color: "#FF0000"
+      - state: base-module-inhand-right
+        color: "#891417"
+      - state: base-part-inhand-right
+      - state: base-stripes-inhand-right
+        color: "#7B0F12"
+
+- type: entity
+  id: BorgModuleCombatPKAShotgun
+  parent: [ BaseBorgModuleCombat, BaseProviderBorgModule ]
+  name: kinetic shotgun cyborg module
+  description: A module equipped with a kinetic shotgun for devastating close-range spread fire.
+  components:
+  - type: Sprite
+    layers:
+    - state: combat
+    - state: icon-syndicate
+  - type: ItemBorgModule
+    moduleId: CombatPKAShotgun
+    items:
+    - WeaponProtoKineticShotgun
+    - WeaponCrusher
+  - type: BorgModuleIcon
+    icon: { sprite: Interface/Actions/actions_borg.rsi, state: syndicate-weapon-module }
+  - type: Item
+    inhandVisuals:
+      left:
+      - state: base-icon-inhand-left
+        color: "#FF0000"
+      - state: base-module-inhand-left
+        color: "#891417"
+      - state: base-part-inhand-left
+      - state: base-stripes-inhand-left
+        color: "#7B0F12"
+      right:
+      - state: base-icon-inhand-right
+        color: "#FF0000"
+      - state: base-module-inhand-right
+        color: "#891417"
+      - state: base-part-inhand-right
+      - state: base-stripes-inhand-right
+        color: "#7B0F12"
+
+- type: entity
+  id: BorgModuleCombatL6C
+  parent: [ BaseBorgModuleCombat, BaseProviderBorgModule ]
+  name: GSW LMG-6 cyborg module
+  description: A module equipped with the GSW LMG-6 light machine gun for sustained fire support.
+  components:
+  - type: Sprite
+    layers:
+    - state: combat
+    - state: icon-syndicate
+  - type: ItemBorgModule
+    moduleId: CombatL6C
+    items:
+    - NFWeaponLightMachineGunL6C
+  - type: BorgModuleIcon
+    icon: { sprite: Interface/Actions/actions_borg.rsi, state: syndicate-l6c-module }
+  - type: Item
+    inhandVisuals:
+      left:
+      - state: base-icon-inhand-left
+        color: "#FF0000"
+      - state: base-module-inhand-left
+        color: "#891417"
+      - state: base-part-inhand-left
+      - state: base-stripes-inhand-left
+        color: "#7B0F12"
+      right:
+      - state: base-icon-inhand-right
+        color: "#FF0000"
+      - state: base-module-inhand-right
+        color: "#891417"
+      - state: base-part-inhand-right
+      - state: base-stripes-inhand-right
+        color: "#7B0F12"
+
+- type: entity
+  id: BorgModuleCombatLaserHeavy
+  parent: [ BaseBorgModuleCombat, BaseProviderBorgModule ]
+  name: heavy laser cyborg module
+  description: A module equipped with a heavy laser system providing massive destructive power.
+  components:
+  - type: Sprite
+    layers:
+    - state: combat
+    - state: icon-syndicate
+  - type: ItemBorgModule
+    moduleId: CombatLaserHeavy
+    items:
+    - NFWeaponEnergyPistolLaserX01Multiphase
+    - NFWeaponEnergyPistolLaserX01Multiphase
+  - type: BorgModuleIcon
+    icon: { sprite: Interface/Actions/actions_borg.rsi, state: syndicate-laser2-module }
+  - type: Item
+    inhandVisuals:
+      left:
+      - state: base-icon-inhand-left
+        color: "#FF0000"
+      - state: base-module-inhand-left
+        color: "#891417"
+      - state: base-part-inhand-left
+      - state: base-stripes-inhand-left
+        color: "#7B0F12"
+      right:
+      - state: base-icon-inhand-right
+        color: "#FF0000"
+      - state: base-module-inhand-right
+        color: "#891417"
+      - state: base-part-inhand-right
+      - state: base-stripes-inhand-right
+        color: "#7B0F12"
+
+- type: entity
+  parent: [ BaseBorgModuleCombat, BaseProviderBorgModule ]
+  id: BorgModuleCombatCloakingDevice
+  name: cloaking device module
+  description: Integrated cloaking device for stealth operations. Renders the operative invisible for extended periods.
+  components:
+  - type: Sprite
+    layers:
+    - state: combat
+    - state: icon-syndicate-cloak
+  - type: ItemBorgModule
+    moduleId: CombatCloaking
+    items:
+    - CloakingDevice
+  - type: BorgModuleIcon
+    icon: { sprite: Interface/Actions/actions_borg.rsi, state: syndicate-cloak-module }
+  - type: Item
+    inhandVisuals:
+      left:
+      - state: base-icon-inhand-left
+        color: "#FF0000"
+      - state: base-module-inhand-left
+        color: "#891417"
+      - state: base-part-inhand-left
+      - state: base-stripes-inhand-left
+        color: "#7B0F12"
+      right:
+      - state: base-icon-inhand-right
+        color: "#FF0000"
+      - state: base-module-inhand-right
+        color: "#891417"
+      - state: base-part-inhand-right
+      - state: base-stripes-inhand-right
+        color: "#7B0F12"
+
+- type: entity
+  id: BorgModuleTranslation
+  parent: [ BaseBorgModuleService, BaseProviderBorgModule ]
+  name: translation cyborg module
+  description: A module equipped with universal translation technology for communication across languages.
+  components:
+  - type: Sprite
+    layers:
+    - state: service
+    - state: icon-musique
+  - type: ItemBorgModule
+    moduleId: Translation
+    items:
+    - RareTranslator
+  - type: BorgModuleIcon
+    icon: { sprite: Interface/Actions/actions_borg.rsi, state: musical-module }
+
+# Horizon end

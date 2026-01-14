@@ -12,14 +12,11 @@
   id: Grifty
   parent: BasePOI
   name: "Grifty's Gas n Grub"
-  minimumDistance: 3250
-  maximumDistance: 5600
-  spawnGroup: Scrapyard
-  gridPath: /Maps/_NF/POI/grifty.yml
+  minimumDistance: 5000 # Horizon
+  maximumDistance: 7500 # Horizon
+  spawnGroup: Required # Horizon
+  gridPath: /Maps/_Horizon/POI/grifty.yml #Horizon-Maps
   addComponents:
-  - type: StationTransit
-    routes:
-      SpawnPoints: 50
   - type: SolarPoweredGrid
     trackOnInit: true
     doNotCull: true
@@ -27,11 +24,11 @@
 - type: gameMap
   id: Grifty
   mapName: "Grifty's Gas n Grub"
-  mapPath: /Maps/_NF/POI/grifty.yml
+  mapPath: /Maps/_Horizon/POI/grifty.yml #Horizon-Maps
   minPlayers: 0
   stations:
     Grifty:
-      stationProto: DeadDropRecordsFrontierOutpost
+      stationProto: StandardFrontierOutpost
       components:
         - type: StationNameSetup
           mapNameTemplate: "Grifty's Gas n Grub"

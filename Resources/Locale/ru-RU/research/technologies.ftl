@@ -1,6 +1,5 @@
 research-discipline-none = Отсутствует
 research-discipline-industrial = Промышленность
-research-discipline-biochemical = Биохимия
 research-discipline-arsenal = Арсенал
 research-discipline-experimental = Экспериментальное
 research-discipline-civilian-services = Обслуживание персонала
@@ -83,9 +82,16 @@ research-technology-virology = Вирусология
 research-technology-cryogenics = Криогеника
 research-technology-crew-monitoring = Мониторинг экипажа
 research-technology-bluespace-chemistry = Блюспейс-химия
+research-technology-cytology = Цитология
 research-technology-cloning = Клонирование
 research-technology-syringelauncher = Дистанционное лечение
 research-technology-military-machinery = Военная машинерия
 research-technology-modern-combat-mechs = Передовые боевые мехи
 research-technology-compact-reanimation = Компактная реанимация
 research-technology-med-jaws-of-life = Ускоренное спасение
+
+# Combat Cyborg Technologies
+research-technology-remote-control-monitoring = Дистанционное управление и мониторинг
+research-technology-combat-cyborgs = Боевые киборги
+research-technology-protokinetic-cyborg = Протокинетические технологии киборгов
+research-technology-other-combat-modules = Продвинутые боевые модули

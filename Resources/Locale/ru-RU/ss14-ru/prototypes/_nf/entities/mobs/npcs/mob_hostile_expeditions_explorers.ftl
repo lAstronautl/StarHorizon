@@ -16,3 +16,21 @@ ent-MobExplorerHauler = грузчик
     .desc = Он нагружен тяжёлым оборудованием и готов тащить всё, что плохо лежит. Простите, это «восстановление активов»!
 ent-MobExplorerBoss = капитан-исследователь
     .desc = Бесстрашные и опытные лидеры, прошедшие через годы исследований и сражений. Эти капитаны знают, как выжить в самых тёмных уголках галактики и покорить её преступный мир. Недооценивать их — значит рисковать всем.
+ent-SeismicChargeGun = пушка сейсмического заряда
+    .desc = Необходима для выстрела зарядом.
+ent-ActionSeismicCharge = [color=yellow]Бросить сейсмический заряд[/color]
+    .desc = Метает активированный сейсмический заряд, который взрывается при контакте. [color=yellow]Перезарядка: 50 секунд.[/color]
+ent-MobExplorerMeleeEVAT1 = { ent-MobMovementSpeedModifierEVAMelee }
+    .desc = { ent-MobMovementSpeedModifierEVAMelee.desc }
+ent-MobExplorerRangedEVAT1 = { ent-MobMovementSpeedModifierEVARanged }
+    .desc = { ent-MobMovementSpeedModifierEVARanged.desc }
+ent-MobExplorerMeleeEVAT2 = { ent-MobMovementSpeedModifierEVAMelee }
+    .desc = { ent-MobMovementSpeedModifierEVAMelee.desc }
+ent-MobExplorerRangedEVAT2 = { ent-MobMovementSpeedModifierEVARanged }
+    .desc = { ent-MobMovementSpeedModifierEVARanged.desc }
+ent-MobExplorerMeleeEVAT3 = { ent-MobMovementSpeedModifierEVAMelee }
+    .desc = { ent-MobMovementSpeedModifierEVAMelee.desc }
+ent-MobExplorerRangedEVAT3 = { ent-MobMovementSpeedModifierEVARanged }
+    .desc = { ent-MobMovementSpeedModifierEVARanged.desc }
+ent-MobExplorerHaulerEVA = { ent-MobExplorerHauler }
+    .desc = { ent-MobExplorerHauler.desc }

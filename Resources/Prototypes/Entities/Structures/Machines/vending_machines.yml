@@ -36,6 +36,15 @@
         density: 200
   - type: Destructible
     thresholds:
+    - trigger: # Excess damage, don't do anything
+        !type:DamageTrigger
+        damage: 200
+      behaviors:
+      - !type:PlaySoundBehavior
+        sound:
+          collection: MetalGlassBreak
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
     - trigger:
         !type:DamageTrigger
         damage: 100
@@ -43,20 +52,6 @@
       - !type:DoActsBehavior
         acts: ["Breakage"]
       - !type:EjectVendorItems
-    - trigger:
-        !type:DamageTrigger
-        damage: 200
-      behaviors:
-      - !type:SpawnEntitiesBehavior
-        spawn:
-          SheetSteel1:
-            min: 1
-            max: 1
-      - !type:DoActsBehavior
-        acts: [ "Destruction" ]
-      - !type:PlaySoundBehavior
-        sound:
-          collection: MetalGlassBreak
   - type: Repairable
     doAfterDelay: 8
   - type: ActivatableUI
@@ -383,6 +378,41 @@
     radius: 1.8
     energy: 1.6
     color: "#3db83b"
+
+# Horizon start
+
+- type: entity
+  parent: VendingMachine
+  id: VendingMachineUnderwear
+  name: UnderwearMate
+  description: A vending machine for underwear.
+  components:
+  - type: VendingMachine
+    pack: UnderwearMateInventory
+    offState: off
+    brokenState: broken
+    normalState: normal-unshaded
+    denyState: deny-unshaded
+  - type: Advertise
+    pack: ClothesMateAds
+  - type: SpeakOnUIClosed
+    pack: GenericVendGoodbyes
+  - type: Sprite
+    sprite: Structures/Machines/VendingMachines/clothing.rsi
+    layers:
+    - state: "off"
+      map: ["enum.VendingMachineVisualLayers.Base"]
+    - state: "off"
+      map: ["enum.VendingMachineVisualLayers.BaseUnshaded"]
+      shader: unshaded
+    - state: panel
+      map: ["enum.WiresVisualLayers.MaintenancePanel"]
+  - type: PointLight
+    radius: 1.8
+    energy: 1.6
+    color: "#3db83b"
+
+# Horizon end
 
 - type: entity
   parent: VendingMachine
