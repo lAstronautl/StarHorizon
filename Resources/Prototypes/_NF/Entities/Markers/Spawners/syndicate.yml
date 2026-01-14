@@ -67,9 +67,9 @@
         - ClothingEyesHudSyndicate
         - ClothingBackpackDuffelSyndicatePyjamaBundle
         - ClothingBackpackDuffelSyndicateMedicalBundleFilled
-        - EncryptionKeySyndie
+#        - EncryptionKeySyndie # Horizon - big no
         - ClothingShoesBootsMagSyndie
-        - ClothingHeadsetAltSyndicate
+#        - ClothingHeadsetAltSyndicate # Horizon - big no
         - ToyFigurineNukieElite
         - ToyNuke
         - PlushieNuke

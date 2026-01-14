@@ -458,7 +458,7 @@
   recipeUnlocks:
   - CytologyGrowingVatMachineCircuitboard
   - CytologyMicroscopeMachineCircuitboard
-  - CytologySampleCombinatorMachineCircuitboard
+  - CytologySampleCombinatorComputerCircuitboard
   - CytologySwab
   - CytologyInjector
   - CytologyPetriDish

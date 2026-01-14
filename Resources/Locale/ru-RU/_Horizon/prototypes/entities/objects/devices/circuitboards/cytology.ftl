@@ -4,5 +4,5 @@ ent-CytologyGrowingVatMachineCircuitboard = чан для выращивания
 ent-CytologyMicroscopeMachineCircuitboard = микроскоп (машинная плата)
     .desc = Печатная плата цитологического микроскопа.
 
-ent-CytologySampleCombinatorMachineCircuitboard = комбинатор образцов (машинная плата)
+ent-CytologySampleCombinatorComputerCircuitboard = комбинатор образцов (машинная плата)
     .desc = Печатная плата комбинатора образцов.

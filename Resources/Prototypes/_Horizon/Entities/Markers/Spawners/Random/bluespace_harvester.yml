@@ -360,7 +360,7 @@
     rarePrototypes:
     - EncryptionKeyStationMaster
     - EncryptionKeyCentCom
-    - EncryptionKeySyndie
+#    - EncryptionKeySyndie # Horizon - big no
     - EncryptionKeyBinary
     rareChance: 0.05
 

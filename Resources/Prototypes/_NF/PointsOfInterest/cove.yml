@@ -13,7 +13,7 @@
   parent: BasePOI
   name: Pirate Cove
   minimumDistance: 10000
-  maximumDistance: 15000
+  maximumDistance: 20000
   spawnGamePreset: [ NFPirate ]
   spawnGroup: Required
   gridPath: /Maps/_Horizon/POI/cove.yml # Horizon-Maps

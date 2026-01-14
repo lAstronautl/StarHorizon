@@ -12,8 +12,8 @@
   id: SindiOutpost
   parent: BasePOI
   name: "Syndicate Outpost"
-  minimumDistance: 7500
-  maximumDistance: 15000
+  minimumDistance: 10000
+  maximumDistance: 20000
   spawnGroup: Required
   gridPath: /Maps/_Horizon/POI/sindioupost.yml
   hideWarp: true
@@ -46,3 +46,4 @@
             SyndicateCargo: [ 4, 4 ]
         - type: StationDeadDropHintExempt
         - type: BindToStationVariationPassExemption
+        - type: NoMailStation # Horizon: Disable mail for Syndicate

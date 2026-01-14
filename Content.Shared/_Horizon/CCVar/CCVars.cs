@@ -8,7 +8,7 @@ namespace Content.Shared._Horizon.CCVar
     public sealed class HorizonCCVars : CVars
     {
         /*
-         * Barks
+         * Barks (Звуки речи)
          */
         public static readonly CVarDef<bool> BarksEnabled =
             CVarDef.Create("barks.enabled", true, CVar.SERVER | CVar.REPLICATED | CVar.ARCHIVE);
@@ -48,5 +48,26 @@ namespace Content.Shared._Horizon.CCVar
 
         public static readonly CVarDef<bool> ShutdownEnabled =
             CVarDef.Create("paths.shutdown_enabled", false, CVar.SERVERONLY);
+
+        /*
+         * Очистка мусора (Trash Cleanup)
+         */
+
+        /// <summary>
+        /// Включена ли автоматическая очистка мусора.
+        /// </summary>
+        public static readonly CVarDef<bool> TrashCleanupEnabled =
+            CVarDef.Create("trash.cleanup_enabled", true, CVar.SERVERONLY);
+
+        /// <summary>
+        /// Время в секундах до автоматического удаления мусора.
+        /// </summary>
+        public static readonly CVarDef<float> TrashCleanupLifetime =
+            CVarDef.Create("trash.cleanup_lifetime", 1800f, CVar.SERVERONLY);
+        /// <summary>
+        /// Задержка в секундах после начала раунда перед активацией очистки мусора.
+        /// </summary>
+        public static readonly CVarDef<float> TrashCleanupStartDelay =
+            CVarDef.Create("trash.cleanup_start_delay", 600f, CVar.SERVERONLY);
     }
 }

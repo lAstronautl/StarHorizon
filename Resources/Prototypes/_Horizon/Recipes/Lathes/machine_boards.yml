@@ -15,5 +15,5 @@
 
 - type: latheRecipe
   parent: [ BaseCircuitboardRecipe, BaseMedicalMachineRecipeCategory ]
-  id: CytologySampleCombinatorMachineCircuitboard
-  result: CytologySampleCombinatorMachineCircuitboard
+  id: CytologySampleCombinatorComputerCircuitboard
+  result: CytologySampleCombinatorComputerCircuitboard

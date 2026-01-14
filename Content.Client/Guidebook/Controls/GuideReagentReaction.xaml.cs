@@ -119,7 +119,11 @@ public sealed partial class GuideReagentReaction : BoxContainer, ISearchableCont
         var amounts = new Dictionary<string, FixedPoint2>();
         foreach (var (reagent, quantity) in reagents)
         {
-            amounts.Add(reagent.Prototype, quantity);
+            // Horizon: TryAdd or aggregate to handle duplicate reagents in solutions
+            if (amounts.TryGetValue(reagent.Prototype, out var existing))
+                amounts[reagent.Prototype] = existing + quantity;
+            else
+                amounts[reagent.Prototype] = quantity;
         }
         SetReagents(amounts, ref container, protoMan, addLinks);
     }

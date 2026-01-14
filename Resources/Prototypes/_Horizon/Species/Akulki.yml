@@ -95,6 +95,16 @@
   - type: Damageable
     damageModifierSet: Akulki
   - type: Wagging
+  # Horizon: Height traits support
+  - type: TallWhitelist
+    scale: 1.15
+    density: 170
+    cosmeticOnly: false
+  - type: ShortWhitelist
+    scale: 0.85
+    density: 130
+    cosmeticOnly: false
+  # Horizon end
 
   - type: Temperature
     heatDamageThreshold: 380

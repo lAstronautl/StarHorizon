@@ -33,3 +33,4 @@
         - type: StationNameSetup
           mapNameTemplate: "Syndicate Deport"
         - type: BindToStationVariationPassExemption
+        - type: NoMailStation # Horizon: Disable mail for Syndicate

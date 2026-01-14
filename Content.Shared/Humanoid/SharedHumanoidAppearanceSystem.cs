@@ -589,7 +589,6 @@ public abstract class SharedHumanoidAppearanceSystem : EntitySystem
             return;
 
         comp.Data = data;
-        comp.Data.Sound = _proto.Index(comp.Data.Proto).Sound;
         humanoid.Bark = data;
     }
 

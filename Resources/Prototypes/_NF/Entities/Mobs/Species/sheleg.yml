@@ -145,6 +145,16 @@
     blockInjectOnProjectile: true
   - type: InventorySlotFriction
   - type: AutoToggleableOuterClothing
+  # Horizon: Height traits (sheleg base scale 1.15, 1.2 - tall)
+  - type: TallWhitelist
+    scale: 1.35  # Even taller than base
+    density: 220
+    cosmeticOnly: false
+  - type: ShortWhitelist
+    scale: 1.0   # Normal human size
+    density: 160
+    cosmeticOnly: false
+  # Horizon end
 
 - type: entity
   save: false

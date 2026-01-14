@@ -74,6 +74,16 @@
       275: 0.6
       250: 0.4
   - type: FluffyWhitelist # Frontier
+  # Horizon: Height traits support
+  - type: TallWhitelist
+    scale: 1.15
+    density: 200
+    cosmeticOnly: false
+  - type: ShortWhitelist
+    scale: 0.85
+    density: 150
+    cosmeticOnly: false
+  # Horizon end
   - type: Sprite # sprite again because we want different layer ordering
     noRot: true
     drawdepth: Mobs

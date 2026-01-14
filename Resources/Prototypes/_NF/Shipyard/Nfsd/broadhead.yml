@@ -32,6 +32,9 @@
       role: "Mercenary"
       costMultiplier: 1.2
     - !type:FactionCostModifier
+      faction: "FactionNFSD"
+      costMultiplier: 0.9
+    - !type:FactionCostModifier
       faction: "FactionSIU"
       costMultiplier: 0.9
     - !type:FactionCostModifier

@@ -33,3 +33,4 @@
         - type: StationNameSetup
           mapNameTemplate: "Pirate Deport"
         - type: BindToStationVariationPassExemption
+        - type: NoMailStation # Horizon: Disable mail for Pirates

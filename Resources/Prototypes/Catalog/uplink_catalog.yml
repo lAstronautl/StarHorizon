@@ -776,19 +776,21 @@
   categories:
   - UplinkDeception
 
-- type: listing
-  id: UplinkHeadsetEncryptionKey
-  name: uplink-encryption-key-name
-  description: uplink-encryption-key-desc
-  icon: { sprite: /Textures/Objects/Devices/encryption_keys.rsi, state: synd_label }
-  productEntity: BoxEncryptionKeySyndie # Two for the price of one
-  discountCategory: usualDiscounts
-  discountDownTo:
-    Telecrystal: 1
-  cost:
-    Telecrystal: 2
-  categories:
-  - UplinkDeception
+# Horizon start
+# - type: listing
+#   id: UplinkHeadsetEncryptionKey
+#   name: uplink-encryption-key-name
+#   description: uplink-encryption-key-desc
+#   icon: { sprite: /Textures/Objects/Devices/encryption_keys.rsi, state: synd_label }
+#   productEntity: BoxEncryptionKeySyndie # Two for the price of one
+#   discountCategory: usualDiscounts
+#   discountDownTo:
+#     Telecrystal: 1
+#   cost:
+#     Telecrystal: 2
+#   categories:
+#   - UplinkDeception
+# Horizon end
 
 - type: listing
   id: UplinkBinaryTranslatorKey

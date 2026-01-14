@@ -2460,13 +2460,6 @@ entities:
     - type: Transform
       pos: -7.440094,-6.5266685
       parent: 1
-- proto: ClothingHeadsetAltSyndicate
-  entities:
-  - uid: 188
-    components:
-    - type: Transform
-      pos: -3.6398454,-2.6581552
-      parent: 1
 - proto: ClothingUniformJumpsuitRecruitSyndie
   entities:
   - uid: 448

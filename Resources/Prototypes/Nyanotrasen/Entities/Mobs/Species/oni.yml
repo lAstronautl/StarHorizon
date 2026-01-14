@@ -40,6 +40,16 @@
   - type: NpcFactionMember
     factions:
     - NanoTrasen
+  # Horizon: Height traits (oni base scale 1.2, 1.2 - large)
+  - type: TallWhitelist
+    scale: 1.35  # Even bigger than base 1.2
+    density: 270
+    cosmeticOnly: false
+  - type: ShortWhitelist
+    scale: 1.05  # Slightly smaller but still big
+    density: 190
+    cosmeticOnly: false
+  # Horizon end
 
 - type: entity
   save: false
