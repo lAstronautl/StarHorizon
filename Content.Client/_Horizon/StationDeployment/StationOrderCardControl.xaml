@@ -1,0 +1,20 @@
+<Control xmlns="https://spacestation14.io">
+    <BoxContainer Name="MainContainer" Orientation="Vertical" Margin="10 0 10 10">
+        <PanelContainer Name="Background"
+                        Access="Public"
+                        StyleClasses="PdaBackground"
+                        MinHeight="15"
+                        VerticalExpand="False"
+                        HorizontalExpand="True"
+                        Margin="0 0 0 -5"/>
+        <BoxContainer Orientation="Vertical" VerticalExpand="True" Margin="5">
+            <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
+                <TextureRect Name="OrderTexture" TextureScale="2 2" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <BoxContainer Orientation="Vertical" HorizontalExpand="True" VerticalAlignment="Center" Margin="10 0 0 0">
+                    <RichTextLabel Name="DescriptionLabel" HorizontalExpand="True"/>
+                    <RichTextLabel Name="RequirementsLabel" HorizontalExpand="True" StyleClasses="LabelSubText"/>
+                </BoxContainer>
+            </BoxContainer>
+        </BoxContainer>
+    </BoxContainer>
+</Control>

@@ -1,0 +1,25 @@
+station-task-console-window-title = Заказы станции
+station-task-console-summon-button = Призвать
+station-task-console-recall-button = Отозвать
+station-task-console-orders-header = Активные заказы
+station-task-console-no-orders = Нет активных заказов.
+station-task-console-level-info = Уровень { $level }
+station-task-console-item-line = { $amount }x { $item }
+station-task-console-capsule-none = Грузовая капсула не развёрнута.
+station-task-console-capsule-en-route = Капсула в пути...
+station-task-console-capsule-docked = Капсула пристыкована - загрузите ящики и отзовите, когда будете готовы.
+
+station-order-console-capsule-already-present = Грузовая капсула уже развёрнута.
+station-order-console-capsule-spawn-failed = Не удалось призвать грузовую капсулу. Попробуйте позже.
+
+station-order-description-toolboxes = Станции нужны инструменты для обслуживания.
+station-order-item-toolbox = ящик с инструментами
+
+station-order-description-blades = На арсенале не хватает колюще-режущих орудий.
+station-order-item-blade = колюще-режущее оружие
+
+station-order-description-syringes = Лаборатории нужны шприцы для экспериментов.
+station-order-item-syringe = шприц
+
+station-order-description-medkits = В медотсеке заканчиваются аптечки.
+station-order-item-medkit = аптечка

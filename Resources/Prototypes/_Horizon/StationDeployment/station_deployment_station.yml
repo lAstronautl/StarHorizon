@@ -4,6 +4,8 @@
   categories: [ HideSpawnMenu ]
   components:
   - type: Transform
+  - type: StationOrderDatabase
+  - type: StationDevelopment
 
 - type: gameMap
   id: DeployedStation

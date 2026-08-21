@@ -16,6 +16,12 @@
   id: ComputerStationTaskPlaceholder
   parent: BaseComputer
   name: station task console
-  description: An interface for managing station tasks. Not yet operational.
+  description: Lets you browse the station's active orders and summon/recall a cargo capsule to deliver them.
   components:
   - type: StationTaskConsole
+  - type: ActivatableUI
+    key: enum.StationTaskConsoleUiKey.Key
+  - type: UserInterface
+    interfaces:
+      enum.StationTaskConsoleUiKey.Key:
+        type: StationTaskConsoleBoundUserInterface

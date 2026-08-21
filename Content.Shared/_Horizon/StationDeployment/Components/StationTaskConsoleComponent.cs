@@ -1,8 +1,23 @@
+using Robust.Shared.Utility;
+
 namespace Content.Shared._Horizon.StationDeployment.Components;
 
 /// <summary>
-/// Marker for the station task console spawned on a deployed station.
-/// No behaviour yet - reserved for future order/reputation BUI work.
+/// The station task console: lets a player browse active station orders, summon a cargo capsule
+/// to a tagged dock port on the console's own grid, and recall it to evaluate/consume its contents.
 /// </summary>
 [RegisterComponent]
-public sealed partial class StationTaskConsoleComponent : Component;
+public sealed partial class StationTaskConsoleComponent : Component
+{
+    /// <summary>
+    /// Path to the pre-built cargo capsule grid map file to load on summon.
+    /// </summary>
+    [DataField]
+    public ResPath CapsulePath = new("/Maps/_Horizon/StationDeployment/cargo_capsule.yml");
+
+    /// <summary>
+    /// How long (seconds) the capsule's FTL trip to the station takes.
+    /// </summary>
+    [DataField]
+    public float CapsuleTravelTime = 10f;
+}

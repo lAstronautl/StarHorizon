@@ -1,0 +1,43 @@
+- type: stationOrder
+  id: StationOrderToolboxes
+  description: station-order-description-toolboxes
+  category: Industrial
+  entries:
+  - name: station-order-item-toolbox
+    amount: 3
+    whitelist:
+      tags:
+      - Toolbox
+
+- type: stationOrder
+  id: StationOrderBlades
+  description: station-order-description-blades
+  category: Arsenal
+  entries:
+  - name: station-order-item-blade
+    amount: 5
+    whitelist:
+      components:
+      - Sharp
+
+- type: stationOrder
+  id: StationOrderSyringes
+  description: station-order-description-syringes
+  category: Experimental
+  entries:
+  - name: station-order-item-syringe
+    amount: 6
+    whitelist:
+      tags:
+      - Syringe
+
+- type: stationOrder
+  id: StationOrderMedkits
+  description: station-order-description-medkits
+  category: CivilianServices
+  entries:
+  - name: station-order-item-medkit
+    amount: 3
+    whitelist:
+      tags:
+      - Medkit
