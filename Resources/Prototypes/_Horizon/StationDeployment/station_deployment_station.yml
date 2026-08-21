@@ -1,0 +1,21 @@
+- type: entity
+  id: DeployedStationBase
+  parent: BaseStation
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Transform
+
+- type: gameMap
+  id: DeployedStation
+  mapName: 'Deployed Station'
+  mapPath: /Maps/_Horizon/StationDeployment/station_core.yml
+  minPlayers: 0
+  stations:
+    DeployedStation:
+      stationProto: DeployedStationBase
+      components:
+      - type: StationNameSetup
+        mapNameTemplate: 'Deployed Station {1}'
+        nameGenerator:
+          !type:NanotrasenNameGenerator
+          prefixCreator: 'DS'
