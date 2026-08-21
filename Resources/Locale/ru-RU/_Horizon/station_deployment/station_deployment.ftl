@@ -9,3 +9,9 @@ station-deployment-proximity = Рядом слишком много объект
 
 station-deployment-success = { $name } развёрнута!
 station-deployment-failed = Что-то пошло не так при развёртывании станции. Попробуйте позже.
+
+station-control-console-window-title = Управление станцией
+station-control-console-name-info = Введите новое название станции:
+station-control-console-name-set = Переименовать
+station-control-console-rename-invalid = Это название недопустимо.
+station-control-console-rename-success = Станция переименована.

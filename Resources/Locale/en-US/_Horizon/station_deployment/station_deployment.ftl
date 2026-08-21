@@ -9,3 +9,9 @@ station-deployment-proximity = Nearby objects are too close to deploy a station 
 
 station-deployment-success = { $name } has been deployed!
 station-deployment-failed = Something went wrong deploying the station. Try again later.
+
+station-control-console-window-title = Station Control
+station-control-console-name-info = Enter a new station name:
+station-control-console-name-set = Rename
+station-control-console-rename-invalid = That name isn't valid.
+station-control-console-rename-success = Station renamed.

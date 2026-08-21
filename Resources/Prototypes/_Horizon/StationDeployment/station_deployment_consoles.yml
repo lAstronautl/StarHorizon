@@ -2,9 +2,15 @@
   id: ComputerStationControlPlaceholder
   parent: BaseComputer
   name: station control console
-  description: A control interface for managing this station. Not yet operational.
+  description: Lets you rename this station. Further station management features are not yet operational.
   components:
   - type: StationControlConsole
+  - type: ActivatableUI
+    key: enum.StationControlConsoleUiKey.Key
+  - type: UserInterface
+    interfaces:
+      enum.StationControlConsoleUiKey.Key:
+        type: StationControlConsoleBoundUserInterface
 
 - type: entity
   id: ComputerStationTaskPlaceholder
