@@ -3,6 +3,7 @@ using Content.Shared._Horizon.StationDeployment.Components;
 using Content.Shared._Horizon.StationDeployment.Events;
 using Content.Shared.DoAfter;
 using Content.Shared.Interaction;
+using Content.Shared.Interaction.Events;
 using Content.Shared.Popups;
 using Content.Server.Maps;
 using Content.Server.Station.Systems;
