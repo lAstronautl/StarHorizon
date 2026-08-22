@@ -1,5 +1,5 @@
 - type: entity
-  id: ComputerStationControlPlaceholder
+  id: ComputerStationControl
   parent: BaseComputer
   name: station control console
   description: Lets you rename this station. Further station management features are not yet operational.
@@ -13,7 +13,7 @@
         type: StationControlConsoleBoundUserInterface
 
 - type: entity
-  id: ComputerStationTaskPlaceholder
+  id: ComputerStationTask
   parent: BaseComputer
   name: station task console
   description: Lets you browse the station's active orders and summon/recall a cargo capsule to deliver them.

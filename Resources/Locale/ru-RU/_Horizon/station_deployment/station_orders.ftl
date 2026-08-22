@@ -4,16 +4,16 @@ station-task-console-recall-button = Отозвать
 station-task-console-orders-header = Активные заказы
 station-task-console-orders-count = Заказов в очереди: { $count }
 station-task-console-cancel-button = Отменить
-station-task-console-cancel-tooltip = Отменяет заказ и снижает прогресс категории на 1
-station-task-console-order-cancelled = Заказ отменён. Прогресс категории снижен.
+station-task-console-cancel-tooltip = Отменяет заказ но прогрес упадёт на 1 уровень
+station-task-console-order-cancelled = Заказ отменён.
 station-task-console-no-orders = Нет активных заказов.
 station-task-console-level-info = Уровень { $level }
 station-task-console-item-line = { $amount }x { $item }
-station-task-console-capsule-none = Грузовая капсула не развёрнута.
+station-task-console-capsule-none = Грузовая капсула призвана.
 station-task-console-capsule-en-route = Капсула в пути...
-station-task-console-capsule-docked = Капсула пристыкована - загрузите ящики и отзовите, когда будете готовы.
+station-task-console-capsule-docked = Капсула пристыкована.
 
-station-order-console-capsule-already-present = Грузовая капсула уже развёрнута.
+station-order-console-capsule-already-present = Грузовая капсула уже призвана.
 station-order-console-capsule-spawn-failed = Не удалось призвать грузовую капсулу. Попробуйте позже.
 
 station-order-description-toolboxes = Станции нужны инструменты для обслуживания.

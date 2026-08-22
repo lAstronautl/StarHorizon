@@ -9,7 +9,7 @@
 
 - type: gameMap
   id: DeployedStation
-  mapName: 'Deployed Station'
+  mapName: 'Развёрнутая станция'
   mapPath: /Maps/_Horizon/CustomStation/station.yml
   minPlayers: 0
   stations:
@@ -17,7 +17,11 @@
       stationProto: DeployedStationBase
       components:
       - type: StationNameSetup
-        mapNameTemplate: 'Deployed Station {1}'
+        mapNameTemplate: 'Развёрнутая станция {1}'
         nameGenerator:
           !type:NanotrasenNameGenerator
-          prefixCreator: 'DS'
+          prefixCreator: '14'
+      - type: StationJobs
+        availableJobs:
+          Contractor: [ 0, 0 ]
+          MercenaryStation: [ 0, 0 ]
