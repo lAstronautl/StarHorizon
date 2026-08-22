@@ -186,12 +186,11 @@ public sealed class StationOrderSystem : EntitySystem
         }
         else if (fulfilled.Count > 0)
         {
-            var ordersPerLevel = TryComp<StationDevelopmentComponent>(station, out var devel) ? devel.OrdersPerLevel : 1;
-            foreach (var (category, progress) in fulfilled)
+            foreach (var (category, level) in fulfilled)
             {
                 var categoryName = _protoMan.TryIndex(category, out var discipline) ? Loc.GetString(discipline.Name) : category.Id;
                 _popup.PopupEntity(Loc.GetString("station-task-console-order-fulfilled",
-                    ("category", categoryName), ("progress", progress % ordersPerLevel == 0 ? ordersPerLevel : progress % ordersPerLevel), ("needed", ordersPerLevel)),
+                    ("category", categoryName), ("level", level)),
                     ent, args.Actor, PopupType.Medium);
             }
         }
@@ -347,16 +346,13 @@ public sealed class StationOrderSystem : EntitySystem
             new StationTaskConsoleBuiState(orders, levels, capsule != null, capsule?.Comp.Docked ?? false));
     }
 
-    private static Dictionary<ProtoId<TechDisciplinePrototype>, StationCategoryProgress> BuildLevels(StationDevelopmentComponent devel)
+    private static Dictionary<ProtoId<TechDisciplinePrototype>, int> BuildLevels(StationDevelopmentComponent devel)
     {
-        var levels = new Dictionary<ProtoId<TechDisciplinePrototype>, StationCategoryProgress>();
+        var levels = new Dictionary<ProtoId<TechDisciplinePrototype>, int>();
         foreach (var category in DevelopmentCategories)
         {
             devel.Progress.TryGetValue(category, out var progress);
-            levels[category] = new StationCategoryProgress(
-                progress / devel.OrdersPerLevel,
-                progress % devel.OrdersPerLevel,
-                devel.OrdersPerLevel);
+            levels[category] = progress;
         }
 
         return levels;
