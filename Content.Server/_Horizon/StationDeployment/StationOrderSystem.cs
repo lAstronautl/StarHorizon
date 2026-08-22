@@ -41,9 +41,14 @@ public sealed class StationOrderSystem : EntitySystem
 
     private const string CargoCapsuleDockTag = "CargoCapsuleDock";
 
+    // Note: the base Industrial/Arsenal/Experimental/CivilianServices disciplines
+    // (Resources/Prototypes/Research/disciplines.yml) are made abstract by this fork's
+    // /Prototypes/Research entry in Resources/IgnoredPrototypes/ignoredPrototypes.yml ("Moved
+    // science techs"), so they can't be Index()'d - use the fork's own active NF discipline set
+    // instead (same sprite states, so visually equivalent to the vanilla icons).
     private static readonly ProtoId<TechDisciplinePrototype>[] DevelopmentCategories =
     {
-        "Industrial", "Arsenal", "Experimental", "CivilianServices"
+        "NFEngineering", "NFArsenalMercenary", "NFScience", "NFService"
     };
 
     public override void Initialize()

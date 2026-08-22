@@ -1,7 +1,7 @@
 - type: stationOrder
   id: StationOrderToolboxes
   description: station-order-description-toolboxes
-  category: Industrial
+  category: NFEngineering
   entries:
   - name: station-order-item-toolbox
     amount: 3
@@ -12,7 +12,7 @@
 - type: stationOrder
   id: StationOrderBlades
   description: station-order-description-blades
-  category: Arsenal
+  category: NFArsenalMercenary
   entries:
   - name: station-order-item-blade
     amount: 5
@@ -23,7 +23,7 @@
 - type: stationOrder
   id: StationOrderSyringes
   description: station-order-description-syringes
-  category: Experimental
+  category: NFScience
   entries:
   - name: station-order-item-syringe
     amount: 6
@@ -34,7 +34,7 @@
 - type: stationOrder
   id: StationOrderMedkits
   description: station-order-description-medkits
-  category: CivilianServices
+  category: NFService
   entries:
   - name: station-order-item-medkit
     amount: 3

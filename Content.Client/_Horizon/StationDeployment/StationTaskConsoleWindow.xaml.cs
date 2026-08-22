@@ -48,7 +48,9 @@ public sealed partial class StationTaskConsoleWindow : FancyWindow
         CategoryLevelsContainer.Children.Clear();
         foreach (var (categoryId, level) in state.Levels.OrderBy(kv => kv.Key.Id))
         {
-            var discipline = _prototype.Index<TechDisciplinePrototype>(categoryId);
+            // Skip categories whose discipline prototype isn't available client-side, rather than crashing the whole BUI.
+            if (!_prototype.TryIndex<TechDisciplinePrototype>(categoryId, out var discipline))
+                continue;
 
             var texture = new TextureRect
             {

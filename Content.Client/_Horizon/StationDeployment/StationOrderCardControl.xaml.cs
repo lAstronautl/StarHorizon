@@ -17,12 +17,20 @@ public sealed partial class StationOrderCardControl : Control
     {
         RobustXamlLoader.Load(this);
 
-        var discipline = prototypeManager.Index<TechDisciplinePrototype>(order.Category);
-        Background.ModulateSelfOverride = discipline.Color;
+        // The discipline prototype might not be available client-side - degrade gracefully instead of crashing the card.
+        prototypeManager.TryIndex<TechDisciplinePrototype>(order.Category, out var discipline);
 
-        OrderTexture.Texture = order.Sprite != null ? spriteSys.Frame0(order.Sprite) : spriteSys.Frame0(discipline.Icon);
+        if (discipline != null)
+            Background.ModulateSelfOverride = discipline.Color;
 
-        DescriptionLabel.SetMessage(order.Description == string.Empty ? Loc.GetString(discipline.Name) : Loc.GetString(order.Description));
+        if (order.Sprite != null)
+            OrderTexture.Texture = spriteSys.Frame0(order.Sprite);
+        else if (discipline != null)
+            OrderTexture.Texture = spriteSys.Frame0(discipline.Icon);
+
+        DescriptionLabel.SetMessage(order.Description != string.Empty
+            ? Loc.GetString(order.Description)
+            : discipline != null ? Loc.GetString(discipline.Name) : string.Empty);
 
         var requirements = string.Join(", ", order.Entries.Select(e => Loc.GetString("station-task-console-item-line", ("amount", e.Amount), ("item", Loc.GetString(e.Name)))));
         RequirementsLabel.SetMessage(requirements);
