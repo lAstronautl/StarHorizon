@@ -112,9 +112,25 @@ public sealed class StationOrderSystem : EntitySystem
         if (FindActiveCapsule(station) is not { } capsule || !capsule.Comp.Docked)
             return;
 
-        EvaluateAndConsume(station, capsule.Owner);
+        var fulfilled = EvaluateAndConsume(station, capsule.Owner);
         _docking.UndockDocks(capsule.Owner);
         QueueDel(capsule.Owner);
+
+        if (fulfilled.Count == 0)
+        {
+            _popup.PopupEntity(Loc.GetString("station-task-console-recall-no-match"), ent, args.Actor, PopupType.SmallCaution);
+        }
+        else
+        {
+            var ordersPerLevel = TryComp<StationDevelopmentComponent>(station, out var devel) ? devel.OrdersPerLevel : 1;
+            foreach (var (category, progress) in fulfilled)
+            {
+                var categoryName = _protoMan.TryIndex(category, out var discipline) ? Loc.GetString(discipline.Name) : category.Id;
+                _popup.PopupEntity(Loc.GetString("station-task-console-order-fulfilled",
+                    ("category", categoryName), ("progress", progress % ordersPerLevel == 0 ? ordersPerLevel : progress % ordersPerLevel), ("needed", ordersPerLevel)),
+                    ent, args.Actor, PopupType.Medium);
+            }
+        }
 
         UpdateUi(ent);
     }
@@ -165,11 +181,18 @@ public sealed class StationOrderSystem : EntitySystem
         }
     }
 
-    private void EvaluateAndConsume(EntityUid station, EntityUid capsuleGrid)
+    /// <summary>
+    /// Checks the capsule's contents against every active order, removing and crediting the
+    /// ones that are satisfied. Returns the category/new-progress pairs for orders that were
+    /// fulfilled, so the caller can report what actually happened.
+    /// </summary>
+    private List<(ProtoId<TechDisciplinePrototype> Category, int Progress)> EvaluateAndConsume(EntityUid station, EntityUid capsuleGrid)
     {
+        var fulfilled = new List<(ProtoId<TechDisciplinePrototype>, int)>();
+
         if (!TryComp<StationOrderDatabaseComponent>(station, out var orderDb) ||
             !TryComp<StationDevelopmentComponent>(station, out var devel))
-            return;
+            return fulfilled;
 
         var entities = new HashSet<EntityUid>();
         var enumerator = Transform(capsuleGrid).ChildEnumerator;
@@ -183,15 +206,21 @@ public sealed class StationOrderSystem : EntitySystem
             if (!_protoMan.TryIndex(order.Order, out var prototype))
                 continue;
 
-            if (!_cargo.IsBountyComplete(entities, prototype.Entries, out _))
+            if (!_cargo.IsBountyComplete(entities, prototype.Entries, out var usedEntities))
                 continue;
+
+            // Don't let the same physical items satisfy more than one order in this pass.
+            entities.ExceptWith(usedEntities);
 
             orderDb.Orders.Remove(order);
             devel.Progress.TryGetValue(prototype.Category, out var progress);
-            devel.Progress[prototype.Category] = progress + 1;
+            progress += 1;
+            devel.Progress[prototype.Category] = progress;
+            fulfilled.Add((prototype.Category, progress));
         }
 
         FillOrderDatabase((station, orderDb));
+        return fulfilled;
     }
 
     /// <summary>
@@ -254,13 +283,16 @@ public sealed class StationOrderSystem : EntitySystem
             new StationTaskConsoleBuiState(orders, levels, capsule != null, capsule?.Comp.Docked ?? false));
     }
 
-    private static Dictionary<ProtoId<TechDisciplinePrototype>, int> BuildLevels(StationDevelopmentComponent devel)
+    private static Dictionary<ProtoId<TechDisciplinePrototype>, StationCategoryProgress> BuildLevels(StationDevelopmentComponent devel)
     {
-        var levels = new Dictionary<ProtoId<TechDisciplinePrototype>, int>();
+        var levels = new Dictionary<ProtoId<TechDisciplinePrototype>, StationCategoryProgress>();
         foreach (var category in DevelopmentCategories)
         {
             devel.Progress.TryGetValue(category, out var progress);
-            levels[category] = progress / devel.OrdersPerLevel;
+            levels[category] = new StationCategoryProgress(
+                progress / devel.OrdersPerLevel,
+                progress % devel.OrdersPerLevel,
+                devel.OrdersPerLevel);
         }
 
         return levels;

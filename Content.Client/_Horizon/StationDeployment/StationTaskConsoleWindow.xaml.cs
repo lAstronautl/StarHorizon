@@ -49,7 +49,7 @@ public sealed partial class StationTaskConsoleWindow : FancyWindow
         RecallButton.Disabled = !state.CapsuleDocked;
 
         CategoryLevelsContainer.Children.Clear();
-        foreach (var (categoryId, level) in state.Levels.OrderBy(kv => kv.Key.Id))
+        foreach (var (categoryId, progress) in state.Levels.OrderBy(kv => kv.Key.Id))
         {
             // Skip categories whose discipline prototype isn't available client-side, rather than crashing the whole BUI.
             if (!_prototype.TryIndex<TechDisciplinePrototype>(categoryId, out var discipline))
@@ -62,7 +62,8 @@ public sealed partial class StationTaskConsoleWindow : FancyWindow
                 Texture = _sprite.Frame0(discipline.Icon),
             };
             var label = new RichTextLabel();
-            label.SetMessage(Loc.GetString("station-task-console-level-info", ("level", level)));
+            label.SetMessage(Loc.GetString("station-task-console-level-info",
+                ("level", progress.Level), ("progress", progress.Progress), ("needed", progress.OrdersPerLevel)));
 
             CategoryLevelsContainer.AddChild(new BoxContainer
             {
