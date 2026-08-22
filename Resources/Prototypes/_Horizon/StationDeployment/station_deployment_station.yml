@@ -1,12 +1,13 @@
 - type: entity
   id: DeployedStationBase
-  parent: BaseStation
+  parent:
+  - StandardFrontierVessel
+  - BaseStationMail # Mail
+  - MarketFrontierOutpost
   categories: [ HideSpawnMenu ]
   components:
-  - type: Transform
   - type: StationOrderDatabase
   - type: StationDevelopment
-  - type: ExtraShuttleInformation
 
 - type: gameMap
   id: DeployedStation
