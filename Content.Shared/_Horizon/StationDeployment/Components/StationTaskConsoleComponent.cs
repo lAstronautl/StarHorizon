@@ -13,7 +13,7 @@ public sealed partial class StationTaskConsoleComponent : Component
     /// Path to the pre-built cargo capsule grid map file to load on summon.
     /// </summary>
     [DataField]
-    public ResPath CapsulePath = new("/Maps/_Horizon/StationDeployment/cargo_capsule.yml");
+    public ResPath CapsulePath = new("/Maps/_Horizon/CustomStation/tradedrop.yml");
 
     /// <summary>
     /// How long (seconds) the capsule's FTL trip to the station takes.

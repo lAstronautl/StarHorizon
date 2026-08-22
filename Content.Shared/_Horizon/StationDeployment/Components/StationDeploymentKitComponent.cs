@@ -21,7 +21,7 @@ public sealed partial class StationDeploymentKitComponent : Component
     /// Path to the pre-built grid map file to load when deploying.
     /// </summary>
     [DataField]
-    public ResPath StationGridPath = new("/Maps/_Horizon/StationDeployment/station_core.yml");
+    public ResPath StationGridPath = new("/Maps/_Horizon/CustomStation/station.yml");
 
     /// <summary>
     /// Id of the <c>gameMap</c> prototype carrying the <see cref="Content.Shared.Station.StationConfig"/> for the deployed station.

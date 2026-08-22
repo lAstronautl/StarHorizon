@@ -10,7 +10,7 @@
 - type: gameMap
   id: DeployedStation
   mapName: 'Deployed Station'
-  mapPath: /Maps/_Horizon/StationDeployment/station_core.yml
+  mapPath: /Maps/_Horizon/CustomStation/station.yml
   minPlayers: 0
   stations:
     DeployedStation:
