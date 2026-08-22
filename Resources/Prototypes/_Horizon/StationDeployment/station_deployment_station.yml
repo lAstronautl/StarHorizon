@@ -6,6 +6,7 @@
   - type: Transform
   - type: StationOrderDatabase
   - type: StationDevelopment
+  - type: ExtraShuttleInformation
 
 - type: gameMap
   id: DeployedStation
