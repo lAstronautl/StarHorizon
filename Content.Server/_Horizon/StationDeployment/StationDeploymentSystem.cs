@@ -1,11 +1,14 @@
 using System.Numerics;
 using Content.Shared._Horizon.StationDeployment.Components;
 using Content.Shared._Horizon.StationDeployment.Events;
+using Content.Shared._NF.Shipyard.Components;
 using Content.Shared.DoAfter;
 using Content.Shared.Interaction;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Popups;
+using Content.Shared.Shuttles.Components;
 using Content.Server.Maps;
+using Content.Server.Shuttles.Systems;
 using Content.Server.Station.Systems;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.EntitySerialization.Systems;
@@ -32,6 +35,13 @@ public sealed class StationDeploymentSystem : EntitySystem
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly ShuttleSystem _shuttle = default!;
+
+    /// <summary>
+    /// IFF color shipyard-purchased vessels get (see BaseVessel in _NF/Shipyard/Base/base.yml) -
+    /// deployed stations should look the same on radar.
+    /// </summary>
+    private static readonly Color StationIFFColor = Color.White;
 
     public override void Initialize()
     {
@@ -161,24 +171,51 @@ public sealed class StationDeploymentSystem : EntitySystem
             return;
         }
 
-        var station = _station.InitializeNewStation(stationConfig, new[] { gridEnt.Value.Owner }, kit.Comp.StationName);
+        // Don't pass a name here - leave it to the station's own StationNameSetup (on its prototype)
+        // to generate the random name/code, same as how shipyard-purchased shuttles get their suffix.
+        var station = _station.InitializeNewStation(stationConfig, new[] { gridEnt.Value.Owner });
+
+        var fullName = MetaData(station).EntityName;
+        ParseStationName(fullName, out var baseName, out var number);
 
         var idCard = kit.Comp.LinkedIdCard!.Value;
         var idDeed = EnsureComp<StationDeedComponent>(idCard);
         idDeed.StationUid = station;
         idDeed.StationGridUid = gridEnt.Value.Owner;
-        idDeed.StationName = kit.Comp.StationName;
+        idDeed.StationName = baseName;
+        idDeed.StationNumber = number;
         Dirty(idCard, idDeed);
 
         var gridDeed = EnsureComp<StationDeedComponent>(gridEnt.Value.Owner);
         gridDeed.StationUid = station;
         gridDeed.StationGridUid = gridEnt.Value.Owner;
-        gridDeed.StationName = kit.Comp.StationName;
+        gridDeed.StationName = baseName;
+        gridDeed.StationNumber = number;
         Dirty(gridEnt.Value.Owner, gridDeed);
 
-        _popup.PopupEntity(Loc.GetString("station-deployment-success", ("name", kit.Comp.StationName)), user, user, PopupType.Medium);
+        var iff = EnsureComp<IFFComponent>(gridEnt.Value.Owner);
+        _shuttle.SetIFFColor(gridEnt.Value.Owner, StationIFFColor, iff);
+        _shuttle.AddIFFFlag(gridEnt.Value.Owner, IFFFlags.IsPlayerShuttle, iff);
+
+        _popup.PopupEntity(Loc.GetString("station-deployment-success", ("name", fullName)), user, user, PopupType.Medium);
         _audio.PlayPvs(kit.Comp.DeploySound, user);
 
         QueueDel(kit.Owner);
+    }
+
+    /// <summary>
+    /// Splits a generated station name like "Deployed Station LV-042" into a renameable base name
+    /// ("Deployed Station") and a persistent number/code suffix ("LV-042") - mirrors
+    /// ShipyardSystem.Consoles.cs's TryParseShuttleName so station codes behave like shuttle ones.
+    /// </summary>
+    private static void ParseStationName(string name, out string baseName, out string? number)
+    {
+        var nameParts = name.Split(' ');
+        var hasSuffix = nameParts.Length > 1
+            && nameParts[^1].Length < ShuttleDeedComponent.MaxSuffixLength
+            && nameParts[^1].Contains('-');
+
+        number = hasSuffix ? nameParts[^1] : null;
+        baseName = string.Join(" ", nameParts[..^(hasSuffix ? 1 : 0)]);
     }
 }

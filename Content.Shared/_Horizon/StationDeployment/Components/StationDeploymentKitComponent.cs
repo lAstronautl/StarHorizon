@@ -36,12 +36,6 @@ public sealed partial class StationDeploymentKitComponent : Component
     public string StationConfigKey = "DeployedStation";
 
     /// <summary>
-    /// Name given to the deployed station.
-    /// </summary>
-    [DataField]
-    public string StationName = "Deployed Station";
-
-    /// <summary>
     /// Radius (in metres) around the deploy position that must be clear of other grids.
     /// </summary>
     [DataField]

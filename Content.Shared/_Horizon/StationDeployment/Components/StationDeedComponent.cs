@@ -17,4 +17,11 @@ public sealed partial class StationDeedComponent : Component
 
     [DataField, AutoNetworkedField]
     public string? StationName;
+
+    /// <summary>
+    /// Persistent station code (e.g. "NX-042"), parsed out of the randomly generated name on deployment.
+    /// Kept stable across renames, like <c>ShuttleDeedComponent.ShuttleNameSuffix</c>.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public string? StationNumber;
 }
