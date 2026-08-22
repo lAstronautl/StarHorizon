@@ -40,3 +40,14 @@ public sealed class StationOrderSummonCapsuleMessage : BoundUserInterfaceMessage
 
 [Serializable, NetSerializable]
 public sealed class StationOrderRecallCapsuleMessage : BoundUserInterfaceMessage;
+
+[Serializable, NetSerializable]
+public sealed class StationOrderCancelMessage : BoundUserInterfaceMessage
+{
+    public readonly string OrderId;
+
+    public StationOrderCancelMessage(string orderId)
+    {
+        OrderId = orderId;
+    }
+}

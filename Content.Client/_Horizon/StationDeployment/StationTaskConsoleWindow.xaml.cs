@@ -18,6 +18,7 @@ public sealed partial class StationTaskConsoleWindow : FancyWindow
 {
     public Action? OnSummonPressed;
     public Action? OnRecallPressed;
+    public Action<string>? OnOrderCancelPressed;
 
     [Dependency] private readonly IEntityManager _entity = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
@@ -85,7 +86,9 @@ public sealed partial class StationTaskConsoleWindow : FancyWindow
             if (!_prototype.TryIndex(order.Order, out var prototype))
                 continue;
 
-            OrdersContainer.AddChild(new StationOrderCardControl(prototype, _prototype, _sprite));
+            var card = new StationOrderCardControl(prototype, _prototype, _sprite);
+            card.OnCancelPressed += () => OnOrderCancelPressed?.Invoke(order.Id);
+            OrdersContainer.AddChild(card);
         }
     }
 }

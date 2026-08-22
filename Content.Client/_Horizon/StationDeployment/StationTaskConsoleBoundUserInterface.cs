@@ -19,6 +19,7 @@ public sealed class StationTaskConsoleBoundUserInterface : BoundUserInterface
         _window = this.CreateWindow<StationTaskConsoleWindow>();
         _window.OnSummonPressed += () => SendMessage(new StationOrderSummonCapsuleMessage());
         _window.OnRecallPressed += () => SendMessage(new StationOrderRecallCapsuleMessage());
+        _window.OnOrderCancelPressed += orderId => SendMessage(new StationOrderCancelMessage(orderId));
     }
 
     protected override void UpdateState(BoundUserInterfaceState state)

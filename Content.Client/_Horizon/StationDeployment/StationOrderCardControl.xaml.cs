@@ -13,9 +13,14 @@ namespace Content.Client._Horizon.StationDeployment;
 [GenerateTypedNameReferences]
 public sealed partial class StationOrderCardControl : Control
 {
+    public Action? OnCancelPressed;
+
     public StationOrderCardControl(StationOrderPrototype order, IPrototypeManager prototypeManager, SpriteSystem spriteSys)
     {
         RobustXamlLoader.Load(this);
+
+        CancelButton.ToolTip = Loc.GetString("station-task-console-cancel-tooltip");
+        CancelButton.OnPressed += _ => OnCancelPressed?.Invoke();
 
         // The discipline prototype might not be available client-side - degrade gracefully instead of crashing the card.
         prototypeManager.TryIndex<TechDisciplinePrototype>(order.Category, out var discipline);

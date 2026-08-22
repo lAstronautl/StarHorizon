@@ -9,9 +9,6 @@ namespace Content.Server._Horizon.StationDeployment.Components;
 public sealed partial class StationOrderDatabaseComponent : Component
 {
     [DataField]
-    public int MaxOrders = 4;
-
-    [DataField]
     public List<StationOrderData> Orders = new();
 
     /// <summary>

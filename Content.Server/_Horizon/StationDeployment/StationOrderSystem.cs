@@ -59,6 +59,7 @@ public sealed class StationOrderSystem : EntitySystem
         SubscribeLocalEvent<StationTaskConsoleComponent, BoundUIOpenedEvent>(OnUiOpened);
         SubscribeLocalEvent<StationTaskConsoleComponent, StationOrderSummonCapsuleMessage>(OnSummon);
         SubscribeLocalEvent<StationTaskConsoleComponent, StationOrderRecallCapsuleMessage>(OnRecall);
+        SubscribeLocalEvent<StationTaskConsoleComponent, StationOrderCancelMessage>(OnCancelOrder);
         SubscribeLocalEvent<CargoCapsuleComponent, FTLCompletedEvent>(OnCapsuleDocked);
     }
 
@@ -118,6 +119,37 @@ public sealed class StationOrderSystem : EntitySystem
         UpdateUi(ent);
     }
 
+    private void OnCancelOrder(Entity<StationTaskConsoleComponent> ent, ref StationOrderCancelMessage args)
+    {
+        if (_station.GetOwningStation(ent.Owner) is not { Valid: true } station)
+            return;
+
+        if (!TryComp<StationOrderDatabaseComponent>(station, out var orderDb) ||
+            !TryComp<StationDevelopmentComponent>(station, out var devel))
+            return;
+
+        var orderId = args.OrderId;
+        var index = orderDb.Orders.FindIndex(o => o.Id == orderId);
+        if (index == -1)
+            return;
+
+        var order = orderDb.Orders[index];
+        orderDb.Orders.RemoveAt(index);
+
+        if (_protoMan.TryIndex(order.Order, out var prototype))
+        {
+            devel.Progress.TryGetValue(prototype.Category, out var progress);
+            devel.Progress[prototype.Category] = Math.Max(0, progress - 1);
+        }
+
+        // Refill just the category slot that was cancelled, keeping exactly one order per category.
+        FillOrderDatabase((station, orderDb));
+
+        _popup.PopupEntity(Loc.GetString("station-task-console-order-cancelled"), ent, args.Actor, PopupType.SmallCaution);
+
+        UpdateUi(ent);
+    }
+
     private void OnCapsuleDocked(Entity<CargoCapsuleComponent> ent, ref FTLCompletedEvent args)
     {
         ent.Comp.Docked = true;
@@ -162,30 +194,33 @@ public sealed class StationOrderSystem : EntitySystem
         FillOrderDatabase((station, orderDb));
     }
 
+    /// <summary>
+    /// Keeps exactly one active order per development category, so the console always shows
+    /// one card per category rather than a randomly-skewed pool.
+    /// </summary>
     private void FillOrderDatabase(Entity<StationOrderDatabaseComponent> ent)
     {
-        while (ent.Comp.Orders.Count < ent.Comp.MaxOrders)
+        foreach (var category in DevelopmentCategories)
         {
-            if (!TryAddOrder(ent))
-                break;
+            var hasOrder = ent.Comp.Orders.Any(o =>
+                _protoMan.TryIndex(o.Order, out var proto) && proto.Category == category);
+
+            if (!hasOrder)
+                TryAddOrderForCategory(ent, category);
         }
     }
 
-    private bool TryAddOrder(Entity<StationOrderDatabaseComponent> ent)
+    private bool TryAddOrderForCategory(Entity<StationOrderDatabaseComponent> ent, ProtoId<TechDisciplinePrototype> category)
     {
-        var allOrders = _protoMan.EnumeratePrototypes<StationOrderPrototype>().ToList();
-        if (allOrders.Count == 0)
+        var candidates = _protoMan.EnumeratePrototypes<StationOrderPrototype>()
+            .Where(o => o.Category == category)
+            .ToList();
+
+        if (candidates.Count == 0)
             return false;
 
-        var filtered = allOrders.Where(o => ent.Comp.Orders.All(active => active.Order != o.ID)).ToList();
-        var pool = filtered.Count == 0 ? allOrders : filtered;
-        var picked = _random.Pick(pool);
-
-        var newOrder = new StationOrderData(picked, ent.Comp.TotalOrders);
-        if (ent.Comp.Orders.Any(o => o.Id == newOrder.Id))
-            return false;
-
-        ent.Comp.Orders.Add(newOrder);
+        var picked = _random.Pick(candidates);
+        ent.Comp.Orders.Add(new StationOrderData(picked, ent.Comp.TotalOrders));
         ent.Comp.TotalOrders++;
         return true;
     }
