@@ -8,6 +8,7 @@ station-task-console-order-cancelled = Заказ отменён. Прогрес
 station-task-console-level-info = Уровень { $level } ({ $progress }/{ $needed })
 station-task-console-recall-no-match = Ни один активный заказ не выполнен - проверьте содержимое капсулы.
 station-task-console-order-fulfilled = Заказ выполнен ({ $category })! Прогресс: { $progress }/{ $needed }.
+station-task-console-capsule-sold = Капсула продана за { $amount } кредитов.
 station-task-console-item-line = { $amount }x { $item }
 station-task-console-capsule-none = Грузовая капсула не развёрнута.
 station-task-console-capsule-en-route = Капсула в пути...

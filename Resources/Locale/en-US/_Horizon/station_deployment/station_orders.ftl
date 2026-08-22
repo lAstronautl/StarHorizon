@@ -8,6 +8,7 @@ station-task-console-order-cancelled = Order cancelled. Category progress reduce
 station-task-console-level-info = Level { $level } ({ $progress }/{ $needed })
 station-task-console-recall-no-match = No active order was fulfilled - check the capsule's contents.
 station-task-console-order-fulfilled = Order fulfilled ({ $category })! Progress: { $progress }/{ $needed }.
+station-task-console-capsule-sold = Capsule sold for { $amount } credits.
 station-task-console-item-line = { $amount }x { $item }
 station-task-console-capsule-none = No cargo capsule deployed.
 station-task-console-capsule-en-route = Capsule en route...

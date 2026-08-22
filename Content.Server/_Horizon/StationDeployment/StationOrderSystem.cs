@@ -9,6 +9,7 @@ using Content.Server.Station.Systems;
 using Content.Shared._Horizon.StationDeployment;
 using Content.Shared._Horizon.StationDeployment.Components;
 using Content.Shared._Horizon.StationDeployment.Prototypes;
+using Content.Shared.Cargo.Components;
 using Content.Shared.GameTicking;
 using Content.Shared.Popups;
 using Content.Shared.Research.Prototypes;
@@ -35,6 +36,7 @@ public sealed class StationOrderSystem : EntitySystem
     [Dependency] private readonly MapLoaderSystem _mapLoader = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly MapSystem _map = default!;
+    [Dependency] private readonly PricingSystem _pricing = default!;
 
     private const string CargoCapsuleDockTag = "CargoCapsuleDock";
 
@@ -158,8 +160,23 @@ public sealed class StationOrderSystem : EntitySystem
             return;
 
         var fulfilled = EvaluateAndConsume(station, capsule.Owner);
+
+        // Sell everything in the capsule for station funds, same as a shuttle sold at the shipyard.
+        var bill = (int) _pricing.AppraiseGrid(capsule.Owner);
+        var sold = false;
+        if (bill > 0 && TryComp<StationBankAccountComponent>(station, out var bank))
+        {
+            _cargo.UpdateBankAccount((station, bank), bill, bank.PrimaryAccount);
+            sold = true;
+        }
+
         _docking.UndockDocks(capsule.Owner);
         QueueDel(capsule.Owner);
+
+        if (sold)
+        {
+            _popup.PopupEntity(Loc.GetString("station-task-console-capsule-sold", ("amount", bill)), ent, args.Actor, PopupType.Medium);
+        }
 
         if (fulfilled.Count == 0)
         {
