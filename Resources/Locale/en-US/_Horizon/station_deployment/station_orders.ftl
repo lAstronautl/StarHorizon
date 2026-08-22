@@ -2,6 +2,7 @@ station-task-console-window-title = Station Orders
 station-task-console-summon-button = Summon
 station-task-console-recall-button = Recall
 station-task-console-orders-header = Active Orders
+station-task-console-orders-count = Orders queued: { $count }
 station-task-console-no-orders = No active orders.
 station-task-console-level-info = Level { $level }
 station-task-console-item-line = { $amount }x { $item }

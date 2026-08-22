@@ -2,6 +2,7 @@ station-task-console-window-title = Заказы станции
 station-task-console-summon-button = Призвать
 station-task-console-recall-button = Отозвать
 station-task-console-orders-header = Активные заказы
+station-task-console-orders-count = Заказов в очереди: { $count }
 station-task-console-no-orders = Нет активных заказов.
 station-task-console-level-info = Уровень { $level }
 station-task-console-item-line = { $amount }x { $item }

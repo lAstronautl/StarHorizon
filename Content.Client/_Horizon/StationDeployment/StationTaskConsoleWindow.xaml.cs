@@ -43,6 +43,8 @@ public sealed partial class StationTaskConsoleWindow : FancyWindow
             _ => "station-task-console-capsule-docked",
         }));
 
+        OrdersCountLabel.SetMessage(Loc.GetString("station-task-console-orders-count", ("count", state.Orders.Count)));
+
         RecallButton.Disabled = !state.CapsuleDocked;
 
         CategoryLevelsContainer.Children.Clear();
