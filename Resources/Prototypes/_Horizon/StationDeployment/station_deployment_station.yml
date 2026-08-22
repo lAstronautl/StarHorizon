@@ -1,12 +1,16 @@
 - type: entity
   id: DeployedStationBase
-  parent: BaseStation
+  parent:
+  - BaseStation
+  - BaseStationJobsSpawning
+  - BaseStationRecords
   categories: [ HideSpawnMenu ]
   components:
   - type: Transform
   - type: StationOrderDatabase
   - type: StationDevelopment
   - type: ExtraShuttleInformation
+  - type: StationBankAccount
 
 - type: gameMap
   id: DeployedStation
