@@ -178,11 +178,13 @@ public sealed class StationOrderSystem : EntitySystem
             _popup.PopupEntity(Loc.GetString("station-task-console-capsule-sold", ("amount", bill)), ent, args.Actor, PopupType.Medium);
         }
 
-        if (fulfilled.Count == 0)
+        // Selling for credits without matching an order is a normal outcome, not a failure - only
+        // warn when the capsule genuinely did nothing (empty or worthless, and no order matched).
+        if (fulfilled.Count == 0 && !sold)
         {
             _popup.PopupEntity(Loc.GetString("station-task-console-recall-no-match"), ent, args.Actor, PopupType.SmallCaution);
         }
-        else
+        else if (fulfilled.Count > 0)
         {
             var ordersPerLevel = TryComp<StationDevelopmentComponent>(station, out var devel) ? devel.OrdersPerLevel : 1;
             foreach (var (category, progress) in fulfilled)
