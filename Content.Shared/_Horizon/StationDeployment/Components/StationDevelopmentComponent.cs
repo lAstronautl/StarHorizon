@@ -12,10 +12,4 @@ public sealed partial class StationDevelopmentComponent : Component
 {
     [DataField]
     public Dictionary<ProtoId<TechDisciplinePrototype>, int> Progress = new();
-
-    /// <summary>
-    /// How many completed orders of one category are needed per level-up.
-    /// </summary>
-    [DataField]
-    public int OrdersPerLevel = 3;
 }

@@ -8,6 +8,7 @@
   components:
   - type: StationOrderDatabase
   - type: StationDevelopment
+  - type: StationBankAccount
 
 - type: gameMap
   id: DeployedStation

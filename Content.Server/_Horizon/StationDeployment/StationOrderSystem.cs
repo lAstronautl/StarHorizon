@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Numerics;
 using Content.Server._Horizon.StationDeployment.Components;
+using Content.Server._NF.Shipyard.Systems;
 using Content.Server.Cargo.Systems;
 using Content.Server.Shuttles.Components;
 using Content.Server.Shuttles.Events;
@@ -11,6 +12,7 @@ using Content.Shared._Horizon.StationDeployment.Components;
 using Content.Shared._Horizon.StationDeployment.Prototypes;
 using Content.Shared.Cargo.Components;
 using Content.Shared.GameTicking;
+using Content.Shared.Mobs.Components;
 using Content.Shared.Popups;
 using Content.Shared.Research.Prototypes;
 using Robust.Server.GameObjects;
@@ -37,6 +39,7 @@ public sealed class StationOrderSystem : EntitySystem
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly MapSystem _map = default!;
     [Dependency] private readonly PricingSystem _pricing = default!;
+    [Dependency] private readonly ShipyardSystem _shipyard = default!;
 
     private const string CargoCapsuleDockTag = "CargoCapsuleDock";
 
@@ -159,6 +162,14 @@ public sealed class StationOrderSystem : EntitySystem
         if (FindActiveCapsule(station) is not { } capsule || !capsule.Comp.Docked)
             return;
 
+        var mobQuery = GetEntityQuery<MobStateComponent>();
+        var xformQuery = GetEntityQuery<TransformComponent>();
+        if (_shipyard.FoundOrganics(capsule.Owner, mobQuery, xformQuery) is { } organicName)
+        {
+            _popup.PopupEntity(Loc.GetString("station-order-console-organics-aboard", ("name", organicName)), ent, args.Actor, PopupType.MediumCaution);
+            return;
+        }
+
         var fulfilled = EvaluateAndConsume(station, capsule.Owner);
 
         // Sell everything in the capsule for station funds, same as a shuttle sold at the shipyard.
@@ -186,12 +197,11 @@ public sealed class StationOrderSystem : EntitySystem
         }
         else if (fulfilled.Count > 0)
         {
-            var ordersPerLevel = TryComp<StationDevelopmentComponent>(station, out var devel) ? devel.OrdersPerLevel : 1;
-            foreach (var (category, progress) in fulfilled)
+            foreach (var (category, level) in fulfilled)
             {
                 var categoryName = _protoMan.TryIndex(category, out var discipline) ? Loc.GetString(discipline.Name) : category.Id;
                 _popup.PopupEntity(Loc.GetString("station-task-console-order-fulfilled",
-                    ("category", categoryName), ("progress", progress % ordersPerLevel == 0 ? ordersPerLevel : progress % ordersPerLevel), ("needed", ordersPerLevel)),
+                    ("category", categoryName), ("level", level)),
                     ent, args.Actor, PopupType.Medium);
             }
         }
@@ -347,16 +357,13 @@ public sealed class StationOrderSystem : EntitySystem
             new StationTaskConsoleBuiState(orders, levels, capsule != null, capsule?.Comp.Docked ?? false));
     }
 
-    private static Dictionary<ProtoId<TechDisciplinePrototype>, StationCategoryProgress> BuildLevels(StationDevelopmentComponent devel)
+    private static Dictionary<ProtoId<TechDisciplinePrototype>, int> BuildLevels(StationDevelopmentComponent devel)
     {
-        var levels = new Dictionary<ProtoId<TechDisciplinePrototype>, StationCategoryProgress>();
+        var levels = new Dictionary<ProtoId<TechDisciplinePrototype>, int>();
         foreach (var category in DevelopmentCategories)
         {
             devel.Progress.TryGetValue(category, out var progress);
-            levels[category] = new StationCategoryProgress(
-                progress / devel.OrdersPerLevel,
-                progress % devel.OrdersPerLevel,
-                devel.OrdersPerLevel);
+            levels[category] = progress;
         }
 
         return levels;

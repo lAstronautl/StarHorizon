@@ -5,9 +5,9 @@ station-task-console-orders-header = Active Orders
 station-task-console-cancel-button = Cancel
 station-task-console-cancel-tooltip = Cancels the order and reduces the category's progress by 1
 station-task-console-order-cancelled = Order cancelled. Category progress reduced.
-station-task-console-level-info = Level { $level } ({ $progress }/{ $needed })
+station-task-console-level-info = Level { $level }
 station-task-console-recall-no-match = No active order was fulfilled - check the capsule's contents.
-station-task-console-order-fulfilled = Order fulfilled ({ $category })! Progress: { $progress }/{ $needed }.
+station-task-console-order-fulfilled = Order fulfilled ({ $category })! New level: { $level }.
 station-task-console-capsule-sold = Capsule sold for { $amount } credits.
 station-task-console-item-line = { $amount }x { $item }
 station-task-console-capsule-none = No cargo capsule deployed.
@@ -16,6 +16,7 @@ station-task-console-capsule-docked = Capsule docked - load crates and recall wh
 
 station-order-console-capsule-already-present = A cargo capsule is already deployed.
 station-order-console-capsule-spawn-failed = Failed to summon the cargo capsule. Try again later.
+station-order-console-organics-aboard = Someone is inside the capsule ({ $name }) - can't recall a capsule with living beings aboard.
 
 station-order-description-toolboxes = The station needs tools for maintenance work.
 station-order-item-toolbox = toolbox

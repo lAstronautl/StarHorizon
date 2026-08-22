@@ -5,9 +5,9 @@ station-task-console-orders-header = Активные заказы
 station-task-console-cancel-button = Отменить
 station-task-console-cancel-tooltip = Отменяет заказ и снижает уровень на 1
 station-task-console-order-cancelled = Заказ отменён.
-station-task-console-level-info = Уровень { $level } ({ $progress }/{ $needed })
+station-task-console-level-info = Уровень { $level }
 station-task-console-recall-no-match = Ни один активный заказ не выполнен - проверьте содержимое капсулы.
-station-task-console-order-fulfilled = Заказ выполнен ({ $category })! Прогресс: { $progress }/{ $needed }.
+station-task-console-order-fulfilled = Заказ выполнен ({ $category })! Новый уровень: { $level }.
 station-task-console-capsule-sold = Капсула продана за { $amount } кредитов.
 station-task-console-item-line = { $amount }x { $item }
 station-task-console-capsule-none = Грузовая капсула призвана.
@@ -16,6 +16,7 @@ station-task-console-capsule-docked = Капсула пристыкована.
 
 station-order-console-capsule-already-present = Грузовая капсула уже призвана.
 station-order-console-capsule-spawn-failed = Не удалось призвать грузовую капсулу. Попробуйте позже.
+station-order-console-organics-aboard = В капсуле кто-то есть ({ $name }) - нельзя отзывать капсулу с живыми существами внутри.
 
 station-order-description-toolboxes = Станции нужны инструменты для обслуживания.
 station-order-item-toolbox = ящик с инструментами

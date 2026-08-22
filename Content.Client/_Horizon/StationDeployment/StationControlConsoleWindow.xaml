@@ -1,13 +1,37 @@
 <controls:FancyWindow xmlns="https://spacestation14.io"
                xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
+               xmlns:customControls="clr-namespace:Content.Client.Administration.UI.CustomControls"
                Title="{Loc 'station-control-console-window-title'}"
-               MinSize="500 100"
-               SetSize="500 100">
+               MinSize="340 260">
     <BoxContainer Orientation="Vertical" Margin="5">
         <Label Text="{Loc 'station-control-console-name-info'}" />
-        <BoxContainer Orientation="Horizontal" Margin="5">
+        <BoxContainer Orientation="Horizontal" Margin="0 0 0 10">
             <LineEdit Name="NameSelector" HorizontalExpand="True" />
             <Button Name="NameSelectorSet" Text="{Loc 'station-control-console-name-set'}" />
         </BoxContainer>
+
+        <customControls:HSeparator StyleClasses="LowDivider" Margin="0 0 0 5"/>
+
+        <GridContainer Columns="2" HorizontalExpand="True">
+            <Label Text="{Loc 'bank-atm-menu-balance-label'}"
+                   StyleClasses="LabelKeyText"
+                   HorizontalAlignment="Right" />
+            <Label Name="BalanceLabel" Text="{Loc 'bank-atm-menu-no-bank'}" />
+
+            <Label Text="{Loc 'bank-atm-menu-amount-label'}"
+                   HorizontalAlignment="Right" />
+            <BoxContainer Orientation="Horizontal">
+                <LineEdit Name="WithdrawEdit" MinSize="80 0" HorizontalExpand="True"/>
+                <Button Name="WithdrawButton" Text="{Loc 'bank-atm-menu-withdraw-button'}"/>
+            </BoxContainer>
+
+            <Label Text="{Loc 'bank-atm-menu-deposit-label'}"
+                   StyleClasses="LabelKeyText"
+                   HorizontalAlignment="Right" />
+            <BoxContainer Orientation="Horizontal">
+                <Label Name="DepositLabel" Text="{Loc 'bank-atm-menu-no-deposit'}" HorizontalExpand="True"/>
+                <Button Name="DepositButton" Text="{Loc 'bank-atm-menu-deposit-button'}"/>
+            </BoxContainer>
+        </GridContainer>
     </BoxContainer>
 </controls:FancyWindow>
