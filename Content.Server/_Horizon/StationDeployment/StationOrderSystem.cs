@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Numerics;
 using Content.Server._Horizon.StationDeployment.Components;
+using Content.Server._NF.Shipyard.Systems;
 using Content.Server.Cargo.Systems;
 using Content.Server.Shuttles.Components;
 using Content.Server.Shuttles.Events;
@@ -11,6 +12,7 @@ using Content.Shared._Horizon.StationDeployment.Components;
 using Content.Shared._Horizon.StationDeployment.Prototypes;
 using Content.Shared.Cargo.Components;
 using Content.Shared.GameTicking;
+using Content.Shared.Mobs.Components;
 using Content.Shared.Popups;
 using Content.Shared.Research.Prototypes;
 using Robust.Server.GameObjects;
@@ -37,6 +39,7 @@ public sealed class StationOrderSystem : EntitySystem
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly MapSystem _map = default!;
     [Dependency] private readonly PricingSystem _pricing = default!;
+    [Dependency] private readonly ShipyardSystem _shipyard = default!;
 
     private const string CargoCapsuleDockTag = "CargoCapsuleDock";
 
@@ -158,6 +161,14 @@ public sealed class StationOrderSystem : EntitySystem
 
         if (FindActiveCapsule(station) is not { } capsule || !capsule.Comp.Docked)
             return;
+
+        var mobQuery = GetEntityQuery<MobStateComponent>();
+        var xformQuery = GetEntityQuery<TransformComponent>();
+        if (_shipyard.FoundOrganics(capsule.Owner, mobQuery, xformQuery) is { } organicName)
+        {
+            _popup.PopupEntity(Loc.GetString("station-order-console-organics-aboard", ("name", organicName)), ent, args.Actor, PopupType.MediumCaution);
+            return;
+        }
 
         var fulfilled = EvaluateAndConsume(station, capsule.Owner);
 
