@@ -41,3 +41,47 @@
     whitelist:
       tags:
       - Medkit
+
+- type: stationOrder
+  id: StationOrderCables
+  description: station-order-description-cables
+  category: NFEngineering
+  entries:
+  - name: station-order-item-cable
+    amount: 8
+    whitelist:
+      tags:
+      - CableCoil
+
+- type: stationOrder
+  id: StationOrderGrenades
+  description: station-order-description-grenades
+  category: NFArsenalMercenary
+  entries:
+  - name: station-order-item-grenade
+    amount: 4
+    whitelist:
+      tags:
+      - Grenade
+
+- type: stationOrder
+  id: StationOrderBeakers
+  description: station-order-description-beakers
+  category: NFScience
+  entries:
+  - name: station-order-item-beaker
+    amount: 5
+    whitelist:
+      tags:
+      - GlassBeaker
+
+- type: stationOrder
+  id: StationOrderVegetables
+  description: station-order-description-vegetables
+  category: NFService
+  entries:
+  - name: station-order-item-vegetable
+    amount: 6
+    whitelist:
+      tags:
+      - Vegetable

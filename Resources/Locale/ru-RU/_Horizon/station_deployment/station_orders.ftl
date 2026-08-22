@@ -24,3 +24,15 @@ station-order-item-syringe = шприц
 
 station-order-description-medkits = В медотсеке заканчиваются аптечки.
 station-order-item-medkit = аптечка
+
+station-order-description-cables = Инженерам скоро понадобится ящик силового кабеля.
+station-order-item-cable = моток кабеля
+
+station-order-description-grenades = Арсеналу нужен ящик с гранатами для тренировок.
+station-order-item-grenade = граната
+
+station-order-description-beakers = Лаборатории не хватает мерных стаканов для новых партий реагентов.
+station-order-item-beaker = мерный стакан
+
+station-order-description-vegetables = Кухне нужен свежий ящик овощей.
+station-order-item-vegetable = овощ

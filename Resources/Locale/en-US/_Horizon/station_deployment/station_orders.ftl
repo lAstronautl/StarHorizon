@@ -24,3 +24,15 @@ station-order-item-syringe = syringe
 
 station-order-description-medkits = Medical bay is running low on medkits.
 station-order-item-medkit = medkit
+
+station-order-description-cables = Engineering will need a crate of power cable soon.
+station-order-item-cable = cable coil
+
+station-order-description-grenades = The arsenal needs a crate of grenades for training.
+station-order-item-grenade = grenade
+
+station-order-description-beakers = The lab is short on beakers for new reagent batches.
+station-order-item-beaker = beaker
+
+station-order-description-vegetables = The kitchen needs a fresh crate of vegetables.
+station-order-item-vegetable = vegetable
