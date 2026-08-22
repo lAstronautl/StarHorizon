@@ -9,9 +9,12 @@ using Content.Server.Station.Systems;
 using Content.Shared._Horizon.StationDeployment;
 using Content.Shared._Horizon.StationDeployment.Components;
 using Content.Shared._Horizon.StationDeployment.Prototypes;
+using Content.Shared.GameTicking;
 using Content.Shared.Popups;
 using Content.Shared.Research.Prototypes;
+using Robust.Server.GameObjects;
 using Robust.Shared.EntitySerialization.Systems;
+using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
@@ -31,15 +34,24 @@ public sealed class StationOrderSystem : EntitySystem
     [Dependency] private readonly DockingSystem _docking = default!;
     [Dependency] private readonly MapLoaderSystem _mapLoader = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-
-    /// <summary>
-    /// How far from the console's grid the capsule is loaded before it FTLs in to dock,
-    /// so it doesn't pop into existence directly on top of the station.
-    /// </summary>
-    private static readonly Vector2 CapsuleSpawnOffset = new(0f, 50f);
+    [Dependency] private readonly MapSystem _map = default!;
 
     private const string CargoCapsuleDockTag = "CargoCapsuleDock";
+
+    /// <summary>
+    /// Space between capsules queued up on the holding map, so simultaneous summons from
+    /// different stations don't overlap.
+    /// </summary>
+    private const float CapsuleSpawnBuffer = 5f;
+
+    /// <summary>
+    /// A dedicated, hidden map capsules spawn onto before FTLing to their station - mirrors
+    /// ShipyardSystem's ShipyardMap so capsules travel through proper FTL instead of just
+    /// drifting over from a point on the station's own map.
+    /// </summary>
+    private MapId? _capsuleHoldingMap;
+
+    private float _capsuleSpawnIndex;
 
     // Note: the base Industrial/Arsenal/Experimental/CivilianServices disciplines
     // (Resources/Prototypes/Research/disciplines.yml) are made abstract by this fork's
@@ -61,6 +73,36 @@ public sealed class StationOrderSystem : EntitySystem
         SubscribeLocalEvent<StationTaskConsoleComponent, StationOrderRecallCapsuleMessage>(OnRecall);
         SubscribeLocalEvent<StationTaskConsoleComponent, StationOrderCancelMessage>(OnCancelOrder);
         SubscribeLocalEvent<CargoCapsuleComponent, FTLCompletedEvent>(OnCapsuleDocked);
+        SubscribeLocalEvent<RoundRestartCleanupEvent>(OnRoundRestart);
+    }
+
+    private void OnRoundRestart(RoundRestartCleanupEvent ev)
+    {
+        CleanupCapsuleMap();
+    }
+
+    private void SetupCapsuleMapIfNeeded()
+    {
+        if (_capsuleHoldingMap != null && _map.MapExists(_capsuleHoldingMap.Value))
+            return;
+
+        _map.CreateMap(out var holdingMap);
+        _capsuleHoldingMap = holdingMap;
+        _capsuleSpawnIndex = 0f;
+
+        _map.SetPaused(_capsuleHoldingMap.Value, false);
+    }
+
+    private void CleanupCapsuleMap()
+    {
+        if (_capsuleHoldingMap == null || !_map.MapExists(_capsuleHoldingMap.Value))
+        {
+            _capsuleHoldingMap = null;
+            return;
+        }
+
+        _map.DeleteMap(_capsuleHoldingMap.Value);
+        _capsuleHoldingMap = null;
     }
 
     private void OnOrderDbMapInit(Entity<StationOrderDatabaseComponent> ent, ref MapInitEvent args)
@@ -87,13 +129,16 @@ public sealed class StationOrderSystem : EntitySystem
         if (Transform(ent.Owner).GridUid is not { Valid: true } consoleGrid)
             return;
 
-        var mapId = Transform(consoleGrid).MapID;
-        var spawnPos = _transform.GetWorldPosition(consoleGrid) + CapsuleSpawnOffset;
-        if (!_mapLoader.TryLoadGrid(mapId, ent.Comp.CapsulePath, out var capsuleGrid, offset: spawnPos))
+        SetupCapsuleMapIfNeeded();
+
+        var spawnPos = new Vector2(_capsuleSpawnIndex, 0f);
+        if (!_mapLoader.TryLoadGrid(_capsuleHoldingMap!.Value, ent.Comp.CapsulePath, out var capsuleGrid, offset: spawnPos))
         {
             _popup.PopupEntity(Loc.GetString("station-order-console-capsule-spawn-failed"), ent, args.Actor, PopupType.MediumCaution);
             return;
         }
+
+        _capsuleSpawnIndex += capsuleGrid.Value.Comp.LocalAABB.Width + CapsuleSpawnBuffer;
 
         var capsuleComp = EnsureComp<CargoCapsuleComponent>(capsuleGrid.Value.Owner);
         capsuleComp.OwningStation = station;
