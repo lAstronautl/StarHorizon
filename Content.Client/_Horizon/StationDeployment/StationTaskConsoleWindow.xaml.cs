@@ -44,8 +44,6 @@ public sealed partial class StationTaskConsoleWindow : FancyWindow
             _ => "station-task-console-capsule-docked",
         }));
 
-        OrdersCountLabel.SetMessage(Loc.GetString("station-task-console-orders-count", ("count", state.Orders.Count)));
-
         RecallButton.Disabled = !state.CapsuleDocked;
 
         CategoryLevelsContainer.Children.Clear();
@@ -77,11 +75,6 @@ public sealed partial class StationTaskConsoleWindow : FancyWindow
         }
 
         OrdersContainer.Children.Clear();
-        if (state.Orders.Count == 0)
-        {
-            OrdersContainer.AddChild(new Label { Text = Loc.GetString("station-task-console-no-orders"), HorizontalAlignment = HAlignment.Center });
-        }
-
         foreach (var order in state.Orders)
         {
             if (!_prototype.TryIndex(order.Order, out var prototype))
