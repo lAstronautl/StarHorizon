@@ -66,6 +66,14 @@ class EntityRule:
     # Some SS13 objects are tiles in SS14: /obj/structure/lattice is an object
     # there and the "Lattice" tile here.
     tile: str | None = None
+    # SS13 places a wall-mounted object on the room's floor tile, next to the
+    # wall. SS14 does not: an AirAlarm, APC, FireAlarm, intercom, extinguisher
+    # cabinet or door signal button sits ON the wall's own tile, embedded in it
+    # -- confirmed against Resources/Maps/amber.yml, where 100% of these sit on
+    # the same tile as a WallSolid, never the neighbouring floor tile. A light or
+    # camera, by contrast, stays on the floor (0% on a wall tile there). Setting
+    # this moves the converted entity one tile toward the wall it names.
+    on_wall: bool = False
 
 
 @dataclass
@@ -135,12 +143,18 @@ def _parse_entity(path: str, raw: Any) -> EntityRule:
                 raise MappingError(f"{path}: wall must be one of {sorted(WALL_TO_FACING)}, got '{wall}'")
             direction = WALL_TO_FACING[wall]
         tile = raw.get("tile")
+        on_wall = bool(raw.get("onWall", False))
+        if on_wall and "wall" not in raw:
+            raise MappingError(f"{path}: onWall needs a wall side, e.g. {{wall: north, onWall: true}}")
         if "entities" in raw:
-            return EntityRule(entities=[str(i) for i in raw["entities"]], direction=direction, tile=tile)
+            return EntityRule(
+                entities=[str(i) for i in raw["entities"]], direction=direction, tile=tile, on_wall=on_wall
+            )
         return EntityRule(
             entities=[str(raw["entity"])] if raw.get("entity") else [],
             direction=direction,
             tile=tile,
+            on_wall=on_wall,
         )
     raise MappingError(f"{path}: an entity rule must be a prototype id or a list, got {type(raw).__name__}")
 

@@ -27,13 +27,14 @@ import ss14map
 # rows listed from the top down. Written out in full so the expectations below
 # can be checked by eye.
 #
-#          x=1              x=2
-#   y=4    space            hazard stripe facing east, on dark floor
-#   y=3    steel floor      catwalk over space
-#   y=2    wall             space
-#   y=1    steel floor,     space
-#          light on the
-#          east wall
+#          x=1              x=2                       x=3
+#   y=4    space            hazard stripe facing east, --
+#                                 on dark floor
+#   y=3    steel floor      catwalk over space          --
+#   y=2    wall             space                       --
+#   y=1    steel floor,     space                       steel floor,
+#          light on the                                 air alarm mounted
+#          east wall                                    on the east wall
 FIXTURE = '''"aa" = (
 /turf/open/space/basic,
 /area/space)
@@ -57,6 +58,10 @@ FIXTURE = '''"aa" = (
 /obj/structure/lattice/catwalk,
 /turf/open/space/basic,
 /area/space)
+"ag" = (
+/obj/machinery/airalarm/directional/east,
+/turf/open/floor/iron,
+/area/station/hallway/primary/central)
 
 (1,1,1) = {"
 aa
@@ -69,6 +74,9 @@ ae
 af
 aa
 aa
+"}
+(3,1,1) = {"
+ag
 "}
 '''
 
@@ -83,9 +91,15 @@ EXPECTED_TILES = {
 }
 EXPECTED_ENTITIES = {
     ("WallSolid", 0.5, 1.5): None,
-    # Mounted on the wall to its east, so it looks west: -pi/2.
+    # Mounted on the wall to its east, so it looks west: -pi/2. A light stays on
+    # the room's floor tile -- SS13's own placement.
     ("PoweredSmallLight", 0.5, 0.5): -1.5707963267948966,
     ("Catwalk", 1.5, 2.5): None,
+    # An air alarm on the same east wall instead sits ON the wall's tile in
+    # SS14 (tile (2,0) -> (3,0), one east of where the .dmm placed it): see
+    # EntityRule.on_wall. Confirmed against Resources/Maps/amber.yml, where
+    # every AirAlarm/APC/FireAlarm/etc. shares its tile with a wall.
+    ("AirAlarm", 3.5, 0.5): -1.5707963267948966,
 }
 EXPECTED_DECAL = ("WarnLineE", 1, 3)
 
@@ -133,8 +147,8 @@ def check_parser() -> Result:
         dmm = dmmparser.parse(path)
 
     problems = []
-    if (dmm.width, dmm.height) != (2, 4):
-        problems.append(f"size {dmm.width}x{dmm.height}, expected 2x4")
+    if (dmm.width, dmm.height) != (3, 4):
+        problems.append(f"size {dmm.width}x{dmm.height}, expected 3x4")
 
     # Rows are listed top down, so the first row of a block is the highest y.
     if dmm.grid.get((1, 4, 1)) != "aa":
@@ -148,7 +162,7 @@ def check_parser() -> Result:
     if decal.vars.get("dir") != 4:
         problems.append(f"dir var parsed as {decal.vars.get('dir')!r}, expected 4")
 
-    return Result("parser: geometry and vars", not problems, "; ".join(problems) or "2x4, top-down rows, dir parsed")
+    return Result("parser: geometry and vars", not problems, "; ".join(problems) or "3x4, top-down rows, dir parsed")
 
 
 def check_rules(mapping_set) -> Result:

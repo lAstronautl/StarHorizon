@@ -91,30 +91,30 @@
 /obj/effect/decal/cleanable/cobweb/cobweb2: Cobweb2
 
 # ---- mounted on a wall or a tile edge: the path names the wall ----
-/obj/item/radio/intercom/directional/north: {entity: IntercomCommon, wall: north}
-/obj/item/radio/intercom/directional/south: {entity: IntercomCommon, wall: south}
-/obj/item/radio/intercom/directional/east: {entity: IntercomCommon, wall: east}
-/obj/item/radio/intercom/directional/west: {entity: IntercomCommon, wall: west}
+/obj/item/radio/intercom/directional/north: {entity: IntercomCommon, wall: north, onWall: true}
+/obj/item/radio/intercom/directional/south: {entity: IntercomCommon, wall: south, onWall: true}
+/obj/item/radio/intercom/directional/east: {entity: IntercomCommon, wall: east, onWall: true}
+/obj/item/radio/intercom/directional/west: {entity: IntercomCommon, wall: west, onWall: true}
 
-/obj/machinery/airalarm/directional/north: {entity: AirAlarm, wall: north}
-/obj/machinery/airalarm/directional/south: {entity: AirAlarm, wall: south}
-/obj/machinery/airalarm/directional/east: {entity: AirAlarm, wall: east}
-/obj/machinery/airalarm/directional/west: {entity: AirAlarm, wall: west}
+/obj/machinery/airalarm/directional/north: {entity: AirAlarm, wall: north, onWall: true}
+/obj/machinery/airalarm/directional/south: {entity: AirAlarm, wall: south, onWall: true}
+/obj/machinery/airalarm/directional/east: {entity: AirAlarm, wall: east, onWall: true}
+/obj/machinery/airalarm/directional/west: {entity: AirAlarm, wall: west, onWall: true}
 
-/obj/machinery/button/door/directional/north: {entity: SignalButtonDirectional, wall: north}
-/obj/machinery/button/door/directional/south: {entity: SignalButtonDirectional, wall: south}
-/obj/machinery/button/door/directional/east: {entity: SignalButtonDirectional, wall: east}
-/obj/machinery/button/door/directional/west: {entity: SignalButtonDirectional, wall: west}
+/obj/machinery/button/door/directional/north: {entity: SignalButtonDirectional, wall: north, onWall: true}
+/obj/machinery/button/door/directional/south: {entity: SignalButtonDirectional, wall: south, onWall: true}
+/obj/machinery/button/door/directional/east: {entity: SignalButtonDirectional, wall: east, onWall: true}
+/obj/machinery/button/door/directional/west: {entity: SignalButtonDirectional, wall: west, onWall: true}
 
 /obj/machinery/camera/directional/north: {entity: SurveillanceCameraGeneral, wall: north}
 /obj/machinery/camera/directional/south: {entity: SurveillanceCameraGeneral, wall: south}
 /obj/machinery/camera/directional/east: {entity: SurveillanceCameraGeneral, wall: east}
 /obj/machinery/camera/directional/west: {entity: SurveillanceCameraGeneral, wall: west}
 
-/obj/machinery/firealarm/directional/north: {entity: FireAlarm, wall: north}
-/obj/machinery/firealarm/directional/south: {entity: FireAlarm, wall: south}
-/obj/machinery/firealarm/directional/east: {entity: FireAlarm, wall: east}
-/obj/machinery/firealarm/directional/west: {entity: FireAlarm, wall: west}
+/obj/machinery/firealarm/directional/north: {entity: FireAlarm, wall: north, onWall: true}
+/obj/machinery/firealarm/directional/south: {entity: FireAlarm, wall: south, onWall: true}
+/obj/machinery/firealarm/directional/east: {entity: FireAlarm, wall: east, onWall: true}
+/obj/machinery/firealarm/directional/west: {entity: FireAlarm, wall: west, onWall: true}
 
 /obj/machinery/light/directional/north: {entity: Poweredlight, wall: north}
 /obj/machinery/light/directional/south: {entity: Poweredlight, wall: south}
@@ -126,20 +126,20 @@
 /obj/machinery/light/small/directional/east: {entity: PoweredSmallLight, wall: east}
 /obj/machinery/light/small/directional/west: {entity: PoweredSmallLight, wall: west}
 
-/obj/machinery/power/apc/auto_name/directional/north: {entity: APCBasic, wall: north}
-/obj/machinery/power/apc/auto_name/directional/south: {entity: APCBasic, wall: south}
-/obj/machinery/power/apc/auto_name/directional/east: {entity: APCBasic, wall: east}
-/obj/machinery/power/apc/auto_name/directional/west: {entity: APCBasic, wall: west}
+/obj/machinery/power/apc/auto_name/directional/north: {entity: APCBasic, wall: north, onWall: true}
+/obj/machinery/power/apc/auto_name/directional/south: {entity: APCBasic, wall: south, onWall: true}
+/obj/machinery/power/apc/auto_name/directional/east: {entity: APCBasic, wall: east, onWall: true}
+/obj/machinery/power/apc/auto_name/directional/west: {entity: APCBasic, wall: west, onWall: true}
 
-/obj/structure/extinguisher_cabinet/directional/north: {entity: ExtinguisherCabinetFilled, wall: north}
-/obj/structure/extinguisher_cabinet/directional/south: {entity: ExtinguisherCabinetFilled, wall: south}
-/obj/structure/extinguisher_cabinet/directional/east: {entity: ExtinguisherCabinetFilled, wall: east}
-/obj/structure/extinguisher_cabinet/directional/west: {entity: ExtinguisherCabinetFilled, wall: west}
+/obj/structure/extinguisher_cabinet/directional/north: {entity: ExtinguisherCabinetFilled, wall: north, onWall: true}
+/obj/structure/extinguisher_cabinet/directional/south: {entity: ExtinguisherCabinetFilled, wall: south, onWall: true}
+/obj/structure/extinguisher_cabinet/directional/east: {entity: ExtinguisherCabinetFilled, wall: east, onWall: true}
+/obj/structure/extinguisher_cabinet/directional/west: {entity: ExtinguisherCabinetFilled, wall: west, onWall: true}
 
-/obj/structure/sign/warning/secure_area/directional/north: {entity: SignSecureMed, wall: north}
-/obj/structure/sign/warning/secure_area/directional/south: {entity: SignSecureMed, wall: south}
-/obj/structure/sign/warning/secure_area/directional/east: {entity: SignSecureMed, wall: east}
-/obj/structure/sign/warning/secure_area/directional/west: {entity: SignSecureMed, wall: west}
+/obj/structure/sign/warning/secure_area/directional/north: {entity: SignSecureMed, wall: north, onWall: true}
+/obj/structure/sign/warning/secure_area/directional/south: {entity: SignSecureMed, wall: south, onWall: true}
+/obj/structure/sign/warning/secure_area/directional/east: {entity: SignSecureMed, wall: east, onWall: true}
+/obj/structure/sign/warning/secure_area/directional/west: {entity: SignSecureMed, wall: west, onWall: true}
 
 /obj/structure/window/reinforced/spawner/directional/north: {entity: WindowReinforcedDirectional, wall: north}
 /obj/structure/window/reinforced/spawner/directional/south: {entity: WindowReinforcedDirectional, wall: south}

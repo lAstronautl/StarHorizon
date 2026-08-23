@@ -40,6 +40,14 @@ CSV_COLUMNS = ["dmm_path", "kind", "count", "example", "suggestion", "ss14_id", 
 MULTI_SEPARATOR = "+"
 DEFAULT_DIR = 2  # BYOND entities face south unless they say otherwise
 
+# Tile offset to walk from a floor tile onto the wall in that direction.
+DIR_OFFSET = {
+    mapping_rules.NORTH: (0, 1),
+    mapping_rules.SOUTH: (0, -1),
+    mapping_rules.EAST: (1, 0),
+    mapping_rules.WEST: (-1, 0),
+}
+
 
 # ---------------------------------------------------------------- reporting
 
@@ -292,11 +300,22 @@ def walk(
                     variant = 0 if variant_mode == "zero" else tile_variant(tile_x, tile_y, variants)
                     builder.set_tile(tile_x, tile_y, rule.tile, variant)
                 facing = rule.direction if rule.direction is not None else direction
+
+                # SS13 leaves a wall-mounted object on the room's floor tile; SS14
+                # embeds it in the wall's own tile instead. Walk one tile against
+                # the facing direction (i.e. toward the wall it is mounted on) to
+                # land on the same tile the wall occupies. See EntityRule.on_wall.
+                entity_x, entity_y = tile_x, tile_y
+                if rule.on_wall:
+                    offset_x, offset_y = DIR_OFFSET.get(facing, (0, 0))
+                    entity_x -= offset_x
+                    entity_y -= offset_y
+
                 for proto in rule.entities:
                     builder.add_entity(
                         proto,
-                        tile_x + 0.5,
-                        tile_y + 0.5,
+                        entity_x + 0.5,
+                        entity_y + 0.5,
                         rotation=ss14map.rotation_for_dir(facing),
                         name=str(name) if isinstance(name, str) else None,
                     )
