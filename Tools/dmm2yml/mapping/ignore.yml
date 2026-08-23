@@ -21,3 +21,18 @@
 - /obj/machinery/atmospherics/pipe
 - /obj/structure/cable
 - /obj/machinery/power/terminal
+
+# Map-init helpers. They tag or reconfigure the object next to them (set an
+# airlock's access, break a floor tile, wire an atmos device) and then delete
+# themselves -- confirmed in tgstation's own code/modules/mapping/mapping_helpers.dm,
+# every one of these calls qdel(src) once its effect is applied and none of
+# them is ever rendered. There is nothing here for a converted map to keep.
+- /obj/effect/mapping_helpers
+
+# SS13 features this fork's SS14 does not implement at all -- not renamed, not
+# hidden elsewhere, genuinely absent from Resources/Prototypes. A newscaster is
+# a physical bulletin board object; nav beacons and status displays are
+# wayfinding/announcement hardware. None of the three exist here.
+- /obj/machinery/newscaster
+- /obj/machinery/navbeacon
+- /obj/machinery/status_display

@@ -6,6 +6,7 @@ guesses: anything it has no rule for is written into a table for a human to fill
 in, and ``convert`` refuses to produce a map while that table has blanks.
 
     scan      read a .dmm, report every path that has no rule, as CSV
+    catalog   the same, pooled across many .dmm files or whole directories
     convert   build the map, using the mapping files plus a filled-in table
     merge     fold a filled-in table back into the shared mapping files
     gui       open a window for all of the above
@@ -74,12 +75,29 @@ class Survey:
     resolved_count: int = 0
     skipped_count: int = 0
 
-    def note_unresolved(self, path: str, kind: str, x: int, y: int, variables) -> None:
+    def note_unresolved(self, path: str, kind: str, x: int, y: int, variables, map_label: str = "") -> None:
         report = self.unresolved.get(path)
         if report is None:
-            report = self.unresolved[path] = PathReport(path=path, kind=kind, example=f"{x},{y}")
+            example = f"{map_label} @{x},{y}" if map_label else f"{x},{y}"
+            report = self.unresolved[path] = PathReport(path=path, kind=kind, example=example)
         report.count += 1
         report.variables.update(variables.keys())
+
+    def merge(self, other: "Survey") -> None:
+        """Fold another map's survey into this one, for cataloguing several maps."""
+        self.resolved_count += other.resolved_count
+        self.skipped_count += other.skipped_count
+        self.inherited.update(other.inherited)
+        for path, report in other.unresolved.items():
+            existing = self.unresolved.get(path)
+            if existing is None:
+                self.unresolved[path] = PathReport(
+                    path=report.path, kind=report.kind, count=report.count,
+                    example=report.example, variables=Counter(report.variables),
+                )
+            else:
+                existing.count += report.count
+                existing.variables.update(report.variables)
 
 
 # ---------------------------------------------------------------- helpers
@@ -236,6 +254,7 @@ def walk(
     z_level: int,
     builder: ss14map.MapBuilder | None,
     variant_mode: str,
+    map_label: str = "",
 ) -> Survey:
     """Visit every atom once; collect a survey and, if given a builder, the map."""
     survey = Survey()
@@ -261,7 +280,7 @@ def walk(
                 survey.skipped_count += 1
                 continue
             if resolution.rule is None:
-                survey.note_unresolved(atom.path, kind, x, y, atom.vars)
+                survey.note_unresolved(atom.path, kind, x, y, atom.vars, map_label)
                 continue
 
             survey.resolved_count += 1
@@ -330,6 +349,62 @@ def load_context(args) -> tuple[mapping_rules.MappingSet, protoindex.ProtoIndex]
     mapping_set = mapping_rules.load(args.mapping_dir)
     index = protoindex.build(args.prototypes)
     return mapping_set, index
+
+
+def collect_dmm_files(paths: list[str]) -> list[str]:
+    """Files named directly, plus every .dmm found by walking any directories given."""
+    files: list[str] = []
+    for path in paths:
+        if os.path.isdir(path):
+            for root, _, names in os.walk(path):
+                for name in sorted(names):
+                    if name.endswith(".dmm"):
+                        files.append(os.path.join(root, name))
+        elif path.endswith(".dmm"):
+            files.append(path)
+        else:
+            print(f"skipping {path}: not a .dmm file or a directory", file=sys.stderr)
+    return sorted(set(files))
+
+
+def command_catalog(args) -> int:
+    """Scan several .dmm files at once and pool what none of them resolve.
+
+    One map only shows the paths it happens to use. A whole upstream map
+    catalogue -- tgstation ships eight -- shows what a converter actually needs
+    to cover, ranked by how often each path is really placed, rather than by
+    how large any single station happens to be.
+    """
+    mapping_set, index = load_context(args)
+    files = collect_dmm_files(args.paths)
+    if not files:
+        print("no .dmm files found under the given paths", file=sys.stderr)
+        return 2
+
+    merged = Survey()
+    scanned = 0
+    for path in files:
+        try:
+            dmm = dmmparser.parse(path)
+        except dmmparser.DmmParseError as error:
+            print(f"skipping {path}: {error}", file=sys.stderr)
+            continue
+        label = os.path.splitext(os.path.basename(path))[0]
+        for z_level in dmm.z_levels:
+            merged.merge(walk(dmm, mapping_set, index, z_level, None, args.variants, map_label=label))
+        scanned += 1
+
+    print(f"{scanned} map(s) scanned ({len(files) - scanned} skipped)")
+    print(f"  resolved   {merged.resolved_count} atoms")
+    print(f"  skipped    {merged.skipped_count} atoms (ignore rules)")
+    print(
+        f"  unresolved {sum(r.count for r in merged.unresolved.values())} atoms "
+        f"across {len(merged.unresolved)} distinct paths"
+    )
+
+    write_table(args.output, list(merged.unresolved.values()), index)
+    print(f"\nwrote {args.output}")
+    return 0
 
 
 def command_scan(args) -> int:
@@ -642,6 +717,16 @@ def main(argv: list[str] | None = None) -> int:
     add_common(scan)
     scan.add_argument("-o", "--output", required=True, help="CSV file to write")
     scan.set_defaults(func=command_scan)
+
+    catalog = subparsers.add_parser(
+        "catalog", help="scan several .dmm files (or whole directories of them) at once"
+    )
+    catalog.add_argument("paths", nargs="+", help=".dmm files and/or directories to search recursively")
+    catalog.add_argument("--mapping-dir", default=DEFAULT_MAPPING_DIR, help="directory holding the mapping files")
+    catalog.add_argument("--prototypes", default=DEFAULT_PROTOTYPES, help="Resources/Prototypes to validate against")
+    catalog.add_argument("--variants", choices=("deterministic", "zero"), default="deterministic")
+    catalog.add_argument("-o", "--output", required=True, help="CSV file to write")
+    catalog.set_defaults(func=command_catalog)
 
     convert = subparsers.add_parser("convert", help="build the SS14 map")
     add_common(convert)

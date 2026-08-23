@@ -919,6 +919,118 @@
     4: WarnLineGreyscaleE
     8: WarnLineGreyscaleW
   color: '#A4610696'
+/obj/effect/turf_decal/trimline/dark/line:
+  dirs:
+    1: BrickLineOverlayN
+    2: BrickLineOverlayS
+    4: BrickLineOverlayE
+    8: BrickLineOverlayW
+  color: '#444646FF'
+/obj/effect/turf_decal/trimline/dark/corner:
+  dirs:
+    1: BrickCornerOverlayNE
+    2: BrickCornerOverlaySW
+    4: BrickCornerOverlaySE
+    8: BrickCornerOverlayNW
+  color: '#444646FF'
+/obj/effect/turf_decal/trimline/dark/end:
+  dirs:
+    1: BrickEndOverlayN
+    2: BrickEndOverlayS
+    4: BrickEndOverlayE
+    8: BrickEndOverlayW
+  color: '#444646FF'
+/obj/effect/turf_decal/trimline/dark/warning:
+  dirs:
+    1: WarnLineGreyscaleN
+    2: WarnLineGreyscaleS
+    4: WarnLineGreyscaleE
+    8: WarnLineGreyscaleW
+  color: '#444646FF'
+/obj/effect/turf_decal/trimline/dark/filled/line:
+  dirs:
+    1: BrickLineOverlayN
+    2: BrickLineOverlayS
+    4: BrickLineOverlayE
+    8: BrickLineOverlayW
+  color: '#444646FF'
+/obj/effect/turf_decal/trimline/dark/filled/corner:
+  dirs:
+    1: BrickCornerOverlayNE
+    2: BrickCornerOverlaySW
+    4: BrickCornerOverlaySE
+    8: BrickCornerOverlayNW
+  color: '#444646FF'
+/obj/effect/turf_decal/trimline/dark/filled/end:
+  dirs:
+    1: BrickEndOverlayN
+    2: BrickEndOverlayS
+    4: BrickEndOverlayE
+    8: BrickEndOverlayW
+  color: '#444646FF'
+/obj/effect/turf_decal/trimline/dark/filled/warning:
+  dirs:
+    1: WarnLineGreyscaleN
+    2: WarnLineGreyscaleS
+    4: WarnLineGreyscaleE
+    8: WarnLineGreyscaleW
+  color: '#444646FF'
+/obj/effect/turf_decal/trimline/dark_blue/line:
+  dirs:
+    1: BrickLineOverlayN
+    2: BrickLineOverlayS
+    4: BrickLineOverlayE
+    8: BrickLineOverlayW
+  color: '#334E6DC8'
+/obj/effect/turf_decal/trimline/dark_blue/corner:
+  dirs:
+    1: BrickCornerOverlayNE
+    2: BrickCornerOverlaySW
+    4: BrickCornerOverlaySE
+    8: BrickCornerOverlayNW
+  color: '#334E6DC8'
+/obj/effect/turf_decal/trimline/dark_blue/end:
+  dirs:
+    1: BrickEndOverlayN
+    2: BrickEndOverlayS
+    4: BrickEndOverlayE
+    8: BrickEndOverlayW
+  color: '#334E6DC8'
+/obj/effect/turf_decal/trimline/dark_blue/warning:
+  dirs:
+    1: WarnLineGreyscaleN
+    2: WarnLineGreyscaleS
+    4: WarnLineGreyscaleE
+    8: WarnLineGreyscaleW
+  color: '#334E6DC8'
+/obj/effect/turf_decal/trimline/dark_blue/filled/line:
+  dirs:
+    1: BrickLineOverlayN
+    2: BrickLineOverlayS
+    4: BrickLineOverlayE
+    8: BrickLineOverlayW
+  color: '#334E6DC8'
+/obj/effect/turf_decal/trimline/dark_blue/filled/corner:
+  dirs:
+    1: BrickCornerOverlayNE
+    2: BrickCornerOverlaySW
+    4: BrickCornerOverlaySE
+    8: BrickCornerOverlayNW
+  color: '#334E6DC8'
+/obj/effect/turf_decal/trimline/dark_blue/filled/end:
+  dirs:
+    1: BrickEndOverlayN
+    2: BrickEndOverlayS
+    4: BrickEndOverlayE
+    8: BrickEndOverlayW
+  color: '#334E6DC8'
+/obj/effect/turf_decal/trimline/dark_blue/filled/warning:
+  dirs:
+    1: WarnLineGreyscaleN
+    2: WarnLineGreyscaleS
+    4: WarnLineGreyscaleE
+    8: WarnLineGreyscaleW
+  color: '#334E6DC8'
 /obj/effect/turf_decal/trimline/dark_red/line:
   dirs:
     1: BrickLineOverlayN
