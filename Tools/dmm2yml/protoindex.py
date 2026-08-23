@@ -14,8 +14,13 @@ import re
 from dataclasses import dataclass, field
 from bisect import bisect_left
 
-TYPE_LINE = re.compile(r"^- type: (\S+)")
-FIELD_LINE = re.compile(r"^  (\w+):\s*(.*)$")
+# Nearly every prototype file starts its list at column 0, but at least one
+# (Entities/Structures/Furniture/sink.yml) indents the whole thing -- still
+# valid YAML, since a top-level sequence only needs consistent indentation, not
+# indentation of zero. Capturing the marker's own indent lets a field line be
+# recognised relative to it instead of assuming column 0.
+TYPE_LINE = re.compile(r"^(\s*)- type: (\S+)")
+FIELD_LINE = re.compile(r"^(\s*)(\w+):\s*(.*)$")
 
 # Prototype kinds the converter can place on a map.
 ENTITY = "entity"
@@ -136,16 +141,22 @@ def build(prototypes_dir: str) -> ProtoIndex:
             path = os.path.join(root, name)
             kind: str | None = None
             fields: dict[str, str] = {}
+            field_indent = 0  # the indent a field line must have to belong to the current type
             try:
                 with open(path, encoding="utf-8-sig") as handle:
                     for line in handle:
                         if (type_match := TYPE_LINE.match(line)) is not None:
                             _flush(index, kind, fields)
-                            found = type_match.group(1)
+                            found = type_match.group(2)
                             kind = found if found in wanted else None
                             fields = {}
-                        elif kind is not None and (field_match := FIELD_LINE.match(line)) is not None:
-                            key, value = field_match.group(1), field_match.group(2).strip()
+                            field_indent = len(type_match.group(1)) + 2
+                        elif (
+                            kind is not None
+                            and (field_match := FIELD_LINE.match(line)) is not None
+                            and len(field_match.group(1)) == field_indent
+                        ):
+                            key, value = field_match.group(2), field_match.group(3).strip()
                             if key in ("id", "abstract", "variants") and key not in fields:
                                 fields[key] = value
             except (OSError, UnicodeDecodeError):

@@ -528,9 +528,51 @@ def check_problem_reporting(mapping_set, index) -> Result:
     return Result("problems: one line per path", True, f"{len(paths)} unresolved paths, {len(lines)} lines")
 
 
+def check_protoindex_indentation() -> Result:
+    """The prototype scanner must not assume every list starts at column 0.
+
+    Every prototype file in this repo opens its list at column 0 except one --
+    Entities/Structures/Furniture/sink.yml indents the whole thing by two
+    spaces, which is valid YAML (a top-level sequence only needs consistent
+    indentation) but made every entity in that file invisible to the index,
+    Sink included, until the scanner tracked each type marker's own indent
+    instead of assuming two spaces from the left margin.
+    """
+    sample = (
+        "  - type: entity\n"
+        "    id: IndentedWidget\n"
+        "    name: indented widget\n"
+        "  - type: entity\n"
+        "    id: IndentedAbstractWidget\n"
+        "    abstract: true\n"
+    )
+    with tempfile.TemporaryDirectory() as directory:
+        os.makedirs(os.path.join(directory, "sub"))
+        with open(os.path.join(directory, "sub", "indented.yml"), "w", encoding="utf-8") as handle:
+            handle.write(sample)
+        index = protoindex.build(directory)
+
+    problems = []
+    if not index.has(protoindex.ENTITY, "IndentedWidget"):
+        problems.append("a concrete entity in an indented list was not found")
+    if "IndentedAbstractWidget" in index.entities:
+        problems.append("an abstract entity in an indented list was not excluded")
+
+    return Result(
+        "dictionaries: indented prototype lists",
+        not problems,
+        "; ".join(problems) or "an indented '- type: entity' list still parses",
+    )
+
+
 def run(repo_root: str, mapping_dir: str, prototypes_dir: str) -> list[Result]:
-    mapping_set = mapping_rules.load(mapping_dir)
-    index = protoindex.build(prototypes_dir)
+    try:
+        mapping_set = mapping_rules.load(mapping_dir)
+        index = protoindex.build(prototypes_dir)
+    except Exception as error:
+        # Nothing below can run without these; report it as one failed check
+        # rather than letting the whole command crash with a bare traceback.
+        return [Result("setup: mapping files and prototype index load", False, f"{type(error).__name__}: {error}")]
 
     checks = [
         ("parser: geometry and vars", lambda: check_parser()),
@@ -541,6 +583,7 @@ def run(repo_root: str, mapping_dir: str, prototypes_dir: str) -> list[Result]:
         ("chunks: no empty chunks", lambda: check_no_empty_chunks(mapping_set, index)),
         ("chunks: round-trip vs repo maps", lambda: check_chunk_roundtrip(repo_root)),
         ("dictionaries: ids resolve", lambda: check_dictionaries(mapping_set, index)),
+        ("dictionaries: indented prototype lists", lambda: check_protoindex_indentation()),
         ("conversion: fixture map", lambda: check_conversion(mapping_set, index)),
         ("rendering: valid map document", lambda: check_rendering(mapping_set, index)),
         ("template: components load bare", lambda: check_template_components(repo_root, mapping_dir)),
