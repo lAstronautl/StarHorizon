@@ -156,3 +156,134 @@
 /obj/structure/chair/stool/directional/south: {entity: Stool, dir: 2}
 /obj/structure/chair/stool/directional/east: {entity: Stool, dir: 4}
 /obj/structure/chair/stool/directional/west: {entity: Stool, dir: 8}
+# ---- added from the tgstation upstream catalog (Tools/dmm2yml/README.md,
+# "Каталог по всему апстриму") -- the tail of common items, furniture and
+# machines that showed up across all seven station maps but weren't yet
+# covered. Every id below was checked against Resources/Prototypes; nothing
+# here is a guess. onWall follows the same rule as before: only set where
+# either a real map (Resources/Maps/amber.yml) shows the SS14 prototype
+# sharing a tile with a wall, or the naming makes it unambiguous (WallClock).
+
+# ---- items (tgstation catalog tail) ----
+/obj/item/analyzer: GasAnalyzer
+/obj/item/assembly/flash/handheld: Flash
+/obj/item/assembly/timer: TimerTrigger
+/obj/item/cigbutt: CigaretteSpent
+/obj/item/clothing/belt/utility: ClothingBeltUtility
+/obj/item/clothing/glasses/meson: ClothingEyesGlassesMeson
+/obj/item/clothing/gloves/color/black: ClothingHandsGlovesColorBlack
+/obj/item/clothing/gloves/latex: ClothingHandsGlovesLatex
+/obj/item/clothing/head/cone: ClothingHeadHatCone
+/obj/item/clothing/mask/breath: ClothingMaskBreath
+/obj/item/clothing/mask/gas: ClothingMaskGas
+/obj/item/clothing/suit/hazardvest: ClothingOuterVestHazard
+/obj/item/crowbar: Crowbar
+/obj/item/crowbar/red: CrowbarRed
+/obj/item/electronics/airlock: DoorElectronics
+/obj/item/folder: BoxFolderBase
+/obj/item/folder/blue: BoxFolderBlue
+/obj/item/folder/red: BoxFolderRed
+/obj/item/folder/white: BoxFolderWhite
+/obj/item/folder/yellow: BoxFolderYellow
+/obj/item/hand_labeler: HandLabeler
+/obj/item/healthanalyzer: HandheldHealthAnalyzer
+/obj/item/multitool: Multitool
+/obj/item/paper: Paper
+/obj/item/pen: Pen
+/obj/item/pickaxe: Pickaxe
+/obj/item/radio: RadioHandheld
+/obj/item/reagent_containers/cup/beaker: Beaker
+/obj/item/reagent_containers/cup/beaker/large: LargeBeaker
+/obj/item/reagent_containers/cup/glass/drinkingglass/shotglass: DrinkShotGlass
+/obj/item/reagent_containers/dropper: Dropper
+/obj/item/reagent_containers/spray/cleaner: SprayBottleSpaceCleaner
+/obj/item/reagent_containers/syringe: Syringe
+/obj/item/restraints/handcuffs: Handcuffs
+/obj/item/screwdriver: Screwdriver
+/obj/item/stack/cable_coil: CableApcStack
+/obj/item/stack/sheet/glass/fifty: SheetGlass
+/obj/item/stack/sheet/iron/fifty: SheetSteel
+/obj/item/stack/sheet/mineral/plasma: SheetPlasma
+/obj/item/stock_parts/power_store/cell/high: PowerCellHigh
+/obj/item/storage/belt/utility: ClothingBeltUtility
+/obj/item/storage/box/bodybags: BoxBodyBag
+/obj/item/storage/box/lights/mixed: BoxLightbulbColorfulMixed
+/obj/item/storage/briefcase/secure: BriefcaseBrown
+/obj/item/storage/medkit/regular: MedkitFilled
+/obj/item/storage/toolbox/electrical: ToolboxElectrical
+/obj/item/storage/toolbox/emergency: ToolboxEmergency
+/obj/item/storage/toolbox/mechanical: ToolboxMechanical
+/obj/item/tank/internals/plasmaman: PlasmaTank
+/obj/item/taperecorder: TapeRecorder
+/obj/item/wirecutters: Wirecutter
+/obj/item/wrench: Wrench
+
+# ---- structures and simple machines (tgstation catalog tail) ----
+/obj/machinery/atmospherics/components/unary/passive_vent: GasPassiveVent
+/obj/machinery/cell_charger: PowerCellRecharger
+/obj/machinery/fax: FaxMachineShip
+/obj/machinery/hydroponics/constructable: hydroponicsTray
+/obj/machinery/hydroponics/soil: hydroponicsSoil
+/obj/machinery/microwave: KitchenMicrowave
+/obj/machinery/portable_atmospherics/canister: AirCanister
+/obj/machinery/portable_atmospherics/canister/air: AirCanister
+/obj/machinery/portable_atmospherics/canister/nitrogen: NitrogenCanister
+/obj/machinery/portable_atmospherics/canister/oxygen: OxygenCanister
+/obj/machinery/power/port_gen/pacman/pre_loaded: PortableGeneratorPacman
+/obj/machinery/reagentgrinder: KitchenReagentGrinder
+/obj/machinery/recharger: WeaponCapacitorRecharger
+/obj/machinery/space_heater: SpaceHeater
+/obj/machinery/vending/cigarette: VendingMachineCigs
+/obj/machinery/vending/coffee: VendingMachineCoffee
+/obj/structure/barricade/wooden/crude: Barricade
+/obj/structure/bed: Bed
+/obj/structure/bodycontainer/morgue: Morgue
+/obj/structure/closet/firecloset: ClosetFireFilled
+/obj/structure/curtain: CurtainSpawner
+/obj/structure/curtain/cloth: CurtainSpawner
+/obj/structure/disposalpipe/junction: DisposalJunction
+/obj/structure/disposalpipe/junction/flip: DisposalJunctionFlipped
+/obj/structure/disposalpipe/junction/yjunction: DisposalYJunction
+/obj/structure/dresser: Dresser
+/obj/structure/fence: FenceMetalStraight
+/obj/structure/fence/corner: FenceMetalCorner
+/obj/structure/fence/post: FenceMetalEnd
+/obj/structure/filingcabinet: filingCabinet
+/obj/structure/filingcabinet/chestdrawer: filingCabinetDrawer
+/obj/structure/frame/computer: ComputerFrame
+/obj/structure/girder: Girder
+/obj/structure/reagent_dispensers/watertank: WaterTank
+/obj/structure/toilet: ToiletEmpty
+
+# ---- door/window: a rotation only, like Airlock ----
+/obj/machinery/door/window/left/directional/north: {entity: Windoor, dir: 1}
+/obj/machinery/door/window/left/directional/south: {entity: Windoor, dir: 2}
+/obj/machinery/door/window/left/directional/east: {entity: Windoor, dir: 4}
+/obj/machinery/door/window/left/directional/west: {entity: Windoor, dir: 8}
+/obj/machinery/door/window/right/directional/north: {entity: Windoor, dir: 1}
+/obj/machinery/door/window/right/directional/south: {entity: Windoor, dir: 2}
+/obj/machinery/door/window/right/directional/east: {entity: Windoor, dir: 4}
+/obj/machinery/door/window/right/directional/west: {entity: Windoor, dir: 8}
+
+# ---- camera/autoname: same physical camera as camera/directional ----
+/obj/machinery/camera/autoname/directional/north: {entity: SurveillanceCameraGeneral, wall: north}
+/obj/machinery/camera/autoname/directional/south: {entity: SurveillanceCameraGeneral, wall: south}
+/obj/machinery/camera/autoname/directional/east: {entity: SurveillanceCameraGeneral, wall: east}
+/obj/machinery/camera/autoname/directional/west: {entity: SurveillanceCameraGeneral, wall: west}
+
+# ---- mounted on the wall itself, not the floor in front of it ----
+/obj/structure/mirror/directional/north: {entity: Mirror, wall: north, onWall: true}
+/obj/structure/mirror/directional/south: {entity: Mirror, wall: south, onWall: true}
+/obj/structure/mirror/directional/east: {entity: Mirror, wall: east, onWall: true}
+/obj/structure/mirror/directional/west: {entity: Mirror, wall: west, onWall: true}
+/obj/structure/sign/clock/directional/north: {entity: WallClock, wall: north, onWall: true}
+/obj/structure/sign/clock/directional/south: {entity: WallClock, wall: south, onWall: true}
+/obj/structure/sign/clock/directional/east: {entity: WallClock, wall: east, onWall: true}
+/obj/structure/sign/clock/directional/west: {entity: WallClock, wall: west, onWall: true}
+
+# /obj/machinery/button/door (no /directional suffix): most instances in a
+# real map (MetaStation.dmm) carry no dir var at all, so there is no reliable
+# wall side to shift toward -- checked empirically and 14/18 landed nowhere
+# near a wall. Left as a plain floor placement instead of guessing.
+/obj/machinery/button/door: SignalButton
+/obj/structure/bookcase: Bookshelf

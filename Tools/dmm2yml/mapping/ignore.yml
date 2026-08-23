@@ -36,3 +36,20 @@
 - /obj/machinery/newscaster
 - /obj/machinery/navbeacon
 - /obj/machinery/status_display
+
+# Checked from several angles (exact id, keyword search, direct grep for the
+# id pattern) and confirmed genuinely absent from this fork's SS14, the same
+# way newscaster/navbeacon/status_display were above -- not renamed, not
+# hidden, the feature or fixture just isn't implemented.
+- /obj/machinery/light_switch
+- /obj/machinery/requests_console
+- /obj/machinery/digital_clock
+- /obj/machinery/photocopier
+- /obj/machinery/iv_drip
+- /obj/machinery/shower
+- /obj/structure/ladder
+- /obj/structure/transit_tube
+- /obj/structure/transport/linear
+- /obj/structure/marker_beacon
+- /obj/item/pai_card
+- /obj/item/newspaper

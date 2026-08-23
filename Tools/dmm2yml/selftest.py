@@ -565,6 +565,45 @@ def check_protoindex_indentation() -> Result:
     )
 
 
+def check_entity_name_quoting() -> Result:
+    """A MetaData name with YAML-special characters must not corrupt the map.
+
+    "Danger: Conveyor Access" -- a real name from a converted map -- written out
+    unquoted turns `name: Danger: Conveyor Access` into a nested mapping as far
+    as a YAML parser is concerned, and the whole file stops loading. Converting
+    MetaStation.dmm is what surfaced this; the fixture map has no named entity
+    dangerous enough to catch it on its own.
+    """
+    builder = ss14map.MapBuilder("- type: MetaData", "- type: MetaData", "0.0.0")
+    tricky = {
+        "plain": "fancy table",
+        "colon": "Danger: Conveyor Access",
+        "apostrophe": "O'Brien's Locker",
+        "hash": "#1 Fan Club",
+    }
+    for name in tricky.values():
+        builder.add_entity("Table", 0.5, 0.5, name=name)
+
+    document = builder.render()
+    try:
+        parsed = yaml.safe_load(document)
+    except yaml.YAMLError as error:
+        return Result("rendering: entity names quote safely", False, f"output is not valid YAML: {error}")
+
+    got_names = {
+        c["name"]
+        for group in parsed["entities"]
+        if group["proto"] == "Table"
+        for entity in group["entities"]
+        for c in entity["components"]
+        if c["type"] == "MetaData" and "name" in c
+    }
+    missing = set(tricky.values()) - got_names
+    if missing:
+        return Result("rendering: entity names quote safely", False, f"names lost or mangled: {sorted(missing)}")
+    return Result("rendering: entity names quote safely", True, f"{len(tricky)} tricky names round-trip")
+
+
 def run(repo_root: str, mapping_dir: str, prototypes_dir: str) -> list[Result]:
     try:
         mapping_set = mapping_rules.load(mapping_dir)
@@ -586,6 +625,7 @@ def run(repo_root: str, mapping_dir: str, prototypes_dir: str) -> list[Result]:
         ("dictionaries: indented prototype lists", lambda: check_protoindex_indentation()),
         ("conversion: fixture map", lambda: check_conversion(mapping_set, index)),
         ("rendering: valid map document", lambda: check_rendering(mapping_set, index)),
+        ("rendering: entity names quote safely", lambda: check_entity_name_quoting()),
         ("template: components load bare", lambda: check_template_components(repo_root, mapping_dir)),
     ]
 

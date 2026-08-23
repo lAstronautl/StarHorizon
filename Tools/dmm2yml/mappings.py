@@ -143,9 +143,11 @@ def _parse_entity(path: str, raw: Any) -> EntityRule:
                 raise MappingError(f"{path}: wall must be one of {sorted(WALL_TO_FACING)}, got '{wall}'")
             direction = WALL_TO_FACING[wall]
         tile = raw.get("tile")
+        # onWall does not require wall: here -- the shift uses whichever
+        # facing is finally in play, and for a path with no /directional
+        # suffix that facing comes from the atom's own dir var at conversion
+        # time (see walk() in dmm2yml.py), not from a fixed override.
         on_wall = bool(raw.get("onWall", False))
-        if on_wall and "wall" not in raw:
-            raise MappingError(f"{path}: onWall needs a wall side, e.g. {{wall: north, onWall: true}}")
         if "entities" in raw:
             return EntityRule(
                 entities=[str(i) for i in raw["entities"]], direction=direction, tile=tile, on_wall=on_wall

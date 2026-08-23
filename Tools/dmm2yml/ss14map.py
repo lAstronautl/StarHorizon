@@ -15,6 +15,8 @@ import struct
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 
+import yaml
+
 CHUNK_SIZE = 16
 TILES_PER_CHUNK = CHUNK_SIZE * CHUNK_SIZE
 MAP_FORMAT = 7
@@ -56,6 +58,20 @@ def rotation_for_dir(direction: int | None) -> float | None:
     if direction is None:
         return None
     return DIR_TO_ROTATION.get(int(direction), None)
+
+
+def yaml_scalar(text: str) -> str:
+    """Render a free-text string the way SS14 itself would write it.
+
+    A MetaData name can contain a colon ("Danger: Conveyor Access") or start
+    with a character YAML treats specially, and writing it out unquoted
+    silently corrupts the map -- the line parses as a nested mapping instead
+    of a string. PyYAML's own scalar writer already makes exactly this call
+    (quote only when needed, single quotes, doubled internal quotes), so it is
+    reused here rather than hand-rolling a second, easier-to-get-wrong version.
+    """
+    rendered = yaml.safe_dump(text, default_style=None, allow_unicode=True)
+    return rendered[: rendered.rindex("\n...")] if rendered.endswith("...\n") else rendered.rstrip("\n")
 
 
 def number(value: float) -> str:
@@ -221,7 +237,7 @@ class MapBuilder:
                 lines.append("    components:")
                 if entity.name:
                     lines.append("    - type: MetaData")
-                    lines.append(f"      name: {entity.name}")
+                    lines.append(f"      name: {yaml_scalar(entity.name)}")
                 lines.append("    - type: Transform")
                 if entity.rotation is not None:
                     lines.append(f"      rot: {entity.rotation} rad")
