@@ -21,12 +21,18 @@ public sealed class StationControlConsoleBuiState : BoundUserInterfaceState
     public readonly bool BankEnabled;
     public readonly int Deposit;
 
-    public StationControlConsoleBuiState(string stationName, int balance, bool bankEnabled, int deposit)
+    /// <summary>
+    /// The station grid's current IFF color, as a hex string (e.g. "#FFFFFFFF").
+    /// </summary>
+    public readonly string IffColorHex;
+
+    public StationControlConsoleBuiState(string stationName, int balance, bool bankEnabled, int deposit, string iffColorHex)
     {
         StationName = stationName;
         Balance = balance;
         BankEnabled = bankEnabled;
         Deposit = deposit;
+        IffColorHex = iffColorHex;
     }
 }
 
@@ -38,5 +44,16 @@ public sealed class StationControlConsoleRenameMessage : BoundUserInterfaceMessa
     public StationControlConsoleRenameMessage(string name)
     {
         Name = name;
+    }
+}
+
+[Serializable, NetSerializable]
+public sealed class StationControlConsoleSetIffColorMessage : BoundUserInterfaceMessage
+{
+    public readonly string ColorHex;
+
+    public StationControlConsoleSetIffColorMessage(string colorHex)
+    {
+        ColorHex = colorHex;
     }
 }

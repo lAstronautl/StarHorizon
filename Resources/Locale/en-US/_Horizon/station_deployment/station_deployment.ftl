@@ -15,3 +15,7 @@ station-control-console-name-info = Enter a new station name:
 station-control-console-name-set = Rename
 station-control-console-rename-invalid = That name isn't valid.
 station-control-console-rename-success = Station renamed.
+station-control-console-iff-color-label = IFF Color (HEX):
+station-control-console-iff-color-set = Apply
+station-control-console-iff-color-invalid = That's not a valid hex color code.
+station-control-console-iff-color-success = Station IFF color changed.

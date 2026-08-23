@@ -15,3 +15,7 @@ station-control-console-name-info = Введите новое название �
 station-control-console-name-set = Переименовать
 station-control-console-rename-invalid = Это название недопустимо.
 station-control-console-rename-success = Станция переименована.
+station-control-console-iff-color-label = Цвет IFF (HEX):
+station-control-console-iff-color-set = Применить
+station-control-console-iff-color-invalid = Некорректный HEX-код цвета.
+station-control-console-iff-color-success = Цвет IFF станции изменён.

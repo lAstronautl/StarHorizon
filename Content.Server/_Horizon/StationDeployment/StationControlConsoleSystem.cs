@@ -1,5 +1,6 @@
 using Content.Server.Cargo.Systems;
 using Content.Server.Hands.Systems;
+using Content.Server.Shuttles.Systems;
 using Content.Server.Stack;
 using Content.Server.Station.Systems;
 using Content.Shared._Horizon.StationDeployment;
@@ -39,6 +40,7 @@ public sealed class StationControlConsoleSystem : EntitySystem
     [Dependency] private readonly TransformSystem _transform = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly ShuttleSystem _shuttle = default!;
 
     private int _maxNameLength;
 
@@ -48,6 +50,7 @@ public sealed class StationControlConsoleSystem : EntitySystem
 
         SubscribeLocalEvent<StationControlConsoleComponent, BoundUIOpenedEvent>(OnUiOpened);
         SubscribeLocalEvent<StationControlConsoleComponent, StationControlConsoleRenameMessage>(OnRename);
+        SubscribeLocalEvent<StationControlConsoleComponent, StationControlConsoleSetIffColorMessage>(OnSetIffColor);
         SubscribeLocalEvent<StationControlConsoleComponent, StationBankWithdrawMessage>(OnWithdraw);
         SubscribeLocalEvent<StationControlConsoleComponent, StationBankDepositMessage>(OnDeposit);
         SubscribeLocalEvent<StationControlConsoleComponent, EntInsertedIntoContainerMessage>(OnCashSlotChanged);
@@ -93,6 +96,33 @@ public sealed class StationControlConsoleSystem : EntitySystem
         }
 
         _popup.PopupEntity(Loc.GetString("station-control-console-rename-success"), ent, args.Actor, PopupType.Medium);
+
+        UpdateUi(ent);
+    }
+
+    private void OnSetIffColor(Entity<StationControlConsoleComponent> ent, ref StationControlConsoleSetIffColorMessage args)
+    {
+        if (args.Actor is not { Valid: true } player)
+            return;
+
+        if (_station.GetOwningStation(ent.Owner) is not { Valid: true } station ||
+            !TryComp<StationDataComponent>(station, out var stationData))
+        {
+            return;
+        }
+
+        if (Color.TryFromHex(args.ColorHex) is not { } color)
+        {
+            _popup.PopupEntity(Loc.GetString("station-control-console-iff-color-invalid"), ent, player, PopupType.SmallCaution);
+            return;
+        }
+
+        foreach (var grid in stationData.Grids)
+        {
+            _shuttle.SetIFFColor(grid, color);
+        }
+
+        _popup.PopupEntity(Loc.GetString("station-control-console-iff-color-success"), ent, player, PopupType.Medium);
 
         UpdateUi(ent);
     }
@@ -193,8 +223,19 @@ public sealed class StationControlConsoleSystem : EntitySystem
 
         GetInsertedCashAmount(ent.Comp, out var deposit);
 
+        var iffColorHex = Color.White.ToHexNoAlpha();
+        if (station is { Valid: true } stationForIff &&
+            TryComp<StationDataComponent>(stationForIff, out var iffStationData))
+        {
+            foreach (var grid in iffStationData.Grids)
+            {
+                iffColorHex = _shuttle.GetIFFColor(grid).ToHexNoAlpha();
+                break;
+            }
+        }
+
         _uiSystem.SetUiState(ent.Owner, StationControlConsoleUiKey.Key,
-            new StationControlConsoleBuiState(name, balance, bankEnabled, deposit));
+            new StationControlConsoleBuiState(name, balance, bankEnabled, deposit, iffColorHex));
     }
 
     private static int GetBalance(StationBankAccountComponent bank)
