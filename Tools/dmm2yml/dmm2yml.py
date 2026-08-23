@@ -8,7 +8,7 @@ in, and ``convert`` refuses to produce a map while that table has blanks.
     scan      read a .dmm, report every path that has no rule, as CSV
     convert   build the map, using the mapping files plus a filled-in table
     merge     fold a filled-in table back into the shared mapping files
-    selftest  check the chunk encoder against the maps already in the repo
+    selftest  run the converter's own checks against this repo
 
 Run ``dmm2yml.py <command> --help`` for the options of each.
 """
@@ -459,38 +459,22 @@ def command_merge(args) -> int:
 
 
 def command_selftest(args) -> int:
-    """Encode/decode chunks taken from maps that already ship in this repo."""
-    maps_dir = os.path.join(REPO_ROOT, "Resources", "Maps")
-    checked = failed = 0
+    """Run every check and print a line per check."""
+    import selftest
 
-    for root, _, files in os.walk(maps_dir):
-        for name in sorted(files):
-            if not name.endswith(".yml"):
-                continue
-            with open(os.path.join(root, name), encoding="utf-8") as handle:
-                text = handle.read()
-            if "version: 7" not in text:
-                continue  # only format-7 chunks use the 7-byte record
-            for encoded in re.findall(r"tiles: ([A-Za-z0-9+/=]+)\n", text)[:50]:
-                try:
-                    tiles = ss14map.decode_chunk(encoded)
-                except ValueError:
-                    continue
-                buffer = bytearray(len(tiles) * ss14map.TILE_RECORD.size)
-                for position, record in enumerate(tiles):
-                    ss14map.TILE_RECORD.pack_into(
-                        buffer, position * ss14map.TILE_RECORD.size, *record
-                    )
-                import base64
+    results = selftest.run(REPO_ROOT, args.mapping_dir, args.prototypes)
+    width = max(len(result.name) for result in results)
+    for result in results:
+        status = "ok  " if result.passed else "FAIL"
+        print(f"  [{status}] {result.name.ljust(width)}  {result.detail}")
 
-                checked += 1
-                if base64.b64encode(bytes(buffer)).decode("ascii") != encoded:
-                    failed += 1
-        if checked > 2000:
-            break
-
-    print(f"chunk round-trip: {checked - failed}/{checked} byte-identical")
-    return 1 if failed or not checked else 0
+    failed = [result for result in results if not result.passed]
+    print()
+    if failed:
+        print(f"{len(failed)} of {len(results)} checks failed.")
+        return 1
+    print(f"all {len(results)} checks passed.")
+    return 0
 
 
 # ---------------------------------------------------------------- entry
@@ -528,8 +512,14 @@ def main(argv: list[str] | None = None) -> int:
     merge.add_argument("table", help="filled-in CSV from 'scan'")
     merge.set_defaults(func=command_merge)
 
-    selftest = subparsers.add_parser("selftest", help="check the chunk encoder against this repo's maps")
-    selftest.set_defaults(func=command_selftest)
+    selftest_parser = subparsers.add_parser(
+        "selftest", help="run the converter's own checks against this repo"
+    )
+    selftest_parser.add_argument("--mapping-dir", default=DEFAULT_MAPPING_DIR,
+                                 help="directory holding the mapping files")
+    selftest_parser.add_argument("--prototypes", default=DEFAULT_PROTOTYPES,
+                                 help="Resources/Prototypes to validate against")
+    selftest_parser.set_defaults(func=command_selftest)
 
     args = parser.parse_args(argv)
     try:
