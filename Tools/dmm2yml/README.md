@@ -97,6 +97,9 @@ SS13 прячет ориентацию части объектов в самом
   ними обычно нужен пол или решётка. Конвертер тайлы сам не дорисовывает.
 * **Диагональные направления.** `dir` 5/6/9/10 сводятся к одной кардинальной
   составляющей — в SS14 диагональных поворотов у большинства сущностей нет.
+* **Разделение грида.** SS14 грузит каждый несвязный участок тайлов как отдельный
+  грид. Это нормально, но чтобы не увидеть это впервые в логе сервера, `convert`
+  сам сообщает число таких участков и где находятся мелкие.
 * **Переменные, кроме `dir` и `name`.** Отбрасываются: `pixel_x/y`, `req_access`,
   `c_tag`, `network` и ещё около 75 других. Какие именно встретились у пути,
   видно в колонке `notes`.
@@ -118,17 +121,19 @@ SS13 прячет ориентацию части объектов в самом
 python3 Tools/dmm2yml/dmm2yml.py selftest
 ```
 
-Восемь проверок, каждая — на ошибку, которая уже была допущена хотя бы раз:
+Десять проверок, каждая — на ошибку, которая уже была допущена хотя бы раз:
 
 ```
   [ok  ] parser: geometry and vars         2x4, top-down rows, dir parsed
   [ok  ] rules: exact, inherited, ignored  all four behave
   [ok  ] orientation: wall vs dir          wall inverts, dir does not
   [ok  ] chunks: cell indexing             6 probes, negative chunks, variant and rotation kept
+  [ok  ] chunks: no empty chunks           1 chunk(s) written, the all-Space one dropped
   [ok  ] chunks: round-trip vs repo maps   994/994 byte-identical across 60 maps
   [ok  ] dictionaries: ids resolve         359 rules, every id exists
   [ok  ] conversion: fixture map           tiles, entities, rotation, decal
   [ok  ] rendering: valid map document     5 entities, uids unique
+  [ok  ] template: components load bare    11 bare components, all seen bare in real maps
 ```
 
 Что именно ловится:
@@ -141,6 +146,9 @@ python3 Tools/dmm2yml/dmm2yml.py selftest
   поворота совпадают с теми, что выведены по `Resources/Maps/amber.yml`.
 * **chunks: cell indexing** — тайл попадает в ту клетку, куда положен (включая
   отрицательные чанки), и не теряет `variant` и `rotationMirroring`.
+* **chunks: no empty chunks** — чанк, в котором только космос, не пишется вовсе.
+  Космос — такой же тайл словаря, и без этого станция посреди карты 255×255 тащит
+  за собой сотню чанков пустоты, на каждый из которых движок ругается.
 * **chunks: round-trip** — чанки всех карт формата 7 из `Resources/Maps`
   перекодируются побайтово одинаково.
 * **dictionaries** — каждый id из `mapping/*.yml` существует в
@@ -150,6 +158,12 @@ python3 Tools/dmm2yml/dmm2yml.py selftest
   светильника, решётка поверх космоса, декаль с направлением.
 * **rendering** — результат грузится как YAML, `format: 7`, тайл 0 — `Space`,
   у грид-сущности есть `MapGrid` и `DecalGrid`, uid'ы не повторяются.
+* **template: components load bare** — каждый компонент, который `grid_template.yml`
+  пишет без полей, обязан встречаться пустым хотя бы в одной карте
+  `Resources/Maps`. Это ловит целый класс ошибок «вписал компонент, а у него есть
+  обязательные данные»: пустой `GridAtmosphere` роняет загрузку карты, потому что
+  `TileAtmosCollectionSerializer` уходит в ветку формата 1 и требует ключ `tiles`.
+  Атмосферу гриду выдаёт `AutomaticAtmosSystem`, руками её вписывать не нужно.
 
 Проверки писались от обратного: в код по очереди вносились поломки (перевёрнутая
 ось Y, транспонированный индекс чанка, выброшенный байт поворота, `wall`

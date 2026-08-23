@@ -17,6 +17,10 @@
 #     must never move.
 #   * BecomesStation is deliberately absent: add it, with the station's id, when
 #     the map is ready to be a real station.
+#   * GridAtmosphere is deliberately absent too, and adding it back with no data
+#     under it breaks loading: TileAtmosCollectionSerializer falls back to the
+#     format-1 branch and demands a `tiles` key. AutomaticAtmosSystem gives the
+#     component to any grid big enough, so the engine handles it.
 
 map_entity: |
   - type: MetaData
@@ -56,7 +60,6 @@ grid_entity: |
     chunkCollection:
       version: 2
   {{DECALGRID_NODES}}
-  - type: GridAtmosphere
   - type: GasTileOverlay
   - type: RadiationGridResistance
   - type: NavMap

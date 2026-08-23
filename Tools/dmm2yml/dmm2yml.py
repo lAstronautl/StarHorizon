@@ -369,9 +369,53 @@ def command_convert(args) -> int:
     print(f"  tiles    {len(builder.tiles)} ({len(builder.build_tilemap())} distinct)")
     print(f"  decals   {sum(len(v) for v in builder.decals.values())} in {len(builder.decals)} nodes")
     print(f"  entities {len(builder.entities)}")
+    report_disconnected(builder)
     if not args.no_verify:
         return verify(builder)
     return 0
+
+
+def report_disconnected(builder: ss14map.MapBuilder) -> None:
+    """Warn about tile islands, because the engine will split them into grids.
+
+    SS14 gives every disconnected run of tiles its own grid. That is correct, but
+    seeing it for the first time in the server log as "Splitting grid into 2
+    grids" is a surprise; better to say so while the mapper is still looking.
+    """
+    tiles = {
+        position
+        for position, (tile_id, _, _) in builder.tiles.items()
+        if tile_id != ss14map.SPACE_TILE
+    }
+
+    seen: set[tuple[int, int]] = set()
+    regions: list[list[tuple[int, int]]] = []
+    for start in tiles:
+        if start in seen:
+            continue
+        stack = [start]
+        seen.add(start)
+        region = []
+        while stack:
+            x, y = stack.pop()
+            region.append((x, y))
+            for neighbour in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+                if neighbour in tiles and neighbour not in seen:
+                    seen.add(neighbour)
+                    stack.append(neighbour)
+        regions.append(region)
+
+    if len(regions) <= 1:
+        return
+
+    regions.sort(key=len, reverse=True)
+    print(f"  note     {len(regions)} disconnected tile regions -- SS14 will load these as separate grids:")
+    for region in regions[1:6]:
+        x = sum(position[0] for position in region) / len(region)
+        y = sum(position[1] for position in region) / len(region)
+        print(f"             {len(region)} tiles around {x:.0f},{y:.0f}")
+    if len(regions) > 6:
+        print(f"             ... and {len(regions) - 6} more")
 
 
 def verify(builder: ss14map.MapBuilder) -> int:

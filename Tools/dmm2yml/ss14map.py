@@ -153,7 +153,15 @@ class MapBuilder:
             offset = (local_y * CHUNK_SIZE + local_x) * TILE_RECORD.size
             TILE_RECORD.pack_into(buffer, offset, tilemap[tile_id], 0, variant, rotation_mirroring)
 
-        return {key: base64.b64encode(bytes(buffer)).decode("ascii") for key, buffer in chunks.items()}
+        # A chunk of nothing but Space carries no information, and the engine
+        # warns about every one it loads. Space is a tile like any other in the
+        # mapping tables, so without this a station in the middle of a 255x255
+        # .dmm drags along a hundred-odd chunks of pure vacuum.
+        return {
+            key: base64.b64encode(bytes(buffer)).decode("ascii")
+            for key, buffer in chunks.items()
+            if any(buffer)
+        }
 
     # -- rendering -------------------------------------------------------
 

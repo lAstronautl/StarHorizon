@@ -384,6 +384,93 @@ def check_chunk_indexing() -> Result:
     return Result("chunks: cell indexing", True, f"{len(probes)} probes, negative chunks, variant and rotation kept")
 
 
+def _bare_components_in(text: str) -> set[str]:
+    """Component names written with no fields under them."""
+    lines = text.split("\n")
+    bare = set()
+    for index, line in enumerate(lines):
+        match = re.match(r"^(\s*)- type: (\w+)\s*$", line)
+        if match is None:
+            continue
+        indent = len(match.group(1))
+        following = lines[index + 1] if index + 1 < len(lines) else ""
+        has_fields = following.strip() and (len(following) - len(following.lstrip())) > indent
+        if not has_fields:
+            bare.add(match.group(2))
+    return bare
+
+
+def check_template_components(repo_root: str, mapping_dir: str) -> Result:
+    """Every component the grid template writes bare must survive being written bare.
+
+    A component with a custom serializer can require fields that look optional.
+    `GridAtmosphere` is one: written with no data it throws on load, because
+    TileAtmosCollectionSerializer falls back to format 1 and demands a `tiles`
+    key. The maps already in this repo are the evidence for what is safe -- if
+    none of them ever writes a component bare, neither should we.
+    """
+    with open(os.path.join(mapping_dir, "grid_template.yml"), encoding="utf-8") as handle:
+        template = yaml.safe_load(handle)
+
+    wanted = _bare_components_in(template["map_entity"]) | _bare_components_in(template["grid_entity"])
+    if not wanted:
+        return Result("template: components load bare", True, "template writes no bare components")
+
+    bare_in_maps: set[str] = set()
+    seen_at_all: set[str] = set()
+    maps_dir = os.path.join(repo_root, "Resources", "Maps")
+    for root, _, files in os.walk(maps_dir):
+        for name in files:
+            if not name.endswith(".yml"):
+                continue
+            with open(os.path.join(root, name), encoding="utf-8") as handle:
+                text = handle.read()
+            bare_in_maps |= _bare_components_in(text)
+            seen_at_all |= set(re.findall(r"^\s*- type: (\w+)", text, re.M))
+
+    # Only judge components the repo's own maps actually use; anything else we
+    # have no evidence about either way.
+    risky = sorted(name for name in wanted & seen_at_all if name not in bare_in_maps)
+    if risky:
+        return Result(
+            "template: components load bare",
+            False,
+            f"never written bare by any map in this repo, so probably needs data: {', '.join(risky)}",
+        )
+    return Result("template: components load bare", True, f"{len(wanted)} bare components, all seen bare in real maps")
+
+
+def check_no_empty_chunks(mapping_set, index) -> Result:
+    """Chunks holding nothing but Space must not be written at all.
+
+    Space is a tile like any other in the mapping tables, so a map with a lot of
+    it -- a station sitting in the middle of a 255x255 .dmm -- fills chunk after
+    chunk with pure Space. The engine loads every one of them and warns about it;
+    converting MetaStation once produced 143 such chunks out of 256.
+    """
+    builder = ss14map.MapBuilder("- type: MetaData", "- type: MetaData", "0.0.0")
+    builder.set_tile(0, 0, "Plating")
+    # Far enough away to land in a chunk of its own, and made of nothing.
+    for offset in range(4):
+        builder.set_tile(100 + offset, 100, ss14map.SPACE_TILE)
+
+    tilemap = builder.build_tilemap()
+    encoded = builder._encode_chunks(tilemap)
+    empty = [
+        key for key, chunk in encoded.items()
+        if all(record[0] == 0 for record in ss14map.decode_chunk(chunk))
+    ]
+    if empty:
+        return Result(
+            "chunks: no empty chunks",
+            False,
+            f"{len(empty)} of {len(encoded)} chunks hold nothing but Space: {sorted(empty)}",
+        )
+    if not encoded:
+        return Result("chunks: no empty chunks", False, "no chunks written at all")
+    return Result("chunks: no empty chunks", True, f"{len(encoded)} chunk(s) written, the all-Space one dropped")
+
+
 def run(repo_root: str, mapping_dir: str, prototypes_dir: str) -> list[Result]:
     mapping_set = mapping_rules.load(mapping_dir)
     index = protoindex.build(prototypes_dir)
@@ -393,10 +480,12 @@ def run(repo_root: str, mapping_dir: str, prototypes_dir: str) -> list[Result]:
         ("rules: exact, inherited, ignored", lambda: check_rules(mapping_set)),
         ("orientation: wall vs dir", lambda: check_orientation(mapping_set)),
         ("chunks: cell indexing", lambda: check_chunk_indexing()),
+        ("chunks: no empty chunks", lambda: check_no_empty_chunks(mapping_set, index)),
         ("chunks: round-trip vs repo maps", lambda: check_chunk_roundtrip(repo_root)),
         ("dictionaries: ids resolve", lambda: check_dictionaries(mapping_set, index)),
         ("conversion: fixture map", lambda: check_conversion(mapping_set, index)),
         ("rendering: valid map document", lambda: check_rendering(mapping_set, index)),
+        ("template: components load bare", lambda: check_template_components(repo_root, mapping_dir)),
     ]
 
     results = []
