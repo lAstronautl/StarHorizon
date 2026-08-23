@@ -1,3 +1,5 @@
+using Content.Server._Horizon.StationDeployment.Components;
+using Content.Server.Cargo.Components;
 using Content.Server.Cargo.Systems;
 using Content.Server.Hands.Systems;
 using Content.Server.Shuttles.Systems;
@@ -5,6 +7,7 @@ using Content.Server.Stack;
 using Content.Server.Station.Systems;
 using Content.Shared._Horizon.StationDeployment;
 using Content.Shared._Horizon.StationDeployment.Components;
+using Content.Shared._Horizon.StationDeployment.Prototypes;
 using Content.Shared._NF.Bank.Events;
 using Content.Shared.Cargo.Components;
 using Content.Shared.CCVar;
@@ -53,6 +56,7 @@ public sealed class StationControlConsoleSystem : EntitySystem
         SubscribeLocalEvent<StationControlConsoleComponent, StationControlConsoleSetIffColorMessage>(OnSetIffColor);
         SubscribeLocalEvent<StationControlConsoleComponent, StationBankWithdrawMessage>(OnWithdraw);
         SubscribeLocalEvent<StationControlConsoleComponent, StationBankDepositMessage>(OnDeposit);
+        SubscribeLocalEvent<StationControlConsoleComponent, StationControlConsolePurchaseUpgradeMessage>(OnPurchaseUpgrade);
         SubscribeLocalEvent<StationControlConsoleComponent, EntInsertedIntoContainerMessage>(OnCashSlotChanged);
         SubscribeLocalEvent<StationControlConsoleComponent, EntRemovedFromContainerMessage>(OnCashSlotChanged);
 
@@ -196,6 +200,83 @@ public sealed class StationControlConsoleSystem : EntitySystem
         UpdateUi(ent);
     }
 
+    private void OnPurchaseUpgrade(Entity<StationControlConsoleComponent> ent, ref StationControlConsolePurchaseUpgradeMessage args)
+    {
+        if (args.Actor is not { Valid: true } player)
+            return;
+
+        if (!_protoMan.TryIndex(args.PurchaseId, out var purchase))
+            return;
+
+        if (_station.GetOwningStation(ent.Owner) is not { Valid: true } station ||
+            !TryComp<StationDataComponent>(station, out var stationData) ||
+            !TryComp<StationBankAccountComponent>(station, out var bank) ||
+            !TryComp<StationDevelopmentComponent>(station, out var devel))
+        {
+            return;
+        }
+
+        var currentLevel = devel.Progress.GetValueOrDefault(purchase.Category, 0);
+        if (currentLevel < purchase.RequiredLevel)
+        {
+            _popup.PopupEntity(Loc.GetString("station-control-console-upgrade-locked"), ent, player, PopupType.SmallCaution);
+            return;
+        }
+
+        if (purchase.Price > GetBalance(bank))
+        {
+            _popup.PopupEntity(Loc.GetString("bank-insufficient-funds"), ent, player, PopupType.SmallCaution);
+            return;
+        }
+
+        if (FindPurchasePallet(stationData) is not { } pallet)
+        {
+            _popup.PopupEntity(Loc.GetString("station-control-console-upgrade-no-pallet"), ent, player, PopupType.MediumCaution);
+            return;
+        }
+
+        _cargo.UpdateBankAccount((station, bank), -purchase.Price, bank.PrimaryAccount);
+
+        var spawned = EntityManager.SpawnEntity(purchase.Entity, Transform(pallet.Pallet).Coordinates);
+        var equipment = EnsureComp<StationUpgradeEquipmentComponent>(spawned);
+        equipment.BoundGrid = pallet.Grid;
+
+        _popup.PopupEntity(Loc.GetString("station-control-console-upgrade-purchased", ("name", Loc.GetString(purchase.Name))), ent, player, PopupType.Medium);
+
+        UpdateUi(ent);
+    }
+
+    /// <summary>
+    /// Finds an anchored CargoPalletBuy-type pallet on one of the station's own grids to deliver a
+    /// purchase to.
+    /// </summary>
+    private (EntityUid Pallet, EntityUid Grid)? FindPurchasePallet(StationDataComponent stationData)
+    {
+        var query = AllEntityQuery<CargoPalletComponent, TransformComponent>();
+        while (query.MoveNext(out var uid, out var pallet, out var xform))
+        {
+            if (!xform.Anchored || xform.GridUid is not { Valid: true } grid)
+                continue;
+
+            var onStation = false;
+            foreach (var stationGrid in stationData.Grids)
+            {
+                if (stationGrid != grid)
+                    continue;
+
+                onStation = true;
+                break;
+            }
+
+            if (!onStation || (pallet.PalletType & BuySellType.Buy) == 0)
+                continue;
+
+            return (uid, grid);
+        }
+
+        return null;
+    }
+
     private void OnCashSlotChanged(Entity<StationControlConsoleComponent> ent, ref EntInsertedIntoContainerMessage args)
     {
         UpdateUi(ent);
@@ -234,8 +315,25 @@ public sealed class StationControlConsoleSystem : EntitySystem
             }
         }
 
+        var upgrades = new List<StationUpgradePurchaseUiEntry>();
+        if (station is { Valid: true } stationForUpgrades &&
+            TryComp<StationDevelopmentComponent>(stationForUpgrades, out var devel))
+        {
+            foreach (var purchase in _protoMan.EnumeratePrototypes<StationUpgradePurchasePrototype>())
+            {
+                var currentLevel = devel.Progress.GetValueOrDefault(purchase.Category, 0);
+                upgrades.Add(new StationUpgradePurchaseUiEntry(
+                    purchase.ID,
+                    purchase.RequiredLevel,
+                    currentLevel,
+                    purchase.Price,
+                    currentLevel >= purchase.RequiredLevel,
+                    purchase.Price <= balance));
+            }
+        }
+
         _uiSystem.SetUiState(ent.Owner, StationControlConsoleUiKey.Key,
-            new StationControlConsoleBuiState(name, balance, bankEnabled, deposit, iffColorHex));
+            new StationControlConsoleBuiState(name, balance, bankEnabled, deposit, iffColorHex, upgrades));
     }
 
     private static int GetBalance(StationBankAccountComponent bank)

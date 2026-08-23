@@ -1,3 +1,5 @@
+using Content.Shared._Horizon.StationDeployment.Prototypes;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared._Horizon.StationDeployment;
@@ -7,6 +9,19 @@ public enum StationControlConsoleUiKey : byte
 {
     Key
 }
+
+/// <summary>
+/// One purchasable upgrade as shown in the console - whether it's unlocked (development level met)
+/// and affordable (enough station funds) are precomputed server-side.
+/// </summary>
+[Serializable, NetSerializable]
+public readonly record struct StationUpgradePurchaseUiEntry(
+    ProtoId<StationUpgradePurchasePrototype> Id,
+    int RequiredLevel,
+    int CurrentLevel,
+    int Price,
+    bool Unlocked,
+    bool Affordable);
 
 [Serializable, NetSerializable]
 public sealed class StationControlConsoleBuiState : BoundUserInterfaceState
@@ -26,13 +41,22 @@ public sealed class StationControlConsoleBuiState : BoundUserInterfaceState
     /// </summary>
     public readonly string IffColorHex;
 
-    public StationControlConsoleBuiState(string stationName, int balance, bool bankEnabled, int deposit, string iffColorHex)
+    public readonly List<StationUpgradePurchaseUiEntry> Upgrades;
+
+    public StationControlConsoleBuiState(
+        string stationName,
+        int balance,
+        bool bankEnabled,
+        int deposit,
+        string iffColorHex,
+        List<StationUpgradePurchaseUiEntry> upgrades)
     {
         StationName = stationName;
         Balance = balance;
         BankEnabled = bankEnabled;
         Deposit = deposit;
         IffColorHex = iffColorHex;
+        Upgrades = upgrades;
     }
 }
 
@@ -55,5 +79,16 @@ public sealed class StationControlConsoleSetIffColorMessage : BoundUserInterface
     public StationControlConsoleSetIffColorMessage(string colorHex)
     {
         ColorHex = colorHex;
+    }
+}
+
+[Serializable, NetSerializable]
+public sealed class StationControlConsolePurchaseUpgradeMessage : BoundUserInterfaceMessage
+{
+    public readonly ProtoId<StationUpgradePurchasePrototype> PurchaseId;
+
+    public StationControlConsolePurchaseUpgradeMessage(ProtoId<StationUpgradePurchasePrototype> purchaseId)
+    {
+        PurchaseId = purchaseId;
     }
 }
