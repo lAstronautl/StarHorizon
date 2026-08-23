@@ -1,0 +1,1313 @@
+# /obj/effect/turf_decal/... -> SS14 decals.
+#
+# Rules are inherited down the SS13 path tree, so a rule for
+# '/obj/effect/turf_decal/siding' also covers '/siding/thinplating_new'.
+# Forms: a bare id, {id, color}, {dirs: {1,2,4,8}} for direction-dependent
+# decals, or {decals: [...]} to put several decals on one tile.
+#
+# Directions are BYOND's: 1 north, 2 south, 4 east, 8 west.
+#
+# NOTE: SS13 stores a decal's orientation in 'dir' while SS14 bakes it into
+# the decal id. The rotation used here (N -> base, E -> 90, S -> 180,
+# W -> 270) is consistent but has not been checked against the sprites --
+# if converted corners come out rotated, fix the four ROT lines here and
+# every tile overlay follows.
+
+# ---- hazard stripes ----
+/obj/effect/turf_decal/stripes/line:
+  dirs:
+    1: WarnLineN
+    2: WarnLineS
+    4: WarnLineE
+    8: WarnLineW
+/obj/effect/turf_decal/stripes/end:
+  dirs:
+    1: WarnEndN
+    2: WarnEndS
+    4: WarnEndE
+    8: WarnEndW
+/obj/effect/turf_decal/stripes/corner:
+  dirs:
+    1: WarnCornerNE
+    2: WarnCornerSW
+    4: WarnCornerSE
+    8: WarnCornerNW
+/obj/effect/turf_decal/stripes/box: WarnBox
+/obj/effect/turf_decal/stripes/white/line:
+  dirs:
+    1: WarnLineGreyscaleN
+    2: WarnLineGreyscaleS
+    4: WarnLineGreyscaleE
+    8: WarnLineGreyscaleW
+  color: '#FFFFFFFF'
+/obj/effect/turf_decal/stripes/white/corner:
+  dirs:
+    1: WarnCornerGreyscaleNE
+    2: WarnCornerGreyscaleSW
+    4: WarnCornerGreyscaleSE
+    8: WarnCornerGreyscaleNW
+  color: '#FFFFFFFF'
+/obj/effect/turf_decal/stripes/white/box:
+  id: WarnBoxGreyscale
+  color: '#FFFFFFFF'
+/obj/effect/turf_decal/stripes/white/full:
+  id: WarnFullGreyscale
+  color: '#FFFFFFFF'
+/obj/effect/turf_decal/stripes/red/line:
+  dirs:
+    1: WarnLineGreyscaleN
+    2: WarnLineGreyscaleS
+    4: WarnLineGreyscaleE
+    8: WarnLineGreyscaleW
+  color: '#DE3A3A96'
+/obj/effect/turf_decal/stripes/red/corner:
+  dirs:
+    1: WarnCornerGreyscaleNE
+    2: WarnCornerGreyscaleSW
+    4: WarnCornerGreyscaleSE
+    8: WarnCornerGreyscaleNW
+  color: '#DE3A3A96'
+/obj/effect/turf_decal/stripes/red/box:
+  id: WarnBoxGreyscale
+  color: '#DE3A3A96'
+/obj/effect/turf_decal/stripes/red/full:
+  id: WarnFullGreyscale
+  color: '#DE3A3A96'
+
+# ---- floor markings ----
+/obj/effect/turf_decal/bot: Bot
+/obj/effect/turf_decal/bot/left: BotLeft
+/obj/effect/turf_decal/bot/right: BotRight
+/obj/effect/turf_decal/delivery: Delivery
+/obj/effect/turf_decal/caution: Caution
+/obj/effect/turf_decal/caution/stand_clear: StandClear
+/obj/effect/turf_decal/loading_area: LoadingArea
+/obj/effect/turf_decal/arrows: Arrows
+/obj/effect/turf_decal/box: Box
+/obj/effect/turf_decal/bot_white:
+  id: BotGreyscale
+  color: '#FFFFFFFF'
+/obj/effect/turf_decal/bot_white/left:
+  id: BotLeftGreyscale
+  color: '#FFFFFFFF'
+/obj/effect/turf_decal/bot_white/right:
+  id: BotRightGreyscale
+  color: '#FFFFFFFF'
+/obj/effect/turf_decal/bot_red:
+  id: BotGreyscale
+  color: '#DE3A3A96'
+/obj/effect/turf_decal/delivery/white:
+  id: DeliveryGreyscale
+  color: '#FFFFFFFF'
+/obj/effect/turf_decal/caution/red:
+  id: CautionGreyscale
+  color: '#DE3A3A96'
+/obj/effect/turf_decal/caution/stand_clear/red:
+  id: StandClearGreyscale
+  color: '#DE3A3A96'
+/obj/effect/turf_decal/loading_area/white:
+  id: LoadingAreaGreyscale
+  color: '#FFFFFFFF'
+/obj/effect/turf_decal/arrows/red:
+  id: ArrowsGreyscale
+  color: '#DE3A3A96'
+/obj/effect/turf_decal/arrows/white:
+  id: ArrowsGreyscale
+  color: '#FFFFFFFF'
+/obj/effect/turf_decal/box/red:
+  id: BoxGreyscale
+  color: '#DE3A3A96'
+/obj/effect/turf_decal/box/white:
+  id: BoxGreyscale
+  color: '#FFFFFFFF'
+
+# ---- coloured tile overlays ----
+/obj/effect/turf_decal/tile/neutral:
+  dirs:
+    1: QuarterTileOverlayGreyscale
+    2: QuarterTileOverlayGreyscale180
+    4: QuarterTileOverlayGreyscale90
+    8: QuarterTileOverlayGreyscale270
+  color: '#D4D4D496'
+/obj/effect/turf_decal/tile/neutral/half:
+  dirs:
+    1: HalfTileOverlayGreyscale
+    2: HalfTileOverlayGreyscale180
+    4: HalfTileOverlayGreyscale90
+    8: HalfTileOverlayGreyscale270
+  color: '#D4D4D496'
+/obj/effect/turf_decal/tile/neutral/half/contrasted:
+  dirs:
+    1: HalfTileOverlayGreyscale
+    2: HalfTileOverlayGreyscale180
+    4: HalfTileOverlayGreyscale90
+    8: HalfTileOverlayGreyscale270
+  color: '#D4D4D496'
+/obj/effect/turf_decal/tile/neutral/anticorner/contrasted:
+  dirs:
+    1: ThreeQuarterTileOverlayGreyscale
+    2: ThreeQuarterTileOverlayGreyscale180
+    4: ThreeQuarterTileOverlayGreyscale90
+    8: ThreeQuarterTileOverlayGreyscale270
+  color: '#D4D4D496'
+/obj/effect/turf_decal/tile/neutral/fourcorners:
+  decals:
+  - QuarterTileOverlayGreyscale
+  - QuarterTileOverlayGreyscale90
+  - QuarterTileOverlayGreyscale180
+  - QuarterTileOverlayGreyscale270
+  color: '#D4D4D496'
+/obj/effect/turf_decal/tile/neutral/opposingcorners:
+  decals:
+  - QuarterTileOverlayGreyscale
+  - QuarterTileOverlayGreyscale180
+  color: '#D4D4D496'
+/obj/effect/turf_decal/tile/neutral/full:
+  id: FullTileOverlayGreyscale
+  color: '#D4D4D496'
+/obj/effect/turf_decal/tile/white:
+  dirs:
+    1: QuarterTileOverlayGreyscale
+    2: QuarterTileOverlayGreyscale180
+    4: QuarterTileOverlayGreyscale90
+    8: QuarterTileOverlayGreyscale270
+  color: '#FFFFFFFF'
+/obj/effect/turf_decal/tile/white/half:
+  dirs:
+    1: HalfTileOverlayGreyscale
+    2: HalfTileOverlayGreyscale180
+    4: HalfTileOverlayGreyscale90
+    8: HalfTileOverlayGreyscale270
+  color: '#FFFFFFFF'
+/obj/effect/turf_decal/tile/white/half/contrasted:
+  dirs:
+    1: HalfTileOverlayGreyscale
+    2: HalfTileOverlayGreyscale180
+    4: HalfTileOverlayGreyscale90
+    8: HalfTileOverlayGreyscale270
+  color: '#FFFFFFFF'
+/obj/effect/turf_decal/tile/white/anticorner/contrasted:
+  dirs:
+    1: ThreeQuarterTileOverlayGreyscale
+    2: ThreeQuarterTileOverlayGreyscale180
+    4: ThreeQuarterTileOverlayGreyscale90
+    8: ThreeQuarterTileOverlayGreyscale270
+  color: '#FFFFFFFF'
+/obj/effect/turf_decal/tile/white/fourcorners:
+  decals:
+  - QuarterTileOverlayGreyscale
+  - QuarterTileOverlayGreyscale90
+  - QuarterTileOverlayGreyscale180
+  - QuarterTileOverlayGreyscale270
+  color: '#FFFFFFFF'
+/obj/effect/turf_decal/tile/white/opposingcorners:
+  decals:
+  - QuarterTileOverlayGreyscale
+  - QuarterTileOverlayGreyscale180
+  color: '#FFFFFFFF'
+/obj/effect/turf_decal/tile/white/full:
+  id: FullTileOverlayGreyscale
+  color: '#FFFFFFFF'
+/obj/effect/turf_decal/tile/blue:
+  dirs:
+    1: QuarterTileOverlayGreyscale
+    2: QuarterTileOverlayGreyscale180
+    4: QuarterTileOverlayGreyscale90
+    8: QuarterTileOverlayGreyscale270
+  color: '#52B4E996'
+/obj/effect/turf_decal/tile/blue/half:
+  dirs:
+    1: HalfTileOverlayGreyscale
+    2: HalfTileOverlayGreyscale180
+    4: HalfTileOverlayGreyscale90
+    8: HalfTileOverlayGreyscale270
+  color: '#52B4E996'
+/obj/effect/turf_decal/tile/blue/half/contrasted:
+  dirs:
+    1: HalfTileOverlayGreyscale
+    2: HalfTileOverlayGreyscale180
+    4: HalfTileOverlayGreyscale90
+    8: HalfTileOverlayGreyscale270
+  color: '#52B4E996'
+/obj/effect/turf_decal/tile/blue/anticorner/contrasted:
+  dirs:
+    1: ThreeQuarterTileOverlayGreyscale
+    2: ThreeQuarterTileOverlayGreyscale180
+    4: ThreeQuarterTileOverlayGreyscale90
+    8: ThreeQuarterTileOverlayGreyscale270
+  color: '#52B4E996'
+/obj/effect/turf_decal/tile/blue/fourcorners:
+  decals:
+  - QuarterTileOverlayGreyscale
+  - QuarterTileOverlayGreyscale90
+  - QuarterTileOverlayGreyscale180
+  - QuarterTileOverlayGreyscale270
+  color: '#52B4E996'
+/obj/effect/turf_decal/tile/blue/opposingcorners:
+  decals:
+  - QuarterTileOverlayGreyscale
+  - QuarterTileOverlayGreyscale180
+  color: '#52B4E996'
+/obj/effect/turf_decal/tile/blue/full:
+  id: FullTileOverlayGreyscale
+  color: '#52B4E996'
+/obj/effect/turf_decal/tile/dark_blue:
+  dirs:
+    1: QuarterTileOverlayGreyscale
+    2: QuarterTileOverlayGreyscale180
+    4: QuarterTileOverlayGreyscale90
+    8: QuarterTileOverlayGreyscale270
+  color: '#334E6DC8'
+/obj/effect/turf_decal/tile/dark_blue/half:
+  dirs:
+    1: HalfTileOverlayGreyscale
+    2: HalfTileOverlayGreyscale180
+    4: HalfTileOverlayGreyscale90
+    8: HalfTileOverlayGreyscale270
+  color: '#334E6DC8'
+/obj/effect/turf_decal/tile/dark_blue/half/contrasted:
+  dirs:
+    1: HalfTileOverlayGreyscale
+    2: HalfTileOverlayGreyscale180
+    4: HalfTileOverlayGreyscale90
+    8: HalfTileOverlayGreyscale270
+  color: '#334E6DC8'
+/obj/effect/turf_decal/tile/dark_blue/anticorner/contrasted:
+  dirs:
+    1: ThreeQuarterTileOverlayGreyscale
+    2: ThreeQuarterTileOverlayGreyscale180
+    4: ThreeQuarterTileOverlayGreyscale90
+    8: ThreeQuarterTileOverlayGreyscale270
+  color: '#334E6DC8'
+/obj/effect/turf_decal/tile/dark_blue/fourcorners:
+  decals:
+  - QuarterTileOverlayGreyscale
+  - QuarterTileOverlayGreyscale90
+  - QuarterTileOverlayGreyscale180
+  - QuarterTileOverlayGreyscale270
+  color: '#334E6DC8'
+/obj/effect/turf_decal/tile/dark_blue/opposingcorners:
+  decals:
+  - QuarterTileOverlayGreyscale
+  - QuarterTileOverlayGreyscale180
+  color: '#334E6DC8'
+/obj/effect/turf_decal/tile/dark_blue/full:
+  id: FullTileOverlayGreyscale
+  color: '#334E6DC8'
+/obj/effect/turf_decal/tile/red:
+  dirs:
+    1: QuarterTileOverlayGreyscale
+    2: QuarterTileOverlayGreyscale180
+    4: QuarterTileOverlayGreyscale90
+    8: QuarterTileOverlayGreyscale270
+  color: '#DE3A3A96'
+/obj/effect/turf_decal/tile/red/half:
+  dirs:
+    1: HalfTileOverlayGreyscale
+    2: HalfTileOverlayGreyscale180
+    4: HalfTileOverlayGreyscale90
+    8: HalfTileOverlayGreyscale270
+  color: '#DE3A3A96'
+/obj/effect/turf_decal/tile/red/half/contrasted:
+  dirs:
+    1: HalfTileOverlayGreyscale
+    2: HalfTileOverlayGreyscale180
+    4: HalfTileOverlayGreyscale90
+    8: HalfTileOverlayGreyscale270
+  color: '#DE3A3A96'
+/obj/effect/turf_decal/tile/red/anticorner/contrasted:
+  dirs:
+    1: ThreeQuarterTileOverlayGreyscale
+    2: ThreeQuarterTileOverlayGreyscale180
+    4: ThreeQuarterTileOverlayGreyscale90
+    8: ThreeQuarterTileOverlayGreyscale270
+  color: '#DE3A3A96'
+/obj/effect/turf_decal/tile/red/fourcorners:
+  decals:
+  - QuarterTileOverlayGreyscale
+  - QuarterTileOverlayGreyscale90
+  - QuarterTileOverlayGreyscale180
+  - QuarterTileOverlayGreyscale270
+  color: '#DE3A3A96'
+/obj/effect/turf_decal/tile/red/opposingcorners:
+  decals:
+  - QuarterTileOverlayGreyscale
+  - QuarterTileOverlayGreyscale180
+  color: '#DE3A3A96'
+/obj/effect/turf_decal/tile/red/full:
+  id: FullTileOverlayGreyscale
+  color: '#DE3A3A96'
+/obj/effect/turf_decal/tile/dark_red:
+  dirs:
+    1: QuarterTileOverlayGreyscale
+    2: QuarterTileOverlayGreyscale180
+    4: QuarterTileOverlayGreyscale90
+    8: QuarterTileOverlayGreyscale270
+  color: '#951710FF'
+/obj/effect/turf_decal/tile/dark_red/half:
+  dirs:
+    1: HalfTileOverlayGreyscale
+    2: HalfTileOverlayGreyscale180
+    4: HalfTileOverlayGreyscale90
+    8: HalfTileOverlayGreyscale270
+  color: '#951710FF'
+/obj/effect/turf_decal/tile/dark_red/half/contrasted:
+  dirs:
+    1: HalfTileOverlayGreyscale
+    2: HalfTileOverlayGreyscale180
+    4: HalfTileOverlayGreyscale90
+    8: HalfTileOverlayGreyscale270
+  color: '#951710FF'
+/obj/effect/turf_decal/tile/dark_red/anticorner/contrasted:
+  dirs:
+    1: ThreeQuarterTileOverlayGreyscale
+    2: ThreeQuarterTileOverlayGreyscale180
+    4: ThreeQuarterTileOverlayGreyscale90
+    8: ThreeQuarterTileOverlayGreyscale270
+  color: '#951710FF'
+/obj/effect/turf_decal/tile/dark_red/fourcorners:
+  decals:
+  - QuarterTileOverlayGreyscale
+  - QuarterTileOverlayGreyscale90
+  - QuarterTileOverlayGreyscale180
+  - QuarterTileOverlayGreyscale270
+  color: '#951710FF'
+/obj/effect/turf_decal/tile/dark_red/opposingcorners:
+  decals:
+  - QuarterTileOverlayGreyscale
+  - QuarterTileOverlayGreyscale180
+  color: '#951710FF'
+/obj/effect/turf_decal/tile/dark_red/full:
+  id: FullTileOverlayGreyscale
+  color: '#951710FF'
+/obj/effect/turf_decal/tile/green:
+  dirs:
+    1: QuarterTileOverlayGreyscale
+    2: QuarterTileOverlayGreyscale180
+    4: QuarterTileOverlayGreyscale90
+    8: QuarterTileOverlayGreyscale270
+  color: '#9FED5896'
+/obj/effect/turf_decal/tile/green/half:
+  dirs:
+    1: HalfTileOverlayGreyscale
+    2: HalfTileOverlayGreyscale180
+    4: HalfTileOverlayGreyscale90
+    8: HalfTileOverlayGreyscale270
+  color: '#9FED5896'
+/obj/effect/turf_decal/tile/green/half/contrasted:
+  dirs:
+    1: HalfTileOverlayGreyscale
+    2: HalfTileOverlayGreyscale180
+    4: HalfTileOverlayGreyscale90
+    8: HalfTileOverlayGreyscale270
+  color: '#9FED5896'
+/obj/effect/turf_decal/tile/green/anticorner/contrasted:
+  dirs:
+    1: ThreeQuarterTileOverlayGreyscale
+    2: ThreeQuarterTileOverlayGreyscale180
+    4: ThreeQuarterTileOverlayGreyscale90
+    8: ThreeQuarterTileOverlayGreyscale270
+  color: '#9FED5896'
+/obj/effect/turf_decal/tile/green/fourcorners:
+  decals:
+  - QuarterTileOverlayGreyscale
+  - QuarterTileOverlayGreyscale90
+  - QuarterTileOverlayGreyscale180
+  - QuarterTileOverlayGreyscale270
+  color: '#9FED5896'
+/obj/effect/turf_decal/tile/green/opposingcorners:
+  decals:
+  - QuarterTileOverlayGreyscale
+  - QuarterTileOverlayGreyscale180
+  color: '#9FED5896'
+/obj/effect/turf_decal/tile/green/full:
+  id: FullTileOverlayGreyscale
+  color: '#9FED5896'
+/obj/effect/turf_decal/tile/yellow:
+  dirs:
+    1: QuarterTileOverlayGreyscale
+    2: QuarterTileOverlayGreyscale180
+    4: QuarterTileOverlayGreyscale90
+    8: QuarterTileOverlayGreyscale270
+  color: '#EFB34196'
+/obj/effect/turf_decal/tile/yellow/half:
+  dirs:
+    1: HalfTileOverlayGreyscale
+    2: HalfTileOverlayGreyscale180
+    4: HalfTileOverlayGreyscale90
+    8: HalfTileOverlayGreyscale270
+  color: '#EFB34196'
+/obj/effect/turf_decal/tile/yellow/half/contrasted:
+  dirs:
+    1: HalfTileOverlayGreyscale
+    2: HalfTileOverlayGreyscale180
+    4: HalfTileOverlayGreyscale90
+    8: HalfTileOverlayGreyscale270
+  color: '#EFB34196'
+/obj/effect/turf_decal/tile/yellow/anticorner/contrasted:
+  dirs:
+    1: ThreeQuarterTileOverlayGreyscale
+    2: ThreeQuarterTileOverlayGreyscale180
+    4: ThreeQuarterTileOverlayGreyscale90
+    8: ThreeQuarterTileOverlayGreyscale270
+  color: '#EFB34196'
+/obj/effect/turf_decal/tile/yellow/fourcorners:
+  decals:
+  - QuarterTileOverlayGreyscale
+  - QuarterTileOverlayGreyscale90
+  - QuarterTileOverlayGreyscale180
+  - QuarterTileOverlayGreyscale270
+  color: '#EFB34196'
+/obj/effect/turf_decal/tile/yellow/opposingcorners:
+  decals:
+  - QuarterTileOverlayGreyscale
+  - QuarterTileOverlayGreyscale180
+  color: '#EFB34196'
+/obj/effect/turf_decal/tile/yellow/full:
+  id: FullTileOverlayGreyscale
+  color: '#EFB34196'
+/obj/effect/turf_decal/tile/brown:
+  dirs:
+    1: QuarterTileOverlayGreyscale
+    2: QuarterTileOverlayGreyscale180
+    4: QuarterTileOverlayGreyscale90
+    8: QuarterTileOverlayGreyscale270
+  color: '#A4610696'
+/obj/effect/turf_decal/tile/brown/half:
+  dirs:
+    1: HalfTileOverlayGreyscale
+    2: HalfTileOverlayGreyscale180
+    4: HalfTileOverlayGreyscale90
+    8: HalfTileOverlayGreyscale270
+  color: '#A4610696'
+/obj/effect/turf_decal/tile/brown/half/contrasted:
+  dirs:
+    1: HalfTileOverlayGreyscale
+    2: HalfTileOverlayGreyscale180
+    4: HalfTileOverlayGreyscale90
+    8: HalfTileOverlayGreyscale270
+  color: '#A4610696'
+/obj/effect/turf_decal/tile/brown/anticorner/contrasted:
+  dirs:
+    1: ThreeQuarterTileOverlayGreyscale
+    2: ThreeQuarterTileOverlayGreyscale180
+    4: ThreeQuarterTileOverlayGreyscale90
+    8: ThreeQuarterTileOverlayGreyscale270
+  color: '#A4610696'
+/obj/effect/turf_decal/tile/brown/fourcorners:
+  decals:
+  - QuarterTileOverlayGreyscale
+  - QuarterTileOverlayGreyscale90
+  - QuarterTileOverlayGreyscale180
+  - QuarterTileOverlayGreyscale270
+  color: '#A4610696'
+/obj/effect/turf_decal/tile/brown/opposingcorners:
+  decals:
+  - QuarterTileOverlayGreyscale
+  - QuarterTileOverlayGreyscale180
+  color: '#A4610696'
+/obj/effect/turf_decal/tile/brown/full:
+  id: FullTileOverlayGreyscale
+  color: '#A4610696'
+/obj/effect/turf_decal/tile/purple:
+  dirs:
+    1: QuarterTileOverlayGreyscale
+    2: QuarterTileOverlayGreyscale180
+    4: QuarterTileOverlayGreyscale90
+    8: QuarterTileOverlayGreyscale270
+  color: '#D381C996'
+/obj/effect/turf_decal/tile/purple/half:
+  dirs:
+    1: HalfTileOverlayGreyscale
+    2: HalfTileOverlayGreyscale180
+    4: HalfTileOverlayGreyscale90
+    8: HalfTileOverlayGreyscale270
+  color: '#D381C996'
+/obj/effect/turf_decal/tile/purple/half/contrasted:
+  dirs:
+    1: HalfTileOverlayGreyscale
+    2: HalfTileOverlayGreyscale180
+    4: HalfTileOverlayGreyscale90
+    8: HalfTileOverlayGreyscale270
+  color: '#D381C996'
+/obj/effect/turf_decal/tile/purple/anticorner/contrasted:
+  dirs:
+    1: ThreeQuarterTileOverlayGreyscale
+    2: ThreeQuarterTileOverlayGreyscale180
+    4: ThreeQuarterTileOverlayGreyscale90
+    8: ThreeQuarterTileOverlayGreyscale270
+  color: '#D381C996'
+/obj/effect/turf_decal/tile/purple/fourcorners:
+  decals:
+  - QuarterTileOverlayGreyscale
+  - QuarterTileOverlayGreyscale90
+  - QuarterTileOverlayGreyscale180
+  - QuarterTileOverlayGreyscale270
+  color: '#D381C996'
+/obj/effect/turf_decal/tile/purple/opposingcorners:
+  decals:
+  - QuarterTileOverlayGreyscale
+  - QuarterTileOverlayGreyscale180
+  color: '#D381C996'
+/obj/effect/turf_decal/tile/purple/full:
+  id: FullTileOverlayGreyscale
+  color: '#D381C996'
+/obj/effect/turf_decal/tile/bar:
+  dirs:
+    1: QuarterTileOverlayGreyscale
+    2: QuarterTileOverlayGreyscale180
+    4: QuarterTileOverlayGreyscale90
+    8: QuarterTileOverlayGreyscale270
+  color: '#A4610696'
+/obj/effect/turf_decal/tile/bar/half:
+  dirs:
+    1: HalfTileOverlayGreyscale
+    2: HalfTileOverlayGreyscale180
+    4: HalfTileOverlayGreyscale90
+    8: HalfTileOverlayGreyscale270
+  color: '#A4610696'
+/obj/effect/turf_decal/tile/bar/half/contrasted:
+  dirs:
+    1: HalfTileOverlayGreyscale
+    2: HalfTileOverlayGreyscale180
+    4: HalfTileOverlayGreyscale90
+    8: HalfTileOverlayGreyscale270
+  color: '#A4610696'
+/obj/effect/turf_decal/tile/bar/anticorner/contrasted:
+  dirs:
+    1: ThreeQuarterTileOverlayGreyscale
+    2: ThreeQuarterTileOverlayGreyscale180
+    4: ThreeQuarterTileOverlayGreyscale90
+    8: ThreeQuarterTileOverlayGreyscale270
+  color: '#A4610696'
+/obj/effect/turf_decal/tile/bar/fourcorners:
+  decals:
+  - QuarterTileOverlayGreyscale
+  - QuarterTileOverlayGreyscale90
+  - QuarterTileOverlayGreyscale180
+  - QuarterTileOverlayGreyscale270
+  color: '#A4610696'
+/obj/effect/turf_decal/tile/bar/opposingcorners:
+  decals:
+  - QuarterTileOverlayGreyscale
+  - QuarterTileOverlayGreyscale180
+  color: '#A4610696'
+/obj/effect/turf_decal/tile/bar/full:
+  id: FullTileOverlayGreyscale
+  color: '#A4610696'
+/obj/effect/turf_decal/tile/dark:
+  dirs:
+    1: QuarterTileOverlayGreyscale
+    2: QuarterTileOverlayGreyscale180
+    4: QuarterTileOverlayGreyscale90
+    8: QuarterTileOverlayGreyscale270
+  color: '#444646FF'
+/obj/effect/turf_decal/tile/dark/half:
+  dirs:
+    1: HalfTileOverlayGreyscale
+    2: HalfTileOverlayGreyscale180
+    4: HalfTileOverlayGreyscale90
+    8: HalfTileOverlayGreyscale270
+  color: '#444646FF'
+/obj/effect/turf_decal/tile/dark/half/contrasted:
+  dirs:
+    1: HalfTileOverlayGreyscale
+    2: HalfTileOverlayGreyscale180
+    4: HalfTileOverlayGreyscale90
+    8: HalfTileOverlayGreyscale270
+  color: '#444646FF'
+/obj/effect/turf_decal/tile/dark/anticorner/contrasted:
+  dirs:
+    1: ThreeQuarterTileOverlayGreyscale
+    2: ThreeQuarterTileOverlayGreyscale180
+    4: ThreeQuarterTileOverlayGreyscale90
+    8: ThreeQuarterTileOverlayGreyscale270
+  color: '#444646FF'
+/obj/effect/turf_decal/tile/dark/fourcorners:
+  decals:
+  - QuarterTileOverlayGreyscale
+  - QuarterTileOverlayGreyscale90
+  - QuarterTileOverlayGreyscale180
+  - QuarterTileOverlayGreyscale270
+  color: '#444646FF'
+/obj/effect/turf_decal/tile/dark/opposingcorners:
+  decals:
+  - QuarterTileOverlayGreyscale
+  - QuarterTileOverlayGreyscale180
+  color: '#444646FF'
+/obj/effect/turf_decal/tile/dark/full:
+  id: FullTileOverlayGreyscale
+  color: '#444646FF'
+
+# ---- siding (thin edging) ----
+/obj/effect/turf_decal/siding:
+  dirs:
+    1: MiniTileLineOverlayN
+    2: MiniTileLineOverlayS
+    4: MiniTileLineOverlayE
+    8: MiniTileLineOverlayW
+  color: '#D4D4D496'
+/obj/effect/turf_decal/siding/corner:
+  dirs:
+    1: MiniTileCornerOverlayNE
+    2: MiniTileCornerOverlaySW
+    4: MiniTileCornerOverlaySE
+    8: MiniTileCornerOverlayNW
+  color: '#D4D4D496'
+/obj/effect/turf_decal/siding/inner_corner:
+  dirs:
+    1: MiniTileInnerOverlayNE
+    2: MiniTileInnerOverlaySW
+    4: MiniTileInnerOverlaySE
+    8: MiniTileInnerOverlayNW
+  color: '#D4D4D496'
+/obj/effect/turf_decal/siding/blue:
+  dirs:
+    1: MiniTileLineOverlayN
+    2: MiniTileLineOverlayS
+    4: MiniTileLineOverlayE
+    8: MiniTileLineOverlayW
+  color: '#52B4E996'
+/obj/effect/turf_decal/siding/blue/corner:
+  dirs:
+    1: MiniTileCornerOverlayNE
+    2: MiniTileCornerOverlaySW
+    4: MiniTileCornerOverlaySE
+    8: MiniTileCornerOverlayNW
+  color: '#52B4E996'
+/obj/effect/turf_decal/siding/blue/inner_corner:
+  dirs:
+    1: MiniTileInnerOverlayNE
+    2: MiniTileInnerOverlaySW
+    4: MiniTileInnerOverlaySE
+    8: MiniTileInnerOverlayNW
+  color: '#52B4E996'
+/obj/effect/turf_decal/siding/green:
+  dirs:
+    1: MiniTileLineOverlayN
+    2: MiniTileLineOverlayS
+    4: MiniTileLineOverlayE
+    8: MiniTileLineOverlayW
+  color: '#9FED5896'
+/obj/effect/turf_decal/siding/green/corner:
+  dirs:
+    1: MiniTileCornerOverlayNE
+    2: MiniTileCornerOverlaySW
+    4: MiniTileCornerOverlaySE
+    8: MiniTileCornerOverlayNW
+  color: '#9FED5896'
+/obj/effect/turf_decal/siding/green/inner_corner:
+  dirs:
+    1: MiniTileInnerOverlayNE
+    2: MiniTileInnerOverlaySW
+    4: MiniTileInnerOverlaySE
+    8: MiniTileInnerOverlayNW
+  color: '#9FED5896'
+/obj/effect/turf_decal/siding/red:
+  dirs:
+    1: MiniTileLineOverlayN
+    2: MiniTileLineOverlayS
+    4: MiniTileLineOverlayE
+    8: MiniTileLineOverlayW
+  color: '#DE3A3A96'
+/obj/effect/turf_decal/siding/red/corner:
+  dirs:
+    1: MiniTileCornerOverlayNE
+    2: MiniTileCornerOverlaySW
+    4: MiniTileCornerOverlaySE
+    8: MiniTileCornerOverlayNW
+  color: '#DE3A3A96'
+/obj/effect/turf_decal/siding/red/inner_corner:
+  dirs:
+    1: MiniTileInnerOverlayNE
+    2: MiniTileInnerOverlaySW
+    4: MiniTileInnerOverlaySE
+    8: MiniTileInnerOverlayNW
+  color: '#DE3A3A96'
+/obj/effect/turf_decal/siding/purple:
+  dirs:
+    1: MiniTileLineOverlayN
+    2: MiniTileLineOverlayS
+    4: MiniTileLineOverlayE
+    8: MiniTileLineOverlayW
+  color: '#D381C996'
+/obj/effect/turf_decal/siding/purple/corner:
+  dirs:
+    1: MiniTileCornerOverlayNE
+    2: MiniTileCornerOverlaySW
+    4: MiniTileCornerOverlaySE
+    8: MiniTileCornerOverlayNW
+  color: '#D381C996'
+/obj/effect/turf_decal/siding/purple/inner_corner:
+  dirs:
+    1: MiniTileInnerOverlayNE
+    2: MiniTileInnerOverlaySW
+    4: MiniTileInnerOverlaySE
+    8: MiniTileInnerOverlayNW
+  color: '#D381C996'
+/obj/effect/turf_decal/siding/white:
+  dirs:
+    1: MiniTileLineOverlayN
+    2: MiniTileLineOverlayS
+    4: MiniTileLineOverlayE
+    8: MiniTileLineOverlayW
+  color: '#FFFFFFFF'
+/obj/effect/turf_decal/siding/white/corner:
+  dirs:
+    1: MiniTileCornerOverlayNE
+    2: MiniTileCornerOverlaySW
+    4: MiniTileCornerOverlaySE
+    8: MiniTileCornerOverlayNW
+  color: '#FFFFFFFF'
+/obj/effect/turf_decal/siding/white/inner_corner:
+  dirs:
+    1: MiniTileInnerOverlayNE
+    2: MiniTileInnerOverlaySW
+    4: MiniTileInnerOverlaySE
+    8: MiniTileInnerOverlayNW
+  color: '#FFFFFFFF'
+/obj/effect/turf_decal/siding/yellow:
+  dirs:
+    1: MiniTileLineOverlayN
+    2: MiniTileLineOverlayS
+    4: MiniTileLineOverlayE
+    8: MiniTileLineOverlayW
+  color: '#EFB34196'
+/obj/effect/turf_decal/siding/yellow/corner:
+  dirs:
+    1: MiniTileCornerOverlayNE
+    2: MiniTileCornerOverlaySW
+    4: MiniTileCornerOverlaySE
+    8: MiniTileCornerOverlayNW
+  color: '#EFB34196'
+/obj/effect/turf_decal/siding/yellow/inner_corner:
+  dirs:
+    1: MiniTileInnerOverlayNE
+    2: MiniTileInnerOverlaySW
+    4: MiniTileInnerOverlaySE
+    8: MiniTileInnerOverlayNW
+  color: '#EFB34196'
+/obj/effect/turf_decal/siding/wood:
+  dirs:
+    1: WoodTrimThinLineN
+    2: WoodTrimThinLineS
+    4: WoodTrimThinLineE
+    8: WoodTrimThinLineW
+/obj/effect/turf_decal/siding/wood/corner:
+  dirs:
+    1: WoodTrimThinCornerNe
+    2: WoodTrimThinCornerSw
+    4: WoodTrimThinCornerSe
+    8: WoodTrimThinCornerNw
+/obj/effect/turf_decal/siding/wood/inner_corner:
+  dirs:
+    1: WoodTrimThinInnerNe
+    2: WoodTrimThinInnerSw
+    4: WoodTrimThinInnerSe
+    8: WoodTrimThinInnerNw
+
+# ---- trimlines ----
+/obj/effect/turf_decal/trimline/blue/line:
+  dirs:
+    1: BrickLineOverlayN
+    2: BrickLineOverlayS
+    4: BrickLineOverlayE
+    8: BrickLineOverlayW
+  color: '#52B4E996'
+/obj/effect/turf_decal/trimline/blue/corner:
+  dirs:
+    1: BrickCornerOverlayNE
+    2: BrickCornerOverlaySW
+    4: BrickCornerOverlaySE
+    8: BrickCornerOverlayNW
+  color: '#52B4E996'
+/obj/effect/turf_decal/trimline/blue/end:
+  dirs:
+    1: BrickEndOverlayN
+    2: BrickEndOverlayS
+    4: BrickEndOverlayE
+    8: BrickEndOverlayW
+  color: '#52B4E996'
+/obj/effect/turf_decal/trimline/blue/warning:
+  dirs:
+    1: WarnLineGreyscaleN
+    2: WarnLineGreyscaleS
+    4: WarnLineGreyscaleE
+    8: WarnLineGreyscaleW
+  color: '#52B4E996'
+/obj/effect/turf_decal/trimline/blue/filled/line:
+  dirs:
+    1: BrickLineOverlayN
+    2: BrickLineOverlayS
+    4: BrickLineOverlayE
+    8: BrickLineOverlayW
+  color: '#52B4E996'
+/obj/effect/turf_decal/trimline/blue/filled/corner:
+  dirs:
+    1: BrickCornerOverlayNE
+    2: BrickCornerOverlaySW
+    4: BrickCornerOverlaySE
+    8: BrickCornerOverlayNW
+  color: '#52B4E996'
+/obj/effect/turf_decal/trimline/blue/filled/end:
+  dirs:
+    1: BrickEndOverlayN
+    2: BrickEndOverlayS
+    4: BrickEndOverlayE
+    8: BrickEndOverlayW
+  color: '#52B4E996'
+/obj/effect/turf_decal/trimline/blue/filled/warning:
+  dirs:
+    1: WarnLineGreyscaleN
+    2: WarnLineGreyscaleS
+    4: WarnLineGreyscaleE
+    8: WarnLineGreyscaleW
+  color: '#52B4E996'
+/obj/effect/turf_decal/trimline/brown/line:
+  dirs:
+    1: BrickLineOverlayN
+    2: BrickLineOverlayS
+    4: BrickLineOverlayE
+    8: BrickLineOverlayW
+  color: '#A4610696'
+/obj/effect/turf_decal/trimline/brown/corner:
+  dirs:
+    1: BrickCornerOverlayNE
+    2: BrickCornerOverlaySW
+    4: BrickCornerOverlaySE
+    8: BrickCornerOverlayNW
+  color: '#A4610696'
+/obj/effect/turf_decal/trimline/brown/end:
+  dirs:
+    1: BrickEndOverlayN
+    2: BrickEndOverlayS
+    4: BrickEndOverlayE
+    8: BrickEndOverlayW
+  color: '#A4610696'
+/obj/effect/turf_decal/trimline/brown/warning:
+  dirs:
+    1: WarnLineGreyscaleN
+    2: WarnLineGreyscaleS
+    4: WarnLineGreyscaleE
+    8: WarnLineGreyscaleW
+  color: '#A4610696'
+/obj/effect/turf_decal/trimline/brown/filled/line:
+  dirs:
+    1: BrickLineOverlayN
+    2: BrickLineOverlayS
+    4: BrickLineOverlayE
+    8: BrickLineOverlayW
+  color: '#A4610696'
+/obj/effect/turf_decal/trimline/brown/filled/corner:
+  dirs:
+    1: BrickCornerOverlayNE
+    2: BrickCornerOverlaySW
+    4: BrickCornerOverlaySE
+    8: BrickCornerOverlayNW
+  color: '#A4610696'
+/obj/effect/turf_decal/trimline/brown/filled/end:
+  dirs:
+    1: BrickEndOverlayN
+    2: BrickEndOverlayS
+    4: BrickEndOverlayE
+    8: BrickEndOverlayW
+  color: '#A4610696'
+/obj/effect/turf_decal/trimline/brown/filled/warning:
+  dirs:
+    1: WarnLineGreyscaleN
+    2: WarnLineGreyscaleS
+    4: WarnLineGreyscaleE
+    8: WarnLineGreyscaleW
+  color: '#A4610696'
+/obj/effect/turf_decal/trimline/dark_red/line:
+  dirs:
+    1: BrickLineOverlayN
+    2: BrickLineOverlayS
+    4: BrickLineOverlayE
+    8: BrickLineOverlayW
+  color: '#951710FF'
+/obj/effect/turf_decal/trimline/dark_red/corner:
+  dirs:
+    1: BrickCornerOverlayNE
+    2: BrickCornerOverlaySW
+    4: BrickCornerOverlaySE
+    8: BrickCornerOverlayNW
+  color: '#951710FF'
+/obj/effect/turf_decal/trimline/dark_red/end:
+  dirs:
+    1: BrickEndOverlayN
+    2: BrickEndOverlayS
+    4: BrickEndOverlayE
+    8: BrickEndOverlayW
+  color: '#951710FF'
+/obj/effect/turf_decal/trimline/dark_red/warning:
+  dirs:
+    1: WarnLineGreyscaleN
+    2: WarnLineGreyscaleS
+    4: WarnLineGreyscaleE
+    8: WarnLineGreyscaleW
+  color: '#951710FF'
+/obj/effect/turf_decal/trimline/dark_red/filled/line:
+  dirs:
+    1: BrickLineOverlayN
+    2: BrickLineOverlayS
+    4: BrickLineOverlayE
+    8: BrickLineOverlayW
+  color: '#951710FF'
+/obj/effect/turf_decal/trimline/dark_red/filled/corner:
+  dirs:
+    1: BrickCornerOverlayNE
+    2: BrickCornerOverlaySW
+    4: BrickCornerOverlaySE
+    8: BrickCornerOverlayNW
+  color: '#951710FF'
+/obj/effect/turf_decal/trimline/dark_red/filled/end:
+  dirs:
+    1: BrickEndOverlayN
+    2: BrickEndOverlayS
+    4: BrickEndOverlayE
+    8: BrickEndOverlayW
+  color: '#951710FF'
+/obj/effect/turf_decal/trimline/dark_red/filled/warning:
+  dirs:
+    1: WarnLineGreyscaleN
+    2: WarnLineGreyscaleS
+    4: WarnLineGreyscaleE
+    8: WarnLineGreyscaleW
+  color: '#951710FF'
+/obj/effect/turf_decal/trimline/green/line:
+  dirs:
+    1: BrickLineOverlayN
+    2: BrickLineOverlayS
+    4: BrickLineOverlayE
+    8: BrickLineOverlayW
+  color: '#9FED5896'
+/obj/effect/turf_decal/trimline/green/corner:
+  dirs:
+    1: BrickCornerOverlayNE
+    2: BrickCornerOverlaySW
+    4: BrickCornerOverlaySE
+    8: BrickCornerOverlayNW
+  color: '#9FED5896'
+/obj/effect/turf_decal/trimline/green/end:
+  dirs:
+    1: BrickEndOverlayN
+    2: BrickEndOverlayS
+    4: BrickEndOverlayE
+    8: BrickEndOverlayW
+  color: '#9FED5896'
+/obj/effect/turf_decal/trimline/green/warning:
+  dirs:
+    1: WarnLineGreyscaleN
+    2: WarnLineGreyscaleS
+    4: WarnLineGreyscaleE
+    8: WarnLineGreyscaleW
+  color: '#9FED5896'
+/obj/effect/turf_decal/trimline/green/filled/line:
+  dirs:
+    1: BrickLineOverlayN
+    2: BrickLineOverlayS
+    4: BrickLineOverlayE
+    8: BrickLineOverlayW
+  color: '#9FED5896'
+/obj/effect/turf_decal/trimline/green/filled/corner:
+  dirs:
+    1: BrickCornerOverlayNE
+    2: BrickCornerOverlaySW
+    4: BrickCornerOverlaySE
+    8: BrickCornerOverlayNW
+  color: '#9FED5896'
+/obj/effect/turf_decal/trimline/green/filled/end:
+  dirs:
+    1: BrickEndOverlayN
+    2: BrickEndOverlayS
+    4: BrickEndOverlayE
+    8: BrickEndOverlayW
+  color: '#9FED5896'
+/obj/effect/turf_decal/trimline/green/filled/warning:
+  dirs:
+    1: WarnLineGreyscaleN
+    2: WarnLineGreyscaleS
+    4: WarnLineGreyscaleE
+    8: WarnLineGreyscaleW
+  color: '#9FED5896'
+/obj/effect/turf_decal/trimline/neutral/line:
+  dirs:
+    1: BrickLineOverlayN
+    2: BrickLineOverlayS
+    4: BrickLineOverlayE
+    8: BrickLineOverlayW
+  color: '#D4D4D496'
+/obj/effect/turf_decal/trimline/neutral/corner:
+  dirs:
+    1: BrickCornerOverlayNE
+    2: BrickCornerOverlaySW
+    4: BrickCornerOverlaySE
+    8: BrickCornerOverlayNW
+  color: '#D4D4D496'
+/obj/effect/turf_decal/trimline/neutral/end:
+  dirs:
+    1: BrickEndOverlayN
+    2: BrickEndOverlayS
+    4: BrickEndOverlayE
+    8: BrickEndOverlayW
+  color: '#D4D4D496'
+/obj/effect/turf_decal/trimline/neutral/warning:
+  dirs:
+    1: WarnLineGreyscaleN
+    2: WarnLineGreyscaleS
+    4: WarnLineGreyscaleE
+    8: WarnLineGreyscaleW
+  color: '#D4D4D496'
+/obj/effect/turf_decal/trimline/neutral/filled/line:
+  dirs:
+    1: BrickLineOverlayN
+    2: BrickLineOverlayS
+    4: BrickLineOverlayE
+    8: BrickLineOverlayW
+  color: '#D4D4D496'
+/obj/effect/turf_decal/trimline/neutral/filled/corner:
+  dirs:
+    1: BrickCornerOverlayNE
+    2: BrickCornerOverlaySW
+    4: BrickCornerOverlaySE
+    8: BrickCornerOverlayNW
+  color: '#D4D4D496'
+/obj/effect/turf_decal/trimline/neutral/filled/end:
+  dirs:
+    1: BrickEndOverlayN
+    2: BrickEndOverlayS
+    4: BrickEndOverlayE
+    8: BrickEndOverlayW
+  color: '#D4D4D496'
+/obj/effect/turf_decal/trimline/neutral/filled/warning:
+  dirs:
+    1: WarnLineGreyscaleN
+    2: WarnLineGreyscaleS
+    4: WarnLineGreyscaleE
+    8: WarnLineGreyscaleW
+  color: '#D4D4D496'
+/obj/effect/turf_decal/trimline/purple/line:
+  dirs:
+    1: BrickLineOverlayN
+    2: BrickLineOverlayS
+    4: BrickLineOverlayE
+    8: BrickLineOverlayW
+  color: '#D381C996'
+/obj/effect/turf_decal/trimline/purple/corner:
+  dirs:
+    1: BrickCornerOverlayNE
+    2: BrickCornerOverlaySW
+    4: BrickCornerOverlaySE
+    8: BrickCornerOverlayNW
+  color: '#D381C996'
+/obj/effect/turf_decal/trimline/purple/end:
+  dirs:
+    1: BrickEndOverlayN
+    2: BrickEndOverlayS
+    4: BrickEndOverlayE
+    8: BrickEndOverlayW
+  color: '#D381C996'
+/obj/effect/turf_decal/trimline/purple/warning:
+  dirs:
+    1: WarnLineGreyscaleN
+    2: WarnLineGreyscaleS
+    4: WarnLineGreyscaleE
+    8: WarnLineGreyscaleW
+  color: '#D381C996'
+/obj/effect/turf_decal/trimline/purple/filled/line:
+  dirs:
+    1: BrickLineOverlayN
+    2: BrickLineOverlayS
+    4: BrickLineOverlayE
+    8: BrickLineOverlayW
+  color: '#D381C996'
+/obj/effect/turf_decal/trimline/purple/filled/corner:
+  dirs:
+    1: BrickCornerOverlayNE
+    2: BrickCornerOverlaySW
+    4: BrickCornerOverlaySE
+    8: BrickCornerOverlayNW
+  color: '#D381C996'
+/obj/effect/turf_decal/trimline/purple/filled/end:
+  dirs:
+    1: BrickEndOverlayN
+    2: BrickEndOverlayS
+    4: BrickEndOverlayE
+    8: BrickEndOverlayW
+  color: '#D381C996'
+/obj/effect/turf_decal/trimline/purple/filled/warning:
+  dirs:
+    1: WarnLineGreyscaleN
+    2: WarnLineGreyscaleS
+    4: WarnLineGreyscaleE
+    8: WarnLineGreyscaleW
+  color: '#D381C996'
+/obj/effect/turf_decal/trimline/red/line:
+  dirs:
+    1: BrickLineOverlayN
+    2: BrickLineOverlayS
+    4: BrickLineOverlayE
+    8: BrickLineOverlayW
+  color: '#DE3A3A96'
+/obj/effect/turf_decal/trimline/red/corner:
+  dirs:
+    1: BrickCornerOverlayNE
+    2: BrickCornerOverlaySW
+    4: BrickCornerOverlaySE
+    8: BrickCornerOverlayNW
+  color: '#DE3A3A96'
+/obj/effect/turf_decal/trimline/red/end:
+  dirs:
+    1: BrickEndOverlayN
+    2: BrickEndOverlayS
+    4: BrickEndOverlayE
+    8: BrickEndOverlayW
+  color: '#DE3A3A96'
+/obj/effect/turf_decal/trimline/red/warning:
+  dirs:
+    1: WarnLineGreyscaleN
+    2: WarnLineGreyscaleS
+    4: WarnLineGreyscaleE
+    8: WarnLineGreyscaleW
+  color: '#DE3A3A96'
+/obj/effect/turf_decal/trimline/red/filled/line:
+  dirs:
+    1: BrickLineOverlayN
+    2: BrickLineOverlayS
+    4: BrickLineOverlayE
+    8: BrickLineOverlayW
+  color: '#DE3A3A96'
+/obj/effect/turf_decal/trimline/red/filled/corner:
+  dirs:
+    1: BrickCornerOverlayNE
+    2: BrickCornerOverlaySW
+    4: BrickCornerOverlaySE
+    8: BrickCornerOverlayNW
+  color: '#DE3A3A96'
+/obj/effect/turf_decal/trimline/red/filled/end:
+  dirs:
+    1: BrickEndOverlayN
+    2: BrickEndOverlayS
+    4: BrickEndOverlayE
+    8: BrickEndOverlayW
+  color: '#DE3A3A96'
+/obj/effect/turf_decal/trimline/red/filled/warning:
+  dirs:
+    1: WarnLineGreyscaleN
+    2: WarnLineGreyscaleS
+    4: WarnLineGreyscaleE
+    8: WarnLineGreyscaleW
+  color: '#DE3A3A96'
+/obj/effect/turf_decal/trimline/white/line:
+  dirs:
+    1: BrickLineOverlayN
+    2: BrickLineOverlayS
+    4: BrickLineOverlayE
+    8: BrickLineOverlayW
+  color: '#FFFFFFFF'
+/obj/effect/turf_decal/trimline/white/corner:
+  dirs:
+    1: BrickCornerOverlayNE
+    2: BrickCornerOverlaySW
+    4: BrickCornerOverlaySE
+    8: BrickCornerOverlayNW
+  color: '#FFFFFFFF'
+/obj/effect/turf_decal/trimline/white/end:
+  dirs:
+    1: BrickEndOverlayN
+    2: BrickEndOverlayS
+    4: BrickEndOverlayE
+    8: BrickEndOverlayW
+  color: '#FFFFFFFF'
+/obj/effect/turf_decal/trimline/white/warning:
+  dirs:
+    1: WarnLineGreyscaleN
+    2: WarnLineGreyscaleS
+    4: WarnLineGreyscaleE
+    8: WarnLineGreyscaleW
+  color: '#FFFFFFFF'
+/obj/effect/turf_decal/trimline/white/filled/line:
+  dirs:
+    1: BrickLineOverlayN
+    2: BrickLineOverlayS
+    4: BrickLineOverlayE
+    8: BrickLineOverlayW
+  color: '#FFFFFFFF'
+/obj/effect/turf_decal/trimline/white/filled/corner:
+  dirs:
+    1: BrickCornerOverlayNE
+    2: BrickCornerOverlaySW
+    4: BrickCornerOverlaySE
+    8: BrickCornerOverlayNW
+  color: '#FFFFFFFF'
+/obj/effect/turf_decal/trimline/white/filled/end:
+  dirs:
+    1: BrickEndOverlayN
+    2: BrickEndOverlayS
+    4: BrickEndOverlayE
+    8: BrickEndOverlayW
+  color: '#FFFFFFFF'
+/obj/effect/turf_decal/trimline/white/filled/warning:
+  dirs:
+    1: WarnLineGreyscaleN
+    2: WarnLineGreyscaleS
+    4: WarnLineGreyscaleE
+    8: WarnLineGreyscaleW
+  color: '#FFFFFFFF'
+/obj/effect/turf_decal/trimline/yellow/line:
+  dirs:
+    1: BrickLineOverlayN
+    2: BrickLineOverlayS
+    4: BrickLineOverlayE
+    8: BrickLineOverlayW
+  color: '#EFB34196'
+/obj/effect/turf_decal/trimline/yellow/corner:
+  dirs:
+    1: BrickCornerOverlayNE
+    2: BrickCornerOverlaySW
+    4: BrickCornerOverlaySE
+    8: BrickCornerOverlayNW
+  color: '#EFB34196'
+/obj/effect/turf_decal/trimline/yellow/end:
+  dirs:
+    1: BrickEndOverlayN
+    2: BrickEndOverlayS
+    4: BrickEndOverlayE
+    8: BrickEndOverlayW
+  color: '#EFB34196'
+/obj/effect/turf_decal/trimline/yellow/warning:
+  dirs:
+    1: WarnLineGreyscaleN
+    2: WarnLineGreyscaleS
+    4: WarnLineGreyscaleE
+    8: WarnLineGreyscaleW
+  color: '#EFB34196'
+/obj/effect/turf_decal/trimline/yellow/filled/line:
+  dirs:
+    1: BrickLineOverlayN
+    2: BrickLineOverlayS
+    4: BrickLineOverlayE
+    8: BrickLineOverlayW
+  color: '#EFB34196'
+/obj/effect/turf_decal/trimline/yellow/filled/corner:
+  dirs:
+    1: BrickCornerOverlayNE
+    2: BrickCornerOverlaySW
+    4: BrickCornerOverlaySE
+    8: BrickCornerOverlayNW
+  color: '#EFB34196'
+/obj/effect/turf_decal/trimline/yellow/filled/end:
+  dirs:
+    1: BrickEndOverlayN
+    2: BrickEndOverlayS
+    4: BrickEndOverlayE
+    8: BrickEndOverlayW
+  color: '#EFB34196'
+/obj/effect/turf_decal/trimline/yellow/filled/warning:
+  dirs:
+    1: WarnLineGreyscaleN
+    2: WarnLineGreyscaleS
+    4: WarnLineGreyscaleE
+    8: WarnLineGreyscaleW
+  color: '#EFB34196'

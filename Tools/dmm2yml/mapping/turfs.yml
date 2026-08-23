@@ -1,0 +1,77 @@
+# /turf/... -> an SS14 tile, and optionally an entity standing on it.
+#
+# Rules are inherited down the SS13 path tree: the rule for
+# '/turf/open/floor/iron/dark' also covers '/turf/open/floor/iron/dark/corner',
+# '/dark/textured', '/dark/smooth_half' and so on. SS13 encodes corner and edge
+# variants as separate turfs; SS14 draws those with decals instead, so they all
+# collapse onto the same tile here.
+#
+# Two forms:
+#   /turf/...: TileId
+#   /turf/...: {tile: TileId, entity: PrototypeId}
+#
+# There is deliberately no catch-all for '/turf/open/floor'. A floor this file
+# does not name shows up in the scan report for a human to decide on, rather
+# than being quietly turned into steel.
+
+# ---- space and hull ----
+/turf/open/space: Space
+/turf/open/floor/plating: Plating
+/turf/open/floor/plating/foam: FloorMetalFoam
+/turf/open/floor/catwalk_floor: Lattice
+
+# ---- the iron family (SS14 calls it steel) ----
+/turf/open/floor/iron: FloorSteel
+/turf/open/floor/iron/dark: FloorDark
+/turf/open/floor/iron/white: FloorWhite
+/turf/open/floor/iron/textured: FloorSteel
+/turf/open/floor/iron/diagonal: FloorSteelDiagonal
+/turf/open/floor/iron/cafeteria: FloorSteelCheckerLight
+/turf/open/floor/iron/checker: FloorSteelCheckerDark
+/turf/open/floor/iron/freezer: FloorFreezer
+/turf/open/floor/iron/kitchen_coldroom: FloorFreezer
+/turf/open/floor/iron/grimy: FloorSteelDirty
+/turf/open/floor/iron/showroomfloor: FloorShowroom
+/turf/open/floor/iron/chapel: FloorSteelMono
+/turf/open/floor/iron/goonplaque: FloorSteel
+/turf/open/floor/iron/recharge_floor: FloorSteel
+/turf/open/floor/iron/stairs: FloorSteel        # SS14 draws stairs as decals
+/turf/open/floor/iron/solarpanel: Plating       # the panels themselves are entities
+/turf/open/floor/iron/dark/telecomms: FloorTechMaint
+
+# ---- engineering ----
+/turf/open/floor/engine: FloorReinforced        # also covers /air, /o2, /n2, /vacuum, ...
+/turf/open/floor/glass/reinforced: FloorRGlass
+
+# ---- circuitry ----
+/turf/open/floor/circuit: FloorBlueCircuit
+/turf/open/floor/circuit/green: FloorGreenCircuit
+/turf/open/floor/circuit/red: FloorRedCircuit
+
+# ---- wood and carpet ----
+/turf/open/floor/wood: FloorWood
+/turf/open/floor/wood/large: FloorWoodLarge
+/turf/open/floor/wood/parquet: FloorWoodTile
+/turf/open/floor/carpet: FloorCarpetOffice      # SS14 has no per-colour carpets
+
+# ---- natural ----
+/turf/open/floor/grass: FloorGrass
+/turf/open/floor/fake_snow: FloorSnow
+/turf/open/misc/asteroid/basalt: FloorBasalt
+
+# ---- walls: a tile plus a wall entity on top ----
+/turf/closed/wall:
+  tile: Plating
+  entity: WallSolid
+/turf/closed/wall/r_wall:
+  tile: Plating
+  entity: WallReinforced
+/turf/closed/wall/mineral/plastitanium:
+  tile: Plating
+  entity: WallPlastitanium
+/turf/closed/indestructible:
+  tile: Plating
+  entity: WallRiveted
+/turf/closed/mineral/volcanic:
+  tile: FloorBasalt
+  entity: WallRock

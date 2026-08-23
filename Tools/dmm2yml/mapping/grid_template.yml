@@ -1,0 +1,63 @@
+# Components given to the map entity (uid 1) and the grid entity (uid 2) of a
+# converted map.  Both blocks are copied into the output verbatim, so this file
+# is the place to change what a converted map comes out as -- no code edits.
+#
+# Write the components at column 0; the converter indents them to fit.
+# Two marker lines are replaced with generated data:
+#   {{MAPGRID_CHUNKS}}   -> the encoded tile chunks
+#   {{DECALGRID_NODES}}  -> the decal nodes (or "nodes: []")
+#
+# The defaults mirror the station grid of Resources/Maps/amber.yml, which is
+# what this fork's station maps look like.  Notes on the choices you are most
+# likely to want to change:
+#   * Parallax "Default" is the neutral starfield; swap it for a per-station one
+#     (AmberStation, BagelStation, ...) once the map has an identity.
+#   * Shuttle + bodyType Dynamic is how stations are set up in this fork -- they
+#     are dockable grids.  Drop Shuttle and use bodyType Static for a grid that
+#     must never move.
+#   * BecomesStation is deliberately absent: add it, with the station's id, when
+#     the map is ready to be a real station.
+
+map_entity: |
+  - type: MetaData
+    name: Map Entity
+  - type: Transform
+  - type: Map
+    mapPaused: True
+  - type: GridTree
+  - type: Broadphase
+  - type: OccluderTree
+  - type: Parallax
+    parallax: Default
+
+grid_entity: |
+  - type: MetaData
+    name: grid
+  - type: Transform
+    parent: 1
+  - type: MapGrid
+    chunks:
+  {{MAPGRID_CHUNKS}}
+  - type: Broadphase
+  - type: Physics
+    bodyStatus: InAir
+    fixedRotation: False
+    bodyType: Dynamic
+  - type: Fixtures
+    fixtures: {}
+  - type: OccluderTree
+  - type: SpreaderGrid
+  - type: Shuttle
+  - type: GridPathfinding
+  - type: Gravity
+    gravityShakeSound: !type:SoundPathSpecifier
+      path: /Audio/Effects/alert.ogg
+  - type: DecalGrid
+    chunkCollection:
+      version: 2
+  {{DECALGRID_NODES}}
+  - type: GridAtmosphere
+  - type: GasTileOverlay
+  - type: RadiationGridResistance
+  - type: NavMap
+  - type: ImplicitRoof

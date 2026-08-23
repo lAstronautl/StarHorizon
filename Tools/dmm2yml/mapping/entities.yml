@@ -1,0 +1,163 @@
+# /obj/... and /mob/... -> SS14 entity prototypes.
+#
+# Rules are inherited down the SS13 path tree, so '/obj/structure/table' also
+# covers '/obj/structure/table/optable' unless that has a rule of its own.
+#
+# Forms:
+#   /obj/...: PrototypeId
+#   /obj/...: [PrototypeA, PrototypeB]        several entities on one tile
+#   /obj/...: {entity: Id, dir: 4}            force a facing (see below)
+#   /obj/...: {tile: TileId, entity: Id}      also set the tile underneath
+#
+# SS13 hides the orientation of some objects in the path instead of in a dir
+# var, and it means two different things there:
+#   'wall: north'  the object is mounted on the wall to its north, so in SS14 it
+#                  faces south, away from it. Use this for anything stuck to a
+#                  wall or sitting on a tile edge -- lights, alarms, cameras,
+#                  APCs, directional windows.
+#   'dir: 1'       the object simply faces north. Use this for free-standing
+#                  things like stools. Values are BYOND's: 1 N, 2 S, 4 E, 8 W.
+# Getting these two mixed up rotates everything by 180 degrees.
+#
+# This file covers the paths a /tg/ station leans on most. Everything else is
+# reported by 'scan' for a human to decide -- that is the point of the tool, so
+# resist the urge to add a catch-all rule here.
+
+# ---- power and wiring ----
+/obj/structure/cable: CableApcExtension
+/obj/structure/cable/multilayer: CableApcExtension
+/obj/machinery/power/terminal: CableTerminal
+/obj/machinery/power/solar: SolarPanel
+/obj/item/solar_assembly: SolarPanel
+
+# ---- structure: floors, walls and openings ----
+/obj/structure/lattice: {tile: Lattice}
+/obj/structure/lattice/catwalk: {tile: Lattice, entity: Catwalk}
+/obj/structure/grille: Grille
+/obj/effect/spawner/random/structure/grille: Grille
+/obj/effect/spawner/structure/window: [Grille, Window]
+/obj/effect/spawner/structure/window/reinforced: [Grille, ReinforcedWindow]
+/obj/structure/window: Window
+/obj/structure/window/reinforced: ReinforcedWindow
+/obj/structure/railing: Railing
+
+# ---- doors ----
+/obj/machinery/door/airlock: Airlock
+/obj/machinery/door/airlock/maintenance: AirlockMaint
+/obj/machinery/door/airlock/external: AirlockExternal
+/obj/machinery/door/airlock/external/glass: AirlockExternalGlass
+/obj/machinery/door/airlock/public/glass: AirlockGlass
+/obj/machinery/door/airlock/security/glass: AirlockSecurityGlassLocked
+/obj/machinery/door/firedoor: Firelock
+/obj/machinery/door/firedoor/glass: FirelockGlass
+/obj/machinery/door/poddoor: BlastDoor
+/obj/machinery/door/poddoor/preopen: BlastDoorOpen
+/obj/machinery/door/poddoor/shutters: ShuttersNormal
+/obj/machinery/door/poddoor/shutters/preopen: ShuttersNormalOpen
+
+# ---- atmospherics ----
+/obj/machinery/atmospherics/pipe/smart/simple: GasPipeStraight
+/obj/machinery/atmospherics/pipe/smart/manifold: GasPipeTJunction
+/obj/machinery/atmospherics/pipe/smart/manifold4w: GasPipeFourway
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple: GasPipeStraight
+/obj/machinery/atmospherics/components/unary/vent_pump: GasVentPump
+/obj/machinery/atmospherics/components/unary/vent_scrubber: GasVentScrubber
+/obj/machinery/atmospherics/components/unary/portables_connector: GasPort
+/obj/machinery/atmospherics/components/unary/outlet_injector: GasOutletInjector
+/obj/machinery/atmospherics/components/binary/pump: GasPressurePump
+/obj/machinery/atmospherics/components/binary/volume_pump: GasVolumePump
+/obj/machinery/meter: GasAnalyzer
+
+# ---- disposals ----
+/obj/structure/disposalpipe/segment: DisposalPipe
+/obj/structure/disposalpipe/trunk: DisposalTrunk
+/obj/machinery/disposal/bin: DisposalUnit
+
+# ---- furniture ----
+/obj/structure/table: Table
+/obj/structure/table/wood: TableWood
+/obj/structure/table/glass: TableGlass
+/obj/structure/table/reinforced: TableReinforced
+/obj/structure/rack: Rack
+/obj/structure/chair: Chair
+/obj/structure/chair/office: ChairOfficeDark
+/obj/structure/chair/office/light: ChairOfficeLight
+/obj/structure/chair/stool: Stool
+/obj/structure/chair/stool/bar: StoolBar
+/obj/structure/closet/emcloset: ClosetEmergencyFilledRandom
+/obj/item/kirbyplants: PottedPlantRandom
+
+# ---- machines ----
+/obj/machinery/holopad: Holopad
+/obj/machinery/conveyor: ConveyorBelt
+
+# ---- mess ----
+/obj/effect/decal/cleanable/cobweb: Cobweb1
+/obj/effect/decal/cleanable/cobweb/cobweb2: Cobweb2
+
+# ---- mounted on a wall or a tile edge: the path names the wall ----
+/obj/item/radio/intercom/directional/north: {entity: IntercomCommon, wall: north}
+/obj/item/radio/intercom/directional/south: {entity: IntercomCommon, wall: south}
+/obj/item/radio/intercom/directional/east: {entity: IntercomCommon, wall: east}
+/obj/item/radio/intercom/directional/west: {entity: IntercomCommon, wall: west}
+
+/obj/machinery/airalarm/directional/north: {entity: AirAlarm, wall: north}
+/obj/machinery/airalarm/directional/south: {entity: AirAlarm, wall: south}
+/obj/machinery/airalarm/directional/east: {entity: AirAlarm, wall: east}
+/obj/machinery/airalarm/directional/west: {entity: AirAlarm, wall: west}
+
+/obj/machinery/button/door/directional/north: {entity: SignalButtonDirectional, wall: north}
+/obj/machinery/button/door/directional/south: {entity: SignalButtonDirectional, wall: south}
+/obj/machinery/button/door/directional/east: {entity: SignalButtonDirectional, wall: east}
+/obj/machinery/button/door/directional/west: {entity: SignalButtonDirectional, wall: west}
+
+/obj/machinery/camera/directional/north: {entity: SurveillanceCameraGeneral, wall: north}
+/obj/machinery/camera/directional/south: {entity: SurveillanceCameraGeneral, wall: south}
+/obj/machinery/camera/directional/east: {entity: SurveillanceCameraGeneral, wall: east}
+/obj/machinery/camera/directional/west: {entity: SurveillanceCameraGeneral, wall: west}
+
+/obj/machinery/firealarm/directional/north: {entity: FireAlarm, wall: north}
+/obj/machinery/firealarm/directional/south: {entity: FireAlarm, wall: south}
+/obj/machinery/firealarm/directional/east: {entity: FireAlarm, wall: east}
+/obj/machinery/firealarm/directional/west: {entity: FireAlarm, wall: west}
+
+/obj/machinery/light/directional/north: {entity: Poweredlight, wall: north}
+/obj/machinery/light/directional/south: {entity: Poweredlight, wall: south}
+/obj/machinery/light/directional/east: {entity: Poweredlight, wall: east}
+/obj/machinery/light/directional/west: {entity: Poweredlight, wall: west}
+
+/obj/machinery/light/small/directional/north: {entity: PoweredSmallLight, wall: north}
+/obj/machinery/light/small/directional/south: {entity: PoweredSmallLight, wall: south}
+/obj/machinery/light/small/directional/east: {entity: PoweredSmallLight, wall: east}
+/obj/machinery/light/small/directional/west: {entity: PoweredSmallLight, wall: west}
+
+/obj/machinery/power/apc/auto_name/directional/north: {entity: APCBasic, wall: north}
+/obj/machinery/power/apc/auto_name/directional/south: {entity: APCBasic, wall: south}
+/obj/machinery/power/apc/auto_name/directional/east: {entity: APCBasic, wall: east}
+/obj/machinery/power/apc/auto_name/directional/west: {entity: APCBasic, wall: west}
+
+/obj/structure/extinguisher_cabinet/directional/north: {entity: ExtinguisherCabinetFilled, wall: north}
+/obj/structure/extinguisher_cabinet/directional/south: {entity: ExtinguisherCabinetFilled, wall: south}
+/obj/structure/extinguisher_cabinet/directional/east: {entity: ExtinguisherCabinetFilled, wall: east}
+/obj/structure/extinguisher_cabinet/directional/west: {entity: ExtinguisherCabinetFilled, wall: west}
+
+/obj/structure/sign/warning/secure_area/directional/north: {entity: SignSecureMed, wall: north}
+/obj/structure/sign/warning/secure_area/directional/south: {entity: SignSecureMed, wall: south}
+/obj/structure/sign/warning/secure_area/directional/east: {entity: SignSecureMed, wall: east}
+/obj/structure/sign/warning/secure_area/directional/west: {entity: SignSecureMed, wall: west}
+
+/obj/structure/window/reinforced/spawner/directional/north: {entity: WindowReinforcedDirectional, wall: north}
+/obj/structure/window/reinforced/spawner/directional/south: {entity: WindowReinforcedDirectional, wall: south}
+/obj/structure/window/reinforced/spawner/directional/east: {entity: WindowReinforcedDirectional, wall: east}
+/obj/structure/window/reinforced/spawner/directional/west: {entity: WindowReinforcedDirectional, wall: west}
+
+/obj/structure/window/spawner/directional/north: {entity: WindowDirectional, wall: north}
+/obj/structure/window/spawner/directional/south: {entity: WindowDirectional, wall: south}
+/obj/structure/window/spawner/directional/east: {entity: WindowDirectional, wall: east}
+/obj/structure/window/spawner/directional/west: {entity: WindowDirectional, wall: west}
+
+# ---- free-standing: the path names the way it faces ----
+/obj/structure/chair/stool/directional/north: {entity: Stool, dir: 1}
+/obj/structure/chair/stool/directional/south: {entity: Stool, dir: 2}
+/obj/structure/chair/stool/directional/east: {entity: Stool, dir: 4}
+/obj/structure/chair/stool/directional/west: {entity: Stool, dir: 8}

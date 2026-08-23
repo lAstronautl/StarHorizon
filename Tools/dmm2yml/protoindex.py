@@ -1,0 +1,130 @@
+"""Index of the prototype ids that a converted map is allowed to reference.
+
+The converter has to answer two questions about every id a human types into the
+mapping table: does it exist, and -- when it does not -- what did they probably
+mean?  Loading the prototypes through YAML would be correct but slow (over
+20 000 entity prototypes spread across thousands of files), and we only need the
+ids, so the files are scanned line by line instead.
+"""
+
+from __future__ import annotations
+
+import os
+import re
+from dataclasses import dataclass, field
+from bisect import bisect_left
+
+TYPE_LINE = re.compile(r"^- type: (\S+)")
+FIELD_LINE = re.compile(r"^  (\w+):\s*(.*)$")
+
+# Prototype kinds the converter can place on a map.
+ENTITY = "entity"
+TILE = "tile"
+DECAL = "decal"
+
+
+@dataclass
+class ProtoIndex:
+    entities: set[str] = field(default_factory=set)
+    tiles: set[str] = field(default_factory=set)
+    decals: set[str] = field(default_factory=set)
+    tile_variants: dict[str, int] = field(default_factory=dict)
+    abstract_entities: set[str] = field(default_factory=set)
+
+    def kinds(self) -> dict[str, set[str]]:
+        return {ENTITY: self.entities, TILE: self.tiles, DECAL: self.decals}
+
+    def has(self, kind: str, proto_id: str) -> bool:
+        return proto_id in self.kinds().get(kind, ())
+
+    def variants(self, tile_id: str) -> int:
+        """How many visual variants a tile prototype declares (at least one)."""
+        return max(1, self.tile_variants.get(tile_id, 1))
+
+    _prefix_cache: dict[str, list[tuple[str, str]]] = field(default_factory=dict, repr=False)
+
+    def _prefix_pool(self, kind: str) -> list[tuple[str, str]]:
+        """(lowercased, id) pairs of one kind, sorted so a prefix can be bisected."""
+        if kind not in self._prefix_cache:
+            self._prefix_cache[kind] = sorted(
+                (candidate.lower(), candidate) for candidate in self.kinds().get(kind, ())
+            )
+        return self._prefix_cache[kind]
+
+    def suggest(self, kind: str, wanted: str, limit: int = 1) -> list[str]:
+        """Ids that plausibly match `wanted`, best first -- or nothing at all.
+
+        Only exact and prefix matches are offered. Substring and fuzzy matching
+        were tried and dropped: over 20 000 ids they answered "BlueprintFulton"
+        for a burnt floor and "Firelock" for an airlock, and cost ~80ms a call,
+        which was most of a scan's runtime. An empty suggestion tells a mapper
+        to go and look; a confident wrong one invites them to accept it.
+        """
+        candidates = self.kinds().get(kind, set())
+        if not candidates:
+            return []
+        if wanted in candidates:
+            return [wanted]
+
+        lowered = wanted.lower()
+        pool = self._prefix_pool(kind)
+        matches: list[str] = []
+        for low, candidate in pool[bisect_left(pool, (lowered, "")):]:
+            if not low.startswith(lowered):
+                break
+            matches.append(candidate)
+
+        # Shortest first: the shortest id starting with "Airlock" is "Airlock".
+        matches.sort(key=lambda candidate: (len(candidate), candidate))
+        return matches[:limit]
+
+
+def _flush(index: ProtoIndex, kind: str | None, fields: dict[str, str]) -> None:
+    proto_id = fields.get("id")
+    if kind is None or not proto_id:
+        return
+
+    if kind == ENTITY:
+        if fields.get("abstract", "").lower() == "true":
+            index.abstract_entities.add(proto_id)
+        else:
+            index.entities.add(proto_id)
+    elif kind == TILE:
+        index.tiles.add(proto_id)
+        try:
+            index.tile_variants[proto_id] = int(fields.get("variants", "1"))
+        except ValueError:
+            index.tile_variants[proto_id] = 1
+    elif kind == DECAL:
+        index.decals.add(proto_id)
+
+
+def build(prototypes_dir: str) -> ProtoIndex:
+    """Scan ``Resources/Prototypes`` for entity, tile and decal ids."""
+    index = ProtoIndex()
+    wanted = {ENTITY, TILE, DECAL}
+
+    for root, _, files in os.walk(prototypes_dir):
+        for name in files:
+            if not name.endswith((".yml", ".yaml")):
+                continue
+            path = os.path.join(root, name)
+            kind: str | None = None
+            fields: dict[str, str] = {}
+            try:
+                with open(path, encoding="utf-8-sig") as handle:
+                    for line in handle:
+                        if (type_match := TYPE_LINE.match(line)) is not None:
+                            _flush(index, kind, fields)
+                            found = type_match.group(1)
+                            kind = found if found in wanted else None
+                            fields = {}
+                        elif kind is not None and (field_match := FIELD_LINE.match(line)) is not None:
+                            key, value = field_match.group(1), field_match.group(2).strip()
+                            if key in ("id", "abstract", "variants") and key not in fields:
+                                fields[key] = value
+            except (OSError, UnicodeDecodeError):
+                continue
+            _flush(index, kind, fields)
+
+    return index
