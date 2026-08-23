@@ -92,6 +92,13 @@ EXPECTED_DECAL = ("WarnLineE", 1, 3)
 MAX_MAPS_SAMPLED = 60
 
 
+def dmm2yml_module():
+    """Imported lazily: dmm2yml imports this module for its `selftest` command."""
+    import dmm2yml
+
+    return dmm2yml
+
+
 @dataclass
 class Result:
     name: str
@@ -471,6 +478,42 @@ def check_no_empty_chunks(mapping_set, index) -> Result:
     return Result("chunks: no empty chunks", True, f"{len(encoded)} chunk(s) written, the all-Space one dropped")
 
 
+def check_problem_reporting(mapping_set, index) -> Result:
+    """A path with no decision must be reported once, not once per code path.
+
+    Applying the table complains that a row is blank; walking the map then
+    complains that the same path has no rule. Both are true and both are the
+    same problem, and adding the lists together told people 4051 paths needed
+    attention when 2026 did.
+    """
+    paths = [
+        "/obj/nothing/one",
+        "/obj/nothing/two",
+        "/obj/nothing/three",
+    ]
+    table = {path: {"dmm_path": path, "kind": "entity", "ss14_id": "", "color": ""} for path in paths}
+
+    dmm2yml = dmm2yml_module()
+    fresh = mapping_rules.load(os.path.join(os.path.dirname(os.path.abspath(__file__)), "mapping"))
+    problems = dmm2yml.apply_table(table, fresh, index)
+
+    # The same paths, now as if the walk had also found them unresolved.
+    survey = dmm2yml.Survey()
+    for number, path in enumerate(paths):
+        survey.note_unresolved(path, "entity", number, number, {})
+    problems += dmm2yml.collect_problems(survey)
+
+    lines = dmm2yml.format_problems(problems)
+    reported = [line.split(":", 1)[0] for line in lines]
+
+    if len(reported) != len(set(reported)):
+        duplicated = sorted({p for p in reported if reported.count(p) > 1})
+        return Result("problems: one line per path", False, f"reported twice: {duplicated}")
+    if sorted(reported) != sorted(paths):
+        return Result("problems: one line per path", False, f"reported {sorted(reported)}, expected {sorted(paths)}")
+    return Result("problems: one line per path", True, f"{len(paths)} unresolved paths, {len(lines)} lines")
+
+
 def run(repo_root: str, mapping_dir: str, prototypes_dir: str) -> list[Result]:
     mapping_set = mapping_rules.load(mapping_dir)
     index = protoindex.build(prototypes_dir)
@@ -478,6 +521,7 @@ def run(repo_root: str, mapping_dir: str, prototypes_dir: str) -> list[Result]:
     checks = [
         ("parser: geometry and vars", lambda: check_parser()),
         ("rules: exact, inherited, ignored", lambda: check_rules(mapping_set)),
+        ("problems: one line per path", lambda: check_problem_reporting(mapping_set, index)),
         ("orientation: wall vs dir", lambda: check_orientation(mapping_set)),
         ("chunks: cell indexing", lambda: check_chunk_indexing()),
         ("chunks: no empty chunks", lambda: check_no_empty_chunks(mapping_set, index)),

@@ -8,3 +8,16 @@
 # a typical /tg/ station would otherwise land in the report with nothing useful
 # to map them to.
 - /area
+
+# Atmospheric pipes and power cables. SS13 and SS14 build these networks
+# differently enough that a converted layout is worth less than the time spent
+# untangling it -- the pipes carry layers, colours and directions that do not
+# survive, and the cable net has to be re-run against SS14's power model anyway.
+# Dropping them leaves clean floors to lay new ones on. On a /tg/ MetaStation
+# this is about a third of all objects: 5857 pipes, 3631 cables.
+#
+# The machines that sit on these networks (vents, scrubbers, pumps, injectors)
+# are still converted -- they are placed correctly and only need connecting up.
+- /obj/machinery/atmospherics/pipe
+- /obj/structure/cable
+- /obj/machinery/power/terminal

@@ -8,6 +8,7 @@ in, and ``convert`` refuses to produce a map while that table has blanks.
     scan      read a .dmm, report every path that has no rule, as CSV
     convert   build the map, using the mapping files plus a filled-in table
     merge     fold a filled-in table back into the shared mapping files
+    gui       open a window for all of the above
     selftest  run the converter's own checks against this repo
 
 Run ``dmm2yml.py <command> --help`` for the options of each.
@@ -167,16 +168,21 @@ def apply_table(
     table: dict[str, dict[str, str]],
     mapping_set: mapping_rules.MappingSet,
     index: protoindex.ProtoIndex,
-) -> list[str]:
-    """Merge human decisions into the mapping set. Returns the problems found."""
-    problems: list[str] = []
+) -> list[tuple[str, str]]:
+    """Merge human decisions into the mapping set.
+
+    Returns (path, reason) pairs rather than finished sentences, so that a path
+    which is both blank here and unresolved during the walk is only reported
+    once -- see `format_problems`.
+    """
+    problems: list[tuple[str, str]] = []
 
     for dmm_path, row in table.items():
         kind = row.get("kind") or "entity"
         value = row.get("ss14_id", "")
 
         if not value:
-            problems.append(f"{dmm_path}: ss14_id is empty (write a prototype id, or '{mapping_rules.SKIP}')")
+            problems.append((dmm_path, f"ss14_id is empty (write a prototype id, or '{mapping_rules.SKIP}')"))
             continue
 
         if value.lower() == mapping_rules.SKIP:
@@ -190,10 +196,10 @@ def apply_table(
             entities = [part for part in parts if part != tile]
             unknown = [part for part in entities if not index.has(protoindex.ENTITY, part)]
             if tile is None and not entities:
-                problems.append(f"{dmm_path}: '{value}' is neither a tile nor an entity prototype")
+                problems.append((dmm_path, f"'{value}' is neither a tile nor an entity prototype"))
                 continue
             if unknown:
-                problems.append(f"{dmm_path}: unknown entity prototype(s) {', '.join(unknown)}")
+                problems.append((dmm_path, f"unknown entity prototype(s) {', '.join(unknown)}"))
                 continue
             mapping_set.turfs[dmm_path] = mapping_rules.TurfRule(
                 tile=tile, entity=entities[0] if entities else None
@@ -205,7 +211,7 @@ def apply_table(
         else:
             unknown = [part for part in parts if not index.has(protoindex.ENTITY, part)]
             if unknown:
-                problems.append(f"{dmm_path}: unknown entity prototype(s) {', '.join(unknown)}")
+                problems.append((dmm_path, f"unknown entity prototype(s) {', '.join(unknown)}"))
                 continue
             mapping_set.entities[dmm_path] = mapping_rules.EntityRule(entities=parts)
 
@@ -328,25 +334,74 @@ def command_scan(args) -> int:
     return 0
 
 
+def collect_problems(survey: Survey) -> list[tuple[str, str]]:
+    """(path, reason) for every path that still has no decision, worst first."""
+    return [
+        (report.path, f"no rule ({report.count} uses, e.g. at {report.example})")
+        for report in sorted(survey.unresolved.values(), key=lambda r: -r.count)
+    ]
+
+
+def format_problems(problems: list[tuple[str, str]]) -> list[str]:
+    """One line per path.
+
+    A blank table row and an unresolved path are the same problem seen twice --
+    once when the table is applied and again when the map is walked. Reporting
+    both told people 4051 paths needed attention when 2026 did.
+    """
+    seen: dict[str, str] = {}
+    for path, reason in problems:
+        seen.setdefault(path, reason)
+    return [f"{path}: {reason}" for path, reason in seen.items()]
+
+
+def build_map(
+    dmm: dmmparser.DmmMap,
+    mapping_set: mapping_rules.MappingSet,
+    index: protoindex.ProtoIndex,
+    z_level: int,
+    variant_mode: str,
+    mapping_dir: str,
+    engine_version: str | None = None,
+) -> ss14map.MapBuilder:
+    """Walk the map into a builder, ready to render."""
+    with open(os.path.join(mapping_dir, "grid_template.yml"), encoding="utf-8") as handle:
+        template = yaml.safe_load(handle)
+
+    builder = ss14map.MapBuilder(
+        map_entity_template=template["map_entity"],
+        grid_entity_template=template["grid_entity"],
+        engine_version=detect_engine_version(engine_version),
+    )
+    walk(dmm, mapping_set, index, z_level, builder, variant_mode)
+    return builder
+
+
+def describe_map(builder: ss14map.MapBuilder, log=print) -> None:
+    log(f"  tiles    {len(builder.tiles)} ({len(builder.build_tilemap())} distinct)")
+    log(f"  decals   {sum(len(v) for v in builder.decals.values())} in {len(builder.decals)} nodes")
+    log(f"  entities {len(builder.entities)}")
+    report_disconnected(builder, log)
+
+
 def command_convert(args) -> int:
     dmm = dmmparser.parse(args.dmm)
     mapping_set, index = load_context(args)
     z_level = args.z if args.z is not None else dmm.z_levels[0]
 
-    problems: list[str] = []
+    problems: list[tuple[str, str]] = []
     if args.table:
         problems = apply_table(read_table(args.table), mapping_set, index)
 
-    survey = walk(dmm, mapping_set, index, z_level, None, args.variants)
-    for report in sorted(survey.unresolved.values(), key=lambda r: -r.count):
-        problems.append(f"{report.path}: no rule ({report.count} uses, e.g. at {report.example})")
+    problems += collect_problems(walk(dmm, mapping_set, index, z_level, None, args.variants))
+    lines = format_problems(problems)
 
-    if problems:
-        print(f"Refusing to convert: {len(problems)} path(s) still need a decision.\n", file=sys.stderr)
-        for line in problems[:20]:
+    if lines:
+        print(f"Refusing to convert: {len(lines)} path(s) still need a decision.\n", file=sys.stderr)
+        for line in lines[:20]:
             print(f"  {line}", file=sys.stderr)
-        if len(problems) > 20:
-            print(f"  ... and {len(problems) - 20} more", file=sys.stderr)
+        if len(lines) > 20:
+            print(f"  ... and {len(lines) - 20} more", file=sys.stderr)
         print(
             f"\nRun 'scan' to regenerate the table, fill in ss14_id for every row "
             f"(or '{mapping_rules.SKIP}' to drop it), then convert again.",
@@ -354,28 +409,18 @@ def command_convert(args) -> int:
         )
         return 1
 
-    template = yaml.safe_load(open(os.path.join(args.mapping_dir, "grid_template.yml"), encoding="utf-8"))
-    builder = ss14map.MapBuilder(
-        map_entity_template=template["map_entity"],
-        grid_entity_template=template["grid_entity"],
-        engine_version=detect_engine_version(args.engine_version),
-    )
-    walk(dmm, mapping_set, index, z_level, builder, args.variants)
-
+    builder = build_map(dmm, mapping_set, index, z_level, args.variants, args.mapping_dir, args.engine_version)
     with open(args.output, "w", encoding="utf-8", newline="\n") as handle:
         handle.write(builder.render())
 
     print(f"wrote {args.output}")
-    print(f"  tiles    {len(builder.tiles)} ({len(builder.build_tilemap())} distinct)")
-    print(f"  decals   {sum(len(v) for v in builder.decals.values())} in {len(builder.decals)} nodes")
-    print(f"  entities {len(builder.entities)}")
-    report_disconnected(builder)
+    describe_map(builder)
     if not args.no_verify:
         return verify(builder)
     return 0
 
 
-def report_disconnected(builder: ss14map.MapBuilder) -> None:
+def report_disconnected(builder: ss14map.MapBuilder, log=print) -> None:
     """Warn about tile islands, because the engine will split them into grids.
 
     SS14 gives every disconnected run of tiles its own grid. That is correct, but
@@ -409,16 +454,16 @@ def report_disconnected(builder: ss14map.MapBuilder) -> None:
         return
 
     regions.sort(key=len, reverse=True)
-    print(f"  note     {len(regions)} disconnected tile regions -- SS14 will load these as separate grids:")
+    log(f"  note     {len(regions)} disconnected tile regions -- SS14 will load these as separate grids:")
     for region in regions[1:6]:
         x = sum(position[0] for position in region) / len(region)
         y = sum(position[1] for position in region) / len(region)
-        print(f"             {len(region)} tiles around {x:.0f},{y:.0f}")
+        log(f"             {len(region)} tiles around {x:.0f},{y:.0f}")
     if len(regions) > 6:
-        print(f"             ... and {len(regions) - 6} more")
+        log(f"             ... and {len(regions) - 6} more")
 
 
-def verify(builder: ss14map.MapBuilder) -> int:
+def verify(builder: ss14map.MapBuilder, log=print) -> int:
     """Decode the chunks we just encoded and check they say what we meant.
 
     This is the check that catches a chunk-index or byte-offset mistake, which
@@ -446,60 +491,96 @@ def verify(builder: ss14map.MapBuilder) -> int:
         missing = set(expected) - set(decoded)
         extra = set(decoded) - set(expected)
         wrong = [p for p in set(expected) & set(decoded) if expected[p] != decoded[p]]
-        print(
+        log(
             f"  VERIFY FAILED: {len(missing)} tiles lost, {len(extra)} invented, "
-            f"{len(wrong)} wrong after encoding",
-            file=sys.stderr,
+            f"{len(wrong)} wrong after encoding"
         )
         return 1
 
-    print(f"  verify   OK ({len(expected)} tiles survive the chunk round-trip)")
+    log(f"  verify   OK ({len(expected)} tiles survive the chunk round-trip)")
     return 0
 
 
-def command_merge(args) -> int:
-    mapping_set, index = load_context(args)
-    table = read_table(args.table)
-    problems = apply_table(table, mapping_set, index)
-    if problems:
-        print(f"{len(problems)} row(s) could not be applied:", file=sys.stderr)
-        for line in problems[:20]:
-            print(f"  {line}", file=sys.stderr)
-        return 1
+def merge_table(
+    table: dict[str, dict[str, str]],
+    mapping_dir: str,
+    index: protoindex.ProtoIndex,
+    log=print,
+) -> int:
+    """Append the decisions in `table` to the shared mapping files. Returns how many."""
+    additions: dict[str, dict] = {"turf": {}, "decal": {}, "entity": {}}
+    skips: list[str] = []
 
-    additions = {"turf": {}, "decal": {}, "entity": {}, "skip": []}
     for dmm_path, row in table.items():
         kind = row.get("kind") or "entity"
-        value = row["ss14_id"]
+        value = (row.get("ss14_id") or "").strip()
+        if not value:
+            continue
         if value.lower() == mapping_rules.SKIP:
-            additions["skip"].append(dmm_path)
+            skips.append(dmm_path)
         elif kind == "turf":
             additions["turf"][dmm_path] = value
-        elif kind == "decal":
-            entry = {"id": value} if MULTI_SEPARATOR not in value else {"decals": value.split(MULTI_SEPARATOR)}
+        elif kind == "decal" and all(
+            index.has(protoindex.DECAL, part) for part in value.split(MULTI_SEPARATOR)
+        ):
+            entry: dict = (
+                {"id": value} if MULTI_SEPARATOR not in value
+                else {"decals": [part.strip() for part in value.split(MULTI_SEPARATOR)]}
+            )
             if row.get("color"):
                 entry["color"] = row["color"]
             additions["decal"][dmm_path] = entry
         else:
             additions["entity"][dmm_path] = value
 
+    written = 0
     for name, key in (("turfs.yml", "turf"), ("decals.yml", "decal"), ("entities.yml", "entity")):
         if not additions[key]:
             continue
-        path = os.path.join(args.mapping_dir, name)
+        path = os.path.join(mapping_dir, name)
         with open(path, "a", encoding="utf-8") as handle:
-            handle.write(f"\n# Added by 'merge' from {os.path.basename(args.table)}\n")
+            handle.write("\n# Added by dmm2yml merge\n")
             handle.write(yaml.safe_dump(additions[key], allow_unicode=True, sort_keys=True, default_flow_style=False))
-        print(f"appended {len(additions[key])} rule(s) to {path}")
+        log(f"appended {len(additions[key])} rule(s) to {path}")
+        written += len(additions[key])
 
-    if additions["skip"]:
-        path = os.path.join(args.mapping_dir, "ignore.yml")
+    if skips:
+        path = os.path.join(mapping_dir, "ignore.yml")
         with open(path, "a", encoding="utf-8") as handle:
-            handle.write(f"\n# Added by 'merge' from {os.path.basename(args.table)}\n")
-            handle.write(yaml.safe_dump(sorted(additions["skip"]), allow_unicode=True, default_flow_style=False))
-        print(f"appended {len(additions['skip'])} ignore rule(s) to {path}")
+            handle.write("\n# Added by dmm2yml merge\n")
+            handle.write(yaml.safe_dump(sorted(skips), allow_unicode=True, default_flow_style=False))
+        log(f"appended {len(skips)} ignore rule(s) to {path}")
+        written += len(skips)
 
+    return written
+
+
+def command_merge(args) -> int:
+    mapping_set, index = load_context(args)
+    table = read_table(args.table)
+    lines = format_problems(apply_table(table, mapping_set, index))
+    if lines:
+        print(f"{len(lines)} row(s) could not be applied:", file=sys.stderr)
+        for line in lines[:20]:
+            print(f"  {line}", file=sys.stderr)
+        return 1
+
+    merge_table(table, args.mapping_dir, index)
     return 0
+
+
+def command_gui(args) -> int:
+    import gui
+
+    return gui.main(
+        [
+            "--mapping-dir", args.mapping_dir,
+            "--prototypes", args.prototypes,
+            "--variants", args.variants,
+        ]
+        + (["--z", str(args.z)] if args.z is not None else [])
+        + (["--dmm", args.dmm] if getattr(args, "dmm", None) else [])
+    )
 
 
 def command_selftest(args) -> int:
@@ -555,6 +636,11 @@ def main(argv: list[str] | None = None) -> int:
     add_common(merge, needs_dmm=False)
     merge.add_argument("table", help="filled-in CSV from 'scan'")
     merge.set_defaults(func=command_merge)
+
+    gui_parser = subparsers.add_parser("gui", help="open the window")
+    add_common(gui_parser, needs_dmm=False)
+    gui_parser.add_argument("--dmm", help="open this map straight away")
+    gui_parser.set_defaults(func=command_gui)
 
     selftest_parser = subparsers.add_parser(
         "selftest", help="run the converter's own checks against this repo"

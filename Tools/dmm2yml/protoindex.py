@@ -51,6 +51,31 @@ class ProtoIndex:
             )
         return self._prefix_cache[kind]
 
+    def search(self, kind: str, text: str, limit: int = 12) -> list[str]:
+        """Ids for a live autocomplete list: prefix matches first, then substring.
+
+        This is deliberately looser than `suggest`. A suggestion is written into
+        a table cell as an answer, so it may only be offered when it is likely
+        right; a dropdown is a list someone reads and picks from, where showing
+        every id containing "airlock" is exactly what is wanted.
+        """
+        if not text:
+            return []
+        lowered = text.lower()
+        pool = self._prefix_pool(kind)
+
+        prefixed = [candidate for low, candidate in pool if low.startswith(lowered)]
+        prefixed.sort(key=lambda candidate: (len(candidate), candidate))
+        if len(prefixed) >= limit:
+            return prefixed[:limit]
+
+        seen = set(prefixed)
+        contained = sorted(
+            (candidate for low, candidate in pool if lowered in low and candidate not in seen),
+            key=lambda candidate: (len(candidate), candidate),
+        )
+        return (prefixed + contained)[:limit]
+
     def suggest(self, kind: str, wanted: str, limit: int = 1) -> list[str]:
         """Ids that plausibly match `wanted`, best first -- or nothing at all.
 
