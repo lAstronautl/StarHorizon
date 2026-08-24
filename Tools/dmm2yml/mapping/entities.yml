@@ -287,3 +287,40 @@
 # near a wall. Left as a plain floor placement instead of guessing.
 /obj/machinery/button/door: SignalButton
 /obj/structure/bookcase: Bookshelf
+# ---- random-loot spawners: matched category to category, not item to item ----
+# SS13 and SS14 both roll a random pick from a themed loot table at map init and
+# then delete themselves (Resources/Prototypes/Entities/Markers/Spawners/Random/*),
+# so the honest conversion is "point at the equivalent table", not "pick one item
+# out of it and lose the randomness". Every id below is a placeable marker entity
+# (`- type: entity`, not a bare `- type: entityTable`) confirmed to exist.
+#
+# Rules use path inheritance same as everywhere else: a rule for
+# '/obj/effect/spawner/random/maintenance' also covers '/maintenance/two',
+# '/maintenance/no_decals', etc. -- SS13's "/two" "/three" suffixes just mean
+# "roll this table more than once", which the marker's own spawn chance already
+# approximates without needing a matching id per count.
+/obj/effect/spawner/random/armory: LootSpawnerArmory
+/obj/effect/spawner/random/bedsheet: BedsheetSpawner
+/obj/effect/spawner/random/bureaucracy/folder: FolderSpawner
+/obj/effect/spawner/random/bureaucracy/pen: Pen
+/obj/effect/spawner/random/engineering/tool: MaintenanceToolSpawner
+/obj/effect/spawner/random/entertainment/arcade: RandomArcade
+/obj/effect/spawner/random/entertainment/cigarette_pack: RandomSmokables
+/obj/effect/spawner/random/entertainment/musical_instrument: RandomInstruments
+/obj/effect/spawner/random/food_or_drink/donkpockets: DonkpocketBoxSpawner
+/obj/effect/spawner/random/food_or_drink/snack: RandomSnacks
+/obj/effect/spawner/random/maintenance: MaintenanceFluffSpawner
+/obj/effect/spawner/random/structure/barricade/crude: Barricade
+/obj/effect/spawner/random/structure/closet_empty/crate: CrateEmptySpawner
+/obj/effect/spawner/random/structure/crate: CrateFilledSpawner
+/obj/effect/spawner/random/structure/crate_abandoned: CrateEmptySpawner
+/obj/effect/spawner/random/structure/crate_loot: CrateFilledSpawner
+/obj/effect/spawner/random/structure/girder: Girder
+/obj/effect/spawner/random/structure/table_fancy: FancyTableSpawner
+/obj/effect/spawner/random/structure/table_or_rack: MaintenanceToolSpawner
+/obj/effect/spawner/random/trash: RandomSpawner
+/obj/effect/spawner/random/trash/cigbutt: CigaretteSpent
+/obj/effect/spawner/random/trash/graffiti: DecalSpawnerGraffiti
+/obj/effect/spawner/random/trash/soap: RandomSoap
+/obj/effect/spawner/random/vending/colavend: RandomVendingDrinks
+/obj/effect/spawner/random/vending/snackvend: RandomVendingSnacks
