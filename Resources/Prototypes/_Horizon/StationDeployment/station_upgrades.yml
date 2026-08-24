@@ -8,7 +8,9 @@
 # they have to be installed and activated by the station owner like any other purchase.
 
 - type: entity
-  parent: ComputerWithdrawBankATM
+  # ComputerWithdrawBankATM alone doesn't disable tool use, unlike the other two ATM variants -
+  # add it explicitly so this can't be unscrewed and carried off once installed.
+  parent: [BaseStructureDisableToolUse, ComputerWithdrawBankATM]
   id: StationUpgradeWithdrawAtm
   suffix: Station Upgrade
   components:
