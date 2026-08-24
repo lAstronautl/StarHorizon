@@ -1,5 +1,6 @@
 using Content.Server._Horizon.StationDeployment.Components;
 using Content.Server._NF.Tools.Components;
+using Content.Server.Power.Components;
 using Content.Server.Station.Systems;
 using Content.Shared._Horizon.StationDeployment.Components;
 using Content.Shared._NF.BindToStation;
@@ -30,11 +31,15 @@ public sealed class StationUpgradeEquipmentSystem : EntitySystem
         SubscribeLocalEvent<StationUpgradeEquipmentComponent, MapInitEvent>(OnMapInit);
     }
 
-    // Some of the underlying ATM prototypes disable tool use (anti-theft on their vanilla usage) -
-    // station upgrade equipment should be removable with a screwdriver/crowbar like anything else.
+    // Some of the underlying prototypes disable tool use (anti-theft on their vanilla usage) - that's
+    // only safe to lift when ExtensionCableSystem is the one keeping the "only works on the bound
+    // station" guarantee (it re-checks StationBoundObjectComponent on every anchor state change).
+    // Big machines wired straight into the HV power network (SMES, power transmission points, etc.)
+    // have no such continuous check, so they stay locked in place once installed.
     private void OnMapInit(Entity<StationUpgradeEquipmentComponent> ent, ref MapInitEvent args)
     {
-        RemComp<DisableToolUseComponent>(ent.Owner);
+        if (HasComp<ExtensionCableReceiverComponent>(ent.Owner))
+            RemComp<DisableToolUseComponent>(ent.Owner);
     }
 
     private void OnIdCardSwipe(Entity<StationUpgradeEquipmentComponent> ent, ref AfterInteractUsingEvent args)
