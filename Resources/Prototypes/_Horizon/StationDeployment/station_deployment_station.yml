@@ -4,6 +4,9 @@
   - StandardFrontierVessel
   - BaseStationMail # Mail
   - MarketFrontierOutpost
+  - BaseStationMagnet
+  - BaseStationGateway
+  - BaseStationSalvageJobs
   categories: [ HideSpawnMenu ]
   components:
   - type: StationOrderDatabase
