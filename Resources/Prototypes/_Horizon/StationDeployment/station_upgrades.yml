@@ -86,9 +86,9 @@
   limit: 5
 
 # Heavier equipment upgrades - same delivery/activation flow as the ATMs above. Machines wired
-# straight into the HV power network (no ExtensionCableReceiver) stay tool-locked in place once
-# installed, since nothing re-validates StationBoundObjectComponent for them on the fly - see
-# StationUpgradeEquipmentSystem.OnMapInit.
+# straight into the HV power network (CableDeviceNode, no ExtensionCableReceiver) are unlocked too,
+# but lose power the moment they're re-anchored off their bound station's grid - see
+# BindToStationSystem.DisableOffGridCableDevices and StationUpgradeEquipmentSystem.OnMapInit.
 
 - type: entity
   parent: SalvageMagnet

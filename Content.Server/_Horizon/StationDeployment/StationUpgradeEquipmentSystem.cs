@@ -1,10 +1,12 @@
 using Content.Server._Horizon.StationDeployment.Components;
 using Content.Server._NF.Tools.Components;
 using Content.Server.Power.Components;
+using Content.Server.Power.Nodes;
 using Content.Server.Station.Systems;
 using Content.Shared._Horizon.StationDeployment.Components;
 using Content.Shared._NF.BindToStation;
 using Content.Shared.Interaction;
+using Content.Shared.NodeContainer;
 using Content.Shared.Popups;
 using Content.Shared.StationRecords;
 using Robust.Shared.Audio.Systems;
@@ -32,14 +34,27 @@ public sealed class StationUpgradeEquipmentSystem : EntitySystem
     }
 
     // Some of the underlying prototypes disable tool use (anti-theft on their vanilla usage) - that's
-    // only safe to lift when ExtensionCableSystem is the one keeping the "only works on the bound
-    // station" guarantee (it re-checks StationBoundObjectComponent on every anchor state change).
-    // Big machines wired straight into the HV power network (SMES, power transmission points, etc.)
-    // have no such continuous check, so they stay locked in place once installed.
+    // only safe to lift when something keeps re-validating StationBoundObjectComponent as the entity
+    // gets moved around: ExtensionCableSystem does this for ExtensionCableReceiver, and
+    // BindToStationSystem does the equivalent for HV-network machines (CableDeviceNode) now too.
     private void OnMapInit(Entity<StationUpgradeEquipmentComponent> ent, ref MapInitEvent args)
     {
-        if (HasComp<ExtensionCableReceiverComponent>(ent.Owner))
+        if (HasComp<ExtensionCableReceiverComponent>(ent.Owner) || HasCableDeviceNode(ent.Owner))
             RemComp<DisableToolUseComponent>(ent.Owner);
+    }
+
+    private bool HasCableDeviceNode(EntityUid uid)
+    {
+        if (!TryComp<NodeContainerComponent>(uid, out var nodeContainer))
+            return false;
+
+        foreach (var node in nodeContainer.Nodes.Values)
+        {
+            if (node is CableDeviceNode)
+                return true;
+        }
+
+        return false;
     }
 
     private void OnIdCardSwipe(Entity<StationUpgradeEquipmentComponent> ent, ref AfterInteractUsingEvent args)
