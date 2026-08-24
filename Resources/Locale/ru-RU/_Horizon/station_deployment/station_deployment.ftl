@@ -25,12 +25,19 @@ station-control-console-upgrade-buy-button = Купить
 station-control-console-upgrade-level-req = Требуется уровень { $category } { $level } (сейчас { $current })
 station-control-console-upgrade-price = Цена: { $price }
 station-control-console-upgrade-locked = Требуемый уровень развития ещё не достигнут.
-station-control-console-upgrade-no-pallet = На станции нет свободной точки для доставки покупки (нужна плита CargoPalletBuy).
+station-control-console-upgrade-no-capsule = Сначала нужно вызвать и пристыковать грузовую капсулу - покупки доставляются через неё.
+station-control-console-upgrade-no-pallet = На капсуле нет точки для доставки покупки (нужна плита CargoPalletBuy).
 station-control-console-upgrade-purchased = Куплено: { $name }. Оборудование доставлено на точку выдачи.
 
 station-upgrade-equipment-wrong-grid = Это оборудование куплено не для этой станции.
 station-upgrade-equipment-not-owner = Только владелец станции может установить это оборудование.
 station-upgrade-equipment-installed = Оборудование установлено и активировано.
 
-station-upgrade-atm-name = Банковский терминал станции
-station-upgrade-atm-description = Банковский терминал, подключённый к счёту станции. Требует установки id-картой владельца станции.
+station-upgrade-withdraw-atm-name = Банкомат (только снятие)
+station-upgrade-withdraw-atm-description = Банкомат только для снятия средств. Требует установки id-картой владельца станции.
+
+station-upgrade-blackmarket-atm-name = Чёрный банковский терминал
+station-upgrade-blackmarket-atm-description = Неофициальный банкомат с комиссией 30% на пополнение, без лишних вопросов. Требует установки id-картой владельца станции.
+
+station-upgrade-full-atm-name = Банковский терминал
+station-upgrade-full-atm-description = Полноценный банкомат для пополнения и снятия средств. Требует установки id-картой владельца станции.

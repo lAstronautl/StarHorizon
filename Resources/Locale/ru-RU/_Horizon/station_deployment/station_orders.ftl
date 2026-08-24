@@ -15,6 +15,7 @@ station-task-console-capsule-en-route = Капсула в пути...
 station-task-console-capsule-docked = Капсула пристыкована - загрузите ящики и отзовите, когда будете готовы.
 
 station-order-console-capsule-already-present = Грузовая капсула уже развёрнута.
+station-order-console-capsule-cooldown = Вызов капсулы перезаряжается ещё { $seconds } сек.
 station-order-console-capsule-spawn-failed = Не удалось призвать грузовую капсулу. Попробуйте позже.
 station-order-console-organics-aboard = В капсуле кто-то есть ({ $name }) - нельзя отзывать капсулу с живыми существами внутри.
 

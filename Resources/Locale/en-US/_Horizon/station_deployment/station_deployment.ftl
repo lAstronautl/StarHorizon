@@ -25,12 +25,19 @@ station-control-console-upgrade-buy-button = Buy
 station-control-console-upgrade-level-req = Requires { $category } level { $level } (currently { $current })
 station-control-console-upgrade-price = Price: { $price }
 station-control-console-upgrade-locked = The required development level hasn't been reached yet.
-station-control-console-upgrade-no-pallet = No free delivery point on the station (needs a CargoPalletBuy pallet).
+station-control-console-upgrade-no-capsule = You need to summon and dock a cargo capsule first - purchases are delivered through it.
+station-control-console-upgrade-no-pallet = No delivery point on the capsule (needs a CargoPalletBuy pallet).
 station-control-console-upgrade-purchased = Purchased: { $name }. Equipment delivered to the pickup point.
 
 station-upgrade-equipment-wrong-grid = This equipment wasn't purchased for this station.
 station-upgrade-equipment-not-owner = Only the station's owner can install this equipment.
 station-upgrade-equipment-installed = Equipment installed and activated.
 
-station-upgrade-atm-name = Station Bank Terminal
-station-upgrade-atm-description = A bank terminal wired to the station's own account. Requires installation with the station owner's ID card.
+station-upgrade-withdraw-atm-name = Withdraw-Only Bank Terminal
+station-upgrade-withdraw-atm-description = A withdraw-only bank ATM. Requires installation with the station owner's ID card.
+
+station-upgrade-blackmarket-atm-name = Black Market Bank Terminal
+station-upgrade-blackmarket-atm-description = An unofficial ATM with a 30% deposit fee, no questions asked. Requires installation with the station owner's ID card.
+
+station-upgrade-full-atm-name = Bank Terminal
+station-upgrade-full-atm-description = A full-service bank ATM. Requires installation with the station owner's ID card.

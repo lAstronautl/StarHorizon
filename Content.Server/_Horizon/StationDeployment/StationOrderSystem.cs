@@ -20,6 +20,7 @@ using Robust.Shared.EntitySerialization.Systems;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
+using Robust.Shared.Timing;
 
 namespace Content.Server._Horizon.StationDeployment;
 
@@ -40,6 +41,7 @@ public sealed class StationOrderSystem : EntitySystem
     [Dependency] private readonly MapSystem _map = default!;
     [Dependency] private readonly PricingSystem _pricing = default!;
     [Dependency] private readonly ShipyardSystem _shipyard = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     private const string CargoCapsuleDockTag = "CargoCapsuleDock";
 
@@ -131,6 +133,22 @@ public sealed class StationOrderSystem : EntitySystem
             return;
         }
 
+        if (!TryComp<StationOrderDatabaseComponent>(station, out var orderDb))
+            return;
+
+        if (_timing.CurTime < orderDb.NextSummonTime)
+        {
+            var secondsLeft = (int) Math.Ceiling((orderDb.NextSummonTime - _timing.CurTime).TotalSeconds);
+            _popup.PopupEntity(Loc.GetString("station-order-console-capsule-cooldown", ("seconds", secondsLeft)), ent, args.Actor, PopupType.SmallCaution);
+            return;
+        }
+
+        if (!TryComp<StationBankAccountComponent>(station, out var bank) || GetBalance(bank) < ent.Comp.SummonCost)
+        {
+            _popup.PopupEntity(Loc.GetString("bank-insufficient-funds"), ent, args.Actor, PopupType.SmallCaution);
+            return;
+        }
+
         if (Transform(ent.Owner).GridUid is not { Valid: true } consoleGrid)
             return;
 
@@ -144,6 +162,10 @@ public sealed class StationOrderSystem : EntitySystem
         }
 
         _capsuleSpawnIndex += capsuleGrid.Value.Comp.LocalAABB.Width + CapsuleSpawnBuffer;
+
+        // Only charge and start the cooldown once we know the capsule actually spawned.
+        _cargo.UpdateBankAccount((station, bank), -ent.Comp.SummonCost, bank.PrimaryAccount);
+        orderDb.NextSummonTime = _timing.CurTime + ent.Comp.SummonCooldown;
 
         var capsuleComp = EnsureComp<CargoCapsuleComponent>(capsuleGrid.Value.Owner);
         capsuleComp.OwningStation = station;
@@ -328,7 +350,11 @@ public sealed class StationOrderSystem : EntitySystem
         return true;
     }
 
-    private Entity<CargoCapsuleComponent>? FindActiveCapsule(EntityUid station)
+    /// <summary>
+    /// Internal (not private) so StationControlConsoleSystem can find the docked capsule to deliver
+    /// purchased upgrade equipment to.
+    /// </summary>
+    internal Entity<CargoCapsuleComponent>? FindActiveCapsule(EntityUid station)
     {
         var query = EntityQueryEnumerator<CargoCapsuleComponent>();
         while (query.MoveNext(out var uid, out var comp))
@@ -338,6 +364,11 @@ public sealed class StationOrderSystem : EntitySystem
         }
 
         return null;
+    }
+
+    private static int GetBalance(StationBankAccountComponent bank)
+    {
+        return bank.Accounts.GetValueOrDefault(bank.PrimaryAccount, 0);
     }
 
     private void UpdateUi(Entity<StationTaskConsoleComponent> ent)

@@ -20,4 +20,16 @@ public sealed partial class StationTaskConsoleComponent : Component
     /// </summary>
     [DataField]
     public float CapsuleTravelTime = 10f;
+
+    /// <summary>
+    /// Credits deducted from the station's bank account each time the capsule is summoned.
+    /// </summary>
+    [DataField]
+    public int SummonCost = 10000;
+
+    /// <summary>
+    /// Minimum time between capsule summons.
+    /// </summary>
+    [DataField]
+    public TimeSpan SummonCooldown = TimeSpan.FromMinutes(1);
 }

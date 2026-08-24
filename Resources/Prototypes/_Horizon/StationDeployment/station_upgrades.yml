@@ -1,56 +1,83 @@
 # Station upgrade equipment - purchasable via the station control console once a development
-# category reaches the required level. Delivered to a CargoPalletBuy pallet on the station's own
-# grid; stays unanchored/inert until activated with the station owner's ID card
+# category reaches the required level. Delivered flatpacked to the docked cargo capsule
+# ("tradedrop"); the crew has to carry it to the station and unpack it with a tool there. The
+# unpacked machine stays inert until activated with the station owner's ID card
 # (StationUpgradeEquipmentSystem), which also anchors it in place.
+#
+# These are the vanilla/NF bank ATM computers, just wrapped with StationUpgradeEquipment so
+# they have to be installed and activated by the station owner like any other purchase.
 
 - type: entity
-  parent: [BaseStructureDisableScrewing, BaseStructureDisablePrying, BaseStructureIndestructible, BaseStructureAccessReaderImmuneToEmag, ComputerBankATMBase]
-  id: StationUpgradeAtm
-  name: station bank terminal
-  description: A bank terminal wired to this station's own account. Swipe the station's deed ID card on it to install and activate it.
+  parent: ComputerWithdrawBankATM
+  id: StationUpgradeWithdrawAtm
+  suffix: Station Upgrade
   components:
-  - type: Sprite
-    netsync: false
-    sprite: Structures/Machines/computers.rsi
-    layers:
-    - map: ["computerLayerBody"]
-      state: computer
-    - map: ["computerLayerKeyboard"]
-      state: generic_keyboard
-    - map: ["computerLayerScreen"]
-      sprite: _NF/Structures/Machines/computers.rsi
-      state: station_atm
-    - map: ["computerLayerKeys"]
-      state: id_key
-  - type: StationUpgradeAtm
-    cashSlot:
-      name: station-upgrade-atm-cashSlot
-      insertSound: /Audio/Machines/scanning.ogg
-      ejectSound: /Audio/Machines/tray_eject.ogg
-      ejectOnBreak: true
-      swap: false
-      whitelist:
-        components:
-        - Cash
   - type: StationUpgradeEquipment
-  - type: ActivatableUI
-    key: enum.BankATMMenuUiKey.ATM
-  - type: UserInterface
-    interfaces:
-      enum.BankATMMenuUiKey.ATM:
-        type: StationAdminConsoleBoundUserInterface
-  - type: ActivatableUIRequiresPower
-  - type: ItemSlots
-  - type: ContainerContainer
-    containers:
-      board: !type:Container
-      station-upgrade-atm-cashSlot: !type:ContainerSlot
+
+- type: entity
+  parent: ComputerBlackMarketBankATM
+  id: StationUpgradeBlackMarketAtm
+  suffix: Station Upgrade
+  components:
+  - type: StationUpgradeEquipment
+
+- type: entity
+  parent: ComputerBankATM
+  id: StationUpgradeFullAtm
+  suffix: Station Upgrade
+  components:
+  - type: StationUpgradeEquipment
+
+- type: entity
+  parent: BaseNFFlatpack
+  id: StationUpgradeWithdrawAtmFlatpack
+  name: station bank terminal flatpack (withdraw-only)
+  description: A flatpack used for installing a withdraw-only bank terminal on a deployed station.
+  components:
+  - type: Flatpack
+    entity: StationUpgradeWithdrawAtm
+
+- type: entity
+  parent: BaseNFFlatpack
+  id: StationUpgradeBlackMarketAtmFlatpack
+  name: station black market terminal flatpack
+  description: A flatpack used for installing a black market bank terminal on a deployed station.
+  components:
+  - type: Flatpack
+    entity: StationUpgradeBlackMarketAtm
+
+- type: entity
+  parent: BaseNFFlatpack
+  id: StationUpgradeFullAtmFlatpack
+  name: station bank terminal flatpack
+  description: A flatpack used for installing a full-service bank terminal on a deployed station.
+  components:
+  - type: Flatpack
+    entity: StationUpgradeFullAtm
 
 - type: stationUpgradePurchase
-  id: StationUpgradeAtmPurchase
-  name: station-upgrade-atm-name
-  description: station-upgrade-atm-description
+  id: StationUpgradeWithdrawAtmPurchase
+  name: station-upgrade-withdraw-atm-name
+  description: station-upgrade-withdraw-atm-description
   category: NFService
   requiredLevel: 3
   price: 5000
-  entity: StationUpgradeAtm
+  entity: StationUpgradeWithdrawAtmFlatpack
+
+- type: stationUpgradePurchase
+  id: StationUpgradeBlackMarketAtmPurchase
+  name: station-upgrade-blackmarket-atm-name
+  description: station-upgrade-blackmarket-atm-description
+  category: NFService
+  requiredLevel: 5
+  price: 8000
+  entity: StationUpgradeBlackMarketAtmFlatpack
+
+- type: stationUpgradePurchase
+  id: StationUpgradeFullAtmPurchase
+  name: station-upgrade-full-atm-name
+  description: station-upgrade-full-atm-description
+  category: NFService
+  requiredLevel: 10
+  price: 15000
+  entity: StationUpgradeFullAtmFlatpack
