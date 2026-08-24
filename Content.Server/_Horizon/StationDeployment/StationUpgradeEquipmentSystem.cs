@@ -1,4 +1,5 @@
 using Content.Server._Horizon.StationDeployment.Components;
+using Content.Server._NF.Tools.Components;
 using Content.Server.Station.Systems;
 using Content.Shared._Horizon.StationDeployment.Components;
 using Content.Shared._NF.BindToStation;
@@ -26,6 +27,14 @@ public sealed class StationUpgradeEquipmentSystem : EntitySystem
         base.Initialize();
 
         SubscribeLocalEvent<StationUpgradeEquipmentComponent, AfterInteractUsingEvent>(OnIdCardSwipe);
+        SubscribeLocalEvent<StationUpgradeEquipmentComponent, MapInitEvent>(OnMapInit);
+    }
+
+    // Some of the underlying ATM prototypes disable tool use (anti-theft on their vanilla usage) -
+    // station upgrade equipment should be removable with a screwdriver/crowbar like anything else.
+    private void OnMapInit(Entity<StationUpgradeEquipmentComponent> ent, ref MapInitEvent args)
+    {
+        RemComp<DisableToolUseComponent>(ent.Owner);
     }
 
     private void OnIdCardSwipe(Entity<StationUpgradeEquipmentComponent> ent, ref AfterInteractUsingEvent args)
