@@ -85,7 +85,13 @@ public sealed class StationUpgradeEquipmentSystem : EntitySystem
         }
 
         ent.Comp.Installed = true;
-        _transform.AnchorEntity(ent.Owner, Transform(ent.Owner));
+
+        // Most of the underlying prototypes (structures/computers) already spawn anchored - only
+        // anchor if it isn't, since re-anchoring an already-anchored entity asserts/crashes trying to
+        // add it to the grid's snap cell a second time.
+        var xform = Transform(ent.Owner);
+        if (!xform.Anchored)
+            _transform.AnchorEntity(ent.Owner, xform);
 
         _popup.PopupEntity(Loc.GetString("station-upgrade-equipment-installed"), ent, args.User, PopupType.Medium);
         _audio.PlayPvs(ent.Comp.ActivateSound, ent);
