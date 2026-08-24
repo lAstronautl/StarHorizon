@@ -43,3 +43,45 @@ station-upgrade-blackmarket-atm-description = An unofficial ATM with a 30% depos
 
 station-upgrade-full-atm-name = Bank Terminal
 station-upgrade-full-atm-description = A full-service bank ATM. Requires installation with the station owner's ID card.
+
+station-upgrade-salvage-magnet-name = Salvage Magnet
+station-upgrade-salvage-magnet-description = Pulls in salvage wreckage. Requires installation with the station owner's ID card.
+
+station-upgrade-gateway-name = Gateway
+station-upgrade-gateway-description = A gateway allowing faster than light travel to far-flung locations. Requires installation with the station owner's ID card.
+
+station-upgrade-energy-air-converter-name = Energy-to-Air Converter
+station-upgrade-energy-air-converter-description = Converts huge amounts of power into superheated air. Requires installation with the station owner's ID card.
+
+station-upgrade-antimatter-fabricator-name = Anti-Matter Fabricator
+station-upgrade-antimatter-fabricator-description = Converts plasteel and power into antimatter fuel. Requires installation with the station owner's ID card.
+
+station-upgrade-power-transmission-point-name = Power Transmission Point
+station-upgrade-power-transmission-point-description = Sells excess power for credits, paid directly into the station's account. Requires installation with the station owner's ID card.
+
+station-upgrade-smes-big-name = BLES Unit
+station-upgrade-smes-big-description = A bluespace-leveraged energy storage unit - ten SMES worth of capacity. Requires installation with the station owner's ID card.
+
+station-upgrade-cryo-pod-name = Cryo Sleep Pod
+station-upgrade-cryo-pod-description = A cryo sleep chamber for the crew. Requires installation with the station owner's ID card.
+
+station-upgrade-flatpack-vend-name = FlatpackVend Vending Machine
+station-upgrade-flatpack-vend-description = Vends flatpacks for essential station equipment. Requires installation with the station owner's ID card.
+
+station-upgrade-gas-sale-point-name = Gas Sale Point
+station-upgrade-gas-sale-point-description = Sells piped-in gas for credits. Requires installation with the station owner's ID card.
+
+station-upgrade-gas-sale-port-name = Gas Sale Port (Dockable)
+station-upgrade-gas-sale-port-description = A dockable gas sale point for selling gas from visiting ships. Requires installation with the station owner's ID card.
+
+station-upgrade-ammo-vend-name = Ammo Vending Machine
+station-upgrade-ammo-vend-description = Vends ammunition. Requires installation with the station owner's ID card.
+
+station-upgrade-picknpack-vend-name = Pick n' Pack Vending Machine
+station-upgrade-picknpack-vend-description = Vends packing and shipping supplies. Requires installation with the station owner's ID card.
+
+station-upgrade-pallet-console-low-name = Cargo Sale Computer (Low Market)
+station-upgrade-pallet-console-low-description = Sells goods loaded onto cargo pallets at a reduced rate. Requires installation with the station owner's ID card.
+
+station-upgrade-pallet-console-normal-name = Cargo Sale Computer
+station-upgrade-pallet-console-normal-description = Sells goods loaded onto cargo pallets at the normal rate. Requires installation with the station owner's ID card.
