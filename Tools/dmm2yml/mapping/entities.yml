@@ -27,6 +27,9 @@
 # Cables are not here: see ignore.yml.
 /obj/machinery/power/solar: SolarPanel
 /obj/item/solar_assembly: SolarPanel
+/obj/machinery/power/smes: SMESBasic
+/obj/machinery/power/emitter: Emitter
+/obj/machinery/field/generator: ContainmentFieldGenerator
 
 # ---- structure: floors, walls and openings ----
 /obj/structure/lattice: {tile: Lattice}
@@ -160,6 +163,46 @@
 /obj/machinery/light/small/directional/south: {entity: PoweredSmallLight, wall: south}
 /obj/machinery/light/small/directional/east: {entity: PoweredSmallLight, wall: east}
 /obj/machinery/light/small/directional/west: {entity: PoweredSmallLight, wall: west}
+
+# Colour/brightness variants of the same fixture. Where this fork ships a
+# matching bulb colour prototype it is used (small/dim -> PoweredDimSmallLight,
+# warm -> PoweredlightSodium, a warm sodium-vapour tint); where none exists
+# (cold, plain dim, small/red, no_nightlight's day/night behaviour) it falls
+# back to the plain fixture -- losing only the tint/behaviour, same call
+# already made for the coloured hazard stripes.
+/obj/machinery/light/cold/directional/north: {entity: Poweredlight, wall: north}
+/obj/machinery/light/cold/directional/south: {entity: Poweredlight, wall: south}
+/obj/machinery/light/cold/directional/east: {entity: Poweredlight, wall: east}
+/obj/machinery/light/cold/directional/west: {entity: Poweredlight, wall: west}
+/obj/machinery/light/warm/directional/north: {entity: PoweredlightSodium, wall: north}
+/obj/machinery/light/warm/directional/south: {entity: PoweredlightSodium, wall: south}
+/obj/machinery/light/warm/directional/east: {entity: PoweredlightSodium, wall: east}
+/obj/machinery/light/warm/directional/west: {entity: PoweredlightSodium, wall: west}
+/obj/machinery/light/dim/directional/north: {entity: Poweredlight, wall: north}
+/obj/machinery/light/dim/directional/south: {entity: Poweredlight, wall: south}
+/obj/machinery/light/dim/directional/east: {entity: Poweredlight, wall: east}
+/obj/machinery/light/dim/directional/west: {entity: Poweredlight, wall: west}
+/obj/machinery/light/no_nightlight/directional/north: {entity: Poweredlight, wall: north}
+/obj/machinery/light/no_nightlight/directional/south: {entity: Poweredlight, wall: south}
+/obj/machinery/light/no_nightlight/directional/east: {entity: Poweredlight, wall: east}
+/obj/machinery/light/no_nightlight/directional/west: {entity: Poweredlight, wall: west}
+/obj/machinery/light/small/dim/directional/north: {entity: PoweredDimSmallLight, wall: north}
+/obj/machinery/light/small/dim/directional/south: {entity: PoweredDimSmallLight, wall: south}
+/obj/machinery/light/small/dim/directional/east: {entity: PoweredDimSmallLight, wall: east}
+/obj/machinery/light/small/dim/directional/west: {entity: PoweredDimSmallLight, wall: west}
+/obj/machinery/light/small/red/directional/north: {entity: PoweredSmallLight, wall: north}
+/obj/machinery/light/small/red/directional/south: {entity: PoweredSmallLight, wall: south}
+/obj/machinery/light/small/red/directional/east: {entity: PoweredSmallLight, wall: east}
+/obj/machinery/light/small/red/directional/west: {entity: PoweredSmallLight, wall: west}
+
+# The camera itself is identical between the plain and motion-triggered
+# variants (code/game/machinery/camera.dm: /camera/motion only adds a motion
+# sensor behaviour, no sprite change) -- see camera/autoname above for the
+# same pattern.
+/obj/machinery/camera/motion/directional/north: {entity: SurveillanceCameraGeneral, wall: north}
+/obj/machinery/camera/motion/directional/south: {entity: SurveillanceCameraGeneral, wall: south}
+/obj/machinery/camera/motion/directional/east: {entity: SurveillanceCameraGeneral, wall: east}
+/obj/machinery/camera/motion/directional/west: {entity: SurveillanceCameraGeneral, wall: west}
 
 /obj/machinery/power/apc/auto_name/directional/north: {entity: APCBasic, wall: north, onWall: true}
 /obj/machinery/power/apc/auto_name/directional/south: {entity: APCBasic, wall: south, onWall: true}
