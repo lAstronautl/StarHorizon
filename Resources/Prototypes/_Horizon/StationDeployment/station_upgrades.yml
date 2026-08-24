@@ -1,0 +1,56 @@
+# Station upgrade equipment - purchasable via the station control console once a development
+# category reaches the required level. Delivered to a CargoPalletBuy pallet on the station's own
+# grid; stays unanchored/inert until activated with the station owner's ID card
+# (StationUpgradeEquipmentSystem), which also anchors it in place.
+
+- type: entity
+  parent: [BaseStructureDisableScrewing, BaseStructureDisablePrying, BaseStructureIndestructible, BaseStructureAccessReaderImmuneToEmag, ComputerBankATMBase]
+  id: StationUpgradeAtm
+  name: station bank terminal
+  description: A bank terminal wired to this station's own account. Swipe the station's deed ID card on it to install and activate it.
+  components:
+  - type: Sprite
+    netsync: false
+    sprite: Structures/Machines/computers.rsi
+    layers:
+    - map: ["computerLayerBody"]
+      state: computer
+    - map: ["computerLayerKeyboard"]
+      state: generic_keyboard
+    - map: ["computerLayerScreen"]
+      sprite: _NF/Structures/Machines/computers.rsi
+      state: station_atm
+    - map: ["computerLayerKeys"]
+      state: id_key
+  - type: StationUpgradeAtm
+    cashSlot:
+      name: station-upgrade-atm-cashSlot
+      insertSound: /Audio/Machines/scanning.ogg
+      ejectSound: /Audio/Machines/tray_eject.ogg
+      ejectOnBreak: true
+      swap: false
+      whitelist:
+        components:
+        - Cash
+  - type: StationUpgradeEquipment
+  - type: ActivatableUI
+    key: enum.BankATMMenuUiKey.ATM
+  - type: UserInterface
+    interfaces:
+      enum.BankATMMenuUiKey.ATM:
+        type: StationAdminConsoleBoundUserInterface
+  - type: ActivatableUIRequiresPower
+  - type: ItemSlots
+  - type: ContainerContainer
+    containers:
+      board: !type:Container
+      station-upgrade-atm-cashSlot: !type:ContainerSlot
+
+- type: stationUpgradePurchase
+  id: StationUpgradeAtmPurchase
+  name: station-upgrade-atm-name
+  description: station-upgrade-atm-description
+  category: NFService
+  requiredLevel: 3
+  price: 5000
+  entity: StationUpgradeAtm

@@ -21,6 +21,8 @@ public sealed class StationControlConsoleBoundUserInterface : BoundUserInterface
         _window.OnNameChange += name => SendMessage(new StationControlConsoleRenameMessage(name));
         _window.OnWithdraw += amount => SendMessage(new StationBankWithdrawMessage(amount, null, null));
         _window.OnDeposit += amount => SendMessage(new StationBankDepositMessage(amount, null, null));
+        _window.OnIffColorChange += colorHex => SendMessage(new StationControlConsoleSetIffColorMessage(colorHex));
+        _window.OnPurchaseUpgrade += purchaseId => SendMessage(new StationControlConsolePurchaseUpgradeMessage(purchaseId));
     }
 
     protected override void UpdateState(BoundUserInterfaceState state)
@@ -28,7 +30,7 @@ public sealed class StationControlConsoleBoundUserInterface : BoundUserInterface
         if (state is not StationControlConsoleBuiState cast || _window == null)
             return;
 
-        _window.UpdateState(cast.StationName, cast.Balance, cast.BankEnabled, cast.Deposit);
+        _window.UpdateState(cast.StationName, cast.Balance, cast.BankEnabled, cast.Deposit, cast.IffColorHex, cast.Upgrades);
     }
 
     protected override void Dispose(bool disposing)
