@@ -27,14 +27,14 @@ import ss14map
 # rows listed from the top down. Written out in full so the expectations below
 # can be checked by eye.
 #
-#          x=1              x=2                       x=3
-#   y=4    space            hazard stripe facing east, --
+#          x=1              x=2                       x=3                x=4
+#   y=4    space            hazard stripe facing east, --                 --
 #                                 on dark floor
-#   y=3    steel floor      catwalk over space          --
-#   y=2    wall             space                       --
-#   y=1    steel floor,     space                       steel floor,
-#          light on the                                 air alarm mounted
-#          east wall                                    on the east wall
+#   y=3    steel floor      catwalk over space          --                --
+#   y=2    wall             space                       --                --
+#   y=1    steel floor,     space                       steel floor,      steel floor,
+#          light on the                                 air alarm mounted disposal pipe bent
+#          east wall                                    on the east wall  SOUTHEAST (dir 6)
 FIXTURE = '''"aa" = (
 /turf/open/space/basic,
 /area/space)
@@ -62,6 +62,12 @@ FIXTURE = '''"aa" = (
 /obj/machinery/airalarm/directional/east,
 /turf/open/floor/iron,
 /area/station/hallway/primary/central)
+"ah" = (
+/obj/structure/disposalpipe/segment{
+\tdir = 6
+\t},
+/turf/open/floor/iron,
+/area/station/hallway/primary/central)
 
 (1,1,1) = {"
 aa
@@ -77,6 +83,9 @@ aa
 "}
 (3,1,1) = {"
 ag
+"}
+(4,1,1) = {"
+ah
 "}
 '''
 
@@ -100,6 +109,10 @@ EXPECTED_ENTITIES = {
     # EntityRule.on_wall. Confirmed against Resources/Maps/amber.yml, where
     # every AirAlarm/APC/FireAlarm/etc. shares its tile with a wall.
     ("AirAlarm", 3.5, 0.5): -1.5707963267948966,
+    # SOUTHEAST (dir 6 = SOUTH|EAST) is BYOND's diagonal-dir trick for "a bend
+    # connecting south and east", not a facing -- see EntityRule.by_dir and
+    # the comment above /obj/structure/disposalpipe/segment in entities.yml.
+    ("DisposalBend", 3.5, 0.5): 1.5707963267948966,
 }
 EXPECTED_DECAL = ("WarnLineE", 1, 3)
 
@@ -147,8 +160,8 @@ def check_parser() -> Result:
         dmm = dmmparser.parse(path)
 
     problems = []
-    if (dmm.width, dmm.height) != (3, 4):
-        problems.append(f"size {dmm.width}x{dmm.height}, expected 3x4")
+    if (dmm.width, dmm.height) != (4, 4):
+        problems.append(f"size {dmm.width}x{dmm.height}, expected 4x4")
 
     # Rows are listed top down, so the first row of a block is the highest y.
     if dmm.grid.get((1, 4, 1)) != "aa":
@@ -162,7 +175,11 @@ def check_parser() -> Result:
     if decal.vars.get("dir") != 4:
         problems.append(f"dir var parsed as {decal.vars.get('dir')!r}, expected 4")
 
-    return Result("parser: geometry and vars", not problems, "; ".join(problems) or "3x4, top-down rows, dir parsed")
+    bend = next(a for a in dmm.definitions["ah"] if a.kind == "entity")
+    if bend.vars.get("dir") != 6:
+        problems.append(f"disposal segment dir parsed as {bend.vars.get('dir')!r}, expected 6")
+
+    return Result("parser: geometry and vars", not problems, "; ".join(problems) or "4x4, top-down rows, dir parsed")
 
 
 def check_rules(mapping_set) -> Result:
@@ -248,6 +265,10 @@ def check_dictionaries(mapping_set, index) -> Result:
         for entity in rule.entities:
             if not index.has(protoindex.ENTITY, entity):
                 problems.append(f"{path}: no entity {entity}")
+        for dmm_dir, variant in rule.by_dir.items():
+            for entity in variant.entities:
+                if not index.has(protoindex.ENTITY, entity):
+                    problems.append(f"{path}: byDir[{dmm_dir}]: no entity {entity}")
 
     counted = len(mapping_set.turfs) + len(mapping_set.decals) + len(mapping_set.entities)
     detail = "; ".join(problems[:5]) if problems else f"{counted} rules, every id exists"

@@ -318,7 +318,19 @@ def walk(
                     variants = index.variants(rule.tile)
                     variant = 0 if variant_mode == "zero" else tile_variant(tile_x, tile_y, variants)
                     builder.set_tile(tile_x, tile_y, rule.tile, variant)
-                facing = rule.direction if rule.direction is not None else direction
+
+                # A dir on the dmm atom does not always mean "facing" -- a
+                # disposal pipe segment with a diagonal dir is BYOND's way of
+                # saying "this is a bend", a different prototype entirely. See
+                # EntityRule.by_dir.
+                variant_rule = rule.by_dir.get(direction)
+                entities = variant_rule.entities if variant_rule is not None else rule.entities
+                if variant_rule is not None and variant_rule.direction is not None:
+                    facing = variant_rule.direction
+                elif rule.direction is not None:
+                    facing = rule.direction
+                else:
+                    facing = direction
 
                 # SS13 leaves a wall-mounted object on the room's floor tile; SS14
                 # embeds it in the wall's own tile instead. Walk one tile against
@@ -330,7 +342,7 @@ def walk(
                     entity_x -= offset_x
                     entity_y -= offset_y
 
-                for proto in rule.entities:
+                for proto in entities:
                     builder.add_entity(
                         proto,
                         entity_x + 0.5,

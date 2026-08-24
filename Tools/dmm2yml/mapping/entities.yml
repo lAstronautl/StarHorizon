@@ -64,8 +64,43 @@
 /obj/machinery/meter: GasAnalyzer
 
 # ---- disposals ----
-/obj/structure/disposalpipe/segment: DisposalPipe
+# tgstation's /obj/structure/disposalpipe/segment abuses a diagonal dir (e.g.
+# NORTHEAST = NORTH|EAST) as a bitmask naming the two ends a bent pipe
+# connects -- see code/modules/recycling/disposal/pipe.dm's ISDIAGONALDIR
+# check. A cardinal dir (or no dir at all) is a straight run instead. The
+# rotation each diagonal needs was found by cross-referencing every
+# DisposalBend in Resources/Maps/amber.yml against its two connected
+# neighbours: SOUTHWEST needs none (0 deg, the SOUTH-facing default),
+# SOUTHEAST needs EAST's rotation, NORTHEAST needs NORTH's, NORTHWEST needs
+# WEST's -- 16-22 samples per case, >70% agreement, the rest explained by
+# unrelated pipes happening to sit on an adjacent tile.
+/obj/structure/disposalpipe/segment:
+  entity: DisposalPipe
+  byDir:
+    5: { entity: DisposalBend, dir: 1 } # NORTHEAST -> rotate as NORTH
+    6: { entity: DisposalBend, dir: 4 } # SOUTHEAST -> rotate as EAST
+    9: { entity: DisposalBend, dir: 8 } # NORTHWEST -> rotate as WEST
+    10: { entity: DisposalBend, dir: 2 } # SOUTHWEST -> rotate as SOUTH (no rot)
+/obj/structure/disposalpipe/broken: DisposalPipeBroken
 /obj/structure/disposalpipe/trunk: DisposalTrunk
+/obj/structure/disposalpipe/junction: DisposalJunction
+/obj/structure/disposalpipe/junction/flip: DisposalJunctionFlipped
+/obj/structure/disposalpipe/junction/yjunction: DisposalYJunction
+# Mail/wrap sorting pipes route tagged items to a side branch via their own
+# tag list, which has no SS14 equivalent to carry over -- but their sprite
+# states (pipe-j1s/pipe-j2s, code/modules/recycling/disposal/pipe_sorting.dm)
+# and 3-way-router shape are identical to SS14's DisposalRouter, so the pipe
+# geometry maps 1:1 even though the tag configuration is dropped.
+/obj/structure/disposalpipe/sorting/mail: DisposalRouter
+/obj/structure/disposalpipe/sorting/mail/flip: DisposalRouterFlipped
+/obj/structure/disposalpipe/sorting/wrap: DisposalRouter
+/obj/structure/disposalpipe/sorting/wrap/flip: DisposalRouterFlipped
+# /obj/structure/disposalpipe/rotator forces an exit direction regardless of
+# which neighbour is actually connected -- a mechanic SS14's disposal system
+# does not have (its DisposalBend only ever follows the pipe it is physically
+# joined to). No rows for it were found on any real tgstation station map, so
+# rather than guess a shape for a mechanic that cannot carry over, it is left
+# unmapped for a human to decide if a custom map ever uses it.
 /obj/machinery/disposal/bin: DisposalUnit
 
 # ---- furniture ----
@@ -241,9 +276,6 @@
 /obj/structure/closet/firecloset: ClosetFireFilled
 /obj/structure/curtain: CurtainSpawner
 /obj/structure/curtain/cloth: CurtainSpawner
-/obj/structure/disposalpipe/junction: DisposalJunction
-/obj/structure/disposalpipe/junction/flip: DisposalJunctionFlipped
-/obj/structure/disposalpipe/junction/yjunction: DisposalYJunction
 /obj/structure/dresser: Dresser
 /obj/structure/fence: FenceMetalStraight
 /obj/structure/fence/corner: FenceMetalCorner

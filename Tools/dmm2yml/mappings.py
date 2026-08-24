@@ -57,6 +57,20 @@ class DecalRule:
 
 
 @dataclass
+class EntityVariant:
+    """An override for one specific raw dir value, cardinal or diagonal.
+
+    Used where the dmm dir does not just mean "facing" -- a disposal pipe
+    segment with a diagonal dir (e.g. NORTHEAST) is BYOND's way of saying
+    "this is a bend between these two directions", not "facing northeast",
+    and it is a different SS14 prototype from the straight segment.
+    """
+
+    entities: list[str] = field(default_factory=list)
+    direction: int | None = None
+
+
+@dataclass
 class EntityRule:
     entities: list[str] = field(default_factory=list)
     # The facing to use, when the path implies one that no dir var records.
@@ -74,6 +88,9 @@ class EntityRule:
     # camera, by contrast, stays on the floor (0% on a wall tile there). Setting
     # this moves the converted entity one tile toward the wall it names.
     on_wall: bool = False
+    # Raw dmm dir -> a different prototype/facing entirely, for paths where
+    # dir does not mean "facing" (see EntityVariant).
+    by_dir: dict[int, EntityVariant] = field(default_factory=dict)
 
 
 @dataclass
@@ -122,6 +139,30 @@ def _parse_decal(path: str, raw: Any) -> DecalRule:
     )
 
 
+def _parse_by_dir(path: str, raw: dict) -> dict[int, EntityVariant]:
+    by_dir: dict[int, EntityVariant] = {}
+    for key, variant_raw in raw.items():
+        dmm_dir = int(key)
+        if not isinstance(variant_raw, dict):
+            raise MappingError(f"{path}: byDir[{dmm_dir}] must be a mapping, got {type(variant_raw).__name__}")
+
+        variant_direction = variant_raw.get("dir")
+        if variant_direction is not None:
+            variant_direction = int(variant_direction)
+            if variant_direction not in DIRECTIONS:
+                raise MappingError(f"{path}: byDir[{dmm_dir}].dir {variant_direction} is not one of {DIRECTIONS}")
+
+        if "entities" in variant_raw:
+            variant_entities = [str(i) for i in variant_raw["entities"]]
+        elif variant_raw.get("entity"):
+            variant_entities = [str(variant_raw["entity"])]
+        else:
+            raise MappingError(f"{path}: byDir[{dmm_dir}] needs an entity or entities")
+
+        by_dir[dmm_dir] = EntityVariant(entities=variant_entities, direction=variant_direction)
+    return by_dir
+
+
 def _parse_entity(path: str, raw: Any) -> EntityRule:
     if raw is None or (isinstance(raw, str) and raw.strip().lower() == SKIP):
         return EntityRule()
@@ -148,15 +189,21 @@ def _parse_entity(path: str, raw: Any) -> EntityRule:
         # suffix that facing comes from the atom's own dir var at conversion
         # time (see walk() in dmm2yml.py), not from a fixed override.
         on_wall = bool(raw.get("onWall", False))
+        by_dir = _parse_by_dir(path, raw.get("byDir") or {})
         if "entities" in raw:
             return EntityRule(
-                entities=[str(i) for i in raw["entities"]], direction=direction, tile=tile, on_wall=on_wall
+                entities=[str(i) for i in raw["entities"]],
+                direction=direction,
+                tile=tile,
+                on_wall=on_wall,
+                by_dir=by_dir,
             )
         return EntityRule(
             entities=[str(raw["entity"])] if raw.get("entity") else [],
             direction=direction,
             tile=tile,
             on_wall=on_wall,
+            by_dir=by_dir,
         )
     raise MappingError(f"{path}: an entity rule must be a prototype id or a list, got {type(raw).__name__}")
 
