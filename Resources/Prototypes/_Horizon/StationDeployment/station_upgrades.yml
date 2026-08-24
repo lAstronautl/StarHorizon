@@ -63,6 +63,7 @@
   requiredLevel: 3
   price: 5000
   entity: StationUpgradeWithdrawAtmFlatpack
+  limit: 5
 
 - type: stationUpgradePurchase
   id: StationUpgradeBlackMarketAtmPurchase
@@ -72,6 +73,7 @@
   requiredLevel: 5
   price: 8000
   entity: StationUpgradeBlackMarketAtmFlatpack
+  limit: 5
 
 - type: stationUpgradePurchase
   id: StationUpgradeFullAtmPurchase
@@ -81,3 +83,4 @@
   requiredLevel: 10
   price: 15000
   entity: StationUpgradeFullAtmFlatpack
+  limit: 5

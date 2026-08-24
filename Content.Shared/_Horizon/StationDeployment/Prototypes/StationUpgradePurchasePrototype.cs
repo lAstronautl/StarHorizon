@@ -39,6 +39,12 @@ public sealed partial class StationUpgradePurchasePrototype : IPrototype
     [DataField(required: true)]
     public EntProtoId Entity;
 
+    /// <summary>
+    /// Maximum number of times a single station can buy this upgrade. Null means unlimited.
+    /// </summary>
+    [DataField]
+    public int? Limit;
+
     [DataField]
     public SpriteSpecifier? Sprite;
 }

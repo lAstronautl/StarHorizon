@@ -21,7 +21,9 @@ public readonly record struct StationUpgradePurchaseUiEntry(
     int CurrentLevel,
     int Price,
     bool Unlocked,
-    bool Affordable);
+    bool Affordable,
+    int? Limit,
+    int Purchased);
 
 [Serializable, NetSerializable]
 public sealed class StationControlConsoleBuiState : BoundUserInterfaceState

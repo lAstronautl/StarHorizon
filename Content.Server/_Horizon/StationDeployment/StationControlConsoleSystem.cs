@@ -225,6 +225,13 @@ public sealed class StationControlConsoleSystem : EntitySystem
             return;
         }
 
+        var purchasedCount = devel.Purchases.GetValueOrDefault(args.PurchaseId, 0);
+        if (purchase.Limit is { } limit && purchasedCount >= limit)
+        {
+            _popup.PopupEntity(Loc.GetString("station-control-console-upgrade-limit-reached"), ent, player, PopupType.SmallCaution);
+            return;
+        }
+
         if (purchase.Price > GetBalance(bank))
         {
             _popup.PopupEntity(Loc.GetString("bank-insufficient-funds"), ent, player, PopupType.SmallCaution);
@@ -246,6 +253,7 @@ public sealed class StationControlConsoleSystem : EntitySystem
         }
 
         _cargo.UpdateBankAccount((station, bank), -purchase.Price, bank.PrimaryAccount);
+        devel.Purchases[args.PurchaseId] = purchasedCount + 1;
 
         // Purchases are delivered flatpacked - the crew has to carry it to the station and unpack it
         // there with a tool. Binding the flatpack to the station carries over to the unpacked
@@ -325,13 +333,17 @@ public sealed class StationControlConsoleSystem : EntitySystem
             foreach (var purchase in _protoMan.EnumeratePrototypes<StationUpgradePurchasePrototype>())
             {
                 var currentLevel = devel.Progress.GetValueOrDefault(purchase.Category, 0);
+                var purchased = devel.Purchases.GetValueOrDefault(purchase.ID, 0);
+                var limitReached = purchase.Limit is { } limit && purchased >= limit;
                 upgrades.Add(new StationUpgradePurchaseUiEntry(
                     purchase.ID,
                     purchase.RequiredLevel,
                     currentLevel,
                     purchase.Price,
                     currentLevel >= purchase.RequiredLevel,
-                    purchase.Price <= balance));
+                    purchase.Price <= balance && !limitReached,
+                    purchase.Limit,
+                    purchased));
             }
         }
 

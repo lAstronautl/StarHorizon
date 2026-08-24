@@ -1,3 +1,4 @@
+using Content.Shared._Horizon.StationDeployment.Prototypes;
 using Content.Shared.Research.Prototypes;
 using Robust.Shared.Prototypes;
 
@@ -12,4 +13,11 @@ public sealed partial class StationDevelopmentComponent : Component
 {
     [DataField]
     public Dictionary<ProtoId<TechDisciplinePrototype>, int> Progress = new();
+
+    /// <summary>
+    /// How many times this station has bought each upgrade, keyed by purchase ID. Enforces
+    /// <see cref="StationUpgradePurchasePrototype.Limit"/>.
+    /// </summary>
+    [DataField]
+    public Dictionary<ProtoId<StationUpgradePurchasePrototype>, int> Purchases = new();
 }
