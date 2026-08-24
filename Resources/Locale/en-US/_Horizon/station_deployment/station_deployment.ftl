@@ -25,12 +25,63 @@ station-control-console-upgrade-buy-button = Buy
 station-control-console-upgrade-level-req = Requires { $category } level { $level } (currently { $current })
 station-control-console-upgrade-price = Price: { $price }
 station-control-console-upgrade-locked = The required development level hasn't been reached yet.
-station-control-console-upgrade-no-pallet = No free delivery point on the station (needs a CargoPalletBuy pallet).
+station-control-console-upgrade-limit = Bought: { $purchased }/{ $limit }
+station-control-console-upgrade-limit-reached = This station has already bought the maximum number of these.
+station-control-console-upgrade-no-capsule = You need to summon and dock a cargo capsule first - purchases are delivered through it.
+station-control-console-upgrade-no-pallet = No delivery point on the capsule (needs a CargoPalletBuy pallet).
 station-control-console-upgrade-purchased = Purchased: { $name }. Equipment delivered to the pickup point.
 
 station-upgrade-equipment-wrong-grid = This equipment wasn't purchased for this station.
 station-upgrade-equipment-not-owner = Only the station's owner can install this equipment.
 station-upgrade-equipment-installed = Equipment installed and activated.
 
-station-upgrade-atm-name = Station Bank Terminal
-station-upgrade-atm-description = A bank terminal wired to the station's own account. Requires installation with the station owner's ID card.
+station-upgrade-withdraw-atm-name = Withdraw-Only Bank Terminal
+station-upgrade-withdraw-atm-description = A withdraw-only bank ATM. Requires installation with the station owner's ID card.
+
+station-upgrade-blackmarket-atm-name = Black Market Bank Terminal
+station-upgrade-blackmarket-atm-description = An unofficial ATM with a 30% deposit fee, no questions asked. Requires installation with the station owner's ID card.
+
+station-upgrade-full-atm-name = Bank Terminal
+station-upgrade-full-atm-description = A full-service bank ATM. Requires installation with the station owner's ID card.
+
+station-upgrade-salvage-magnet-name = Salvage Magnet
+station-upgrade-salvage-magnet-description = Pulls in salvage wreckage. Requires installation with the station owner's ID card.
+
+station-upgrade-gateway-name = Gateway
+station-upgrade-gateway-description = A gateway allowing faster than light travel to far-flung locations. Requires installation with the station owner's ID card.
+
+station-upgrade-energy-air-converter-name = Energy-to-Air Converter
+station-upgrade-energy-air-converter-description = Converts huge amounts of power into superheated air. Requires installation with the station owner's ID card.
+
+station-upgrade-antimatter-fabricator-name = Anti-Matter Fabricator
+station-upgrade-antimatter-fabricator-description = Converts plasteel and power into antimatter fuel. Requires installation with the station owner's ID card.
+
+station-upgrade-power-transmission-point-name = Power Transmission Point
+station-upgrade-power-transmission-point-description = Sells excess power for credits, paid directly into the station's account. Requires installation with the station owner's ID card.
+
+station-upgrade-smes-big-name = BLES Unit
+station-upgrade-smes-big-description = A bluespace-leveraged energy storage unit - ten SMES worth of capacity. Requires installation with the station owner's ID card.
+
+station-upgrade-cryo-pod-name = Cryo Sleep Pod
+station-upgrade-cryo-pod-description = A cryo sleep chamber for the crew. Requires installation with the station owner's ID card.
+
+station-upgrade-flatpack-vend-name = FlatpackVend Vending Machine
+station-upgrade-flatpack-vend-description = Vends flatpacks for essential station equipment. Requires installation with the station owner's ID card.
+
+station-upgrade-gas-sale-point-name = Gas Sale Point
+station-upgrade-gas-sale-point-description = Sells piped-in gas for credits. Requires installation with the station owner's ID card.
+
+station-upgrade-gas-sale-port-name = Gas Sale Port (Dockable)
+station-upgrade-gas-sale-port-description = A dockable gas sale point for selling gas from visiting ships. Requires installation with the station owner's ID card.
+
+station-upgrade-ammo-vend-name = Ammo Vending Machine
+station-upgrade-ammo-vend-description = Vends ammunition. Requires installation with the station owner's ID card.
+
+station-upgrade-picknpack-vend-name = Pick n' Pack Vending Machine
+station-upgrade-picknpack-vend-description = Vends packing and shipping supplies. Requires installation with the station owner's ID card.
+
+station-upgrade-pallet-console-low-name = Cargo Sale Computer (Low Market)
+station-upgrade-pallet-console-low-description = Sells goods loaded onto cargo pallets at a reduced rate. Requires installation with the station owner's ID card.
+
+station-upgrade-pallet-console-normal-name = Cargo Sale Computer
+station-upgrade-pallet-console-normal-description = Sells goods loaded onto cargo pallets at the normal rate. Requires installation with the station owner's ID card.

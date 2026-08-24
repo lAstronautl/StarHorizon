@@ -1,4 +1,5 @@
 using Content.Shared._Horizon.StationDeployment;
+using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
 namespace Content.Server._Horizon.StationDeployment.Components;
 
@@ -16,4 +17,10 @@ public sealed partial class StationOrderDatabaseComponent : Component
     /// </summary>
     [DataField]
     public int TotalOrders;
+
+    /// <summary>
+    /// The earliest time the cargo capsule can next be summoned.
+    /// </summary>
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
+    public TimeSpan NextSummonTime;
 }

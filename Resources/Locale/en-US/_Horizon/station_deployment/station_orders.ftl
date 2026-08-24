@@ -15,6 +15,7 @@ station-task-console-capsule-en-route = Capsule en route...
 station-task-console-capsule-docked = Capsule docked - load crates and recall when ready.
 
 station-order-console-capsule-already-present = A cargo capsule is already deployed.
+station-order-console-capsule-cooldown = Capsule summon is still on cooldown ({ $seconds }s left).
 station-order-console-capsule-spawn-failed = Failed to summon the cargo capsule. Try again later.
 station-order-console-organics-aboard = Someone is inside the capsule ({ $name }) - can't recall a capsule with living beings aboard.
 

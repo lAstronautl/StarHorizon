@@ -25,12 +25,63 @@ station-control-console-upgrade-buy-button = Купить
 station-control-console-upgrade-level-req = Требуется уровень { $category } { $level } (сейчас { $current })
 station-control-console-upgrade-price = Цена: { $price }
 station-control-console-upgrade-locked = Требуемый уровень развития ещё не достигнут.
-station-control-console-upgrade-no-pallet = На станции нет свободной точки для доставки покупки (нужна плита CargoPalletBuy).
+station-control-console-upgrade-limit = Куплено: { $purchased }/{ $limit }
+station-control-console-upgrade-limit-reached = Станция уже купила максимальное количество этого оборудования.
+station-control-console-upgrade-no-capsule = Сначала нужно вызвать и пристыковать грузовую капсулу - покупки доставляются через неё.
+station-control-console-upgrade-no-pallet = На капсуле нет точки для доставки покупки (нужна плита CargoPalletBuy).
 station-control-console-upgrade-purchased = Куплено: { $name }. Оборудование доставлено на точку выдачи.
 
 station-upgrade-equipment-wrong-grid = Это оборудование куплено не для этой станции.
 station-upgrade-equipment-not-owner = Только владелец станции может установить это оборудование.
 station-upgrade-equipment-installed = Оборудование установлено и активировано.
 
-station-upgrade-atm-name = Банковский терминал станции
-station-upgrade-atm-description = Банковский терминал, подключённый к счёту станции. Требует установки id-картой владельца станции.
+station-upgrade-withdraw-atm-name = Банкомат (только снятие)
+station-upgrade-withdraw-atm-description = Банкомат только для снятия средств. Требует установки id-картой владельца станции.
+
+station-upgrade-blackmarket-atm-name = Чёрный банковский терминал
+station-upgrade-blackmarket-atm-description = Неофициальный банкомат с комиссией 30% на пополнение, без лишних вопросов. Требует установки id-картой владельца станции.
+
+station-upgrade-full-atm-name = Банковский терминал
+station-upgrade-full-atm-description = Полноценный банкомат для пополнения и снятия средств. Требует установки id-картой владельца станции.
+
+station-upgrade-salvage-magnet-name = Магнит для утиля
+station-upgrade-salvage-magnet-description = Притягивает обломки для утилизации. Требует установки id-картой владельца станции.
+
+station-upgrade-gateway-name = Врата
+station-upgrade-gateway-description = Врата для сверхсветовых перелётов в отдалённые точки. Требуют установки id-картой владельца станции.
+
+station-upgrade-energy-air-converter-name = Конвертер энергии в воздух
+station-upgrade-energy-air-converter-description = Преобразует огромное количество энергии в перегретый воздух. Требует установки id-картой владельца станции.
+
+station-upgrade-antimatter-fabricator-name = Антиматериальный фабрикатор
+station-upgrade-antimatter-fabricator-description = Преобразует пласталь и энергию в топливо из антиматерии. Требует установки id-картой владельца станции.
+
+station-upgrade-power-transmission-point-name = Точка передачи энергии
+station-upgrade-power-transmission-point-description = Продаёт излишки энергии за кредиты, которые поступают напрямую на счёт станции. Требует установки id-картой владельца станции.
+
+station-upgrade-smes-big-name = Блок БЛЕС
+station-upgrade-smes-big-description = Блуспейс-накопитель энергии - ёмкостью в десять обычных SMES. Требует установки id-картой владельца станции.
+
+station-upgrade-cryo-pod-name = Криокапсула
+station-upgrade-cryo-pod-description = Камера криосна для экипажа. Требует установки id-картой владельца станции.
+
+station-upgrade-flatpack-vend-name = Автомат FlatpackVend
+station-upgrade-flatpack-vend-description = Продаёт флэтпаки с необходимым станционным оборудованием. Требует установки id-картой владельца станции.
+
+station-upgrade-gas-sale-point-name = Точка продажи газа
+station-upgrade-gas-sale-point-description = Продаёт закачанный газ за кредиты. Требует установки id-картой владельца станции.
+
+station-upgrade-gas-sale-port-name = Порт продажи газа (стыковочный)
+station-upgrade-gas-sale-port-description = Стыковочная точка продажи газа с прибывающих кораблей. Требует установки id-картой владельца станции.
+
+station-upgrade-ammo-vend-name = Автомат с боеприпасами
+station-upgrade-ammo-vend-description = Продаёт боеприпасы. Требует установки id-картой владельца станции.
+
+station-upgrade-picknpack-vend-name = Автомат Pick n' Pack
+station-upgrade-picknpack-vend-description = Продаёт упаковочные и почтовые принадлежности. Требует установки id-картой владельца станции.
+
+station-upgrade-pallet-console-low-name = Компьютер продажи груза (низкий рынок)
+station-upgrade-pallet-console-low-description = Продаёт товары с грузовых поддонов по сниженной ставке. Требует установки id-картой владельца станции.
+
+station-upgrade-pallet-console-normal-name = Компьютер продажи груза
+station-upgrade-pallet-console-normal-description = Продаёт товары с грузовых поддонов по обычной ставке. Требует установки id-картой владельца станции.

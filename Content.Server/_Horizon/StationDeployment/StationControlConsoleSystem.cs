@@ -1,4 +1,5 @@
 using Content.Server._Horizon.StationDeployment.Components;
+using Content.Server._NF.BindToStation;
 using Content.Server.Cargo.Components;
 using Content.Server.Cargo.Systems;
 using Content.Server.Hands.Systems;
@@ -44,6 +45,8 @@ public sealed class StationControlConsoleSystem : EntitySystem
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly ShuttleSystem _shuttle = default!;
+    [Dependency] private readonly StationOrderSystem _orderSystem = default!;
+    [Dependency] private readonly BindToStationSystem _bindToStation = default!;
 
     private int _maxNameLength;
 
@@ -209,7 +212,6 @@ public sealed class StationControlConsoleSystem : EntitySystem
             return;
 
         if (_station.GetOwningStation(ent.Owner) is not { Valid: true } station ||
-            !TryComp<StationDataComponent>(station, out var stationData) ||
             !TryComp<StationBankAccountComponent>(station, out var bank) ||
             !TryComp<StationDevelopmentComponent>(station, out var devel))
         {
@@ -223,23 +225,42 @@ public sealed class StationControlConsoleSystem : EntitySystem
             return;
         }
 
+        var purchasedCount = devel.Purchases.GetValueOrDefault(args.PurchaseId, 0);
+        if (purchase.Limit is { } limit && purchasedCount >= limit)
+        {
+            _popup.PopupEntity(Loc.GetString("station-control-console-upgrade-limit-reached"), ent, player, PopupType.SmallCaution);
+            return;
+        }
+
         if (purchase.Price > GetBalance(bank))
         {
             _popup.PopupEntity(Loc.GetString("bank-insufficient-funds"), ent, player, PopupType.SmallCaution);
             return;
         }
 
-        if (FindPurchasePallet(stationData) is not { } pallet)
+        // Purchases arrive via the same cargo capsule ("tradedrop") used for order deliveries, not
+        // directly on the station - the capsule has to already be summoned and docked.
+        if (_orderSystem.FindActiveCapsule(station) is not { } capsule || !capsule.Comp.Docked)
+        {
+            _popup.PopupEntity(Loc.GetString("station-control-console-upgrade-no-capsule"), ent, player, PopupType.MediumCaution);
+            return;
+        }
+
+        if (FindPurchasePallet(capsule.Owner) is not { } pallet)
         {
             _popup.PopupEntity(Loc.GetString("station-control-console-upgrade-no-pallet"), ent, player, PopupType.MediumCaution);
             return;
         }
 
         _cargo.UpdateBankAccount((station, bank), -purchase.Price, bank.PrimaryAccount);
+        devel.Purchases[args.PurchaseId] = purchasedCount + 1;
 
-        var spawned = EntityManager.SpawnEntity(purchase.Entity, Transform(pallet.Pallet).Coordinates);
-        var equipment = EnsureComp<StationUpgradeEquipmentComponent>(spawned);
-        equipment.BoundGrid = pallet.Grid;
+        // Purchases are delivered flatpacked - the crew has to carry it to the station and unpack it
+        // there with a tool. Binding the flatpack to the station carries over to the unpacked
+        // equipment automatically (see SharedFlatpackSystem), which is what StationUpgradeEquipment
+        // checks to confirm it's on the grid it was bought for.
+        var spawned = EntityManager.SpawnEntity(purchase.Entity, Transform(pallet).Coordinates);
+        _bindToStation.BindToStation(spawned, station);
 
         _popup.PopupEntity(Loc.GetString("station-control-console-upgrade-purchased", ("name", Loc.GetString(purchase.Name))), ent, player, PopupType.Medium);
 
@@ -247,31 +268,21 @@ public sealed class StationControlConsoleSystem : EntitySystem
     }
 
     /// <summary>
-    /// Finds an anchored CargoPalletBuy-type pallet on one of the station's own grids to deliver a
-    /// purchase to.
+    /// Finds an anchored CargoPalletBuy-type pallet on the given grid (the docked capsule) to
+    /// deliver a purchase to.
     /// </summary>
-    private (EntityUid Pallet, EntityUid Grid)? FindPurchasePallet(StationDataComponent stationData)
+    private EntityUid? FindPurchasePallet(EntityUid grid)
     {
         var query = AllEntityQuery<CargoPalletComponent, TransformComponent>();
         while (query.MoveNext(out var uid, out var pallet, out var xform))
         {
-            if (!xform.Anchored || xform.GridUid is not { Valid: true } grid)
+            if (xform.GridUid != grid || !xform.Anchored)
                 continue;
 
-            var onStation = false;
-            foreach (var stationGrid in stationData.Grids)
-            {
-                if (stationGrid != grid)
-                    continue;
-
-                onStation = true;
-                break;
-            }
-
-            if (!onStation || (pallet.PalletType & BuySellType.Buy) == 0)
+            if ((pallet.PalletType & BuySellType.Buy) == 0)
                 continue;
 
-            return (uid, grid);
+            return uid;
         }
 
         return null;
@@ -322,13 +333,17 @@ public sealed class StationControlConsoleSystem : EntitySystem
             foreach (var purchase in _protoMan.EnumeratePrototypes<StationUpgradePurchasePrototype>())
             {
                 var currentLevel = devel.Progress.GetValueOrDefault(purchase.Category, 0);
+                var purchased = devel.Purchases.GetValueOrDefault(purchase.ID, 0);
+                var limitReached = purchase.Limit is { } limit && purchased >= limit;
                 upgrades.Add(new StationUpgradePurchaseUiEntry(
                     purchase.ID,
                     purchase.RequiredLevel,
                     currentLevel,
                     purchase.Price,
                     currentLevel >= purchase.RequiredLevel,
-                    purchase.Price <= balance));
+                    purchase.Price <= balance && !limitReached,
+                    purchase.Limit,
+                    purchased));
             }
         }
 

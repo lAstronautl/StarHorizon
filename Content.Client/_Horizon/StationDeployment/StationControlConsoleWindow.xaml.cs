@@ -84,11 +84,19 @@ public sealed partial class StationControlConsoleWindow : FancyWindow
             reqLabel.SetMessage(Loc.GetString("station-control-console-upgrade-level-req",
                 ("category", categoryName), ("level", upgrade.RequiredLevel), ("current", upgrade.CurrentLevel)));
             var priceLabel = new Label { Text = Loc.GetString("station-control-console-upgrade-price", ("price", upgrade.Price)), StyleClasses = { "LabelSubText" } };
+            var limitLabel = new Label
+            {
+                Text = upgrade.Limit is { } limitText
+                    ? Loc.GetString("station-control-console-upgrade-limit", ("purchased", upgrade.Purchased), ("limit", limitText))
+                    : string.Empty,
+                StyleClasses = { "LabelSubText" },
+            };
 
+            var limitReached = upgrade.Limit is { } limit && upgrade.Purchased >= limit;
             var buyButton = new Button
             {
                 Text = Loc.GetString("station-control-console-upgrade-buy-button"),
-                Disabled = !upgrade.Unlocked || !upgrade.Affordable,
+                Disabled = !upgrade.Unlocked || !upgrade.Affordable || limitReached,
             };
             buyButton.OnPressed += _ => OnPurchaseUpgrade?.Invoke(upgrade.Id);
 
@@ -103,7 +111,7 @@ public sealed partial class StationControlConsoleWindow : FancyWindow
                     new BoxContainer
                     {
                         Orientation = BoxContainer.LayoutOrientation.Horizontal,
-                        Children = { priceLabel, new Control { HorizontalExpand = true }, buyButton },
+                        Children = { priceLabel, limitLabel, new Control { HorizontalExpand = true }, buyButton },
                     },
                 },
             });
