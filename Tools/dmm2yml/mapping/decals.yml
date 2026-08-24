@@ -8,10 +8,25 @@
 # Directions are BYOND's: 1 north, 2 south, 4 east, 8 west.
 #
 # NOTE: SS13 stores a decal's orientation in 'dir' while SS14 bakes it into
-# the decal id. The rotation used here (N -> base, E -> 90, S -> 180,
-# W -> 270) is consistent but has not been checked against the sprites --
-# if converted corners come out rotated, fix the four ROT lines here and
-# every tile overlay follows.
+# the decal id.
+#
+# Straight lines and end caps: checked pixel-for-pixel against both sides'
+# sprites (tgstation's icons/turf/decals.dmi "warningline"/"warn_end" states,
+# and this repo's Resources/Textures/Decals/markings.rsi) -- both name a
+# direction by which literal tile edge it touches (N = top, E = right, ...),
+# so the plain N->N, E->E, S->S, W->W mapping used below is correct as is.
+#
+# Corners are a different story: every corner-family decal on both sides
+# (WarnCorner*, MiniTileCornerOverlay*, BrickCornerOverlay*,
+# WoodTrimThinCorner*) turned out to hang its accent off ONE tile corner
+# rather than following the line's own direction, and BYOND's dir names
+# that accent's *diagonal opposite*, not the corner itself: dir N (top) sits
+# in the NW quadrant, S (bottom) in SE, E (right) in NE, W (left) in SW.
+# Confirmed by measuring pixel-quadrant density on every corner sprite in
+# both decals.dmi and this repo's decal RSIs -- not by eye. Every corner rule
+# below already uses dir 1->NW, 2->SE, 4->NE, 8->SW; if a new corner-style
+# decal is added later, re-derive it the same way rather than copying the
+# line/end N->N pattern -- that pattern does not hold for corners.
 
 # ---- hazard stripes ----
 /obj/effect/turf_decal/stripes/line:
@@ -28,10 +43,10 @@
     8: WarnEndW
 /obj/effect/turf_decal/stripes/corner:
   dirs:
-    1: WarnCornerNE
-    2: WarnCornerSW
-    4: WarnCornerSE
-    8: WarnCornerNW
+    1: WarnCornerNW
+    2: WarnCornerSE
+    4: WarnCornerNE
+    8: WarnCornerSW
 /obj/effect/turf_decal/stripes/box: WarnBox
 /obj/effect/turf_decal/stripes/white/line:
   dirs:
@@ -42,10 +57,10 @@
   color: '#FFFFFFFF'
 /obj/effect/turf_decal/stripes/white/corner:
   dirs:
-    1: WarnCornerGreyscaleNE
-    2: WarnCornerGreyscaleSW
-    4: WarnCornerGreyscaleSE
-    8: WarnCornerGreyscaleNW
+    1: WarnCornerGreyscaleNW
+    2: WarnCornerGreyscaleSE
+    4: WarnCornerGreyscaleNE
+    8: WarnCornerGreyscaleSW
   color: '#FFFFFFFF'
 /obj/effect/turf_decal/stripes/white/box:
   id: WarnBoxGreyscale
@@ -62,10 +77,10 @@
   color: '#DE3A3A96'
 /obj/effect/turf_decal/stripes/red/corner:
   dirs:
-    1: WarnCornerGreyscaleNE
-    2: WarnCornerGreyscaleSW
-    4: WarnCornerGreyscaleSE
-    8: WarnCornerGreyscaleNW
+    1: WarnCornerGreyscaleNW
+    2: WarnCornerGreyscaleSE
+    4: WarnCornerGreyscaleNE
+    8: WarnCornerGreyscaleSW
   color: '#DE3A3A96'
 /obj/effect/turf_decal/stripes/red/box:
   id: WarnBoxGreyscale
@@ -649,17 +664,17 @@
   color: '#D4D4D496'
 /obj/effect/turf_decal/siding/corner:
   dirs:
-    1: MiniTileCornerOverlayNE
-    2: MiniTileCornerOverlaySW
-    4: MiniTileCornerOverlaySE
-    8: MiniTileCornerOverlayNW
+    1: MiniTileCornerOverlayNW
+    2: MiniTileCornerOverlaySE
+    4: MiniTileCornerOverlayNE
+    8: MiniTileCornerOverlaySW
   color: '#D4D4D496'
 /obj/effect/turf_decal/siding/inner_corner:
   dirs:
-    1: MiniTileInnerOverlayNE
-    2: MiniTileInnerOverlaySW
-    4: MiniTileInnerOverlaySE
-    8: MiniTileInnerOverlayNW
+    1: MiniTileInnerOverlayNW
+    2: MiniTileInnerOverlaySE
+    4: MiniTileInnerOverlayNE
+    8: MiniTileInnerOverlaySW
   color: '#D4D4D496'
 /obj/effect/turf_decal/siding/blue:
   dirs:
@@ -670,17 +685,17 @@
   color: '#52B4E996'
 /obj/effect/turf_decal/siding/blue/corner:
   dirs:
-    1: MiniTileCornerOverlayNE
-    2: MiniTileCornerOverlaySW
-    4: MiniTileCornerOverlaySE
-    8: MiniTileCornerOverlayNW
+    1: MiniTileCornerOverlayNW
+    2: MiniTileCornerOverlaySE
+    4: MiniTileCornerOverlayNE
+    8: MiniTileCornerOverlaySW
   color: '#52B4E996'
 /obj/effect/turf_decal/siding/blue/inner_corner:
   dirs:
-    1: MiniTileInnerOverlayNE
-    2: MiniTileInnerOverlaySW
-    4: MiniTileInnerOverlaySE
-    8: MiniTileInnerOverlayNW
+    1: MiniTileInnerOverlayNW
+    2: MiniTileInnerOverlaySE
+    4: MiniTileInnerOverlayNE
+    8: MiniTileInnerOverlaySW
   color: '#52B4E996'
 /obj/effect/turf_decal/siding/green:
   dirs:
@@ -691,17 +706,17 @@
   color: '#9FED5896'
 /obj/effect/turf_decal/siding/green/corner:
   dirs:
-    1: MiniTileCornerOverlayNE
-    2: MiniTileCornerOverlaySW
-    4: MiniTileCornerOverlaySE
-    8: MiniTileCornerOverlayNW
+    1: MiniTileCornerOverlayNW
+    2: MiniTileCornerOverlaySE
+    4: MiniTileCornerOverlayNE
+    8: MiniTileCornerOverlaySW
   color: '#9FED5896'
 /obj/effect/turf_decal/siding/green/inner_corner:
   dirs:
-    1: MiniTileInnerOverlayNE
-    2: MiniTileInnerOverlaySW
-    4: MiniTileInnerOverlaySE
-    8: MiniTileInnerOverlayNW
+    1: MiniTileInnerOverlayNW
+    2: MiniTileInnerOverlaySE
+    4: MiniTileInnerOverlayNE
+    8: MiniTileInnerOverlaySW
   color: '#9FED5896'
 /obj/effect/turf_decal/siding/red:
   dirs:
@@ -712,17 +727,17 @@
   color: '#DE3A3A96'
 /obj/effect/turf_decal/siding/red/corner:
   dirs:
-    1: MiniTileCornerOverlayNE
-    2: MiniTileCornerOverlaySW
-    4: MiniTileCornerOverlaySE
-    8: MiniTileCornerOverlayNW
+    1: MiniTileCornerOverlayNW
+    2: MiniTileCornerOverlaySE
+    4: MiniTileCornerOverlayNE
+    8: MiniTileCornerOverlaySW
   color: '#DE3A3A96'
 /obj/effect/turf_decal/siding/red/inner_corner:
   dirs:
-    1: MiniTileInnerOverlayNE
-    2: MiniTileInnerOverlaySW
-    4: MiniTileInnerOverlaySE
-    8: MiniTileInnerOverlayNW
+    1: MiniTileInnerOverlayNW
+    2: MiniTileInnerOverlaySE
+    4: MiniTileInnerOverlayNE
+    8: MiniTileInnerOverlaySW
   color: '#DE3A3A96'
 /obj/effect/turf_decal/siding/purple:
   dirs:
@@ -733,17 +748,17 @@
   color: '#D381C996'
 /obj/effect/turf_decal/siding/purple/corner:
   dirs:
-    1: MiniTileCornerOverlayNE
-    2: MiniTileCornerOverlaySW
-    4: MiniTileCornerOverlaySE
-    8: MiniTileCornerOverlayNW
+    1: MiniTileCornerOverlayNW
+    2: MiniTileCornerOverlaySE
+    4: MiniTileCornerOverlayNE
+    8: MiniTileCornerOverlaySW
   color: '#D381C996'
 /obj/effect/turf_decal/siding/purple/inner_corner:
   dirs:
-    1: MiniTileInnerOverlayNE
-    2: MiniTileInnerOverlaySW
-    4: MiniTileInnerOverlaySE
-    8: MiniTileInnerOverlayNW
+    1: MiniTileInnerOverlayNW
+    2: MiniTileInnerOverlaySE
+    4: MiniTileInnerOverlayNE
+    8: MiniTileInnerOverlaySW
   color: '#D381C996'
 /obj/effect/turf_decal/siding/white:
   dirs:
@@ -754,17 +769,17 @@
   color: '#FFFFFFFF'
 /obj/effect/turf_decal/siding/white/corner:
   dirs:
-    1: MiniTileCornerOverlayNE
-    2: MiniTileCornerOverlaySW
-    4: MiniTileCornerOverlaySE
-    8: MiniTileCornerOverlayNW
+    1: MiniTileCornerOverlayNW
+    2: MiniTileCornerOverlaySE
+    4: MiniTileCornerOverlayNE
+    8: MiniTileCornerOverlaySW
   color: '#FFFFFFFF'
 /obj/effect/turf_decal/siding/white/inner_corner:
   dirs:
-    1: MiniTileInnerOverlayNE
-    2: MiniTileInnerOverlaySW
-    4: MiniTileInnerOverlaySE
-    8: MiniTileInnerOverlayNW
+    1: MiniTileInnerOverlayNW
+    2: MiniTileInnerOverlaySE
+    4: MiniTileInnerOverlayNE
+    8: MiniTileInnerOverlaySW
   color: '#FFFFFFFF'
 /obj/effect/turf_decal/siding/yellow:
   dirs:
@@ -775,17 +790,17 @@
   color: '#EFB34196'
 /obj/effect/turf_decal/siding/yellow/corner:
   dirs:
-    1: MiniTileCornerOverlayNE
-    2: MiniTileCornerOverlaySW
-    4: MiniTileCornerOverlaySE
-    8: MiniTileCornerOverlayNW
+    1: MiniTileCornerOverlayNW
+    2: MiniTileCornerOverlaySE
+    4: MiniTileCornerOverlayNE
+    8: MiniTileCornerOverlaySW
   color: '#EFB34196'
 /obj/effect/turf_decal/siding/yellow/inner_corner:
   dirs:
-    1: MiniTileInnerOverlayNE
-    2: MiniTileInnerOverlaySW
-    4: MiniTileInnerOverlaySE
-    8: MiniTileInnerOverlayNW
+    1: MiniTileInnerOverlayNW
+    2: MiniTileInnerOverlaySE
+    4: MiniTileInnerOverlayNE
+    8: MiniTileInnerOverlaySW
   color: '#EFB34196'
 /obj/effect/turf_decal/siding/wood:
   dirs:
@@ -795,16 +810,16 @@
     8: WoodTrimThinLineW
 /obj/effect/turf_decal/siding/wood/corner:
   dirs:
-    1: WoodTrimThinCornerNe
-    2: WoodTrimThinCornerSw
-    4: WoodTrimThinCornerSe
-    8: WoodTrimThinCornerNw
+    1: WoodTrimThinCornerNw
+    2: WoodTrimThinCornerSe
+    4: WoodTrimThinCornerNe
+    8: WoodTrimThinCornerSw
 /obj/effect/turf_decal/siding/wood/inner_corner:
   dirs:
-    1: WoodTrimThinInnerNe
-    2: WoodTrimThinInnerSw
-    4: WoodTrimThinInnerSe
-    8: WoodTrimThinInnerNw
+    1: WoodTrimThinInnerNw
+    2: WoodTrimThinInnerSe
+    4: WoodTrimThinInnerNe
+    8: WoodTrimThinInnerSw
 
 # ---- trimlines ----
 /obj/effect/turf_decal/trimline/blue/line:
@@ -816,10 +831,10 @@
   color: '#52B4E996'
 /obj/effect/turf_decal/trimline/blue/corner:
   dirs:
-    1: BrickCornerOverlayNE
-    2: BrickCornerOverlaySW
-    4: BrickCornerOverlaySE
-    8: BrickCornerOverlayNW
+    1: BrickCornerOverlayNW
+    2: BrickCornerOverlaySE
+    4: BrickCornerOverlayNE
+    8: BrickCornerOverlaySW
   color: '#52B4E996'
 /obj/effect/turf_decal/trimline/blue/end:
   dirs:
@@ -844,10 +859,10 @@
   color: '#52B4E996'
 /obj/effect/turf_decal/trimline/blue/filled/corner:
   dirs:
-    1: BrickCornerOverlayNE
-    2: BrickCornerOverlaySW
-    4: BrickCornerOverlaySE
-    8: BrickCornerOverlayNW
+    1: BrickCornerOverlayNW
+    2: BrickCornerOverlaySE
+    4: BrickCornerOverlayNE
+    8: BrickCornerOverlaySW
   color: '#52B4E996'
 /obj/effect/turf_decal/trimline/blue/filled/end:
   dirs:
@@ -872,10 +887,10 @@
   color: '#A4610696'
 /obj/effect/turf_decal/trimline/brown/corner:
   dirs:
-    1: BrickCornerOverlayNE
-    2: BrickCornerOverlaySW
-    4: BrickCornerOverlaySE
-    8: BrickCornerOverlayNW
+    1: BrickCornerOverlayNW
+    2: BrickCornerOverlaySE
+    4: BrickCornerOverlayNE
+    8: BrickCornerOverlaySW
   color: '#A4610696'
 /obj/effect/turf_decal/trimline/brown/end:
   dirs:
@@ -900,10 +915,10 @@
   color: '#A4610696'
 /obj/effect/turf_decal/trimline/brown/filled/corner:
   dirs:
-    1: BrickCornerOverlayNE
-    2: BrickCornerOverlaySW
-    4: BrickCornerOverlaySE
-    8: BrickCornerOverlayNW
+    1: BrickCornerOverlayNW
+    2: BrickCornerOverlaySE
+    4: BrickCornerOverlayNE
+    8: BrickCornerOverlaySW
   color: '#A4610696'
 /obj/effect/turf_decal/trimline/brown/filled/end:
   dirs:
@@ -928,10 +943,10 @@
   color: '#444646FF'
 /obj/effect/turf_decal/trimline/dark/corner:
   dirs:
-    1: BrickCornerOverlayNE
-    2: BrickCornerOverlaySW
-    4: BrickCornerOverlaySE
-    8: BrickCornerOverlayNW
+    1: BrickCornerOverlayNW
+    2: BrickCornerOverlaySE
+    4: BrickCornerOverlayNE
+    8: BrickCornerOverlaySW
   color: '#444646FF'
 /obj/effect/turf_decal/trimline/dark/end:
   dirs:
@@ -956,10 +971,10 @@
   color: '#444646FF'
 /obj/effect/turf_decal/trimline/dark/filled/corner:
   dirs:
-    1: BrickCornerOverlayNE
-    2: BrickCornerOverlaySW
-    4: BrickCornerOverlaySE
-    8: BrickCornerOverlayNW
+    1: BrickCornerOverlayNW
+    2: BrickCornerOverlaySE
+    4: BrickCornerOverlayNE
+    8: BrickCornerOverlaySW
   color: '#444646FF'
 /obj/effect/turf_decal/trimline/dark/filled/end:
   dirs:
@@ -984,10 +999,10 @@
   color: '#334E6DC8'
 /obj/effect/turf_decal/trimline/dark_blue/corner:
   dirs:
-    1: BrickCornerOverlayNE
-    2: BrickCornerOverlaySW
-    4: BrickCornerOverlaySE
-    8: BrickCornerOverlayNW
+    1: BrickCornerOverlayNW
+    2: BrickCornerOverlaySE
+    4: BrickCornerOverlayNE
+    8: BrickCornerOverlaySW
   color: '#334E6DC8'
 /obj/effect/turf_decal/trimline/dark_blue/end:
   dirs:
@@ -1012,10 +1027,10 @@
   color: '#334E6DC8'
 /obj/effect/turf_decal/trimline/dark_blue/filled/corner:
   dirs:
-    1: BrickCornerOverlayNE
-    2: BrickCornerOverlaySW
-    4: BrickCornerOverlaySE
-    8: BrickCornerOverlayNW
+    1: BrickCornerOverlayNW
+    2: BrickCornerOverlaySE
+    4: BrickCornerOverlayNE
+    8: BrickCornerOverlaySW
   color: '#334E6DC8'
 /obj/effect/turf_decal/trimline/dark_blue/filled/end:
   dirs:
@@ -1040,10 +1055,10 @@
   color: '#951710FF'
 /obj/effect/turf_decal/trimline/dark_red/corner:
   dirs:
-    1: BrickCornerOverlayNE
-    2: BrickCornerOverlaySW
-    4: BrickCornerOverlaySE
-    8: BrickCornerOverlayNW
+    1: BrickCornerOverlayNW
+    2: BrickCornerOverlaySE
+    4: BrickCornerOverlayNE
+    8: BrickCornerOverlaySW
   color: '#951710FF'
 /obj/effect/turf_decal/trimline/dark_red/end:
   dirs:
@@ -1068,10 +1083,10 @@
   color: '#951710FF'
 /obj/effect/turf_decal/trimline/dark_red/filled/corner:
   dirs:
-    1: BrickCornerOverlayNE
-    2: BrickCornerOverlaySW
-    4: BrickCornerOverlaySE
-    8: BrickCornerOverlayNW
+    1: BrickCornerOverlayNW
+    2: BrickCornerOverlaySE
+    4: BrickCornerOverlayNE
+    8: BrickCornerOverlaySW
   color: '#951710FF'
 /obj/effect/turf_decal/trimline/dark_red/filled/end:
   dirs:
@@ -1096,10 +1111,10 @@
   color: '#9FED5896'
 /obj/effect/turf_decal/trimline/green/corner:
   dirs:
-    1: BrickCornerOverlayNE
-    2: BrickCornerOverlaySW
-    4: BrickCornerOverlaySE
-    8: BrickCornerOverlayNW
+    1: BrickCornerOverlayNW
+    2: BrickCornerOverlaySE
+    4: BrickCornerOverlayNE
+    8: BrickCornerOverlaySW
   color: '#9FED5896'
 /obj/effect/turf_decal/trimline/green/end:
   dirs:
@@ -1124,10 +1139,10 @@
   color: '#9FED5896'
 /obj/effect/turf_decal/trimline/green/filled/corner:
   dirs:
-    1: BrickCornerOverlayNE
-    2: BrickCornerOverlaySW
-    4: BrickCornerOverlaySE
-    8: BrickCornerOverlayNW
+    1: BrickCornerOverlayNW
+    2: BrickCornerOverlaySE
+    4: BrickCornerOverlayNE
+    8: BrickCornerOverlaySW
   color: '#9FED5896'
 /obj/effect/turf_decal/trimline/green/filled/end:
   dirs:
@@ -1152,10 +1167,10 @@
   color: '#D4D4D496'
 /obj/effect/turf_decal/trimline/neutral/corner:
   dirs:
-    1: BrickCornerOverlayNE
-    2: BrickCornerOverlaySW
-    4: BrickCornerOverlaySE
-    8: BrickCornerOverlayNW
+    1: BrickCornerOverlayNW
+    2: BrickCornerOverlaySE
+    4: BrickCornerOverlayNE
+    8: BrickCornerOverlaySW
   color: '#D4D4D496'
 /obj/effect/turf_decal/trimline/neutral/end:
   dirs:
@@ -1180,10 +1195,10 @@
   color: '#D4D4D496'
 /obj/effect/turf_decal/trimline/neutral/filled/corner:
   dirs:
-    1: BrickCornerOverlayNE
-    2: BrickCornerOverlaySW
-    4: BrickCornerOverlaySE
-    8: BrickCornerOverlayNW
+    1: BrickCornerOverlayNW
+    2: BrickCornerOverlaySE
+    4: BrickCornerOverlayNE
+    8: BrickCornerOverlaySW
   color: '#D4D4D496'
 /obj/effect/turf_decal/trimline/neutral/filled/end:
   dirs:
@@ -1208,10 +1223,10 @@
   color: '#D381C996'
 /obj/effect/turf_decal/trimline/purple/corner:
   dirs:
-    1: BrickCornerOverlayNE
-    2: BrickCornerOverlaySW
-    4: BrickCornerOverlaySE
-    8: BrickCornerOverlayNW
+    1: BrickCornerOverlayNW
+    2: BrickCornerOverlaySE
+    4: BrickCornerOverlayNE
+    8: BrickCornerOverlaySW
   color: '#D381C996'
 /obj/effect/turf_decal/trimline/purple/end:
   dirs:
@@ -1236,10 +1251,10 @@
   color: '#D381C996'
 /obj/effect/turf_decal/trimline/purple/filled/corner:
   dirs:
-    1: BrickCornerOverlayNE
-    2: BrickCornerOverlaySW
-    4: BrickCornerOverlaySE
-    8: BrickCornerOverlayNW
+    1: BrickCornerOverlayNW
+    2: BrickCornerOverlaySE
+    4: BrickCornerOverlayNE
+    8: BrickCornerOverlaySW
   color: '#D381C996'
 /obj/effect/turf_decal/trimline/purple/filled/end:
   dirs:
@@ -1264,10 +1279,10 @@
   color: '#DE3A3A96'
 /obj/effect/turf_decal/trimline/red/corner:
   dirs:
-    1: BrickCornerOverlayNE
-    2: BrickCornerOverlaySW
-    4: BrickCornerOverlaySE
-    8: BrickCornerOverlayNW
+    1: BrickCornerOverlayNW
+    2: BrickCornerOverlaySE
+    4: BrickCornerOverlayNE
+    8: BrickCornerOverlaySW
   color: '#DE3A3A96'
 /obj/effect/turf_decal/trimline/red/end:
   dirs:
@@ -1292,10 +1307,10 @@
   color: '#DE3A3A96'
 /obj/effect/turf_decal/trimline/red/filled/corner:
   dirs:
-    1: BrickCornerOverlayNE
-    2: BrickCornerOverlaySW
-    4: BrickCornerOverlaySE
-    8: BrickCornerOverlayNW
+    1: BrickCornerOverlayNW
+    2: BrickCornerOverlaySE
+    4: BrickCornerOverlayNE
+    8: BrickCornerOverlaySW
   color: '#DE3A3A96'
 /obj/effect/turf_decal/trimline/red/filled/end:
   dirs:
@@ -1320,10 +1335,10 @@
   color: '#FFFFFFFF'
 /obj/effect/turf_decal/trimline/white/corner:
   dirs:
-    1: BrickCornerOverlayNE
-    2: BrickCornerOverlaySW
-    4: BrickCornerOverlaySE
-    8: BrickCornerOverlayNW
+    1: BrickCornerOverlayNW
+    2: BrickCornerOverlaySE
+    4: BrickCornerOverlayNE
+    8: BrickCornerOverlaySW
   color: '#FFFFFFFF'
 /obj/effect/turf_decal/trimline/white/end:
   dirs:
@@ -1348,10 +1363,10 @@
   color: '#FFFFFFFF'
 /obj/effect/turf_decal/trimline/white/filled/corner:
   dirs:
-    1: BrickCornerOverlayNE
-    2: BrickCornerOverlaySW
-    4: BrickCornerOverlaySE
-    8: BrickCornerOverlayNW
+    1: BrickCornerOverlayNW
+    2: BrickCornerOverlaySE
+    4: BrickCornerOverlayNE
+    8: BrickCornerOverlaySW
   color: '#FFFFFFFF'
 /obj/effect/turf_decal/trimline/white/filled/end:
   dirs:
@@ -1376,10 +1391,10 @@
   color: '#EFB34196'
 /obj/effect/turf_decal/trimline/yellow/corner:
   dirs:
-    1: BrickCornerOverlayNE
-    2: BrickCornerOverlaySW
-    4: BrickCornerOverlaySE
-    8: BrickCornerOverlayNW
+    1: BrickCornerOverlayNW
+    2: BrickCornerOverlaySE
+    4: BrickCornerOverlayNE
+    8: BrickCornerOverlaySW
   color: '#EFB34196'
 /obj/effect/turf_decal/trimline/yellow/end:
   dirs:
@@ -1404,10 +1419,10 @@
   color: '#EFB34196'
 /obj/effect/turf_decal/trimline/yellow/filled/corner:
   dirs:
-    1: BrickCornerOverlayNE
-    2: BrickCornerOverlaySW
-    4: BrickCornerOverlaySE
-    8: BrickCornerOverlayNW
+    1: BrickCornerOverlayNW
+    2: BrickCornerOverlaySE
+    4: BrickCornerOverlayNE
+    8: BrickCornerOverlaySW
   color: '#EFB34196'
 /obj/effect/turf_decal/trimline/yellow/filled/end:
   dirs:

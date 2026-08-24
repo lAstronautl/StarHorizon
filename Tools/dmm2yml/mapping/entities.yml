@@ -176,15 +176,26 @@
 /obj/structure/sign/warning/secure_area/directional/east: {entity: SignSecureMed, wall: east, onWall: true}
 /obj/structure/sign/warning/secure_area/directional/west: {entity: SignSecureMed, wall: west, onWall: true}
 
-/obj/structure/window/reinforced/spawner/directional/north: {entity: WindowReinforcedDirectional, wall: north}
-/obj/structure/window/reinforced/spawner/directional/south: {entity: WindowReinforcedDirectional, wall: south}
-/obj/structure/window/reinforced/spawner/directional/east: {entity: WindowReinforcedDirectional, wall: east}
-/obj/structure/window/reinforced/spawner/directional/west: {entity: WindowReinforcedDirectional, wall: west}
+# A directional window is not a device mounted on a floor tile next to a wall
+# (see onWall above) -- it IS the border piece, occupying the edge of its own
+# tile that its dir names. tgstation's own window.dm confirms this directly
+# ("dir == get_dir(loc, T)" is what the window blocks passage through), and it
+# was confirmed against every /tg/ station map: where a directional windoor
+# (the door version of the same border-object family, code/game/machinery/
+# doors/windowdoor.dm) sits right up against a wall on one side, that wall is
+# on the side OPPOSITE the name in its path -- i.e. the path names the way it
+# faces, not the wall it is mounted to (102/102 samples, all main stations).
+# Using wall: here, like the wall-mounted devices above, would face every
+# directional window and windoor 180 degrees from where it should.
+/obj/structure/window/reinforced/spawner/directional/north: {entity: WindowReinforcedDirectional, dir: 1}
+/obj/structure/window/reinforced/spawner/directional/south: {entity: WindowReinforcedDirectional, dir: 2}
+/obj/structure/window/reinforced/spawner/directional/east: {entity: WindowReinforcedDirectional, dir: 4}
+/obj/structure/window/reinforced/spawner/directional/west: {entity: WindowReinforcedDirectional, dir: 8}
 
-/obj/structure/window/spawner/directional/north: {entity: WindowDirectional, wall: north}
-/obj/structure/window/spawner/directional/south: {entity: WindowDirectional, wall: south}
-/obj/structure/window/spawner/directional/east: {entity: WindowDirectional, wall: east}
-/obj/structure/window/spawner/directional/west: {entity: WindowDirectional, wall: west}
+/obj/structure/window/spawner/directional/north: {entity: WindowDirectional, dir: 1}
+/obj/structure/window/spawner/directional/south: {entity: WindowDirectional, dir: 2}
+/obj/structure/window/spawner/directional/east: {entity: WindowDirectional, dir: 4}
+/obj/structure/window/spawner/directional/west: {entity: WindowDirectional, dir: 8}
 
 # ---- free-standing: the path names the way it faces ----
 /obj/structure/chair/stool/directional/north: {entity: Stool, dir: 1}
@@ -287,7 +298,10 @@
 /obj/structure/reagent_dispensers/watertank: WaterTank
 /obj/structure/toilet: ToiletEmpty
 
-# ---- door/window: a rotation only, like Airlock ----
+# ---- door/window: a rotation only, like Airlock -- see the directional
+# window comment above for why dir is not inverted here. SS14 has no
+# left/right Windoor split (only tgstation's sprite does), so both hands
+# collapse onto the one symmetric prototype. ----
 /obj/machinery/door/window/left/directional/north: {entity: Windoor, dir: 1}
 /obj/machinery/door/window/left/directional/south: {entity: Windoor, dir: 2}
 /obj/machinery/door/window/left/directional/east: {entity: Windoor, dir: 4}

@@ -227,6 +227,21 @@ def check_orientation(mapping_set) -> Result:
     elif facing.direction != mapping_rules.NORTH:
         problems.append(f"dir:1 gave facing {facing.direction}, expected {mapping_rules.NORTH}")
 
+    # A directional window/windoor is the border piece its dir names, not a
+    # device mounted next to a wall -- confirmed against every /tg/ station
+    # map (see the comment in entities.yml). wall: would invert this.
+    window = mapping_set.resolve("/obj/structure/window/spawner/directional/east", "entity").rule
+    if window is None:
+        problems.append("no rule for a directional window")
+    elif window.direction != mapping_rules.EAST:
+        problems.append(f"directional window east gave facing {window.direction}, expected {mapping_rules.EAST}")
+
+    windoor = mapping_set.resolve("/obj/machinery/door/window/left/directional/east", "entity").rule
+    if windoor is None:
+        problems.append("no rule for a directional windoor")
+    elif windoor.direction != mapping_rules.EAST:
+        problems.append(f"directional windoor east gave facing {windoor.direction}, expected {mapping_rules.EAST}")
+
     # Verified against the wall-mounted machines of Resources/Maps/amber.yml.
     expected = {
         mapping_rules.SOUTH: None,
@@ -239,6 +254,36 @@ def check_orientation(mapping_set) -> Result:
             problems.append(f"dir {direction} -> {ss14map.rotation_for_dir(direction)}, expected {rotation}")
 
     return Result("orientation: wall vs dir", not problems, "; ".join(problems) or "wall inverts, dir does not")
+
+
+def check_decal_corners(mapping_set) -> Result:
+    """A corner decal's dir names the edge it touches, not the quadrant its
+    accent sits in -- those are diagonally opposite. See the comment at the
+    top of decals.yml: confirmed by pixel-quadrant measurement on both
+    tgstation's icons/turf/decals.dmi and this repo's decal RSIs, across four
+    independent corner-decal families."""
+    problems = []
+
+    expected = {1: "NW", 2: "SE", 4: "NE", 8: "SW"}
+    families = [
+        ("/obj/effect/turf_decal/stripes/corner", "WarnCorner"),
+        ("/obj/effect/turf_decal/siding/corner", "MiniTileCornerOverlay"),
+        ("/obj/effect/turf_decal/trimline/blue/corner", "BrickCornerOverlay"),
+    ]
+    for path, prefix in families:
+        rule = mapping_set.resolve(path, "decal").rule
+        if rule is None or not getattr(rule, "dirs", None):
+            problems.append(f"{path}: no direction-keyed decal rule")
+            continue
+        for direction, suffix in expected.items():
+            got = rule.dirs.get(direction)
+            want = f"{prefix}{suffix}"
+            if got != want:
+                problems.append(f"{path} dir {direction}: {got}, expected {want}")
+
+    return Result(
+        "decals: corner accents match their quadrant", not problems, "; ".join(problems) or "N->NW, S->SE, E->NE, W->SW"
+    )
 
 
 def check_dictionaries(mapping_set, index) -> Result:
@@ -639,6 +684,7 @@ def run(repo_root: str, mapping_dir: str, prototypes_dir: str) -> list[Result]:
         ("rules: exact, inherited, ignored", lambda: check_rules(mapping_set)),
         ("problems: one line per path", lambda: check_problem_reporting(mapping_set, index)),
         ("orientation: wall vs dir", lambda: check_orientation(mapping_set)),
+        ("decals: corner accents match their quadrant", lambda: check_decal_corners(mapping_set)),
         ("chunks: cell indexing", lambda: check_chunk_indexing()),
         ("chunks: no empty chunks", lambda: check_no_empty_chunks(mapping_set, index)),
         ("chunks: round-trip vs repo maps", lambda: check_chunk_roundtrip(repo_root)),
