@@ -203,6 +203,26 @@ public sealed class StationOrderSystem : EntitySystem
             sold = true;
         }
 
+        // Raise the normal sold event (with the station we already resolved, since the capsule's own
+        // grid was never added to StationDataComponent.Grids) so cargo bounties, the salvage job
+        // board and market data all pick up on whatever was aboard, same as selling through a pallet
+        // console.
+        var soldEntities = new HashSet<EntityUid>();
+        var children = Transform(capsule.Owner).ChildEnumerator;
+        while (children.MoveNext(out var child))
+        {
+            if (TryComp<TransformComponent>(child, out var childXform) && childXform.Anchored)
+                continue;
+
+            soldEntities.Add(child);
+        }
+
+        if (soldEntities.Count > 0)
+        {
+            var soldEv = new EntitySoldEvent(soldEntities, station, args.Actor);
+            RaiseLocalEvent(ref soldEv);
+        }
+
         _docking.UndockDocks(capsule.Owner);
         QueueDel(capsule.Owner);
 
