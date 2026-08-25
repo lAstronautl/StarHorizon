@@ -86,3 +86,9 @@ station-upgrade-pallet-console-low-description = Продаёт товары с 
 
 station-upgrade-pallet-console-normal-name = Компьютер продажи груза
 station-upgrade-pallet-console-normal-description = Продаёт товары с грузовых поддонов по обычной ставке. Требует установки id-картой владельца станции.
+
+station-upgrade-rcd-name = РСУ станции
+station-upgrade-rcd-description = РСУ, привязанное к станции. Проведите по нему id-картой владельца станции для авторизации - работает только на гриде станции.
+
+station-upgrade-advanced-rcd-name = Строительный пистолет станции
+station-upgrade-advanced-rcd-description = Строительный пистолет, привязанный к станции. Проведите по нему id-картой владельца станции для авторизации - работает только на гриде станции и не принимает платы.

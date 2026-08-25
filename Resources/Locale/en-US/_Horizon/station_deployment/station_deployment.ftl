@@ -86,3 +86,9 @@ station-upgrade-pallet-console-low-description = Sells goods loaded onto cargo p
 
 station-upgrade-pallet-console-normal-name = Cargo Sale Computer
 station-upgrade-pallet-console-normal-description = Sells goods loaded onto cargo pallets at the normal rate. Requires installation with the station owner's ID card.
+
+station-upgrade-rcd-name = Station RCD
+station-upgrade-rcd-description = A rapid construction device bound to the station. Swipe the station's deed ID card on it to authorize - it only works on the station's own grid.
+
+station-upgrade-advanced-rcd-name = Station Construction Pistol
+station-upgrade-advanced-rcd-description = An advanced construction device bound to the station. Swipe the station's deed ID card on it to authorize - it only works on the station's own grid, and can't accept machine boards.

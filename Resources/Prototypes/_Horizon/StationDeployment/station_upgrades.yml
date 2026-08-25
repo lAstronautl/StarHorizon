@@ -462,3 +462,67 @@
   price: 10000
   entity: StationUpgradePalletConsoleNormalMarketFlatpack
   limit: 1
+
+# Station-bound tools - not StationUpgradeEquipment (those anchor into place; these stay handheld
+# items). Instead they use GridAccessComponent, the same swipe-to-authorize mechanism ShipyardRCD
+# uses for ships, extended to also recognize StationDeedComponent (see GridAccessSystem). Swiping
+# the station's deed ID card on one binds it to that station's grid; it just won't work anywhere
+# else.
+
+- type: entity
+  name: station RCD
+  parent: RCD
+  id: StationRCD
+  suffix: Station Upgrade
+  description: A rapid construction device bound to a deployed station - swipe the station's deed ID card on it to authorize.
+  components:
+  - type: GridAccess
+
+- type: entity
+  name: station construction pistol
+  parent: AdvancedRCD
+  id: StationAdvancedRCD
+  suffix: Station Upgrade
+  description: An advanced construction device bound to a deployed station - swipe the station's deed ID card on it to authorize. Doesn't accept machine boards.
+  components:
+  - type: GridAccess
+  - type: AdvancedRCD
+    allowBoardInsertion: false
+
+- type: entity
+  parent: BaseNFFlatpack
+  id: StationRCDFlatpack
+  name: station RCD flatpack
+  description: A flatpack used for delivering a station-bound RCD.
+  components:
+  - type: Flatpack
+    entity: StationRCD
+
+- type: entity
+  parent: BaseNFFlatpack
+  id: StationAdvancedRCDFlatpack
+  name: station construction pistol flatpack
+  description: A flatpack used for delivering a station-bound construction pistol.
+  components:
+  - type: Flatpack
+    entity: StationAdvancedRCD
+
+- type: stationUpgradePurchase
+  id: StationRCDPurchase
+  name: station-upgrade-rcd-name
+  description: station-upgrade-rcd-description
+  category: NFEngineering
+  requiredLevel: 2
+  price: 6000
+  entity: StationRCDFlatpack
+  limit: 4
+
+- type: stationUpgradePurchase
+  id: StationAdvancedRCDPurchase
+  name: station-upgrade-advanced-rcd-name
+  description: station-upgrade-advanced-rcd-description
+  category: NFEngineering
+  requiredLevel: 5
+  price: 15000
+  entity: StationAdvancedRCDFlatpack
+  limit: 1
