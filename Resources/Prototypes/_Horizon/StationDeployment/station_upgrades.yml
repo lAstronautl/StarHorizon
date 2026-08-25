@@ -103,6 +103,10 @@
   suffix: Station Upgrade
   components:
   - type: StationUpgradeEquipment
+  # Gateway.Enabled defaults to false (normally toggled on by admins/mappers once a destination is
+  # ready) - a purchased gateway should just work once installed.
+  - type: Gateway
+    enabled: true
 
 - type: entity
   parent: EnergyAirConverter
