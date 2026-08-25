@@ -97,16 +97,19 @@
   components:
   - type: StationUpgradeEquipment
 
-- type: entity
-  parent: Gateway
-  id: StationUpgradeGateway
-  suffix: Station Upgrade
-  components:
-  - type: StationUpgradeEquipment
-  # Gateway.Enabled defaults to false (normally toggled on by admins/mappers once a destination is
-  # ready) - a purchased gateway should just work once installed.
-  - type: Gateway
-    enabled: true
+# Disabled - the gateway's destinations rely on GatewayGeneratorSystem, which is gated behind the
+# gateway.generator_enabled server cvar (defaults to false) and looks unfinished upstream. Re-enable
+# once that's sorted out.
+# - type: entity
+#   parent: Gateway
+#   id: StationUpgradeGateway
+#   suffix: Station Upgrade
+#   components:
+#   - type: StationUpgradeEquipment
+#   # Gateway.Enabled defaults to false (normally toggled on by admins/mappers once a destination is
+#   # ready) - a purchased gateway should just work once installed.
+#   - type: Gateway
+#     enabled: true
 
 - type: entity
   parent: EnergyAirConverter
@@ -201,14 +204,15 @@
   - type: Flatpack
     entity: StationUpgradeSalvageMagnet
 
-- type: entity
-  parent: BaseNFFlatpack
-  id: StationUpgradeGatewayFlatpack
-  name: station gateway flatpack
-  description: A flatpack used for installing a gateway on a deployed station.
-  components:
-  - type: Flatpack
-    entity: StationUpgradeGateway
+# Disabled - see StationUpgradeGateway above.
+# - type: entity
+#   parent: BaseNFFlatpack
+#   id: StationUpgradeGatewayFlatpack
+#   name: station gateway flatpack
+#   description: A flatpack used for installing a gateway on a deployed station.
+#   components:
+#   - type: Flatpack
+#     entity: StationUpgradeGateway
 
 - type: entity
   parent: BaseNFFlatpack
@@ -328,15 +332,16 @@
   entity: StationUpgradeSalvageMagnetFlatpack
   limit: 1
 
-- type: stationUpgradePurchase
-  id: StationUpgradeGatewayPurchase
-  name: station-upgrade-gateway-name
-  description: station-upgrade-gateway-description
-  category: NFScience
-  requiredLevel: 8
-  price: 50000
-  entity: StationUpgradeGatewayFlatpack
-  limit: 1
+# Disabled - see StationUpgradeGateway above.
+# - type: stationUpgradePurchase
+#   id: StationUpgradeGatewayPurchase
+#   name: station-upgrade-gateway-name
+#   description: station-upgrade-gateway-description
+#   category: NFScience
+#   requiredLevel: 8
+#   price: 50000
+#   entity: StationUpgradeGatewayFlatpack
+#   limit: 1
 
 - type: stationUpgradePurchase
   id: StationUpgradeEnergyAirConverterPurchase

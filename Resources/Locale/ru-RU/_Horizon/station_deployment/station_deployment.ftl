@@ -47,8 +47,9 @@ station-upgrade-full-atm-description = Полноценный банкомат �
 station-upgrade-salvage-magnet-name = Магнит для утиля
 station-upgrade-salvage-magnet-description = Притягивает обломки для утилизации. Требует установки id-картой владельца станции.
 
-station-upgrade-gateway-name = Врата
-station-upgrade-gateway-description = Врата для сверхсветовых перелётов в отдалённые точки. Требуют установки id-картой владельца станции.
+# Отключено - см. StationUpgradeGateway в station_upgrades.yml.
+# station-upgrade-gateway-name = Врата
+# station-upgrade-gateway-description = Врата для сверхсветовых перелётов в отдалённые точки. Требуют установки id-картой владельца станции.
 
 station-upgrade-energy-air-converter-name = Конвертер энергии в воздух
 station-upgrade-energy-air-converter-description = Преобразует огромное количество энергии в перегретый воздух. Требует установки id-картой владельца станции.

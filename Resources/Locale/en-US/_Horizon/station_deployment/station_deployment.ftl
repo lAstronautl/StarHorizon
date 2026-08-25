@@ -47,8 +47,9 @@ station-upgrade-full-atm-description = A full-service bank ATM. Requires install
 station-upgrade-salvage-magnet-name = Salvage Magnet
 station-upgrade-salvage-magnet-description = Pulls in salvage wreckage. Requires installation with the station owner's ID card.
 
-station-upgrade-gateway-name = Gateway
-station-upgrade-gateway-description = A gateway allowing faster than light travel to far-flung locations. Requires installation with the station owner's ID card.
+# Disabled - see StationUpgradeGateway in station_upgrades.yml.
+# station-upgrade-gateway-name = Gateway
+# station-upgrade-gateway-description = A gateway allowing faster than light travel to far-flung locations. Requires installation with the station owner's ID card.
 
 station-upgrade-energy-air-converter-name = Energy-to-Air Converter
 station-upgrade-energy-air-converter-description = Converts huge amounts of power into superheated air. Requires installation with the station owner's ID card.
