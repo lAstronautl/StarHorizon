@@ -22,7 +22,7 @@ station-control-console-iff-color-success = Station IFF color changed.
 
 station-control-console-upgrades-header = Station Upgrades
 station-control-console-upgrade-buy-button = Buy
-station-control-console-upgrade-level-req = Requires { $category } level { $level } (currently { $current })
+station-control-console-upgrade-level-req = Requires { $category } level { $level }
 station-control-console-upgrade-price = Price: { $price }
 station-control-console-upgrade-locked = The required development level hasn't been reached yet.
 station-control-console-upgrade-limit = Bought: { $purchased }/{ $limit }

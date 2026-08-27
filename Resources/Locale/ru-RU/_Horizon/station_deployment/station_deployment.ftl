@@ -22,7 +22,7 @@ station-control-console-iff-color-success = Цвет IFF станции изме
 
 station-control-console-upgrades-header = Улучшения станции
 station-control-console-upgrade-buy-button = Купить
-station-control-console-upgrade-level-req = Требуется уровень { $category } { $level } (сейчас { $current })
+station-control-console-upgrade-level-req = Требуется уровень { $category } { $level }
 station-control-console-upgrade-price = Цена: { $price }
 station-control-console-upgrade-locked = Требуемый уровень развития ещё не достигнут.
 station-control-console-upgrade-limit = Куплено: { $purchased }/{ $limit }

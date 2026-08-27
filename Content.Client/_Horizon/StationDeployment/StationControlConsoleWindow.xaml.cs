@@ -82,7 +82,7 @@ public sealed partial class StationControlConsoleWindow : FancyWindow
             var nameLabel = new Label { Text = Loc.GetString(proto.Name), StyleClasses = { "LabelKeyText" }, HorizontalExpand = true };
             var reqLabel = new RichTextLabel();
             reqLabel.SetMessage(Loc.GetString("station-control-console-upgrade-level-req",
-                ("category", categoryName), ("level", upgrade.RequiredLevel), ("current", upgrade.CurrentLevel)));
+                ("category", categoryName), ("level", upgrade.RequiredLevel)));
             var priceLabel = new Label { Text = Loc.GetString("station-control-console-upgrade-price", ("price", upgrade.Price)), StyleClasses = { "LabelSubText" } };
             var limitLabel = new Label
             {
