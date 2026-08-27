@@ -42,3 +42,103 @@ station-order-item-beaker = beaker
 
 station-order-description-vegetables = The kitchen needs a fresh crate of vegetables.
 station-order-item-vegetable = vegetable
+
+# Engineering - bulk/varied orders
+
+station-order-description-power-cells = Engineering is running low on battery cells for tools and equipment.
+station-order-item-powercell = power cell
+station-order-item-powercell-small = small power cell
+
+station-order-description-lighting-restock = The station needs a bulk shipment of light bulbs and cable to keep the halls lit.
+station-order-item-lightbulb = light bulb
+
+station-order-description-hand-tool-set = A full set of hand tools is needed to outfit the engineering bay.
+station-order-item-wrench = wrench
+station-order-item-screwdriver = screwdriver
+station-order-item-crowbar = crowbar
+station-order-item-wirecutter = wirecutter
+
+station-order-description-gas-canisters = Atmospherics needs a fresh supply of gas tanks.
+station-order-item-gastank = gas tank
+station-order-item-flamethrower-tank = flamethrower fuel tank
+
+station-order-description-multitool-shipment = Engineering wants a bulk shipment of multitools and wirecutters for wiring work.
+station-order-item-multitool = multitool
+
+station-order-description-full-engineering-restock = A full restock for engineering - toolboxes, cable, and light bulbs, all at once.
+
+# Arsenal - bulk/varied orders
+
+station-order-description-pistol-magazines = The armory is running low on pistol magazines.
+station-order-item-pistol-mag-35 = pistol magazine (.35 auto)
+station-order-item-pistol-mag-45 = pistol magazine (.45 magnum)
+
+station-order-description-rifle-magazines = The armory needs rifle magazines restocked.
+station-order-item-rifle-mag-20 = rifle magazine (20-round)
+station-order-item-rifle-mag-30 = rifle magazine (30-round)
+
+station-order-description-combat-blades = The arsenal needs a batch of combat-ready blades.
+station-order-item-combat-knife = combat knife
+station-order-item-knife = knife
+
+station-order-description-tactical-gear = Security wants a shipment of restraints and stun weapons.
+station-order-item-handcuffs = handcuffs
+station-order-item-taser = taser
+
+station-order-description-grenade-cache = The arsenal wants a diverse grenade cache built up for emergencies.
+station-order-item-hand-grenade = hand grenade
+station-order-item-flashbang = flashbang grenade
+station-order-item-grenade-mag = grenade magazine
+
+station-order-description-smg-magazines = The armory is short on submachine gun magazines.
+station-order-item-smg-mag-35 = SMG magazine (.35 auto)
+station-order-item-smg-mag-45 = SMG magazine (.45 magnum)
+
+# Science - bulk/varied orders
+
+station-order-description-pill-canisters = The lab needs pill canisters and loose pills restocked.
+station-order-item-pill-canister = pill canister
+station-order-item-pill = pill
+
+station-order-description-chem-glassware = Chemistry needs a bulk shipment of beakers and bottles.
+station-order-item-bottle = chem bottle
+
+station-order-description-cryo-supplies = Medbay wants cryobeakers and syringes for the cryo pods.
+station-order-item-cryobeaker = cryobeaker
+
+station-order-description-anomaly-materials = Science wants bluespace anomaly materials for research.
+station-order-item-anomaly-core = anomaly core
+station-order-item-bluespace-core = bluespace core
+
+station-order-description-syringe-gun-ammo = The lab needs syringe gun ammo and spare syringes.
+station-order-item-syringe-gun-ammo = syringe gun ammo
+
+station-order-description-full-lab-restock = A full restock for the lab - beakers, syringes, pill canisters, and bottles.
+
+# Service - bulk/varied orders
+
+station-order-description-fresh-produce = The kitchen wants a big shipment of fresh vegetables and fruit.
+station-order-item-fruit = fruit
+
+station-order-description-baked-goods = The kitchen needs bread, cake, and pancakes for the crew.
+station-order-item-bread = bread
+station-order-item-cake = cake
+station-order-item-pancake = pancake
+
+station-order-description-drinks-restock = The bar wants bottles, cans, and glasses of drinks restocked.
+station-order-item-drink-bottle = drink bottle
+station-order-item-drink-can = drink can
+station-order-item-drink-glass = drink glass
+
+station-order-description-medical-supplies = Medbay needs brute healing packs, ointment, and gauze.
+station-order-item-brutepack = brute healing pack
+station-order-item-ointment = ointment
+station-order-item-gauze = gauze roll
+
+station-order-description-plushie-shipment = The gift shop wants an assorted shipment of plushies.
+station-order-item-plushie-carp = carp plushie
+station-order-item-plushie-lizard = lizard plushie
+station-order-item-plushie-ghost = ghost plushie
+
+station-order-description-full-pantry-restock = A full pantry restock - vegetables, fruit, bread, and meat.
+station-order-item-meat = meat
