@@ -1,5 +1,7 @@
 station-task-console-window-title = Station Orders
 station-task-console-summon-button = Summon
+station-task-console-summon-cost = Cost: { $amount } cr
+station-task-console-summon-cost-cooldown = Cost: { $amount } cr (ready in { $seconds }s)
 station-task-console-recall-button = Recall
 station-task-console-orders-header = Active Orders
 station-task-console-cancel-button = Cancel

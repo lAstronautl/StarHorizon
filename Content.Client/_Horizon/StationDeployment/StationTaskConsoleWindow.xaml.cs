@@ -10,6 +10,7 @@ using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Timing;
 
 namespace Content.Client._Horizon.StationDeployment;
 
@@ -22,7 +23,11 @@ public sealed partial class StationTaskConsoleWindow : FancyWindow
 
     [Dependency] private readonly IEntityManager _entity = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     private readonly SpriteSystem _sprite;
+
+    private int _summonCost;
+    private TimeSpan _nextSummonTime;
 
     public StationTaskConsoleWindow()
     {
@@ -45,6 +50,10 @@ public sealed partial class StationTaskConsoleWindow : FancyWindow
         }));
 
         RecallButton.Disabled = !state.CapsuleDocked;
+
+        _summonCost = state.SummonCost;
+        _nextSummonTime = state.NextSummonTime;
+        UpdateSummonCostLabel();
 
         CategoryLevelsContainer.Children.Clear();
         foreach (var (categoryId, level) in state.Levels.OrderBy(kv => kv.Key.Id))
@@ -83,5 +92,20 @@ public sealed partial class StationTaskConsoleWindow : FancyWindow
             card.OnCancelPressed += () => OnOrderCancelPressed?.Invoke(order.Id);
             OrdersContainer.AddChild(card);
         }
+    }
+
+    protected override void FrameUpdate(FrameEventArgs args)
+    {
+        base.FrameUpdate(args);
+
+        UpdateSummonCostLabel();
+    }
+
+    private void UpdateSummonCostLabel()
+    {
+        var remaining = _nextSummonTime - _timing.CurTime;
+        SummonCostLabel.Text = remaining > TimeSpan.Zero
+            ? Loc.GetString("station-task-console-summon-cost-cooldown", ("amount", _summonCost), ("seconds", (int) Math.Ceiling(remaining.TotalSeconds)))
+            : Loc.GetString("station-task-console-summon-cost", ("amount", _summonCost));
     }
 }

@@ -1,5 +1,7 @@
 station-task-console-window-title = Заказы станции
 station-task-console-summon-button = Призвать
+station-task-console-summon-cost = Стоимость: { $amount } кр.
+station-task-console-summon-cost-cooldown = Стоимость: { $amount } кр. (готово через { $seconds } с)
 station-task-console-recall-button = Отозвать
 station-task-console-orders-header = Активные заказы
 station-task-console-cancel-button = Отменить

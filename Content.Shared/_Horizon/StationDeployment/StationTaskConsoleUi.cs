@@ -26,16 +26,31 @@ public sealed class StationTaskConsoleBuiState : BoundUserInterfaceState
     public readonly bool CapsulePresent;
     public readonly bool CapsuleDocked;
 
+    /// <summary>
+    /// Credits deducted from the station's bank account each time the capsule is summoned.
+    /// </summary>
+    public readonly int SummonCost;
+
+    /// <summary>
+    /// The server time at which the capsule can next be summoned - compare against the client's own
+    /// IGameTiming.CurTime to show a live countdown.
+    /// </summary>
+    public readonly TimeSpan NextSummonTime;
+
     public StationTaskConsoleBuiState(
         List<StationOrderUiEntry> orders,
         Dictionary<ProtoId<TechDisciplinePrototype>, int> levels,
         bool capsulePresent,
-        bool capsuleDocked)
+        bool capsuleDocked,
+        int summonCost,
+        TimeSpan nextSummonTime)
     {
         Orders = orders;
         Levels = levels;
         CapsulePresent = capsulePresent;
         CapsuleDocked = capsuleDocked;
+        SummonCost = summonCost;
+        NextSummonTime = nextSummonTime;
     }
 }
 

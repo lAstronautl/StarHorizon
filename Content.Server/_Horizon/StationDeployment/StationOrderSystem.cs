@@ -405,7 +405,7 @@ public sealed class StationOrderSystem : EntitySystem
         var capsule = FindActiveCapsule(station);
 
         _uiSystem.SetUiState(ent.Owner, StationTaskConsoleUiKey.Key,
-            new StationTaskConsoleBuiState(orders, levels, capsule != null, capsule?.Comp.Docked ?? false));
+            new StationTaskConsoleBuiState(orders, levels, capsule != null, capsule?.Comp.Docked ?? false, ent.Comp.SummonCost, orderDb.NextSummonTime));
     }
 
     private static Dictionary<ProtoId<TechDisciplinePrototype>, int> BuildLevels(StationDevelopmentComponent devel)

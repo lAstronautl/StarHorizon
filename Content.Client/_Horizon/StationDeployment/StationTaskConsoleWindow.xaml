@@ -19,6 +19,7 @@
             </BoxContainer>
             <BoxContainer Orientation="Vertical" VerticalExpand="True" HorizontalAlignment="Right">
                 <Button Name="SummonButton" Text="{Loc 'station-task-console-summon-button'}" MinHeight="40"/>
+                <Label Name="SummonCostLabel" StyleClasses="LabelSubText" HorizontalAlignment="Center"/>
                 <Button Name="RecallButton" Text="{Loc 'station-task-console-recall-button'}" MinHeight="40"/>
             </BoxContainer>
         </BoxContainer>
