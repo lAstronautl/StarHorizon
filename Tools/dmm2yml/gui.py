@@ -97,6 +97,7 @@ class App(ttk.Frame):
 
         self.dmm_path = tk.StringVar()
         self.output_path = tk.StringVar()
+        self.z_choice = tk.StringVar()
         self.filter_text = tk.StringVar()
         self.only_unfilled = tk.BooleanVar(value=False)
         self.status = tk.StringVar(value="индекс прототипов загружается...")
@@ -125,6 +126,9 @@ class App(ttk.Frame):
         ttk.Label(files, text="Карта .dmm").grid(row=0, column=0, sticky="w", padx=(0, 6))
         ttk.Entry(files, textvariable=self.dmm_path).grid(row=0, column=1, sticky="ew")
         ttk.Button(files, text="Обзор...", command=self._pick_dmm).grid(row=0, column=2, padx=(6, 0))
+        ttk.Label(files, text="Уровень (z)").grid(row=0, column=3, sticky="w", padx=(12, 6))
+        self.z_combo = ttk.Combobox(files, textvariable=self.z_choice, width=5, state="readonly")
+        self.z_combo.grid(row=0, column=4)
 
         ttk.Label(files, text="Результат .yml").grid(row=1, column=0, sticky="w", pady=(4, 0), padx=(0, 6))
         ttk.Entry(files, textvariable=self.output_path).grid(row=1, column=1, sticky="ew", pady=(4, 0))
@@ -253,6 +257,21 @@ class App(ttk.Frame):
             if not self.output_path.get():
                 base = os.path.splitext(os.path.basename(path))[0].lower()
                 self.output_path.set(os.path.join(os.path.dirname(path), base + ".yml"))
+            self.dmm_cache = None
+            self.z_choice.set("")
+            self.z_combo["values"] = ()
+            self._probe_z_levels()
+
+    def _probe_z_levels(self) -> None:
+        """SS14 has no stacked floors, so a multi-z .dmm needs one picked by hand
+        before scan/convert can run -- see _ready(). Parsing the whole file is
+        the only way to know how many z-levels it has, so this runs off the UI
+        thread and _finished() fills the dropdown once it is back."""
+
+        def work():
+            return self._parsed_map().z_levels
+
+        self._run_async("z-levels", work)
 
     def _pick_output(self) -> None:
         path = filedialog.asksaveasfilename(
@@ -276,10 +295,11 @@ class App(ttk.Frame):
         if not self._ready():
             return
 
+        z = int(self.z_choice.get())
+
         def work():
             dmm = self._parsed_map()
             mapping_set = mapping_rules.load(self.mapping_dir)
-            z = self.z_level if self.z_level is not None else dmm.z_levels[0]
             self._thread_log(f"{os.path.basename(self.dmm_path.get())}: {dmm.width}x{dmm.height}, z={z}")
             survey = dmm2yml.walk(dmm, mapping_set, self.index, z, None, self.variants)
             return survey
@@ -298,11 +318,11 @@ class App(ttk.Frame):
             for row in self.rows.values()
         }
         output = self.output_path.get()
+        z = int(self.z_choice.get())
 
         def work():
             dmm = self._parsed_map()
             mapping_set = mapping_rules.load(self.mapping_dir)
-            z = self.z_level if self.z_level is not None else dmm.z_levels[0]
 
             problems = dmm2yml.apply_table(table, mapping_set, self.index)
             problems += dmm2yml.collect_problems(
@@ -357,6 +377,18 @@ class App(ttk.Frame):
         self._run_async("selftest", work)
 
     def _finished(self, name: str, payload) -> None:
+        if name == "z-levels":
+            levels = payload
+            self.z_combo["values"] = [str(z) for z in levels]
+            if len(levels) == 1:
+                self.z_choice.set(str(levels[0]))
+            elif self.z_level is not None and self.z_level in levels:
+                self.z_choice.set(str(self.z_level))
+            else:
+                self.z_choice.set("")
+                self.log(f"уровни карты: {levels} -- выберите нужный в списке «Уровень (z)»")
+            return
+
         if name == "индекс":
             self.index = payload
             self.log(
@@ -364,6 +396,11 @@ class App(ttk.Frame):
                 f"{len(payload.tiles)} тайлов, {len(payload.decals)} декалей"
             )
             self._update_status()
+            # --dmm at launch sets the path before this (the very first async job)
+            # finishes, so _run_async's busy guard would have swallowed a probe
+            # fired then. Fire it now instead, once the index job has cleared.
+            if self.dmm_path.get() and not self.z_combo["values"]:
+                self._probe_z_levels()
             return
 
         if name == "scan":
@@ -423,6 +460,16 @@ class App(ttk.Frame):
             return False
         if not self.dmm_path.get() or not os.path.exists(self.dmm_path.get()):
             messagebox.showwarning("Нет карты", "Выберите файл .dmm")
+            return False
+        if not self.z_combo["values"]:
+            messagebox.showinfo("Ещё не готово", "Идёт разбор уровней карты, подождите секунду.")
+            return False
+        if not self.z_choice.get():
+            messagebox.showwarning(
+                "Выберите уровень",
+                "У карты несколько уровней (z), а в SS14 нет многоэтажных зданий -- "
+                "каждый уровень становится отдельной картой. Выберите один в списке «Уровень (z)».",
+            )
             return False
         return True
 
@@ -702,6 +749,7 @@ def main(argv: list[str] | None = None) -> int:
     app = App(root, args.mapping_dir, args.prototypes, args.z, args.variants)
     if args.dmm:
         app.dmm_path.set(args.dmm)
+        app._probe_z_levels()
     root.mainloop()
     return 0
 

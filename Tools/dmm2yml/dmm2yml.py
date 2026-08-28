@@ -422,11 +422,24 @@ def command_catalog(args) -> int:
 def command_scan(args) -> int:
     dmm = dmmparser.parse(args.dmm)
     mapping_set, index = load_context(args)
-    z_level = args.z if args.z is not None else dmm.z_levels[0]
 
-    survey = walk(dmm, mapping_set, index, z_level, None, args.variants)
+    if args.all_z:
+        survey = Survey()
+        for z_level in dmm.z_levels:
+            survey.merge(walk(dmm, mapping_set, index, z_level, None, args.variants, map_label=f"z{z_level}"))
+        scanned = f"z-levels {dmm.z_levels} (all of them)"
+    else:
+        z_level = args.z if args.z is not None else dmm.z_levels[0]
+        survey = walk(dmm, mapping_set, index, z_level, None, args.variants)
+        scanned = f"z-levels {dmm.z_levels} (scanning z={z_level})"
+        if len(dmm.z_levels) > 1 and args.z is None:
+            print(
+                f"note: this map has {len(dmm.z_levels)} z-levels ({dmm.z_levels}); only z={z_level} was "
+                f"scanned. Pass --z N for a specific level or --all-z to pool every level into one table.",
+                file=sys.stderr,
+            )
 
-    print(f"{args.dmm}: {dmm.width}x{dmm.height}, z-levels {dmm.z_levels} (scanning z={z_level})")
+    print(f"{args.dmm}: {dmm.width}x{dmm.height}, {scanned}")
     print(f"  resolved   {survey.resolved_count} atoms")
     print(f"  skipped    {survey.skipped_count} atoms (ignore rules)")
     print(f"  unresolved {sum(r.count for r in survey.unresolved.values())} atoms "
@@ -490,40 +503,67 @@ def describe_map(builder: ss14map.MapBuilder, log=print) -> None:
     report_disconnected(builder, log)
 
 
+def per_z_output_path(output: str, z_level: int) -> str:
+    """map.yml, z 2 -> map.z2.yml -- SS14 has no stacked floors, so --all-z writes one file per level."""
+    stem, ext = os.path.splitext(output)
+    return f"{stem}.z{z_level}{ext or '.yml'}"
+
+
+def _report_refusal(lines: list[str]) -> None:
+    print(f"Refusing to convert: {len(lines)} path(s) still need a decision.\n", file=sys.stderr)
+    for line in lines[:20]:
+        print(f"  {line}", file=sys.stderr)
+    if len(lines) > 20:
+        print(f"  ... and {len(lines) - 20} more", file=sys.stderr)
+    print(
+        f"\nRun 'scan' to regenerate the table, fill in ss14_id for every row "
+        f"(or '{mapping_rules.SKIP}' to drop it), then convert again.",
+        file=sys.stderr,
+    )
+
+
 def command_convert(args) -> int:
     dmm = dmmparser.parse(args.dmm)
     mapping_set, index = load_context(args)
-    z_level = args.z if args.z is not None else dmm.z_levels[0]
+
+    if not args.all_z and args.z is None and len(dmm.z_levels) > 1:
+        print(
+            f"{args.dmm} has {len(dmm.z_levels)} z-levels ({dmm.z_levels}), and SS14 has no stacked floors -- "
+            f"each one needs to become its own map. Pick one with --z N, or convert all of them at once "
+            f"with --all-z (writes one file per level, named from -o).",
+            file=sys.stderr,
+        )
+        return 1
+
+    z_levels = list(dmm.z_levels) if args.all_z else [args.z if args.z is not None else dmm.z_levels[0]]
 
     problems: list[tuple[str, str]] = []
     if args.table:
         problems = apply_table(read_table(args.table), mapping_set, index)
 
-    problems += collect_problems(walk(dmm, mapping_set, index, z_level, None, args.variants))
+    survey = Survey()
+    for z_level in z_levels:
+        label = f"z{z_level}" if args.all_z else ""
+        survey.merge(walk(dmm, mapping_set, index, z_level, None, args.variants, map_label=label))
+    problems += collect_problems(survey)
     lines = format_problems(problems)
 
     if lines:
-        print(f"Refusing to convert: {len(lines)} path(s) still need a decision.\n", file=sys.stderr)
-        for line in lines[:20]:
-            print(f"  {line}", file=sys.stderr)
-        if len(lines) > 20:
-            print(f"  ... and {len(lines) - 20} more", file=sys.stderr)
-        print(
-            f"\nRun 'scan' to regenerate the table, fill in ss14_id for every row "
-            f"(or '{mapping_rules.SKIP}' to drop it), then convert again.",
-            file=sys.stderr,
-        )
+        _report_refusal(lines)
         return 1
 
-    builder = build_map(dmm, mapping_set, index, z_level, args.variants, args.mapping_dir, args.engine_version)
-    with open(args.output, "w", encoding="utf-8", newline="\n") as handle:
-        handle.write(builder.render())
+    exit_code = 0
+    for z_level in z_levels:
+        output = per_z_output_path(args.output, z_level) if args.all_z else args.output
+        builder = build_map(dmm, mapping_set, index, z_level, args.variants, args.mapping_dir, args.engine_version)
+        with open(output, "w", encoding="utf-8", newline="\n") as handle:
+            handle.write(builder.render())
 
-    print(f"wrote {args.output}")
-    describe_map(builder)
-    if not args.no_verify:
-        return verify(builder)
-    return 0
+        print(f"wrote {output}" + (f" (z={z_level})" if args.all_z else ""))
+        describe_map(builder)
+        if not args.no_verify:
+            exit_code = verify(builder) or exit_code
+    return exit_code
 
 
 def report_disconnected(builder: ss14map.MapBuilder, log=print) -> None:
@@ -722,6 +762,10 @@ def main(argv: list[str] | None = None) -> int:
         sub.add_argument("--mapping-dir", default=DEFAULT_MAPPING_DIR, help="directory holding the mapping files")
         sub.add_argument("--prototypes", default=DEFAULT_PROTOTYPES, help="Resources/Prototypes to validate against")
         sub.add_argument("--z", type=int, default=None, help="z-level to convert (default: the first one)")
+        sub.add_argument(
+            "--all-z", action="store_true",
+            help="every z-level, not just one -- SS14 has no stacked floors, so each becomes its own map/file",
+        )
         sub.add_argument("--variants", choices=("deterministic", "zero"), default="deterministic",
                          help="tile variant picking (default: deterministic)")
 
