@@ -53,3 +53,8 @@
 - /obj/structure/marker_beacon
 - /obj/item/pai_card
 - /obj/item/newspaper
+
+# Away-mission arrival markers, not physical objects: invisible mapping-logic
+# effects that place an arriving mob/player, the same category as /area above.
+# SS14 has no away-mission system to place one for.
+- /obj/effect/landmark/awaystart

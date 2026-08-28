@@ -57,6 +57,11 @@
 # ---- natural ----
 /turf/open/floor/grass: FloorGrass
 /turf/open/floor/fake_snow: FloorSnow
+# The base asteroid floor -- basalt above is a colder-biome recolour of the
+# same turf and stays a separate, more specific rule. /airless is the same
+# tile with no atmosphere (code/game/turfs/open/asteroid.dm: only var changes,
+# baseturfs points right back at itself), so it's covered by inheritance.
+/turf/open/misc/asteroid: FloorAsteroidSand
 /turf/open/misc/asteroid/basalt: FloorBasalt
 
 # ---- walls: a tile plus a wall entity on top ----
@@ -74,4 +79,10 @@
   entity: WallRiveted
 /turf/closed/mineral/volcanic:
   tile: FloorBasalt
+  entity: WallRock
+# The bare, ore-less rock wall -- code/game/turfs/closed/minerals.dm sets its
+# own baseturfs to /turf/open/misc/asteroid/airless, i.e. this is exactly what
+# is left once it's mined out.
+/turf/closed/mineral:
+  tile: FloorAsteroidSand
   entity: WallRock

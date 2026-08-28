@@ -12,11 +12,13 @@
 # SS13 hides the orientation of some objects in the path instead of in a dir
 # var, and it means two different things there:
 #   'wall: north'  the object is mounted on the wall to its north, so in SS14 it
-#                  faces south, away from it. Use this for anything stuck to a
-#                  wall or sitting on a tile edge -- lights, alarms, cameras,
-#                  APCs, directional windows.
+#                  faces south, away from it. Use this for a device standing on
+#                  the floor next to a wall -- lights, alarms, cameras, APCs.
 #   'dir: 1'       the object simply faces north. Use this for free-standing
-#                  things like stools. Values are BYOND's: 1 N, 2 S, 4 E, 8 W.
+#                  things like stools, and for directional windows/windoors --
+#                  those are the border piece their dir names, not a device
+#                  next to a wall (see the comment above the window rules).
+#                  Values are BYOND's: 1 N, 2 S, 4 E, 8 W.
 # Getting these two mixed up rotates everything by 180 degrees.
 #
 # This file covers the paths a /tg/ station leans on most. Everything else is
@@ -413,3 +415,136 @@
 /obj/effect/spawner/random/trash/soap: RandomSoap
 /obj/effect/spawner/random/vending/colavend: RandomVendingDrinks
 /obj/effect/spawner/random/vending/snackvend: RandomVendingSnacks
+
+# ---- research/mining outpost tail (closing gaps found converting research.dmm) ----
+
+# Ammo/weapons: SS14 does not split real-world calibres the way tgstation
+# does, only broad categories (pistol/magnum/rifle/...). .45 lands on
+# CartridgeMagnum -- WeaponPistolN1984's own description calls .45 "chambered
+# ... the lord's caliber", i.e. SS14's own name for that calibre. wt550 is a
+# literal, unambiguous name match (WeaponSubMachineGunWt550); c9mm/c46x30mm
+# have no closer analogue than the base pistol round.
+/obj/item/ammo_casing/c45: CartridgeMagnum
+/obj/item/ammo_casing/c9mm: CartridgePistol
+/obj/item/ammo_casing/c46x30mm: CartridgePistol
+/obj/item/ammo_box/magazine/m45: MagazineMagnum
+/obj/item/ammo_box/magazine/wt550m9: MagazinePistolSubMachineGunTopMounted
+/obj/item/gun/ballistic/automatic/pistol/m1911: WeaponPistolN1984
+/obj/item/gun/ballistic/automatic/wt550: WeaponSubMachineGunWt550
+/obj/item/grenade/c4: C4
+
+# /obj/effect/decal/cleanable/* are objects in SS13, not turf decals, and this
+# fork has no floor-decal equivalent -- but it does have the same thing as a
+# structure (Entities/Effects/puddle.yml), so these fall through to the
+# entity table rather than the decal one (see MappingSet.resolve).
+/obj/effect/decal/cleanable/blood: PuddleBlood
+/obj/effect/decal/cleanable/blood/drip: PuddleBloodSmall
+
+/obj/item/shard: ShardGlass
+/obj/item/stack/rods: PartRodMetal
+/obj/item/stack/sheet/iron: SheetSteel
+/obj/item/stack/sheet/plasteel: SheetPlasteel
+/obj/item/stack/sheet/mineral/bananium: MaterialBananium
+/obj/item/disk/data: ResearchDisk
+/obj/item/reagent_containers/blood/random: Bloodpack
+/obj/item/book/manual/wiki/security_space_law: BookSpaceLaw
+/obj/item/circular_saw: Saw
+/obj/item/scalpel: Scalpel
+/obj/item/bikehorn: BikeHorn
+/obj/item/storage/dice: DiceBag
+/obj/item/storage/medkit/brute: MedkitBrute
+/obj/item/storage/medkit/toxin: MedkitToxin
+/obj/item/storage/toolbox/syndicate: ToolboxSyndicate
+/obj/item/storage/box/donkpockets: FoodBoxDonkpocket
+/obj/item/storage/fancy/donut_box: FoodBoxDonut
+/obj/item/storage/fancy/cigarettes/dromedaryco: CigPackRed # exact brand match ("DromedaryCo packet")
+/obj/item/paper_bin: PaperBin
+/obj/item/circuitboard/machine/smes: SMESMachineCircuitboard
+/obj/item/melee/baton/telescopic: TelescopicShield
+/obj/item/clothing/head/helmet: ClothingHeadHelmetBasic
+/obj/item/clothing/head/helmet/alt: ClothingHeadHelmetBasic
+/obj/item/clothing/head/helmet/toggleable/riot: ClothingHeadHelmetRiot
+/obj/item/clothing/suit/armor/riot: ClothingOuterArmorRiot
+/obj/item/clothing/suit/armor/bulletproof: ClothingOuterArmorBulletproof
+/obj/item/clothing/suit/armor/vest: ClothingOuterVest
+/obj/item/clothing/gloves/color/yellow: ClothingHandsGlovesColorYellow
+/obj/item/bedsheet: BedsheetWhite
+/obj/item/bedsheet/blue: BedsheetBlue
+/obj/item/bedsheet/clown: BedsheetClown
+/obj/item/bedsheet/green: BedsheetGreen
+/obj/item/bedsheet/purple: BedsheetPurple
+/obj/item/bedsheet/rainbow: BedsheetRainbow
+
+/obj/structure/closet: ClosetMaintenance # bare closet, no theme or access level
+/obj/structure/closet/crate: CrateGenericSteel
+/obj/structure/closet/crate/freezer: CrateFreezer
+/obj/structure/closet/crate/preopen: CrateGenericSteel # loses only the starts-open state
+/obj/structure/closet/crate/bin: CrateTrashCart
+/obj/structure/closet/secure_closet/security: LockerSecurity
+/obj/structure/closet/secure_closet/engineering_personal: LockerEngineer
+/obj/structure/closet/secure_closet/personal/cabinet: LockerSteel # generic secure closet, no personal-effects theme in this fork
+/obj/structure/closet/wardrobe/green: WardrobeGreen
+/obj/structure/closet/wardrobe/grey: WardrobeGrey
+/obj/structure/closet/wardrobe/mixed: WardrobeMixed
+/obj/structure/barricade/security: Barricade # loses the security theme, keeps the improvised-barrier concept
+/obj/structure/frame/machine: MachineFrame
+/obj/structure/plaque/static_plaque/golden: SignPlaque # loses the gold colour, no such variant here
+/obj/structure/tank_dispenser: VendingMachineTankDispenserEVA # bare dispenser stocks both O2 and plasma tanks, same as EVA
+/obj/structure/reagent_dispensers/fueltank: WeldingFuelTank
+/obj/structure/sink/directional/north: {entity: Sink, wall: north, onWall: true}
+/obj/structure/sink/directional/south: {entity: Sink, wall: south, onWall: true}
+/obj/structure/sink/directional/east: {entity: Sink, wall: east, onWall: true}
+/obj/structure/sink/directional/west: {entity: Sink, wall: west, onWall: true}
+
+/obj/machinery/cryo_cell: CryoPod
+/obj/machinery/gateway/away: Gateway
+/obj/machinery/power/port_gen/pacman: PortableGeneratorPacman
+/obj/machinery/vending/cola: VendingMachineCola
+/obj/machinery/vending/security: VendingMachineSec
+/obj/machinery/vending/snack: VendingMachineSnack
+# The four tgstation shuttle-engine part roles (heater/burst/left/right) all
+# collapse onto the one SS14 shuttle engine part -- it has no equivalent
+# per-role split.
+/obj/machinery/power/shuttle_engine/heater: Thruster
+/obj/machinery/power/shuttle_engine/propulsion/burst: Thruster
+/obj/machinery/power/shuttle_engine/propulsion/left: Thruster
+/obj/machinery/power/shuttle_engine/propulsion/right: Thruster
+
+/obj/structure/sign/directions/engineering: SignDirectionalEng
+/obj/structure/sign/directions/evac: SignDirectionalEvac
+/obj/structure/sign/directions/medical: SignDirectionalMed
+/obj/structure/sign/directions/science: SignDirectionalSci
+/obj/structure/sign/directions/security: SignDirectionalSec
+/obj/structure/sign/departments/medbay: SignMedical
+/obj/structure/sign/departments/science: SignScience
+/obj/structure/sign/warning/vacuum/directional/north: {entity: SignSpace, wall: north, onWall: true}
+/obj/structure/sign/warning/vacuum/directional/south: {entity: SignSpace, wall: south, onWall: true}
+/obj/structure/sign/warning/vacuum/directional/east: {entity: SignSpace, wall: east, onWall: true}
+/obj/structure/sign/warning/vacuum/directional/west: {entity: SignSpace, wall: west, onWall: true}
+/obj/structure/sign/warning/pods/directional/north: {entity: SignEscapePods, wall: north, onWall: true}
+/obj/structure/sign/warning/pods/directional/south: {entity: SignEscapePods, wall: south, onWall: true}
+/obj/structure/sign/warning/pods/directional/east: {entity: SignEscapePods, wall: east, onWall: true}
+/obj/structure/sign/warning/pods/directional/west: {entity: SignEscapePods, wall: west, onWall: true}
+/obj/structure/sign/warning/no_smoking/circle/directional/north: {entity: SignSmoking, wall: north, onWall: true}
+/obj/structure/sign/warning/no_smoking/circle/directional/south: {entity: SignSmoking, wall: south, onWall: true}
+/obj/structure/sign/warning/no_smoking/circle/directional/east: {entity: SignSmoking, wall: east, onWall: true}
+/obj/structure/sign/warning/no_smoking/circle/directional/west: {entity: SignSmoking, wall: west, onWall: true}
+
+# Away-mission combat mobs. /trooper/syndicate matches the existing hostile
+# Syndicate faction NPC (NpcFactionMember: Syndicate) regardless of loadout
+# subtype (ranged/melee/smg are all the same actor, different gear).
+# /trooper/nanotrasen is NOT mapped: it needs a friendly-to-crew,
+# hostile-to-Syndicate NPC, and MobSyndicateFootsoldier is the opposite --
+# using it would invert who the mob attacks, not just reskin it.
+/mob/living/basic/trooper/syndicate: MobSyndicateFootsoldier
+/mob/living/carbon/human/species/monkey: MobMonkey
+/mob/living/carbon/human: MobHuman
+/obj/effect/mob_spawn/corpse/human/doctor: MobRandomMedicCorpse
+/obj/effect/mob_spawn/corpse/human/engineer: MobRandomEngineerCorpse
+/obj/effect/mob_spawn/corpse/human/geneticist: MobRandomScienceCorpse # outfit's own icon_state is "corpsescientist" -- Science, not Medical
+# Syndicate/Nanotrasen soldier corpses: no faction-specific corpse exists,
+# and a dead body's faction no longer matters the way a live mob's does, so
+# the armed-personnel corpse is a fair stand-in for both (loses which side
+# they were on, not who they'd fight).
+/obj/effect/mob_spawn/corpse/human/syndicatesoldier: MobRandomSecurityCorpse
+/obj/effect/mob_spawn/corpse/human/nanotrasensoldier: MobRandomSecurityCorpse
