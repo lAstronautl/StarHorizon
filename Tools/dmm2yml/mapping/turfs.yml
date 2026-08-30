@@ -45,6 +45,21 @@
 /turf/open/floor/glass/reinforced: FloorRGlass
 /turf/open/floor/eighties: FloorEighties
 
+# ---- misc named floors ----
+/turf/open/floor/plastic: FloorPlastic
+/turf/open/floor/mineral/silver: FloorSilver
+# rockvault.png is icon_state "rockvault" on both sides: tgstation's own
+# /turf/open/floor/vault ("strange floor") and the indestructible-mechanic
+# /turf/open/indestructible/vault use the exact same icon_state.
+/turf/open/floor/vault: FloorRockVault
+/turf/open/indestructible/vault: FloorRockVault
+# Ratvar/clockwork tiles: filled and flat are exact icon_state matches
+# (clockwork_floor_filled.png, reebe.png) -- the bare, unsuffixed bronze
+# floor (icon_state "clockwork_floor", no "_filled") has no equivalent tile
+# in this fork and is left unresolved rather than reusing the filled one.
+/turf/open/floor/bronze/filled: FloorBrassFilled
+/turf/open/floor/bronze/flat: FloorBrassReebe
+
 # ---- circuitry ----
 /turf/open/floor/circuit: FloorBlueCircuit
 /turf/open/floor/circuit/green: FloorGreenCircuit
@@ -65,6 +80,21 @@
 # baseturfs points right back at itself), so it's covered by inheritance.
 /turf/open/misc/asteroid: FloorAsteroidSand
 /turf/open/misc/asteroid/basalt: FloorBasalt
+# /misc/grass itself has no icon_state of its own in tgstation -- every real
+# instance is the /jungle subtype (icon_state "junglegrass", also covering
+# /jungle/lavaland and /jungle/station, which only change baseturfs/atmos, not
+# the sprite) -- FloorGrassJungle's own sprite file is literally grassjungle.png.
+# Unlike the procedural genturf/icemoon biome turfs below, this one has an
+# exact, confirmed sprite match, so it stays mapped rather than excluded.
+/turf/open/misc/grass: FloorGrassJungle
+# Same "use THIS for station maps" split as grass above (planet.dm's own
+# comment on dirt/station literally says so): bare /misc/dirt and /dirt/jungle
+# keep their planetary baseturf and are left with the excluded procedural
+# terrain below, but /dirt/station (icon_state "dirt", unchanged) and
+# /dirt/dark/station ("greenerdirt", losing only the green tint -- this fork
+# has one dirt tile) are real station floor dressing.
+/turf/open/misc/dirt/station: FloorDirt
+/turf/open/misc/dirt/dark/station: FloorDirt
 
 # ---- walls: a tile plus a wall entity on top ----
 /turf/closed/wall:
