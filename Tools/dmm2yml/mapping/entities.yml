@@ -815,3 +815,17 @@
 /obj/item/soap/nanotrasen: SoapNT # description matches word for word ("Nanotrasen brand bar of soap")
 /obj/item/gps: HandheldGPSBasic # bare form; description matches tgstation's word for word
 /obj/structure/sign/warning/vacuum: SignSpace # bare (non-directional) variant, same id as the directional ones above
+
+# ---- seventh catalog-wide pass ----
+/obj/item/soap: Soap # bare, unbranded -- /soap/nanotrasen above is the branded one
+/obj/item/kitchen/fork: Fork # the metal fork; ForkPlastic above is the separate disposable one
+/obj/item/chair: Chair # the item form (icon_state "chair_toppled") of the same furniture piece
+/obj/item/flashlight/flare: Flare # the bare emergency flare; /flare/candle is the separate candle subtype
+/obj/item/toy/basketball: Basketball
+/obj/item/stack/ore/silver: SilverOre
+/obj/item/storage/backpack: ClothingBackpack
+/obj/item/hand_tele: HandTeleporter # description matches tgstation's almost word for word
+/obj/item/tape: CassetteTape # a blank/recorded cassette, not the recorder device (TapeRecorder is a different item)
+/obj/item/defibrillator/loaded: Defibrillator # loses the pre-charged battery state, keeps the tool
+/obj/item/melee/baton/security/loaded: Stunbaton
+/obj/item/clothing/shoes/jackboots: ClothingShoesBootsJack
