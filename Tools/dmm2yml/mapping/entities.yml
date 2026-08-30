@@ -850,3 +850,18 @@
 # device; this is what you'd insert into an empty frame during construction,
 # same distinction as the earlier APC electronics/APC device split.
 /obj/item/electronics/firealarm: FireAlarmElectronics
+
+# ---- ninth catalog-wide pass ----
+/obj/structure/table_frame: TableFrame
+/obj/item/instrument/harmonica: HarmonicaInstrument
+/obj/structure/musician/piano: PianoInstrument
+/obj/item/bodybag: BodyBag
+/obj/item/cigarette: Cigarette # bare; /cigarette/cigar above is the separate cigar subtype
+/obj/effect/spawner/random/entertainment/cigarette: Cigarette
+/obj/effect/spawner/random/entertainment/cigar: Cigar
+/obj/machinery/computer/robotics: ComputerRoboticsControl # description matches tgstation's almost word for word
+# The ridden vehicle and its folded, carryable item form -- this fork's
+# wheelchair (_Goobstation) has the same split (VehicleWheelchairFolded's
+# own Foldable component is the item state of VehicleWheelchair).
+/obj/vehicle/ridden/wheelchair: VehicleWheelchair
+/obj/item/wheelchair: VehicleWheelchairFolded
