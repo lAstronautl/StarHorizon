@@ -776,3 +776,27 @@
 # fork has (AI/Security/Command) to tgstation's generic "controls a room's
 # automated defenses" panel -- none is a perfect department-neutral match.
 /obj/machinery/turretid: WeaponEnergyTurretSecurityControlPanel
+
+# ---- fifth catalog-wide pass ----
+/obj/item/reagent_containers/cup/glass/bottle/beer: DrinkBottleBeer
+/obj/item/t_scanner: trayScanner
+/obj/machinery/power/solar_control: ComputerSolarControl
+/obj/item/clothing/under/color/red: ClothingUniformJumpsuitColorRed
+/obj/structure/sign/directions/supply: SignDirectionalSupply
+/obj/machinery/chem_dispenser: ChemDispenser
+/obj/machinery/computer/communications: ComputerComms
+# Bare /smartfridge covers every themed subtype below it that has no rule of
+# its own (organ, chemistry, food, extract, drinks, drying, petri, virology)
+# -- this fork's SmartFridge structure has no per-theme variants, so all of
+# them collapse onto the one generic id, losing only the label/artwork theme.
+/obj/machinery/smartfridge: SmartFridge
+/obj/item/kitchen/spoon/plastic: SpoonPlastic
+/obj/item/clothing/glasses/blindfold: ClothingEyesBlindfold
+/obj/item/target: TargetHuman # the bare, unthemed target -- /clown and /syndicate are already mapped as their own subtypes
+/obj/item/reagent_containers/cup/glass/mug: DrinkMug
+/obj/item/reagent_containers/cup/glass/shaker: DrinkShaker
+/obj/item/mining_scanner: MineralScanner
+# Autodrobe is tgstation's THEATER COSTUME vendor specifically; this fork's
+# only clothing vending machine (ClothesMate) stocks everyday work clothes,
+# not costumes -- same tier of theme loss as other vending-machine reuses.
+/obj/machinery/vending/autodrobe: VendingMachineClothing
