@@ -89,3 +89,19 @@
 - /turf/template_noop
 - /turf/cordon
 - /turf/open/ai_visible
+
+# Same "invisible map-logic marker, self-deletes, nothing to convert" pattern
+# as /obj/effect/mapping_helpers above, confirmed by source on each:
+#   /obj/modular_map_connector and /obj/modular_map_root -- both
+#     invisibility = INVISIBILITY_ABSTRACT (modular_map_loader.dm); root loads
+#     a random sub-map from a .toml config at Initialize() and never renders.
+#   /obj/docking_port (and every subtype, incl. /stationary) --
+#     invisibility = INVISIBILITY_ABSTRACT (shuttle.dm) -- a coordinate marker
+#     for tgstation's shuttle subsystem, which SS14 does not share the data
+#     model of, the same reasoning as the pipe/cable networks above.
+#   /obj/structure/fans/tiny/invisible -- invisibility = INVISIBILITY_ABSTRACT
+#     (fans.dm), an airflow-blocker logic marker, not a real fan.
+- /obj/modular_map_connector
+- /obj/modular_map_root
+- /obj/docking_port
+- /obj/structure/fans/tiny/invisible

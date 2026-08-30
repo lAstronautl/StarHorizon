@@ -698,3 +698,30 @@
 /obj/item/shovel/spade: Shovel
 /obj/item/stamp/granted: RubberStampApproved
 /obj/item/stamp/denied: RubberStampDenied
+
+# ---- second catalog-wide pass ----
+/obj/item/clipboard: BoxFolderClipboardEmpty
+/obj/item/flashlight/lamp: Lamp # /lamp/green (a colour variant) inherits this
+/obj/item/tank/internals/emergency_oxygen: EmergencyOxygenTank
+/obj/effect/spawner/random/structure/closet_maintenance: ClosetMaintenance
+/obj/structure/plasticflaps: PlasticFlapsClear # bare/see-through variant
+/obj/structure/plasticflaps/opaque: PlasticFlapsOpaque
+/obj/machinery/recharge_station: BorgCharger
+/obj/machinery/portable_atmospherics/scrubber: PortableScrubber
+/obj/machinery/portable_atmospherics/pump: PortablePump
+# tgstation's /plumbed is explicitly the stationary, anchored version of the
+# same water tank (name = "stationary water tank") -- WaterTank is the mobile,
+# wheeled one, so this keeps the tank itself but loses the anchored/plumbed
+# distinction, the same tier of loss as the shuttle-engine roles above.
+/obj/structure/reagent_dispensers/plumbed: WaterTank
+# FloorDrain ("drain... useful for dumping mop buckets") matches the shower
+# drain fixture itself, not the unrelated /obj/machinery/light/floor (a
+# walk-on lightbulb -- no SS14 equivalent, left unmapped).
+/obj/structure/fluff/shower_drain: FloorDrain
+/obj/structure/sign/warning/secure_area: SignSecureMed # bare (non-directional) variant
+/obj/structure/sign/warning/electric_shock: SignShock
+/obj/structure/sign/warning/electric_shock/directional/north: {entity: SignShock, wall: north, onWall: true}
+/obj/structure/sign/warning/electric_shock/directional/south: {entity: SignShock, wall: south, onWall: true}
+/obj/structure/sign/warning/electric_shock/directional/east: {entity: SignShock, wall: east, onWall: true}
+/obj/structure/sign/warning/electric_shock/directional/west: {entity: SignShock, wall: west, onWall: true}
+/obj/structure/desk_bell: DeskBell

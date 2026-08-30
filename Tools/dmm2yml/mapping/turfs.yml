@@ -41,7 +41,9 @@
 
 # ---- engineering ----
 /turf/open/floor/engine: FloorReinforced        # also covers /air, /o2, /n2, /vacuum, ...
+/turf/open/floor/glass: FloorGlass
 /turf/open/floor/glass/reinforced: FloorRGlass
+/turf/open/floor/eighties: FloorEighties
 
 # ---- circuitry ----
 /turf/open/floor/circuit: FloorBlueCircuit

@@ -702,6 +702,52 @@
   id: FullTileOverlayGreyscale
   color: '#444646FF'
 
+# dark_green was missing from the tile/<colour> family the same way it was
+# missing from trimline/ -- same source hex (tilecoloring.dm), same 96 alpha.
+/obj/effect/turf_decal/tile/dark_green:
+  dirs:
+    1: QuarterTileOverlayGreyscale
+    2: QuarterTileOverlayGreyscale180
+    4: QuarterTileOverlayGreyscale90
+    8: QuarterTileOverlayGreyscale270
+  color: '#439C1E96'
+/obj/effect/turf_decal/tile/dark_green/half:
+  dirs:
+    1: HalfTileOverlayGreyscale
+    2: HalfTileOverlayGreyscale180
+    4: HalfTileOverlayGreyscale90
+    8: HalfTileOverlayGreyscale270
+  color: '#439C1E96'
+/obj/effect/turf_decal/tile/dark_green/half/contrasted:
+  dirs:
+    1: HalfTileOverlayGreyscale
+    2: HalfTileOverlayGreyscale180
+    4: HalfTileOverlayGreyscale90
+    8: HalfTileOverlayGreyscale270
+  color: '#439C1E96'
+/obj/effect/turf_decal/tile/dark_green/anticorner/contrasted:
+  dirs:
+    1: ThreeQuarterTileOverlayGreyscale
+    2: ThreeQuarterTileOverlayGreyscale180
+    4: ThreeQuarterTileOverlayGreyscale90
+    8: ThreeQuarterTileOverlayGreyscale270
+  color: '#439C1E96'
+/obj/effect/turf_decal/tile/dark_green/fourcorners:
+  decals:
+  - QuarterTileOverlayGreyscale
+  - QuarterTileOverlayGreyscale90
+  - QuarterTileOverlayGreyscale180
+  - QuarterTileOverlayGreyscale270
+  color: '#439C1E96'
+/obj/effect/turf_decal/tile/dark_green/opposingcorners:
+  decals:
+  - QuarterTileOverlayGreyscale
+  - QuarterTileOverlayGreyscale180
+  color: '#439C1E96'
+/obj/effect/turf_decal/tile/dark_green/full:
+  id: FullTileOverlayGreyscale
+  color: '#439C1E96'
+
 # ---- siding (thin edging) ----
 /obj/effect/turf_decal/siding:
   dirs:
