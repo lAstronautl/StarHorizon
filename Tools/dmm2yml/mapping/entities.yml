@@ -487,7 +487,7 @@
 /obj/effect/landmark/start/chief_engineer: SpawnPointChiefEngineer
 # Not mapped after checking -- no equivalent SS14 job/spawn point exists for
 # these, so left for a human to decide rather than reassigned to the nearest
-# job (that would misassign, not just reskin): prisoner, roboticist, coroner,
+# job (that would misassign, not just reskin): roboticist, coroner,
 # bitrunner, ai/ai/secondary (the AI is not spawned via a SpawnPoint marker
 # in this fork), new_player, and the bare /landmark/start (not job-specific).
 
@@ -725,3 +725,28 @@
 /obj/structure/sign/warning/electric_shock/directional/east: {entity: SignShock, wall: east, onWall: true}
 /obj/structure/sign/warning/electric_shock/directional/west: {entity: SignShock, wall: west, onWall: true}
 /obj/structure/desk_bell: DeskBell
+
+# ---- third catalog-wide pass ----
+# Correction: SpawnPointPrisoner does exist (parent SpawnPointJobBase, name
+# "prisoner") -- the earlier "prisoner has no SS14 spawn point" note in the
+# job-spawn-points block above was wrong, checked again here.
+/obj/effect/landmark/start/prisoner: SpawnPointPrisoner
+/obj/item/assembly/prox_sensor: ProximitySensor
+/obj/structure/reagent_dispensers/water_cooler: WaterCooler
+/obj/item/shovel: Shovel # bare form of the already-mapped /shovel/spade -- identical description in tgstation source
+/obj/item/stack/sheet/glass: SheetGlass # bare form of the already-mapped /glass/fifty
+/obj/machinery/computer/crew: ComputerCrewMonitoring
+/obj/item/phone: PhoneInstrument # name/description match tgstation's word for word
+/obj/item/reagent_containers/cup/bucket: Bucket
+/obj/item/clothing/head/utility/welding: ClothingHeadHatWelding
+/obj/item/grenade/chem_grenade/smart_metal_foam: MetalFoamGrenade
+/obj/structure/sign/painting/library: PaintingEmpty # "waiting to be filled with art" matches the public exhibit mounting
+# door_buttons/access_button is an embedded-controller device this fork has no
+# equivalent for; SignalButtonDirectional (already used for the plain door
+# button) is the closest wall-mounted button shape, losing only the
+# access-control-specific behaviour.
+/obj/machinery/door_buttons/access_button: SignalButtonDirectional
+# Loses the "electrified" hazard, keeps the physical grille in place -- the
+# cable half of the spawn is dropped for the same reason cables are ignored
+# everywhere else.
+/obj/effect/spawner/structure/electrified_grille: Grille
