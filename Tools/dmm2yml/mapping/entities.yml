@@ -440,6 +440,75 @@
 /obj/effect/decal/cleanable/blood: PuddleBlood
 /obj/effect/decal/cleanable/blood/drip: PuddleBloodSmall
 
+# ---- job spawn points ----
+# /obj/effect/landmark itself is invisible (invisibility = INVISIBILITY_ABSTRACT
+# on the base class, code/game/objects/effects/landmarks.dm) in tgstation too,
+# so there is nothing to preserve visually here -- the value is the spawn
+# location itself, which SS14's SpawnPoint markers carry the same way.
+# depsec/* (department-liaison security officers) have no distinct SS14 job or
+# spawn point, so all four collapse onto the plain security officer spawn.
+# "hangover" is the drunk-on-roundstart trait's own spawn tag, but it still
+# spawns you as an ordinary civilian crew member, same as assistant.
+/obj/effect/landmark/start/assistant: SpawnPointPassenger
+/obj/effect/landmark/start/hangover: SpawnPointPassenger
+/obj/effect/landmark/start/security_officer: SpawnPointSecurityOfficer
+/obj/effect/landmark/start/depsec/science: SpawnPointSecurityOfficer
+/obj/effect/landmark/start/depsec/engineering: SpawnPointSecurityOfficer
+/obj/effect/landmark/start/depsec/medical: SpawnPointSecurityOfficer
+/obj/effect/landmark/start/depsec/supply: SpawnPointSecurityOfficer
+/obj/effect/landmark/start/medical_doctor: SpawnPointMedicalDoctor
+/obj/effect/landmark/start/scientist: SpawnPointScientist
+/obj/effect/landmark/start/geneticist: SpawnPointScientist # no distinct SS14 job; same department cross-check as the geneticist corpse above
+/obj/effect/landmark/start/station_engineer: SpawnPointStationEngineer
+/obj/effect/landmark/start/botanist: SpawnPointBotanist
+/obj/effect/landmark/start/cargo_technician: SpawnPointCargoTechnician
+/obj/effect/landmark/start/atmospheric_technician: SpawnPointAtmos
+/obj/effect/landmark/start/chemist: SpawnPointChemist
+/obj/effect/landmark/start/chaplain: SpawnPointChaplain
+/obj/effect/landmark/start/paramedic: SpawnPointParamedic
+/obj/effect/landmark/start/shaft_miner: SpawnPointSalvageSpecialist # SS14 merged mining into salvage
+/obj/effect/landmark/start/cyborg: SpawnPointBorg
+/obj/effect/landmark/start/cook: SpawnPointChef
+/obj/effect/landmark/start/lawyer: SpawnPointLawyer
+/obj/effect/landmark/start/captain: SpawnPointCaptain
+/obj/effect/landmark/start/janitor: SpawnPointJanitor
+/obj/effect/landmark/start/bartender: SpawnPointBartender
+/obj/effect/landmark/start/head_of_personnel: SpawnPointHeadOfPersonnel
+/obj/effect/landmark/start/head_of_security: SpawnPointHeadOfSecurity
+/obj/effect/landmark/start/quartermaster: SpawnPointQuartermaster
+/obj/effect/landmark/start/chief_medical_officer: SpawnPointChiefMedicalOfficer
+/obj/effect/landmark/start/psychologist: SpawnPointPsychologist
+/obj/effect/landmark/start/detective: SpawnPointDetective
+/obj/effect/landmark/start/librarian: SpawnPointLibrarian
+/obj/effect/landmark/start/research_director: SpawnPointResearchDirector
+/obj/effect/landmark/start/warden: SpawnPointWarden
+/obj/effect/landmark/start/clown: SpawnPointClown
+/obj/effect/landmark/start/mime: SpawnPointMime
+/obj/effect/landmark/start/chief_engineer: SpawnPointChiefEngineer
+# Not mapped after checking -- no equivalent SS14 job/spawn point exists for
+# these, so left for a human to decide rather than reassigned to the nearest
+# job (that would misassign, not just reskin): prisoner, roboticist, coroner,
+# bitrunner, ai/ai/secondary (the AI is not spawned via a SpawnPoint marker
+# in this fork), new_player, and the bare /landmark/start (not job-specific).
+
+# ---- flora ----
+# tgstation's own base classes describe these as generic decoration --
+# /obj/structure/flora/bush: "Some type of shrubbery"; /grass: "A patch of
+# overgrown grass" -- and every subtype (style_random, style_2/3, ferny,
+# grassy, ...) is the same object with a different icon_state, confirmed in
+# code/game/objects/structures/flora.dm. This fork has no physical bush/grass
+# structure, only ground decals, so they fall through to the entity table via
+# the same decal-fallback path used for cleanable blood above; a decal loses
+# the (minor) density/harvestable behaviour a structure would keep, but nets
+# a visual match instead of nothing. Rock piles keep the real structure
+# match (FloraRockSolid: density = TRUE in both, and it is not a decal).
+/obj/structure/flora/bush: DecalSpawnerBushesAC
+/obj/structure/flora/grass: DecalSpawnerGrassAB
+/obj/structure/flora/rock: FloraRockSolid
+/obj/structure/flora/tree/pine/xmas: FloraTreeChristmas01
+/obj/structure/flora/tree/pine: FloraTreeConifer
+/obj/structure/flora/tree: FloraTree
+
 /obj/item/shard: ShardGlass
 /obj/item/stack/rods: PartRodMetal
 /obj/item/stack/sheet/iron: SheetSteel
@@ -529,6 +598,37 @@
 /obj/structure/sign/warning/no_smoking/circle/directional/south: {entity: SignSmoking, wall: south, onWall: true}
 /obj/structure/sign/warning/no_smoking/circle/directional/east: {entity: SignSmoking, wall: east, onWall: true}
 /obj/structure/sign/warning/no_smoking/circle/directional/west: {entity: SignSmoking, wall: west, onWall: true}
+/obj/structure/sign/warning/no_smoking: SignSmoking # bare (non-directional) variant
+/obj/structure/sign/warning/vacuum/external/directional/north: {entity: SignSpace, wall: north, onWall: true}
+/obj/structure/sign/warning/vacuum/external/directional/south: {entity: SignSpace, wall: south, onWall: true}
+/obj/structure/sign/warning/vacuum/external/directional/east: {entity: SignSpace, wall: east, onWall: true}
+/obj/structure/sign/warning/vacuum/external/directional/west: {entity: SignSpace, wall: west, onWall: true}
+/obj/structure/sign/warning/biohazard: SignBiohazard
+/obj/structure/sign/warning/directional/north: {entity: SignDanger, wall: north, onWall: true}
+/obj/structure/sign/warning/directional/south: {entity: SignDanger, wall: south, onWall: true}
+/obj/structure/sign/warning/directional/east: {entity: SignDanger, wall: east, onWall: true}
+/obj/structure/sign/warning/directional/west: {entity: SignDanger, wall: west, onWall: true}
+/obj/structure/sign/nanotrasen/directional/north: {entity: SignNanotrasen1, wall: north, onWall: true}
+/obj/structure/sign/nanotrasen/directional/south: {entity: SignNanotrasen1, wall: south, onWall: true}
+/obj/structure/sign/nanotrasen/directional/east: {entity: SignNanotrasen1, wall: east, onWall: true}
+/obj/structure/sign/nanotrasen/directional/west: {entity: SignNanotrasen1, wall: west, onWall: true}
+/obj/structure/noticeboard/directional/north: {entity: NoticeBoard, wall: north, onWall: true}
+/obj/structure/noticeboard/directional/south: {entity: NoticeBoard, wall: south, onWall: true}
+/obj/structure/noticeboard/directional/east: {entity: NoticeBoard, wall: east, onWall: true}
+/obj/structure/noticeboard/directional/west: {entity: NoticeBoard, wall: west, onWall: true}
+/obj/effect/spawner/random/decoration/poster/random: RandomPosterAny
+/obj/structure/sign/poster/random/directional/north: {entity: RandomPosterAny, wall: north, onWall: true}
+/obj/structure/sign/poster/random/directional/south: {entity: RandomPosterAny, wall: south, onWall: true}
+/obj/structure/sign/poster/random/directional/east: {entity: RandomPosterAny, wall: east, onWall: true}
+/obj/structure/sign/poster/random/directional/west: {entity: RandomPosterAny, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/random/directional/north: {entity: RandomPosterContraband, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/random/directional/south: {entity: RandomPosterContraband, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/random/directional/east: {entity: RandomPosterContraband, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/random/directional/west: {entity: RandomPosterContraband, wall: west, onWall: true}
+/obj/structure/sign/poster/official/random/directional/north: {entity: RandomPosterLegit, wall: north, onWall: true}
+/obj/structure/sign/poster/official/random/directional/south: {entity: RandomPosterLegit, wall: south, onWall: true}
+/obj/structure/sign/poster/official/random/directional/east: {entity: RandomPosterLegit, wall: east, onWall: true}
+/obj/structure/sign/poster/official/random/directional/west: {entity: RandomPosterLegit, wall: west, onWall: true}
 
 # Away-mission combat mobs. /trooper/syndicate matches the existing hostile
 # Syndicate faction NPC (NpcFactionMember: Syndicate) regardless of loadout
@@ -548,3 +648,53 @@
 # they were on, not who they'd fight).
 /obj/effect/mob_spawn/corpse/human/syndicatesoldier: MobRandomSecurityCorpse
 /obj/effect/mob_spawn/corpse/human/nanotrasensoldier: MobRandomSecurityCorpse
+
+# ---- catalog-wide pass (tgstation/_maps/map_files, all 112 station/away maps) ----
+/obj/machinery/chem_master: ChemMaster
+/obj/machinery/biogenerator: Biogenerator
+/obj/machinery/seed_extractor: SeedExtractor
+
+/obj/item/assembly/igniter: Igniter
+/obj/item/lighter: Lighter
+/obj/item/mop: MopItem
+/obj/item/plant_analyzer: PlantAnalyzer
+/obj/item/flashlight/lantern: FlashlightLantern
+/obj/item/mmi: MMI
+/obj/item/storage/bag/ore: OreBag
+/obj/item/book/bible: Bible
+/obj/item/flashlight/flare/candle: Candle
+/obj/item/rag: RagItem
+# A box of syringes, not a single syringe -- BoxSyringe (Catalog/Fills/Boxes/
+# medical.yml, "syringe box") matches the container, not SyringeSaline which
+# is one prefilled syringe.
+/obj/item/storage/box/syringes: BoxSyringe
+/obj/item/binoculars: Binoculars
+/obj/item/tank/internals/oxygen: OxygenTank
+/obj/item/flashlight/seclite: FlashlightSeclite
+/obj/item/stack/sheet/rglass: SheetRGlass
+/obj/item/cigarette/cigar: Cigar
+/obj/item/kitchen/fork/plastic: ForkPlastic
+/obj/item/knife/plastic: KnifePlastic
+/obj/item/target/clown: TargetClown
+/obj/item/target/syndicate: TargetSyndicate
+/obj/item/clothing/neck/stethoscope: ClothingNeckStethoscope
+# ExtinguisherSpray is the vapour VFX an extinguisher sprays, not the tool
+# itself (parent: Vapor, categories: [HideSpawnMenu]) -- FireExtinguisher is
+# the actual handheld item.
+/obj/item/extinguisher: FireExtinguisher
+/obj/item/storage/medkit/o2: MedkitO2
+/obj/structure/fireplace: Fireplace
+/obj/item/stack/medical/wrap/gauze: Gauze
+/obj/item/plunger: Plunger
+/obj/item/electronics/apc: APCElectronics
+/obj/item/reagent_containers/cup/bottle/epinephrine: EpinephrineMedicalVial
+# The tgstation path is the prisoner's jumpsuit (/clothing/under/...), not an
+# ID card -- ClothingUniformJumpsuitPrisoner, not the same-sounding
+# PrisonerIDCard (parent: IDCardStandard).
+/obj/item/clothing/under/rank/prisoner: ClothingUniformJumpsuitPrisoner
+/obj/structure/ore_box: OreBox
+/obj/item/weldingtool: Welder
+/obj/item/cultivator: HydroponicsToolMiniHoe
+/obj/item/shovel/spade: Shovel
+/obj/item/stamp/granted: RubberStampApproved
+/obj/item/stamp/denied: RubberStampDenied

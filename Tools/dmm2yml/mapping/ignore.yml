@@ -54,7 +54,38 @@
 - /obj/item/pai_card
 - /obj/item/newspaper
 
-# Away-mission arrival markers, not physical objects: invisible mapping-logic
-# effects that place an arriving mob/player, the same category as /area above.
-# SS14 has no away-mission system to place one for.
+# Every /obj/effect/landmark is invisible by construction --
+# invisibility = INVISIBILITY_ABSTRACT is set on the base class itself
+# (code/game/objects/effects/landmarks.dm), so there is nothing visual any of
+# them are worth preserving. Job spawn points (landmark/start/<job>) are the
+# one subtree with a real SS14 counterpart (SpawnPointJob markers) and are
+# mapped in entities.yml instead -- everything below is tgstation-specific
+# game logic (a minigame arena, event/loot-spawning systems, nav beacons, a
+# unit-test-only sanity marker) with no matching system in this fork to wire
+# up, so there is genuinely nothing to convert them to, the same reasoning as
+# /area above.
 - /obj/effect/landmark/awaystart
+- /obj/effect/landmark/thunderdome
+- /obj/effect/landmark/event_spawn
+- /obj/effect/landmark/generic_maintenance_landmark
+- /obj/effect/landmark/navigate_destination
+- /obj/effect/landmark/firealarm_sanity
+- /obj/effect/landmark/blobstart
+- /obj/effect/landmark/carpspawn
+- /obj/effect/landmark/secequipment
+
+# Three more turfs in the same "genuinely not a real map tile" category as
+# /area above, each confirmed by source:
+#   /turf/template_noop      -- a sentinel the DMM reader checks for (reader.dm)
+#                                to mean "skip placing a turf here", not a turf
+#                                that is ever actually placed.
+#   /turf/cordon              -- the invisible, indestructible world-border turf
+#                                (invisibility = INVISIBILITY_ABSTRACT,
+#                                code/modules/awaymissions/cordon.dm).
+#   /turf/open/ai_visible     -- background tile of the AI multicam HUD's
+#                                viewing room, off-map (plane -19, SPACE_LAYER,
+#                                code/modules/mob/living/silicon/ai/multicam.dm),
+#                                never a placeable station floor.
+- /turf/template_noop
+- /turf/cordon
+- /turf/open/ai_visible

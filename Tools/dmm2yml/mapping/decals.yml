@@ -88,6 +88,54 @@
 /obj/effect/turf_decal/stripes/red/full:
   id: WarnFullGreyscale
   color: '#DE3A3A96'
+/obj/effect/turf_decal/stripes/white/end:
+  dirs:
+    1: WarnEndGreyscaleN
+    2: WarnEndGreyscaleS
+    4: WarnEndGreyscaleE
+    8: WarnEndGreyscaleW
+  color: '#FFFFFFFF'
+/obj/effect/turf_decal/stripes/red/end:
+  dirs:
+    1: WarnEndGreyscaleN
+    2: WarnEndGreyscaleS
+    4: WarnEndGreyscaleE
+    8: WarnEndGreyscaleW
+  color: '#DE3A3A96'
+/obj/effect/turf_decal/stripes/full: WarnFull
+# /obj/effect/turf_decal itself (decal.dm) defaults to icon_state "warningline"
+# -- the same state /stripes/line sets explicitly -- so the bare path with no
+# subtype at all renders identically to /stripes/line.
+/obj/effect/turf_decal/stripes:
+  dirs:
+    1: WarnLineN
+    2: WarnLineS
+    4: WarnLineE
+    8: WarnLineW
+# Asteroid stripes are a visually distinct sprite in tgstation (icon_state
+# "ast_warn*", a rougher hand-painted look) but this fork has no matching
+# asteroid-specific decal, so they fall back to the same ids as the regular
+# hazard stripes -- same "hazard boundary" meaning, different texture lost.
+/obj/effect/turf_decal/stripes/asteroid/line:
+  dirs:
+    1: WarnLineN
+    2: WarnLineS
+    4: WarnLineE
+    8: WarnLineW
+/obj/effect/turf_decal/stripes/asteroid/end:
+  dirs:
+    1: WarnEndN
+    2: WarnEndS
+    4: WarnEndE
+    8: WarnEndW
+/obj/effect/turf_decal/stripes/asteroid/corner:
+  dirs:
+    1: WarnCornerNW
+    2: WarnCornerSE
+    4: WarnCornerNE
+    8: WarnCornerSW
+/obj/effect/turf_decal/stripes/asteroid/box: WarnBox
+/obj/effect/turf_decal/stripes/asteroid/full: WarnFull
 
 # ---- floor markings ----
 /obj/effect/turf_decal/bot: Bot
@@ -1158,6 +1206,64 @@
     4: WarnLineGreyscaleE
     8: WarnLineGreyscaleW
   color: '#9FED5896'
+# color = "#439C1E" (code/.../tilecoloring.dm) + the same 96 alpha suffix
+# every other trimline colour but dark/dark_blue/dark_red/white uses.
+/obj/effect/turf_decal/trimline/dark_green/line:
+  dirs:
+    1: BrickLineOverlayN
+    2: BrickLineOverlayS
+    4: BrickLineOverlayE
+    8: BrickLineOverlayW
+  color: '#439C1E96'
+/obj/effect/turf_decal/trimline/dark_green/corner:
+  dirs:
+    1: BrickCornerOverlayNW
+    2: BrickCornerOverlaySE
+    4: BrickCornerOverlayNE
+    8: BrickCornerOverlaySW
+  color: '#439C1E96'
+/obj/effect/turf_decal/trimline/dark_green/end:
+  dirs:
+    1: BrickEndOverlayN
+    2: BrickEndOverlayS
+    4: BrickEndOverlayE
+    8: BrickEndOverlayW
+  color: '#439C1E96'
+/obj/effect/turf_decal/trimline/dark_green/warning:
+  dirs:
+    1: WarnLineGreyscaleN
+    2: WarnLineGreyscaleS
+    4: WarnLineGreyscaleE
+    8: WarnLineGreyscaleW
+  color: '#439C1E96'
+/obj/effect/turf_decal/trimline/dark_green/filled/line:
+  dirs:
+    1: BrickLineOverlayN
+    2: BrickLineOverlayS
+    4: BrickLineOverlayE
+    8: BrickLineOverlayW
+  color: '#439C1E96'
+/obj/effect/turf_decal/trimline/dark_green/filled/corner:
+  dirs:
+    1: BrickCornerOverlayNW
+    2: BrickCornerOverlaySE
+    4: BrickCornerOverlayNE
+    8: BrickCornerOverlaySW
+  color: '#439C1E96'
+/obj/effect/turf_decal/trimline/dark_green/filled/end:
+  dirs:
+    1: BrickEndOverlayN
+    2: BrickEndOverlayS
+    4: BrickEndOverlayE
+    8: BrickEndOverlayW
+  color: '#439C1E96'
+/obj/effect/turf_decal/trimline/dark_green/filled/warning:
+  dirs:
+    1: WarnLineGreyscaleN
+    2: WarnLineGreyscaleS
+    4: WarnLineGreyscaleE
+    8: WarnLineGreyscaleW
+  color: '#439C1E96'
 /obj/effect/turf_decal/trimline/neutral/line:
   dirs:
     1: BrickLineOverlayN
@@ -1438,3 +1544,29 @@
     4: WarnLineGreyscaleE
     8: WarnLineGreyscaleW
   color: '#EFB34196'
+
+# The bare /trimline/<colour> path (no /line, /corner, ... suffix) is the
+# base class itself, icon_state "trimline_box" (tilecoloring.dm) -- a filled
+# box, not a line. BrickBoxOverlay is the one box-shaped id in that family.
+# arrow_cw/arrow_ccw/mid_joiner/shrink_cw/shrink_ccw and the /tram colour
+# have no matching id in this fork at all and are not mapped here or
+# anywhere else in this file -- left for the CSV.
+/obj/effect/turf_decal/trimline/blue: {id: BrickBoxOverlay, color: '#52B4E996'}
+/obj/effect/turf_decal/trimline/brown: {id: BrickBoxOverlay, color: '#A4610696'}
+/obj/effect/turf_decal/trimline/dark: {id: BrickBoxOverlay, color: '#444646FF'}
+/obj/effect/turf_decal/trimline/dark_blue: {id: BrickBoxOverlay, color: '#334E6DC8'}
+/obj/effect/turf_decal/trimline/dark_green: {id: BrickBoxOverlay, color: '#439C1E96'}
+/obj/effect/turf_decal/trimline/dark_red: {id: BrickBoxOverlay, color: '#951710FF'}
+/obj/effect/turf_decal/trimline/green: {id: BrickBoxOverlay, color: '#9FED5896'}
+/obj/effect/turf_decal/trimline/neutral: {id: BrickBoxOverlay, color: '#D4D4D496'}
+/obj/effect/turf_decal/trimline/purple: {id: BrickBoxOverlay, color: '#D381C996'}
+/obj/effect/turf_decal/trimline/red: {id: BrickBoxOverlay, color: '#DE3A3A96'}
+/obj/effect/turf_decal/trimline/white: {id: BrickBoxOverlay, color: '#FFFFFFFF'}
+/obj/effect/turf_decal/trimline/yellow: {id: BrickBoxOverlay, color: '#EFB34196'}
+
+# ---- cleanable filth ----
+# tgstation has ~20 distinct filth decals (dust, ash, vomit, food smudges,
+# glass, rubble, confetti, ...); this fork's decal set only has one, so only
+# the one with a real match is mapped. /dirt/dust inherits this by path-tree
+# lookup, being a subpath of /dirt.
+/obj/effect/decal/cleanable/dirt: Dirt
