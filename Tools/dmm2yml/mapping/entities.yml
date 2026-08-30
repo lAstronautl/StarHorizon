@@ -800,3 +800,18 @@
 # only clothing vending machine (ClothesMate) stocks everyday work clothes,
 # not costumes -- same tier of theme loss as other vending-machine reuses.
 /obj/machinery/vending/autodrobe: VendingMachineClothing
+
+# ---- sixth catalog-wide pass ----
+/obj/item/stock_parts/matter_bin: MatterBinStockPart
+/obj/item/stock_parts/capacitor: CapacitorStockPart
+/obj/item/reagent_containers/cup/glass/waterbottle: DrinkWaterBottleFull
+/obj/item/storage/box/evidence: BoxEvidenceMarkers
+/obj/item/assembly/mousetrap/armed: MousetrapArmed
+/obj/item/kitchen/rollingpin: RollingPin
+/obj/item/reagent_containers/spray/plantbgone: PlantBGoneSpray
+/obj/item/reagent_containers/cup/glass/bottle/whiskey: DrinkWhiskeyBottleFull
+/obj/structure/water_source/puddle: Puddle
+/obj/structure/kitchenspike: KitchenSpike
+/obj/item/soap/nanotrasen: SoapNT # description matches word for word ("Nanotrasen brand bar of soap")
+/obj/item/gps: HandheldGPSBasic # bare form; description matches tgstation's word for word
+/obj/structure/sign/warning/vacuum: SignSpace # bare (non-directional) variant, same id as the directional ones above
