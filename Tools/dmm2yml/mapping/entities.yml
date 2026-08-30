@@ -829,3 +829,24 @@
 /obj/item/defibrillator/loaded: Defibrillator # loses the pre-charged battery state, keeps the tool
 /obj/item/melee/baton/security/loaded: Stunbaton
 /obj/item/clothing/shoes/jackboots: ClothingShoesBootsJack
+
+# ---- eighth catalog-wide pass ----
+/obj/structure/sign/nanotrasen: SignNanotrasen1 # bare (non-directional) variant
+/obj/item/hemostat: Hemostat
+/obj/item/storage/medkit: Medkit # bare, unthemed medkit
+/obj/structure/mop_bucket: MopBucket
+# Item (toppled/carryable) forms of the already-mapped chair structures --
+# same physical furniture, tgstation's own source confirms (origin_type
+# points straight back at /obj/structure/chair/stool and .../chair/wood).
+/obj/item/chair/stool: Stool
+/obj/item/chair/wood: ChairWood
+/obj/item/fishing_rod: FishingRod
+/obj/item/gavelblock: GavelBlock
+/obj/item/lightreplacer: LightReplacer
+/obj/item/storage/bag/trash: TrashBag
+/obj/item/trash/candle: Candle # a burned-out/melted candle, still the same item visually
+/obj/item/soap/deluxe: SoapDeluxe
+# A circuit board item, not the wall device -- FireAlarm above is the full
+# device; this is what you'd insert into an empty frame during construction,
+# same distinction as the earlier APC electronics/APC device split.
+/obj/item/electronics/firealarm: FireAlarmElectronics
