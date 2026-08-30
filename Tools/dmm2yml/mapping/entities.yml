@@ -750,3 +750,29 @@
 # cable half of the spawn is dropped for the same reason cables are ignored
 # everywhere else.
 /obj/effect/spawner/structure/electrified_grille: Grille
+
+# ---- fourth catalog-wide pass ----
+# Brig/secure doors are their own branch under /door/window, separate from
+# the /left and /right paths already mapped above -- same border-piece dir
+# rule applies (max_integrity 300 vs a plain windoor's 200 is exactly what
+# WindoorSecure's own "sturdy" description calls out).
+/obj/machinery/door/window/brigdoor/left/directional/north: {entity: WindoorSecure, dir: 1}
+/obj/machinery/door/window/brigdoor/left/directional/south: {entity: WindoorSecure, dir: 2}
+/obj/machinery/door/window/brigdoor/left/directional/east: {entity: WindoorSecure, dir: 4}
+/obj/machinery/door/window/brigdoor/left/directional/west: {entity: WindoorSecure, dir: 8}
+/obj/machinery/door/window/brigdoor/right/directional/north: {entity: WindoorSecure, dir: 1}
+/obj/machinery/door/window/brigdoor/right/directional/south: {entity: WindoorSecure, dir: 2}
+/obj/machinery/door/window/brigdoor/right/directional/east: {entity: WindoorSecure, dir: 4}
+/obj/machinery/door/window/brigdoor/right/directional/west: {entity: WindoorSecure, dir: 8}
+/obj/machinery/computer/records/medical: ComputerMedicalRecords
+/obj/machinery/computer/cargo: ComputerCargoOrders
+/obj/item/stack/sheet/mineral/wood: MaterialWoodPlank
+/obj/item/storage/box: BoxCardboard
+/obj/item/toy/plush/moth: PlushieMoth
+/obj/item/chair/plastic: ChairFolding # tgstation's own name is "folding plastic chair"
+/obj/item/storage/briefcase: BriefcaseBrown # same case as the already-mapped /briefcase/secure
+/obj/item/gps/mining: HandheldGPSBasic # loses the mining theme, keeps the GPS function
+# The closest of several linked-sentry-turret control panel variants this
+# fork has (AI/Security/Command) to tgstation's generic "controls a room's
+# automated defenses" panel -- none is a perfect department-neutral match.
+/obj/machinery/turretid: WeaponEnergyTurretSecurityControlPanel
