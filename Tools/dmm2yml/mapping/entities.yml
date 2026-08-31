@@ -1510,3 +1510,9 @@
 /obj/machinery/camera/autoname/motion/directional/south: {entity: SurveillanceCameraGeneral, wall: south}
 /obj/machinery/camera/autoname/motion/directional/east: {entity: SurveillanceCameraGeneral, wall: east}
 /obj/machinery/camera/autoname/motion/directional/west: {entity: SurveillanceCameraGeneral, wall: west}
+
+# ---- category pass 18/N: remaining flashlights ----
+/obj/item/flashlight: FlashlightLantern # bare; no separate plain-Flashlight id in this fork, same call as the engineering flashlight spawner above
+/obj/item/flashlight/glowstick: GlowstickBase # bare, uncoloured
+/obj/item/flashlight/glowstick/red: GlowstickRed
+/obj/item/flashlight/glowstick/yellow: GlowstickYellow
