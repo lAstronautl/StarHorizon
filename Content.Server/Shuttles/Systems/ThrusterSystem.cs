@@ -483,6 +483,52 @@ public sealed class ThrusterSystem : EntitySystem
         RefreshCenter(uid, shuttleComponent);
     }
 
+    /// <summary>
+    /// Updates the thrust produced by a thruster (e.g. in response to changing gas pressure), keeping the
+    /// shuttle's cached impulse in sync if the thruster is currently on.
+    /// </summary>
+    public void SetThrust(EntityUid uid, ThrusterComponent component, float thrust)
+    {
+        thrust = MathF.Max(0f, thrust);
+
+        if (component.Thrust.Equals(thrust))
+            return;
+
+        if (component.IsOn &&
+            TryComp(uid, out TransformComponent? xform) &&
+            TryComp(xform.GridUid, out ShuttleComponent? shuttleComponent))
+        {
+            var delta = thrust - component.Thrust;
+
+            switch (component.Type)
+            {
+                case ThrusterType.Linear:
+                    var direction = (int)xform.LocalRotation.GetCardinalDir() / 2;
+                    shuttleComponent.LinearThrust[direction] += delta;
+                    break;
+                case ThrusterType.Angular:
+                    shuttleComponent.AngularThrust += delta;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            component.Thrust = thrust;
+            RefreshCenter(uid, shuttleComponent);
+            return;
+        }
+
+        component.Thrust = thrust;
+    }
+
+    /// <summary>
+    /// Whether the thruster is currently actively producing thrust (as opposed to merely enabled/on standby).
+    /// </summary>
+    public bool IsFiring(ThrusterComponent component)
+    {
+        return component.IsOn && component.Firing;
+    }
+
     public bool CanEnable(EntityUid uid, ThrusterComponent component)
     {
         if (!component.Enabled)
