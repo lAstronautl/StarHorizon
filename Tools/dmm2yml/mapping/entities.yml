@@ -1280,3 +1280,14 @@
 /obj/machinery/atmospherics/components/unary/thermomachine/freezer: GasThermoMachineFreezer # bare "cools gas in connected pipes"; /on, /layer2, /coldroom, /layer4 inherit
 /obj/machinery/atmospherics/components/unary/thermomachine/heater: GasThermoMachineHeater # bare "heats gas in connected pipes"; /on inherits
 /obj/machinery/atmospherics/components/binary/passive_gate: GasPassiveGate # "a one-way air valve that does not require power"; /layer4 inherits
+
+# ---- category pass 6/N: material/item stacks ----
+/obj/item/stack/medical/ointment: Ointment
+/obj/item/stack/medical/bone_gel: BoneGel # Russian description matches "container for bone gel" exactly
+/obj/item/stack/spacecash/c10: SpaceCash10
+/obj/item/stack/spacecash/c100: SpaceCash100
+/obj/item/stack/spacecash/c500: SpaceCash500
+/obj/item/stack/spacecash/c1000: SpaceCash1000
+/obj/item/stack/sheet/cloth: MaterialCloth # bare; /five and /ten (different starting quantities) inherit
+/obj/item/stack/sheet/mineral/coal: Coal # bare; /five inherits
+/obj/item/stack/sheet/mineral/diamond: MaterialDiamond # "refined diamond" -- exact match
