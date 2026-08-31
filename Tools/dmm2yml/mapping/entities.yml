@@ -1320,6 +1320,22 @@
 # (code/modules/uplink/uplink_items/badass.dm) -- exact brand match.
 /obj/item/storage/fancy/cigarettes/cigpack_syndicate: CigPackSyndicate
 
+# ---- category pass 25/N: reagent containers ----
+# Full bottles, from drinks_bottles.yml -- not the visually-different EMPTY
+# "trash" bottles in trash_drinks.yml (checked: those are a separate family,
+# sprite-named e.g. "rumbottle_empty.rsi", the wrong match for tgstation's
+# drinkable /cup/glass/bottle/* items). This is the same *Full naming family
+# the already-mapped /whiskey -> DrinkWhiskeyBottleFull rule uses.
+/obj/item/reagent_containers/cup/glass/bottle/rum: DrinkRumBottleFull
+/obj/item/reagent_containers/cup/glass/bottle/vodka: DrinkVodkaBottleFull
+/obj/item/reagent_containers/cup/glass/bottle/wine: DrinkWineBottleFull
+/obj/item/reagent_containers/cup/glass/bottle/sake: DrinkSakeBottleFull
+# Description near-verbatim matches (condiment.dm vs. ingredients.yml):
+# "A big bag of flour. Good for baking!" / "A big bag of tasty spacey sugar."
+/obj/item/reagent_containers/condiment/flour: ReagentContainerFlour
+/obj/item/reagent_containers/condiment/rice: ReagentContainerRice
+/obj/item/reagent_containers/condiment/sugar: ReagentContainerSugar
+
 # ---- category pass 9/N: stock parts ----
 # Higher-rated stock parts (micro_laser, scanning_module, servo, the subspace
 # family) have no match beyond the Rating-1 matter bin/capacitor above --
