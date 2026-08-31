@@ -1291,3 +1291,9 @@
 /obj/item/stack/sheet/cloth: MaterialCloth # bare; /five and /ten (different starting quantities) inherit
 /obj/item/stack/sheet/mineral/coal: Coal # bare; /five inherits
 /obj/item/stack/sheet/mineral/diamond: MaterialDiamond # "refined diamond" -- exact match
+
+# ---- category pass 7/N: storage (bags/boxes/toolboxes) ----
+/obj/item/storage/crayons: CrayonBox # exact match, "box of crayons"
+/obj/item/storage/pill_bottle: PillCanister # bare, "holds up to 10 pills" -- covers every themed pill bottle subtype (mannitol, mutadone, sepsisillin, epinephrine, ...), losing only the medicine label
+/obj/item/storage/fancy/cigarettes/cigars: CigarCase # bare; /cohiba, /havana inherit
+/obj/item/storage/toolbox/artistic: ToolboxArtistic
