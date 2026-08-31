@@ -1365,6 +1365,29 @@
 /obj/structure/sign/departments/lawyer/directional/south: {entity: SignLawyer, wall: south, onWall: true}
 /obj/structure/sign/departments/lawyer/directional/east: {entity: SignLawyer, wall: east, onWall: true}
 /obj/structure/sign/departments/lawyer/directional/west: {entity: SignLawyer, wall: west, onWall: true}
+# "A sign indicating a hydroponics area" / "labelling an area where the
+# janitor works" / "indicating the chapel" / "labelling an area where the
+# Psychologist works" -- exact matches for botany/custodian/holy/psychology.
+/obj/structure/sign/departments/botany: SignHydro1
+/obj/structure/sign/departments/botany/directional/north: {entity: SignHydro1, wall: north, onWall: true}
+/obj/structure/sign/departments/botany/directional/south: {entity: SignHydro1, wall: south, onWall: true}
+/obj/structure/sign/departments/botany/directional/east: {entity: SignHydro1, wall: east, onWall: true}
+/obj/structure/sign/departments/botany/directional/west: {entity: SignHydro1, wall: west, onWall: true}
+/obj/structure/sign/departments/custodian: SignJanitor
+/obj/structure/sign/departments/custodian/directional/north: {entity: SignJanitor, wall: north, onWall: true}
+/obj/structure/sign/departments/custodian/directional/south: {entity: SignJanitor, wall: south, onWall: true}
+/obj/structure/sign/departments/custodian/directional/east: {entity: SignJanitor, wall: east, onWall: true}
+/obj/structure/sign/departments/custodian/directional/west: {entity: SignJanitor, wall: west, onWall: true}
+/obj/structure/sign/departments/holy: SignChapel
+/obj/structure/sign/departments/holy/directional/north: {entity: SignChapel, wall: north, onWall: true}
+/obj/structure/sign/departments/holy/directional/south: {entity: SignChapel, wall: south, onWall: true}
+/obj/structure/sign/departments/holy/directional/east: {entity: SignChapel, wall: east, onWall: true}
+/obj/structure/sign/departments/holy/directional/west: {entity: SignChapel, wall: west, onWall: true}
+/obj/structure/sign/departments/psychology: SignPsychology
+/obj/structure/sign/departments/psychology/directional/north: {entity: SignPsychology, wall: north, onWall: true}
+/obj/structure/sign/departments/psychology/directional/south: {entity: SignPsychology, wall: south, onWall: true}
+/obj/structure/sign/departments/psychology/directional/east: {entity: SignPsychology, wall: east, onWall: true}
+/obj/structure/sign/departments/psychology/directional/west: {entity: SignPsychology, wall: west, onWall: true}
 
 # ---- category pass 27/N: disks ----
 # Both items keep this exact SS13 flavour text verbatim, including the
