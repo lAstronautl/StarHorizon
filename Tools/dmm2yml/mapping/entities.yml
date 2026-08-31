@@ -2912,3 +2912,8 @@
 /obj/item/clothing/gloves/boxing/blue: ClothingHandsGlovesBoxingBlue
 /obj/item/clothing/head/rasta: ClothingHeadRastaHat
 /obj/machinery/gravity_generator/main: GravityGenerator
+/obj/machinery/vending/robotics: VendingMachineRobotics # "Robotech Deluxe" == "All the tools you need to create your own robot army"
+/obj/machinery/barsign: BarSign
+/obj/structure/noticeboard/ce: NoticeBoard # generic "notice board", closest available -- this fork has no CE-specific reskin
+/obj/structure/door_assembly/door_assembly_med: AirlockAssembly # "medical airlock assembly" is a construction-stage solid airlock, same kind as this fork's generic AirlockAssembly -- not WindoorAssembly, which is a different (windowed) door family
+/obj/vehicle/ridden/janicart: VehicleJanicart # "janicart (pimpin' ride)" == "janicart"
