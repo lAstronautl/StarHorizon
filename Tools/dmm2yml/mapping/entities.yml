@@ -1222,3 +1222,34 @@
 /obj/item/reagent_containers/blood: Bloodpack # bare; /blood/random above already uses this id
 /obj/item/reagent_containers/cup/bottle/chlorine: ChlorineChemistryVial # the only pre-filled element vial this fork has that matches one of tgstation's ~15 chemical bottles
 /obj/item/reagent_containers/cup/glass/drinkingglass: DrinkGlass
+
+# ---- category pass 3/N: clothing ----
+/obj/item/clothing/glasses/hud/health: ClothingEyesHudMedical
+/obj/item/clothing/gloves/color/fyellow: ClothingHandsGlovesColorYellowBudget # "budget insulated gloves", tgstation's own name for this cheap-knockoff variant
+/obj/item/clothing/head/utility/hardhat/orange: ClothingHeadHatHardhatOrange
+/obj/item/clothing/mask/surgical: ClothingMaskSterile # description matches tgstation's word for word
+# Bare wintercoat -- the /science, /engineering, /eva, /security and /miner
+# subtypes below it inherit this, since this fork's coat has no per-department
+# recolour (loses the theme, keeps "a heavy winter coat").
+/obj/item/clothing/suit/hooded/wintercoat: ClothingOuterWinterCoat
+/obj/item/clothing/shoes/magboots: ClothingShoesBootsMag
+/obj/item/clothing/glasses/sunglasses: ClothingEyesGlassesSunglasses
+/obj/item/clothing/gloves/color/blue: ClothingHandsGlovesColorBlue
+/obj/item/clothing/gloves/color/green: ClothingHandsGlovesColorGreen
+/obj/item/clothing/neck/tie/red: ClothingNeckTieRed
+/obj/item/clothing/mask/balaclava: ClothingMaskBalaclava
+/obj/item/clothing/mask/whistle: Whistle
+/obj/item/clothing/mask/muzzle: ClothingMaskMuzzle
+/obj/item/clothing/head/hats/bowler: ClothingHeadHatBowlerHat
+/obj/item/clothing/head/hats/tophat: ClothingHeadHatTophat
+/obj/item/clothing/head/cowboy: ClothingHeadHatCowboyBrown # tgstation's bare "cowboy hat" is unthemed; this is the closest unthemed variant this fork has (/brown and /black are separately named "sheriff"/"desperado" hats there)
+/obj/item/clothing/shoes/clown_shoes: ClothingShoesClown
+/obj/item/clothing/under/color/blue: ClothingUniformJumpsuitColorBlue
+/obj/item/clothing/under/color/green: ClothingUniformJumpsuitColorGreen
+/obj/item/clothing/under/color/grey: ClothingUniformJumpsuitColorGrey
+/obj/item/clothing/suit/apron/chef: ClothingOuterApronChef
+/obj/item/clothing/suit/apron: ClothingOuterApron # bare
+/obj/item/clothing/head/costume/cardborg: ClothingHeadHatCardborg # "a hat made out of a box"
+/obj/item/clothing/gloves/fingerless: ClothingHandsGlovesFingerless
+/obj/item/clothing/glasses/eyepatch: ClothingEyesEyepatch
+/obj/item/clothing/shoes/leather: ClothingShoesLeather
