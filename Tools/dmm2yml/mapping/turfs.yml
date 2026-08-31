@@ -215,3 +215,15 @@
 # two subtypes reuse an icon_state this file already has a tile for.
 /turf/open/floor/holofloor/plating: FloorReinforced # icon_state "engine", same as /turf/open/floor/engine above
 /turf/open/floor/holofloor/chapel: FloorSteelMono   # icon_state "chapel", same as /turf/open/floor/iron/chapel above
+
+# ---- stand-ins picked by hand: no matching sprite exists in this fork, but
+# these were chosen deliberately (north_star.dmm review) rather than left
+# blank -- closest available tile by colour/material, not a sprite match. ----
+/turf/open/floor/mineral/plastitanium: FloorShuttleBlack
+/turf/open/floor/mineral/plastitanium/red: FloorShuttleRed
+/turf/open/floor/bamboo/tatami/black: FloorWoodTile
+/turf/open/floor/noslip: FloorSteelLime
+/turf/open/misc/beach/sand: FloorDesert
+/turf/open/misc/sandy_dirt: FloorLowDesert
+/turf/open/floor/bronze: FloorBrassFilled
+/turf/open/floor/stone: FloorSteelPavement
