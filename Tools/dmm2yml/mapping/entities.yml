@@ -1475,3 +1475,15 @@
 # cmo, hos, medical, rd, mining, centcom, industrial, industrial/loader,
 # mining/eva) inherits this and loses only the department paint job.
 /obj/machinery/suit_storage_unit: SuitStorageBase
+
+# ---- category pass 15/N: random engineering loot spawners ----
+# Each reuses the highest-weighted (most common) item from tgstation's own
+# loot list for that spawner, same category-to-category pattern as the
+# random spawners mapped earlier this session.
+/obj/effect/spawner/random/engineering/material_cheap: MaterialWoodPlank # highest-weight entry is wood
+/obj/effect/spawner/random/engineering/material: SheetSteel # highest-weight entry is iron/fifty
+/obj/effect/spawner/random/engineering/toolbox: ToolboxEmergency # weight 4, the top pick over electrical/mechanical (weight 2 each)
+/obj/effect/spawner/random/engineering/flashlight: FlashlightLantern # weight 20 vs flare's 10; this fork has no bare Flashlight id
+/obj/effect/spawner/random/engineering/canister: AirCanister # weight 4 vs oxygen's 1
+/obj/effect/spawner/random/engineering/tank: WeldingFuelTank # fueltank, weight 5, the top pick over the watertank variants
+/obj/effect/spawner/random/engineering/atmospherics_portable: SpaceHeater # weight 8, the top pick over shieldgen/pump
