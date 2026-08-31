@@ -1427,6 +1427,10 @@
 # resolve unlike the Venus statue below it in this fork's own file (Red vs.
 # Blue toolbox, no signal in tgstation's source for which -- left unresolved).
 /obj/structure/statue/bananium/clown: StatueBananiumClown
+# "spider web... stringy and sticky" -- direct thematic match, both games'
+# spider-antagonist systems produce a smoothed sticky-web structure. Bare;
+# /sealed/tough and /very_sticky inherit, losing only the strength variant.
+/obj/structure/spider/stickyweb: SpiderWeb
 
 # ---- category pass 9/N: stock parts ----
 # Higher-rated stock parts (micro_laser, scanning_module, servo, the subspace
