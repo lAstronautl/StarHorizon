@@ -2873,3 +2873,42 @@
 /obj/machinery/defibrillator_mount/directional/east: {entity: DefibrillatorCabinet, wall: east, onWall: true}
 /obj/machinery/defibrillator_mount/directional/west: {entity: DefibrillatorCabinet, wall: west, onWall: true}
 /obj/structure/sign/painting: RandomPainting # bare "Painting" frame gets a random canvas at runtime in both games; category match, same reasoning as the other random-loot spawners above
+/obj/structure/firelock_frame: FirelockFrame # descriptions match: "firelock frame" / "That is a firelock frame."
+/obj/effect/spawner/random/decoration/glowstick: GlowstickRed # loot table has no marker equivalent, picks the one concrete colour this fork has -- same "spawner -> single fixed item" tradeoff as /obj/effect/spawner/random/structure/girder above
+/obj/effect/spawner/random/structure/chair_comfy: ComfyChair # not actually random -- tgstation's own loot_type_path is a single fixed /obj/structure/chair/comfy, so this is an exact substitution, not a "closest available" guess
+/obj/item/reagent_containers/cup/glass/coffee: DrinkCoffee
+/obj/item/storage/fancy/candle_box: BoxCandle # "candle pack" == "specifically moulded to only carry candles"
+
+# ---- category pass 55/N: north_star.dmm sweep, round 3 (fuzzy keyword pass, each hand-verified) ----
+# Element-labelled chemistry bottles: tgstation's own "<element> bottle" name
+# and its single reagent line up one-to-one with this fork's labelled
+# ChemistryBottle* set (BaseChemistryBottleFilled + a Label component).
+/obj/item/reagent_containers/cup/bottle/carbon: ChemistryBottleCarbon
+/obj/item/reagent_containers/cup/bottle/ethanol: ChemistryBottleEthanol
+/obj/item/reagent_containers/cup/bottle/fluorine: ChemistryBottleFluorine
+/obj/item/reagent_containers/cup/bottle/iodine: ChemistryBottleIodine
+/obj/item/reagent_containers/cup/bottle/iron: ChemistryBottleIron
+/obj/item/reagent_containers/cup/bottle/lithium: ChemistryBottleLithium
+/obj/item/reagent_containers/cup/bottle/mercury: ChemistryBottleMercury
+/obj/item/reagent_containers/cup/bottle/nitrogen: ChemistryBottleNitrogen
+/obj/item/reagent_containers/cup/bottle/oxygen: ChemistryBottleOxygen
+/obj/item/reagent_containers/cup/bottle/phosphorus: ChemistryBottlePhosphorus
+/obj/item/reagent_containers/cup/bottle/potassium: ChemistryBottlePotassium
+/obj/item/reagent_containers/cup/bottle/sodium: ChemistryBottleSodium
+/obj/item/reagent_containers/pill/iron: PillIron
+/obj/item/seeds/coffee: CoffeeSeeds
+/obj/item/seeds/tea: TeaPlantSeeds
+/obj/item/instrument/violin: ViolinInstrument
+/obj/item/light/tube/broken: LightTubeBroken
+/obj/item/toy/nuke: ToyNuke # "Nuclear Fission Explosive toy" == "A plastic model of a Nuclear Fission Explosive"
+/obj/item/toy/plush/rouny: PlushieRouny # tgstation's own "runner plushie" is this fork's mascot rat, Rouny
+/obj/item/trash/cheesie: FoodPacketCheesieTrash # exact name match: "cheesie honkers"
+/obj/item/card/id/advanced/prisoner: PrisonerIDCard # bare; the /one /two /three... subtypes are just different serial numbers, same card
+/obj/item/food/baguette: FoodBreadBaguette
+/obj/item/food/donkpocket/warm/berry: FoodDonkpocketBerryWarm
+/obj/item/food/energybar: FoodSnackEnergyBar
+/obj/item/food/ready_donk: FoodDonkpocket # bare; not an exact match ("Ready-Donk: Bachelor Chow" is a distinct TV-dinner brand) but the closest "sketchy premade traitor food" this fork has
+/obj/item/gun/ballistic/shotgun/doublebarrel: WeaponShotgunDoubleBarreled
+/obj/item/clothing/gloves/boxing/blue: ClothingHandsGlovesBoxingBlue
+/obj/item/clothing/head/rasta: ClothingHeadRastaHat
+/obj/machinery/gravity_generator/main: GravityGenerator
