@@ -1268,3 +1268,15 @@
 /obj/machinery/computer/atmos_alert: ComputerAlert # bare; /station_only inherits
 /obj/machinery/computer/rdconsole: ComputerResearchAndDevelopment # bare; /unlocked inherits
 /obj/machinery/computer/shuttle: ComputerShuttle # bare; /mining, /labor, /mining/common inherit
+
+# ---- category pass 5/N: atmospherics components ----
+# Same "the machine converts, the pipe network it plugs into doesn't" split
+# as the vent pump/scrubber already mapped at the top of this file --
+# these are real placeable atmos devices, not pipe segments.
+/obj/machinery/atmospherics/components/binary/valve: GasValve # bare "manual valve"; /on inherits
+/obj/machinery/atmospherics/components/binary/valve/digital: SignalControlledValve # "a valve that can be controlled with signals"; /on, /layer2, /layer4 inherit
+/obj/machinery/atmospherics/components/trinary/mixer: GasMixer # bare; /flipped, /airmix inherit
+/obj/machinery/atmospherics/components/trinary/filter: GasFilter # bare; /flipped, /atmos/*, /layer2 inherit
+/obj/machinery/atmospherics/components/unary/thermomachine/freezer: GasThermoMachineFreezer # bare "cools gas in connected pipes"; /on, /layer2, /coldroom, /layer4 inherit
+/obj/machinery/atmospherics/components/unary/thermomachine/heater: GasThermoMachineHeater # bare "heats gas in connected pipes"; /on inherits
+/obj/machinery/atmospherics/components/binary/passive_gate: GasPassiveGate # "a one-way air valve that does not require power"; /layer4 inherits
