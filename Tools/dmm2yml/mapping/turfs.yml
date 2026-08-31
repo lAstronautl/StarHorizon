@@ -95,6 +95,27 @@
 # has one dirt tile) are real station floor dressing.
 /turf/open/misc/dirt/station: FloorDirt
 /turf/open/misc/dirt/dark/station: FloorDirt
+# Real snow terrain (icon_state "snow", icons/turf/snow.dmi -- distinct from
+# the station-dressing /turf/open/floor/fake_snow above, which reuses this
+# same tile). Covers /actually_safe by inheritance -- it only changes
+# gas/slowdown vars, not the sprite (snow.dm).
+/turf/open/misc/snow: FloorSnow
+
+# tgstation's plastitanium "pod" floor family (mineral_floor.dm; this fork's
+# maps still carry the pre-rename path -- see tools/UpdatePaths/Scripts/
+# 96838_podstuff_to_plastitatanium.txt, which renamed
+# /turf/open/floor/pod{,/light} to /turf/open/floor/mineral/plastitanium/pod{,/light}
+# upstream). This fork has no plastitanium tile of its own, but a direct
+# side-by-side crop of icon_state "podfloor"/"podfloor_light"/"podfloor_dark"
+# (icons/turf/floors.dmi) against FloorMining/FloorMiningLight/FloorMiningDark's
+# own sprites shows the same design -- a 2x2 grid of rounded plates split by a
+# center cross of grout -- at matching relative light/dark levels across all
+# three variants, just a different render style (solid fill vs. this fork's
+# dithered texture). Closest confirmed visual match in this fork's catalog,
+# not a guess from the name alone.
+/turf/open/floor/pod: FloorMining
+/turf/open/floor/pod/light: FloorMiningLight
+/turf/open/floor/pod/dark: FloorMiningDark
 
 # ---- walls: a tile plus a wall entity on top ----
 /turf/closed/wall:

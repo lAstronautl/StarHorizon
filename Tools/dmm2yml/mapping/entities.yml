@@ -2821,3 +2821,35 @@
 /obj/structure/microscope: CytologyMicroscope
 /obj/structure/reagent_dispensers/keg/beer: WoodenKegBeer
 /obj/vehicle/ridden/secway: VehicleSecway
+
+# ---- category pass 53/N: north_star.dmm sweep ----
+# Same exact-name cross-reference as pass 52, run again against a specific
+# map (north_star.dmm) to close its remaining gaps. One candidate the
+# technique turned up was excluded: /obj/structure/emergency_shield/regenerating
+# ("energy shield") is a stationary, indestructible force-field barrier
+# structure (game/machinery/modular_shield.dm) fed by a shield generator --
+# SS14's own EnergyShield id with that exact name is an unrelated handheld,
+# foldable pocket item (Entities/Objects/Shields/shields.yml), not a
+# placeable barrier.
+/mob/living/basic/pig: MobPig
+/obj/effect/spawner/random/medical: LootSpawnerMedicalClassy # bare parent; category match like the other random spawners above
+/obj/item/food/boiledrice: FoodRiceBoiled
+/obj/item/food/cake/chocolate: FoodCakeChocolate
+/obj/item/pneumatic_cannon/pie: LauncherCreamPie
+/obj/item/stack/sheet/animalhide/mothroach: HideMothroach
+/obj/item/stack/tile/iron/white: FloorTileItemWhite
+/obj/item/weaponcrafting/receiver: ModularReceiver
+# Two paths this fork's own maps still carry pre-rename: tgstation's own
+# tools/UpdatePaths/Scripts renamed both upstream, and the current source
+# confirms the rename (bare /obj/item/knife is the literal original kitchen
+# knife -- "it is said that all other knives are only copies of this one",
+# icon 'icons/obj/service/kitchen.dmi' -- and /obj/item/rag's own desc,
+# "For cleaning up messes, you suppose.", is this fork's RagItem description
+# verbatim).
+/obj/item/knife: KitchenKnife
+/obj/item/reagent_containers/cup/rag: RagItem
+/obj/item/food/grown/carrot: FoodCarrot
+/obj/item/stack/medical/gauze: Gauze
+/obj/item/stack/medical/suture: MedicatedSuture
+/obj/item/stack/medical/mesh: RegenerativeMesh
+/obj/item/stack/tile/wood: FloorTileItemWood
