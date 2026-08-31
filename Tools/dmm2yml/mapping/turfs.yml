@@ -55,6 +55,7 @@
 /turf/open/misc/asteroid/basalt: FloorBasalt
 /turf/open/misc/grass: FloorGrassJungle
 /turf/open/misc/dirt/station: FloorDirt
+/turf/open/misc/dirt/jungle: FloorDirt
 /turf/open/misc/dirt/dark/station: FloorDirt
 /turf/open/misc/snow: FloorSnow
 

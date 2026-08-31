@@ -337,6 +337,9 @@
 /obj/effect/decal/cleanable/blood/gibs/robot_debris: PuddleSmear
 /obj/effect/decal/cleanable/blood/xeno: Puddle
 /obj/effect/decal/cleanable/blood/gibs/xeno: PuddleSmear
+/obj/effect/decal/cleanable/vomit/old: PuddleVomit
+/obj/effect/decal/cleanable/greenglow: Puddle
+/obj/effect/decal/cleanable/chem_pile: Puddle
 
 # ---- job spawn points ----
 /obj/effect/landmark/start/assistant: SpawnPointPassenger
@@ -1370,6 +1373,7 @@
 /mob/living/basic/butterfly: MobButterfly
 /mob/living/basic/goat: MobGoat
 /mob/living/basic/parrot: MobParrot
+/mob/living/basic/slime: MobAdultSlimesGrey
 /mob/living/basic/pet/cat: MobCatSpace
 /mob/living/basic/pet/dog/corgi: MobCorgi
 /mob/living/basic/pet/dog/corgi/puppy: MobCorgiPuppy
@@ -1565,6 +1569,7 @@
 /obj/machinery/computer: BaseComputer
 /obj/machinery/computer/emergency_shuttle: ComputerEmergencyShuttle
 /obj/machinery/computer/monitor: ComputerPowerMonitoring
+/obj/machinery/ai_law_rack/base/core: StationAiUploadComputer
 
 # ---- contraband posters ----
 /obj/structure/sign/poster/contraband/ambrosia_vulgaris: PosterContrabandAmbrosiaVulgaris

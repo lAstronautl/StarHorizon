@@ -1595,6 +1595,19 @@
 
 # ---- cleanable filth ----
 /obj/effect/decal/cleanable/dirt: Dirt
+/obj/effect/decal/cleanable/confetti: Dirt
+/obj/effect/decal/cleanable/glitter: Dirt
+/obj/effect/decal/cleanable/food/flour: DirtLight
+/obj/effect/decal/cleanable/food/salt: DirtLight
+/obj/effect/decal/cleanable/garbage: DirtHeavy
+/obj/effect/decal/cleanable/glass: Remains
+/obj/effect/decal/cleanable/molten_object/large: Remains
+/obj/effect/decal/cleanable/plastic: Remains
+/obj/effect/decal/cleanable/shreds: Remains
+/obj/effect/decal/cleanable/wrapping: Remains
+/obj/effect/decal/cleanable/food/pie_smudge: Remains
+/obj/effect/decal/cleanable/food/plant_smudge: Remains
+/obj/effect/decal/cleanable/food/tomato_smudge: Remains
 
 /obj/effect/decal/cleanable/ash: burnt1
 /obj/effect/decal/cleanable/ash/large: burnt3
