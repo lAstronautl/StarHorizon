@@ -105,3 +105,22 @@
 - /obj/modular_map_root
 - /obj/docking_port
 - /obj/structure/fans/tiny/invisible
+
+# More logic-only landmark subtrees (see the comment above the first batch
+# of these for the general reasoning) -- each is a marker for a
+# tgstation-specific system this fork doesn't implement: the away-mission
+# hotel elevator, the lavaland mining event, ERT event spawning, the
+# automated atmos self-test framework, the AI multicam viewing room
+# (paired with the ai_visible turf already ignored above), the CTF and
+# Mafia minigames, and the procedural river system (river_waypoint's own
+# source sets invisibility = INVISIBILITY_ABSTRACT explicitly, same as the
+# base landmark class every one of these already inherits it from).
+- /obj/effect/landmark/prisonwarp
+- /obj/effect/landmark/ert_spawn
+- /obj/effect/landmark/atmospheric_sanity
+- /obj/effect/landmark/mining_center
+- /obj/effect/landmark/ai_multicam_room
+- /obj/effect/landmark/ctf
+- /obj/effect/landmark/mafia_game_area
+- /obj/effect/landmark/river_waypoint
+- /obj/effect/landmark/transport

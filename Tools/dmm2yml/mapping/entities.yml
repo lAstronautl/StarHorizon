@@ -1487,3 +1487,7 @@
 /obj/effect/spawner/random/engineering/canister: AirCanister # weight 4 vs oxygen's 1
 /obj/effect/spawner/random/engineering/tank: WeldingFuelTank # fueltank, weight 5, the top pick over the watertank variants
 /obj/effect/spawner/random/engineering/atmospherics_portable: SpaceHeater # weight 8, the top pick over shieldgen/pump
+
+# ---- category pass 16/N: remaining landmarks ----
+/obj/effect/landmark/observer_start: SpawnPointObserver # exact match, "Observer-Start"
+/obj/effect/landmark/latejoin: SpawnPointLatejoin # exact match, "JoinLate"
