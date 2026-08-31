@@ -2021,3 +2021,244 @@
 # left to the bare fallback above:
 /obj/machinery/computer/emergency_shuttle: ComputerEmergencyShuttle # "Handles authorization to early launch the shuttle"
 /obj/machinery/computer/monitor: ComputerPowerMonitoring # "monitors power levels across the station"
+
+# ---- category pass 50/N: contraband posters ----
+# This fork ported a large chunk of tgstation's contraband poster jokes
+# verbatim (matched here by exact name-string equality, e.g. "DONK CO.
+# BRAND MICROWAVEABLE FOOD" and "Make Mine a Waffle Corp: Fine Rifles,
+# Economic Prices" both appear character-for-character in both games).
+/obj/structure/sign/poster/contraband/ambrosia_vulgaris: PosterContrabandAmbrosiaVulgaris
+/obj/structure/sign/poster/contraband/ambrosia_vulgaris/directional/north: {entity: PosterContrabandAmbrosiaVulgaris, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/ambrosia_vulgaris/directional/south: {entity: PosterContrabandAmbrosiaVulgaris, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/ambrosia_vulgaris/directional/east: {entity: PosterContrabandAmbrosiaVulgaris, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/ambrosia_vulgaris/directional/west: {entity: PosterContrabandAmbrosiaVulgaris, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/atmosia_independence: PosterContrabandAtmosiaDeclarationIndependence
+/obj/structure/sign/poster/contraband/atmosia_independence/directional/north: {entity: PosterContrabandAtmosiaDeclarationIndependence, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/atmosia_independence/directional/south: {entity: PosterContrabandAtmosiaDeclarationIndependence, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/atmosia_independence/directional/east: {entity: PosterContrabandAtmosiaDeclarationIndependence, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/atmosia_independence/directional/west: {entity: PosterContrabandAtmosiaDeclarationIndependence, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/borg_fancy_1: PosterContrabandBorgFancy
+/obj/structure/sign/poster/contraband/borg_fancy_1/directional/north: {entity: PosterContrabandBorgFancy, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/borg_fancy_1/directional/south: {entity: PosterContrabandBorgFancy, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/borg_fancy_1/directional/east: {entity: PosterContrabandBorgFancy, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/borg_fancy_1/directional/west: {entity: PosterContrabandBorgFancy, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/borg_fancy_2: PosterContrabandBorgFancyv2
+/obj/structure/sign/poster/contraband/borg_fancy_2/directional/north: {entity: PosterContrabandBorgFancyv2, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/borg_fancy_2/directional/south: {entity: PosterContrabandBorgFancyv2, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/borg_fancy_2/directional/east: {entity: PosterContrabandBorgFancyv2, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/borg_fancy_2/directional/west: {entity: PosterContrabandBorgFancyv2, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/bountyhunters: PosterContrabandBountyHunters
+/obj/structure/sign/poster/contraband/bountyhunters/directional/north: {entity: PosterContrabandBountyHunters, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/bountyhunters/directional/south: {entity: PosterContrabandBountyHunters, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/bountyhunters/directional/east: {entity: PosterContrabandBountyHunters, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/bountyhunters/directional/west: {entity: PosterContrabandBountyHunters, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/c20r: PosterContrabandC20r
+/obj/structure/sign/poster/contraband/c20r/directional/north: {entity: PosterContrabandC20r, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/c20r/directional/south: {entity: PosterContrabandC20r, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/c20r/directional/east: {entity: PosterContrabandC20r, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/c20r/directional/west: {entity: PosterContrabandC20r, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/cc64k_ad: PosterContrabandCC64KAd
+/obj/structure/sign/poster/contraband/cc64k_ad/directional/north: {entity: PosterContrabandCC64KAd, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/cc64k_ad/directional/south: {entity: PosterContrabandCC64KAd, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/cc64k_ad/directional/east: {entity: PosterContrabandCC64KAd, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/cc64k_ad/directional/west: {entity: PosterContrabandCC64KAd, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/clown: PosterContrabandClown
+/obj/structure/sign/poster/contraband/clown/directional/north: {entity: PosterContrabandClown, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/clown/directional/south: {entity: PosterContrabandClown, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/clown/directional/east: {entity: PosterContrabandClown, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/clown/directional/west: {entity: PosterContrabandClown, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/communist_state: PosterContrabandCommunistState
+/obj/structure/sign/poster/contraband/communist_state/directional/north: {entity: PosterContrabandCommunistState, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/communist_state/directional/south: {entity: PosterContrabandCommunistState, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/communist_state/directional/east: {entity: PosterContrabandCommunistState, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/communist_state/directional/west: {entity: PosterContrabandCommunistState, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/d_day_promo: PosterContrabandDDayPromo
+/obj/structure/sign/poster/contraband/d_day_promo/directional/north: {entity: PosterContrabandDDayPromo, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/d_day_promo/directional/south: {entity: PosterContrabandDDayPromo, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/d_day_promo/directional/east: {entity: PosterContrabandDDayPromo, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/d_day_promo/directional/west: {entity: PosterContrabandDDayPromo, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/donk_co: PosterContrabandDonk
+/obj/structure/sign/poster/contraband/donk_co/directional/north: {entity: PosterContrabandDonk, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/donk_co/directional/south: {entity: PosterContrabandDonk, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/donk_co/directional/east: {entity: PosterContrabandDonk, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/donk_co/directional/west: {entity: PosterContrabandDonk, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/donut_corp: PosterContrabandDonutCorp
+/obj/structure/sign/poster/contraband/donut_corp/directional/north: {entity: PosterContrabandDonutCorp, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/donut_corp/directional/south: {entity: PosterContrabandDonutCorp, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/donut_corp/directional/east: {entity: PosterContrabandDonutCorp, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/donut_corp/directional/west: {entity: PosterContrabandDonutCorp, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/eat: PosterContrabandEAT
+/obj/structure/sign/poster/contraband/eat/directional/north: {entity: PosterContrabandEAT, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/eat/directional/south: {entity: PosterContrabandEAT, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/eat/directional/east: {entity: PosterContrabandEAT, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/eat/directional/west: {entity: PosterContrabandEAT, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/energy_swords: PosterContrabandEnergySwords
+/obj/structure/sign/poster/contraband/energy_swords/directional/north: {entity: PosterContrabandEnergySwords, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/energy_swords/directional/south: {entity: PosterContrabandEnergySwords, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/energy_swords/directional/east: {entity: PosterContrabandEnergySwords, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/energy_swords/directional/west: {entity: PosterContrabandEnergySwords, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/free_drone: PosterContrabandFreeDrone
+/obj/structure/sign/poster/contraband/free_drone/directional/north: {entity: PosterContrabandFreeDrone, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/free_drone/directional/south: {entity: PosterContrabandFreeDrone, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/free_drone/directional/east: {entity: PosterContrabandFreeDrone, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/free_drone/directional/west: {entity: PosterContrabandFreeDrone, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/free_key: PosterContrabandFreeSyndicateEncryptionKey
+/obj/structure/sign/poster/contraband/free_key/directional/north: {entity: PosterContrabandFreeSyndicateEncryptionKey, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/free_key/directional/south: {entity: PosterContrabandFreeSyndicateEncryptionKey, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/free_key/directional/east: {entity: PosterContrabandFreeSyndicateEncryptionKey, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/free_key/directional/west: {entity: PosterContrabandFreeSyndicateEncryptionKey, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/free_tonto: PosterContrabandFreeTonto
+/obj/structure/sign/poster/contraband/free_tonto/directional/north: {entity: PosterContrabandFreeTonto, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/free_tonto/directional/south: {entity: PosterContrabandFreeTonto, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/free_tonto/directional/east: {entity: PosterContrabandFreeTonto, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/free_tonto/directional/west: {entity: PosterContrabandFreeTonto, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/fun_police: PosterContrabandFunPolice
+/obj/structure/sign/poster/contraband/fun_police/directional/north: {entity: PosterContrabandFunPolice, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/fun_police/directional/south: {entity: PosterContrabandFunPolice, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/fun_police/directional/east: {entity: PosterContrabandFunPolice, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/fun_police/directional/west: {entity: PosterContrabandFunPolice, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/gorlex_recruitment: PosterContrabandEnlistGorlex
+/obj/structure/sign/poster/contraband/gorlex_recruitment/directional/north: {entity: PosterContrabandEnlistGorlex, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/gorlex_recruitment/directional/south: {entity: PosterContrabandEnlistGorlex, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/gorlex_recruitment/directional/east: {entity: PosterContrabandEnlistGorlex, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/gorlex_recruitment/directional/west: {entity: PosterContrabandEnlistGorlex, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/grey_tide: PosterContrabandGreyTide
+/obj/structure/sign/poster/contraband/grey_tide/directional/north: {entity: PosterContrabandGreyTide, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/grey_tide/directional/south: {entity: PosterContrabandGreyTide, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/grey_tide/directional/east: {entity: PosterContrabandGreyTide, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/grey_tide/directional/west: {entity: PosterContrabandGreyTide, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/hacking_guide: PosterContrabandHackingGuide
+/obj/structure/sign/poster/contraband/hacking_guide/directional/north: {entity: PosterContrabandHackingGuide, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/hacking_guide/directional/south: {entity: PosterContrabandHackingGuide, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/hacking_guide/directional/east: {entity: PosterContrabandHackingGuide, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/hacking_guide/directional/west: {entity: PosterContrabandHackingGuide, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/have_a_puff: PosterContrabandHaveaPuff
+/obj/structure/sign/poster/contraband/have_a_puff/directional/north: {entity: PosterContrabandHaveaPuff, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/have_a_puff/directional/south: {entity: PosterContrabandHaveaPuff, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/have_a_puff/directional/east: {entity: PosterContrabandHaveaPuff, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/have_a_puff/directional/west: {entity: PosterContrabandHaveaPuff, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/interdyne_gene_clinics: PosterContrabandInterdyne
+/obj/structure/sign/poster/contraband/interdyne_gene_clinics/directional/north: {entity: PosterContrabandInterdyne, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/interdyne_gene_clinics/directional/south: {entity: PosterContrabandInterdyne, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/interdyne_gene_clinics/directional/east: {entity: PosterContrabandInterdyne, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/interdyne_gene_clinics/directional/west: {entity: PosterContrabandInterdyne, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/kss13: PosterContrabandKosmicheskayaStantsiya
+/obj/structure/sign/poster/contraband/kss13/directional/north: {entity: PosterContrabandKosmicheskayaStantsiya, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/kss13/directional/south: {entity: PosterContrabandKosmicheskayaStantsiya, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/kss13/directional/east: {entity: PosterContrabandKosmicheskayaStantsiya, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/kss13/directional/west: {entity: PosterContrabandKosmicheskayaStantsiya, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/kudzu: PosterContrabandKudzu
+/obj/structure/sign/poster/contraband/kudzu/directional/north: {entity: PosterContrabandKudzu, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/kudzu/directional/south: {entity: PosterContrabandKudzu, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/kudzu/directional/east: {entity: PosterContrabandKudzu, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/kudzu/directional/west: {entity: PosterContrabandKudzu, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/lamarr: PosterContrabandLamarr
+/obj/structure/sign/poster/contraband/lamarr/directional/north: {entity: PosterContrabandLamarr, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/lamarr/directional/south: {entity: PosterContrabandLamarr, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/lamarr/directional/east: {entity: PosterContrabandLamarr, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/lamarr/directional/west: {entity: PosterContrabandLamarr, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/masked_men: PosterContrabandMaskedMen
+/obj/structure/sign/poster/contraband/masked_men/directional/north: {entity: PosterContrabandMaskedMen, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/masked_men/directional/south: {entity: PosterContrabandMaskedMen, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/masked_men/directional/east: {entity: PosterContrabandMaskedMen, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/masked_men/directional/west: {entity: PosterContrabandMaskedMen, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/missing_gloves: PosterContrabandMissingGloves
+/obj/structure/sign/poster/contraband/missing_gloves/directional/north: {entity: PosterContrabandMissingGloves, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/missing_gloves/directional/south: {entity: PosterContrabandMissingGloves, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/missing_gloves/directional/east: {entity: PosterContrabandMissingGloves, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/missing_gloves/directional/west: {entity: PosterContrabandMissingGloves, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/power: PosterContrabandPower
+/obj/structure/sign/poster/contraband/power/directional/north: {entity: PosterContrabandPower, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/power/directional/south: {entity: PosterContrabandPower, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/power/directional/east: {entity: PosterContrabandPower, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/power/directional/west: {entity: PosterContrabandPower, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/punch_shit: PosterContrabandPunchShit
+/obj/structure/sign/poster/contraband/punch_shit/directional/north: {entity: PosterContrabandPunchShit, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/punch_shit/directional/south: {entity: PosterContrabandPunchShit, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/punch_shit/directional/east: {entity: PosterContrabandPunchShit, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/punch_shit/directional/west: {entity: PosterContrabandPunchShit, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/pwr_game: PosterContrabandPwrGame
+/obj/structure/sign/poster/contraband/pwr_game/directional/north: {entity: PosterContrabandPwrGame, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/pwr_game/directional/south: {entity: PosterContrabandPwrGame, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/pwr_game/directional/east: {entity: PosterContrabandPwrGame, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/pwr_game/directional/west: {entity: PosterContrabandPwrGame, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/rebels_unite: PosterContrabandRebelsUnite
+/obj/structure/sign/poster/contraband/rebels_unite/directional/north: {entity: PosterContrabandRebelsUnite, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/rebels_unite/directional/south: {entity: PosterContrabandRebelsUnite, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/rebels_unite/directional/east: {entity: PosterContrabandRebelsUnite, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/rebels_unite/directional/west: {entity: PosterContrabandRebelsUnite, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/red_rum: PosterContrabandRedRum
+/obj/structure/sign/poster/contraband/red_rum/directional/north: {entity: PosterContrabandRedRum, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/red_rum/directional/south: {entity: PosterContrabandRedRum, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/red_rum/directional/east: {entity: PosterContrabandRedRum, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/red_rum/directional/west: {entity: PosterContrabandRedRum, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/revolver: PosterContrabandRevolver
+/obj/structure/sign/poster/contraband/revolver/directional/north: {entity: PosterContrabandRevolver, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/revolver/directional/south: {entity: PosterContrabandRevolver, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/revolver/directional/east: {entity: PosterContrabandRevolver, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/revolver/directional/west: {entity: PosterContrabandRevolver, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/rip_badger: PosterContrabandRIPBadger
+/obj/structure/sign/poster/contraband/rip_badger/directional/north: {entity: PosterContrabandRIPBadger, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/rip_badger/directional/south: {entity: PosterContrabandRIPBadger, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/rip_badger/directional/east: {entity: PosterContrabandRIPBadger, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/rip_badger/directional/west: {entity: PosterContrabandRIPBadger, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/robust_softdrinks: PosterContrabandRobustSoftdrinks
+/obj/structure/sign/poster/contraband/robust_softdrinks/directional/north: {entity: PosterContrabandRobustSoftdrinks, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/robust_softdrinks/directional/south: {entity: PosterContrabandRobustSoftdrinks, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/robust_softdrinks/directional/east: {entity: PosterContrabandRobustSoftdrinks, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/robust_softdrinks/directional/west: {entity: PosterContrabandRobustSoftdrinks, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/shamblers_juice: PosterContrabandShamblersJuice
+/obj/structure/sign/poster/contraband/shamblers_juice/directional/north: {entity: PosterContrabandShamblersJuice, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/shamblers_juice/directional/south: {entity: PosterContrabandShamblersJuice, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/shamblers_juice/directional/east: {entity: PosterContrabandShamblersJuice, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/shamblers_juice/directional/west: {entity: PosterContrabandShamblersJuice, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/smoke: PosterContrabandSmoke
+/obj/structure/sign/poster/contraband/smoke/directional/north: {entity: PosterContrabandSmoke, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/smoke/directional/south: {entity: PosterContrabandSmoke, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/smoke/directional/east: {entity: PosterContrabandSmoke, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/smoke/directional/west: {entity: PosterContrabandSmoke, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/space_cola: PosterContrabandSpaceCola
+/obj/structure/sign/poster/contraband/space_cola/directional/north: {entity: PosterContrabandSpaceCola, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/space_cola/directional/south: {entity: PosterContrabandSpaceCola, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/space_cola/directional/east: {entity: PosterContrabandSpaceCola, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/space_cola/directional/west: {entity: PosterContrabandSpaceCola, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/space_cube: PosterContrabandSpaceCube
+/obj/structure/sign/poster/contraband/space_cube/directional/north: {entity: PosterContrabandSpaceCube, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/space_cube/directional/south: {entity: PosterContrabandSpaceCube, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/space_cube/directional/east: {entity: PosterContrabandSpaceCube, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/space_cube/directional/west: {entity: PosterContrabandSpaceCube, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/space_up: PosterContrabandSpaceUp
+/obj/structure/sign/poster/contraband/space_up/directional/north: {entity: PosterContrabandSpaceUp, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/space_up/directional/south: {entity: PosterContrabandSpaceUp, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/space_up/directional/east: {entity: PosterContrabandSpaceUp, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/space_up/directional/west: {entity: PosterContrabandSpaceUp, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/syndicate_pistol: PosterContrabandSyndicatePistol
+/obj/structure/sign/poster/contraband/syndicate_pistol/directional/north: {entity: PosterContrabandSyndicatePistol, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/syndicate_pistol/directional/south: {entity: PosterContrabandSyndicatePistol, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/syndicate_pistol/directional/east: {entity: PosterContrabandSyndicatePistol, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/syndicate_pistol/directional/west: {entity: PosterContrabandSyndicatePistol, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/syndicate_recruitment: PosterContrabandSyndicateRecruitment
+/obj/structure/sign/poster/contraband/syndicate_recruitment/directional/north: {entity: PosterContrabandSyndicateRecruitment, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/syndicate_recruitment/directional/south: {entity: PosterContrabandSyndicateRecruitment, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/syndicate_recruitment/directional/east: {entity: PosterContrabandSyndicateRecruitment, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/syndicate_recruitment/directional/west: {entity: PosterContrabandSyndicateRecruitment, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/the_big_gas_giant_truth: PosterContrabandTheBigGasTruth
+/obj/structure/sign/poster/contraband/the_big_gas_giant_truth/directional/north: {entity: PosterContrabandTheBigGasTruth, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/the_big_gas_giant_truth/directional/south: {entity: PosterContrabandTheBigGasTruth, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/the_big_gas_giant_truth/directional/east: {entity: PosterContrabandTheBigGasTruth, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/the_big_gas_giant_truth/directional/west: {entity: PosterContrabandTheBigGasTruth, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/the_griffin: PosterContrabandTheGriffin
+/obj/structure/sign/poster/contraband/the_griffin/directional/north: {entity: PosterContrabandTheGriffin, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/the_griffin/directional/south: {entity: PosterContrabandTheGriffin, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/the_griffin/directional/east: {entity: PosterContrabandTheGriffin, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/the_griffin/directional/west: {entity: PosterContrabandTheGriffin, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/tools: PosterContrabandTools
+/obj/structure/sign/poster/contraband/tools/directional/north: {entity: PosterContrabandTools, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/tools/directional/south: {entity: PosterContrabandTools, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/tools/directional/east: {entity: PosterContrabandTools, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/tools/directional/west: {entity: PosterContrabandTools, wall: west, onWall: true}
+/obj/structure/sign/poster/contraband/waffle_corp_rifles: PosterContrabandWaffleCorp
+/obj/structure/sign/poster/contraband/waffle_corp_rifles/directional/north: {entity: PosterContrabandWaffleCorp, wall: north, onWall: true}
+/obj/structure/sign/poster/contraband/waffle_corp_rifles/directional/south: {entity: PosterContrabandWaffleCorp, wall: south, onWall: true}
+/obj/structure/sign/poster/contraband/waffle_corp_rifles/directional/east: {entity: PosterContrabandWaffleCorp, wall: east, onWall: true}
+/obj/structure/sign/poster/contraband/waffle_corp_rifles/directional/west: {entity: PosterContrabandWaffleCorp, wall: west, onWall: true}
