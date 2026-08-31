@@ -2853,3 +2853,9 @@
 /obj/item/stack/medical/suture: MedicatedSuture
 /obj/item/stack/medical/mesh: RegenerativeMesh
 /obj/item/stack/tile/wood: FloorTileItemWood
+/obj/item/food/grown/poppy: FoodPoppy
+# This fork has exactly one flasher entity -- no separate wall-mounted vs.
+# portable split like tgstation's /obj/machinery/flasher vs. /flasher/portable
+# -- so the bare rule covers both, same "one target, no finer split available"
+# reasoning as /turf/open/floor/carpet above.
+/obj/machinery/flasher: PortableFlasher

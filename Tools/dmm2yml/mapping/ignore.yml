@@ -210,6 +210,21 @@
 # mapper places, the same reasoning as step_trigger above.
 - /obj/effect/particle_effect
 
+# Three more structures checked from several angles (exact id, keyword
+# search) and confirmed genuinely absent from this fork's SS14, the same
+# way newscaster/navbeacon/status_display were above -- not renamed, not
+# hidden, the fixture just isn't implemented:
+#   /obj/structure/hedge (and /opaque) -- a smoothing garden-maze structure
+#     (modules/hydroponics/grown/hedges.dm), no Hedge* entity anywhere.
+#   /obj/structure/foamedmetal (and /iron, /resin) -- the wall a chemistry
+#     metal-foam reaction leaves behind (effects_foam.dm); this fork's own
+#     metal foam is a grenade effect only, no placeable resulting wall.
+#   /obj/structure/barricade/sandbags -- a smoothing sandbag cover
+#     (game/machinery/deployable.dm), no Sandbag* entity anywhere.
+- /obj/structure/hedge
+- /obj/structure/foamedmetal
+- /obj/structure/barricade/sandbags
+
 # /turf/open/openspace (and every subtype -- icemoon, icemoon/ruins,
 # icemoon/keep_below, airless, telecomms, coldroom, xenobio): confirmed by
 # source (game/turfs/open/openspace.dm) to be a "hole in the floor" -- it
