@@ -1174,3 +1174,51 @@
 /obj/structure/sign/poster/official/wtf_is_co2/directional/south: {entity: PosterLegitCarbonDioxide, wall: south, onWall: true}
 /obj/structure/sign/poster/official/wtf_is_co2/directional/east: {entity: PosterLegitCarbonDioxide, wall: east, onWall: true}
 /obj/structure/sign/poster/official/wtf_is_co2/directional/west: {entity: PosterLegitCarbonDioxide, wall: west, onWall: true}
+
+# ---- category pass 2/N: food and drink ----
+# Seed packets -- every one of these is confirmed as a real "packet of X
+# seeds" entity in this fork, not just a name-based guess.
+/obj/item/seeds/wheat: WheatSeeds
+/obj/item/seeds/potato: PotatoSeeds
+/obj/item/seeds/banana: BananaSeeds
+/obj/item/seeds/onion: OnionSeeds
+/obj/item/seeds/tomato: TomatoSeeds
+/obj/item/seeds/apple: AppleSeeds
+/obj/item/seeds/carrot: CarrotSeeds
+/obj/item/seeds/garlic: GarlicSeeds
+/obj/item/seeds/pumpkin: PumpkinSeeds
+/obj/item/seeds/watermelon: WatermelonSeeds
+/obj/item/seeds/cannabis: CannabisSeeds
+/obj/item/seeds/ambrosia: AmbrosiaVulgarisSeeds # tgstation's own name is "ambrosia VULGARIS seed pack" -- not the stronger Deus variant
+/obj/item/seeds/tower: TowercapSeeds # "tower-cap mycelium pack"
+/obj/item/seeds/sugarcane: SugarcaneSeeds # not the bare "Sugarcane" id, which is the produce itself
+/obj/item/seeds/orange: OrangeSeeds
+/obj/item/seeds/berry: BerrySeeds
+/obj/item/seeds/cabbage: CabbageSeeds
+/obj/item/seeds/chanter: ChanterelleSeeds
+/obj/item/seeds/rose: RosepSeeds
+/obj/item/seeds/tobacco: TobaccoSeeds
+/obj/item/seeds/aloe: AloeSeeds
+/obj/item/seeds/nettle: NettleSeeds
+/obj/item/seeds/grape: GrapeSeeds
+/obj/item/seeds/sunflower: SunflowerSeeds
+/obj/item/seeds/poppy: PoppySeeds # the seed packet itself -- distinct from the harvested flower below, which has no matching produce item
+
+# Harvested produce -- the FoodProduceBase family, distinct from the seed
+# packets above (a seed packet id would be a category error here, same
+# mistake avoided for the coffee cup/poppy flower items earlier).
+/obj/item/food/grown/banana: FoodBanana
+/obj/item/food/grown/onion: FoodOnion
+/obj/item/food/grown/tomato: FoodTomato
+/obj/item/food/grown/potato: FoodPotato
+/obj/item/food/grown/apple: FoodApple
+/obj/item/food/grown/carrotlike/carrot: FoodCarrot
+/obj/item/food/grown/pumpkin: FoodPumpkin
+/obj/item/food/grown/melonlike/watermelon: FoodWatermelon
+/obj/item/food/grown/grapes: FoodGrape
+/obj/item/food/grown/corn: FoodCorn
+/obj/item/food/grown/citrus/orange: FoodOrange
+
+/obj/item/reagent_containers/blood: Bloodpack # bare; /blood/random above already uses this id
+/obj/item/reagent_containers/cup/bottle/chlorine: ChlorineChemistryVial # the only pre-filled element vial this fork has that matches one of tgstation's ~15 chemical bottles
+/obj/item/reagent_containers/cup/glass/drinkingglass: DrinkGlass
