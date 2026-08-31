@@ -1386,6 +1386,17 @@
 /obj/machinery/button: SignalButton
 /obj/machinery/button/ticket_machine: SignalButton
 /obj/machinery/button/photobooth: SignalButton
+# Same embedded-controller-device case as door_buttons/access_button above
+# ("access console... cycle opening between two airlocks") -- no equivalent,
+# falls back to the same generic wall control shape.
+/obj/machinery/door_buttons/airlock_controller: SignalButtonDirectional
+
+# ---- category pass 29/N: grenades ----
+# Exact name/description matches (Objects/Weapons/Throwable/grenades.yml).
+/obj/item/grenade/chem_grenade/cleaner: CleanerGrenade # "cleanade... releasing large cloud of space cleaner foam"
+/obj/item/grenade/smokebomb: SmokeGrenade
+/obj/item/grenade/empgrenade: EmpGrenade
+/obj/item/grenade/chem_grenade/teargas: TearGasGrenade
 
 # ---- category pass 9/N: stock parts ----
 # Higher-rated stock parts (micro_laser, scanning_module, servo, the subspace
