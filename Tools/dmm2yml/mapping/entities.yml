@@ -1356,3 +1356,75 @@
 # to the one giant spider.
 /mob/living/basic/spider/giant: MobGiantSpider
 /mob/living/basic/bot/cleanbot: MobCleanBot # bare; /autopatrol, /medbay inherit
+
+# ---- category pass 12/N: lights (colour/state combinations) ----
+# The plain colour and /small/dim/red families are already mapped above; these
+# are the remaining two-property combinations (colour+dim, small+broken, etc.)
+# that don't inherit from those more general rules -- each documented with what
+# it loses.
+/obj/machinery/light/directional: Poweredlight # bare, no direction suffix -- rare (3 occurrences total), no wall side to orient toward
+# keeps the warm tint, loses the dim brightness (no warm+dim combo exists)
+/obj/machinery/light/warm/dim/directional/north: {entity: PoweredlightSodium, wall: north}
+/obj/machinery/light/warm/dim/directional/south: {entity: PoweredlightSodium, wall: south}
+/obj/machinery/light/warm/dim/directional/east: {entity: PoweredlightSodium, wall: east}
+/obj/machinery/light/warm/dim/directional/west: {entity: PoweredlightSodium, wall: west}
+# cold has no tint match already (see /cold above); dim doesn't change that
+/obj/machinery/light/cold/dim/directional/north: {entity: Poweredlight, wall: north}
+/obj/machinery/light/cold/dim/directional/south: {entity: Poweredlight, wall: south}
+/obj/machinery/light/cold/dim/directional/east: {entity: Poweredlight, wall: east}
+/obj/machinery/light/cold/dim/directional/west: {entity: Poweredlight, wall: west}
+# same reasoning as the bare /cold and /no_nightlight rules above
+/obj/machinery/light/cold/no_nightlight/directional/north: {entity: Poweredlight, wall: north}
+/obj/machinery/light/cold/no_nightlight/directional/south: {entity: Poweredlight, wall: south}
+/obj/machinery/light/cold/no_nightlight/directional/east: {entity: Poweredlight, wall: east}
+/obj/machinery/light/cold/no_nightlight/directional/west: {entity: Poweredlight, wall: west}
+# no broken-state sprite in this fork; loses the visibly-broken look, keeps the fixture
+/obj/machinery/light/small/broken/directional/north: {entity: PoweredSmallLight, wall: north}
+/obj/machinery/light/small/broken/directional/south: {entity: PoweredSmallLight, wall: south}
+/obj/machinery/light/small/broken/directional/east: {entity: PoweredSmallLight, wall: east}
+/obj/machinery/light/small/broken/directional/west: {entity: PoweredSmallLight, wall: west}
+# small has no colour variants at all (see /small/red above)
+/obj/machinery/light/small/red/dim/directional/north: {entity: PoweredSmallLight, wall: north}
+/obj/machinery/light/small/red/dim/directional/south: {entity: PoweredSmallLight, wall: south}
+/obj/machinery/light/small/red/dim/directional/east: {entity: PoweredSmallLight, wall: east}
+/obj/machinery/light/small/red/dim/directional/west: {entity: PoweredSmallLight, wall: west}
+# no UV/blacklight fixture in this fork
+/obj/machinery/light/blacklight/directional/north: {entity: Poweredlight, wall: north}
+/obj/machinery/light/blacklight/directional/south: {entity: Poweredlight, wall: south}
+/obj/machinery/light/blacklight/directional/east: {entity: Poweredlight, wall: east}
+/obj/machinery/light/blacklight/directional/west: {entity: Poweredlight, wall: west}
+# no UV/blacklight fixture in this fork
+/obj/machinery/light/small/blacklight/directional/north: {entity: PoweredSmallLight, wall: north}
+/obj/machinery/light/small/blacklight/directional/south: {entity: PoweredSmallLight, wall: south}
+/obj/machinery/light/small/blacklight/directional/east: {entity: PoweredSmallLight, wall: east}
+/obj/machinery/light/small/blacklight/directional/west: {entity: PoweredSmallLight, wall: west}
+# no dedicated very-dim sprite; closest available fixture
+/obj/machinery/light/very_dim/directional/north: {entity: Poweredlight, wall: north}
+/obj/machinery/light/very_dim/directional/south: {entity: Poweredlight, wall: south}
+/obj/machinery/light/very_dim/directional/east: {entity: Poweredlight, wall: east}
+/obj/machinery/light/very_dim/directional/west: {entity: Poweredlight, wall: west}
+# full-size fixture has no colour variants (see /small/red above for the same call on the small one)
+/obj/machinery/light/red/dim/directional/north: {entity: Poweredlight, wall: north}
+/obj/machinery/light/red/dim/directional/south: {entity: Poweredlight, wall: south}
+/obj/machinery/light/red/dim/directional/east: {entity: Poweredlight, wall: east}
+/obj/machinery/light/red/dim/directional/west: {entity: Poweredlight, wall: west}
+# bare (non-small) red; no colour variant in this fork
+/obj/machinery/light/red/directional/north: {entity: Poweredlight, wall: north}
+/obj/machinery/light/red/directional/south: {entity: Poweredlight, wall: south}
+/obj/machinery/light/red/directional/east: {entity: Poweredlight, wall: east}
+/obj/machinery/light/red/directional/west: {entity: Poweredlight, wall: west}
+# bare (non-small) broken; no broken-state sprite in this fork
+/obj/machinery/light/broken/directional/north: {entity: Poweredlight, wall: north}
+/obj/machinery/light/broken/directional/south: {entity: Poweredlight, wall: south}
+/obj/machinery/light/broken/directional/east: {entity: Poweredlight, wall: east}
+/obj/machinery/light/broken/directional/west: {entity: Poweredlight, wall: west}
+# exact match -- "a light fixture... equipped with a light tube", i.e. the empty socket
+/obj/machinery/light/empty/directional/north: {entity: PoweredlightEmpty, wall: north}
+/obj/machinery/light/empty/directional/south: {entity: PoweredlightEmpty, wall: south}
+/obj/machinery/light/empty/directional/east: {entity: PoweredlightEmpty, wall: east}
+/obj/machinery/light/empty/directional/west: {entity: PoweredlightEmpty, wall: west}
+# exact match, same as above for the small fixture
+/obj/machinery/light/small/empty/directional/north: {entity: PoweredSmallLightEmpty, wall: north}
+/obj/machinery/light/small/empty/directional/south: {entity: PoweredSmallLightEmpty, wall: south}
+/obj/machinery/light/small/empty/directional/east: {entity: PoweredSmallLightEmpty, wall: east}
+/obj/machinery/light/small/empty/directional/west: {entity: PoweredSmallLightEmpty, wall: west}
