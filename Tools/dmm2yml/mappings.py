@@ -18,6 +18,15 @@ import yaml
 SKIP = "skip"  # what a human writes to say "drop this on purpose"
 NORTH, SOUTH, EAST, WEST = 1, 2, 4, 8
 DIRECTIONS = (NORTH, SOUTH, EAST, WEST)
+# BYOND also OR's two cardinals together for a diagonal facing. Entities in
+# this converter only ever rotate 4 ways, so EntityRule/EntityVariant reject
+# these -- but a handful of decals (tgstation's own /obj/effect/turf_decal/
+# stripes/line, icon_state "warningline", genuinely has 8 hand-drawn dirs)
+# use a diagonal dir to mean "border both of these two edges", i.e. the same
+# picture as the matching cardinal corner decal. DecalRule.dirs allows these
+# in addition to DIRECTIONS.
+NORTHEAST, NORTHWEST, SOUTHEAST, SOUTHWEST = NORTH | EAST, NORTH | WEST, SOUTH | EAST, SOUTH | WEST
+DECAL_DIRECTIONS = DIRECTIONS + (NORTHEAST, NORTHWEST, SOUTHEAST, SOUTHWEST)
 
 # "Mounted on the north wall" and "facing north" are opposites, and SS13 and
 # SS14 disagree about which one they record. SS13 writes the wall
@@ -125,8 +134,8 @@ def _parse_decal(path: str, raw: Any) -> DecalRule:
 
     dirs = {int(key): str(value) for key, value in (raw.get("dirs") or {}).items()}
     for direction in dirs:
-        if direction not in DIRECTIONS:
-            raise MappingError(f"{path}: dir {direction} is not one of {DIRECTIONS}")
+        if direction not in DECAL_DIRECTIONS:
+            raise MappingError(f"{path}: dir {direction} is not one of {DECAL_DIRECTIONS}")
 
     return DecalRule(
         decal_id=raw.get("id"),

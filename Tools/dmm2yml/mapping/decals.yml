@@ -27,6 +27,19 @@
 # below already uses dir 1->NW, 2->SE, 4->NE, 8->SW; if a new corner-style
 # decal is added later, re-derive it the same way rather than copying the
 # line/end N->N pattern -- that pattern does not hold for corners.
+#
+# A third case: /obj/effect/turf_decal/stripes/line's own icon_state
+# ("warningline", decals.dmi) has all 8 BYOND dirs, not just 4 -- extracting
+# and viewing all 8 shows the 4 diagonal ones (dir 5/6/9/10, i.e. NORTH|EAST
+# etc.) are not a rotated line at all, but the exact same double-edge corner
+# picture as WarnCorner*: dir 5 (NORTHEAST) borders the top AND right edges,
+# pixel-identical to warn_corner_ne.png. Unlike the /stripes/corner case
+# above, no opposite-quadrant trick is needed here -- the compound dir names
+# its two edges directly, so NORTHEAST -> WarnCornerNE by name. Mappers can
+# place either a /stripes/corner (cardinal dir) or a /stripes/line with a
+# diagonal dir for the same visual, and both need to resolve here or one of
+# them silently drops the decal (DecalRule.ids_for returns nothing for a dir
+# not in the table).
 
 # ---- hazard stripes ----
 # The true bare path, no subtype at all: /obj/effect/turf_decal's own class
@@ -40,12 +53,20 @@
     2: WarnLineS
     4: WarnLineE
     8: WarnLineW
+    5: WarnCornerNE
+    6: WarnCornerSE
+    9: WarnCornerNW
+    10: WarnCornerSW
 /obj/effect/turf_decal/stripes/line:
   dirs:
     1: WarnLineN
     2: WarnLineS
     4: WarnLineE
     8: WarnLineW
+    5: WarnCornerNE
+    6: WarnCornerSE
+    9: WarnCornerNW
+    10: WarnCornerSW
 /obj/effect/turf_decal/stripes/end:
   dirs:
     1: WarnEndN
@@ -65,6 +86,10 @@
     2: WarnLineGreyscaleS
     4: WarnLineGreyscaleE
     8: WarnLineGreyscaleW
+    5: WarnCornerGreyscaleNE
+    6: WarnCornerGreyscaleSE
+    9: WarnCornerGreyscaleNW
+    10: WarnCornerGreyscaleSW
   color: '#FFFFFFFF'
 /obj/effect/turf_decal/stripes/white/corner:
   dirs:
@@ -85,6 +110,10 @@
     2: WarnLineGreyscaleS
     4: WarnLineGreyscaleE
     8: WarnLineGreyscaleW
+    5: WarnCornerGreyscaleNE
+    6: WarnCornerGreyscaleSE
+    9: WarnCornerGreyscaleNW
+    10: WarnCornerGreyscaleSW
   color: '#DE3A3A96'
 /obj/effect/turf_decal/stripes/red/corner:
   dirs:
@@ -123,6 +152,10 @@
     2: WarnLineS
     4: WarnLineE
     8: WarnLineW
+    5: WarnCornerNE
+    6: WarnCornerSE
+    9: WarnCornerNW
+    10: WarnCornerSW
 # Asteroid stripes are a visually distinct sprite in tgstation (icon_state
 # "ast_warn*", a rougher hand-painted look) but this fork has no matching
 # asteroid-specific decal, so they fall back to the same ids as the regular
@@ -133,6 +166,10 @@
     2: WarnLineS
     4: WarnLineE
     8: WarnLineW
+    5: WarnCornerNE
+    6: WarnCornerSE
+    9: WarnCornerNW
+    10: WarnCornerSW
 /obj/effect/turf_decal/stripes/asteroid/end:
   dirs:
     1: WarnEndN

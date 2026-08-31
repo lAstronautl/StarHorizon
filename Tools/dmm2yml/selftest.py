@@ -281,8 +281,27 @@ def check_decal_corners(mapping_set) -> Result:
             if got != want:
                 problems.append(f"{path} dir {direction}: {got}, expected {want}")
 
+    # A diagonal dir on /stripes/line means something different: BYOND names
+    # the two edges the double-edge picture borders directly (dir 5 =
+    # NORTH|EAST = the top and right edges = WarnCornerNE), no diagonal-flip
+    # involved -- unlike the plain-cardinal /stripes/corner case above. Mixing
+    # the two conventions up would point every diagonal /stripes/line at the
+    # wrong corner.
+    diagonal_expected = {5: "NE", 6: "SE", 9: "NW", 10: "SW"}
+    rule = mapping_set.resolve("/obj/effect/turf_decal/stripes/line", "decal").rule
+    if rule is None or not getattr(rule, "dirs", None):
+        problems.append("/obj/effect/turf_decal/stripes/line: no direction-keyed decal rule")
+    else:
+        for direction, suffix in diagonal_expected.items():
+            got = rule.dirs.get(direction)
+            want = f"WarnCorner{suffix}"
+            if got != want:
+                problems.append(f"/obj/effect/turf_decal/stripes/line dir {direction}: {got}, expected {want}")
+
     return Result(
-        "decals: corner accents match their quadrant", not problems, "; ".join(problems) or "N->NW, S->SE, E->NE, W->SW"
+        "decals: corner accents match their quadrant",
+        not problems,
+        "; ".join(problems) or "N->NW, S->SE, E->NE, W->SW; diagonal line dirs -> matching corner, unflipped",
     )
 
 
