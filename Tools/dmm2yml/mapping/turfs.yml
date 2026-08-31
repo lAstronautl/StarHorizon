@@ -18,7 +18,22 @@
 /turf/open/space: Space
 /turf/open/floor/plating: Plating
 /turf/open/floor/plating/foam: FloorMetalFoam
-/turf/open/floor/catwalk_floor: Lattice
+# Bug found by loading a converted map and seeing bare Lattice wireframe
+# everywhere maintenance corridors should be: this was `Lattice` alone with
+# no entity, which draws only the open see-through frame and none of the
+# grate walkway that's supposed to sit on top of it. tgstation's own turf
+# (catwalk_plating.dm) renders two layers -- an underlay showing what's
+# "underneath" plus the walkway grate on top ("Flooring that shows its
+# contents underneath. Engineers love it!") -- and this fork models that
+# same two-layer idea as a tile plus a structure, not a single tile:
+# Entities/Structures/catwalk.yml's own Catwalk entity ("A catwalk for
+# easier EVA maneuvering...", TrayScanReveal, footstep sound FootstepCatwalk)
+# sits on top of a base tile by design (its own TODO says "move this to
+# tiles once tile smoothing is supported"), and catwalk_preview.png is the
+# same yellow/black-hazard-bordered grate look as tgstation's icon.
+/turf/open/floor/catwalk_floor:
+  tile: Lattice
+  entity: Catwalk
 
 # ---- the iron family (SS14 calls it steel) ----
 /turf/open/floor/iron: FloorSteel
