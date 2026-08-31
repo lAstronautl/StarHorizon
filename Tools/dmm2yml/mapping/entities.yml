@@ -1491,3 +1491,22 @@
 # ---- category pass 16/N: remaining landmarks ----
 /obj/effect/landmark/observer_start: SpawnPointObserver # exact match, "Observer-Start"
 /obj/effect/landmark/latejoin: SpawnPointLatejoin # exact match, "JoinLate"
+
+# ---- category pass 17/N: remaining cameras ----
+# Same physical camera the plain/motion/autoname combinations already
+# mapped above use -- see the comment there. These are the bare (no dir
+# var baked into the path, so no wall side to place against) and
+# double-combination forms that don't inherit from those.
+/obj/machinery/camera: SurveillanceCameraGeneral
+/obj/machinery/camera/emp_proof: SurveillanceCameraGeneral # loses the EMP-proof property, keeps the camera
+/obj/machinery/camera/emp_proof/directional/north: {entity: SurveillanceCameraGeneral, wall: north}
+/obj/machinery/camera/emp_proof/directional/south: {entity: SurveillanceCameraGeneral, wall: south}
+/obj/machinery/camera/emp_proof/directional/east: {entity: SurveillanceCameraGeneral, wall: east}
+/obj/machinery/camera/emp_proof/directional/west: {entity: SurveillanceCameraGeneral, wall: west}
+/obj/machinery/camera/preset/ordnance: SurveillanceCameraGeneral # loses the ordnance-only camera network theme
+/obj/machinery/camera/motion: SurveillanceCameraGeneral # bare; /thunderdome inherits
+/obj/machinery/camera/autoname: SurveillanceCameraGeneral # bare
+/obj/machinery/camera/autoname/motion/directional/north: {entity: SurveillanceCameraGeneral, wall: north}
+/obj/machinery/camera/autoname/motion/directional/south: {entity: SurveillanceCameraGeneral, wall: south}
+/obj/machinery/camera/autoname/motion/directional/east: {entity: SurveillanceCameraGeneral, wall: east}
+/obj/machinery/camera/autoname/motion/directional/west: {entity: SurveillanceCameraGeneral, wall: west}
