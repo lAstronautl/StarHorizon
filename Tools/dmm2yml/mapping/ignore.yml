@@ -9,6 +9,13 @@
 # placed", blank icon_state, nothing to render.
 - /obj/effect/baseturf_helper
 
+# /obj/effect/gibspawner: icon_state exists "for the map editor" only
+# (source comment) -- at runtime it spawns randomized blood-gib decals and
+# self-deletes (return INITIALIZE_HINT_QDEL), the same spawn-then-vanish
+# pattern as mapping_helpers above. The gibs it produces are randomized
+# scatter, not something a static conversion could place correctly anyway.
+- /obj/effect/gibspawner
+
 # SS14 has no areas at all: rooms are defined by their walls and by the station
 # map prototype, not by an area object covering the tiles. All 171 area paths of
 # a typical /tg/ station would otherwise land in the report with nothing useful

@@ -1569,6 +1569,19 @@
 # patient's metabolism and prevents bodily decay" -- exact medical function.
 /obj/machinery/stasis: StasisBed
 
+# ---- category pass 43/N: more vending machines ----
+# Direct name matches (Structures/Machines/vending_machines.yml).
+# "YouTool"/"Tools for tools" is an exact match for tgstation's own
+# "YouTool"/"Tools for tools" vendor. No match for /assist ("Part-Mart",
+# miscellaneous electronics) -- this fork's closest-sounding vendor,
+# Discount Dan's, sells snacks instead.
+/obj/machinery/vending/clothing: VendingMachineClothing
+/obj/machinery/vending/cart: VendingMachineCart
+/obj/machinery/vending/engivend: VendingMachineEngivend
+/obj/machinery/vending/sustenance: VendingMachineSustenance
+/obj/machinery/vending/magivend: VendingMachineMagivend
+/obj/machinery/vending/tool: VendingMachineYouTool
+
 # ---- category pass 9/N: stock parts ----
 # Higher-rated stock parts (micro_laser, scanning_module, servo, the subspace
 # family) have no match beyond the Rating-1 matter bin/capacitor above --
