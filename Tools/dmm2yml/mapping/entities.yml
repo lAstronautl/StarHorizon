@@ -2872,3 +2872,4 @@
 /obj/machinery/defibrillator_mount/directional/south: {entity: DefibrillatorCabinet, wall: south, onWall: true}
 /obj/machinery/defibrillator_mount/directional/east: {entity: DefibrillatorCabinet, wall: east, onWall: true}
 /obj/machinery/defibrillator_mount/directional/west: {entity: DefibrillatorCabinet, wall: west, onWall: true}
+/obj/structure/sign/painting: RandomPainting # bare "Painting" frame gets a random canvas at runtime in both games; category match, same reasoning as the other random-loot spawners above
