@@ -1320,3 +1320,12 @@
 # this fork's part tiers don't go that high. Power cells checked separately:
 /obj/item/stock_parts/power_store/cell: PowerCellMedium # bare "power cell... the popular and reliable version"; /empty inherits
 /obj/item/stock_parts/power_store/cell/potato: PowerCellPotato # exact match, "potato battery"
+
+# ---- category pass 10/N: books ----
+# Bare /manual -- covers every wiki-topic manual (engineering, chemistry,
+# atmospherics, medicine, surgery, robotics, ...) plus the sibling
+# chef_recipes/hydroponics_pod_people/fish_catalog/nuclear paths, all with
+# a generic "a hardcover book" placeholder. /manual/wiki/security_space_law
+# above is more specific and still wins over this.
+/obj/item/book/manual: BookBase
+/obj/item/book/random: BookRandom # exact match, "each book is unique"
