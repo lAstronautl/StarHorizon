@@ -16,6 +16,17 @@
 # scatter, not something a static conversion could place correctly anyway.
 - /obj/effect/gibspawner
 
+# /obj/item/airlock_painter (base tool + its /decal, /decal/cyborg,
+# /decal/debug subtypes): a handheld tool for repainting airlocks and floor
+# decals in-game. SS14 has no equivalent player-facing paint tool -- decals
+# are placed by the map editor, not spawned/applied by an item -- checked
+# Resources/Prototypes/Entities for anything matching "paint" combined with
+# "airlock" or "decal" and found nothing besides unrelated map-generation
+# decal *spawners* (e.g. DecalSpawnerBurns, a random scorch-mark scatterer,
+# which a previous pass of this table had wrongly matched to
+# /obj/item/airlock_painter/decal by keyword only -- caught and reverted).
+- /obj/item/airlock_painter
+
 # SS14 has no areas at all: rooms are defined by their walls and by the station
 # map prototype, not by an area object covering the tiles. All 171 area paths of
 # a typical /tg/ station would otherwise land in the report with nothing useful
