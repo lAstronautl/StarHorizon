@@ -1428,3 +1428,41 @@
 /obj/machinery/light/small/empty/directional/south: {entity: PoweredSmallLightEmpty, wall: south}
 /obj/machinery/light/small/empty/directional/east: {entity: PoweredSmallLightEmpty, wall: east}
 /obj/machinery/light/small/empty/directional/west: {entity: PoweredSmallLightEmpty, wall: west}
+
+# ---- category pass 13/N: vending machines ----
+# The *_wardrobe family matches this fork's own VendingMachine*Drobe id
+# family one-for-one by department -- confirmed by name (e.g. ChemDrobe,
+# EngiDrobe, JaniDrobe are literally short for the same department names
+# tgstation uses). No coroner-themed wardrobe exists in this fork.
+/obj/machinery/vending/wardrobe/chem_wardrobe: VendingMachineChemDrobe
+/obj/machinery/vending/wardrobe/cargo_wardrobe: VendingMachineCargoDrobe
+/obj/machinery/vending/wardrobe/sec_wardrobe: VendingMachineSecDrobe
+/obj/machinery/vending/wardrobe/chef_wardrobe: VendingMachineChefDrobe
+/obj/machinery/vending/wardrobe/gene_wardrobe: VendingMachineGeneDrobe
+/obj/machinery/vending/wardrobe/science_wardrobe: VendingMachineSciDrobe
+/obj/machinery/vending/wardrobe/atmos_wardrobe: VendingMachineAtmosDrobe
+/obj/machinery/vending/wardrobe/bar_wardrobe: VendingBarDrobe
+/obj/machinery/vending/wardrobe/chap_wardrobe: VendingMachineChapel # "PietyVend" -- the chaplain-themed vendor, not literally named "Drobe" but the same department slot
+/obj/machinery/vending/wardrobe/curator_wardrobe: VendingMachineCuraDrobe
+/obj/machinery/vending/wardrobe/det_wardrobe: VendingMachineDetDrobe
+/obj/machinery/vending/wardrobe/engi_wardrobe: VendingMachineEngiDrobe
+/obj/machinery/vending/wardrobe/hydro_wardrobe: VendingMachineHydrobe
+/obj/machinery/vending/wardrobe/jani_wardrobe: VendingMachineJaniDrobe
+/obj/machinery/vending/wardrobe/law_wardrobe: VendingMachineLawDrobe
+/obj/machinery/vending/wardrobe/medi_wardrobe: VendingMachineMediDrobe
+/obj/machinery/vending/wardrobe/robo_wardrobe: VendingMachineRoboDrobe
+/obj/machinery/vending/wardrobe/viro_wardrobe: VendingMachineViroDrobe
+/obj/machinery/vending/wardrobe/cent_wardrobe: VendingMachineCentDrobe
+
+/obj/machinery/vending/boozeomat: VendingMachineBooze # "Booze-O-Mat" -- exact match
+/obj/machinery/vending/games: VendingMachineGames # "Good Clean Fun" -- exact match, description nearly word for word
+/obj/machinery/vending/hydroseeds: VendingMachineSeeds # suffix "Hydroponics"
+/obj/machinery/vending/hydronutrients: VendingMachineNutri # "NutriMax" -- exact name match, both sides
+/obj/machinery/vending/dinnerware: VendingMachineDinnerware # exact match
+/obj/machinery/vending/medical: VendingMachineMedical # "NanoMed Plus... medical drug dispenser"
+/obj/machinery/vending/drugs: VendingMachineMedical # tgstation's own "NanoDrug Plus" is a second, near-identical "medical drugs dispenser" this fork doesn't split out separately from NanoMed
+/obj/machinery/vending/wallmed/directional/north: {entity: VendingMachineWallMedical, wall: north, onWall: true}
+/obj/machinery/vending/wallmed/directional/south: {entity: VendingMachineWallMedical, wall: south, onWall: true}
+/obj/machinery/vending/wallmed/directional/east: {entity: VendingMachineWallMedical, wall: east, onWall: true}
+/obj/machinery/vending/wallmed/directional/west: {entity: VendingMachineWallMedical, wall: west, onWall: true}
+/obj/machinery/vending/sovietsoda: VendingMachineSovietSoda # "BODA... sweet water" -- exact match
