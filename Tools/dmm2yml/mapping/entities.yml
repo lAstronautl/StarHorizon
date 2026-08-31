@@ -1313,6 +1313,12 @@
 /obj/item/toy/plush/carpplushie: PlushieCarp
 /obj/item/toy/plush/slimeplushie: PlushieSlime
 /obj/item/toy/plush/snakeplushie: PlushieSnake
+/obj/item/toy/plush/nukeplushie: PlushieNuke
+/obj/item/toy/plush/lizard_plushie: PlushieLizard # bare; /green and /space/green inherit
+/obj/item/toy/crayon/blue: CrayonBlue
+# Sold via the same uplink-item, syndicate-contraband role in both games
+# (code/modules/uplink/uplink_items/badass.dm) -- exact brand match.
+/obj/item/storage/fancy/cigarettes/cigpack_syndicate: CigPackSyndicate
 
 # ---- category pass 9/N: stock parts ----
 # Higher-rated stock parts (micro_laser, scanning_module, servo, the subspace
