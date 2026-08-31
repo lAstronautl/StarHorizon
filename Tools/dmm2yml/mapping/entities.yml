@@ -1297,3 +1297,19 @@
 /obj/item/storage/pill_bottle: PillCanister # bare, "holds up to 10 pills" -- covers every themed pill bottle subtype (mannitol, mutadone, sepsisillin, epinephrine, ...), losing only the medicine label
 /obj/item/storage/fancy/cigarettes/cigars: CigarCase # bare; /cohiba, /havana inherit
 /obj/item/storage/toolbox/artistic: ToolboxArtistic
+
+# ---- category pass 8/N: toys ----
+/obj/item/toy/crayon/white: CrayonWhite
+/obj/item/toy/crayon/mime: CrayonMime
+/obj/item/toy/crayon/orange: CrayonOrange
+/obj/item/toy/crayon/red: CrayonRed
+/obj/item/toy/crayon/yellow: CrayonYellow
+/obj/item/toy/sword: ToySword
+/obj/item/toy/snappop: SnapPop
+/obj/item/toy/foamblade: FoamBlade
+/obj/item/toy/balloon: BalloonNT # bare, the plain NT balloon; /corgi below is a separate, more specific match
+/obj/item/toy/balloon/corgi: BalloonCorgi
+/obj/item/toy/beach_ball: BeachBall # bare; /branded, /baseball inherit
+/obj/item/toy/plush/carpplushie: PlushieCarp
+/obj/item/toy/plush/slimeplushie: PlushieSlime
+/obj/item/toy/plush/snakeplushie: PlushieSnake
