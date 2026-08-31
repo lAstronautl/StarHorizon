@@ -124,3 +124,13 @@
 - /obj/effect/landmark/mafia_game_area
 - /obj/effect/landmark/river_waypoint
 - /obj/effect/landmark/transport
+
+# /turf/open/genturf (plain, /blue, /orange): not a real tile, a debug
+# placeholder. Its own source comment says so outright -- "This turf doesn't
+# actually do anything beyond provide contrast for mappers and be very
+# visible when stuff breaks in game. [...] If you see this, and you're not a
+# ghost, yell at coders" (code/datums/mapgen/JungleGenerator.dm). The map
+# generator's generate_terrain() overwrites every genturf tile with a
+# procedurally chosen biome turf before a round starts -- it is never the
+# tile a player actually sees, so there is no fixed sprite to convert it to.
+- /turf/open/genturf

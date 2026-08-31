@@ -118,3 +118,43 @@
 /turf/closed/mineral:
   tile: FloorAsteroidSand
   entity: WallRock
+
+# ---- lavaland/icemoon hazard "tiles" (SS14 draws these as an entity sitting
+# on top of a base ground tile, not as a tile of their own -- Resources/Prototypes/
+# Entities/Tiles/{lava,liquid_plasma,chasm}.yml). The underlying ground tile for
+# each pairing is not a guess: tgstation's own get_smooth_underlay_icon on
+# /turf/open/lava/smooth points at /turf/open/misc/asteroid/basalt (basalt.dm),
+# and on /turf/open/chasm/icemoon at /turf/open/misc/asteroid/snow/icemoon
+# (chasm.dm) -- confirmed in code/game/turfs/open/{lava,chasm}.dm. The bare
+# /turf/open/lava and /turf/open/lava/plasma have no such override in source,
+# so they get the only lavaland ground tile this fork has (FloorBasalt) rather
+# than a made-up alternative.
+/turf/open/lava:
+  tile: FloorBasalt
+  entity: FloorLavaEntity
+/turf/open/lava/plasma:
+  tile: FloorBasalt
+  entity: FloorLiquidPlasmaEntity
+/turf/open/chasm:
+  tile: FloorBasalt
+  entity: FloorChasmEntity
+/turf/open/chasm/icemoon:
+  tile: FloorSnow
+  entity: FloorSnowChasm
+
+# "A sheet of solid ice. Looks slippery." (ice.dm) -- FloorIce's own friction
+# value (0.05, vs. a normal tile's 1) is this fork's slippery-ice tile, exact
+# thematic and mechanical match. Covers /icemoon and /smooth by inheritance.
+/turf/open/misc/ice: FloorIce
+
+# A handful of the /turf/open/indestructible/* reskins share the exact same
+# icon_state as an ordinary floor already in this file (_open.dm) -- reusing
+# that tile loses only the "can't be deconstructed" property, which SS14 has
+# no equivalent flag for anyway. The other reskins (necropolis, hierophant,
+# paper, binary, meat, airblock, boss, honk, kitchen, rockyground, light,
+# large) have no sprite match in this fork and are deliberately left
+# unresolved rather than swept in under a guessed bare-/indestructible rule.
+/turf/open/indestructible/white: FloorWhite    # icon_state "white"
+/turf/open/indestructible/dark: FloorDark      # icon_state "darkfull"
+/turf/open/indestructible/permalube: FloorDark # icon_state "darkfull" too, not nested under /dark in the path tree
+/turf/open/indestructible/plating: Plating     # icon_state "plating", desc calls it out as plating
