@@ -1596,3 +1596,31 @@
 /obj/machinery/power/apc/worn_out/directional/south: {entity: APCBasic, wall: south, onWall: true}
 /obj/machinery/power/apc/worn_out/directional/east: {entity: APCBasic, wall: east, onWall: true}
 /obj/machinery/power/apc/worn_out/directional/west: {entity: APCBasic, wall: west, onWall: true}
+
+# ---- category pass 23/N: stairs ----
+# A real, placeable Rotatable structure entity ("The greatest invention
+# since rocket-propelled grenades" -- Resources/Prototypes/Entities/
+# Structures/stairs.yml), not just a decal here -- unlike most directional
+# structures in this file it isn't wall-mounted, so it takes a forced dir:
+# (the numeric-facing form already used for windows/stools above) rather
+# than wall:.
+/obj/structure/stairs/north: {entity: Stairs, dir: 1}
+/obj/structure/stairs/south: {entity: Stairs, dir: 2}
+/obj/structure/stairs/east: {entity: Stairs, dir: 4}
+/obj/structure/stairs/west: {entity: Stairs, dir: 8}
+/obj/structure/stairs: Stairs # bare; uses whatever dir the instance carries
+
+# ---- category pass 24/N: computer consoles ----
+# The bare path's icon_state ("computer"), icon_keyboard ("generic_key") and
+# icon_screen ("generic") (code/game/machinery/computer/_computer.dm) match
+# this fork's BaseComputer layer-for-layer (state: computer / generic_keyboard
+# / generic). This is a fallback for any subtype below it without its own
+# more specific rule here -- tgstation gives many console subtypes their own
+# icon_screen state, so a subtype with a themed screen (not yet individually
+# verified) will render as a blank generic console until it gets its own
+# entry, the same tradeoff /obj/structure/closet's bare rule already makes.
+/obj/machinery/computer: BaseComputer
+# Exact functional + description matches, verified individually rather than
+# left to the bare fallback above:
+/obj/machinery/computer/emergency_shuttle: ComputerEmergencyShuttle # "Handles authorization to early launch the shuttle"
+/obj/machinery/computer/monitor: ComputerPowerMonitoring # "monitors power levels across the station"
