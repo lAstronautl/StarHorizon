@@ -1329,3 +1329,30 @@
 # above is more specific and still wins over this.
 /obj/item/book/manual: BookBase
 /obj/item/book/random: BookRandom # exact match, "each book is unique"
+
+# ---- category pass 11/N: mobs (pets, bots, simple animals) ----
+/mob/living/basic/mouse: MobMouse # bare; /brown/tom, /white, /gray, /rat inherit
+/mob/living/basic/chicken: MobChicken
+/mob/living/basic/butterfly: MobButterfly
+/mob/living/basic/goat: MobGoat # bare; /pete inherits
+/mob/living/basic/parrot: MobParrot # bare; /poly inherits
+/mob/living/basic/pet/cat: MobCatSpace # bare; /runtime, /jerry, /space inherit
+/mob/living/basic/pet/dog/corgi: MobCorgi # bare; /ian inherits
+/mob/living/basic/pet/dog/corgi/puppy: MobCorgiPuppy # bare; /slime, /void inherit
+/mob/living/basic/pet/dog/breaddog: MobBreadDog # exact match, tgstation's own name is "breaddog"
+/mob/living/basic/pet/fox: MobFox # bare; /renault, /docile inherit
+/mob/living/basic/pet/penguin: MobPenguin # bare; /baby/permanent, /emperor inherit
+/mob/living/basic/cow: MobCow
+/mob/living/basic/lizard: MobLizard # bare; /wags_his_tail, /eats_the_roaches inherit
+/mob/living/basic/crab: MobCrab
+/mob/living/basic/mothroach: MobMothroach
+/mob/living/basic/mining/goliath: MobGoliath
+/mob/living/basic/bot/medbot: MobMedibot # bare; /autopatrol inherits
+/mob/living/basic/sloth: MobSloth # bare; /citrus, /paperwork inherit
+# Covers every hostile giant-spider colour/faction variant tgstation has
+# (guard, ambush, hunter, scout, nurse, tangle, tank, breacher, viper,
+# midwife, ice, tarantula, and the named HoS companion sgt_araneus) --
+# none of those cosmetic themes exist in this fork, so they all fall back
+# to the one giant spider.
+/mob/living/basic/spider/giant: MobGiantSpider
+/mob/living/basic/bot/cleanbot: MobCleanBot # bare; /autopatrol, /medbay inherit
