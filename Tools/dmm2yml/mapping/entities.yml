@@ -686,6 +686,14 @@
 /obj/item/storage/medkit/o2: MedkitO2
 /obj/structure/fireplace: Fireplace
 /obj/item/stack/medical/wrap/gauze: Gauze
+# Covers /decal, /decal/cyborg and /decal/debug too (same physical tool in
+# tgstation -- decal_painter.dm's subtypes only swap the ink cartridge/icon,
+# not the function). SS14's SprayPainter ("A spray painter for painting
+# airlocks, pipes, and other items", Content.Server/SprayPainter/
+# SprayPainterSystem.cs) paints airlocks, pipes AND floor decals through one
+# item's UI -- confirmed by reading SprayPainterSystem.cs, which calls
+# DecalSystem.TryAddDecal/RemoveDecal directly.
+/obj/item/airlock_painter: SprayPainter
 # tgstation's bandage: a brute-healing, light-bleed-stopping first aid stack.
 # SS14 has no separate Bandage prototype -- Gauze is the closest available
 # consumable wound-healing stack, not an exact match.
