@@ -1,37 +1,7 @@
-# /turf/... -> an SS14 tile, and optionally an entity standing on it.
-#
-# Rules are inherited down the SS13 path tree: the rule for
-# '/turf/open/floor/iron/dark' also covers '/turf/open/floor/iron/dark/corner',
-# '/dark/textured', '/dark/smooth_half' and so on. SS13 encodes corner and edge
-# variants as separate turfs; SS14 draws those with decals instead, so they all
-# collapse onto the same tile here.
-#
-# Two forms:
-#   /turf/...: TileId
-#   /turf/...: {tile: TileId, entity: PrototypeId}
-#
-# There is deliberately no catch-all for '/turf/open/floor'. A floor this file
-# does not name shows up in the scan report for a human to decide on, rather
-# than being quietly turned into steel.
-
 # ---- space and hull ----
 /turf/open/space: Space
 /turf/open/floor/plating: Plating
 /turf/open/floor/plating/foam: FloorMetalFoam
-# Previously mapped to {tile: Lattice, entity: Catwalk}, copying the rule
-# for the unrelated /obj/structure/lattice/catwalk (an EVA walkway that
-# genuinely sits over open space -- see entities.yml). That was wrong for
-# this path: catwalk_plating.dm's own comment is "Flooring that shows its
-# CONTENTS underneath. Engineers love it!" -- it inherits /turf/open/floor
-# (not /turf/open/floor/plating/lattice or open space), has no
-# initial_gas_mix override, and its /airless subtypes only exist because the
-# base type holds air. It is a solid, airtight maintenance floor with a
-# grate-look skin, not a walkway over vacuum. Mapping it to Lattice (SS14:
-# baseTurf Space, isSpace: true) silently depressurized every maintenance
-# corridor using it. SS14 has no matching grate-look floor prototype, so
-# this uses Plating (solid, walkable, the same "exposed subfloor" tile
-# already used two lines up) -- closest available by function, not a sprite
-# match.
 /turf/open/floor/catwalk_floor: Plating
 
 # ---- the iron family (SS14 calls it steel) ----
@@ -49,12 +19,12 @@
 /turf/open/floor/iron/chapel: FloorSteelMono
 /turf/open/floor/iron/goonplaque: FloorSteel
 /turf/open/floor/iron/recharge_floor: FloorSteel
-/turf/open/floor/iron/stairs: FloorSteel        # SS14 draws stairs as decals
-/turf/open/floor/iron/solarpanel: Plating       # the panels themselves are entities
+/turf/open/floor/iron/stairs: FloorSteel
+/turf/open/floor/iron/solarpanel: Plating
 /turf/open/floor/iron/dark/telecomms: FloorTechMaint
 
 # ---- engineering ----
-/turf/open/floor/engine: FloorReinforced        # also covers /air, /o2, /n2, /vacuum, ...
+/turf/open/floor/engine: FloorReinforced
 /turf/open/floor/glass: FloorGlass
 /turf/open/floor/glass/reinforced: FloorRGlass
 /turf/open/floor/eighties: FloorEighties
@@ -62,15 +32,8 @@
 # ---- misc named floors ----
 /turf/open/floor/plastic: FloorPlastic
 /turf/open/floor/mineral/silver: FloorSilver
-# rockvault.png is icon_state "rockvault" on both sides: tgstation's own
-# /turf/open/floor/vault ("strange floor") and the indestructible-mechanic
-# /turf/open/indestructible/vault use the exact same icon_state.
 /turf/open/floor/vault: FloorRockVault
 /turf/open/indestructible/vault: FloorRockVault
-# Ratvar/clockwork tiles: filled and flat are exact icon_state matches
-# (clockwork_floor_filled.png, reebe.png) -- the bare, unsuffixed bronze
-# floor (icon_state "clockwork_floor", no "_filled") has no equivalent tile
-# in this fork and is left unresolved rather than reusing the filled one.
 /turf/open/floor/bronze/filled: FloorBrassFilled
 /turf/open/floor/bronze/flat: FloorBrassReebe
 
@@ -83,53 +46,24 @@
 /turf/open/floor/wood: FloorWood
 /turf/open/floor/wood/large: FloorWoodLarge
 /turf/open/floor/wood/parquet: FloorWoodTile
-/turf/open/floor/carpet: FloorCarpetOffice      # SS14 has no per-colour carpets
+/turf/open/floor/carpet: FloorCarpetOffice
 
 # ---- natural ----
 /turf/open/floor/grass: FloorGrass
 /turf/open/floor/fake_snow: FloorSnow
-# The base asteroid floor -- basalt above is a colder-biome recolour of the
-# same turf and stays a separate, more specific rule. /airless is the same
-# tile with no atmosphere (code/game/turfs/open/asteroid.dm: only var changes,
-# baseturfs points right back at itself), so it's covered by inheritance.
 /turf/open/misc/asteroid: FloorAsteroidSand
 /turf/open/misc/asteroid/basalt: FloorBasalt
-# /misc/grass itself has no icon_state of its own in tgstation -- every real
-# instance is the /jungle subtype (icon_state "junglegrass", also covering
-# /jungle/lavaland and /jungle/station, which only change baseturfs/atmos, not
-# the sprite) -- FloorGrassJungle's own sprite file is literally grassjungle.png.
-# Unlike the procedural genturf/icemoon biome turfs below, this one has an
-# exact, confirmed sprite match, so it stays mapped rather than excluded.
 /turf/open/misc/grass: FloorGrassJungle
-# Same "use THIS for station maps" split as grass above (planet.dm's own
-# comment on dirt/station literally says so): bare /misc/dirt and /dirt/jungle
-# keep their planetary baseturf and are left with the excluded procedural
-# terrain below, but /dirt/station (icon_state "dirt", unchanged) and
-# /dirt/dark/station ("greenerdirt", losing only the green tint -- this fork
-# has one dirt tile) are real station floor dressing.
 /turf/open/misc/dirt/station: FloorDirt
 /turf/open/misc/dirt/dark/station: FloorDirt
-# Real snow terrain (icon_state "snow", icons/turf/snow.dmi -- distinct from
-# the station-dressing /turf/open/floor/fake_snow above, which reuses this
-# same tile). Covers /actually_safe by inheritance -- it only changes
-# gas/slowdown vars, not the sprite (snow.dm).
 /turf/open/misc/snow: FloorSnow
 
-# tgstation's plastitanium "pod" floor family (mineral_floor.dm; this fork's
-# maps still carry the pre-rename path -- see tools/UpdatePaths/Scripts/
-# 96838_podstuff_to_plastitatanium.txt, which renamed
-# /turf/open/floor/pod{,/light} to /turf/open/floor/mineral/plastitanium/pod{,/light}
-# upstream). This fork has no plastitanium tile of its own, but a direct
-# side-by-side crop of icon_state "podfloor"/"podfloor_light"/"podfloor_dark"
-# (icons/turf/floors.dmi) against FloorMining/FloorMiningLight/FloorMiningDark's
-# own sprites shows the same design -- a 2x2 grid of rounded plates split by a
-# center cross of grout -- at matching relative light/dark levels across all
-# three variants, just a different render style (solid fill vs. this fork's
-# dithered texture). Closest confirmed visual match in this fork's catalog,
-# not a guess from the name alone.
 /turf/open/floor/pod: FloorMining
 /turf/open/floor/pod/light: FloorMiningLight
 /turf/open/floor/pod/dark: FloorMiningDark
+/turf/open/floor/mineral/plastitanium/pod: FloorMining
+/turf/open/floor/mineral/plastitanium/pod/light: FloorMiningLight
+/turf/open/floor/mineral/plastitanium/pod/dark: FloorMiningDark
 
 # ---- walls: a tile plus a wall entity on top ----
 /turf/closed/wall:
@@ -147,23 +81,10 @@
 /turf/closed/mineral/volcanic:
   tile: FloorBasalt
   entity: WallRock
-# The bare, ore-less rock wall -- code/game/turfs/closed/minerals.dm sets its
-# own baseturfs to /turf/open/misc/asteroid/airless, i.e. this is exactly what
-# is left once it's mined out.
 /turf/closed/mineral:
   tile: FloorAsteroidSand
   entity: WallRock
 
-# ---- lavaland/icemoon hazard "tiles" (SS14 draws these as an entity sitting
-# on top of a base ground tile, not as a tile of their own -- Resources/Prototypes/
-# Entities/Tiles/{lava,liquid_plasma,chasm}.yml). The underlying ground tile for
-# each pairing is not a guess: tgstation's own get_smooth_underlay_icon on
-# /turf/open/lava/smooth points at /turf/open/misc/asteroid/basalt (basalt.dm),
-# and on /turf/open/chasm/icemoon at /turf/open/misc/asteroid/snow/icemoon
-# (chasm.dm) -- confirmed in code/game/turfs/open/{lava,chasm}.dm. The bare
-# /turf/open/lava and /turf/open/lava/plasma have no such override in source,
-# so they get the only lavaland ground tile this fork has (FloorBasalt) rather
-# than a made-up alternative.
 /turf/open/lava:
   tile: FloorBasalt
   entity: FloorLavaEntity
@@ -177,47 +98,19 @@
   tile: FloorSnow
   entity: FloorSnowChasm
 
-# "A sheet of solid ice. Looks slippery." (ice.dm) -- FloorIce's own friction
-# value (0.05, vs. a normal tile's 1) is this fork's slippery-ice tile, exact
-# thematic and mechanical match. Covers /icemoon and /smooth by inheritance.
 /turf/open/misc/ice: FloorIce
 
-# A handful of the /turf/open/indestructible/* reskins share the exact same
-# icon_state as an ordinary floor already in this file (_open.dm) -- reusing
-# that tile loses only the "can't be deconstructed" property, which SS14 has
-# no equivalent flag for anyway. The other reskins (necropolis, hierophant,
-# paper, binary, meat, airblock, boss, honk, kitchen, rockyground, light,
-# large) have no sprite match in this fork and are deliberately left
-# unresolved rather than swept in under a guessed bare-/indestructible rule.
-/turf/open/indestructible/white: FloorWhite    # icon_state "white"
-/turf/open/indestructible/dark: FloorDark      # icon_state "darkfull"
-/turf/open/indestructible/permalube: FloorDark # icon_state "darkfull" too, not nested under /dark in the path tree
-/turf/open/indestructible/plating: Plating     # icon_state "plating", desc calls it out as plating
+/turf/open/indestructible/white: FloorWhite
+/turf/open/indestructible/dark: FloorDark
+/turf/open/indestructible/permalube: FloorDark
+/turf/open/indestructible/plating: Plating
 
-# ---- more icon_state matches, same "reuse an already-mapped tile when the
-# sprite is provably identical" methodology as the pairs above ----
-# tiles-asphalt / asphalt.png on the SS14 side, name = "asphalt" and
-# icon_state left at the DMI default (misc_floor.dm) on the tgstation side.
 /turf/open/floor/asphalt: FloorAsphalt
-# fakebasalt (fancy_floor.dm): "Safely recreated turf for your
-# hellplanet-scaping" -- icon_state "basalt", same as the real basalt tile
-# already mapped above.
 /turf/open/floor/fakebasalt: FloorBasalt
-# fakespace (fancy_floor.dm): icon = icons/turf/space.dmi, icon_state
-# "space" -- byte-for-byte the same sprite reference as /turf/open/space's
-# own MAP_SWITCH("space", "space_map") (space.dm), just without the
-# vacuum/hard-space behaviour.
 /turf/open/floor/fakespace: Space
-# Holodeck floor variants (modules/holodeck/turfs.dm): the holodeck system
-# itself has no equivalent in this fork (no Holodeck* prototype anywhere in
-# Resources/Prototypes), so most of this family is left unresolved -- but
-# two subtypes reuse an icon_state this file already has a tile for.
-/turf/open/floor/holofloor/plating: FloorReinforced # icon_state "engine", same as /turf/open/floor/engine above
-/turf/open/floor/holofloor/chapel: FloorSteelMono   # icon_state "chapel", same as /turf/open/floor/iron/chapel above
+/turf/open/floor/holofloor/plating: FloorReinforced
+/turf/open/floor/holofloor/chapel: FloorSteelMono
 
-# ---- stand-ins picked by hand: no matching sprite exists in this fork, but
-# these were chosen deliberately (north_star.dmm review) rather than left
-# blank -- closest available tile by colour/material, not a sprite match. ----
 /turf/open/floor/mineral/plastitanium: FloorShuttleBlack
 /turf/open/floor/mineral/plastitanium/red: FloorShuttleRed
 /turf/open/floor/bamboo/tatami/black: FloorWoodTile

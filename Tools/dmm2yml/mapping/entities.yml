@@ -1,32 +1,4 @@
-# /obj/... and /mob/... -> SS14 entity prototypes.
-#
-# Rules are inherited down the SS13 path tree, so '/obj/structure/table' also
-# covers '/obj/structure/table/optable' unless that has a rule of its own.
-#
-# Forms:
-#   /obj/...: PrototypeId
-#   /obj/...: [PrototypeA, PrototypeB]        several entities on one tile
-#   /obj/...: {entity: Id, dir: 4}            force a facing (see below)
-#   /obj/...: {tile: TileId, entity: Id}      also set the tile underneath
-#
-# SS13 hides the orientation of some objects in the path instead of in a dir
-# var, and it means two different things there:
-#   'wall: north'  the object is mounted on the wall to its north, so in SS14 it
-#                  faces south, away from it. Use this for a device standing on
-#                  the floor next to a wall -- lights, alarms, cameras, APCs.
-#   'dir: 1'       the object simply faces north. Use this for free-standing
-#                  things like stools, and for directional windows/windoors --
-#                  those are the border piece their dir names, not a device
-#                  next to a wall (see the comment above the window rules).
-#                  Values are BYOND's: 1 N, 2 S, 4 E, 8 W.
-# Getting these two mixed up rotates everything by 180 degrees.
-#
-# This file covers the paths a /tg/ station leans on most. Everything else is
-# reported by 'scan' for a human to decide -- that is the point of the tool, so
-# resist the urge to add a catch-all rule here.
-
 # ---- power ----
-# Cables are not here: see ignore.yml.
 /obj/machinery/power/solar: SolarPanel
 /obj/item/solar_assembly: SolarPanel
 /obj/machinery/power/smes: SMESBasic
@@ -59,7 +31,6 @@
 /obj/machinery/door/poddoor/shutters/preopen: ShuttersNormalOpen
 
 # ---- atmospherics ----
-# Pipes are not here: see ignore.yml. These are the machines that sit on them.
 /obj/machinery/atmospherics/components/unary/vent_pump: GasVentPump
 /obj/machinery/atmospherics/components/unary/vent_scrubber: GasVentScrubber
 /obj/machinery/atmospherics/components/unary/portables_connector: GasPort
@@ -69,43 +40,22 @@
 /obj/machinery/meter: GasAnalyzer
 
 # ---- disposals ----
-# tgstation's /obj/structure/disposalpipe/segment abuses a diagonal dir (e.g.
-# NORTHEAST = NORTH|EAST) as a bitmask naming the two ends a bent pipe
-# connects -- see code/modules/recycling/disposal/pipe.dm's ISDIAGONALDIR
-# check. A cardinal dir (or no dir at all) is a straight run instead. The
-# rotation each diagonal needs was found by cross-referencing every
-# DisposalBend in Resources/Maps/amber.yml against its two connected
-# neighbours: SOUTHWEST needs none (0 deg, the SOUTH-facing default),
-# SOUTHEAST needs EAST's rotation, NORTHEAST needs NORTH's, NORTHWEST needs
-# WEST's -- 16-22 samples per case, >70% agreement, the rest explained by
-# unrelated pipes happening to sit on an adjacent tile.
 /obj/structure/disposalpipe/segment:
   entity: DisposalPipe
   byDir:
-    5: { entity: DisposalBend, dir: 1 } # NORTHEAST -> rotate as NORTH
-    6: { entity: DisposalBend, dir: 4 } # SOUTHEAST -> rotate as EAST
-    9: { entity: DisposalBend, dir: 8 } # NORTHWEST -> rotate as WEST
-    10: { entity: DisposalBend, dir: 2 } # SOUTHWEST -> rotate as SOUTH (no rot)
+    5: { entity: DisposalBend, dir: 1 }
+    6: { entity: DisposalBend, dir: 4 }
+    9: { entity: DisposalBend, dir: 8 }
+    10: { entity: DisposalBend, dir: 2 }
 /obj/structure/disposalpipe/broken: DisposalPipeBroken
 /obj/structure/disposalpipe/trunk: DisposalTrunk
 /obj/structure/disposalpipe/junction: DisposalJunction
 /obj/structure/disposalpipe/junction/flip: DisposalJunctionFlipped
 /obj/structure/disposalpipe/junction/yjunction: DisposalYJunction
-# Mail/wrap sorting pipes route tagged items to a side branch via their own
-# tag list, which has no SS14 equivalent to carry over -- but their sprite
-# states (pipe-j1s/pipe-j2s, code/modules/recycling/disposal/pipe_sorting.dm)
-# and 3-way-router shape are identical to SS14's DisposalRouter, so the pipe
-# geometry maps 1:1 even though the tag configuration is dropped.
 /obj/structure/disposalpipe/sorting/mail: DisposalRouter
 /obj/structure/disposalpipe/sorting/mail/flip: DisposalRouterFlipped
 /obj/structure/disposalpipe/sorting/wrap: DisposalRouter
 /obj/structure/disposalpipe/sorting/wrap/flip: DisposalRouterFlipped
-# /obj/structure/disposalpipe/rotator forces an exit direction regardless of
-# which neighbour is actually connected -- a mechanic SS14's disposal system
-# does not have (its DisposalBend only ever follows the pipe it is physically
-# joined to). No rows for it were found on any real tgstation station map, so
-# rather than guess a shape for a mechanic that cannot carry over, it is left
-# unmapped for a human to decide if a custom map ever uses it.
 /obj/machinery/disposal/bin: DisposalUnit
 
 # ---- furniture ----
@@ -166,12 +116,6 @@
 /obj/machinery/light/small/directional/east: {entity: PoweredSmallLight, wall: east}
 /obj/machinery/light/small/directional/west: {entity: PoweredSmallLight, wall: west}
 
-# Colour/brightness variants of the same fixture. Where this fork ships a
-# matching bulb colour prototype it is used (small/dim -> PoweredDimSmallLight,
-# warm -> PoweredlightSodium, a warm sodium-vapour tint); where none exists
-# (cold, plain dim, small/red, no_nightlight's day/night behaviour) it falls
-# back to the plain fixture -- losing only the tint/behaviour, same call
-# already made for the coloured hazard stripes.
 /obj/machinery/light/cold/directional/north: {entity: Poweredlight, wall: north}
 /obj/machinery/light/cold/directional/south: {entity: Poweredlight, wall: south}
 /obj/machinery/light/cold/directional/east: {entity: Poweredlight, wall: east}
@@ -197,10 +141,6 @@
 /obj/machinery/light/small/red/directional/east: {entity: PoweredSmallLight, wall: east}
 /obj/machinery/light/small/red/directional/west: {entity: PoweredSmallLight, wall: west}
 
-# The camera itself is identical between the plain and motion-triggered
-# variants (code/game/machinery/camera.dm: /camera/motion only adds a motion
-# sensor behaviour, no sprite change) -- see camera/autoname above for the
-# same pattern.
 /obj/machinery/camera/motion/directional/north: {entity: SurveillanceCameraGeneral, wall: north}
 /obj/machinery/camera/motion/directional/south: {entity: SurveillanceCameraGeneral, wall: south}
 /obj/machinery/camera/motion/directional/east: {entity: SurveillanceCameraGeneral, wall: east}
@@ -221,17 +161,6 @@
 /obj/structure/sign/warning/secure_area/directional/east: {entity: SignSecureMed, wall: east, onWall: true}
 /obj/structure/sign/warning/secure_area/directional/west: {entity: SignSecureMed, wall: west, onWall: true}
 
-# A directional window is not a device mounted on a floor tile next to a wall
-# (see onWall above) -- it IS the border piece, occupying the edge of its own
-# tile that its dir names. tgstation's own window.dm confirms this directly
-# ("dir == get_dir(loc, T)" is what the window blocks passage through), and it
-# was confirmed against every /tg/ station map: where a directional windoor
-# (the door version of the same border-object family, code/game/machinery/
-# doors/windowdoor.dm) sits right up against a wall on one side, that wall is
-# on the side OPPOSITE the name in its path -- i.e. the path names the way it
-# faces, not the wall it is mounted to (102/102 samples, all main stations).
-# Using wall: here, like the wall-mounted devices above, would face every
-# directional window and windoor 180 degrees from where it should.
 /obj/structure/window/reinforced/spawner/directional/north: {entity: WindowReinforcedDirectional, dir: 1}
 /obj/structure/window/reinforced/spawner/directional/south: {entity: WindowReinforcedDirectional, dir: 2}
 /obj/structure/window/reinforced/spawner/directional/east: {entity: WindowReinforcedDirectional, dir: 4}
@@ -247,13 +176,6 @@
 /obj/structure/chair/stool/directional/south: {entity: Stool, dir: 2}
 /obj/structure/chair/stool/directional/east: {entity: Stool, dir: 4}
 /obj/structure/chair/stool/directional/west: {entity: Stool, dir: 8}
-# ---- added from the tgstation upstream catalog (Tools/dmm2yml/README.md,
-# "Каталог по всему апстриму") -- the tail of common items, furniture and
-# machines that showed up across all seven station maps but weren't yet
-# covered. Every id below was checked against Resources/Prototypes; nothing
-# here is a guess. onWall follows the same rule as before: only set where
-# either a real map (Resources/Maps/amber.yml) shows the SS14 prototype
-# sharing a tile with a wall, or the naming makes it unambiguous (WallClock).
 
 # ---- items (tgstation catalog tail) ----
 /obj/item/analyzer: GasAnalyzer
@@ -343,10 +265,6 @@
 /obj/structure/reagent_dispensers/watertank: WaterTank
 /obj/structure/toilet: ToiletEmpty
 
-# ---- door/window: a rotation only, like Airlock -- see the directional
-# window comment above for why dir is not inverted here. SS14 has no
-# left/right Windoor split (only tgstation's sprite does), so both hands
-# collapse onto the one symmetric prototype. ----
 /obj/machinery/door/window/left/directional/north: {entity: Windoor, dir: 1}
 /obj/machinery/door/window/left/directional/south: {entity: Windoor, dir: 2}
 /obj/machinery/door/window/left/directional/east: {entity: Windoor, dir: 4}
@@ -372,24 +290,9 @@
 /obj/structure/sign/clock/directional/east: {entity: WallClock, wall: east, onWall: true}
 /obj/structure/sign/clock/directional/west: {entity: WallClock, wall: west, onWall: true}
 
-# /obj/machinery/button/door (no /directional suffix): most instances in a
-# real map (MetaStation.dmm) carry no dir var at all, so there is no reliable
-# wall side to shift toward -- checked empirically and 14/18 landed nowhere
-# near a wall. Left as a plain floor placement instead of guessing.
 /obj/machinery/button/door: SignalButton
 /obj/structure/bookcase: Bookshelf
 # ---- random-loot spawners: matched category to category, not item to item ----
-# SS13 and SS14 both roll a random pick from a themed loot table at map init and
-# then delete themselves (Resources/Prototypes/Entities/Markers/Spawners/Random/*),
-# so the honest conversion is "point at the equivalent table", not "pick one item
-# out of it and lose the randomness". Every id below is a placeable marker entity
-# (`- type: entity`, not a bare `- type: entityTable`) confirmed to exist.
-#
-# Rules use path inheritance same as everywhere else: a rule for
-# '/obj/effect/spawner/random/maintenance' also covers '/maintenance/two',
-# '/maintenance/no_decals', etc. -- SS13's "/two" "/three" suffixes just mean
-# "roll this table more than once", which the marker's own spawn chance already
-# approximates without needing a matching id per count.
 /obj/effect/spawner/random/armory: LootSpawnerArmory
 /obj/effect/spawner/random/bedsheet: BedsheetSpawner
 /obj/effect/spawner/random/bureaucracy/folder: FolderSpawner
@@ -418,12 +321,6 @@
 
 # ---- research/mining outpost tail (closing gaps found converting research.dmm) ----
 
-# Ammo/weapons: SS14 does not split real-world calibres the way tgstation
-# does, only broad categories (pistol/magnum/rifle/...). .45 lands on
-# CartridgeMagnum -- WeaponPistolN1984's own description calls .45 "chambered
-# ... the lord's caliber", i.e. SS14's own name for that calibre. wt550 is a
-# literal, unambiguous name match (WeaponSubMachineGunWt550); c9mm/c46x30mm
-# have no closer analogue than the base pistol round.
 /obj/item/ammo_casing/c45: CartridgeMagnum
 /obj/item/ammo_casing/c9mm: CartridgePistol
 /obj/item/ammo_casing/c46x30mm: CartridgePistol
@@ -433,22 +330,15 @@
 /obj/item/gun/ballistic/automatic/wt550: WeaponSubMachineGunWt550
 /obj/item/grenade/c4: C4
 
-# /obj/effect/decal/cleanable/* are objects in SS13, not turf decals, and this
-# fork has no floor-decal equivalent -- but it does have the same thing as a
-# structure (Entities/Effects/puddle.yml), so these fall through to the
-# entity table rather than the decal one (see MappingSet.resolve).
 /obj/effect/decal/cleanable/blood: PuddleBlood
 /obj/effect/decal/cleanable/blood/drip: PuddleBloodSmall
+/obj/effect/decal/cleanable/blood/oil: Puddle
+/obj/effect/decal/cleanable/blood/splatter/oil: Puddle
+/obj/effect/decal/cleanable/blood/gibs/robot_debris: PuddleSmear
+/obj/effect/decal/cleanable/blood/xeno: Puddle
+/obj/effect/decal/cleanable/blood/gibs/xeno: PuddleSmear
 
 # ---- job spawn points ----
-# /obj/effect/landmark itself is invisible (invisibility = INVISIBILITY_ABSTRACT
-# on the base class, code/game/objects/effects/landmarks.dm) in tgstation too,
-# so there is nothing to preserve visually here -- the value is the spawn
-# location itself, which SS14's SpawnPoint markers carry the same way.
-# depsec/* (department-liaison security officers) have no distinct SS14 job or
-# spawn point, so all four collapse onto the plain security officer spawn.
-# "hangover" is the drunk-on-roundstart trait's own spawn tag, but it still
-# spawns you as an ordinary civilian crew member, same as assistant.
 /obj/effect/landmark/start/assistant: SpawnPointPassenger
 /obj/effect/landmark/start/hangover: SpawnPointPassenger
 /obj/effect/landmark/start/security_officer: SpawnPointSecurityOfficer
@@ -458,8 +348,8 @@
 /obj/effect/landmark/start/depsec/supply: SpawnPointSecurityOfficer
 /obj/effect/landmark/start/medical_doctor: SpawnPointMedicalDoctor
 /obj/effect/landmark/start/scientist: SpawnPointScientist
-/obj/effect/landmark/start/geneticist: SpawnPointScientist # no distinct SS14 job; same department cross-check as the geneticist corpse above
-/obj/effect/landmark/start/roboticist: SpawnPointScientist # same reasoning as geneticist above -- robotics is a science sub-specialization here, no distinct job
+/obj/effect/landmark/start/geneticist: SpawnPointScientist
+/obj/effect/landmark/start/roboticist: SpawnPointScientist
 /obj/effect/landmark/start/station_engineer: SpawnPointStationEngineer
 /obj/effect/landmark/start/botanist: SpawnPointBotanist
 /obj/effect/landmark/start/cargo_technician: SpawnPointCargoTechnician
@@ -467,7 +357,7 @@
 /obj/effect/landmark/start/chemist: SpawnPointChemist
 /obj/effect/landmark/start/chaplain: SpawnPointChaplain
 /obj/effect/landmark/start/paramedic: SpawnPointParamedic
-/obj/effect/landmark/start/shaft_miner: SpawnPointSalvageSpecialist # SS14 merged mining into salvage
+/obj/effect/landmark/start/shaft_miner: SpawnPointSalvageSpecialist
 /obj/effect/landmark/start/cyborg: SpawnPointBorg
 /obj/effect/landmark/start/cook: SpawnPointChef
 /obj/effect/landmark/start/lawyer: SpawnPointLawyer
@@ -486,23 +376,8 @@
 /obj/effect/landmark/start/clown: SpawnPointClown
 /obj/effect/landmark/start/mime: SpawnPointMime
 /obj/effect/landmark/start/chief_engineer: SpawnPointChiefEngineer
-# Not mapped after checking -- no equivalent SS14 job/spawn point exists for
-# these, so left for a human to decide rather than reassigned to the nearest
-# job (that would misassign, not just reskin): roboticist, coroner,
-# bitrunner, ai/ai/secondary (the AI is not spawned via a SpawnPoint marker
-# in this fork), new_player, and the bare /landmark/start (not job-specific).
 
 # ---- flora ----
-# tgstation's own base classes describe these as generic decoration --
-# /obj/structure/flora/bush: "Some type of shrubbery"; /grass: "A patch of
-# overgrown grass" -- and every subtype (style_random, style_2/3, ferny,
-# grassy, ...) is the same object with a different icon_state, confirmed in
-# code/game/objects/structures/flora.dm. This fork has no physical bush/grass
-# structure, only ground decals, so they fall through to the entity table via
-# the same decal-fallback path used for cleanable blood above; a decal loses
-# the (minor) density/harvestable behaviour a structure would keep, but nets
-# a visual match instead of nothing. Rock piles keep the real structure
-# match (FloraRockSolid: density = TRUE in both, and it is not a decal).
 /obj/structure/flora/bush: DecalSpawnerBushesAC
 /obj/structure/flora/grass: DecalSpawnerGrassAB
 /obj/structure/flora/rock: FloraRockSolid
@@ -527,7 +402,7 @@
 /obj/item/storage/toolbox/syndicate: ToolboxSyndicate
 /obj/item/storage/box/donkpockets: FoodBoxDonkpocket
 /obj/item/storage/fancy/donut_box: FoodBoxDonut
-/obj/item/storage/fancy/cigarettes/dromedaryco: CigPackRed # exact brand match ("DromedaryCo packet")
+/obj/item/storage/fancy/cigarettes/dromedaryco: CigPackRed
 /obj/item/paper_bin: PaperBin
 /obj/item/circuitboard/machine/smes: SMESMachineCircuitboard
 /obj/item/melee/baton/telescopic: TelescopicShield
@@ -545,21 +420,21 @@
 /obj/item/bedsheet/purple: BedsheetPurple
 /obj/item/bedsheet/rainbow: BedsheetRainbow
 
-/obj/structure/closet: ClosetMaintenance # bare closet, no theme or access level
+/obj/structure/closet: ClosetMaintenance
 /obj/structure/closet/crate: CrateGenericSteel
 /obj/structure/closet/crate/freezer: CrateFreezer
-/obj/structure/closet/crate/preopen: CrateGenericSteel # loses only the starts-open state
+/obj/structure/closet/crate/preopen: CrateGenericSteel
 /obj/structure/closet/crate/bin: CrateTrashCart
 /obj/structure/closet/secure_closet/security: LockerSecurity
 /obj/structure/closet/secure_closet/engineering_personal: LockerEngineer
-/obj/structure/closet/secure_closet/personal/cabinet: LockerSteel # generic secure closet, no personal-effects theme in this fork
+/obj/structure/closet/secure_closet/personal/cabinet: LockerSteel
 /obj/structure/closet/wardrobe/green: WardrobeGreen
 /obj/structure/closet/wardrobe/grey: WardrobeGrey
 /obj/structure/closet/wardrobe/mixed: WardrobeMixed
-/obj/structure/barricade/security: Barricade # loses the security theme, keeps the improvised-barrier concept
+/obj/structure/barricade/security: Barricade
 /obj/structure/frame/machine: MachineFrame
-/obj/structure/plaque/static_plaque/golden: SignPlaque # loses the gold colour, no such variant here
-/obj/structure/tank_dispenser: VendingMachineTankDispenserEVA # bare dispenser stocks both O2 and plasma tanks, same as EVA
+/obj/structure/plaque/static_plaque/golden: SignPlaque
+/obj/structure/tank_dispenser: VendingMachineTankDispenserEVA
 /obj/structure/reagent_dispensers/fueltank: WeldingFuelTank
 /obj/structure/sink/directional/north: {entity: Sink, wall: north, onWall: true}
 /obj/structure/sink/directional/south: {entity: Sink, wall: south, onWall: true}
@@ -572,9 +447,6 @@
 /obj/machinery/vending/cola: VendingMachineCola
 /obj/machinery/vending/security: VendingMachineSec
 /obj/machinery/vending/snack: VendingMachineSnack
-# The four tgstation shuttle-engine part roles (heater/burst/left/right) all
-# collapse onto the one SS14 shuttle engine part -- it has no equivalent
-# per-role split.
 /obj/machinery/power/shuttle_engine/heater: Thruster
 /obj/machinery/power/shuttle_engine/propulsion/burst: Thruster
 /obj/machinery/power/shuttle_engine/propulsion/left: Thruster
@@ -599,7 +471,7 @@
 /obj/structure/sign/warning/no_smoking/circle/directional/south: {entity: SignSmoking, wall: south, onWall: true}
 /obj/structure/sign/warning/no_smoking/circle/directional/east: {entity: SignSmoking, wall: east, onWall: true}
 /obj/structure/sign/warning/no_smoking/circle/directional/west: {entity: SignSmoking, wall: west, onWall: true}
-/obj/structure/sign/warning/no_smoking: SignSmoking # bare (non-directional) variant
+/obj/structure/sign/warning/no_smoking: SignSmoking
 /obj/structure/sign/warning/vacuum/external/directional/north: {entity: SignSpace, wall: north, onWall: true}
 /obj/structure/sign/warning/vacuum/external/directional/south: {entity: SignSpace, wall: south, onWall: true}
 /obj/structure/sign/warning/vacuum/external/directional/east: {entity: SignSpace, wall: east, onWall: true}
@@ -631,22 +503,12 @@
 /obj/structure/sign/poster/official/random/directional/east: {entity: RandomPosterLegit, wall: east, onWall: true}
 /obj/structure/sign/poster/official/random/directional/west: {entity: RandomPosterLegit, wall: west, onWall: true}
 
-# Away-mission combat mobs. /trooper/syndicate matches the existing hostile
-# Syndicate faction NPC (NpcFactionMember: Syndicate) regardless of loadout
-# subtype (ranged/melee/smg are all the same actor, different gear).
-# /trooper/nanotrasen is NOT mapped: it needs a friendly-to-crew,
-# hostile-to-Syndicate NPC, and MobSyndicateFootsoldier is the opposite --
-# using it would invert who the mob attacks, not just reskin it.
 /mob/living/basic/trooper/syndicate: MobSyndicateFootsoldier
 /mob/living/carbon/human/species/monkey: MobMonkey
 /mob/living/carbon/human: MobHuman
 /obj/effect/mob_spawn/corpse/human/doctor: MobRandomMedicCorpse
 /obj/effect/mob_spawn/corpse/human/engineer: MobRandomEngineerCorpse
-/obj/effect/mob_spawn/corpse/human/geneticist: MobRandomScienceCorpse # outfit's own icon_state is "corpsescientist" -- Science, not Medical
-# Syndicate/Nanotrasen soldier corpses: no faction-specific corpse exists,
-# and a dead body's faction no longer matters the way a live mob's does, so
-# the armed-personnel corpse is a fair stand-in for both (loses which side
-# they were on, not who they'd fight).
+/obj/effect/mob_spawn/corpse/human/geneticist: MobRandomScienceCorpse
 /obj/effect/mob_spawn/corpse/human/syndicatesoldier: MobRandomSecurityCorpse
 /obj/effect/mob_spawn/corpse/human/nanotrasensoldier: MobRandomSecurityCorpse
 
@@ -665,9 +527,6 @@
 /obj/item/book/bible: Bible
 /obj/item/flashlight/flare/candle: Candle
 /obj/item/rag: RagItem
-# A box of syringes, not a single syringe -- BoxSyringe (Catalog/Fills/Boxes/
-# medical.yml, "syringe box") matches the container, not SyringeSaline which
-# is one prefilled syringe.
 /obj/item/storage/box/syringes: BoxSyringe
 /obj/item/binoculars: Binoculars
 /obj/item/tank/internals/oxygen: OxygenTank
@@ -679,31 +538,15 @@
 /obj/item/target/clown: TargetClown
 /obj/item/target/syndicate: TargetSyndicate
 /obj/item/clothing/neck/stethoscope: ClothingNeckStethoscope
-# ExtinguisherSpray is the vapour VFX an extinguisher sprays, not the tool
-# itself (parent: Vapor, categories: [HideSpawnMenu]) -- FireExtinguisher is
-# the actual handheld item.
 /obj/item/extinguisher: FireExtinguisher
 /obj/item/storage/medkit/o2: MedkitO2
 /obj/structure/fireplace: Fireplace
 /obj/item/stack/medical/wrap/gauze: Gauze
-# Covers /decal, /decal/cyborg and /decal/debug too (same physical tool in
-# tgstation -- decal_painter.dm's subtypes only swap the ink cartridge/icon,
-# not the function). SS14's SprayPainter ("A spray painter for painting
-# airlocks, pipes, and other items", Content.Server/SprayPainter/
-# SprayPainterSystem.cs) paints airlocks, pipes AND floor decals through one
-# item's UI -- confirmed by reading SprayPainterSystem.cs, which calls
-# DecalSystem.TryAddDecal/RemoveDecal directly.
 /obj/item/airlock_painter: SprayPainter
-# tgstation's bandage: a brute-healing, light-bleed-stopping first aid stack.
-# SS14 has no separate Bandage prototype -- Gauze is the closest available
-# consumable wound-healing stack, not an exact match.
 /obj/item/stack/medical/bandage: Gauze
 /obj/item/plunger: Plunger
 /obj/item/electronics/apc: APCElectronics
 /obj/item/reagent_containers/cup/bottle/epinephrine: EpinephrineMedicalVial
-# The tgstation path is the prisoner's jumpsuit (/clothing/under/...), not an
-# ID card -- ClothingUniformJumpsuitPrisoner, not the same-sounding
-# PrisonerIDCard (parent: IDCardStandard).
 /obj/item/clothing/under/rank/prisoner: ClothingUniformJumpsuitPrisoner
 /obj/structure/ore_box: OreBox
 /obj/item/weldingtool: Welder
@@ -714,24 +557,17 @@
 
 # ---- second catalog-wide pass ----
 /obj/item/clipboard: BoxFolderClipboardEmpty
-/obj/item/flashlight/lamp: Lamp # /lamp/green (a colour variant) inherits this
+/obj/item/flashlight/lamp: Lamp
 /obj/item/tank/internals/emergency_oxygen: EmergencyOxygenTank
 /obj/effect/spawner/random/structure/closet_maintenance: ClosetMaintenance
-/obj/structure/plasticflaps: PlasticFlapsClear # bare/see-through variant
+/obj/structure/plasticflaps: PlasticFlapsClear
 /obj/structure/plasticflaps/opaque: PlasticFlapsOpaque
 /obj/machinery/recharge_station: BorgCharger
 /obj/machinery/portable_atmospherics/scrubber: PortableScrubber
 /obj/machinery/portable_atmospherics/pump: PortablePump
-# tgstation's /plumbed is explicitly the stationary, anchored version of the
-# same water tank (name = "stationary water tank") -- WaterTank is the mobile,
-# wheeled one, so this keeps the tank itself but loses the anchored/plumbed
-# distinction, the same tier of loss as the shuttle-engine roles above.
 /obj/structure/reagent_dispensers/plumbed: WaterTank
-# FloorDrain ("drain... useful for dumping mop buckets") matches the shower
-# drain fixture itself, not the unrelated /obj/machinery/light/floor (a
-# walk-on lightbulb -- no SS14 equivalent, left unmapped).
 /obj/structure/fluff/shower_drain: FloorDrain
-/obj/structure/sign/warning/secure_area: SignSecureMed # bare (non-directional) variant
+/obj/structure/sign/warning/secure_area: SignSecureMed
 /obj/structure/sign/warning/electric_shock: SignShock
 /obj/structure/sign/warning/electric_shock/directional/north: {entity: SignShock, wall: north, onWall: true}
 /obj/structure/sign/warning/electric_shock/directional/south: {entity: SignShock, wall: south, onWall: true}
@@ -740,35 +576,21 @@
 /obj/structure/desk_bell: DeskBell
 
 # ---- third catalog-wide pass ----
-# Correction: SpawnPointPrisoner does exist (parent SpawnPointJobBase, name
-# "prisoner") -- the earlier "prisoner has no SS14 spawn point" note in the
-# job-spawn-points block above was wrong, checked again here.
 /obj/effect/landmark/start/prisoner: SpawnPointPrisoner
 /obj/item/assembly/prox_sensor: ProximitySensor
 /obj/structure/reagent_dispensers/water_cooler: WaterCooler
-/obj/item/shovel: Shovel # bare form of the already-mapped /shovel/spade -- identical description in tgstation source
-/obj/item/stack/sheet/glass: SheetGlass # bare form of the already-mapped /glass/fifty
+/obj/item/shovel: Shovel
+/obj/item/stack/sheet/glass: SheetGlass
 /obj/machinery/computer/crew: ComputerCrewMonitoring
-/obj/item/phone: PhoneInstrument # name/description match tgstation's word for word
+/obj/item/phone: PhoneInstrument
 /obj/item/reagent_containers/cup/bucket: Bucket
 /obj/item/clothing/head/utility/welding: ClothingHeadHatWelding
 /obj/item/grenade/chem_grenade/smart_metal_foam: MetalFoamGrenade
-/obj/structure/sign/painting/library: PaintingEmpty # "waiting to be filled with art" matches the public exhibit mounting
-# door_buttons/access_button is an embedded-controller device this fork has no
-# equivalent for; SignalButtonDirectional (already used for the plain door
-# button) is the closest wall-mounted button shape, losing only the
-# access-control-specific behaviour.
+/obj/structure/sign/painting/library: PaintingEmpty
 /obj/machinery/door_buttons/access_button: SignalButtonDirectional
-# Loses the "electrified" hazard, keeps the physical grille in place -- the
-# cable half of the spawn is dropped for the same reason cables are ignored
-# everywhere else.
 /obj/effect/spawner/structure/electrified_grille: Grille
 
 # ---- fourth catalog-wide pass ----
-# Brig/secure doors are their own branch under /door/window, separate from
-# the /left and /right paths already mapped above -- same border-piece dir
-# rule applies (max_integrity 300 vs a plain windoor's 200 is exactly what
-# WindoorSecure's own "sturdy" description calls out).
 /obj/machinery/door/window/brigdoor/left/directional/north: {entity: WindoorSecure, dir: 1}
 /obj/machinery/door/window/brigdoor/left/directional/south: {entity: WindoorSecure, dir: 2}
 /obj/machinery/door/window/brigdoor/left/directional/east: {entity: WindoorSecure, dir: 4}
@@ -782,12 +604,9 @@
 /obj/item/stack/sheet/mineral/wood: MaterialWoodPlank
 /obj/item/storage/box: BoxCardboard
 /obj/item/toy/plush/moth: PlushieMoth
-/obj/item/chair/plastic: ChairFolding # tgstation's own name is "folding plastic chair"
-/obj/item/storage/briefcase: BriefcaseBrown # same case as the already-mapped /briefcase/secure
-/obj/item/gps/mining: HandheldGPSBasic # loses the mining theme, keeps the GPS function
-# The closest of several linked-sentry-turret control panel variants this
-# fork has (AI/Security/Command) to tgstation's generic "controls a room's
-# automated defenses" panel -- none is a perfect department-neutral match.
+/obj/item/chair/plastic: ChairFolding
+/obj/item/storage/briefcase: BriefcaseBrown
+/obj/item/gps/mining: HandheldGPSBasic
 /obj/machinery/turretid: WeaponEnergyTurretSecurityControlPanel
 
 # ---- fifth catalog-wide pass ----
@@ -798,20 +617,13 @@
 /obj/structure/sign/directions/supply: SignDirectionalSupply
 /obj/machinery/chem_dispenser: ChemDispenser
 /obj/machinery/computer/communications: ComputerComms
-# Bare /smartfridge covers every themed subtype below it that has no rule of
-# its own (organ, chemistry, food, extract, drinks, drying, petri, virology)
-# -- this fork's SmartFridge structure has no per-theme variants, so all of
-# them collapse onto the one generic id, losing only the label/artwork theme.
 /obj/machinery/smartfridge: SmartFridge
 /obj/item/kitchen/spoon/plastic: SpoonPlastic
 /obj/item/clothing/glasses/blindfold: ClothingEyesBlindfold
-/obj/item/target: TargetHuman # the bare, unthemed target -- /clown and /syndicate are already mapped as their own subtypes
+/obj/item/target: TargetHuman
 /obj/item/reagent_containers/cup/glass/mug: DrinkMug
 /obj/item/reagent_containers/cup/glass/shaker: DrinkShaker
 /obj/item/mining_scanner: MineralScanner
-# Autodrobe is tgstation's THEATER COSTUME vendor specifically; this fork's
-# only clothing vending machine (ClothesMate) stocks everyday work clothes,
-# not costumes -- same tier of theme loss as other vending-machine reuses.
 /obj/machinery/vending/autodrobe: VendingMachineClothing
 
 # ---- sixth catalog-wide pass ----
@@ -825,43 +637,37 @@
 /obj/item/reagent_containers/cup/glass/bottle/whiskey: DrinkWhiskeyBottleFull
 /obj/structure/water_source/puddle: Puddle
 /obj/structure/kitchenspike: KitchenSpike
-/obj/item/soap/nanotrasen: SoapNT # description matches word for word ("Nanotrasen brand bar of soap")
-/obj/item/gps: HandheldGPSBasic # bare form; description matches tgstation's word for word
-/obj/structure/sign/warning/vacuum: SignSpace # bare (non-directional) variant, same id as the directional ones above
+/obj/item/soap/nanotrasen: SoapNT
+/obj/item/gps: HandheldGPSBasic
+/obj/structure/sign/warning/vacuum: SignSpace
 
 # ---- seventh catalog-wide pass ----
-/obj/item/soap: Soap # bare, unbranded -- /soap/nanotrasen above is the branded one
-/obj/item/kitchen/fork: Fork # the metal fork; ForkPlastic above is the separate disposable one
-/obj/item/chair: Chair # the item form (icon_state "chair_toppled") of the same furniture piece
-/obj/item/flashlight/flare: Flare # the bare emergency flare; /flare/candle is the separate candle subtype
+/obj/item/soap: Soap
+/obj/item/kitchen/fork: Fork
+/obj/item/chair: Chair
+/obj/item/flashlight/flare: Flare
 /obj/item/toy/basketball: Basketball
 /obj/item/stack/ore/silver: SilverOre
 /obj/item/storage/backpack: ClothingBackpack
-/obj/item/hand_tele: HandTeleporter # description matches tgstation's almost word for word
-/obj/item/tape: CassetteTape # a blank/recorded cassette, not the recorder device (TapeRecorder is a different item)
-/obj/item/defibrillator/loaded: Defibrillator # loses the pre-charged battery state, keeps the tool
+/obj/item/hand_tele: HandTeleporter
+/obj/item/tape: CassetteTape
+/obj/item/defibrillator/loaded: Defibrillator
 /obj/item/melee/baton/security/loaded: Stunbaton
 /obj/item/clothing/shoes/jackboots: ClothingShoesBootsJack
 
 # ---- eighth catalog-wide pass ----
-/obj/structure/sign/nanotrasen: SignNanotrasen1 # bare (non-directional) variant
+/obj/structure/sign/nanotrasen: SignNanotrasen1
 /obj/item/hemostat: Hemostat
-/obj/item/storage/medkit: Medkit # bare, unthemed medkit
+/obj/item/storage/medkit: Medkit
 /obj/structure/mop_bucket: MopBucket
-# Item (toppled/carryable) forms of the already-mapped chair structures --
-# same physical furniture, tgstation's own source confirms (origin_type
-# points straight back at /obj/structure/chair/stool and .../chair/wood).
 /obj/item/chair/stool: Stool
 /obj/item/chair/wood: ChairWood
 /obj/item/fishing_rod: FishingRod
 /obj/item/gavelblock: GavelBlock
 /obj/item/lightreplacer: LightReplacer
 /obj/item/storage/bag/trash: TrashBag
-/obj/item/trash/candle: Candle # a burned-out/melted candle, still the same item visually
+/obj/item/trash/candle: Candle
 /obj/item/soap/deluxe: SoapDeluxe
-# A circuit board item, not the wall device -- FireAlarm above is the full
-# device; this is what you'd insert into an empty frame during construction,
-# same distinction as the earlier APC electronics/APC device split.
 /obj/item/electronics/firealarm: FireAlarmElectronics
 
 # ---- ninth catalog-wide pass ----
@@ -869,22 +675,14 @@
 /obj/item/instrument/harmonica: HarmonicaInstrument
 /obj/structure/musician/piano: PianoInstrument
 /obj/item/bodybag: BodyBag
-/obj/item/cigarette: Cigarette # bare; /cigarette/cigar above is the separate cigar subtype
+/obj/item/cigarette: Cigarette
 /obj/effect/spawner/random/entertainment/cigarette: Cigarette
 /obj/effect/spawner/random/entertainment/cigar: Cigar
-/obj/machinery/computer/robotics: ComputerRoboticsControl # description matches tgstation's almost word for word
-# The ridden vehicle and its folded, carryable item form -- this fork's
-# wheelchair (_Goobstation) has the same split (VehicleWheelchairFolded's
-# own Foldable component is the item state of VehicleWheelchair).
+/obj/machinery/computer/robotics: ComputerRoboticsControl
 /obj/vehicle/ridden/wheelchair: VehicleWheelchair
 /obj/item/wheelchair: VehicleWheelchairFolded
 
 # ---- tenth catalog-wide pass ----
-# JetpackBlackFilled is the plain, fuelled, no-theme jetpack -- used for the
-# bare oxygen jetpack directly, and also for the carbon dioxide subtype
-# (this fork's only jetpacks are named by colour, not by fuel gas, so CO2
-# reuses the plain one rather than staying unmapped: same physical item and
-# function, only the specific propellant gas is lost).
 /obj/item/tank/jetpack: JetpackBlackFilled
 /obj/item/tank/jetpack/carbondioxide: JetpackBlackFilled
 /obj/item/tank/jetpack/captain: JetpackCaptainFilled
@@ -892,13 +690,13 @@
 /obj/item/storage/lockbox/medal: MedalCase
 /obj/machinery/recycler: Recycler
 /obj/item/toy/plush/beeplushie: PlushieBee
-/obj/item/wallframe/apc: APCFrame # the construction frame, "lacking the electronics" -- APCElectronics above is the separate circuit-board item
+/obj/item/wallframe/apc: APCFrame
 
 # ---- eleventh catalog-wide pass ----
-/obj/item/assembly/mousetrap: Mousetrap # bare/unarmed; /armed is already mapped above
-/obj/item/kitchen/spoon: Spoon # the metal spoon; SpoonPlastic above is the separate disposable one
+/obj/item/assembly/mousetrap: Mousetrap
+/obj/item/kitchen/spoon: Spoon
 /obj/item/stack/ore/gold: GoldOre
-/obj/item/storage/bag/construction: ConstructionBag # same pattern as OreBag above
+/obj/item/storage/bag/construction: ConstructionBag
 
 # ---- twelfth catalog-wide pass: sign family ----
 /obj/structure/sign/directions/command: SignHead
@@ -907,7 +705,6 @@
 /obj/structure/sign/directions/dorms: SignDirectionalDorms
 /obj/structure/sign/departments/security: SignSecurity
 /obj/structure/sign/departments/cargo: SignCargo
-# Covers /chemistry/pharmacy and /chemistry/alt too -- generic "chemistry lab" sign, this fork has no separate pharmacy-themed sprite
 /obj/structure/sign/departments/chemistry: SignChem
 /obj/structure/sign/warning/fire: SignFire
 /obj/structure/sign/warning/fire/directional/north: {entity: SignFire, wall: north, onWall: true}
@@ -915,7 +712,7 @@
 /obj/structure/sign/warning/fire/directional/east: {entity: SignFire, wall: east, onWall: true}
 /obj/structure/sign/warning/fire/directional/west: {entity: SignFire, wall: west, onWall: true}
 /obj/structure/sign/warning/radiation: SignRadiation
-/obj/structure/sign/warning/radiation/rad_area: SignRadiation # same core hazard, no separate "radioactive area" sprite in this fork
+/obj/structure/sign/warning/radiation/rad_area: SignRadiation
 /obj/structure/sign/warning/radiation/directional/north: {entity: SignRadiation, wall: north, onWall: true}
 /obj/structure/sign/warning/radiation/rad_area/directional/north: {entity: SignRadiation, wall: north, onWall: true}
 /obj/structure/sign/warning/radiation/directional/south: {entity: SignRadiation, wall: south, onWall: true}
@@ -924,24 +721,19 @@
 /obj/structure/sign/warning/radiation/rad_area/directional/east: {entity: SignRadiation, wall: east, onWall: true}
 /obj/structure/sign/warning/radiation/directional/west: {entity: SignRadiation, wall: west, onWall: true}
 /obj/structure/sign/warning/radiation/rad_area/directional/west: {entity: SignRadiation, wall: west, onWall: true}
-/obj/structure/sign/warning/docking: SignShipDock # "where the evac shuttle will arrive" -- closest match to a generic docking-area warning
+/obj/structure/sign/warning/docking: SignShipDock
 /obj/structure/sign/warning/docking/directional/north: {entity: SignShipDock, wall: north, onWall: true}
 /obj/structure/sign/warning/docking/directional/south: {entity: SignShipDock, wall: south, onWall: true}
 /obj/structure/sign/warning/docking/directional/east: {entity: SignShipDock, wall: east, onWall: true}
 /obj/structure/sign/warning/docking/directional/west: {entity: SignShipDock, wall: west, onWall: true}
-/obj/structure/sign/warning/pods: SignEscapePods # bare; the directional variants are already mapped above
-# SignCryogenics is about cold-storage hazard, not tgstation's general "freezing air" room warning --
-# closest cold-hazard sign this fork has, loses the specific theme, keeps the core cold warning.
+/obj/structure/sign/warning/pods: SignEscapePods
 /obj/structure/sign/warning/cold_temp: SignCryogenics
 /obj/structure/sign/warning/cold_temp/directional/north: {entity: SignCryogenics, wall: north, onWall: true}
 /obj/structure/sign/warning/cold_temp/directional/south: {entity: SignCryogenics, wall: south, onWall: true}
 /obj/structure/sign/warning/cold_temp/directional/east: {entity: SignCryogenics, wall: east, onWall: true}
 /obj/structure/sign/warning/cold_temp/directional/west: {entity: SignCryogenics, wall: west, onWall: true}
-/obj/structure/sign/warning: SignDanger # bare, unthemed warning sign
-/obj/structure/sign/plaques/kiddie: SignKiddiePlaque # covers /kiddie/library too
-# No per-theme painting-frame exists for these more specific tgstation variants --
-# PaintingEmpty (already used for the bare /library path above) covers all of them,
-# losing only the curated/private/large framing, not the "place for hung art" concept.
+/obj/structure/sign/warning: SignDanger
+/obj/structure/sign/plaques/kiddie: SignKiddiePlaque
 /obj/structure/sign/painting/library_secure: PaintingEmpty
 /obj/structure/sign/painting/library_private: PaintingEmpty
 /obj/structure/sign/painting/large/library: PaintingEmpty
@@ -951,17 +743,13 @@
 /obj/structure/sign/flag/nanotrasen/directional/south: {entity: NTFlag, wall: south, onWall: true}
 /obj/structure/sign/flag/nanotrasen/directional/east: {entity: NTFlag, wall: east, onWall: true}
 /obj/structure/sign/flag/nanotrasen/directional/west: {entity: NTFlag, wall: west, onWall: true}
-/obj/structure/sign/poster/ripped: PosterBroken # description matches tgstation's word for word
+/obj/structure/sign/poster/ripped: PosterBroken
 /obj/structure/sign/poster/ripped/directional/north: {entity: PosterBroken, wall: north, onWall: true}
 /obj/structure/sign/poster/ripped/directional/south: {entity: PosterBroken, wall: south, onWall: true}
 /obj/structure/sign/poster/ripped/directional/east: {entity: PosterBroken, wall: east, onWall: true}
 /obj/structure/sign/poster/ripped/directional/west: {entity: PosterBroken, wall: west, onWall: true}
 /obj/structure/sign/map/meta/right: PosterMapMetaRight
 
-# Every one of these tgstation official posters exists in this fork under the same
-# name/description (a wholesale ported asset set, confirmed on a dozen samples word for
-# word) -- a handful with no match (plasma_effects, jim_nortons, twenty_four_seven,
-# midtown_slice, festive, download, map/meta/left) are left unresolved.
 /obj/structure/sign/poster/official/anniversary_vintage_reprint: PosterLegit50thAnniversaryVintageReprint
 /obj/structure/sign/poster/official/anniversary_vintage_reprint/directional/north: {entity: PosterLegit50thAnniversaryVintageReprint, wall: north, onWall: true}
 /obj/structure/sign/poster/official/anniversary_vintage_reprint/directional/south: {entity: PosterLegit50thAnniversaryVintageReprint, wall: south, onWall: true}
@@ -1188,9 +976,7 @@
 /obj/structure/sign/poster/official/wtf_is_co2/directional/east: {entity: PosterLegitCarbonDioxide, wall: east, onWall: true}
 /obj/structure/sign/poster/official/wtf_is_co2/directional/west: {entity: PosterLegitCarbonDioxide, wall: west, onWall: true}
 
-# ---- category pass 2/N: food and drink ----
-# Seed packets -- every one of these is confirmed as a real "packet of X
-# seeds" entity in this fork, not just a name-based guess.
+# ---- food and drink ----
 /obj/item/seeds/wheat: WheatSeeds
 /obj/item/seeds/potato: PotatoSeeds
 /obj/item/seeds/banana: BananaSeeds
@@ -1202,9 +988,9 @@
 /obj/item/seeds/pumpkin: PumpkinSeeds
 /obj/item/seeds/watermelon: WatermelonSeeds
 /obj/item/seeds/cannabis: CannabisSeeds
-/obj/item/seeds/ambrosia: AmbrosiaVulgarisSeeds # tgstation's own name is "ambrosia VULGARIS seed pack" -- not the stronger Deus variant
-/obj/item/seeds/tower: TowercapSeeds # "tower-cap mycelium pack"
-/obj/item/seeds/sugarcane: SugarcaneSeeds # not the bare "Sugarcane" id, which is the produce itself
+/obj/item/seeds/ambrosia: AmbrosiaVulgarisSeeds
+/obj/item/seeds/tower: TowercapSeeds
+/obj/item/seeds/sugarcane: SugarcaneSeeds
 /obj/item/seeds/orange: OrangeSeeds
 /obj/item/seeds/berry: BerrySeeds
 /obj/item/seeds/cabbage: CabbageSeeds
@@ -1215,11 +1001,8 @@
 /obj/item/seeds/nettle: NettleSeeds
 /obj/item/seeds/grape: GrapeSeeds
 /obj/item/seeds/sunflower: SunflowerSeeds
-/obj/item/seeds/poppy: PoppySeeds # the seed packet itself -- distinct from the harvested flower below, which has no matching produce item
+/obj/item/seeds/poppy: PoppySeeds
 
-# Harvested produce -- the FoodProduceBase family, distinct from the seed
-# packets above (a seed packet id would be a category error here, same
-# mistake avoided for the coffee cup/poppy flower items earlier).
 /obj/item/food/grown/banana: FoodBanana
 /obj/item/food/grown/onion: FoodOnion
 /obj/item/food/grown/tomato: FoodTomato
@@ -1232,18 +1015,15 @@
 /obj/item/food/grown/corn: FoodCorn
 /obj/item/food/grown/citrus/orange: FoodOrange
 
-/obj/item/reagent_containers/blood: Bloodpack # bare; /blood/random above already uses this id
-/obj/item/reagent_containers/cup/bottle/chlorine: ChlorineChemistryVial # the only pre-filled element vial this fork has that matches one of tgstation's ~15 chemical bottles
+/obj/item/reagent_containers/blood: Bloodpack
+/obj/item/reagent_containers/cup/bottle/chlorine: ChlorineChemistryVial
 /obj/item/reagent_containers/cup/glass/drinkingglass: DrinkGlass
 
-# ---- category pass 3/N: clothing ----
+# ---- clothing ----
 /obj/item/clothing/glasses/hud/health: ClothingEyesHudMedical
-/obj/item/clothing/gloves/color/fyellow: ClothingHandsGlovesColorYellowBudget # "budget insulated gloves", tgstation's own name for this cheap-knockoff variant
+/obj/item/clothing/gloves/color/fyellow: ClothingHandsGlovesColorYellowBudget
 /obj/item/clothing/head/utility/hardhat/orange: ClothingHeadHatHardhatOrange
-/obj/item/clothing/mask/surgical: ClothingMaskSterile # description matches tgstation's word for word
-# Bare wintercoat -- the /science, /engineering, /eva, /security and /miner
-# subtypes below it inherit this, since this fork's coat has no per-department
-# recolour (loses the theme, keeps "a heavy winter coat").
+/obj/item/clothing/mask/surgical: ClothingMaskSterile
 /obj/item/clothing/suit/hooded/wintercoat: ClothingOuterWinterCoat
 /obj/item/clothing/shoes/magboots: ClothingShoesBootsMag
 /obj/item/clothing/glasses/sunglasses: ClothingEyesGlassesSunglasses
@@ -1255,63 +1035,54 @@
 /obj/item/clothing/mask/muzzle: ClothingMaskMuzzle
 /obj/item/clothing/head/hats/bowler: ClothingHeadHatBowlerHat
 /obj/item/clothing/head/hats/tophat: ClothingHeadHatTophat
-/obj/item/clothing/head/cowboy: ClothingHeadHatCowboyBrown # tgstation's bare "cowboy hat" is unthemed; this is the closest unthemed variant this fork has (/brown and /black are separately named "sheriff"/"desperado" hats there)
+/obj/item/clothing/head/cowboy: ClothingHeadHatCowboyBrown
 /obj/item/clothing/shoes/clown_shoes: ClothingShoesClown
 /obj/item/clothing/under/color/blue: ClothingUniformJumpsuitColorBlue
 /obj/item/clothing/under/color/green: ClothingUniformJumpsuitColorGreen
 /obj/item/clothing/under/color/grey: ClothingUniformJumpsuitColorGrey
 /obj/item/clothing/suit/apron/chef: ClothingOuterApronChef
-/obj/item/clothing/suit/apron: ClothingOuterApron # bare
-/obj/item/clothing/head/costume/cardborg: ClothingHeadHatCardborg # "a hat made out of a box"
+/obj/item/clothing/suit/apron: ClothingOuterApron
+/obj/item/clothing/head/costume/cardborg: ClothingHeadHatCardborg
 /obj/item/clothing/gloves/fingerless: ClothingHandsGlovesFingerless
 /obj/item/clothing/glasses/eyepatch: ClothingEyesEyepatch
 /obj/item/clothing/shoes/leather: ClothingShoesLeather
 
-# ---- category pass 4/N: computers/consoles ----
-/obj/machinery/computer/records/security: ComputerCriminalRecords # "criminal records computer... check criminal records" -- near-synonym match
-/obj/machinery/modular_computer/preset/id: ComputerId # covers /id/centcom too
-# Bare console; every /security/* subtype below (hos, mining, wooden_tv, labor,
-# qm, ...) inherits it -- this fork's camera monitor has no per-department
-# variant, so they all collapse onto the one id.
+# ---- computers/consoles ----
+/obj/machinery/computer/records/security: ComputerCriminalRecords
+/obj/machinery/modular_computer/preset/id: ComputerId
 /obj/machinery/computer/security: ComputerSurveillanceCameraMonitor
-# Same icon_state in tgstation's own source (station_alert literally reuses
-# atmos_alert's sprite) and near-identical "automated alert system" wording --
-# ComputerAlert covers both.
 /obj/machinery/computer/station_alert: ComputerAlert
-/obj/machinery/computer/atmos_alert: ComputerAlert # bare; /station_only inherits
-/obj/machinery/computer/rdconsole: ComputerResearchAndDevelopment # bare; /unlocked inherits
-/obj/machinery/computer/shuttle: ComputerShuttle # bare; /mining, /labor, /mining/common inherit
+/obj/machinery/computer/atmos_alert: ComputerAlert
+/obj/machinery/computer/rdconsole: ComputerResearchAndDevelopment
+/obj/machinery/computer/shuttle: ComputerShuttle
 
-# ---- category pass 5/N: atmospherics components ----
-# Same "the machine converts, the pipe network it plugs into doesn't" split
-# as the vent pump/scrubber already mapped at the top of this file --
-# these are real placeable atmos devices, not pipe segments.
-/obj/machinery/atmospherics/components/binary/valve: GasValve # bare "manual valve"; /on inherits
-/obj/machinery/atmospherics/components/binary/valve/digital: SignalControlledValve # "a valve that can be controlled with signals"; /on, /layer2, /layer4 inherit
-/obj/machinery/atmospherics/components/trinary/mixer: GasMixer # bare; /flipped, /airmix inherit
-/obj/machinery/atmospherics/components/trinary/filter: GasFilter # bare; /flipped, /atmos/*, /layer2 inherit
-/obj/machinery/atmospherics/components/unary/thermomachine/freezer: GasThermoMachineFreezer # bare "cools gas in connected pipes"; /on, /layer2, /coldroom, /layer4 inherit
-/obj/machinery/atmospherics/components/unary/thermomachine/heater: GasThermoMachineHeater # bare "heats gas in connected pipes"; /on inherits
-/obj/machinery/atmospherics/components/binary/passive_gate: GasPassiveGate # "a one-way air valve that does not require power"; /layer4 inherits
+# ---- atmospherics components ----
+/obj/machinery/atmospherics/components/binary/valve: GasValve
+/obj/machinery/atmospherics/components/binary/valve/digital: SignalControlledValve
+/obj/machinery/atmospherics/components/trinary/mixer: GasMixer
+/obj/machinery/atmospherics/components/trinary/filter: GasFilter
+/obj/machinery/atmospherics/components/unary/thermomachine/freezer: GasThermoMachineFreezer
+/obj/machinery/atmospherics/components/unary/thermomachine/heater: GasThermoMachineHeater
+/obj/machinery/atmospherics/components/binary/passive_gate: GasPassiveGate
 
-# ---- category pass 6/N: material/item stacks ----
+# ---- material/item stacks ----
 /obj/item/stack/medical/ointment: Ointment
-/obj/item/stack/medical/bone_gel: BoneGel # Russian description matches "container for bone gel" exactly
+/obj/item/stack/medical/bone_gel: BoneGel
 /obj/item/stack/spacecash/c10: SpaceCash10
 /obj/item/stack/spacecash/c100: SpaceCash100
 /obj/item/stack/spacecash/c500: SpaceCash500
 /obj/item/stack/spacecash/c1000: SpaceCash1000
-/obj/item/stack/sheet/cloth: MaterialCloth # bare; /five and /ten (different starting quantities) inherit
-/obj/item/stack/sheet/mineral/coal: Coal # bare; /five inherits
-/obj/item/stack/sheet/mineral/diamond: MaterialDiamond # "refined diamond" -- exact match
+/obj/item/stack/sheet/cloth: MaterialCloth
+/obj/item/stack/sheet/mineral/coal: Coal
+/obj/item/stack/sheet/mineral/diamond: MaterialDiamond
 
-# ---- category pass 7/N: storage (bags/boxes/toolboxes) ----
-/obj/item/storage/crayons: CrayonBox # exact match, "box of crayons"
-/obj/item/storage/pill_bottle: PillCanister # bare, "holds up to 10 pills" -- covers every themed pill bottle subtype (mannitol, mutadone, sepsisillin, epinephrine, ...), losing only the medicine label
-/obj/item/storage/fancy/cigarettes/cigars: CigarCase # bare; /cohiba, /havana inherit
+# ---- storage (bags/boxes/toolboxes) ----
+/obj/item/storage/crayons: CrayonBox
+/obj/item/storage/pill_bottle: PillCanister
+/obj/item/storage/fancy/cigarettes/cigars: CigarCase
 /obj/item/storage/toolbox/artistic: ToolboxArtistic
 
-# ---- category pass 8/N: toys ----
+# ---- toys ----
 /obj/item/toy/crayon/white: CrayonWhite
 /obj/item/toy/crayon/mime: CrayonMime
 /obj/item/toy/crayon/orange: CrayonOrange
@@ -1320,38 +1091,27 @@
 /obj/item/toy/sword: ToySword
 /obj/item/toy/snappop: SnapPop
 /obj/item/toy/foamblade: FoamBlade
-/obj/item/toy/balloon: BalloonNT # bare, the plain NT balloon; /corgi below is a separate, more specific match
+/obj/item/toy/balloon: BalloonNT
 /obj/item/toy/balloon/corgi: BalloonCorgi
-/obj/item/toy/beach_ball: BeachBall # bare; /branded, /baseball inherit
+/obj/item/toy/beach_ball: BeachBall
 /obj/item/toy/plush/carpplushie: PlushieCarp
 /obj/item/toy/plush/slimeplushie: PlushieSlime
 /obj/item/toy/plush/snakeplushie: PlushieSnake
 /obj/item/toy/plush/nukeplushie: PlushieNuke
-/obj/item/toy/plush/lizard_plushie: PlushieLizard # bare; /green and /space/green inherit
+/obj/item/toy/plush/lizard_plushie: PlushieLizard
 /obj/item/toy/crayon/blue: CrayonBlue
-# Sold via the same uplink-item, syndicate-contraband role in both games
-# (code/modules/uplink/uplink_items/badass.dm) -- exact brand match.
 /obj/item/storage/fancy/cigarettes/cigpack_syndicate: CigPackSyndicate
 
-# ---- category pass 25/N: reagent containers ----
-# Full bottles, from drinks_bottles.yml -- not the visually-different EMPTY
-# "trash" bottles in trash_drinks.yml (checked: those are a separate family,
-# sprite-named e.g. "rumbottle_empty.rsi", the wrong match for tgstation's
-# drinkable /cup/glass/bottle/* items). This is the same *Full naming family
-# the already-mapped /whiskey -> DrinkWhiskeyBottleFull rule uses.
+# ---- reagent containers ----
 /obj/item/reagent_containers/cup/glass/bottle/rum: DrinkRumBottleFull
 /obj/item/reagent_containers/cup/glass/bottle/vodka: DrinkVodkaBottleFull
 /obj/item/reagent_containers/cup/glass/bottle/wine: DrinkWineBottleFull
 /obj/item/reagent_containers/cup/glass/bottle/sake: DrinkSakeBottleFull
-# Description near-verbatim matches (condiment.dm vs. ingredients.yml):
-# "A big bag of flour. Good for baking!" / "A big bag of tasty spacey sugar."
 /obj/item/reagent_containers/condiment/flour: ReagentContainerFlour
 /obj/item/reagent_containers/condiment/rice: ReagentContainerRice
 /obj/item/reagent_containers/condiment/sugar: ReagentContainerSugar
 
-# ---- category pass 26/N: department signs ----
-# Exact name/description matches (Structures/Wallmounts/Signs/signs.yml),
-# same pattern as the already-mapped departments/medbay -> SignMedical etc.
+# ---- department signs ----
 /obj/structure/sign/departments/engineering: SignEngineering
 /obj/structure/sign/departments/engineering/directional/north: {entity: SignEngineering, wall: north, onWall: true}
 /obj/structure/sign/departments/engineering/directional/south: {entity: SignEngineering, wall: south, onWall: true}
@@ -1377,9 +1137,6 @@
 /obj/structure/sign/departments/lawyer/directional/south: {entity: SignLawyer, wall: south, onWall: true}
 /obj/structure/sign/departments/lawyer/directional/east: {entity: SignLawyer, wall: east, onWall: true}
 /obj/structure/sign/departments/lawyer/directional/west: {entity: SignLawyer, wall: west, onWall: true}
-# "A sign indicating a hydroponics area" / "labelling an area where the
-# janitor works" / "indicating the chapel" / "labelling an area where the
-# Psychologist works" -- exact matches for botany/custodian/holy/psychology.
 /obj/structure/sign/departments/botany: SignHydro1
 /obj/structure/sign/departments/botany/directional/north: {entity: SignHydro1, wall: north, onWall: true}
 /obj/structure/sign/departments/botany/directional/south: {entity: SignHydro1, wall: south, onWall: true}
@@ -1401,123 +1158,74 @@
 /obj/structure/sign/departments/psychology/directional/east: {entity: SignPsychology, wall: east, onWall: true}
 /obj/structure/sign/departments/psychology/directional/west: {entity: SignPsychology, wall: west, onWall: true}
 
-# ---- category pass 27/N: disks ----
-# Both items keep this exact SS13 flavour text verbatim, including the
-# "SECURE DAT FUKKEN DISK!" note -- as direct a match as this dictionary
-# gets.
+# ---- disks ----
 /obj/item/disk/nuclear: NukeDisk
 /obj/item/disk/nuclear/fake/obvious: NukeDiskFake
-/obj/item/disk/tech_disk: TechnologyDisk # "technology disk" -- exact name match
+/obj/item/disk/tech_disk: TechnologyDisk
 
-# ---- category pass 28/N: generic signal button ----
-# "A remote control switch" (buttons.dm) matches this fork's SignalButton
-# ("a button for activating something") exactly. Only the plain-icon
-# subtypes are mapped -- ticket_machine and photobooth don't override
-# icon_state, so they render identically to the bare button. Several other
-# subtypes (ignition, flasher, curtain, crematorium) switch to a distinct
-# "button-warning" red-striped skin in tgstation that this fork has no
-# matching variant for, so they're left unresolved rather than losing that
-# visual cue; tram/elevator buttons have their own unique sprite too and are
-# for systems this fork doesn't implement regardless.
+# ---- generic signal button ----
 /obj/machinery/button: SignalButton
 /obj/machinery/button/ticket_machine: SignalButton
 /obj/machinery/button/photobooth: SignalButton
-# Same embedded-controller-device case as door_buttons/access_button above
-# ("access console... cycle opening between two airlocks") -- no equivalent,
-# falls back to the same generic wall control shape.
 /obj/machinery/door_buttons/airlock_controller: SignalButtonDirectional
 
-# ---- category pass 29/N: grenades ----
-# Exact name/description matches (Objects/Weapons/Throwable/grenades.yml).
-/obj/item/grenade/chem_grenade/cleaner: CleanerGrenade # "cleanade... releasing large cloud of space cleaner foam"
+# ---- grenades ----
+/obj/item/grenade/chem_grenade/cleaner: CleanerGrenade
 /obj/item/grenade/smokebomb: SmokeGrenade
 /obj/item/grenade/empgrenade: EmpGrenade
 /obj/item/grenade/chem_grenade/teargas: TearGasGrenade
 
-# ---- category pass 30/N: tank holders and sinks ----
-# "A metallic frame that can hold tanks and extinguishers" (tank_holder.dm)
-# matches this fork's ExtinguisherCabinet family by function. The
-# extinguisher subtype starts pre-loaded (icon_state "holder_extinguisher",
-# tank = /obj/item/extinguisher) so it takes the *Filled variant; the bare
-# holder starts empty and takes the unfilled one. /advanced and /anti keep
-# the same filled look, losing only the foam/anti-fire reagent theme --
-# this fork has no separate id for those.
+# ---- tank holders and sinks ----
 /obj/structure/tank_holder: ExtinguisherCabinet
 /obj/structure/tank_holder/extinguisher: ExtinguisherCabinetFilled
 /obj/structure/tank_holder/extinguisher/advanced: ExtinguisherCabinetFilled
 /obj/structure/tank_holder/extinguisher/anti: ExtinguisherCabinetFilled
-# "wide sink" (sink.yml) matches the kitchen theme by name; bare Sink is the
-# standard, non-kitchen basin.
 /obj/structure/sink: Sink
 /obj/structure/sink/kitchen: SinkWide
 
-# ---- category pass 31/N: knives ----
-# Exact functional matches (Objects/Weapons/Melee/knife.yml). /combat is
-# bare so /bone and /cyborg inherit it, losing only their reskin theme.
+# ---- knives ----
 /obj/item/knife/kitchen: KitchenKnife
 /obj/item/knife/butcher: ButchCleaver
 /obj/item/knife/combat: CombatKnife
 /obj/item/knife/combat/survival: SurvivalKnife
-/obj/item/knife/shiv: Shiv # bare; /carrot, /plastitanium inherit
-# "statue of a clown" (statues.dm) -- exact thematic match, no colour tie to
-# resolve unlike the Venus statue below it in this fork's own file (Red vs.
-# Blue toolbox, no signal in tgstation's source for which -- left unresolved).
+/obj/item/knife/shiv: Shiv
 /obj/structure/statue/bananium/clown: StatueBananiumClown
-# "spider web... stringy and sticky" -- direct thematic match, both games'
-# spider-antagonist systems produce a smoothed sticky-web structure. Bare;
-# /sealed/tough and /very_sticky inherit, losing only the strength variant.
 /obj/structure/spider/stickyweb: SpiderWeb
 
-# ---- category pass 32/N: assembly components ----
-# "Adds a machine link that is triggered by signals"/"...by vocal keywords"
-# (triggers.yml) -- exact functional match for tgstation's radio and voice
-# signaler assembly parts.
-/obj/item/assembly/signaler: SignalTrigger # bare; /cyborg inherits
+# ---- assembly components ----
+/obj/item/assembly/signaler: SignalTrigger
 /obj/item/assembly/voice: VoiceTrigger
 
-# ---- category pass 33/N: raw meat slabs and grown produce ----
-# This fork's FoodMeat* raw-slab family (Consumable/Food/meat.yml) is a
-# near-verbatim port of tgstation's own slab flavour text -- "A very manly
-# slab of raw bear meat" vs. tgstation's "A very manly slab of meat" for
-# bear, "A slab of raw chicken. Remember to wash your hands!" is character-
-# for-character identical for chicken, "A pile of raw crab meat." identical
-# for crab, "Delicious dino damage." identical for the lizard mutant.
+# ---- raw meat slabs and grown produce ----
 /obj/item/food/meat/slab: FoodMeat
 /obj/item/food/meat/slab/bear: FoodMeatBear
 /obj/item/food/meat/slab/chicken: FoodMeatChicken
 /obj/item/food/meat/slab/rawcrab: FoodMeatCrab
 /obj/item/food/meat/slab/human: FoodMeatHuman
 /obj/item/food/meat/slab/human/mutant/lizard: FoodMeatLizard
-/obj/item/food/meat/rawcutlet: FoodMeatCutlet # "A raw meat cutlet" -- this fork has no separate big-slab-then-cut pipeline, the cutlet is the base cut
+/obj/item/food/meat/rawcutlet: FoodMeatCutlet
 /obj/item/food/meat/rawbacon: FoodMeatBacon
-/obj/item/food/grown/flower/poppy: FoodPoppy # bare; /lily, /geranium inherit, losing only the colour variant
+/obj/item/food/grown/flower/poppy: FoodPoppy
 /obj/item/food/grown/ambrosia/vulgaris: FoodAmbrosiaVulgaris
 /obj/item/food/chocolatebar: FoodSnackChocolateBar
 /obj/item/food/breadslice/plain: FoodBreadPlainSlice
 /obj/item/food/grown/wheat: WheatBushel
 
-# ---- category pass 34/N: clothing ----
-# tgstation's bare hardhat icon_state is "hardhat0_yellow" (hardhat.dm) --
-# the default colour is yellow, matching ClothingHeadHatHardhatYellow.
+# ---- clothing ----
 /obj/item/clothing/head/utility/hardhat: ClothingHeadHatHardhatYellow
 /obj/item/clothing/head/utility/hardhat/red: ClothingHeadHatHardhatRed
 /obj/item/clothing/head/utility/chefhat: ClothingHeadHatChef
 /obj/item/clothing/shoes/winterboots: ClothingShoesBootsWinter
-# "A suit that helps protect against hazardous temperatures" matches
-# icon_state "firesuit" and the heat/cold-protection function exactly.
 /obj/item/clothing/suit/utility/fire/firefighter: ClothingOuterSuitFire
 /obj/item/clothing/gloves/combat: ClothingHandsGlovesCombat
 /obj/item/clothing/shoes/combat: ClothingShoesBootsCombat
 
-# ---- category pass 35/N: mobs ----
+# ---- mobs ----
 /mob/living/basic/bee: MobBee
 /mob/living/basic/gorilla/hostile: MobGorilla
 /mob/living/basic/carp: MobCarp
 
-# ---- category pass 36/N: R&D lathes ----
-# Direct name and function matches (Structures/Machines/lathe.yml). The
-# department/offstation subtypes only change access requirements and paint
-# theme in tgstation, losing that flavour but keeping the correct machine.
+# ---- R&D lathes ----
 /obj/machinery/rnd/production/protolathe/department/engineering: Protolathe
 /obj/machinery/rnd/production/protolathe/department/science: Protolathe
 /obj/machinery/rnd/production/protolathe/offstation: Protolathe
@@ -1527,69 +1235,32 @@
 /obj/machinery/rnd/production/techfab/department/security: SecurityTechFab
 /obj/machinery/rnd/production/techfab/department/medical: MedicalTechFab
 
-# ---- category pass 37/N: barricades and space vine ----
-# "wooden barricade" is an exact name match (deployable.dm); bare so /snowed
-# inherits, losing only the snow overlay. No match for sandbags -- distinct
-# sprite, nothing equivalent in this fork.
+# ---- barricades and space vine ----
 /obj/structure/barricade/wooden: Barricade
-# "An extremely expansionistic species of vine" matches Kudzu's "A rapidly
-# growing, dangerous plant" -- both games' botany-contamination hazard event.
 /obj/structure/spacevine: Kudzu
 
-# ---- category pass 38/N: manipulator-tier stock parts ----
-# This fork's own machine-part tier config (_NF/MachineParts/machine_parts.yml)
-# names the base "servo" tier stockPartPrototype explicitly as
-# MicroManipulatorStockPart, with Nano/Pico/Femto above it -- not a guess,
-# read straight from the tier definition. No "Lens"/laser-focus or scanner
-# machine-part category exists in this fork at all (only Capacitor,
-# Manipulator, MatterBin, PowerCell), so micro_laser and scanning_module
-# have no equivalent.
+# ---- manipulator-tier stock parts ----
 /obj/item/stock_parts/servo: MicroManipulatorStockPart
 /obj/item/stock_parts/servo/nano: NanoManipulatorStockPart
 /obj/item/stock_parts/servo/pico: PicoManipulatorStockPart
 /obj/item/stock_parts/servo/femto: FemtoManipulatorStockPart
 
-# Found under this fork's _NF/ content tree, not the base Entities/ one --
-# a real, non-abstract wallet (_NF/Entities/Clothing/Wallet/leather.yml).
 /obj/item/storage/wallet: ClothingWalletLeatherBrown
 
-# ---- category pass 39/N: turrets ----
-# Found under Objects/Weapons/Guns/Turrets/ and this fork's _NF/ turret file
-# -- an earlier pass wrongly concluded no turret system exists here because
-# the search only covered Entities/Structures/Machines/, not Objects/Weapons/
-# or the _NF/ content tree. "A high-tech autonomous weapons system designed
-# to keep unauthorized personnel out of sensitive areas" (sentry turret,
-# the base class) is the same security-turret concept as tgstation's
-# porta_turret. WeaponEnergyTurretAI is explicitly "AI, Silicon"-controlled,
-# matching porta_turret/ai by function exactly. The bare syndicate rule
-# picks up the whole syndicate/* subtree (energy, pod, shuttle, raven,
-# heavy, teleport, irs, ruin, cybersun, donk) in one line, losing only each
-# variant's specific loadout theme.
+# ---- turrets ----
 /obj/machinery/porta_turret/ai: WeaponEnergyTurretAI
 /obj/machinery/porta_turret: WeaponEnergyTurretSecurity
 /obj/machinery/porta_turret/syndicate: NFWeaponTurretLaserSyndicate
-# "RTG... A Radioisotope Thermoelectric Generator for long term power" --
-# exact match. Bare; /advanced, /debug, /lavaland, /old_station all inherit,
-# losing only their output-tier/skin flavour -- this fork has no matching
-# tier system for RTGs (only a "Damaged" skin, for a different case: the
-# damage-state look, not tgstation's dev/admin-only debug variant).
 /obj/machinery/power/rtg: GeneratorRTG
 
-# ---- category pass 40/N: mineral doors ----
-# Near-exact name matches (mineral_doors.dm: "wood door", "paper frame
-# door"). No sandstone match.
+# ---- mineral doors ----
 /obj/structure/mineral_door/wood: WoodDoor
 /obj/structure/mineral_door/paperframe: PaperDoor
 /obj/structure/mineral_door/iron: MetalDoor
 /obj/structure/mineral_door/gold: GoldDoor
 /obj/structure/mineral_door/silver: SilverDoor
 
-# ---- category pass 41/N: energy swords ----
-# "A very loud & dangerous sword with a beam made of pure, concentrated
-# plasma" -- exact functional match. This fork's blade is a single colorable
-# layer (default white) rather than separate colour/holographic prototypes,
-# so every themed saber variant collapses to the same id, losing only the
-# colour -- the blade shape and function are correct.
+# ---- energy swords ----
 /obj/item/melee/energy/sword/saber/red: EnergySword
 /obj/item/melee/energy/sword/saber/green: EnergySword
 /obj/item/melee/energy/sword/saber/purple: EnergySword
@@ -1597,20 +1268,13 @@
 /obj/item/melee/energy/sword/holographic/red: EnergySword
 /obj/item/melee/energy/sword/pirate: EnergySword
 
-# ---- category pass 42/N: plates and stasis beds ----
-/obj/item/plate: FoodPlate # bare, no size distinction in tgstation; matches this fork's "large plate"
-/obj/item/plate/large: FoodPlate # "buffet plate" -- even bigger, no matching id here so it takes the same one
+# ---- plates and stasis beds ----
+/obj/item/plate: FoodPlate
+/obj/item/plate/large: FoodPlate
 /obj/item/plate/small: FoodPlateSmall
-# "lifeform stasis unit" matches "A bed that massively slows down the
-# patient's metabolism and prevents bodily decay" -- exact medical function.
 /obj/machinery/stasis: StasisBed
 
-# ---- category pass 43/N: more vending machines ----
-# Direct name matches (Structures/Machines/vending_machines.yml).
-# "YouTool"/"Tools for tools" is an exact match for tgstation's own
-# "YouTool"/"Tools for tools" vendor. No match for /assist ("Part-Mart",
-# miscellaneous electronics) -- this fork's closest-sounding vendor,
-# Discount Dan's, sells snacks instead.
+# ---- more vending machines ----
 /obj/machinery/vending/clothing: VendingMachineClothing
 /obj/machinery/vending/cart: VendingMachineCart
 /obj/machinery/vending/engivend: VendingMachineEngivend
@@ -1618,15 +1282,7 @@
 /obj/machinery/vending/magivend: VendingMachineMagivend
 /obj/machinery/vending/tool: VendingMachineYouTool
 
-# ---- category pass 44/N: telecomm servers (correcting an earlier miss) ----
-# An earlier pass concluded this fork has no telecomms system at all -- it
-# does (Structures/Machines/telecomms.yml), just consolidated to a single
-# TelecomServer machine instead of tgstation's rack of distinct machine
-# types (broadcaster/bus/hub/message_server/processor/receiver/relay all
-# stay unresolved, no equivalent for those specifically). The eight
-# department-filled presets match tgstation's own eight server presets by
-# name one-for-one (supply -> Cargo is this fork's synonym for the same
-# department, same as elsewhere in this file).
+# ---- telecomm servers (correcting an earlier miss) ----
 /obj/machinery/telecomms/server: TelecomServer
 /obj/machinery/telecomms/server/presets/common: TelecomServerFilledCommon
 /obj/machinery/telecomms/server/presets/supply: TelecomServerFilledCargo
@@ -1637,51 +1293,31 @@
 /obj/machinery/telecomms/server/presets/service: TelecomServerFilledService
 /obj/machinery/telecomms/server/presets/command: TelecomServerFilledCommand
 
-# "A robust baseball bat" -- exact name and flavour match.
 /obj/item/melee/baseball_bat: BaseBallBat
-# "It can wear any clothing with style" matches the clothing-display-dummy
-# function of tgstation's mannequin mob; loses the "secretly a living mob"
-# behaviour, keeps the correct clothing-rack prop.
 /mob/living/basic/statue/mannequin: Mannequin
 
-# ---- category pass 45/N: condiments and dishware ----
+# ---- condiments and dishware ----
 /obj/item/reagent_containers/condiment/saltshaker: FoodShakerSalt
-/obj/item/reagent_containers/condiment/peppermill: FoodShakerPepper # loses the grinder mechanic, keeps "add pepper to food"
-# "A simple bowl, used for soups and salads" -- exact match.
+/obj/item/reagent_containers/condiment/peppermill: FoodShakerPepper
 /obj/item/reagent_containers/cup/bowl: FoodBowlBig
 /obj/item/storage/belt/medical: ClothingBeltMedical
 /obj/item/storage/fancy/egg_box: FoodContainerEgg
 /obj/item/food/sashimi: FoodMealSashimi
 /obj/item/food/cheese/wheel: FoodCheese
 /obj/item/food/bun: FoodBreadBun
-/obj/item/clothing/head/fedora: ClothingHeadHatFedoraBrown # tgstation's own colour is unspecified; brown is the classic mobster fedora
+/obj/item/clothing/head/fedora: ClothingHeadHatFedoraBrown
 
-# ---- category pass 46/N: department-themed corpse props ----
-# This fork's corpse prop family (Mobs/Corpses/corpses.yml) groups by
-# department rather than specific job -- matched by each corpse's own job
-# department in tgstation source (job_corpses.dm). shaft_miner corpse takes
-# the Cargo corpse for the same "mining merged into salvage/cargo here"
-# reasoning already used for the shaft_miner spawn point above.
+# ---- department-themed corpse props ----
 /obj/effect/mob_spawn/corpse/human/cargo_tech: MobRandomCargoCorpse
 /obj/effect/mob_spawn/corpse/human/miner: MobRandomCargoCorpse
 /obj/effect/mob_spawn/corpse/human/scientist: MobRandomScienceCorpse
 /obj/effect/mob_spawn/corpse/human/clown: MobRandomServiceCorpse
 
-# ---- category pass 47/N: guns ----
-# "Favoured by Nanotrasen Security for being cheap and easy to use" matches
-# tgstation's own "the workhorse of Nanotrasen's security forces" almost
-# word for word -- same standard-issue NT security laser weapon in both
-# games, sprite literally named laser_gun.rsi.
+# ---- guns ----
 /obj/item/gun/energy/laser: WeaponLaserCarbine
-# icon_state "mateba" on both sides -- the same distinctive "auto-revolver"
-# real-world gun family (tgstation's own name is "Unica 6 auto-revolver").
 /obj/item/gun/ballistic/revolver/mateba: WeaponRevolverMateba
 
-# ---- category pass 48/N: action figures ----
-# This fork has a large by-job figurine collectible set (Objects/Fun/
-# figurines.yml) matching tgstation's own by-job figure set one-for-one.
-# assistant -> Passenger and geneticist/roboticist -> Scientist follow the
-# same job-mapping precedents already used for their spawn points above.
+# ---- action figures ----
 /obj/item/toy/figure/syndie: ToyFigurineNukie
 /obj/item/toy/figure/clown: ToyFigurineClown
 /obj/item/toy/figure/secofficer: ToyFigurineSecurity
@@ -1714,135 +1350,98 @@
 /obj/item/toy/figure/miner: ToyFigurineSalvage
 /obj/item/toy/figure/wizard: ToyFigurineWizard
 
-# ---- category pass 49/N: machine circuitboards ----
-# Direct id matches for the machine circuitboard family (Objects/Devices/
-# Circuitboards/Machine/production.yml), corresponding to machines already
-# mapped or confirmed to exist earlier in this file.
+# ---- machine circuitboards ----
 /obj/item/circuitboard/machine/circuit_imprinter/offstation: CircuitImprinterMachineCircuitboard
 /obj/item/circuitboard/machine/microwave: MicrowaveMachineCircuitboard
 /obj/item/circuitboard/machine/chem_master: ChemMasterMachineCircuitboard
 /obj/item/circuitboard/machine/emitter: EmitterCircuitboard
 
-# ---- category pass 9/N: stock parts ----
-# Higher-rated stock parts (micro_laser, scanning_module, servo, the subspace
-# family) have no match beyond the Rating-1 matter bin/capacitor above --
-# this fork's part tiers don't go that high. Power cells checked separately:
-/obj/item/stock_parts/power_store/cell: PowerCellMedium # bare "power cell... the popular and reliable version"; /empty inherits
-/obj/item/stock_parts/power_store/cell/potato: PowerCellPotato # exact match, "potato battery"
+# ---- stock parts ----
+/obj/item/stock_parts/power_store/cell: PowerCellMedium
+/obj/item/stock_parts/power_store/cell/potato: PowerCellPotato
 
-# ---- category pass 10/N: books ----
-# Bare /manual -- covers every wiki-topic manual (engineering, chemistry,
-# atmospherics, medicine, surgery, robotics, ...) plus the sibling
-# chef_recipes/hydroponics_pod_people/fish_catalog/nuclear paths, all with
-# a generic "a hardcover book" placeholder. /manual/wiki/security_space_law
-# above is more specific and still wins over this.
+# ---- books ----
 /obj/item/book/manual: BookBase
-/obj/item/book/random: BookRandom # exact match, "each book is unique"
+/obj/item/book/random: BookRandom
 
-# ---- category pass 11/N: mobs (pets, bots, simple animals) ----
-/mob/living/basic/mouse: MobMouse # bare; /brown/tom, /white, /gray, /rat inherit
+# ---- mobs (pets, bots, simple animals) ----
+/mob/living/basic/mouse: MobMouse
 /mob/living/basic/chicken: MobChicken
 /mob/living/basic/butterfly: MobButterfly
-/mob/living/basic/goat: MobGoat # bare; /pete inherits
-/mob/living/basic/parrot: MobParrot # bare; /poly inherits
-/mob/living/basic/pet/cat: MobCatSpace # bare; /runtime, /jerry, /space inherit
-/mob/living/basic/pet/dog/corgi: MobCorgi # bare; /ian inherits
-/mob/living/basic/pet/dog/corgi/puppy: MobCorgiPuppy # bare; /slime, /void inherit
-/mob/living/basic/pet/dog/breaddog: MobBreadDog # exact match, tgstation's own name is "breaddog"
-/mob/living/basic/pet/fox: MobFox # bare; /renault, /docile inherit
-/mob/living/basic/pet/penguin: MobPenguin # bare; /baby/permanent, /emperor inherit
+/mob/living/basic/goat: MobGoat
+/mob/living/basic/parrot: MobParrot
+/mob/living/basic/pet/cat: MobCatSpace
+/mob/living/basic/pet/dog/corgi: MobCorgi
+/mob/living/basic/pet/dog/corgi/puppy: MobCorgiPuppy
+/mob/living/basic/pet/dog/breaddog: MobBreadDog
+/mob/living/basic/pet/fox: MobFox
+/mob/living/basic/pet/penguin: MobPenguin
 /mob/living/basic/cow: MobCow
-/mob/living/basic/lizard: MobLizard # bare; /wags_his_tail, /eats_the_roaches inherit
+/mob/living/basic/lizard: MobLizard
 /mob/living/basic/crab: MobCrab
 /mob/living/basic/mothroach: MobMothroach
 /mob/living/basic/mining/goliath: MobGoliath
-/mob/living/basic/bot/medbot: MobMedibot # bare; /autopatrol inherits
-/mob/living/basic/sloth: MobSloth # bare; /citrus, /paperwork inherit
-# Covers every hostile giant-spider colour/faction variant tgstation has
-# (guard, ambush, hunter, scout, nurse, tangle, tank, breacher, viper,
-# midwife, ice, tarantula, and the named HoS companion sgt_araneus) --
-# none of those cosmetic themes exist in this fork, so they all fall back
-# to the one giant spider.
+/mob/living/basic/bot/medbot: MobMedibot
+/mob/living/basic/sloth: MobSloth
 /mob/living/basic/spider/giant: MobGiantSpider
-/mob/living/basic/bot/cleanbot: MobCleanBot # bare; /autopatrol, /medbay inherit
+/mob/living/basic/bot/cleanbot: MobCleanBot
 
-# ---- category pass 12/N: lights (colour/state combinations) ----
-# The plain colour and /small/dim/red families are already mapped above; these
-# are the remaining two-property combinations (colour+dim, small+broken, etc.)
-# that don't inherit from those more general rules -- each documented with what
-# it loses.
-/obj/machinery/light/directional: Poweredlight # bare, no direction suffix -- rare (3 occurrences total), no wall side to orient toward
-# keeps the warm tint, loses the dim brightness (no warm+dim combo exists)
+# ---- lights (colour/state combinations) ----
+/obj/machinery/light/directional: Poweredlight
 /obj/machinery/light/warm/dim/directional/north: {entity: PoweredlightSodium, wall: north}
 /obj/machinery/light/warm/dim/directional/south: {entity: PoweredlightSodium, wall: south}
 /obj/machinery/light/warm/dim/directional/east: {entity: PoweredlightSodium, wall: east}
 /obj/machinery/light/warm/dim/directional/west: {entity: PoweredlightSodium, wall: west}
-# cold has no tint match already (see /cold above); dim doesn't change that
 /obj/machinery/light/cold/dim/directional/north: {entity: Poweredlight, wall: north}
 /obj/machinery/light/cold/dim/directional/south: {entity: Poweredlight, wall: south}
 /obj/machinery/light/cold/dim/directional/east: {entity: Poweredlight, wall: east}
 /obj/machinery/light/cold/dim/directional/west: {entity: Poweredlight, wall: west}
-# same reasoning as the bare /cold and /no_nightlight rules above
 /obj/machinery/light/cold/no_nightlight/directional/north: {entity: Poweredlight, wall: north}
 /obj/machinery/light/cold/no_nightlight/directional/south: {entity: Poweredlight, wall: south}
 /obj/machinery/light/cold/no_nightlight/directional/east: {entity: Poweredlight, wall: east}
 /obj/machinery/light/cold/no_nightlight/directional/west: {entity: Poweredlight, wall: west}
-# no broken-state sprite in this fork; loses the visibly-broken look, keeps the fixture
 /obj/machinery/light/small/broken/directional/north: {entity: PoweredSmallLight, wall: north}
 /obj/machinery/light/small/broken/directional/south: {entity: PoweredSmallLight, wall: south}
 /obj/machinery/light/small/broken/directional/east: {entity: PoweredSmallLight, wall: east}
 /obj/machinery/light/small/broken/directional/west: {entity: PoweredSmallLight, wall: west}
-# small has no colour variants at all (see /small/red above)
 /obj/machinery/light/small/red/dim/directional/north: {entity: PoweredSmallLight, wall: north}
 /obj/machinery/light/small/red/dim/directional/south: {entity: PoweredSmallLight, wall: south}
 /obj/machinery/light/small/red/dim/directional/east: {entity: PoweredSmallLight, wall: east}
 /obj/machinery/light/small/red/dim/directional/west: {entity: PoweredSmallLight, wall: west}
-# no UV/blacklight fixture in this fork
 /obj/machinery/light/blacklight/directional/north: {entity: Poweredlight, wall: north}
 /obj/machinery/light/blacklight/directional/south: {entity: Poweredlight, wall: south}
 /obj/machinery/light/blacklight/directional/east: {entity: Poweredlight, wall: east}
 /obj/machinery/light/blacklight/directional/west: {entity: Poweredlight, wall: west}
-# no UV/blacklight fixture in this fork
 /obj/machinery/light/small/blacklight/directional/north: {entity: PoweredSmallLight, wall: north}
 /obj/machinery/light/small/blacklight/directional/south: {entity: PoweredSmallLight, wall: south}
 /obj/machinery/light/small/blacklight/directional/east: {entity: PoweredSmallLight, wall: east}
 /obj/machinery/light/small/blacklight/directional/west: {entity: PoweredSmallLight, wall: west}
-# no dedicated very-dim sprite; closest available fixture
 /obj/machinery/light/very_dim/directional/north: {entity: Poweredlight, wall: north}
 /obj/machinery/light/very_dim/directional/south: {entity: Poweredlight, wall: south}
 /obj/machinery/light/very_dim/directional/east: {entity: Poweredlight, wall: east}
 /obj/machinery/light/very_dim/directional/west: {entity: Poweredlight, wall: west}
-# full-size fixture has no colour variants (see /small/red above for the same call on the small one)
 /obj/machinery/light/red/dim/directional/north: {entity: Poweredlight, wall: north}
 /obj/machinery/light/red/dim/directional/south: {entity: Poweredlight, wall: south}
 /obj/machinery/light/red/dim/directional/east: {entity: Poweredlight, wall: east}
 /obj/machinery/light/red/dim/directional/west: {entity: Poweredlight, wall: west}
-# bare (non-small) red; no colour variant in this fork
 /obj/machinery/light/red/directional/north: {entity: Poweredlight, wall: north}
 /obj/machinery/light/red/directional/south: {entity: Poweredlight, wall: south}
 /obj/machinery/light/red/directional/east: {entity: Poweredlight, wall: east}
 /obj/machinery/light/red/directional/west: {entity: Poweredlight, wall: west}
-# bare (non-small) broken; no broken-state sprite in this fork
 /obj/machinery/light/broken/directional/north: {entity: Poweredlight, wall: north}
 /obj/machinery/light/broken/directional/south: {entity: Poweredlight, wall: south}
 /obj/machinery/light/broken/directional/east: {entity: Poweredlight, wall: east}
 /obj/machinery/light/broken/directional/west: {entity: Poweredlight, wall: west}
-# exact match -- "a light fixture... equipped with a light tube", i.e. the empty socket
 /obj/machinery/light/empty/directional/north: {entity: PoweredlightEmpty, wall: north}
 /obj/machinery/light/empty/directional/south: {entity: PoweredlightEmpty, wall: south}
 /obj/machinery/light/empty/directional/east: {entity: PoweredlightEmpty, wall: east}
 /obj/machinery/light/empty/directional/west: {entity: PoweredlightEmpty, wall: west}
-# exact match, same as above for the small fixture
 /obj/machinery/light/small/empty/directional/north: {entity: PoweredSmallLightEmpty, wall: north}
 /obj/machinery/light/small/empty/directional/south: {entity: PoweredSmallLightEmpty, wall: south}
 /obj/machinery/light/small/empty/directional/east: {entity: PoweredSmallLightEmpty, wall: east}
 /obj/machinery/light/small/empty/directional/west: {entity: PoweredSmallLightEmpty, wall: west}
 
-# ---- category pass 13/N: vending machines ----
-# The *_wardrobe family matches this fork's own VendingMachine*Drobe id
-# family one-for-one by department -- confirmed by name (e.g. ChemDrobe,
-# EngiDrobe, JaniDrobe are literally short for the same department names
-# tgstation uses). No coroner-themed wardrobe exists in this fork.
+# ---- vending machines ----
 /obj/machinery/vending/wardrobe/chem_wardrobe: VendingMachineChemDrobe
 /obj/machinery/vending/wardrobe/cargo_wardrobe: VendingMachineCargoDrobe
 /obj/machinery/vending/wardrobe/sec_wardrobe: VendingMachineSecDrobe
@@ -1851,7 +1450,7 @@
 /obj/machinery/vending/wardrobe/science_wardrobe: VendingMachineSciDrobe
 /obj/machinery/vending/wardrobe/atmos_wardrobe: VendingMachineAtmosDrobe
 /obj/machinery/vending/wardrobe/bar_wardrobe: VendingBarDrobe
-/obj/machinery/vending/wardrobe/chap_wardrobe: VendingMachineChapel # "PietyVend" -- the chaplain-themed vendor, not literally named "Drobe" but the same department slot
+/obj/machinery/vending/wardrobe/chap_wardrobe: VendingMachineChapel
 /obj/machinery/vending/wardrobe/curator_wardrobe: VendingMachineCuraDrobe
 /obj/machinery/vending/wardrobe/det_wardrobe: VendingMachineDetDrobe
 /obj/machinery/vending/wardrobe/engi_wardrobe: VendingMachineEngiDrobe
@@ -1863,182 +1462,111 @@
 /obj/machinery/vending/wardrobe/viro_wardrobe: VendingMachineViroDrobe
 /obj/machinery/vending/wardrobe/cent_wardrobe: VendingMachineCentDrobe
 
-/obj/machinery/vending/boozeomat: VendingMachineBooze # "Booze-O-Mat" -- exact match
-/obj/machinery/vending/games: VendingMachineGames # "Good Clean Fun" -- exact match, description nearly word for word
-/obj/machinery/vending/hydroseeds: VendingMachineSeeds # suffix "Hydroponics"
-/obj/machinery/vending/hydronutrients: VendingMachineNutri # "NutriMax" -- exact name match, both sides
-/obj/machinery/vending/dinnerware: VendingMachineDinnerware # exact match
-/obj/machinery/vending/medical: VendingMachineMedical # "NanoMed Plus... medical drug dispenser"
-/obj/machinery/vending/drugs: VendingMachineMedical # tgstation's own "NanoDrug Plus" is a second, near-identical "medical drugs dispenser" this fork doesn't split out separately from NanoMed
+/obj/machinery/vending/boozeomat: VendingMachineBooze
+/obj/machinery/vending/games: VendingMachineGames
+/obj/machinery/vending/hydroseeds: VendingMachineSeeds
+/obj/machinery/vending/hydronutrients: VendingMachineNutri
+/obj/machinery/vending/dinnerware: VendingMachineDinnerware
+/obj/machinery/vending/medical: VendingMachineMedical
+/obj/machinery/vending/drugs: VendingMachineMedical
 /obj/machinery/vending/wallmed/directional/north: {entity: VendingMachineWallMedical, wall: north, onWall: true}
 /obj/machinery/vending/wallmed/directional/south: {entity: VendingMachineWallMedical, wall: south, onWall: true}
 /obj/machinery/vending/wallmed/directional/east: {entity: VendingMachineWallMedical, wall: east, onWall: true}
 /obj/machinery/vending/wallmed/directional/west: {entity: VendingMachineWallMedical, wall: west, onWall: true}
-/obj/machinery/vending/sovietsoda: VendingMachineSovietSoda # "BODA... sweet water" -- exact match
+/obj/machinery/vending/sovietsoda: VendingMachineSovietSoda
 
-# ---- category pass 14/N: suit storage units ----
-# One rule closes the whole family: this fork's suit storage unit has no
-# per-department sprite ("a fancy hi-tech storage unit made for storing
-# space suits", exact match for tgstation's own description) -- every
-# themed subtype (standard_unit, engine, security, ce, captain, atmos,
-# cmo, hos, medical, rd, mining, centcom, industrial, industrial/loader,
-# mining/eva) inherits this and loses only the department paint job.
+# ---- suit storage units ----
 /obj/machinery/suit_storage_unit: SuitStorageBase
 
-# ---- category pass 15/N: random engineering loot spawners ----
-# Each reuses the highest-weighted (most common) item from tgstation's own
-# loot list for that spawner, same category-to-category pattern as the
-# random spawners mapped earlier this session.
-/obj/effect/spawner/random/engineering/material_cheap: MaterialWoodPlank # highest-weight entry is wood
-/obj/effect/spawner/random/engineering/material: SheetSteel # highest-weight entry is iron/fifty
-/obj/effect/spawner/random/engineering/toolbox: ToolboxEmergency # weight 4, the top pick over electrical/mechanical (weight 2 each)
-/obj/effect/spawner/random/engineering/flashlight: FlashlightLantern # weight 20 vs flare's 10; this fork has no bare Flashlight id
-/obj/effect/spawner/random/engineering/canister: AirCanister # weight 4 vs oxygen's 1
-/obj/effect/spawner/random/engineering/tank: WeldingFuelTank # fueltank, weight 5, the top pick over the watertank variants
-/obj/effect/spawner/random/engineering/atmospherics_portable: SpaceHeater # weight 8, the top pick over shieldgen/pump
+# ---- random engineering loot spawners ----
+/obj/effect/spawner/random/engineering/material_cheap: MaterialWoodPlank
+/obj/effect/spawner/random/engineering/material: SheetSteel
+/obj/effect/spawner/random/engineering/toolbox: ToolboxEmergency
+/obj/effect/spawner/random/engineering/flashlight: FlashlightLantern
+/obj/effect/spawner/random/engineering/canister: AirCanister
+/obj/effect/spawner/random/engineering/tank: WeldingFuelTank
+/obj/effect/spawner/random/engineering/atmospherics_portable: SpaceHeater
 
-# ---- category pass 16/N: remaining landmarks ----
-/obj/effect/landmark/observer_start: SpawnPointObserver # exact match, "Observer-Start"
-/obj/effect/landmark/latejoin: SpawnPointLatejoin # exact match, "JoinLate"
+# ---- remaining landmarks ----
+/obj/effect/landmark/observer_start: SpawnPointObserver
+/obj/effect/landmark/latejoin: SpawnPointLatejoin
 
-# ---- category pass 17/N: remaining cameras ----
-# Same physical camera the plain/motion/autoname combinations already
-# mapped above use -- see the comment there. These are the bare (no dir
-# var baked into the path, so no wall side to place against) and
-# double-combination forms that don't inherit from those.
+# ---- remaining cameras ----
 /obj/machinery/camera: SurveillanceCameraGeneral
-/obj/machinery/camera/emp_proof: SurveillanceCameraGeneral # loses the EMP-proof property, keeps the camera
+/obj/machinery/camera/emp_proof: SurveillanceCameraGeneral
 /obj/machinery/camera/emp_proof/directional/north: {entity: SurveillanceCameraGeneral, wall: north}
 /obj/machinery/camera/emp_proof/directional/south: {entity: SurveillanceCameraGeneral, wall: south}
 /obj/machinery/camera/emp_proof/directional/east: {entity: SurveillanceCameraGeneral, wall: east}
 /obj/machinery/camera/emp_proof/directional/west: {entity: SurveillanceCameraGeneral, wall: west}
-/obj/machinery/camera/preset/ordnance: SurveillanceCameraGeneral # loses the ordnance-only camera network theme
-/obj/machinery/camera/motion: SurveillanceCameraGeneral # bare; /thunderdome inherits
-/obj/machinery/camera/autoname: SurveillanceCameraGeneral # bare
+/obj/machinery/camera/preset/ordnance: SurveillanceCameraGeneral
+/obj/machinery/camera/motion: SurveillanceCameraGeneral
+/obj/machinery/camera/autoname: SurveillanceCameraGeneral
 /obj/machinery/camera/autoname/motion/directional/north: {entity: SurveillanceCameraGeneral, wall: north}
 /obj/machinery/camera/autoname/motion/directional/south: {entity: SurveillanceCameraGeneral, wall: south}
 /obj/machinery/camera/autoname/motion/directional/east: {entity: SurveillanceCameraGeneral, wall: east}
 /obj/machinery/camera/autoname/motion/directional/west: {entity: SurveillanceCameraGeneral, wall: west}
 
-# ---- category pass 18/N: remaining flashlights ----
-/obj/item/flashlight: FlashlightLantern # bare; no separate plain-Flashlight id in this fork, same call as the engineering flashlight spawner above
-/obj/item/flashlight/glowstick: GlowstickBase # bare, uncoloured
+# ---- remaining flashlights ----
+/obj/item/flashlight: FlashlightLantern
+/obj/item/flashlight/glowstick: GlowstickBase
 /obj/item/flashlight/glowstick/red: GlowstickRed
 /obj/item/flashlight/glowstick/yellow: GlowstickYellow
 
-# ---- category pass 19/N: /obj/structure/fluff, the museum decoy props ----
-# fake_camera/fake_scrubber/fake_vent are non-functional museum-exhibit
-# decoys that copy a real machine's icon by direct type-reference
-# (museum.dm: icon = /obj/machinery/camera::icon, etc.) -- not a guess, the
-# source itself says these are meant to look identical to the real thing.
-# Reusing the real machine's already-mapped id keeps the look and loses only
-# the "it doesn't actually work" property, same as the emp_proof camera above.
+# ---- /obj/structure/fluff, the museum decoy props ----
 /obj/structure/fluff/fake_camera: SurveillanceCameraGeneral
 /obj/structure/fluff/fake_scrubber: GasVentScrubber
 /obj/structure/fluff/fake_vent: GasVentPump
 
-# ---- category pass 20/N: bare (non-/directional) light fixtures ----
-# tgstation still has an older, pre-refactor bare /obj/machinery/light form
-# alongside the newer /directional/<dir> subtypes -- its wall side comes from
-# a runtime dir var rather than a path segment, same case already handled
-# for the existing bare /obj/machinery/light/directional rule above (no
-# wall: override, just the entity). None of dim/warm/small/red/blacklight
-# get a distinct SS14 id from their directional siblings either, so the bare
-# forms follow the exact same id choices already established for them.
+# ---- bare (non-/directional) light fixtures ----
 /obj/machinery/light: Poweredlight
-/obj/machinery/light/broken: Poweredlight # loses the "starts pre-broken" flavour, no such prototype variant exists
+/obj/machinery/light/broken: Poweredlight
 /obj/machinery/light/dim: Poweredlight
 /obj/machinery/light/warm: PoweredlightSodium
 /obj/machinery/light/small: PoweredSmallLight
 /obj/machinery/light/small/broken: PoweredSmallLight
 /obj/machinery/light/small/red/dim: PoweredSmallLight
-/obj/machinery/light/small/blacklight/directional: PoweredSmallLight # bare directional, no NSEW suffix seen
+/obj/machinery/light/small/blacklight/directional: PoweredSmallLight
 /obj/machinery/light/small/empty: PoweredSmallLightEmpty
 /obj/machinery/light/small/burned/directional/north: {entity: PoweredSmallLight, wall: north}
-# "no_nightlight" sits between "warm" and "directional" in the path, so it
-# does not inherit from /warm/directional/<dir> above -- needs its own rules.
 /obj/machinery/light/warm/no_nightlight/directional/north: {entity: PoweredlightSodium, wall: north}
 /obj/machinery/light/warm/no_nightlight/directional/south: {entity: PoweredlightSodium, wall: south}
 /obj/machinery/light/warm/no_nightlight/directional/east: {entity: PoweredlightSodium, wall: east}
 /obj/machinery/light/warm/no_nightlight/directional/west: {entity: PoweredlightSodium, wall: west}
 
-# ---- category pass 21/N: ore and sheet stacks ----
-# Ore ids follow their refined_type (ores_coins.dm) matching this fork's own
-# ore->sheet naming, the same equivalence already used for /obj/item/stack/
-# ore/silver->SilverOre and /gold->GoldOre above: iron ore refines to
-# /obj/item/stack/sheet/iron (already mapped to SheetSteel), so it takes the
-# ore counterpart of that name; plasma/bananium/diamond/uranium ore each
-# refine to a sheet already mapped the same way.
+# ---- ore and sheet stacks ----
 /obj/item/stack/ore/iron: SteelOre
 /obj/item/stack/ore/plasma: PlasmaOre
 /obj/item/stack/ore/bananium: BananiumOre
 /obj/item/stack/ore/diamond: DiamondOre
 /obj/item/stack/ore/uranium: UraniumOre
-/obj/item/stack/sheet/mineral/uranium: SheetUranium # bare; /five inherits
-/obj/item/stack/sheet/cardboard: MaterialCardboard # bare; /fifty inherits
-# "You can use this to wrap items in" (wrap.dm) -- exact functional match for
-# this fork's ParcelWrap ("Paper used [to] contain items for transport").
-/obj/item/stack/package_wrap: ParcelWrap # bare; /small and /one inherit
+/obj/item/stack/sheet/mineral/uranium: SheetUranium
+/obj/item/stack/sheet/cardboard: MaterialCardboard
+/obj/item/stack/package_wrap: ParcelWrap
 
-# ---- category pass 22/N: shuttle/singularity engine hardware ----
-# "A bluespace engine used to make shuttles move" (shuttle_engines.dm) --
-# exact functional match for this fork's Thruster ("A thruster that allows a
-# shuttle to move"). Bare rule; /propulsion, /propulsion/left, /right,
-# /burst and the /large, /huge size tiers all inherit -- this fork's
-# thruster has no size-tier ids to distinguish them by anyway.
+# ---- shuttle/singularity engine hardware ----
 /obj/machinery/power/shuttle_engine: Thruster
-# This fork's own Tesla engine structures, matched by name and function
-# (both project/ground the tesla energy ball between paired generators).
-/obj/machinery/power/energy_accumulator/tesla_coil: TeslaCoil # bare; /anchored inherits
-/obj/machinery/power/energy_accumulator/grounding_rod: TeslaGroundingRod # bare; /anchored inherits
-# "A shield generator" that projects a force-field wall between paired units
-# (shieldgen.dm) -- same function as this fork's ContainmentFieldGenerator.
-# /xenobiologyaccess and /unlocked lose their access-requirement flavour,
-# same "loses X property" pattern as elsewhere in this file.
+/obj/machinery/power/energy_accumulator/tesla_coil: TeslaCoil
+/obj/machinery/power/energy_accumulator/grounding_rod: TeslaGroundingRod
 /obj/machinery/power/shieldwallgen: ContainmentFieldGenerator
-# The APC itself: /auto_name/directional/<dir> above already covers the
-# common case. Bare (no directional suffix, a legacy/ruin placement using a
-# runtime dir var) and /worn_out (a damaged skin, no equivalent prototype)
-# both reuse the same id.
 /obj/machinery/power/apc: APCBasic
 /obj/machinery/power/apc/worn_out/directional/north: {entity: APCBasic, wall: north, onWall: true}
 /obj/machinery/power/apc/worn_out/directional/south: {entity: APCBasic, wall: south, onWall: true}
 /obj/machinery/power/apc/worn_out/directional/east: {entity: APCBasic, wall: east, onWall: true}
 /obj/machinery/power/apc/worn_out/directional/west: {entity: APCBasic, wall: west, onWall: true}
 
-# ---- category pass 23/N: stairs ----
-# A real, placeable Rotatable structure entity ("The greatest invention
-# since rocket-propelled grenades" -- Resources/Prototypes/Entities/
-# Structures/stairs.yml), not just a decal here -- unlike most directional
-# structures in this file it isn't wall-mounted, so it takes a forced dir:
-# (the numeric-facing form already used for windows/stools above) rather
-# than wall:.
+# ---- stairs ----
 /obj/structure/stairs/north: {entity: Stairs, dir: 1}
 /obj/structure/stairs/south: {entity: Stairs, dir: 2}
 /obj/structure/stairs/east: {entity: Stairs, dir: 4}
 /obj/structure/stairs/west: {entity: Stairs, dir: 8}
-/obj/structure/stairs: Stairs # bare; uses whatever dir the instance carries
+/obj/structure/stairs: Stairs
 
-# ---- category pass 24/N: computer consoles ----
-# The bare path's icon_state ("computer"), icon_keyboard ("generic_key") and
-# icon_screen ("generic") (code/game/machinery/computer/_computer.dm) match
-# this fork's BaseComputer layer-for-layer (state: computer / generic_keyboard
-# / generic). This is a fallback for any subtype below it without its own
-# more specific rule here -- tgstation gives many console subtypes their own
-# icon_screen state, so a subtype with a themed screen (not yet individually
-# verified) will render as a blank generic console until it gets its own
-# entry, the same tradeoff /obj/structure/closet's bare rule already makes.
+# ---- computer consoles ----
 /obj/machinery/computer: BaseComputer
-# Exact functional + description matches, verified individually rather than
-# left to the bare fallback above:
-/obj/machinery/computer/emergency_shuttle: ComputerEmergencyShuttle # "Handles authorization to early launch the shuttle"
-/obj/machinery/computer/monitor: ComputerPowerMonitoring # "monitors power levels across the station"
+/obj/machinery/computer/emergency_shuttle: ComputerEmergencyShuttle
+/obj/machinery/computer/monitor: ComputerPowerMonitoring
 
-# ---- category pass 50/N: contraband posters ----
-# This fork ported a large chunk of tgstation's contraband poster jokes
-# verbatim (matched here by exact name-string equality, e.g. "DONK CO.
-# BRAND MICROWAVEABLE FOOD" and "Make Mine a Waffle Corp: Fine Rifles,
-# Economic Prices" both appear character-for-character in both games).
+# ---- contraband posters ----
 /obj/structure/sign/poster/contraband/ambrosia_vulgaris: PosterContrabandAmbrosiaVulgaris
 /obj/structure/sign/poster/contraband/ambrosia_vulgaris/directional/north: {entity: PosterContrabandAmbrosiaVulgaris, wall: north, onWall: true}
 /obj/structure/sign/poster/contraband/ambrosia_vulgaris/directional/south: {entity: PosterContrabandAmbrosiaVulgaris, wall: south, onWall: true}
@@ -2275,11 +1803,7 @@
 /obj/structure/sign/poster/contraband/waffle_corp_rifles/directional/east: {entity: PosterContrabandWaffleCorp, wall: east, onWall: true}
 /obj/structure/sign/poster/contraband/waffle_corp_rifles/directional/west: {entity: PosterContrabandWaffleCorp, wall: west, onWall: true}
 
-# ---- category pass 51/N: official ("legit") posters ----
-# Same verbatim-port situation as the contraband posters above, matched the
-# same way: exact name-string equality between tgstation's poster
-# name = "..." and this fork's own name:, each candidate id checked against
-# the prototype index before being written.
+# ---- official ("legit") posters ----
 /obj/structure/sign/poster/official/anniversary_vintage_reprint: PosterLegit50thAnniversaryVintageReprint
 /obj/structure/sign/poster/official/anniversary_vintage_reprint/directional/north: {entity: PosterLegit50thAnniversaryVintageReprint, wall: north, onWall: true}
 /obj/structure/sign/poster/official/anniversary_vintage_reprint/directional/south: {entity: PosterLegit50thAnniversaryVintageReprint, wall: south, onWall: true}
@@ -2500,34 +2024,7 @@
 /obj/structure/sign/poster/official/wtf_is_co2/directional/south: {entity: PosterLegitCarbonDioxide, wall: south, onWall: true}
 /obj/structure/sign/poster/official/wtf_is_co2/directional/east: {entity: PosterLegitCarbonDioxide, wall: east, onWall: true}
 /obj/structure/sign/poster/official/wtf_is_co2/directional/west: {entity: PosterLegitCarbonDioxide, wall: west, onWall: true}
-# ---- category pass 52/N: general-purpose exact-name cross-reference ----
-# Generalizes the poster technique above to the whole corpus: every tgstation
-# /obj|mob name = "..." string (13,452 paths, from every .dm file) cross-
-# referenced against every SS14 name: field in Resources/Prototypes, resolved
-# through the full parent: inheritance chain (a child that does not override
-# name inherits its nearest ancestor's), keeping a candidate only when that
-# resolved name is unique to exactly one non-abstract entity id. Resolving
-# inheritance properly mattered: a first pass that only looked at explicit
-# name: lines called "stairs" and "mirror" unique when they are not -- this
-# fork has 8 stair variants (Stairs/StairWood/StairDark/...) and 2 mirrors
-# (Mirror/MirrorModern) that all inherit the same bare name, which the naive
-# scan couldn't see; both are left unresolved here rather than guessing.
-#
-# Every hit was then individually screened for kind mismatches -- a display
-# name that coincidentally collides across unrelated categories (a live mob,
-# a wall poster, a soda can and an admin-smite hazard all turned up sharing a
-# name with something else entirely) -- and for semantic loss (a generic
-# ancestor name collapsing distinct variants onto one id, as with the donut
-# below). Excluded from this pass for those reasons, left for individual/
-# human review:
-#   /obj/item/toy/spinningtoy                        -- Singularity is the real hazard, not a toy
-#   /obj/effect/landmark/error                       -- Error is a joke food item, not the invisible landmark
-#   /obj/structure/statue/goliath                    -- MobGoliath is the live NPC, not a statue
-#   /obj/item/food/donut/plain                       -- FoodDonutHomer is the themed pink donut, not a plain one
-#   /mob/living/basic/clown                          -- a hostile NPC mob, not PosterContrabandClown
-#   /obj/item/reagent_containers/cup/soda_cans/cola  -- a drink can, not PosterContrabandSpaceCola
-#   /obj/item/reagent_containers/cup/soda_cans/pwr_game -- a drink can, not PosterContrabandPwrGame
-#   /obj/effect/particle_effect/water/extinguisher/stomach_acid -- a runtime-spawned VFX particle (see ignore.yml), not a placeable Acidifier
+# ---- general-purpose exact-name cross-reference ----
 /mob/living/basic/frog: MobFrog
 /mob/living/basic/hivebot/strong: MobHivebotStrong
 /mob/living/basic/mining/basilisk: MobBasilisk
@@ -2834,30 +2331,15 @@
 /obj/structure/reagent_dispensers/keg/beer: WoodenKegBeer
 /obj/vehicle/ridden/secway: VehicleSecway
 
-# ---- category pass 53/N: north_star.dmm sweep ----
-# Same exact-name cross-reference as pass 52, run again against a specific
-# map (north_star.dmm) to close its remaining gaps. One candidate the
-# technique turned up was excluded: /obj/structure/emergency_shield/regenerating
-# ("energy shield") is a stationary, indestructible force-field barrier
-# structure (game/machinery/modular_shield.dm) fed by a shield generator --
-# SS14's own EnergyShield id with that exact name is an unrelated handheld,
-# foldable pocket item (Entities/Objects/Shields/shields.yml), not a
-# placeable barrier.
+# ---- north_star.dmm sweep ----
 /mob/living/basic/pig: MobPig
-/obj/effect/spawner/random/medical: LootSpawnerMedicalClassy # bare parent; category match like the other random spawners above
+/obj/effect/spawner/random/medical: LootSpawnerMedicalClassy
 /obj/item/food/boiledrice: FoodRiceBoiled
 /obj/item/food/cake/chocolate: FoodCakeChocolate
 /obj/item/pneumatic_cannon/pie: LauncherCreamPie
 /obj/item/stack/sheet/animalhide/mothroach: HideMothroach
 /obj/item/stack/tile/iron/white: FloorTileItemWhite
 /obj/item/weaponcrafting/receiver: ModularReceiver
-# Two paths this fork's own maps still carry pre-rename: tgstation's own
-# tools/UpdatePaths/Scripts renamed both upstream, and the current source
-# confirms the rename (bare /obj/item/knife is the literal original kitchen
-# knife -- "it is said that all other knives are only copies of this one",
-# icon 'icons/obj/service/kitchen.dmi' -- and /obj/item/rag's own desc,
-# "For cleaning up messes, you suppose.", is this fork's RagItem description
-# verbatim).
 /obj/item/knife: KitchenKnife
 /obj/item/reagent_containers/cup/rag: RagItem
 /obj/item/food/grown/carrot: FoodCarrot
@@ -2866,35 +2348,28 @@
 /obj/item/stack/medical/mesh: RegenerativeMesh
 /obj/item/stack/tile/wood: FloorTileItemWood
 /obj/item/food/grown/poppy: FoodPoppy
-# This fork has exactly one flasher entity -- no separate wall-mounted vs.
-# portable split like tgstation's /obj/machinery/flasher vs. /flasher/portable
-# -- so the bare rule covers both, same "one target, no finer split available"
-# reasoning as /turf/open/floor/carpet above.
 /obj/machinery/flasher: PortableFlasher
 
-# ---- category pass 54/N: north_star.dmm sweep, round 2 ----
-/obj/machinery/door/morgue: Morgue # "Used to store bodies until someone fetches them", same combined tray+door unit tgstation's path is
-/obj/item/clothing/suit/chaplainsuit/whiterobe: ClothingUniformJumpsuitMonasticRobeLight # "white robe... Good for clerics" == "light monastic robe... worn by religious folk"
-/obj/item/stack/arcadeticket: PrizeTicket # "arcade tickets... you could buy a bike!" == "stack-prize-ticket"
-/obj/item/clothing/glasses/regular: ClothingEyesGlasses # "prescription glasses" == "glasses... with prescription lenses"
-/obj/item/clothing/suit/toggle/labcoat: ClothingOuterCoatLab # descriptions are word-for-word identical: "A suit that protects against minor chemical spills."
+# ---- north_star.dmm sweep, round 2 ----
+/obj/machinery/door/morgue: Morgue
+/obj/item/clothing/suit/chaplainsuit/whiterobe: ClothingUniformJumpsuitMonasticRobeLight
+/obj/item/stack/arcadeticket: PrizeTicket
+/obj/item/clothing/glasses/regular: ClothingEyesGlasses
+/obj/item/clothing/suit/toggle/labcoat: ClothingOuterCoatLab
 /obj/item/food/grown/chili: FoodChiliPepper
-/obj/machinery/defibrillator_mount: DefibrillatorCabinet # "Holds defibrillators" == "designed to hold a defibrillator"
+/obj/machinery/defibrillator_mount: DefibrillatorCabinet
 /obj/machinery/defibrillator_mount/directional/north: {entity: DefibrillatorCabinet, wall: north, onWall: true}
 /obj/machinery/defibrillator_mount/directional/south: {entity: DefibrillatorCabinet, wall: south, onWall: true}
 /obj/machinery/defibrillator_mount/directional/east: {entity: DefibrillatorCabinet, wall: east, onWall: true}
 /obj/machinery/defibrillator_mount/directional/west: {entity: DefibrillatorCabinet, wall: west, onWall: true}
-/obj/structure/sign/painting: RandomPainting # bare "Painting" frame gets a random canvas at runtime in both games; category match, same reasoning as the other random-loot spawners above
-/obj/structure/firelock_frame: FirelockFrame # descriptions match: "firelock frame" / "That is a firelock frame."
-/obj/effect/spawner/random/decoration/glowstick: GlowstickRed # loot table has no marker equivalent, picks the one concrete colour this fork has -- same "spawner -> single fixed item" tradeoff as /obj/effect/spawner/random/structure/girder above
-/obj/effect/spawner/random/structure/chair_comfy: ComfyChair # not actually random -- tgstation's own loot_type_path is a single fixed /obj/structure/chair/comfy, so this is an exact substitution, not a "closest available" guess
+/obj/structure/sign/painting: RandomPainting
+/obj/structure/firelock_frame: FirelockFrame
+/obj/effect/spawner/random/decoration/glowstick: GlowstickRed
+/obj/effect/spawner/random/structure/chair_comfy: ComfyChair
 /obj/item/reagent_containers/cup/glass/coffee: DrinkCoffee
-/obj/item/storage/fancy/candle_box: BoxCandle # "candle pack" == "specifically moulded to only carry candles"
+/obj/item/storage/fancy/candle_box: BoxCandle
 
-# ---- category pass 55/N: north_star.dmm sweep, round 3 (fuzzy keyword pass, each hand-verified) ----
-# Element-labelled chemistry bottles: tgstation's own "<element> bottle" name
-# and its single reagent line up one-to-one with this fork's labelled
-# ChemistryBottle* set (BaseChemistryBottleFilled + a Label component).
+# ---- north_star.dmm sweep, round 3 (fuzzy keyword pass, each hand-verified) ----
 /obj/item/reagent_containers/cup/bottle/carbon: ChemistryBottleCarbon
 /obj/item/reagent_containers/cup/bottle/ethanol: ChemistryBottleEthanol
 /obj/item/reagent_containers/cup/bottle/fluorine: ChemistryBottleFluorine
@@ -2908,27 +2383,25 @@
 /obj/item/reagent_containers/cup/bottle/potassium: ChemistryBottlePotassium
 /obj/item/reagent_containers/cup/bottle/sodium: ChemistryBottleSodium
 /obj/item/reagent_containers/pill/iron: PillIron
-# tgstation moved pills under reagent_containers/applicator/pill/* (see
-# tools/UpdatePaths); same item, same id, just a deeper path today.
 /obj/item/reagent_containers/applicator/pill/iron: PillIron
 /obj/item/seeds/coffee: CoffeeSeeds
 /obj/item/seeds/tea: TeaPlantSeeds
 /obj/item/instrument/violin: ViolinInstrument
 /obj/item/light/tube/broken: LightTubeBroken
-/obj/item/toy/nuke: ToyNuke # "Nuclear Fission Explosive toy" == "A plastic model of a Nuclear Fission Explosive"
-/obj/item/toy/plush/rouny: PlushieRouny # tgstation's own "runner plushie" is this fork's mascot rat, Rouny
-/obj/item/trash/cheesie: FoodPacketCheesieTrash # exact name match: "cheesie honkers"
-/obj/item/card/id/advanced/prisoner: PrisonerIDCard # bare; the /one /two /three... subtypes are just different serial numbers, same card
+/obj/item/toy/nuke: ToyNuke
+/obj/item/toy/plush/rouny: PlushieRouny
+/obj/item/trash/cheesie: FoodPacketCheesieTrash
+/obj/item/card/id/advanced/prisoner: PrisonerIDCard
 /obj/item/food/baguette: FoodBreadBaguette
 /obj/item/food/donkpocket/warm/berry: FoodDonkpocketBerryWarm
 /obj/item/food/energybar: FoodSnackEnergyBar
-/obj/item/food/ready_donk: FoodDonkpocket # bare; not an exact match ("Ready-Donk: Bachelor Chow" is a distinct TV-dinner brand) but the closest "sketchy premade traitor food" this fork has
+/obj/item/food/ready_donk: FoodDonkpocket
 /obj/item/gun/ballistic/shotgun/doublebarrel: WeaponShotgunDoubleBarreled
 /obj/item/clothing/gloves/boxing/blue: ClothingHandsGlovesBoxingBlue
 /obj/item/clothing/head/rasta: ClothingHeadRastaHat
 /obj/machinery/gravity_generator/main: GravityGenerator
-/obj/machinery/vending/robotics: VendingMachineRobotics # "Robotech Deluxe" == "All the tools you need to create your own robot army"
+/obj/machinery/vending/robotics: VendingMachineRobotics
 /obj/machinery/barsign: BarSign
-/obj/structure/noticeboard/ce: NoticeBoard # generic "notice board", closest available -- this fork has no CE-specific reskin
-/obj/structure/door_assembly/door_assembly_med: AirlockAssembly # "medical airlock assembly" is a construction-stage solid airlock, same kind as this fork's generic AirlockAssembly -- not WindoorAssembly, which is a different (windowed) door family
-/obj/vehicle/ridden/janicart: VehicleJanicart # "janicart (pimpin' ride)" == "janicart"
+/obj/structure/noticeboard/ce: NoticeBoard
+/obj/structure/door_assembly/door_assembly_med: AirlockAssembly
+/obj/vehicle/ridden/janicart: VehicleJanicart

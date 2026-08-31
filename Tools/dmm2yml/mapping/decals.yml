@@ -1,52 +1,4 @@
-# /obj/effect/turf_decal/... -> SS14 decals.
-#
-# Rules are inherited down the SS13 path tree, so a rule for
-# '/obj/effect/turf_decal/siding' also covers '/siding/thinplating_new'.
-# Forms: a bare id, {id, color}, {dirs: {1,2,4,8}} for direction-dependent
-# decals, or {decals: [...]} to put several decals on one tile.
-#
-# Directions are BYOND's: 1 north, 2 south, 4 east, 8 west.
-#
-# NOTE: SS13 stores a decal's orientation in 'dir' while SS14 bakes it into
-# the decal id.
-#
-# Straight lines and end caps: checked pixel-for-pixel against both sides'
-# sprites (tgstation's icons/turf/decals.dmi "warningline"/"warn_end" states,
-# and this repo's Resources/Textures/Decals/markings.rsi) -- both name a
-# direction by which literal tile edge it touches (N = top, E = right, ...),
-# so the plain N->N, E->E, S->S, W->W mapping used below is correct as is.
-#
-# Corners are a different story: every corner-family decal on both sides
-# (WarnCorner*, MiniTileCornerOverlay*, BrickCornerOverlay*,
-# WoodTrimThinCorner*) turned out to hang its accent off ONE tile corner
-# rather than following the line's own direction, and BYOND's dir names
-# that accent's *diagonal opposite*, not the corner itself: dir N (top) sits
-# in the NW quadrant, S (bottom) in SE, E (right) in NE, W (left) in SW.
-# Confirmed by measuring pixel-quadrant density on every corner sprite in
-# both decals.dmi and this repo's decal RSIs -- not by eye. Every corner rule
-# below already uses dir 1->NW, 2->SE, 4->NE, 8->SW; if a new corner-style
-# decal is added later, re-derive it the same way rather than copying the
-# line/end N->N pattern -- that pattern does not hold for corners.
-#
-# A third case: /obj/effect/turf_decal/stripes/line's own icon_state
-# ("warningline", decals.dmi) has all 8 BYOND dirs, not just 4 -- extracting
-# and viewing all 8 shows the 4 diagonal ones (dir 5/6/9/10, i.e. NORTH|EAST
-# etc.) are not a rotated line at all, but the exact same double-edge corner
-# picture as WarnCorner*: dir 5 (NORTHEAST) borders the top AND right edges,
-# pixel-identical to warn_corner_ne.png. Unlike the /stripes/corner case
-# above, no opposite-quadrant trick is needed here -- the compound dir names
-# its two edges directly, so NORTHEAST -> WarnCornerNE by name. Mappers can
-# place either a /stripes/corner (cardinal dir) or a /stripes/line with a
-# diagonal dir for the same visual, and both need to resolve here or one of
-# them silently drops the decal (DecalRule.ids_for returns nothing for a dir
-# not in the table).
-
 # ---- hazard stripes ----
-# The true bare path, no subtype at all: /obj/effect/turf_decal's own class
-# defaults to icon_state "warningline" (code/game/objects/effects/decals/
-# decal.dm) -- the same state /stripes/line sets explicitly below, so it
-# renders identically. /stripes below covers the more common case of a
-# mapper writing out /stripes/line explicitly.
 /obj/effect/turf_decal:
   dirs:
     1: WarnLineN
@@ -143,9 +95,6 @@
     8: WarnEndGreyscaleW
   color: '#DE3A3A96'
 /obj/effect/turf_decal/stripes/full: WarnFull
-# /obj/effect/turf_decal itself (decal.dm) defaults to icon_state "warningline"
-# -- the same state /stripes/line sets explicitly -- so the bare path with no
-# subtype at all renders identically to /stripes/line.
 /obj/effect/turf_decal/stripes:
   dirs:
     1: WarnLineN
@@ -156,10 +105,6 @@
     6: WarnCornerSE
     9: WarnCornerNW
     10: WarnCornerSW
-# Asteroid stripes are a visually distinct sprite in tgstation (icon_state
-# "ast_warn*", a rougher hand-painted look) but this fork has no matching
-# asteroid-specific decal, so they fall back to the same ids as the regular
-# hazard stripes -- same "hazard boundary" meaning, different texture lost.
 /obj/effect/turf_decal/stripes/asteroid/line:
   dirs:
     1: WarnLineN
@@ -750,8 +695,6 @@
   id: FullTileOverlayGreyscale
   color: '#444646FF'
 
-# dark_green was missing from the tile/<colour> family the same way it was
-# missing from trimline/ -- same source hex (tilecoloring.dm), same 96 alpha.
 /obj/effect/turf_decal/tile/dark_green:
   dirs:
     1: QuarterTileOverlayGreyscale
@@ -1300,8 +1243,6 @@
     4: WarnLineGreyscaleE
     8: WarnLineGreyscaleW
   color: '#9FED5896'
-# color = "#439C1E" (code/.../tilecoloring.dm) + the same 96 alpha suffix
-# every other trimline colour but dark/dark_blue/dark_red/white uses.
 /obj/effect/turf_decal/trimline/dark_green/line:
   dirs:
     1: BrickLineOverlayN
@@ -1639,12 +1580,6 @@
     8: WarnLineGreyscaleW
   color: '#EFB34196'
 
-# The bare /trimline/<colour> path (no /line, /corner, ... suffix) is the
-# base class itself, icon_state "trimline_box" (tilecoloring.dm) -- a filled
-# box, not a line. BrickBoxOverlay is the one box-shaped id in that family.
-# arrow_cw/arrow_ccw/mid_joiner/shrink_cw/shrink_ccw and the /tram colour
-# have no matching id in this fork at all and are not mapped here or
-# anywhere else in this file -- left for the CSV.
 /obj/effect/turf_decal/trimline/blue: {id: BrickBoxOverlay, color: '#52B4E996'}
 /obj/effect/turf_decal/trimline/brown: {id: BrickBoxOverlay, color: '#A4610696'}
 /obj/effect/turf_decal/trimline/dark: {id: BrickBoxOverlay, color: '#444646FF'}
@@ -1659,36 +1594,13 @@
 /obj/effect/turf_decal/trimline/yellow: {id: BrickBoxOverlay, color: '#EFB34196'}
 
 # ---- cleanable filth ----
-# tgstation has ~20 distinct filth decals (dust, ash, vomit, food smudges,
-# glass, rubble, confetti, ...); this fork's decal set only has one, so only
-# the one with a real match is mapped. /dirt/dust inherits this by path-tree
-# lookup, being a subpath of /dirt.
 /obj/effect/decal/cleanable/dirt: Dirt
 
-# Ash: tgstation's own icon_state is a grey speckled ash-pile silhouette
-# (icons/obj/debris.dmi, "ash") -- this fork's Decals/burnt.rsi ("scorch
-# marks left after something burns", burnt1-4) is the same grey speckled
-# scorch-mark register, closest available rather than an exact sprite match.
-# /large gets a different burnt variant for a visibly bigger mark.
 /obj/effect/decal/cleanable/ash: burnt1
 /obj/effect/decal/cleanable/ash/large: burnt3
 
-# Not under /cleanable -- a separate /obj/effect/decal/remains subtree.
-# icon_state "remains" (remains.dm) is an exact match for this fork's
-# Decals/dirty.rsi state "remains" (dirty.yml). /human/smokey inherits this
-# too, losing only its looter-detecting gas-trap behaviour, which has no
-# decal-level equivalent anyway.
 /obj/effect/decal/remains/human: Remains
 
-# Crayon graffiti: this fork ported the same icon_state set wholesale as
-# decal ids (Decals/crayons.yml, e.g. id: rune1, id: x, id: i -- one id per
-# icon_state, lowercase, exactly as tgstation names them in crayon.dm).
-# Colour comes from each subtype's paint_colour var, converted from its
-# COLOR_CRAYON_* #RRGGBB define (code/__DEFINES/colors.dm) to this file's
-# usual #RRGGBBAA form with a full-opacity AA. The bare path (icon_state
-# "rune1", paint_colour COLOR_WHITE by default) also covers /puzzle and
-# /puzzle/pin, losing only their link-matching minigame behaviour -- there is
-# no decal-level equivalent for that either.
 /obj/effect/decal/cleanable/crayon: {id: rune1, color: '#FFFFFFFF'}
 /obj/effect/decal/cleanable/crayon/rune4: {id: rune4, color: '#DA0000FF'}
 /obj/effect/decal/cleanable/crayon/rune2: {id: rune2, color: '#FFFFFFFF'}
