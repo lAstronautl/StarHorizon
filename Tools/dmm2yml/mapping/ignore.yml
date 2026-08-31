@@ -3,6 +3,12 @@
 # Everything here is a decision already made, not a guess -- delete a line and
 # those paths come back in the scan report for you to decide on individually.
 
+# Lives in the same source file as mapping_helpers above (code/modules/
+# mapping/mapping_helpers.dm) and does the same job for baseturfs
+# specifically -- "Set the baseturfs of every turf in the /area/ it is
+# placed", blank icon_state, nothing to render.
+- /obj/effect/baseturf_helper
+
 # SS14 has no areas at all: rooms are defined by their walls and by the station
 # map prototype, not by an area object covering the tiles. All 171 area paths of
 # a typical /tg/ station would otherwise land in the report with nothing useful
