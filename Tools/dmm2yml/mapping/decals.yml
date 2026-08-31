@@ -29,6 +29,17 @@
 # line/end N->N pattern -- that pattern does not hold for corners.
 
 # ---- hazard stripes ----
+# The true bare path, no subtype at all: /obj/effect/turf_decal's own class
+# defaults to icon_state "warningline" (code/game/objects/effects/decals/
+# decal.dm) -- the same state /stripes/line sets explicitly below, so it
+# renders identically. /stripes below covers the more common case of a
+# mapper writing out /stripes/line explicitly.
+/obj/effect/turf_decal:
+  dirs:
+    1: WarnLineN
+    2: WarnLineS
+    4: WarnLineE
+    8: WarnLineW
 /obj/effect/turf_decal/stripes/line:
   dirs:
     1: WarnLineN
@@ -1616,3 +1627,27 @@
 # the one with a real match is mapped. /dirt/dust inherits this by path-tree
 # lookup, being a subpath of /dirt.
 /obj/effect/decal/cleanable/dirt: Dirt
+
+# Not under /cleanable -- a separate /obj/effect/decal/remains subtree.
+# icon_state "remains" (remains.dm) is an exact match for this fork's
+# Decals/dirty.rsi state "remains" (dirty.yml). /human/smokey inherits this
+# too, losing only its looter-detecting gas-trap behaviour, which has no
+# decal-level equivalent anyway.
+/obj/effect/decal/remains/human: Remains
+
+# Crayon graffiti: this fork ported the same icon_state set wholesale as
+# decal ids (Decals/crayons.yml, e.g. id: rune1, id: x, id: i -- one id per
+# icon_state, lowercase, exactly as tgstation names them in crayon.dm).
+# Colour comes from each subtype's paint_colour var, converted from its
+# COLOR_CRAYON_* #RRGGBB define (code/__DEFINES/colors.dm) to this file's
+# usual #RRGGBBAA form with a full-opacity AA. The bare path (icon_state
+# "rune1", paint_colour COLOR_WHITE by default) also covers /puzzle and
+# /puzzle/pin, losing only their link-matching minigame behaviour -- there is
+# no decal-level equivalent for that either.
+/obj/effect/decal/cleanable/crayon: {id: rune1, color: '#FFFFFFFF'}
+/obj/effect/decal/cleanable/crayon/rune4: {id: rune4, color: '#DA0000FF'}
+/obj/effect/decal/cleanable/crayon/rune2: {id: rune2, color: '#FFFFFFFF'}
+/obj/effect/decal/cleanable/crayon/x: {id: x, color: '#FF9300FF'}
+/obj/effect/decal/cleanable/crayon/l: {id: l, color: '#FFFFFFFF'}
+/obj/effect/decal/cleanable/crayon/i: {id: i, color: '#FFFFFFFF'}
+/obj/effect/decal/cleanable/crayon/i/orange: {id: i, color: '#FF9300FF'}

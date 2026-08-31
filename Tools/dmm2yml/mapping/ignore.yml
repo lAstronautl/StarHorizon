@@ -125,6 +125,15 @@
 - /obj/effect/landmark/river_waypoint
 - /obj/effect/landmark/transport
 
+# /obj/effect/light_emitter (and /thunderdome, /fake_outdoors, /podbay):
+# invisibility = INVISIBILITY_ABSTRACT, no sprite of its own -- it exists
+# purely to call set_light() and fake ambient lighting near lava/glowing
+# terrain in mining ruins (code/modules/mining/mine_items.dm). Every light
+# source this fork's prototypes define is attached to a real, visible
+# fixture (a wall light, a lamp post, a crystal, ...) -- there is no
+# "invisible light with no fixture" concept to place it as.
+- /obj/effect/light_emitter
+
 # /turf/open/genturf (plain, /blue, /orange): not a real tile, a debug
 # placeholder. Its own source comment says so outright -- "This turf doesn't
 # actually do anything beyond provide contrast for mappers and be very
