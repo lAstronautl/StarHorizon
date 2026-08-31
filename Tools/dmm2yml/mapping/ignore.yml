@@ -137,6 +137,15 @@
 - /obj/effect/landmark/river_waypoint
 - /obj/effect/landmark/transport
 
+# /obj/effect/step_trigger (teleporter, thrower, message, sound_effect, ...):
+# invisibility = INVISIBILITY_ABSTRACT set on the base class itself
+# ("nope cant see this shit" -- code/game/objects/effects/step_triggers.dm),
+# the same invisible-logic-marker pattern as the landmarks above. The
+# teleporter variant's target is also literal fixed x/y/z coordinates baked
+# into the source map, which wouldn't mean anything in a converted map's
+# coordinate space even if it were visible.
+- /obj/effect/step_trigger
+
 # The Xenomorph antagonist subsystem (hive weeds, resin walls/membranes,
 # eggs, the drone/hunter/etc. castes themselves) has no equivalent in this
 # fork at all -- checked from several angles (exact id, "xeno"/"alien"/
