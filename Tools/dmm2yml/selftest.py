@@ -631,6 +631,44 @@ def check_protoindex_indentation() -> Result:
     )
 
 
+def check_protoindex_trailing_comments() -> Result:
+    """A trailing '# comment' on an id: line must not become part of the id.
+
+    Found while mapping /obj/item/toy/plush/lizard_plushie: tgstation's own
+    plushies.yml writes 'id: PlushieLizard #Weh!' -- a bare inline comment,
+    valid YAML, common throughout Resources/Prototypes (242 occurrences).
+    FIELD_LINE captured everything after the colon verbatim, so the indexed
+    id became "PlushieLizard #Weh!" and index.has(ENTITY, "PlushieLizard")
+    came back False even though the entity is real and non-abstract --
+    the same failure shape as the indented-list bug above, just on the
+    value side of the field instead of the indent.
+    """
+    sample = (
+        "- type: entity\n"
+        "  id: CommentedWidget #Weh!\n"
+        "  name: commented widget\n"
+        "- type: entity\n"
+        "  id: CommentedAbstractWidget\n"
+        "  abstract: true # not placeable\n"
+    )
+    with tempfile.TemporaryDirectory() as directory:
+        with open(os.path.join(directory, "commented.yml"), "w", encoding="utf-8") as handle:
+            handle.write(sample)
+        index = protoindex.build(directory)
+
+    problems = []
+    if not index.has(protoindex.ENTITY, "CommentedWidget"):
+        problems.append("an id: line with a trailing comment was not found")
+    if "CommentedAbstractWidget" in index.entities:
+        problems.append("an abstract: true with a trailing comment was not excluded")
+
+    return Result(
+        "dictionaries: trailing comments on id/abstract lines",
+        not problems,
+        "; ".join(problems) or "a trailing '# comment' on id/abstract lines is stripped",
+    )
+
+
 def check_entity_name_quoting() -> Result:
     """A MetaData name with YAML-special characters must not corrupt the map.
 
@@ -690,6 +728,7 @@ def run(repo_root: str, mapping_dir: str, prototypes_dir: str) -> list[Result]:
         ("chunks: round-trip vs repo maps", lambda: check_chunk_roundtrip(repo_root)),
         ("dictionaries: ids resolve", lambda: check_dictionaries(mapping_set, index)),
         ("dictionaries: indented prototype lists", lambda: check_protoindex_indentation()),
+        ("dictionaries: trailing comments on id/abstract lines", lambda: check_protoindex_trailing_comments()),
         ("conversion: fixture map", lambda: check_conversion(mapping_set, index)),
         ("rendering: valid map document", lambda: check_rendering(mapping_set, index)),
         ("rendering: entity names quote safely", lambda: check_entity_name_quoting()),

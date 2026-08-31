@@ -21,6 +21,13 @@ from bisect import bisect_left
 # recognised relative to it instead of assuming column 0.
 TYPE_LINE = re.compile(r"^(\s*)- type: (\S+)")
 FIELD_LINE = re.compile(r"^(\s*)(\w+):\s*(.*)$")
+# A bare (unquoted) trailing '# comment' on an id/abstract/variants line, e.g.
+# 'id: PlushieLizard #Weh!' -- valid YAML, and common enough in this repo
+# (242 occurrences) that leaving it in the captured value silently broke
+# lookups for every id written that way. None of the three fields this
+# scanner reads ever legitimately contains '#', so stripping from the first
+# whitespace-preceded '#' is safe.
+TRAILING_COMMENT = re.compile(r"\s+#.*$")
 
 # Prototype kinds the converter can place on a map.
 ENTITY = "entity"
@@ -158,7 +165,7 @@ def build(prototypes_dir: str) -> ProtoIndex:
                         ):
                             key, value = field_match.group(2), field_match.group(3).strip()
                             if key in ("id", "abstract", "variants") and key not in fields:
-                                fields[key] = value
+                                fields[key] = TRAILING_COMMENT.sub("", value).strip()
             except (OSError, UnicodeDecodeError):
                 continue
             _flush(index, kind, fields)
