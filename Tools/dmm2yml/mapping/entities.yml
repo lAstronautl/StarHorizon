@@ -1532,6 +1532,12 @@
 /obj/machinery/porta_turret/ai: WeaponEnergyTurretAI
 /obj/machinery/porta_turret: WeaponEnergyTurretSecurity
 /obj/machinery/porta_turret/syndicate: NFWeaponTurretLaserSyndicate
+# "RTG... A Radioisotope Thermoelectric Generator for long term power" --
+# exact match. Bare; /advanced, /debug, /lavaland, /old_station all inherit,
+# losing only their output-tier/skin flavour -- this fork has no matching
+# tier system for RTGs (only a "Damaged" skin, for a different case: the
+# damage-state look, not tgstation's dev/admin-only debug variant).
+/obj/machinery/power/rtg: GeneratorRTG
 
 # ---- category pass 9/N: stock parts ----
 # Higher-rated stock parts (micro_laser, scanning_module, servo, the subspace
