@@ -1582,6 +1582,25 @@
 /obj/machinery/vending/magivend: VendingMachineMagivend
 /obj/machinery/vending/tool: VendingMachineYouTool
 
+# ---- category pass 44/N: telecomm servers (correcting an earlier miss) ----
+# An earlier pass concluded this fork has no telecomms system at all -- it
+# does (Structures/Machines/telecomms.yml), just consolidated to a single
+# TelecomServer machine instead of tgstation's rack of distinct machine
+# types (broadcaster/bus/hub/message_server/processor/receiver/relay all
+# stay unresolved, no equivalent for those specifically). The eight
+# department-filled presets match tgstation's own eight server presets by
+# name one-for-one (supply -> Cargo is this fork's synonym for the same
+# department, same as elsewhere in this file).
+/obj/machinery/telecomms/server: TelecomServer
+/obj/machinery/telecomms/server/presets/common: TelecomServerFilledCommon
+/obj/machinery/telecomms/server/presets/supply: TelecomServerFilledCargo
+/obj/machinery/telecomms/server/presets/engineering: TelecomServerFilledEngineering
+/obj/machinery/telecomms/server/presets/medical: TelecomServerFilledMedical
+/obj/machinery/telecomms/server/presets/science: TelecomServerFilledScience
+/obj/machinery/telecomms/server/presets/security: TelecomServerFilledSecurity
+/obj/machinery/telecomms/server/presets/service: TelecomServerFilledService
+/obj/machinery/telecomms/server/presets/command: TelecomServerFilledCommand
+
 # ---- category pass 9/N: stock parts ----
 # Higher-rated stock parts (micro_laser, scanning_module, servo, the subspace
 # family) have no match beyond the Rating-1 matter bin/capacitor above --
