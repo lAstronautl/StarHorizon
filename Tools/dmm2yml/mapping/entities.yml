@@ -2859,3 +2859,16 @@
 # -- so the bare rule covers both, same "one target, no finer split available"
 # reasoning as /turf/open/floor/carpet above.
 /obj/machinery/flasher: PortableFlasher
+
+# ---- category pass 54/N: north_star.dmm sweep, round 2 ----
+/obj/machinery/door/morgue: Morgue # "Used to store bodies until someone fetches them", same combined tray+door unit tgstation's path is
+/obj/item/clothing/suit/chaplainsuit/whiterobe: ClothingUniformJumpsuitMonasticRobeLight # "white robe... Good for clerics" == "light monastic robe... worn by religious folk"
+/obj/item/stack/arcadeticket: PrizeTicket # "arcade tickets... you could buy a bike!" == "stack-prize-ticket"
+/obj/item/clothing/glasses/regular: ClothingEyesGlasses # "prescription glasses" == "glasses... with prescription lenses"
+/obj/item/clothing/suit/toggle/labcoat: ClothingOuterCoatLab # descriptions are word-for-word identical: "A suit that protects against minor chemical spills."
+/obj/item/food/grown/chili: FoodChiliPepper
+/obj/machinery/defibrillator_mount: DefibrillatorCabinet # "Holds defibrillators" == "designed to hold a defibrillator"
+/obj/machinery/defibrillator_mount/directional/north: {entity: DefibrillatorCabinet, wall: north, onWall: true}
+/obj/machinery/defibrillator_mount/directional/south: {entity: DefibrillatorCabinet, wall: south, onWall: true}
+/obj/machinery/defibrillator_mount/directional/east: {entity: DefibrillatorCabinet, wall: east, onWall: true}
+/obj/machinery/defibrillator_mount/directional/west: {entity: DefibrillatorCabinet, wall: west, onWall: true}

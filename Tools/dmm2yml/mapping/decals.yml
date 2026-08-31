@@ -1665,6 +1665,14 @@
 # lookup, being a subpath of /dirt.
 /obj/effect/decal/cleanable/dirt: Dirt
 
+# Ash: tgstation's own icon_state is a grey speckled ash-pile silhouette
+# (icons/obj/debris.dmi, "ash") -- this fork's Decals/burnt.rsi ("scorch
+# marks left after something burns", burnt1-4) is the same grey speckled
+# scorch-mark register, closest available rather than an exact sprite match.
+# /large gets a different burnt variant for a visibly bigger mark.
+/obj/effect/decal/cleanable/ash: burnt1
+/obj/effect/decal/cleanable/ash/large: burnt3
+
 # Not under /cleanable -- a separate /obj/effect/decal/remains subtree.
 # icon_state "remains" (remains.dm) is an exact match for this fork's
 # Decals/dirty.rsi state "remains" (dirty.yml). /human/smokey inherits this
