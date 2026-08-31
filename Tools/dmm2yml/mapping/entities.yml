@@ -1478,6 +1478,19 @@
 /mob/living/basic/gorilla/hostile: MobGorilla
 /mob/living/basic/carp: MobCarp
 
+# ---- category pass 36/N: R&D lathes ----
+# Direct name and function matches (Structures/Machines/lathe.yml). The
+# department/offstation subtypes only change access requirements and paint
+# theme in tgstation, losing that flavour but keeping the correct machine.
+/obj/machinery/rnd/production/protolathe/department/engineering: Protolathe
+/obj/machinery/rnd/production/protolathe/department/science: Protolathe
+/obj/machinery/rnd/production/protolathe/offstation: Protolathe
+/obj/machinery/rnd/production/circuit_imprinter: CircuitImprinter
+/obj/machinery/rnd/production/circuit_imprinter/department/science: CircuitImprinter
+/obj/machinery/rnd/production/circuit_imprinter/offstation: CircuitImprinter
+/obj/machinery/rnd/production/techfab/department/security: SecurityTechFab
+/obj/machinery/rnd/production/techfab/department/medical: MedicalTechFab
+
 # ---- category pass 9/N: stock parts ----
 # Higher-rated stock parts (micro_laser, scanning_module, servo, the subspace
 # family) have no match beyond the Rating-1 matter bin/capacitor above --
