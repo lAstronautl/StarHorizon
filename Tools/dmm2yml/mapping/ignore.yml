@@ -201,6 +201,15 @@
 # "invisible light with no fixture" concept to place it as.
 - /obj/effect/light_emitter
 
+# /obj/effect/particle_effect (and every subtype -- water/extinguisher incl.
+# the acid-spit variant, smoke, foam, sparks, explosion, trail): the runtime
+# VFX base class behind tgstation's effect_system, confirmed by source
+# (code/game/objects/effects/effect_system/*) -- every instance is created
+# with `new()` from mob/machine code (a spat acid glob, an extinguisher jet,
+# a smoke machine puff) and moves/times out on its own. Not something a
+# mapper places, the same reasoning as step_trigger above.
+- /obj/effect/particle_effect
+
 # /turf/open/genturf (plain, /blue, /orange): not a real tile, a debug
 # placeholder. Its own source comment says so outright -- "This turf doesn't
 # actually do anything beyond provide contrast for mappers and be very
