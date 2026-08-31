@@ -1679,6 +1679,15 @@
 /obj/item/toy/figure/miner: ToyFigurineSalvage
 /obj/item/toy/figure/wizard: ToyFigurineWizard
 
+# ---- category pass 49/N: machine circuitboards ----
+# Direct id matches for the machine circuitboard family (Objects/Devices/
+# Circuitboards/Machine/production.yml), corresponding to machines already
+# mapped or confirmed to exist earlier in this file.
+/obj/item/circuitboard/machine/circuit_imprinter/offstation: CircuitImprinterMachineCircuitboard
+/obj/item/circuitboard/machine/microwave: MicrowaveMachineCircuitboard
+/obj/item/circuitboard/machine/chem_master: ChemMasterMachineCircuitboard
+/obj/item/circuitboard/machine/emitter: EmitterCircuitboard
+
 # ---- category pass 9/N: stock parts ----
 # Higher-rated stock parts (micro_laser, scanning_module, servo, the subspace
 # family) have no match beyond the Rating-1 matter bin/capacitor above --
