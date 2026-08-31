@@ -149,6 +149,28 @@
 - /obj/effect/landmark/mafia_game_area
 - /obj/effect/landmark/river_waypoint
 - /obj/effect/landmark/transport
+# Another batch of minigame/antagonist-specific spawn markers, same "no
+# matching system in this fork" reasoning as the batch above -- each
+# verified by source: deathmatch (deathmatch_mapping.dm), mafia
+# (mafia/map_pieces.dm), the whole bitrunning/* subtree
+# (bitrunning/objects/landmarks.dm), basketball (basketball_map_loading.dm),
+# the shuttle arena minigame (area/areas/shuttles.dm), the voidwalker and
+# abductor antagonist roles (their own antagonist modules), and the
+# holding-facility/ert-shuttle/nukeop-elevator/nukeop-base event markers
+# (game/objects/effects/landmarks.dm) -- none of these game modes or
+# antagonist roles exist in this fork.
+- /obj/effect/landmark/deathmatch_player_spawn
+- /obj/effect/landmark/mafia
+- /obj/effect/landmark/bitrunning
+- /obj/effect/landmark/basketball
+- /obj/effect/landmark/shuttle_arena_entrance
+- /obj/effect/landmark/shuttle_arena_safe
+- /obj/effect/landmark/voidwalker_void
+- /obj/effect/landmark/abductor
+- /obj/effect/landmark/holding_facility
+- /obj/effect/landmark/ert_shuttle_spawn
+- /obj/effect/landmark/start/nukeop_elevator
+- /obj/effect/landmark/start/nukeop_base
 
 # /obj/effect/step_trigger (teleporter, thrower, message, sound_effect, ...):
 # invisibility = INVISIBILITY_ABSTRACT set on the base class itself

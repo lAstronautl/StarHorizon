@@ -459,6 +459,7 @@
 /obj/effect/landmark/start/medical_doctor: SpawnPointMedicalDoctor
 /obj/effect/landmark/start/scientist: SpawnPointScientist
 /obj/effect/landmark/start/geneticist: SpawnPointScientist # no distinct SS14 job; same department cross-check as the geneticist corpse above
+/obj/effect/landmark/start/roboticist: SpawnPointScientist # same reasoning as geneticist above -- robotics is a science sub-specialization here, no distinct job
 /obj/effect/landmark/start/station_engineer: SpawnPointStationEngineer
 /obj/effect/landmark/start/botanist: SpawnPointBotanist
 /obj/effect/landmark/start/cargo_technician: SpawnPointCargoTechnician
