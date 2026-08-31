@@ -1516,3 +1516,39 @@
 /obj/item/flashlight/glowstick: GlowstickBase # bare, uncoloured
 /obj/item/flashlight/glowstick/red: GlowstickRed
 /obj/item/flashlight/glowstick/yellow: GlowstickYellow
+
+# ---- category pass 19/N: /obj/structure/fluff, the museum decoy props ----
+# fake_camera/fake_scrubber/fake_vent are non-functional museum-exhibit
+# decoys that copy a real machine's icon by direct type-reference
+# (museum.dm: icon = /obj/machinery/camera::icon, etc.) -- not a guess, the
+# source itself says these are meant to look identical to the real thing.
+# Reusing the real machine's already-mapped id keeps the look and loses only
+# the "it doesn't actually work" property, same as the emp_proof camera above.
+/obj/structure/fluff/fake_camera: SurveillanceCameraGeneral
+/obj/structure/fluff/fake_scrubber: GasVentScrubber
+/obj/structure/fluff/fake_vent: GasVentPump
+
+# ---- category pass 20/N: bare (non-/directional) light fixtures ----
+# tgstation still has an older, pre-refactor bare /obj/machinery/light form
+# alongside the newer /directional/<dir> subtypes -- its wall side comes from
+# a runtime dir var rather than a path segment, same case already handled
+# for the existing bare /obj/machinery/light/directional rule above (no
+# wall: override, just the entity). None of dim/warm/small/red/blacklight
+# get a distinct SS14 id from their directional siblings either, so the bare
+# forms follow the exact same id choices already established for them.
+/obj/machinery/light: Poweredlight
+/obj/machinery/light/broken: Poweredlight # loses the "starts pre-broken" flavour, no such prototype variant exists
+/obj/machinery/light/dim: Poweredlight
+/obj/machinery/light/warm: PoweredlightSodium
+/obj/machinery/light/small: PoweredSmallLight
+/obj/machinery/light/small/broken: PoweredSmallLight
+/obj/machinery/light/small/red/dim: PoweredSmallLight
+/obj/machinery/light/small/blacklight/directional: PoweredSmallLight # bare directional, no NSEW suffix seen
+/obj/machinery/light/small/empty: PoweredSmallLightEmpty
+/obj/machinery/light/small/burned/directional/north: {entity: PoweredSmallLight, wall: north}
+# "no_nightlight" sits between "warm" and "directional" in the path, so it
+# does not inherit from /warm/directional/<dir> above -- needs its own rules.
+/obj/machinery/light/warm/no_nightlight/directional/north: {entity: PoweredlightSodium, wall: north}
+/obj/machinery/light/warm/no_nightlight/directional/south: {entity: PoweredlightSodium, wall: south}
+/obj/machinery/light/warm/no_nightlight/directional/east: {entity: PoweredlightSodium, wall: east}
+/obj/machinery/light/warm/no_nightlight/directional/west: {entity: PoweredlightSodium, wall: west}

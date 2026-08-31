@@ -22,6 +22,15 @@
 - /obj/structure/cable
 - /obj/machinery/power/terminal
 
+# tgstation's plumbing subsystem: a second, separate pipe network (fluid
+# ducts, code/modules/plumbing/) that moves chemistry/hydroponics reagents
+# between machines, layered independently of the atmos pipe network above.
+# This fork has no matching reagent-piping system at all (checked
+# Resources/Prototypes for "plumbing"/"ductnet"/"fluid duct", nothing but an
+# unrelated substring hit) -- same reasoning as the atmos pipes/cables above,
+# not worth converting a network layout for a system that doesn't exist here.
+- /obj/machinery/duct
+
 # Map-init helpers. They tag or reconfigure the object next to them (set an
 # airlock's access, break a floor tile, wire an atmos device) and then delete
 # themselves -- confirmed in tgstation's own code/modules/mapping/mapping_helpers.dm,
@@ -124,6 +133,17 @@
 - /obj/effect/landmark/mafia_game_area
 - /obj/effect/landmark/river_waypoint
 - /obj/effect/landmark/transport
+
+# The Xenomorph antagonist subsystem (hive weeds, resin walls/membranes,
+# eggs, the drone/hunter/etc. castes themselves) has no equivalent in this
+# fork at all -- checked from several angles (exact id, "xeno"/"alien"/
+# "hivemind"/"facehugger" keyword search across Resources/Prototypes) and
+# found nothing but unrelated substring hits (xenoarchaeology artifacts,
+# flavour text). Not renamed or hidden elsewhere, the whole gameplay system
+# just isn't implemented, the same reasoning as newscaster/navbeacon above.
+- /obj/structure/alien
+- /mob/living/basic/alien
+- /obj/item/clothing/mask/facehugger
 
 # /obj/effect/light_emitter (and /thunderdome, /fake_outdoors, /podbay):
 # invisibility = INVISIBILITY_ABSTRACT, no sprite of its own -- it exists
