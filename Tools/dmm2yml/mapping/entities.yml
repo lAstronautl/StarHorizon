@@ -880,3 +880,9 @@
 /obj/machinery/recycler: Recycler
 /obj/item/toy/plush/beeplushie: PlushieBee
 /obj/item/wallframe/apc: APCFrame # the construction frame, "lacking the electronics" -- APCElectronics above is the separate circuit-board item
+
+# ---- eleventh catalog-wide pass ----
+/obj/item/assembly/mousetrap: Mousetrap # bare/unarmed; /armed is already mapped above
+/obj/item/kitchen/spoon: Spoon # the metal spoon; SpoonPlastic above is the separate disposable one
+/obj/item/stack/ore/gold: GoldOre
+/obj/item/storage/bag/construction: ConstructionBag # same pattern as OreBag above
