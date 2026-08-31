@@ -210,6 +210,29 @@
 # mapper places, the same reasoning as step_trigger above.
 - /obj/effect/particle_effect
 
+# /turf/open/openspace (and every subtype -- icemoon, icemoon/ruins,
+# icemoon/keep_below, airless, telecomms, coldroom, xenobio): confirmed by
+# source (game/turfs/open/openspace.dm) to be a "hole in the floor" -- it
+# isn't drawn at all ("We don't actually draw openspace"), passes atmosphere
+# and light straight through, and drops anything standing on it to the z-level
+# below (zFall() on Entered()). A tile prototype has no way to express any of
+# that; this is a mechanic, not a sprite, the same reasoning as the atmos
+# pipe network above.
+- /turf/open/openspace
+
+# /turf/open/water (and every subtype -- deep_beach, beach, jungle, lavaland_atmos,
+# ...): tgstation's swimming/drowning terrain (water.dm). This fork has no
+# water or swimming system at all -- checked from several angles (a Tiles
+# prototype search for "water"/"beach" turns up nothing, and there is no
+# Swimming/WaterComponent/DeepWater anywhere in Content.Server or
+# Content.Shared) -- not renamed or reskinned, the feature just isn't
+# implemented, same reasoning as newscaster/navbeacon above. The walkable
+# (non-swimming) sand next to it, /turf/open/misc/beach/sand and
+# /turf/open/misc/beach/coast, has no equivalent either and is left
+# unresolved rather than force it onto an asteroid tile that isn't sand for
+# the same reason.
+- /turf/open/water
+
 # /turf/open/genturf (plain, /blue, /orange): not a real tile, a debug
 # placeholder. Its own source comment says so outright -- "This turf doesn't
 # actually do anything beyond provide contrast for mappers and be very

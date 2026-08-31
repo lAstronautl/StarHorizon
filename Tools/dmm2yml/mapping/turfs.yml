@@ -158,3 +158,24 @@
 /turf/open/indestructible/dark: FloorDark      # icon_state "darkfull"
 /turf/open/indestructible/permalube: FloorDark # icon_state "darkfull" too, not nested under /dark in the path tree
 /turf/open/indestructible/plating: Plating     # icon_state "plating", desc calls it out as plating
+
+# ---- more icon_state matches, same "reuse an already-mapped tile when the
+# sprite is provably identical" methodology as the pairs above ----
+# tiles-asphalt / asphalt.png on the SS14 side, name = "asphalt" and
+# icon_state left at the DMI default (misc_floor.dm) on the tgstation side.
+/turf/open/floor/asphalt: FloorAsphalt
+# fakebasalt (fancy_floor.dm): "Safely recreated turf for your
+# hellplanet-scaping" -- icon_state "basalt", same as the real basalt tile
+# already mapped above.
+/turf/open/floor/fakebasalt: FloorBasalt
+# fakespace (fancy_floor.dm): icon = icons/turf/space.dmi, icon_state
+# "space" -- byte-for-byte the same sprite reference as /turf/open/space's
+# own MAP_SWITCH("space", "space_map") (space.dm), just without the
+# vacuum/hard-space behaviour.
+/turf/open/floor/fakespace: Space
+# Holodeck floor variants (modules/holodeck/turfs.dm): the holodeck system
+# itself has no equivalent in this fork (no Holodeck* prototype anywhere in
+# Resources/Prototypes), so most of this family is left unresolved -- but
+# two subtypes reuse an icon_state this file already has a tile for.
+/turf/open/floor/holofloor/plating: FloorReinforced # icon_state "engine", same as /turf/open/floor/engine above
+/turf/open/floor/holofloor/chapel: FloorSteelMono   # icon_state "chapel", same as /turf/open/floor/iron/chapel above
