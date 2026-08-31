@@ -1570,3 +1570,29 @@
 # "You can use this to wrap items in" (wrap.dm) -- exact functional match for
 # this fork's ParcelWrap ("Paper used [to] contain items for transport").
 /obj/item/stack/package_wrap: ParcelWrap # bare; /small and /one inherit
+
+# ---- category pass 22/N: shuttle/singularity engine hardware ----
+# "A bluespace engine used to make shuttles move" (shuttle_engines.dm) --
+# exact functional match for this fork's Thruster ("A thruster that allows a
+# shuttle to move"). Bare rule; /propulsion, /propulsion/left, /right,
+# /burst and the /large, /huge size tiers all inherit -- this fork's
+# thruster has no size-tier ids to distinguish them by anyway.
+/obj/machinery/power/shuttle_engine: Thruster
+# This fork's own Tesla engine structures, matched by name and function
+# (both project/ground the tesla energy ball between paired generators).
+/obj/machinery/power/energy_accumulator/tesla_coil: TeslaCoil # bare; /anchored inherits
+/obj/machinery/power/energy_accumulator/grounding_rod: TeslaGroundingRod # bare; /anchored inherits
+# "A shield generator" that projects a force-field wall between paired units
+# (shieldgen.dm) -- same function as this fork's ContainmentFieldGenerator.
+# /xenobiologyaccess and /unlocked lose their access-requirement flavour,
+# same "loses X property" pattern as elsewhere in this file.
+/obj/machinery/power/shieldwallgen: ContainmentFieldGenerator
+# The APC itself: /auto_name/directional/<dir> above already covers the
+# common case. Bare (no directional suffix, a legacy/ruin placement using a
+# runtime dir var) and /worn_out (a damaged skin, no equivalent prototype)
+# both reuse the same id.
+/obj/machinery/power/apc: APCBasic
+/obj/machinery/power/apc/worn_out/directional/north: {entity: APCBasic, wall: north, onWall: true}
+/obj/machinery/power/apc/worn_out/directional/south: {entity: APCBasic, wall: south, onWall: true}
+/obj/machinery/power/apc/worn_out/directional/east: {entity: APCBasic, wall: east, onWall: true}
+/obj/machinery/power/apc/worn_out/directional/west: {entity: APCBasic, wall: west, onWall: true}
