@@ -1466,3 +1466,12 @@
 /obj/machinery/vending/wallmed/directional/east: {entity: VendingMachineWallMedical, wall: east, onWall: true}
 /obj/machinery/vending/wallmed/directional/west: {entity: VendingMachineWallMedical, wall: west, onWall: true}
 /obj/machinery/vending/sovietsoda: VendingMachineSovietSoda # "BODA... sweet water" -- exact match
+
+# ---- category pass 14/N: suit storage units ----
+# One rule closes the whole family: this fork's suit storage unit has no
+# per-department sprite ("a fancy hi-tech storage unit made for storing
+# space suits", exact match for tgstation's own description) -- every
+# themed subtype (standard_unit, engine, security, ce, captain, atmos,
+# cmo, hos, medical, rd, mining, centcom, industrial, industrial/loader,
+# mining/eva) inherits this and loses only the department paint job.
+/obj/machinery/suit_storage_unit: SuitStorageBase
