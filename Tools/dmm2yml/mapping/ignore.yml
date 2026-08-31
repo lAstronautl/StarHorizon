@@ -29,7 +29,10 @@
 # Resources/Prototypes for "plumbing"/"ductnet"/"fluid duct", nothing but an
 # unrelated substring hit) -- same reasoning as the atmos pipes/cables above,
 # not worth converting a network layout for a system that doesn't exist here.
+# The item form (a wrenchable stack you place to build the network) is the
+# same absent system.
 - /obj/machinery/duct
+- /obj/item/stack/ducts
 
 # Map-init helpers. They tag or reconfigure the object next to them (set an
 # airlock's access, break a floor tile, wire an atmos device) and then delete

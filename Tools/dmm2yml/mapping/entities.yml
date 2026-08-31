@@ -1552,3 +1552,21 @@
 /obj/machinery/light/warm/no_nightlight/directional/south: {entity: PoweredlightSodium, wall: south}
 /obj/machinery/light/warm/no_nightlight/directional/east: {entity: PoweredlightSodium, wall: east}
 /obj/machinery/light/warm/no_nightlight/directional/west: {entity: PoweredlightSodium, wall: west}
+
+# ---- category pass 21/N: ore and sheet stacks ----
+# Ore ids follow their refined_type (ores_coins.dm) matching this fork's own
+# ore->sheet naming, the same equivalence already used for /obj/item/stack/
+# ore/silver->SilverOre and /gold->GoldOre above: iron ore refines to
+# /obj/item/stack/sheet/iron (already mapped to SheetSteel), so it takes the
+# ore counterpart of that name; plasma/bananium/diamond/uranium ore each
+# refine to a sheet already mapped the same way.
+/obj/item/stack/ore/iron: SteelOre
+/obj/item/stack/ore/plasma: PlasmaOre
+/obj/item/stack/ore/bananium: BananiumOre
+/obj/item/stack/ore/diamond: DiamondOre
+/obj/item/stack/ore/uranium: UraniumOre
+/obj/item/stack/sheet/mineral/uranium: SheetUranium # bare; /five inherits
+/obj/item/stack/sheet/cardboard: MaterialCardboard # bare; /fifty inherits
+# "You can use this to wrap items in" (wrap.dm) -- exact functional match for
+# this fork's ParcelWrap ("Paper used [to] contain items for transport").
+/obj/item/stack/package_wrap: ParcelWrap # bare; /small and /one inherit
