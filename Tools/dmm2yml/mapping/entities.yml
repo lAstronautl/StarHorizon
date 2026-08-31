@@ -1398,6 +1398,23 @@
 /obj/item/grenade/empgrenade: EmpGrenade
 /obj/item/grenade/chem_grenade/teargas: TearGasGrenade
 
+# ---- category pass 30/N: tank holders and sinks ----
+# "A metallic frame that can hold tanks and extinguishers" (tank_holder.dm)
+# matches this fork's ExtinguisherCabinet family by function. The
+# extinguisher subtype starts pre-loaded (icon_state "holder_extinguisher",
+# tank = /obj/item/extinguisher) so it takes the *Filled variant; the bare
+# holder starts empty and takes the unfilled one. /advanced and /anti keep
+# the same filled look, losing only the foam/anti-fire reagent theme --
+# this fork has no separate id for those.
+/obj/structure/tank_holder: ExtinguisherCabinet
+/obj/structure/tank_holder/extinguisher: ExtinguisherCabinetFilled
+/obj/structure/tank_holder/extinguisher/advanced: ExtinguisherCabinetFilled
+/obj/structure/tank_holder/extinguisher/anti: ExtinguisherCabinetFilled
+# "wide sink" (sink.yml) matches the kitchen theme by name; bare Sink is the
+# standard, non-kitchen basin.
+/obj/structure/sink: Sink
+/obj/structure/sink/kitchen: SinkWide
+
 # ---- category pass 9/N: stock parts ----
 # Higher-rated stock parts (micro_laser, scanning_module, servo, the subspace
 # family) have no match beyond the Rating-1 matter bin/capacitor above --
