@@ -686,6 +686,10 @@
 /obj/item/storage/medkit/o2: MedkitO2
 /obj/structure/fireplace: Fireplace
 /obj/item/stack/medical/wrap/gauze: Gauze
+# tgstation's bandage: a brute-healing, light-bleed-stopping first aid stack.
+# SS14 has no separate Bandage prototype -- Gauze is the closest available
+# consumable wound-healing stack, not an exact match.
+/obj/item/stack/medical/bandage: Gauze
 /obj/item/plunger: Plunger
 /obj/item/electronics/apc: APCElectronics
 /obj/item/reagent_containers/cup/bottle/epinephrine: EpinephrineMedicalVial
@@ -2896,6 +2900,9 @@
 /obj/item/reagent_containers/cup/bottle/potassium: ChemistryBottlePotassium
 /obj/item/reagent_containers/cup/bottle/sodium: ChemistryBottleSodium
 /obj/item/reagent_containers/pill/iron: PillIron
+# tgstation moved pills under reagent_containers/applicator/pill/* (see
+# tools/UpdatePaths); same item, same id, just a deeper path today.
+/obj/item/reagent_containers/applicator/pill/iron: PillIron
 /obj/item/seeds/coffee: CoffeeSeeds
 /obj/item/seeds/tea: TeaPlantSeeds
 /obj/item/instrument/violin: ViolinInstrument

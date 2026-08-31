@@ -18,22 +18,21 @@
 /turf/open/space: Space
 /turf/open/floor/plating: Plating
 /turf/open/floor/plating/foam: FloorMetalFoam
-# Bug found by loading a converted map and seeing bare Lattice wireframe
-# everywhere maintenance corridors should be: this was `Lattice` alone with
-# no entity, which draws only the open see-through frame and none of the
-# grate walkway that's supposed to sit on top of it. tgstation's own turf
-# (catwalk_plating.dm) renders two layers -- an underlay showing what's
-# "underneath" plus the walkway grate on top ("Flooring that shows its
-# contents underneath. Engineers love it!") -- and this fork models that
-# same two-layer idea as a tile plus a structure, not a single tile:
-# Entities/Structures/catwalk.yml's own Catwalk entity ("A catwalk for
-# easier EVA maneuvering...", TrayScanReveal, footstep sound FootstepCatwalk)
-# sits on top of a base tile by design (its own TODO says "move this to
-# tiles once tile smoothing is supported"), and catwalk_preview.png is the
-# same yellow/black-hazard-bordered grate look as tgstation's icon.
-/turf/open/floor/catwalk_floor:
-  tile: Lattice
-  entity: Catwalk
+# Previously mapped to {tile: Lattice, entity: Catwalk}, copying the rule
+# for the unrelated /obj/structure/lattice/catwalk (an EVA walkway that
+# genuinely sits over open space -- see entities.yml). That was wrong for
+# this path: catwalk_plating.dm's own comment is "Flooring that shows its
+# CONTENTS underneath. Engineers love it!" -- it inherits /turf/open/floor
+# (not /turf/open/floor/plating/lattice or open space), has no
+# initial_gas_mix override, and its /airless subtypes only exist because the
+# base type holds air. It is a solid, airtight maintenance floor with a
+# grate-look skin, not a walkway over vacuum. Mapping it to Lattice (SS14:
+# baseTurf Space, isSpace: true) silently depressurized every maintenance
+# corridor using it. SS14 has no matching grate-look floor prototype, so
+# this uses Plating (solid, walkable, the same "exposed subfloor" tile
+# already used two lines up) -- closest available by function, not a sprite
+# match.
+/turf/open/floor/catwalk_floor: Plating
 
 # ---- the iron family (SS14 calls it steel) ----
 /turf/open/floor/iron: FloorSteel
