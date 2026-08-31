@@ -865,3 +865,18 @@
 # own Foldable component is the item state of VehicleWheelchair).
 /obj/vehicle/ridden/wheelchair: VehicleWheelchair
 /obj/item/wheelchair: VehicleWheelchairFolded
+
+# ---- tenth catalog-wide pass ----
+# JetpackBlackFilled is the plain, fuelled, no-theme jetpack -- used for the
+# bare oxygen jetpack directly, and also for the carbon dioxide subtype
+# (this fork's only jetpacks are named by colour, not by fuel gas, so CO2
+# reuses the plain one rather than staying unmapped: same physical item and
+# function, only the specific propellant gas is lost).
+/obj/item/tank/jetpack: JetpackBlackFilled
+/obj/item/tank/jetpack/carbondioxide: JetpackBlackFilled
+/obj/item/tank/jetpack/captain: JetpackCaptainFilled
+/obj/item/electronics/firelock: FirelockElectronics
+/obj/item/storage/lockbox/medal: MedalCase
+/obj/machinery/recycler: Recycler
+/obj/item/toy/plush/beeplushie: PlushieBee
+/obj/item/wallframe/apc: APCFrame # the construction frame, "lacking the electronics" -- APCElectronics above is the separate circuit-board item
