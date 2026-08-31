@@ -1615,6 +1615,10 @@
 /obj/item/reagent_containers/cup/bowl: FoodBowlBig
 /obj/item/storage/belt/medical: ClothingBeltMedical
 /obj/item/storage/fancy/egg_box: FoodContainerEgg
+/obj/item/food/sashimi: FoodMealSashimi
+/obj/item/food/cheese/wheel: FoodCheese
+/obj/item/food/bun: FoodBreadBun
+/obj/item/clothing/head/fedora: ClothingHeadHatFedoraBrown # tgstation's own colour is unspecified; brown is the classic mobster fedora
 
 # ---- category pass 9/N: stock parts ----
 # Higher-rated stock parts (micro_laser, scanning_module, servo, the subspace
