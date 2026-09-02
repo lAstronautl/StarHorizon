@@ -2410,3 +2410,25 @@
 /obj/structure/noticeboard/ce: NoticeBoard
 /obj/structure/door_assembly/door_assembly_med: AirlockAssembly
 /obj/vehicle/ridden/janicart: VehicleJanicart
+
+/obj/machinery/conveyor_switch/oneway: TwoWayLever
+/obj/item/clothing/glasses/science: ClothingEyesGlassesChemical
+/obj/effect/spawner/random/entertainment/money_small: SpaceCash
+/obj/effect/spawner/random/bureaucracy/briefcase: BriefcaseBrown
+/obj/effect/spawner/random/structure/closet_empty: ClosetMaintenance
+/obj/structure/floodlight_frame: Floodlight
+/obj/item/reagent_containers/spray/syndicate: SprayBottle
+/obj/item/stack/sheet/plastic/five: SheetPlastic
+/obj/item/storage/fancy/cigarettes/cigpack_midori: CigPackGreen
+/obj/item/trash/semki/healthy: FoodPacketSemkiTrash
+/obj/machinery/air_sensor/engine_chamber: AirSensor
+/obj/machinery/air_sensor/ordnance_burn_chamber: AirSensor
+/obj/machinery/atmospherics/components/binary/dp_vent_pump/high_volume/incinerator_atmos: GasDualPortVentPump
+/obj/machinery/modular_computer/preset/cargochat/science: ComputerCargoOrdersScience
+/obj/machinery/modular_computer/preset/research: ComputerResearchAndDevelopment
+/obj/machinery/ore_silo: MachineMaterialSilo
+/obj/machinery/power/turbine/core_rotor: Turbine
+/obj/structure/mannequin/skeleton: Mannequin
+/obj/structure/sign/departments/aisat/directional/north: SignAi
+/obj/structure/sign/departments/telecomms/directional/south: SignTelecomms
+/obj/vehicle/sealed/mecha/ripley/paddy/preset: MechRipley
