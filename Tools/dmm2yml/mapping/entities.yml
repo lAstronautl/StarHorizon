@@ -2432,3 +2432,37 @@
 /obj/structure/sign/departments/aisat/directional/north: SignAi
 /obj/structure/sign/departments/telecomms/directional/south: SignTelecomms
 /obj/vehicle/sealed/mecha/ripley/paddy/preset: MechRipley
+
+/obj/effect/spawner/random/structure/tank_holder: ExtinguisherCabinet
+/obj/effect/spawner/random/structure/furniture_parts: TableFrame
+/obj/effect/spawner/random/contraband/prison: Cigarette
+/obj/item/grenade/chem_grenade: ModularGrenade
+/obj/effect/spawner/random/entertainment/drugs: DrinkHoochGlass
+/obj/effect/spawner/random/structure/table: Table
+/obj/effect/spawner/random/entertainment/money_large: SpaceCash
+/obj/item/reagent_containers/applicator/pill/maintenance: Pill
+/obj/effect/spawner/random/food_or_drink/condiment: FoodCondimentPacketKetchup
+/obj/effect/spawner/random/contraband: LeavesCannabis
+/obj/effect/spawner/random/entertainment/dice: d20Dice
+/obj/effect/spawner/random/structure/chair_flipped: ChairFoldingSpawnFolded
+/obj/effect/spawner/random/techstorage/arcade_boards: SpaceVillainArcadeComputerCircuitboard
+/obj/effect/spawner/random/techstorage/rnd_secure_all: RoboticsConsoleCircuitboard
+/obj/item/cautery: Cautery
+/obj/item/clothing/head/costume/festive: ClothingHeadHatPartyRed
+/obj/item/clothing/neck/necklace/dope: ClothingNeckBling
+/obj/item/grown/bananapeel: TrashBananaPeel
+/obj/item/instrument/guitar: AcousticGuitarInstrument
+/obj/item/reagent_containers/applicator/pill/epinephrine: Pill
+/obj/item/seeds/soya: SoybeanSeeds
+/obj/item/stamp: RubberStampApproved
+/obj/item/storage/fancy/cigarettes: CigPackGreen
+/obj/item/trash/can/food/envirochow: FoodTinBeansTrash
+/obj/item/vending_refill/hydroseeds: VendingMachineRestockSeeds
+/obj/machinery/air_sensor/carbon_tank: AirSensor
+/obj/machinery/air_sensor/nitrous_tank: AirSensor
+/obj/machinery/atmospherics/components/binary/crystallizer: BaseGasCondenser
+/obj/machinery/door/window/brigdoor/security/cell/left/directional/west: {entity: WindoorSecure, dir: 8}
+/obj/structure/light_construct/directional/north: PoweredlightEmpty
+/obj/structure/showcase/perfect_employee: ShowcaseRobot
+/obj/structure/sign/departments/telecomms/alt/directional/south: SignTelecomms
+/obj/vehicle/sealed/mecha/ripley/cargo: MechRipleyMk2Hauler
