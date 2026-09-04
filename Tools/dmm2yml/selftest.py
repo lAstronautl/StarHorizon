@@ -50,7 +50,8 @@ FIXTURE = '''"aa" = (
 /area/station/hallway/primary/central)
 "ae" = (
 /obj/effect/turf_decal/stripes/line{
-\tdir = 4
+\tdir = 4;
+\tcolor = "#74b2d3"
 \t},
 /turf/open/floor/iron/dark/textured,
 /area/station/hallway/primary/central)
@@ -115,6 +116,9 @@ EXPECTED_ENTITIES = {
     ("DisposalBend", 3.5, 0.5): 1.5707963267948966,
 }
 EXPECTED_DECAL = ("WarnLineE", 1, 3)
+# The fixture's decal carries its own color = "#74b2d3" (no alpha, lowercase),
+# overriding the rule's default -- see decal_color_of() in dmm2yml.py.
+EXPECTED_DECAL_COLOR = "#74B2D3FF"
 
 MAX_MAPS_SAMPLED = 60
 
@@ -381,6 +385,39 @@ def check_decal_line_edges(mapping_set, prototypes_dir) -> Result:
     )
 
 
+def check_decal_color_override() -> Result:
+    """A decal atom's own ``color =`` var must win over the rule's default.
+
+    A mapper who recolors one specific decal instance in the .dmm (rather
+    than accepting the mapping table's default color for that path) had that
+    override silently discarded -- every instance of a path rendered in the
+    same static color regardless of what the map actually said. See
+    decal_color_of() in dmm2yml.py."""
+    dmm2yml = dmm2yml_module()
+    problems = []
+    default_rule = mapping_rules.DecalRule(decal_id="Foo", color="#123456AB")
+
+    cases = [
+        (None, "#123456AB", "no color var falls back to the rule default"),
+        ("#74b2d3", "#74B2D3FF", "6-digit hex, lowercase, no leading '#' worth normalizing"),
+        ("74b2d3", "#74B2D3FF", "6-digit hex without a leading '#' at all"),
+        ("#74B2D3AA", "#74B2D3AA", "8-digit hex already carries its own alpha"),
+        ("red", "#123456AB", "a named BYOND color is not guessed at, falls back"),
+        ("rgb(116,178,211)", "#123456AB", "an rgb() call is not parsed, falls back"),
+    ]
+    for raw, expected, description in cases:
+        atom = dmmparser.Atom(path="/obj/effect/turf_decal/stripes/line", vars={} if raw is None else {"color": raw})
+        got = dmm2yml.decal_color_of(atom, default_rule)
+        if got != expected:
+            problems.append(f"{description}: color={raw!r} -> {got!r}, expected {expected!r}")
+
+    return Result(
+        "decals: per-instance color= overrides the rule default",
+        not problems,
+        "; ".join(problems) or f"{len(cases)} cases: hex overrides win, unparseable values fall back",
+    )
+
+
 def check_dictionaries(mapping_set, index) -> Result:
     """Every id the shipped mapping files name must still exist."""
     problems = []
@@ -435,12 +472,15 @@ def check_conversion(mapping_set, index) -> Result:
             problems.append(f"{key[0]}: rot {placed[key]}, expected {rotation}")
 
     decal_id, decal_x, decal_y = EXPECTED_DECAL
-    found = any(
-        node.decal_id == decal_id and (decal_x, decal_y) in positions
+    matches = [
+        node
         for node, positions in builder.decals.items()
-    )
-    if not found:
+        if node.decal_id == decal_id and (decal_x, decal_y) in positions
+    ]
+    if not matches:
         problems.append(f"decal {decal_id} missing at {decal_x},{decal_y}")
+    elif matches[0].color != EXPECTED_DECAL_COLOR:
+        problems.append(f"decal {decal_id} color {matches[0].color!r}, expected {EXPECTED_DECAL_COLOR!r} (its own color= var, not the rule default)")
 
     if survey.unresolved:
         problems.append(f"unexpected unresolved paths: {sorted(survey.unresolved)}")
@@ -819,6 +859,7 @@ def run(repo_root: str, mapping_dir: str, prototypes_dir: str) -> list[Result]:
         ("orientation: wall vs dir", lambda: check_orientation(mapping_set)),
         ("decals: corner accents match their quadrant", lambda: check_decal_corners(mapping_set)),
         ("decals: line edges match their sprite", lambda: check_decal_line_edges(mapping_set, prototypes_dir)),
+        ("decals: per-instance color= overrides the rule default", lambda: check_decal_color_override()),
         ("chunks: cell indexing", lambda: check_chunk_indexing()),
         ("chunks: no empty chunks", lambda: check_no_empty_chunks(mapping_set, index)),
         ("chunks: round-trip vs repo maps", lambda: check_chunk_roundtrip(repo_root)),

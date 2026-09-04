@@ -158,6 +158,31 @@ def direction_of(atom: dmmparser.Atom) -> int:
         return DEFAULT_DIR
 
 
+_HEX_COLOR = re.compile(r"^#?([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$")
+
+
+def decal_color_of(atom: dmmparser.Atom, rule: mapping_rules.DecalRule) -> str:
+    """The color a decal atom should render in.
+
+    A mapping-table rule's ``color`` is a static default, but a mapper may
+    have recolored one specific instance in the .dmm with its own ``color =``
+    var (BYOND hex, RGB or RGBA, no leading '#' guaranteed). Prefer that when
+    it parses as a plain hex color; anything else (a named color, an rgb()
+    call, a color matrix) falls back to the rule's default rather than
+    guessing, same as before this override existed.
+    """
+    raw = atom.vars.get("color")
+    if not isinstance(raw, str):
+        return rule.color
+    match = _HEX_COLOR.match(raw.strip())
+    if not match:
+        return rule.color
+    hex_digits = match.group(1)
+    if len(hex_digits) == 6:
+        hex_digits += "FF"
+    return f"#{hex_digits.upper()}"
+
+
 # ---------------------------------------------------------------- the table
 
 
@@ -300,13 +325,14 @@ def walk(
                 if rule.entity:
                     builder.add_entity(rule.entity, tile_x + 0.5, tile_y + 0.5)
             elif kind == "decal" and isinstance(rule, mapping_rules.DecalRule):
+                color = decal_color_of(atom, rule)
                 for decal_id in rule.ids_for(direction):
                     builder.add_decal(
                         tile_x,
                         tile_y,
                         ss14map.DecalNode(
                             decal_id=decal_id,
-                            color=rule.color,
+                            color=color,
                             angle=rule.angle,
                             z_index=rule.z_index,
                             cleanable=rule.cleanable,
