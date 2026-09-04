@@ -1,0 +1,54 @@
+# Персональный ИИ «Сайга» — на основе штатного pAI, но с локальной моделью Сайга (Ollama).
+# Пока в устройство не вселился игрок-призрак, отвечает на речь рядом сам, через нейросеть.
+# Как только кто-то занимает ghost-роль pAI — Сайга умолкает, говорит игрок.
+# Требует CVar saiga.enabled=true и запущенного Ollama с моделью saiga.model.
+- type: entity
+  parent: PersonalAI
+  id: PersonalAISaiga
+  name: Сайга
+  description: Персональный ИИ-помощник на базе нейросети «Сайга». Любит поболтать.
+  suffix: Saiga
+  components:
+  - type: SaigaNpc
+    systemPrompt: >-
+      Ты — персональный ИИ-помощник «Сайга» в карманном устройстве на космической станции
+      в игре Space Station 14. Ты дружелюбный, краткий и слегка остроумный.
+      Отвечай 1-2 предложениями, всегда по-русски, оставаясь в роли устройства-помощника.
+      Помогай советами и поддерживай беседу. Никогда не упоминай, что ты языковая модель.
+    range: 6
+    cooldown: 6
+    maxHistory: 6
+    respondToPlayersOnly: true
+
+# Гуманоидная Сайга в облике персонажа «Цзинъи Тао» (профиль применяется кодом на спавне).
+# Внешность/имя/пол/возраст берутся из SaigaTaoAppearance; поведение — от SaigaNpc.
+- type: entity
+  parent: MobCivilian
+  id: MobSaigaTao
+  name: Цзинъи Тао
+  description: Девушка азиатской наружности. За её спокойным взглядом — нейросеть «Сайга».
+  suffix: Saiga AI
+  components:
+  - type: SaigaTaoAppearance
+  # Поведение/движение — штатный NPC-ИИ игры (HTN, работает на CPU, видеокарта не нужна).
+  # По умолчанию стоит; следует за тем, кто попросил, когда нейросеть ставит FollowTarget.
+  - type: HTN
+    rootTask:
+      task: SaigaBehaviorCompound
+    blackboard:
+      IdleRange: !type:Single
+        3.5
+      FollowCloseRange: !type:Single
+        2.0
+      FollowRange: !type:Single
+        4.0
+  - type: SaigaNpc
+    systemPrompt: >-
+      Ты — Цзинъи Тао, член экипажа космической станции в игре Space Station 14,
+      за чьим разумом стоит нейросеть «Сайга». Спокойная, дружелюбная, слегка ироничная.
+      Отвечай 1-2 предложениями, всегда по-русски, оставаясь в роли.
+      Никогда не упоминай, что ты языковая модель.
+    range: 6
+    cooldown: 6
+    maxHistory: 6
+    respondToPlayersOnly: true

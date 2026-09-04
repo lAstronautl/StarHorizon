@@ -1,5 +1,6 @@
 using Content.Server._Horizon;
 using Content.Server._Horizon.SponsorManager;
+using Content.Server._Mono.Saiga; // Mono — local LLM (Ollama/Saiga)
 using Content.Server._NF.Auth;
 using Content.Server._Harmony.JoinQueue; // Harmony Queue
 using Content.Server.Administration;
@@ -84,6 +85,7 @@ namespace Content.Server.IoC
             IoCManager.Register<CVarControlManager>();
             IoCManager.Register<MiniAuthManager>(); //Frontier
             IoCManager.Register<SponsorManager>(); // _Horizon
+            IoCManager.Register<SaigaManager>(); // Mono — local LLM (Ollama/Saiga)
 
 
             IoCManager.Register<DiscordLink>();

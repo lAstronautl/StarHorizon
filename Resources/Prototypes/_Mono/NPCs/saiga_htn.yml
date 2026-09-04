@@ -1,0 +1,14 @@
+# Поведение Сайги: если задана цель следования (FollowTarget) — идёт за ней (с навигацией),
+# иначе просто стоит/бездействует. Ключ FollowTarget ставит/убирает SaigaNpcSystem по команде
+# нейросети ("иди за мной" / "стой"). Всё движение — нативный HTN на CPU.
+- type: htnCompound
+  id: SaigaBehaviorCompound
+  branches:
+    # Следовать, если есть цель (ветка отвалится, если FollowTarget не задан).
+    - tasks:
+        - !type:HTNCompoundTask
+          task: FollowCompound
+    # Иначе бездействовать.
+    - tasks:
+        - !type:HTNCompoundTask
+          task: IdleCompound

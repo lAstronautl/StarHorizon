@@ -1,5 +1,6 @@
 using Content.Server._Horizon;
 using Content.Server._Horizon.SponsorManager;
+using Content.Server._Mono.Saiga; // Mono — local LLM (Ollama/Saiga)
 using Content.Server._NF.Auth;
 using Content.Server.Acz;
 using Content.Server.Administration;
@@ -132,6 +133,7 @@ namespace Content.Server.Entry
                 _watchlistWebhookManager.Initialize();
                 IoCManager.Resolve<JobWhitelistManager>().Initialize();
                 IoCManager.Resolve<PlayerRateLimitManager>().Initialize();
+                IoCManager.Resolve<SaigaManager>().Initialize(); // Mono — local LLM (Ollama/Saiga)
             }
             // Harmony Queue Start
             IoCManager.Resolve<IJoinQueueManager>().Initialize();
