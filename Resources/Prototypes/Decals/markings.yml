@@ -459,21 +459,21 @@
   tags: ["station", "markings"]
   sprite:
     sprite: Decals/markings.rsi
-    state: warn_line_n
+    state: warn_line_w
 
 - type: decal
   id: WarnLineN
   tags: ["station", "markings"]
   sprite:
     sprite: Decals/markings.rsi
-    state: warn_line_s
+    state: warn_line_n
 
 - type: decal
   id: WarnLineS
   tags: ["station", "markings"]
   sprite:
     sprite: Decals/markings.rsi
-    state: warn_line_w
+    state: warn_line_s
 
 - type: decal
   id: WarnLineGreyscaleE
