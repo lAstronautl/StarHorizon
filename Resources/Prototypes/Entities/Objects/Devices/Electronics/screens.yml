@@ -1,0 +1,205 @@
+- type: entity
+  abstract: true
+  noSpawn: true
+  parent: BasePciDevice
+  id: BaseScreenDevice
+  components:
+    - type: ShowPciDeviceInCase
+    - type: Sprite
+      state: micro_screen
+    - type: MouseDevice
+    - type: KeyboardDevice
+    - type: ScreenDevice
+      width: 320
+      height: 240
+    - type: ActivatableUI
+      key: enum.ScreenUiKey.Key
+    - type: UserInterface
+      interfaces:
+        - key: enum.ScreenUiKey.Key
+          type: ScreenBoundUserInterface
+
+## Micro screens
+
+- type: entity
+  parent: BaseScreenDevice
+  id: MicroScreenDevice
+  components:
+    - type: Sprite
+      state: micro_screen
+    - type: PhysProps
+      length: 101
+      volume: 450
+    - type: StaticPrice
+      price: 1600
+    - type: ScreenDevice
+      width: 180
+      height: 180
+    - type: Tag
+      tags: [Pci, MicroScreen, SquareScreen]
+
+- type: entity
+  parent: MicroScreenDevice
+  id: MicroHorizontalScreenDevice
+  components:
+    - type: Sprite
+      state: micro_screen_horizontal
+    - type: ScreenDevice
+      width: 270
+      height: 180
+    - type: Tag
+      tags: [Pci, MicroScreen, HorizontalScreen]
+
+- type: entity
+  parent: MicroScreenDevice
+  id: MicroVerticalScreenDevice
+  components:
+    - type: Sprite
+      state: micro_screen_vertical
+    - type: ScreenDevice
+      width: 180
+      height: 270
+    - type: Tag
+      tags: [Pci, MicroScreen, VerticalScreen]
+
+## Small screens
+
+- type: entity
+  parent: BaseScreenDevice
+  id: SmallScreenDevice
+  components:
+    - type: Sprite
+      state: small_screen
+    - type: PhysProps
+      length: 152
+      volume: 890
+    - type: StaticPrice
+      price: 3300
+    - type: ScreenDevice
+      width: 280
+      height: 280
+    - type: Tag
+      tags: [Pci, SmallScreen, SquareScreen]
+
+- type: entity
+  parent: SmallScreenDevice
+  id: SmallHorizontalScreenDevice
+  components:
+    - type: Sprite
+      state: small_screen_horizontal
+    - type: ScreenDevice
+      width: 420
+      height: 280
+    - type: Tag
+      tags: [Pci, SmallScreen, HorizontalScreen]
+
+- type: entity
+  parent: SmallScreenDevice
+  id: SmallVerticalScreenDevice
+  components:
+    - type: Sprite
+      state: small_screen_vertical
+    - type: ScreenDevice
+      width: 280
+      height: 420
+    - type: Tag
+      tags: [Pci, SmallScreen, VerticalScreen]
+
+## Medium screens
+
+- type: entity
+  parent: BaseScreenDevice
+  id: MediumScreenDevice
+  components:
+    - type: Sprite
+      state: medium_screen
+    - type: PhysProps
+      length: 225
+      volume: 1655
+    - type: StaticPrice
+      price: 6900
+    - type: ScreenDevice
+      width: 380
+      height: 380
+    - type: Tag
+      tags: [Pci, MediumScreen, SquareScreen]
+
+- type: entity
+  parent: MediumScreenDevice
+  id: MediumHorizontalScreenDevice
+  components:
+    - type: Sprite
+      state: medium_screen_horizontal
+    - type: ScreenDevice
+      width: 570
+      height: 380
+    - type: Tag
+      tags: [Pci, MediumScreen, HorizontalScreen]
+
+- type: entity
+  parent: MediumScreenDevice
+  id: MediumVerticalScreenDevice
+  components:
+    - type: Sprite
+      state: medium_screen_vertical
+    - type: ScreenDevice
+      width: 380
+      height: 570
+    - type: Tag
+      tags: [Pci, MediumScreen, VerticalScreen]
+
+## Large
+
+- type: entity
+  parent: BaseScreenDevice
+  id: LargeScreenDevice
+  components:
+    - type: Sprite
+      state: large_screen
+    - type: PhysProps
+      length: 395
+      volume: 2506
+    - type: StaticPrice
+      price: 9950
+    - type: ScreenDevice
+      width: 480
+      height: 480
+    - type: Tag
+      tags: [Pci, LargeScreen, SquareScreen]
+
+- type: entity
+  parent: LargeScreenDevice
+  id: LargeHorizontalScreenDevice
+  components:
+    - type: Sprite
+      state: large_screen_horizontal
+    - type: ScreenDevice
+      width: 720
+      height: 480
+    - type: Tag
+      tags: [Pci, LargeScreen, HorizontalScreen]
+
+- type: entity
+  parent: LargeScreenDevice
+  id: LargeVerticalScreenDevice
+  components:
+    - type: Sprite
+      state: large_screen_vertical
+    - type: ScreenDevice
+      width: 480
+      height: 720
+    - type: Tag
+      tags: [Pci, LargeScreen, VerticalScreen]
+
+## Special
+
+- type: entity
+  parent: SmallHorizontalScreenDevice
+  id: HealthAnalyzerScreen
+  components:
+    - type: ScreenDevice
+      borderColor: "#e4e7ea"
+      labelColor: "#000"
+      label: MedUnion
+      width: 420
+      height: 180

@@ -1,0 +1,15 @@
+- type: entity
+  parent: BaseElectronics
+  id: Programmer
+  components:
+    - type: Sprite
+      sprite: Objects/Devices/programmer.rsi
+      state: base
+    - type: Programmer
+    - type: Bootrom
+    - type: UserInterface
+      interfaces:
+        - key: enum.ProgrammerUiKey.Key
+          type: ProgrammerBoundUserInterface
+    - type: ActivatableUI
+      key: enum.ProgrammerUiKey.Key

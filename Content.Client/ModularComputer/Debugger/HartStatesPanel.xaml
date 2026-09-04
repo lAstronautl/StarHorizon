@@ -1,0 +1,24 @@
+<BoxContainer SeparationOverride="4" xmlns="https://spacestation14.io"
+              xmlns:graphics="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
+              Orientation="Horizontal" VerticalExpand="True" HorizontalExpand="True">
+    <SplitContainer HorizontalExpand="True" VerticalExpand="True">
+        <ScrollContainer VerticalExpand="True" HorizontalExpand="True">
+            <PanelContainer VerticalExpand="True" HorizontalExpand="True">
+                <PanelContainer.PanelOverride>
+                    <graphics:StyleBoxFlat BackgroundColor="#1B1B1E" />
+                </PanelContainer.PanelOverride>
+                <Label Text="{Loc 'modular-computers-debugger-ui-no-selected-hart'}" Name="NoSelectedHart" Align="Center" Visible="True" />
+                <GridContainer Columns="2" Name="RegistersList" Margin="2 2 2 2" HorizontalExpand="True" VerticalExpand="True" Visible="False" />
+            </PanelContainer>
+        </ScrollContainer>
+        <ScrollContainer HorizontalExpand="True">
+            <PanelContainer>
+                <PanelContainer.PanelOverride>
+                    <graphics:StyleBoxFlat BackgroundColor="#1B1B1E" />
+                </PanelContainer.PanelOverride>
+                
+                <BoxContainer Orientation="Vertical" Margin="2 2 2 2" SeparationOverride="4" Name="HartsList" />
+            </PanelContainer>
+        </ScrollContainer>
+    </SplitContainer>
+</BoxContainer>

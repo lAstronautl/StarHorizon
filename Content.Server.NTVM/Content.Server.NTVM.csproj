@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <!-- Work around https://github.com/dotnet/project-system/issues/4314 -->
+        <TargetFramework>$(TargetFramework)</TargetFramework>
+        <LangVersion>11</LangVersion>
+        <IsPackable>false</IsPackable>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <OutputPath>..\bin\Content.Server\</OutputPath>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        <NoWarn>1998</NoWarn>
+        <WarningsAsErrors>nullable</WarningsAsErrors>
+        <Nullable>enable</Nullable>
+        <ServerGarbageCollection>true</ServerGarbageCollection>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="JetBrains.Annotations" PrivateAssets="All"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <!-- The upstream mod builds against a privately patched RVVM fork whose binaries/bindings
+             aren't published anywhere public, so there's nothing to vendor here. Drop a prebuilt
+             native library at one of these paths (see Content.Server.NTVM/README.md) to enable it. -->
+        <NativeLibs Condition="'$(Configuration)' == 'Release' And '$(OS)' == 'Windows_NT' And Exists('$(SolutionDir)/RVVM/artifacts/release/rvvm.dll')" Include="$(SolutionDir)/RVVM/artifacts/release/rvvm.dll"/>
+        <NativeLibs Condition="'$(Configuration)' == 'Debug' And '$(OS)' == 'Windows_NT' And Exists('$(SolutionDir)/RVVM/artifacts/debug/rvvm.dll')" Include="$(SolutionDir)/RVVM/artifacts/debug/rvvm.dll"/>
+        <NativeLibs Condition="'$(OS)' != 'Windows_NT' And Exists('$(SolutionDir)/RVVM/artifacts/librvvm.so')" Include="$(SolutionDir)/RVVM/artifacts/librvvm.so"/>
+
+        <None Include="@(NativeLibs)">
+            <Link>%(RecursiveDir)%(FileName)%(Extension)</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
+    <Import Project="..\RobustToolbox\MSBuild\Robust.Properties.targets"/>
+</Project>

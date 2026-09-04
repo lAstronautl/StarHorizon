@@ -1,0 +1,26 @@
+<screen:ScreenWindow xmlns="https://spacestation14.io"
+              xmlns:screen="clr-namespace:Content.Client.ModularComputer.Devices.Screen"
+              MouseFilter="Stop">
+    <PanelContainer Name="Background" Access="Public" StyleClasses="PDABackgroundRect" ModulateSelfOverride="#171615" />
+    <PanelContainer Name="Border" StyleClasses="PDABorderRect" />
+    <BoxContainer Orientation="Vertical" HorizontalExpand="True">
+        <!--Heading-->
+        <BoxContainer SetHeight="26" Margin="4 2 8 0" Orientation="Horizontal">
+            <Control HorizontalExpand="True"/>
+            <TextureButton Name="CloseButton" StyleClasses="windowCloseButton"
+                           VerticalAlignment="Center" Margin="0 4 4 0"/>
+        </BoxContainer>
+        <!--Content-->
+        <Control Margin="18 0" RectClipContent="True" VerticalExpand="true"
+                 HorizontalExpand="True">
+            <Control Margin="3 3">
+                <PanelContainer Name="ContentBackground" StyleClasses="PDAContentBackground"/>
+                <screen:ScreenControl Name="Screen" Stretch="KeepAspect" HorizontalExpand="True" VerticalExpand="True" />
+            </Control>
+        </Control>
+        <!--Footer-->
+        <BoxContainer Orientation="Horizontal" HorizontalExpand="True" SetHeight="28">
+            <Label Name="ScreenLabel" HorizontalExpand="True" Align="Center" />
+        </BoxContainer>
+    </BoxContainer>
+</screen:ScreenWindow>

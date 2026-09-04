@@ -1,0 +1,443 @@
+- type: entity
+  parent: BaseElectronics
+  abstract: true
+  noSpawn: true
+  id: BasePciDevice
+  components:
+    - type: Sprite
+      sprite: Objects/Devices/pci.rsi
+    - type: Tag
+      tags: [Pci]
+    - type: SerialNumber
+
+- type: entity
+  parent: BasePciDevice
+  id: TtsPciDevice
+  components:
+    - type: Sprite
+      state: tts
+    - type: TtsDevice
+    - type: Speech
+      speechSounds: Vending
+
+- type: entity
+  parent: BasePciDevice
+  id: SerialTerminalDevice
+  components:
+    - type: Sprite
+      state: serial_terminal
+    - type: SerialTerminalDevice
+    - type: ActivatableUI
+      key: enum.SerialTerminalUiKey.Key
+    - type: UserInterface
+      interfaces:
+        - key: enum.SerialTerminalUiKey.Key
+          type: SerialTerminalBoundUserInterface
+
+- type: entity
+  parent: BasePciDevice
+  id: GpuDevice
+  components:
+    - type: PhysProps
+      length: 213
+      volume: 890
+    - type: StaticPrice
+      price: 8000
+    - type: Sprite
+      state: gpu
+    - type: GpuDevice
+
+- type: entity
+  parent: BasePciDevice
+  id: HealthAnalyzerDevice
+  components:
+    - type: Sprite
+      state: health_analyzer
+    - type: HealthAnalyzerDevice
+      scanningEndSound:
+        path: "/Audio/Items/Medical/healthscanner.ogg"
+
+- type: entity
+  parent: HealthAnalyzerDevice
+  id: HealthAnalyzerDeviceGigacancer
+  suffix: Gigacancer
+  components:
+    - type: HealthAnalyzerDevice
+      scanningEndSound:
+        path: "/Audio/Items/Medical/healthscanner.ogg"
+      disease: Ultragigacancer
+
+- type: entity
+  parent: HealthAnalyzerDevice
+  id: HealthAnalyzerDeviceZombie
+  suffix: Gigacancer
+  components:
+    - type: HealthAnalyzerDevice
+      scanningEndSound:
+        path: "/Audio/Items/Medical/healthscanner.ogg"
+      disease: ActiveZombieVirus
+
+- type: entity
+  parent: HealthAnalyzerDevice
+  id: HealthAnalyzerDeviceHonk
+  suffix: Gigacancer
+  components:
+    - type: HealthAnalyzerDevice
+      scanningEndSound:
+        path: "/Audio/Items/Medical/healthscanner.ogg"
+      disease: ActiveHonkVirus
+
+- type: entity
+  parent: BasePciDevice
+  id: NetworkHubDevice8
+  components:
+    - type: ShowPciDeviceInCase
+    - type: PhysProps
+      length: 162
+      volume: 450
+      weight: 850
+    - type: StaticPrice
+      price: 1200
+    - type: Sprite
+      state: network_hub
+    - type: NetworkHubDevice
+    - type: DeviceLinkSource
+      ports:
+        - NetworkOutput1
+        - NetworkOutput2
+        - NetworkOutput3
+        - NetworkOutput4
+        - NetworkOutput5
+        - NetworkOutput6
+        - NetworkOutput7
+        - NetworkOutput8
+    - type: DeviceLinkSink
+      ports:
+        - NetworkInput1
+        - NetworkInput2
+        - NetworkInput3
+        - NetworkInput4
+        - NetworkInput5
+        - NetworkInput6
+        - NetworkInput7
+        - NetworkInput8
+
+- type: entity
+  parent: NetworkHubDevice8
+  id: NetworkHubDevice16
+  components:
+    - type: PhysProps
+      length: 225
+      volume: 780
+      weight: 1330
+    - type: StaticPrice
+      price: 3250
+    - type: DeviceLinkSource
+      ports:
+        - NetworkOutput1
+        - NetworkOutput2
+        - NetworkOutput3
+        - NetworkOutput4
+        - NetworkOutput5
+        - NetworkOutput6
+        - NetworkOutput7
+        - NetworkOutput8
+        - NetworkOutput9
+        - NetworkOutput10
+        - NetworkOutput11
+        - NetworkOutput12
+        - NetworkOutput13
+        - NetworkOutput14
+        - NetworkOutput15
+        - NetworkOutput16
+    - type: DeviceLinkSink
+      ports:
+        - NetworkInput1
+        - NetworkInput2
+        - NetworkInput3
+        - NetworkInput4
+        - NetworkInput5
+        - NetworkInput6
+        - NetworkInput7
+        - NetworkInput8
+        - NetworkInput9
+        - NetworkInput10
+        - NetworkInput11
+        - NetworkInput12
+        - NetworkInput13
+        - NetworkInput14
+        - NetworkInput15
+        - NetworkInput16
+
+- type: entity
+  parent: NetworkHubDevice8
+  id: NetworkHubDevice24
+  components:
+    - type: PhysProps
+      length: 325
+      volume: 1400
+      weight: 1895
+    - type: StaticPrice
+      price: 5630
+    - type: DeviceLinkSource
+      ports:
+        - NetworkOutput1
+        - NetworkOutput2
+        - NetworkOutput3
+        - NetworkOutput4
+        - NetworkOutput5
+        - NetworkOutput6
+        - NetworkOutput7
+        - NetworkOutput8
+        - NetworkOutput9
+        - NetworkOutput10
+        - NetworkOutput11
+        - NetworkOutput12
+        - NetworkOutput13
+        - NetworkOutput14
+        - NetworkOutput15
+        - NetworkOutput16
+        - NetworkOutput17
+        - NetworkOutput18
+        - NetworkOutput19
+        - NetworkOutput20
+        - NetworkOutput21
+        - NetworkOutput22
+        - NetworkOutput23
+        - NetworkOutput24
+    - type: DeviceLinkSink
+      ports:
+        - NetworkInput1
+        - NetworkInput2
+        - NetworkInput3
+        - NetworkInput4
+        - NetworkInput5
+        - NetworkInput6
+        - NetworkInput7
+        - NetworkInput8
+        - NetworkInput9
+        - NetworkInput10
+        - NetworkInput11
+        - NetworkInput12
+        - NetworkInput13
+        - NetworkInput14
+        - NetworkInput15
+        - NetworkInput16
+        - NetworkInput17
+        - NetworkInput18
+        - NetworkInput19
+        - NetworkInput20
+        - NetworkInput21
+        - NetworkInput22
+        - NetworkInput23
+        - NetworkInput24
+
+- type: entity
+  parent: NetworkHubDevice8
+  id: NetworkHubDevice32
+  components:
+    - type: PhysProps
+      length: 555
+      volume: 2150
+      weight: 2825
+    - type: StaticPrice
+      price: 8650
+    - type: DeviceLinkSource
+      ports:
+        - NetworkOutput1
+        - NetworkOutput2
+        - NetworkOutput3
+        - NetworkOutput4
+        - NetworkOutput5
+        - NetworkOutput6
+        - NetworkOutput7
+        - NetworkOutput8
+        - NetworkOutput9
+        - NetworkOutput10
+        - NetworkOutput11
+        - NetworkOutput12
+        - NetworkOutput13
+        - NetworkOutput14
+        - NetworkOutput15
+        - NetworkOutput16
+        - NetworkOutput17
+        - NetworkOutput18
+        - NetworkOutput19
+        - NetworkOutput20
+        - NetworkOutput21
+        - NetworkOutput22
+        - NetworkOutput23
+        - NetworkOutput24
+        - NetworkOutput25
+        - NetworkOutput26
+        - NetworkOutput27
+        - NetworkOutput28
+        - NetworkOutput29
+        - NetworkOutput30
+        - NetworkOutput31
+        - NetworkOutput32
+    - type: DeviceLinkSink
+      ports:
+        - NetworkInput1
+        - NetworkInput2
+        - NetworkInput3
+        - NetworkInput4
+        - NetworkInput5
+        - NetworkInput6
+        - NetworkInput7
+        - NetworkInput8
+        - NetworkInput9
+        - NetworkInput10
+        - NetworkInput11
+        - NetworkInput12
+        - NetworkInput13
+        - NetworkInput14
+        - NetworkInput15
+        - NetworkInput16
+        - NetworkInput17
+        - NetworkInput18
+        - NetworkInput19
+        - NetworkInput20
+        - NetworkInput21
+        - NetworkInput22
+        - NetworkInput23
+        - NetworkInput24
+        - NetworkInput25
+        - NetworkInput26
+        - NetworkInput27
+        - NetworkInput28
+        - NetworkInput29
+        - NetworkInput30
+        - NetworkInput31
+        - NetworkInput32
+
+- type: entity
+  parent: BasePciDevice
+  abstract: true
+  noSpawn: true
+  id: BaseHardDriveDevice
+  components:
+    - type: Sprite
+      state: hdd_micro
+    - type: HardDriveDevice
+      accessSounds: !type:SoundCollectionSpecifier
+        collection: HddAccess
+
+- type: entity
+  parent: BaseHardDriveDevice
+  id: HardDriveDevice4MiB
+  suffix: 4MiB
+  components:
+    - type: PhysProps
+      length: 75
+      volume: 120
+      weight: 300
+    - type: StaticPrice
+      price: 2300
+    - type: Sprite
+      state: hdd_micro
+    - type: HardDriveDevice
+      size: 4194304
+
+- type: entity
+  parent: BaseHardDriveDevice
+  id: HardDriveDevice8MiB
+  suffix: 8MiB
+  components:
+    - type: PhysProps
+      length: 95
+      volume: 220
+      weight: 450
+    - type: StaticPrice
+      price: 4050
+    - type: Sprite
+      state: hdd_small
+    - type: HardDriveDevice
+      size: 8388608
+
+- type: entity
+  parent: BaseHardDriveDevice
+  id: HardDriveDevice16MiB
+  suffix: 16MiB
+  components:
+    - type: PhysProps
+      length: 118
+      volume: 455
+      weight: 450
+    - type: StaticPrice
+      price: 7610
+    - type: Sprite
+      state: hdd_normal
+    - type: HardDriveDevice
+      size: 16777216
+
+- type: entity
+  parent: BaseHardDriveDevice
+  id: HardDriveDevice24MiB
+  suffix: 24MiB
+  components:
+    - type: PhysProps
+      length: 135
+      volume: 650
+      weight: 781
+    - type: StaticPrice
+      price: 9950
+    - type: Sprite
+      state: hdd_advanced
+    - type: HardDriveDevice
+      size: 25165824
+
+- type: entity
+  parent: BaseHardDriveDevice
+  id: HardDriveDevice32MiB
+  suffix: 32MiB
+  components:
+    - type: PhysProps
+      length: 151
+      volume: 780
+      weight: 1050
+    - type: StaticPrice
+      price: 14000
+    - type: Sprite
+      state: hdd_super
+    - type: HardDriveDevice
+      size: 33554432
+
+- type: entity
+  parent: BaseHardDriveDevice
+  id: HardDriveDevice64MiB
+  suffix: 64MiB
+  components:
+    - type: PhysProps
+      length: 177
+      volume: 990
+      weight: 1592
+    - type: StaticPrice
+      price: 19500
+    - type: Sprite
+      state: hdd_cluster
+    - type: HardDriveDevice
+      size: 67108864
+
+- type: entity
+  parent: BasePciDevice
+  id: FloppyDrive
+  components:
+    - type: ShowPciDeviceInCase
+    - type: PhysProps
+      length: 177
+      volume: 990
+      weight: 1592
+    - type: StaticPrice
+      price: 3880
+    - type: Sprite
+      state: floppy_drive
+    - type: ContainerContainer
+      containers:
+        floppy_drive: !type:Container
+    - type: FloppyDriveDevice
+      accessSounds: !type:SoundCollectionSpecifier
+        collection: FloppyAccess
+      ejectSound: /Audio/Effects/ModularComputers/Floppy/eject.ogg
+      insertSound: /Audio/Effects/ModularComputers/Floppy/insert.ogg
+      floppyContainerId: floppy_drive

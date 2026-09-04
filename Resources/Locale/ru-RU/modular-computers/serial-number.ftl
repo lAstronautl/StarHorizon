@@ -1,0 +1,1 @@
+serial-number-examine = Серийный номер: [color=white]{ $uuid }[/color]

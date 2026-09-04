@@ -1,0 +1,170 @@
+- type: entity
+  parent: BaseElectronics
+  id: BaseCpu
+  abstract: true
+  noSpawn: true
+  components:
+    - type: Sprite
+      sprite: Objects/Devices/cpu.rsi
+      state: base
+    - type: AmbientSound
+      enabled: false
+      volume: -6
+      range: 2
+      sound:
+        path: /Audio/Ambience/Objects/cpu.ogg
+    - type: Bootrom
+    - type: RtcDevice
+    - type: ApmDevice
+    - type: ClintDevice
+    - type: PlicDevice
+    - type: PciBusDevice
+    - type: TpmDevice
+    - type: FlashMemoryDevice
+    - type: SerialNumber
+
+## Nano
+
+- type: entity
+  parent: BaseCpu
+  id: VirtTechNanoV
+  components:
+    - type: StaticPrice
+      price: 4700
+    - type: Sprite
+      state: small
+    - type: Cpu
+      prototype: VirtTechNanoV
+
+- type: entity
+  parent: BaseCpu
+  id: VirtTechNanoVEX
+  components:
+    - type: StaticPrice
+      price: 5300
+    - type: Sprite
+      state: small
+    - type: Cpu
+      prototype: VirtTechNanoVEX
+
+## Micro
+
+- type: entity
+  parent: BaseCpu
+  id: VirtTechMicroV
+  components:
+    - type: StaticPrice
+      price: 6000
+    - type: Sprite
+      state: small
+    - type: Cpu
+      prototype: VirtTechMicroV
+
+- type: entity
+  parent: BaseCpu
+  id: VirtTechMicroVEX
+  components:
+    - type: StaticPrice
+      price: 6600
+    - type: Sprite
+      state: small
+    - type: Cpu
+      prototype: VirtTechMicroVEX
+
+- type: entity
+  parent: BaseCpu
+  id: VirtTechMicroVEEX
+  components:
+    - type: StaticPrice
+      price: 7000
+    - type: Sprite
+      state: small
+    - type: Cpu
+      prototype: VirtTechMicroVEEX
+
+## Mini
+
+- type: entity
+  parent: BaseCpu
+  id: VirtTechMiniV
+  components:
+    - type: StaticPrice
+      price: 8700
+    - type: Cpu
+      prototype: VirtTechMiniV
+
+- type: entity
+  parent: BaseCpu
+  id: VirtTechMiniVEX
+  components:
+    - type: StaticPrice
+      price: 9500
+    - type: Cpu
+      prototype: VirtTechMiniVEX
+
+- type: entity
+  parent: BaseCpu
+  id: VirtTechMiniVEEX
+  components:
+    - type: StaticPrice
+      price: 9800
+    - type: Cpu
+      prototype: VirtTechMiniVEEX
+
+## Pro
+
+- type: entity
+  parent: BaseCpu
+  id: VirtTechProV
+  components:
+    - type: StaticPrice
+      price: 11700
+    - type: Cpu
+      prototype: VirtTechProV
+
+- type: entity
+  parent: BaseCpu
+  id: VirtTechProVEX
+  components:
+    - type: StaticPrice
+      price: 12600
+    - type: Cpu
+      prototype: VirtTechProVEX
+
+- type: entity
+  parent: BaseCpu
+  id: VirtTechProVEEX
+  components:
+    - type: StaticPrice
+      price: 13600
+    - type: Cpu
+      prototype: VirtTechProVEEX
+
+## Super
+
+- type: entity
+  parent: BaseCpu
+  id: VirtTechSuperV
+  components:
+    - type: StaticPrice
+      price: 19700
+    - type: Cpu
+      prototype: VirtTechSuperV
+
+- type: entity
+  parent: BaseCpu
+  id: VirtTechSuperVEX
+  components:
+    - type: StaticPrice
+      price: 21700
+    - type: Cpu
+      prototype: VirtTechSuperVEX
+
+- type: entity
+  parent: BaseCpu
+  id: VirtTechSuperVEEX
+  components:
+    - type: StaticPrice
+      price: 23700
+    - type: Cpu
+      prototype: VirtTechSuperVEEX

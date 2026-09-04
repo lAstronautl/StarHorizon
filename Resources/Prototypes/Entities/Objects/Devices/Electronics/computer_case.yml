@@ -1,0 +1,363 @@
+- type: entity
+  abstract: true
+  noSpawn: true
+  id: BaseComputerCase
+  components:
+    - type: Appearance
+    - type: PciSlots
+      count: 5
+      defaultWhitelist:
+        tags: [Pci]
+      defaultBlacklist:
+        tags: [HorizontalScreen, VerticalScreen, SmallScreen, MediumScreen, LargeScreen]
+    - type: LitOnPowered
+    - type: PointLight
+      radius: 1.5
+      energy: 1.6
+      enabled: false
+      castShadows: false
+      color: "#2fb92d"
+    - type: ComputerCase
+      motherboardSlot: motherboard
+      mouseClickSound: !type:SoundCollectionSpecifier
+        collection: MouseClick
+      keyboardPressSound: !type:SoundCollectionSpecifier
+        collection: KeyboardKeyPress
+    - type: ItemSlots
+      slots:
+        motherboard:
+          name: case-cpu-slot-name
+          locked: true
+          whitelist:
+            components: [Cpu]
+
+## Stationary
+
+- type: entity
+  abstract: true
+  noSpawn: true
+  id: BaseStationaryComputerCase
+  parent: [BaseStructure, BaseComputerCase]
+  components:
+    - type: Transform
+      anchored: true
+    - type: ExtensionCableReceiver
+    - type: ApcPowerReceiver
+      powerLoad: 0
+
+- type: entity
+  id: ConsoleComputerCase
+  parent: BaseStationaryComputerCase
+  components:
+    - type: Sprite
+      sprite: Structures/Machines/computers.rsi
+      layers:
+        - map: ["computerLayerBody"]
+          state: computer
+        - map: ["computerLayerKeyboard"]
+          state: generic_keyboard
+        - map: ["computerLayerScreen"]
+          state: generic
+        - map: ["computerLayerKeys"]
+          state: generic_keys
+    - type: Icon
+      sprite: Structures/Machines/computers.rsi
+      state: computer
+    - type: IconSmooth
+      key: computer
+      base: computer_
+      mode: SameDir
+    - type: GenericVisualizer
+      visuals:
+        enum.ComputerCaseVisuals.On:
+          computerLayerScreen:
+            True: { visible: true, shader: unshaded }
+            False: { visible: false }
+          computerLayerKeys:
+            True: { visible: true, shader: unshaded }
+            False: { visible: true, shader: shaded }
+    - type: LitOnPowered
+    - type: PointLight
+      radius: 1.5
+      energy: 1.6
+      enabled: false
+      mask: /Textures/Effects/LightMasks/cone.png
+      autoRot: true
+      offset: "0, 0.4" # shine from the top, not bottom of the computer
+      castShadows: false
+    - type: Construction
+      graph: Computer
+      node: computer
+    - type: PciSlots
+      overrides:
+        0:
+          whitelist:
+            tags: [Pci, HorizontalScreen]
+            requireAll: true
+          blacklist: null
+
+- type: entity
+  id: ConsoleComputerCaseFilled
+  parent: ConsoleComputerCase
+  suffix: Filled
+  components:
+    - type: PciSlots
+      overrides:
+        0:
+          whitelist:
+            tags: [Pci, HorizontalScreen]
+            requireAll: true
+          blacklist: null
+          startingItem: LargeScreenDevice
+
+- type: entity
+  id: ArcadeStationaryComputerCase
+  parent: BaseStationaryComputerCase
+  components:
+    - type: Sprite
+      sprite: Structures/Machines/arcade.rsi
+      layers:
+        - state: arcade
+        - state: invaders
+          visible: false
+          map: ["enum.ComputerCaseVisuals.On"]
+    - type: GenericVisualizer
+      visuals:
+        enum.ComputerCaseVisuals.On:
+          enum.ComputerCaseVisuals.On:
+            True: { visible: true }
+            False: { visible: false }
+    - type: Icon
+      sprite: Structures/Machines/arcade.rsi
+      state: arcade
+    - type: PciSlots
+      overrides:
+        0:
+          whitelist:
+            tags: [Pci, VerticalScreen, MediumScreen]
+            requireAll: true
+
+- type: entity
+  id: ArcadeStationaryComputerCaseFilled
+  parent: ArcadeStationaryComputerCase
+  suffix: Filled
+  components:
+    - type: PciSlots
+      overrides:
+        0:
+          whitelist:
+            tags: [Pci, VerticalScreen, MediumScreen]
+            requireAll: true
+          startingItem: MediumVerticalScreenDevice
+
+## Wallmount
+
+- type: entity
+  abstract: true
+  noSpawn: true
+  id: BaseWallmountComputerCase
+  parent: BaseStationaryComputerCase
+  components:
+    - type: WallMount
+    - type: Transform
+      anchored: true
+
+- type: entity
+  id: TelescreenComputerCase
+  parent: BaseWallmountComputerCase
+  components:
+    - type: Sprite
+      sprite: Objects/Devices/computer_case.rsi
+      layers:
+        - state: telescreen
+        - state: telescreen_on
+          visible: false
+          map: ["enum.ComputerCaseVisuals.On"]
+    - type: GenericVisualizer
+      visuals:
+        enum.ComputerCaseVisuals.On:
+          enum.ComputerCaseVisuals.On:
+            True: { visible: true }
+            False: { visible: false }
+    - type: Icon
+      sprite: Objects/Devices/computer_case.rsi
+      state: telescreen
+    - type: PciSlots
+      overrides:
+        0:
+          whitelist:
+            tags: [Pci, HorizontalScreen]
+            requireAll: true
+          blacklist: null
+
+- type: entity
+  id: TelescreenComputerCaseFilled
+  parent: TelescreenComputerCase
+  suffix: Filled
+  components:
+    - type: PciSlots
+      overrides:
+        0:
+          whitelist:
+            tags: [Pci, HorizontalScreen]
+            requireAll: true
+          blacklist: null
+          startingItem: LargeScreenDevice
+
+## Portable
+
+- type: entity
+  abstract: true
+  noSpawn: true
+  id: BasePortableComputerCase
+  parent: [BaseItem, PowerCellSlotSmallItem, BaseComputerCase]
+  components:
+    - type: PowerCellDraw
+    - type: ComputerCase
+      powerCellSlot: cell_slot
+      motherboardSlot: motherboard
+    - type: ItemSlots
+      slots:
+        cell_slot:
+          name: power-cell-slot-component-slot-name-default
+          locked: true
+        motherboard:
+          name: case-cpu-slot-name
+          locked: true
+          whitelist:
+            components: [Cpu]
+
+- type: entity
+  id: PadComputerCase
+  parent: BasePortableComputerCase
+  components:
+    - type: PhysProps
+      volume: 300
+      length: 150
+    - type: Sprite
+      sprite: Objects/Devices/computer_case.rsi
+      layers:
+        - state: pad
+        - state: pad_on
+          visible: false
+          map: ["enum.ComputerCaseVisuals.On"]
+    - type: Icon
+      sprite: Objects/Devices/computer_case.rsi
+      state: pad
+    - type: GenericVisualizer
+      visuals:
+        enum.ComputerCaseVisuals.On:
+          enum.ComputerCaseVisuals.On:
+            True: { visible: true }
+            False: { visible: false }
+    - type: PciSlots
+      overrides:
+        0:
+          whitelist:
+            tags: [Pci, VerticalScreen, SmallScreen]
+            requireAll: true
+          blacklist: null
+
+- type: entity
+  id: PadComputerCaseFilled
+  parent: PadComputerCase
+  suffix: Filled
+  components:
+    - type: PciSlots
+      overrides:
+        0:
+          whitelist:
+            tags: [Pci, VerticalScreen, SmallScreen]
+            requireAll: true
+          blacklist: null
+          startingItem: SmallVerticalScreenDevice
+
+- type: entity
+  id: TabletComputerCase
+  parent: BasePortableComputerCase
+  components:
+    - type: PhysProps
+      volume: 850
+      length: 255
+    - type: Sprite
+      sprite: Objects/Devices/computer_case.rsi
+      layers:
+        - state: tablet
+        - state: tablet_on
+          visible: false
+          map: ["enum.ComputerCaseVisuals.On"]
+    - type: Icon
+      sprite: Objects/Devices/computer_case.rsi
+      state: tablet
+    - type: GenericVisualizer
+      visuals:
+        enum.ComputerCaseVisuals.On:
+          enum.ComputerCaseVisuals.On:
+            True: { visible: true }
+            False: { visible: false }
+    - type: PciSlots
+      overrides:
+        0:
+          whitelist:
+            tags: [HorizontalScreen, SmallScreen]
+            requireAll: true
+          blacklist: null
+
+- type: entity
+  id: TabletComputerCaseFilled
+  parent: TabletComputerCase
+  suffix: Filled
+  components:
+    - type: PciSlots
+      overrides:
+        0:
+          whitelist:
+            tags: [HorizontalScreen, SmallScreen]
+            requireAll: true
+          blacklist: null
+          startingItem: SmallScreenDevice
+
+- type: entity
+  id: LaptopComputerCase
+  parent: BasePortableComputerCase
+  components:
+    - type: PhysProps
+      volume: 1960
+      length: 620
+    - type: Sprite
+      sprite: Objects/Devices/computer_case.rsi
+      layers:
+        - state: laptop
+        - state: laptop_on
+          visible: false
+          map: ["enum.ComputerCaseVisuals.On"]
+    - type: Icon
+      sprite: Objects/Devices/computer_case.rsi
+      state: laptop
+    - type: GenericVisualizer
+      visuals:
+        enum.ComputerCaseVisuals.On:
+          enum.ComputerCaseVisuals.On:
+            True: { visible: true }
+            False: { visible: false }
+    - type: PciSlots
+      overrides:
+        0:
+          whitelist:
+            tags: [HorizontalScreen, MediumScreen]
+            requireAll: true
+          blacklist: null
+
+- type: entity
+  id: LaptopComputerCaseFilled
+  parent: LaptopComputerCase
+  suffix: Filled
+  components:
+    - type: PciSlots
+      overrides:
+        0:
+          whitelist:
+            tags: [HorizontalScreen, MediumScreen]
+            requireAll: true
+          blacklist: null
+          startingItem: MediumScreenDevice

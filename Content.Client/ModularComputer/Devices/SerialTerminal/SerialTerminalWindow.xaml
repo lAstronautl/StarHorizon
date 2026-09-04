@@ -1,0 +1,10 @@
+<controls:FancyWindow xmlns="https://spacestation14.io"
+                      xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
+                      Title="{Loc 'modular-computers-serial-terminal-ui-window-title'}"
+                      MinWidth="400"
+                      MinHeight="250">
+    <BoxContainer Margin="8 8 8 8" SeparationOverride="4" Orientation="Vertical" VerticalExpand="True" HorizontalExpand="True">
+        <OutputPanel VerticalExpand="True" HorizontalExpand="True" Name="Output" />
+        <LineEdit HorizontalExpand="True" Name="Input" />
+    </BoxContainer>
+</controls:FancyWindow>
