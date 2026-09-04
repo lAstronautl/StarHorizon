@@ -305,6 +305,82 @@ def check_decal_corners(mapping_set) -> Result:
     )
 
 
+_DECAL_ID_LINE = re.compile(r"^\s*id:\s*(\S+)")
+_DECAL_STATE_LINE = re.compile(r"^\s*state:\s*(\S+)")
+
+
+def _decal_sprite_states(prototypes_dir: str) -> dict[str, str]:
+    """id -> sprite state, read straight from Resources/Prototypes/Decals.
+
+    Not the id's own name -- what it actually renders. WarnLineN and friends
+    have historically had these disagree (see check_decal_line_edges).
+    """
+    states: dict[str, str] = {}
+    decals_dir = os.path.join(prototypes_dir, "Decals")
+    if not os.path.isdir(decals_dir):
+        return states
+    for root, _, files in os.walk(decals_dir):
+        for name in files:
+            if not name.endswith((".yml", ".yaml")):
+                continue
+            pending_id = None
+            with open(os.path.join(root, name), encoding="utf-8-sig") as handle:
+                for line in handle:
+                    if (m := _DECAL_ID_LINE.match(line)) is not None:
+                        pending_id = m.group(1)
+                        continue
+                    if pending_id and (m := _DECAL_STATE_LINE.match(line)) is not None:
+                        states[pending_id] = m.group(1)
+                        pending_id = None
+    return states
+
+
+def check_decal_line_edges(mapping_set, prototypes_dir) -> Result:
+    """A straight-line decal's chosen id must actually render on the edge its
+    BYOND dir names -- checked against the id's real sprite state, not its
+    name. Resources/Prototypes/Decals/markings.yml has a standing bug where
+    WarnLineN/S/W each point at a DIFFERENT one's sprite (only WarnLineE is
+    wired to itself); decals.yml compensates by picking whichever id's
+    *current* sprite state is actually correct for each edge. This check
+    would catch either direction going wrong again: someone "fixing" the
+    seemingly-mismatched ids in decals.yml back to the obvious N/S/E/W
+    reading, or upstream fixing the prototype file out from under the
+    compensation."""
+    states = _decal_sprite_states(prototypes_dir)
+    if not states:
+        return Result("decals: line edges match their sprite", False, "could not read Resources/Prototypes/Decals")
+
+    problems = []
+    wanted_suffix = {1: "_n", 2: "_s", 4: "_e", 8: "_w"}
+    families = [
+        "/obj/effect/turf_decal",
+        "/obj/effect/turf_decal/stripes/line",
+        "/obj/effect/turf_decal/stripes",
+        "/obj/effect/turf_decal/stripes/asteroid/line",
+    ]
+    for path in families:
+        rule = mapping_set.resolve(path, "decal").rule
+        if rule is None or not getattr(rule, "dirs", None):
+            problems.append(f"{path}: no direction-keyed decal rule")
+            continue
+        for direction, suffix in wanted_suffix.items():
+            decal_id = rule.dirs.get(direction)
+            if decal_id is None:
+                problems.append(f"{path} dir {direction}: no id")
+                continue
+            state = states.get(decal_id)
+            if state is None:
+                problems.append(f"{path} dir {direction}: {decal_id} has no known sprite state")
+            elif not state.endswith(suffix):
+                problems.append(f"{path} dir {direction}: {decal_id} renders {state!r}, wanted one ending {suffix!r}")
+
+    return Result(
+        "decals: line edges match their sprite",
+        not problems,
+        "; ".join(problems) or "N/S/E/W line ids each checked against their real sprite state, not their name",
+    )
+
+
 def check_dictionaries(mapping_set, index) -> Result:
     """Every id the shipped mapping files name must still exist."""
     problems = []
@@ -742,6 +818,7 @@ def run(repo_root: str, mapping_dir: str, prototypes_dir: str) -> list[Result]:
         ("problems: one line per path", lambda: check_problem_reporting(mapping_set, index)),
         ("orientation: wall vs dir", lambda: check_orientation(mapping_set)),
         ("decals: corner accents match their quadrant", lambda: check_decal_corners(mapping_set)),
+        ("decals: line edges match their sprite", lambda: check_decal_line_edges(mapping_set, prototypes_dir)),
         ("chunks: cell indexing", lambda: check_chunk_indexing()),
         ("chunks: no empty chunks", lambda: check_no_empty_chunks(mapping_set, index)),
         ("chunks: round-trip vs repo maps", lambda: check_chunk_roundtrip(repo_root)),

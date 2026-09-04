@@ -1,20 +1,24 @@
 # ---- hazard stripes ----
+# dirs below are deliberately NOT 1:N/2:S/8:W -- Decals/markings.yml's own
+# WarnLineN/S/W ids point at each other's sprite states (a bug in that file,
+# not here; WarnLineE is the only one wired correctly). This swaps in
+# whichever id actually renders the wanted edge until that's fixed upstream.
 /obj/effect/turf_decal:
   dirs:
-    1: WarnLineN
-    2: WarnLineS
+    1: WarnLineW
+    2: WarnLineN
     4: WarnLineE
-    8: WarnLineW
+    8: WarnLineS
     5: WarnCornerNE
     6: WarnCornerSE
     9: WarnCornerNW
     10: WarnCornerSW
 /obj/effect/turf_decal/stripes/line:
   dirs:
-    1: WarnLineN
-    2: WarnLineS
+    1: WarnLineW
+    2: WarnLineN
     4: WarnLineE
-    8: WarnLineW
+    8: WarnLineS
     5: WarnCornerNE
     6: WarnCornerSE
     9: WarnCornerNW
@@ -97,20 +101,20 @@
 /obj/effect/turf_decal/stripes/full: WarnFull
 /obj/effect/turf_decal/stripes:
   dirs:
-    1: WarnLineN
-    2: WarnLineS
+    1: WarnLineW
+    2: WarnLineN
     4: WarnLineE
-    8: WarnLineW
+    8: WarnLineS
     5: WarnCornerNE
     6: WarnCornerSE
     9: WarnCornerNW
     10: WarnCornerSW
 /obj/effect/turf_decal/stripes/asteroid/line:
   dirs:
-    1: WarnLineN
-    2: WarnLineS
+    1: WarnLineW
+    2: WarnLineN
     4: WarnLineE
-    8: WarnLineW
+    8: WarnLineS
     5: WarnCornerNE
     6: WarnCornerSE
     9: WarnCornerNW
