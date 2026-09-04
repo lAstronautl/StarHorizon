@@ -2567,3 +2567,36 @@
 /obj/structure/sign/departments/aiupload/directional/south: SignAiUpload
 /obj/structure/sign/directions/arrival/directional/west: SignDirectionalEvac
 /obj/structure/sign/poster/contraband/moffuchis_pizza: PosterLegitPizzaHope
+
+/obj/effect/spawner/random/contraband/landmine: LandMineExplosive
+/obj/machinery/disposal/delivery_chute: DisposalUnit
+/obj/structure/holosign/barrier/engineering: HolosignSecurity
+/obj/item/transfer_valve: ExplosivePayload
+/obj/structure/showcase/cyborg/old: ShowcaseRobot
+/obj/item/gun/syringe: LauncherSyringe
+/obj/structure/holosign/barrier: HolosignSecurity
+/obj/effect/spawner/random/contraband/cannabis: LeavesCannabis
+/obj/item/key/security: VehicleKeySecway
+/obj/structure/fake_stairs/directional/south: Stairs
+/obj/effect/spawner/random/decoration/carpet: FloorTileItemCarpetOffice
+/obj/item/holosign_creator/atmos: HolofanProjector
+/obj/machinery/quantumpad: CargoTelepad
+/obj/structure/fluff/oldturret: WeaponTurretSyndicateBroken
+/obj/structure/sign/departments/court: SignLawyer
+/obj/effect/spawner/random/decoration/material: LootSpawnerMaterials
+/obj/effect/spawner/random/structure/twelve_percent_spirit_board: PottedPlantRandom
+/obj/effect/spawner/random/techstorage/medical_all: RandomBoard
+/obj/effect/spawner/random/techstorage/tcomms_all: RandomBoard
+/obj/item/ammo_casing/shotgun/beanbag: ShellShotgunBeanbag
+/obj/item/clothing/suit/hooded/ablative: ClothingOuterArmorReflective
+/obj/item/flamethrower: FirethrowerGun
+/obj/item/food/pizzaslice/moldy: FoodPizzaMoldySlice
+/obj/item/reagent_containers/condiment/milk: DrinkMilkCarton
+/obj/item/tank/internals/anesthetic: NitrousOxideTank
+/obj/machinery/air_sensor/mix_tank: AirSensor
+/obj/machinery/air_sensor/oxygen_tank: AirSensor
+/obj/machinery/door/window/brigdoor/security/cell/left/directional/north: {entity: WindoorSecureBrigLocked, dir: 1}
+/obj/machinery/power/turbine/turbine_outlet: Turbine
+/obj/machinery/rnd/destructive_analyzer: MachineArtifactCrusher
+/obj/machinery/rnd/server/master: ResearchAndDevelopmentServer
+/obj/machinery/vending/wardrobe/coroner_wardrobe: VendingMachineMediDrobe
