@@ -1,5 +1,6 @@
 using System.IO;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -25,6 +26,7 @@ public sealed class SaigaManager
     private bool _enabled;
     private string _apiUrl = string.Empty;
     private string _apiFormat = "ollama";   // "ollama" (native /api/chat) or "openai" (/chat/completions)
+    private string _apiKey = string.Empty;  // Bearer token for cloud openai-compatible backends
     private string _model = string.Empty;
     private string _systemPrompt = string.Empty;
     private int _timeout;
@@ -44,6 +46,7 @@ public sealed class SaigaManager
         _cfg.OnValueChanged(SaigaCVars.Enabled, v => _enabled = v, true);
         _cfg.OnValueChanged(SaigaCVars.ApiUrl, v => _apiUrl = v.TrimEnd('/'), true);
         _cfg.OnValueChanged(SaigaCVars.ApiFormat, v => _apiFormat = v.Trim().ToLowerInvariant(), true);
+        _cfg.OnValueChanged(SaigaCVars.ApiKey, v => _apiKey = v, true);
         _cfg.OnValueChanged(SaigaCVars.Model, v => _model = v, true);
         _cfg.OnValueChanged(SaigaCVars.SystemPrompt, v => _systemPrompt = v, true);
         _cfg.OnValueChanged(SaigaCVars.Timeout, v => _timeout = v, true);
@@ -213,9 +216,14 @@ public sealed class SaigaManager
             };
 
             var json = JsonSerializer.Serialize(payload);
-            using var content = new StringContent(json, Encoding.UTF8, "application/json");
+            using var request = new HttpRequestMessage(HttpMethod.Post, $"{apiUrl}/chat/completions")
+            {
+                Content = new StringContent(json, Encoding.UTF8, "application/json"),
+            };
+            if (!string.IsNullOrEmpty(_apiKey))
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
 
-            var response = await _httpClient.PostAsync($"{apiUrl}/chat/completions", content, cts.Token);
+            var response = await _httpClient.SendAsync(request, cts.Token);
             var latencyMs = (DateTime.UtcNow - reqTime).TotalMilliseconds;
 
             if (!response.IsSuccessStatusCode)

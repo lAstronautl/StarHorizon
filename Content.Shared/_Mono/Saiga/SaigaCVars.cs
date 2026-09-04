@@ -30,6 +30,15 @@ public sealed class SaigaCVars
         CVarDef.Create("saiga.api_format", "ollama", CVar.SERVERONLY | CVar.ARCHIVE);
 
     /// <summary>
+    ///     Bearer token sent as "Authorization: Bearer &lt;key&gt;" when saiga.api_format is
+    ///     "openai" — for cloud/paid OpenAI-compatible backends (OpenRouter, Google AI Studio's
+    ///     OpenAI-compat endpoint, OpenAI itself, ...). Empty (default) sends no auth header, for
+    ///     local unauthenticated servers (LM Studio, Ollama, vLLM). Ignored for api_format=ollama.
+    /// </summary>
+    public static readonly CVarDef<string> ApiKey =
+        CVarDef.Create("saiga.api_key", "", CVar.SERVERONLY | CVar.CONFIDENTIAL);
+
+    /// <summary>
     ///     Ollama model tag to use for completions.
     /// </summary>
     public static readonly CVarDef<string> Model =

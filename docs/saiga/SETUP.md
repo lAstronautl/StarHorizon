@@ -161,6 +161,50 @@ vLLM используй `--backend openai --backend-url http://127.0.0.1:1234/v1
 Подробности всех флагов (`--listen`, `--tool-mode prompt`, бэкенд `openai` для LM Studio/vLLM) —
 в `Tools/saiga-agent-runner/README.md`.
 
+## 3.5. Облачные OpenAI-совместимые провайдеры (OpenRouter, Google AI Studio, ...) для встроенного мозга
+
+Способы 1 и 2 (встроенный C#-мозг: NPC и клиент-агент, без внешней MCP-модели) поддерживают ключ
+через CVar `saiga.api_key` — он уходит заголовком `Authorization: Bearer <ключ>` при
+`saiga.api_format = "openai"`. Работает с любым провайдером, у которого есть OpenAI-совместимый
+`/chat/completions`, в частности:
+
+**OpenRouter:**
+```toml
+[saiga]
+enabled    = true
+api_format = "openai"
+api_url    = "https://openrouter.ai/api/v1"
+api_key    = "sk-or-v1-..."          # твой ключ с openrouter.ai/keys
+model      = "google/gemma-3-27b-it:free"   # точный id модели — сверь на openrouter.ai/models
+```
+
+**Google AI Studio (Gemini через OpenAI-совместимый слой):**
+```toml
+[saiga]
+enabled    = true
+api_format = "openai"
+api_url    = "https://generativelanguage.googleapis.com/v1beta/openai"
+api_key    = "AQ...."                # твой ключ с aistudio.google.com/apikey
+model      = "gemini-2.5-flash"      # точный id модели — сверь в консоли Google AI Studio
+```
+
+Для `agent-runner` (способ 3) то же самое делается флагами `--backend openai --backend-url <url>
+--api-key <ключ> --model <id>` — см. раздел 3.
+
+**Важно про модели:** указывай ровно тот id модели, что провайдер показывает в своём списке — если
+слаг не существует (опечатка, снятая с продажи модель), запрос вернёт 400/404, и агент просто
+промолчит (см. лог сервера, sawmill `saiga`).
+
+**Важно про сам ключ:**
+- `saiga.api_key` помечен `CONFIDENTIAL` — движок не пишет его в консольные логи/дампы конфига.
+- Храни его только в `bin/Content.Server/server_config.toml` — это generated-путь, `bin/` целиком
+  в `.gitignore` этого репозитория, так что случайно закоммитить ключ через обычный `git add`
+  не получится. **Никогда не вставляй реальный ключ в `.cs`/`.yml`/`.md` файлы, PR-описания или
+  сюда в чат** — они не игнорируются и уйдут в историю git/переписки.
+- Если ключ всё же где-то засветился (например, был вставлен в чат или закоммичен) — считай его
+  скомпрометированным и немедленно отзови/перевыпусти в кабинете провайдера, даже если после
+  этого удалить текст с ключом.
+
 ## 4. Быстрая проверка, что модель вообще отвечает
 
 Админ-команда в консоли сервера (не требует включённого агента/NPC):
@@ -178,6 +222,7 @@ saiga Привет, как дела?
 | `saiga.enabled` | сервер | `false` | общий рубильник встроенного мозга (NPC/клиент-агент) |
 | `saiga.api_format` | сервер | `ollama` | `ollama` (нативный `/api/chat`) или `openai` (`/chat/completions`) |
 | `saiga.api_url` | сервер | `http://localhost:11434` | адрес модели по умолчанию (для `openai` — с `/v1` на конце) |
+| `saiga.api_key` | сервер | пусто | Bearer-ключ для облачных OpenAI-совместимых API (OpenRouter, Google AI Studio, ...); игнорируется при `api_format=ollama` |
 | `saiga.model` | сервер | `saiga_gemma2_9b` (GGUF) | тег модели |
 | `saiga.timeout` / `saiga.temperature` / `saiga.max_tokens` / `saiga.num_ctx` / `saiga.num_gpu` | сервер | `30` / `0.4` / `256` / `2048` / `-1` | параметры генерации |
 | `saiga.allow_client_endpoint` | сервер | `true` | разрешить клиентам указывать свой инференс-эндпоинт (иначе риск SSRF на чужих серверах — выключай на публичных) |
