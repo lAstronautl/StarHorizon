@@ -673,6 +673,9 @@
   id: GrenadeFlashBang
 
 - type: Tag
+  id: HorizontalScreen
+
+- type: Tag
   id: HudMedical
 
 - type: Tag
@@ -850,6 +853,9 @@
   id: KnockdownImmune
 
 - type: Tag
+  id: LargeScreen
+
+- type: Tag
   id: LavaBrig
 
 - type: Tag
@@ -938,6 +944,9 @@
   id: Medal
 
 - type: Tag
+  id: MediumScreen
+
+- type: Tag
   id: Medkit
 
 - type: Tag
@@ -948,6 +957,9 @@
 
 - type: Tag
   id: MicroBomb
+
+- type: Tag
+  id: MicroScreen
 
 - type: Tag
   id: MicrowaveMachineBoard
@@ -1050,6 +1062,9 @@
 
 - type: Tag
   id: Payload # for grenade/bomb crafting
+
+- type: Tag
+  id: Pci
 
 - type: Tag
   id: Pen
@@ -1302,6 +1317,9 @@
   id: SmallMech
 
 - type: Tag
+  id: SmallScreen
+
+- type: Tag
   id: Smokable
 
 - type: Tag
@@ -1345,6 +1363,9 @@
 
 - type: Tag
   id: SpreaderIgnore
+
+- type: Tag
+  id: SquareScreen
 
 - type: Tag
   id: StationAi
@@ -1462,6 +1483,9 @@
 
 - type: Tag
   id: VGRoidInterior
+
+- type: Tag
+  id: VerticalScreen
 
 - type: Tag
   id: VimPilot
