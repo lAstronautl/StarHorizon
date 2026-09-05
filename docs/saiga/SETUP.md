@@ -199,12 +199,27 @@ enabled    = true
 api_format = "openai"
 api_url    = "https://api.groq.com/openai/v1"
 api_key    = "gsk_..."                    # твой ключ с console.groq.com/keys
-model      = "llama-3.3-70b-versatile"
+model      = "openai/gpt-oss-120b"        # проверено вживую на 2026-09-05, 200 OK
 ```
 Путь `.../openai/v1/chat/completions` подтверждён напрямую (фейковый ключ → `401 Invalid API Key`,
 т.е. роут существует и реально проверяет ключ, а не отдаёт 404). Из трёх провайдеров в этом разделе
 у Groq заметно ниже задержка ответа — за счёт специализированного инференс-железа, а не размера
 модели — что для реакции на речь в реальном времени может ощущаться быстрее остальных.
+
+**`llama-3.3-70b-versatile` больше не годится** — числится в публичной документации Groq как
+Active/Production, но реальный запрос с рабочим ключом вернул `404 model_not_found`. Каталог Groq
+меняется быстрее, чем доки: доверяй только `GET /openai/v1/models` с твоим ключом (см. ниже), а не
+названию модели из гайда (в т.ч. этого) или из общих доков провайдера.
+
+**Как узнать, что реально доступно ИМЕННО твоему ключу** (надёжнее любых доков):
+```bash
+curl -s https://api.groq.com/openai/v1/models -H "Authorization: Bearer ТВОЙ_КЛЮЧ" \
+  | python3 -c "import json,sys; [print(m['id']) for m in json.load(sys.stdin)['data']]"
+```
+На момент проверки список включал чат-модели `openai/gpt-oss-120b`, `openai/gpt-oss-20b`,
+`qwen/qwen3.8-27b`, `groq/compound(-mini)` — и отдельно speech-to-text/TTS/модерацию
+(`whisper-large-v3*`, `canopylabs/orpheus-*`, `*prompt-guard*`, `*-safeguard-*`), которые для чата
+не подходят.
 
 Для `agent-runner` (способ 3) то же самое делается флагами `--backend openai --backend-url <url>
 --api-key <ключ> --model <id>` — см. раздел 3.
