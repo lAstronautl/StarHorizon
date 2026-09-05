@@ -118,6 +118,11 @@ namespace Content.Server.Entry
                 IoCManager.Resolve<GhostKickManager>().Initialize();
                 IoCManager.Resolve<ServerInfoManager>().Initialize();
                 IoCManager.Resolve<ServerApi>().Initialize();
+                // RMC14-Mcp-Start
+#if !FULL_RELEASE || RMC_MCP
+                IoCManager.Resolve<_RMC14.Mcp.McpManager>().Initialize();
+#endif
+                // RMC14-Mcp-End
                 var sponsorManager = IoCManager.Resolve<SponsorManager>();
                 sponsorManager.Initialize(); // _Horizon
                 sponsorManager.LoadSponsorsInfoFile(); // _Horizon
@@ -208,6 +213,11 @@ namespace Content.Server.Entry
             _playTimeTracking?.Shutdown();
             _dbManager?.Shutdown();
             IoCManager.Resolve<ServerApi>().Shutdown();
+            // RMC14-Mcp-Start
+#if !FULL_RELEASE || RMC_MCP
+            IoCManager.Resolve<_RMC14.Mcp.McpManager>().Shutdown();
+#endif
+            // RMC14-Mcp-End
 
             IoCManager.Resolve<DiscordLink>().Shutdown();
             IoCManager.Resolve<DiscordChatLink>().Shutdown();
