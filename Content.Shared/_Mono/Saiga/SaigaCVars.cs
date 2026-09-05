@@ -142,10 +142,11 @@ public sealed class SaigaCVars
 
     /// <summary>
     ///     The player's OWN Ollama endpoint, sent to the server so inference runs on THIS player's
-    ///     machine (decentralized). Empty = use the server's default. Client-side.
+    ///     machine (decentralized). Empty (default) = use the server's own saiga.api_url — don't
+    ///     silently redirect every agent to localhost when nobody configured this.
     /// </summary>
     public static readonly CVarDef<string> AgentEndpoint =
-        CVarDef.Create("saiga.agent.endpoint", "http://localhost:11434", CVar.CLIENTONLY | CVar.ARCHIVE);
+        CVarDef.Create("saiga.agent.endpoint", "", CVar.CLIENTONLY | CVar.ARCHIVE);
 
     /// <summary>
     ///     GPU layers (num_gpu) for THIS player's Ollama, sent to the server. -1 = let Ollama decide.
