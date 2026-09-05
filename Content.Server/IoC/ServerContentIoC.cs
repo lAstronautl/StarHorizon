@@ -18,6 +18,7 @@ using Content.Server.GhostKick;
 using Content.Server.Info;
 using Content.Server.Mapping;
 using Content.Server.Maps;
+using Content.Server.ModularComputer;
 using Content.Server.NodeContainer.NodeGroups;
 using Content.Server.Players.JobWhitelist;
 using Content.Server.Players.PlayTimeTracking;
@@ -91,6 +92,7 @@ namespace Content.Server.IoC
 
             // Harmony Queue Start
             IoCManager.Register<IJoinQueueManager, JoinQueueManager>();
+            IoCManager.Register<ModularComputersManager>();
             // Harmony Queue End
         }
     }
