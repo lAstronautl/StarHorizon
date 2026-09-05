@@ -64,6 +64,7 @@ public sealed partial class CpuSystem : EntitySystem
     [Dependency] private readonly IGameTiming _timing = default!;
 
     private bool _enabled;
+    private bool _nativeAvailable;
     private int _maxMachines;
     private ulong _maxMemory;
     private ulong _memoryUsed;
@@ -72,6 +73,11 @@ public sealed partial class CpuSystem : EntitySystem
     public override void Initialize()
     {
         base.Initialize();
+
+        _nativeAvailable = Machine.IsNativeAvailable();
+
+        if (!_nativeAvailable)
+            Log.Error("Native `rvvm` library could not be loaded; modular computers are disabled.");
 
         _cfg.OnValueChanged(CCVars.ModularComputersEnabled, OnModularComputersEnabledChanged, true);
         _cfg.OnValueChanged(CCVars.ModularComputersMaxMachinesHard, newValue => _maxMachines = newValue, true);
@@ -203,7 +209,7 @@ public sealed partial class CpuSystem : EntitySystem
     {
         base.Update(frameTime);
 
-        if (!_enabled)
+        if (!_enabled || !_nativeAvailable)
             return;
 
         if (_timing.CurTime <= _nextUpdate)
@@ -230,7 +236,7 @@ public sealed partial class CpuSystem : EntitySystem
 
     private void OnRoundRestartCleanup(RoundRestartCleanupEvent ev)
     {
-        if (!_enabled)
+        if (!_enabled || !_nativeAvailable)
             return;
 
         var query = EntityQueryEnumerator<CpuComponent>();
@@ -262,7 +268,7 @@ public sealed partial class CpuSystem : EntitySystem
     [PublicAPI]
     public bool TryStart(EntityUid uid, CpuComponent? component)
     {
-        if (!_enabled)
+        if (!_enabled || !_nativeAvailable)
             return false;
 
         if (!Resolve(uid, ref component))
@@ -373,7 +379,7 @@ public sealed partial class CpuSystem : EntitySystem
 
     private void OnComponentStartup(EntityUid uid, CpuComponent component, ComponentStartup args)
     {
-        if (!_enabled)
+        if (!_enabled || !_nativeAvailable)
             return;
 
         if (component.Machine is not null)

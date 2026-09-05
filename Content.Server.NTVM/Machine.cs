@@ -63,6 +63,34 @@ public sealed class Machine : IDisposable
     /// </summary>
     private static readonly Dictionary<nint, Machine> Machines = new();
 
+    private static bool? _nativeAvailable;
+
+    /// <summary>
+    ///     Checks (once, cached) whether the native `rvvm` library can actually be loaded.
+    ///     StarHorizon does not ship a native library matching the P/Invoke surface this
+    ///     port expects, so callers must check this before touching any other member of
+    ///     <see cref="Machine" /> to avoid crashing the whole server with a
+    ///     <see cref="DllNotFoundException" />.
+    /// </summary>
+    [PublicAPI]
+    public static bool IsNativeAvailable()
+    {
+        if (_nativeAvailable is { } cached)
+            return cached;
+
+        try
+        {
+            RVVM.rvvm_machines_count();
+            _nativeAvailable = true;
+        }
+        catch (Exception)
+        {
+            _nativeAvailable = false;
+        }
+
+        return _nativeAvailable.Value;
+    }
+
     private readonly unsafe rvvm_machine_t* _ptr;
     public MMIOAccessHandler? MMIOAccess;
 
