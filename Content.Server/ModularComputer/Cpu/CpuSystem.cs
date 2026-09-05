@@ -20,6 +20,7 @@ using Content.Server.ModularComputer.Devices.Mmio;
 using Content.Server.NTVM;
 using Content.Server.Popups;
 using Content.Shared.CCVar;
+using Content.Shared.ModularComputer.Cpu;
 using Content.Shared.Examine;
 using Content.Shared.GameTicking;
 using JetBrains.Annotations;
@@ -304,7 +305,7 @@ public sealed partial class CpuSystem : EntitySystem
             (_, address, data, access) => OnMmioAccess(uid, component, address, data, access);
 
         if (!component.Machine.IsPowered())
-            _audio.PlayPvs(new SoundPathSpecifier("/Audio/Effects/Signals/ping3.ogg"), uid);
+            _audio.PlayPvs(new SoundPathSpecifier("/Audio/Effects/newplayerping.ogg"), uid);
 
         Log.Info($"Staring machine on motherboard `{ToPrettyString(uid)}`");
 

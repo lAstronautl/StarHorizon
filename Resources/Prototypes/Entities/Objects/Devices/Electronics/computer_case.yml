@@ -19,10 +19,10 @@
       color: "#2fb92d"
     - type: ComputerCase
       motherboardSlot: motherboard
-      mouseClickSound: !type:SoundCollectionSpecifier
-        collection: MouseClick
+      mouseClickSound:
+        path: /Audio/UserInterface/click.ogg
       keyboardPressSound: !type:SoundCollectionSpecifier
-        collection: KeyboardKeyPress
+        collection: Keyboard
     - type: ItemSlots
       slots:
         motherboard:

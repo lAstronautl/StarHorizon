@@ -1,0 +1,126 @@
+# Compiled by hand from cpu.yml.ncl (Nickel source) - StarHorizon has no Nickel build
+# step wired in, and the CpuPrototype ("type: cpu") entries here are what
+# Content.Server/ModularComputer/Cpu/CpuSystem.cs actually indexes at runtime via
+# each Cpu entity's `prototype:` field. Keep this in sync with cpu.yml.ncl by hand.
+
+## Nano
+
+- type: cpu
+  id: VirtTechNanoV
+  name: VirtTech Nano-V
+  memory: 524288 # 512 KiB
+  flashMemory: 1024 # 1 KiB
+  ipq: 10
+  drawRate: 0.2
+
+- type: cpu
+  id: VirtTechNanoVEX
+  name: VirtTech Nano-V EX
+  memory: 1048576 # 1 MiB
+  flashMemory: 1024 # 1 KiB
+  ipq: 20
+  drawRate: 0.3
+
+## Micro
+
+- type: cpu
+  id: VirtTechMicroV
+  name: VirtTech Micro-V
+  memory: 1048576 # 1 MiB
+  flashMemory: 4096 # 4 KiB
+  ipq: 50
+  drawRate: 0.5
+
+- type: cpu
+  id: VirtTechMicroVEX
+  name: VirtTech Micro-V EX
+  memory: 3145728 # 3 MiB
+  flashMemory: 4096 # 4 KiB
+  ipq: 60
+  drawRate: 0.6
+
+- type: cpu
+  id: VirtTechMicroVEEX
+  name: VirtTech Micro-V ExtraEX
+  memory: 6291456 # 6 MiB
+  flashMemory: 4096 # 4 KiB
+  ipq: 70
+  drawRate: 0.7
+
+## Mini
+
+- type: cpu
+  id: VirtTechMiniV
+  name: VirtTech Mini-V
+  memory: 1048576 # 1 MiB
+  flashMemory: 8192 # 8 KiB
+  ipq: 100
+  drawRate: 0.8
+
+- type: cpu
+  id: VirtTechMiniVEX
+  name: VirtTech Mini-V EX
+  memory: 3145728 # 3 MiB
+  flashMemory: 8192 # 8 KiB
+  ipq: 200
+  drawRate: 0.9
+
+- type: cpu
+  id: VirtTechMiniVEEX
+  name: VirtTech Mini-V ExtraEX
+  memory: 6291456 # 6 MiB
+  flashMemory: 8192 # 8 KiB
+  ipq: 300
+  drawRate: 1.0
+
+## Pro
+
+- type: cpu
+  id: VirtTechProV
+  name: VirtTech Pro-V
+  memory: 3145728 # 3 MiB
+  flashMemory: 12288 # 12 KiB
+  ipq: 500
+  drawRate: 1.5
+
+- type: cpu
+  id: VirtTechProVEX
+  name: VirtTech Pro-V EX
+  memory: 6291456 # 6 MiB
+  flashMemory: 12288 # 12 KiB
+  ipq: 600
+  drawRate: 1.6
+
+- type: cpu
+  id: VirtTechProVEEX
+  name: VirtTech Pro-V ExtraEX
+  memory: 8388608 # 8 MiB
+  flashMemory: 12288 # 12 KiB
+  ipq: 700
+  drawRate: 1.7
+
+## Super
+
+- type: cpu
+  id: VirtTechSuperV
+  name: VirtTech Super-V
+  memory: 6291456 # 6 MiB
+  flashMemory: 16384 # 16 KiB
+  ipq: 1000
+  drawRate: 2.0
+
+- type: cpu
+  id: VirtTechSuperVEX
+  name: VirtTech Super-V EX
+  memory: 8388608 # 8 MiB
+  flashMemory: 16384 # 16 KiB
+  ipq: 1500
+  drawRate: 2.5
+
+- type: cpu
+  id: VirtTechSuperVEEX
+  name: VirtTech Super-V ExtraEX
+  memory: 12582912 # 12 MiB
+  flashMemory: 16384 # 16 KiB
+  ipq: 2000
+  drawRate: 3.0

@@ -55,7 +55,6 @@
     - type: HealthAnalyzerDevice
       scanningEndSound:
         path: "/Audio/Items/Medical/healthscanner.ogg"
-      disease: Ultragigacancer
 
 - type: entity
   parent: HealthAnalyzerDevice
@@ -65,7 +64,6 @@
     - type: HealthAnalyzerDevice
       scanningEndSound:
         path: "/Audio/Items/Medical/healthscanner.ogg"
-      disease: ActiveZombieVirus
 
 - type: entity
   parent: HealthAnalyzerDevice
@@ -75,7 +73,6 @@
     - type: HealthAnalyzerDevice
       scanningEndSound:
         path: "/Audio/Items/Medical/healthscanner.ogg"
-      disease: ActiveHonkVirus
 
 - type: entity
   parent: BasePciDevice
@@ -290,8 +287,8 @@
   id: BaseHardDriveDevice
   components:
     - type: HardDriveDevice
-      accessSounds: !type:SoundCollectionSpecifier
-        collection: HddAccess
+      accessSounds:
+        path: /Audio/Ambience/Objects/hdd_buzz.ogg
 
 - type: entity
   parent: BaseHardDriveDevice
@@ -364,8 +361,8 @@
       containers:
         floppy_drive: !type:Container
     - type: FloppyDriveDevice
-      accessSounds: !type:SoundCollectionSpecifier
-        collection: FloppyAccess
-      ejectSound: /Audio/Effects/ModularComputers/Floppy/eject.ogg
-      insertSound: /Audio/Effects/ModularComputers/Floppy/insert.ogg
+      accessSounds:
+        path: /Audio/Machines/spinning.ogg
+      ejectSound: /Audio/Machines/tray_eject.ogg
+      insertSound: /Audio/Machines/terminal_insert_disc.ogg
       floppyContainerId: floppy_drive

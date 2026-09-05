@@ -21,7 +21,12 @@ public abstract class ShaderedTextureRectControl : TextureRect
 
     public void SetShader(string prototypeId, Action<ShaderInstance> configure)
     {
-        var shader = _prototypeManager.Index<ShaderPrototype>(prototypeId).InstanceUnique();
+        // StarHorizon doesn't ship a "Crt" shader (or whatever else callers may ask for) -
+        // fall back to no shader instead of throwing and taking down the client.
+        if (!_prototypeManager.TryIndex<ShaderPrototype>(prototypeId, out var proto))
+            return;
+
+        var shader = proto.InstanceUnique();
         configure(shader);
         ShaderOverride = shader;
     }

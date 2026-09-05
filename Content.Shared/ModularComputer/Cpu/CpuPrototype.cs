@@ -13,10 +13,9 @@
 // limitations under the License.
 //-----------------------------------------------------------------------------
 
-using Content.Server.NTVM;
 using Robust.Shared.Prototypes;
 
-namespace Content.Server.ModularComputer.Cpu;
+namespace Content.Shared.ModularComputer.Cpu;
 
 [Prototype("cpu")]
 public sealed class CpuPrototype : IPrototype
@@ -27,7 +26,7 @@ public sealed class CpuPrototype : IPrototype
     public int FlashMemorySize;
 
     /// <summary>
-    ///     See <see cref="MachineConfig.IPQ" />.
+    ///     See <see cref="Content.Server.NTVM.MachineConfig.IPQ" />.
     /// </summary>
     [DataField("ipq", true, required: true)]
     public int Ipq;

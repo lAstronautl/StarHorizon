@@ -15,6 +15,7 @@
 
 using Content.Server.ModularComputer.Devices.Mmio;
 using Content.Server.NTVM;
+using Content.Shared.ModularComputer.Cpu;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
 
 namespace Content.Server.ModularComputer.Cpu;
