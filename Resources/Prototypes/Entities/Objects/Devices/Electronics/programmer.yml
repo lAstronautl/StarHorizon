@@ -9,7 +9,7 @@
     - type: Bootrom
     - type: UserInterface
       interfaces:
-        - key: enum.ProgrammerUiKey.Key
+        enum.ProgrammerUiKey.Key:
           type: ProgrammerBoundUserInterface
     - type: ActivatableUI
       key: enum.ProgrammerUiKey.Key

@@ -16,7 +16,7 @@
       key: enum.ScreenUiKey.Key
     - type: UserInterface
       interfaces:
-        - key: enum.ScreenUiKey.Key
+        enum.ScreenUiKey.Key:
           type: ScreenBoundUserInterface
 
 ## Micro screens
@@ -27,9 +27,6 @@
   components:
     - type: Sprite
       state: micro_screen
-    - type: PhysProps
-      length: 101
-      volume: 450
     - type: StaticPrice
       price: 1600
     - type: ScreenDevice
@@ -70,9 +67,6 @@
   components:
     - type: Sprite
       state: small_screen
-    - type: PhysProps
-      length: 152
-      volume: 890
     - type: StaticPrice
       price: 3300
     - type: ScreenDevice
@@ -113,9 +107,6 @@
   components:
     - type: Sprite
       state: medium_screen
-    - type: PhysProps
-      length: 225
-      volume: 1655
     - type: StaticPrice
       price: 6900
     - type: ScreenDevice
@@ -156,9 +147,6 @@
   components:
     - type: Sprite
       state: large_screen
-    - type: PhysProps
-      length: 395
-      volume: 2506
     - type: StaticPrice
       price: 9950
     - type: ScreenDevice

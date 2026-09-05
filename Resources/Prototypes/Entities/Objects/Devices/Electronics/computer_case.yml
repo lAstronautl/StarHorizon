@@ -66,7 +66,7 @@
     - type: IconSmooth
       key: computer
       base: computer_
-      mode: SameDir
+      mode: Corners
     - type: GenericVisualizer
       visuals:
         enum.ComputerCaseVisuals.On:
@@ -231,9 +231,6 @@
   id: PadComputerCase
   parent: BasePortableComputerCase
   components:
-    - type: PhysProps
-      volume: 300
-      length: 150
     - type: Sprite
       sprite: Objects/Devices/computer_case.rsi
       layers:
@@ -276,9 +273,6 @@
   id: TabletComputerCase
   parent: BasePortableComputerCase
   components:
-    - type: PhysProps
-      volume: 850
-      length: 255
     - type: Sprite
       sprite: Objects/Devices/computer_case.rsi
       layers:
@@ -321,9 +315,6 @@
   id: LaptopComputerCase
   parent: BasePortableComputerCase
   components:
-    - type: PhysProps
-      volume: 1960
-      length: 620
     - type: Sprite
       sprite: Objects/Devices/computer_case.rsi
       layers:

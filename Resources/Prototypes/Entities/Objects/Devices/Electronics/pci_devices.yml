@@ -31,16 +31,13 @@
       key: enum.SerialTerminalUiKey.Key
     - type: UserInterface
       interfaces:
-        - key: enum.SerialTerminalUiKey.Key
+        enum.SerialTerminalUiKey.Key:
           type: SerialTerminalBoundUserInterface
 
 - type: entity
   parent: BasePciDevice
   id: GpuDevice
   components:
-    - type: PhysProps
-      length: 213
-      volume: 890
     - type: StaticPrice
       price: 8000
     - type: Sprite
@@ -92,10 +89,6 @@
   id: NetworkHubDevice8
   components:
     - type: ShowPciDeviceInCase
-    - type: PhysProps
-      length: 162
-      volume: 450
-      weight: 850
     - type: StaticPrice
       price: 1200
     - type: Sprite
@@ -126,10 +119,6 @@
   parent: NetworkHubDevice8
   id: NetworkHubDevice16
   components:
-    - type: PhysProps
-      length: 225
-      volume: 780
-      weight: 1330
     - type: StaticPrice
       price: 3250
     - type: DeviceLinkSource
@@ -173,10 +162,6 @@
   parent: NetworkHubDevice8
   id: NetworkHubDevice24
   components:
-    - type: PhysProps
-      length: 325
-      volume: 1400
-      weight: 1895
     - type: StaticPrice
       price: 5630
     - type: DeviceLinkSource
@@ -236,10 +221,6 @@
   parent: NetworkHubDevice8
   id: NetworkHubDevice32
   components:
-    - type: PhysProps
-      length: 555
-      volume: 2150
-      weight: 2825
     - type: StaticPrice
       price: 8650
     - type: DeviceLinkSource
@@ -328,10 +309,6 @@
   id: HardDriveDevice4MiB
   suffix: 4MiB
   components:
-    - type: PhysProps
-      length: 75
-      volume: 120
-      weight: 300
     - type: StaticPrice
       price: 2300
     - type: Sprite
@@ -344,10 +321,6 @@
   id: HardDriveDevice8MiB
   suffix: 8MiB
   components:
-    - type: PhysProps
-      length: 95
-      volume: 220
-      weight: 450
     - type: StaticPrice
       price: 4050
     - type: Sprite
@@ -360,10 +333,6 @@
   id: HardDriveDevice16MiB
   suffix: 16MiB
   components:
-    - type: PhysProps
-      length: 118
-      volume: 455
-      weight: 450
     - type: StaticPrice
       price: 7610
     - type: Sprite
@@ -376,10 +345,6 @@
   id: HardDriveDevice24MiB
   suffix: 24MiB
   components:
-    - type: PhysProps
-      length: 135
-      volume: 650
-      weight: 781
     - type: StaticPrice
       price: 9950
     - type: Sprite
@@ -392,10 +357,6 @@
   id: HardDriveDevice32MiB
   suffix: 32MiB
   components:
-    - type: PhysProps
-      length: 151
-      volume: 780
-      weight: 1050
     - type: StaticPrice
       price: 14000
     - type: Sprite
@@ -408,10 +369,6 @@
   id: HardDriveDevice64MiB
   suffix: 64MiB
   components:
-    - type: PhysProps
-      length: 177
-      volume: 990
-      weight: 1592
     - type: StaticPrice
       price: 19500
     - type: Sprite
@@ -424,10 +381,6 @@
   id: FloppyDrive
   components:
     - type: ShowPciDeviceInCase
-    - type: PhysProps
-      length: 177
-      volume: 990
-      weight: 1592
     - type: StaticPrice
       price: 3880
     - type: Sprite
