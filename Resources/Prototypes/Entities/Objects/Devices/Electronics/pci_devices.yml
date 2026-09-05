@@ -5,7 +5,8 @@
   id: BasePciDevice
   components:
     - type: Sprite
-      sprite: Objects/Devices/pci.rsi
+      sprite: Objects/Misc/module.rsi
+      state: blank_mod
     - type: Tag
       tags: [Pci]
     - type: SerialNumber
@@ -14,8 +15,6 @@
   parent: BasePciDevice
   id: TtsPciDevice
   components:
-    - type: Sprite
-      state: tts
     - type: TtsDevice
     - type: Speech
       speechSounds: Vending
@@ -24,8 +23,6 @@
   parent: BasePciDevice
   id: SerialTerminalDevice
   components:
-    - type: Sprite
-      state: serial_terminal
     - type: SerialTerminalDevice
     - type: ActivatableUI
       key: enum.SerialTerminalUiKey.Key
@@ -40,16 +37,12 @@
   components:
     - type: StaticPrice
       price: 8000
-    - type: Sprite
-      state: gpu
     - type: GpuDevice
 
 - type: entity
   parent: BasePciDevice
   id: HealthAnalyzerDevice
   components:
-    - type: Sprite
-      state: health_analyzer
     - type: HealthAnalyzerDevice
       scanningEndSound:
         path: "/Audio/Items/Medical/healthscanner.ogg"
@@ -91,8 +84,6 @@
     - type: ShowPciDeviceInCase
     - type: StaticPrice
       price: 1200
-    - type: Sprite
-      state: network_hub
     - type: NetworkHubDevice
     - type: DeviceLinkSource
       ports:
@@ -298,8 +289,6 @@
   noSpawn: true
   id: BaseHardDriveDevice
   components:
-    - type: Sprite
-      state: hdd_micro
     - type: HardDriveDevice
       accessSounds: !type:SoundCollectionSpecifier
         collection: HddAccess
@@ -311,8 +300,6 @@
   components:
     - type: StaticPrice
       price: 2300
-    - type: Sprite
-      state: hdd_micro
     - type: HardDriveDevice
       size: 4194304
 
@@ -323,8 +310,6 @@
   components:
     - type: StaticPrice
       price: 4050
-    - type: Sprite
-      state: hdd_small
     - type: HardDriveDevice
       size: 8388608
 
@@ -335,8 +320,6 @@
   components:
     - type: StaticPrice
       price: 7610
-    - type: Sprite
-      state: hdd_normal
     - type: HardDriveDevice
       size: 16777216
 
@@ -347,8 +330,6 @@
   components:
     - type: StaticPrice
       price: 9950
-    - type: Sprite
-      state: hdd_advanced
     - type: HardDriveDevice
       size: 25165824
 
@@ -359,8 +340,6 @@
   components:
     - type: StaticPrice
       price: 14000
-    - type: Sprite
-      state: hdd_super
     - type: HardDriveDevice
       size: 33554432
 
@@ -371,8 +350,6 @@
   components:
     - type: StaticPrice
       price: 19500
-    - type: Sprite
-      state: hdd_cluster
     - type: HardDriveDevice
       size: 67108864
 
@@ -383,8 +360,6 @@
     - type: ShowPciDeviceInCase
     - type: StaticPrice
       price: 3880
-    - type: Sprite
-      state: floppy_drive
     - type: ContainerContainer
       containers:
         floppy_drive: !type:Container

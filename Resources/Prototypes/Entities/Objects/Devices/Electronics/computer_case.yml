@@ -118,7 +118,7 @@
       sprite: Structures/Machines/arcade.rsi
       layers:
         - state: arcade
-        - state: invaders
+        - state: screen_invaders
           visible: false
           map: ["enum.ComputerCaseVisuals.On"]
     - type: GenericVisualizer
@@ -167,10 +167,10 @@
   parent: BaseWallmountComputerCase
   components:
     - type: Sprite
-      sprite: Objects/Devices/computer_case.rsi
+      sprite: Structures/Machines/computers.rsi
       layers:
         - state: telescreen
-        - state: telescreen_on
+        - state: telescreen
           visible: false
           map: ["enum.ComputerCaseVisuals.On"]
     - type: GenericVisualizer
@@ -180,7 +180,7 @@
             True: { visible: true }
             False: { visible: false }
     - type: Icon
-      sprite: Objects/Devices/computer_case.rsi
+      sprite: Structures/Machines/computers.rsi
       state: telescreen
     - type: PciSlots
       overrides:
@@ -232,15 +232,15 @@
   parent: BasePortableComputerCase
   components:
     - type: Sprite
-      sprite: Objects/Devices/computer_case.rsi
+      sprite: Objects/Devices/tablets.rsi
       layers:
-        - state: pad
-        - state: pad_on
+        - state: tablet
+        - state: tablet
           visible: false
           map: ["enum.ComputerCaseVisuals.On"]
     - type: Icon
-      sprite: Objects/Devices/computer_case.rsi
-      state: pad
+      sprite: Objects/Devices/tablets.rsi
+      state: tablet
     - type: GenericVisualizer
       visuals:
         enum.ComputerCaseVisuals.On:
@@ -274,14 +274,14 @@
   parent: BasePortableComputerCase
   components:
     - type: Sprite
-      sprite: Objects/Devices/computer_case.rsi
+      sprite: Objects/Devices/tablets.rsi
       layers:
         - state: tablet
-        - state: tablet_on
+        - state: tablet
           visible: false
           map: ["enum.ComputerCaseVisuals.On"]
     - type: Icon
-      sprite: Objects/Devices/computer_case.rsi
+      sprite: Objects/Devices/tablets.rsi
       state: tablet
     - type: GenericVisualizer
       visuals:
@@ -316,15 +316,15 @@
   parent: BasePortableComputerCase
   components:
     - type: Sprite
-      sprite: Objects/Devices/computer_case.rsi
+      sprite: Objects/Devices/tablets.rsi
       layers:
-        - state: laptop
-        - state: laptop_on
+        - state: generic
+        - state: generic
           visible: false
           map: ["enum.ComputerCaseVisuals.On"]
     - type: Icon
-      sprite: Objects/Devices/computer_case.rsi
-      state: laptop
+      sprite: Objects/Devices/tablets.rsi
+      state: generic
     - type: GenericVisualizer
       visuals:
         enum.ComputerCaseVisuals.On:

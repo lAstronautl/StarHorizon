@@ -3,8 +3,8 @@
   id: Programmer
   components:
     - type: Sprite
-      sprite: Objects/Devices/programmer.rsi
-      state: base
+      sprite: Objects/Misc/module.rsi
+      state: blank_mod
     - type: Programmer
     - type: Bootrom
     - type: UserInterface
