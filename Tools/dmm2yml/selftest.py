@@ -257,6 +257,17 @@ def check_orientation(mapping_set) -> Result:
         if ss14map.rotation_for_dir(direction) != rotation:
             problems.append(f"dir {direction} -> {ss14map.rotation_for_dir(direction)}, expected {rotation}")
 
+    # A camera is the one wall-mounted entity that faces the SAME side as its
+    # wall, not the opposite -- confirmed 48/48 clean against Resources/Maps/
+    # box.yml (0/11 clean the other way for AirAlarm/APCBasic/FireAlarm on the
+    # same map, which confirmed wall: for those instead). entities.yml uses
+    # dir: for camera for exactly this reason; wall: would face it backwards.
+    camera = mapping_set.resolve("/obj/machinery/camera/directional/north", "entity").rule
+    if camera is None:
+        problems.append("no rule for a directional camera")
+    elif camera.direction != mapping_rules.NORTH:
+        problems.append(f"camera directional/north gave facing {camera.direction}, expected {mapping_rules.NORTH} (dir:, not wall:)")
+
     return Result("orientation: wall vs dir", not problems, "; ".join(problems) or "wall inverts, dir does not")
 
 

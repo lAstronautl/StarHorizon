@@ -96,10 +96,17 @@
 /obj/machinery/button/door/directional/east: {entity: SignalButtonDirectional, wall: east, onWall: true}
 /obj/machinery/button/door/directional/west: {entity: SignalButtonDirectional, wall: west, onWall: true}
 
-/obj/machinery/camera/directional/north: {entity: SurveillanceCameraGeneral, wall: north}
-/obj/machinery/camera/directional/south: {entity: SurveillanceCameraGeneral, wall: south}
-/obj/machinery/camera/directional/east: {entity: SurveillanceCameraGeneral, wall: east}
-/obj/machinery/camera/directional/west: {entity: SurveillanceCameraGeneral, wall: west}
+# A camera is the one wall-mounted entity here that is NOT like AirAlarm/APC/
+# FireAlarm: those face away from the wall they are mounted on ("wall:", the
+# opposite of "dir:"), but a camera's sprite faces the SAME side as its wall,
+# confirmed 48/48 clean (0 counterexamples) checking SurveillanceCameraGeneral
+# against its neighbouring WallSolid/WallReinforced in Resources/Maps/box.yml
+# -- vs. 0/11 clean "same side" for AirAlarm/APCBasic/FireAlarm on the same
+# map, which confirmed the existing wall: convention for those instead.
+/obj/machinery/camera/directional/north: {entity: SurveillanceCameraGeneral, dir: 1}
+/obj/machinery/camera/directional/south: {entity: SurveillanceCameraGeneral, dir: 2}
+/obj/machinery/camera/directional/east: {entity: SurveillanceCameraGeneral, dir: 4}
+/obj/machinery/camera/directional/west: {entity: SurveillanceCameraGeneral, dir: 8}
 
 /obj/machinery/firealarm/directional/north: {entity: FireAlarm, wall: north, onWall: true}
 /obj/machinery/firealarm/directional/south: {entity: FireAlarm, wall: south, onWall: true}
@@ -141,10 +148,10 @@
 /obj/machinery/light/small/red/directional/east: {entity: PoweredSmallLight, wall: east}
 /obj/machinery/light/small/red/directional/west: {entity: PoweredSmallLight, wall: west}
 
-/obj/machinery/camera/motion/directional/north: {entity: SurveillanceCameraGeneral, wall: north}
-/obj/machinery/camera/motion/directional/south: {entity: SurveillanceCameraGeneral, wall: south}
-/obj/machinery/camera/motion/directional/east: {entity: SurveillanceCameraGeneral, wall: east}
-/obj/machinery/camera/motion/directional/west: {entity: SurveillanceCameraGeneral, wall: west}
+/obj/machinery/camera/motion/directional/north: {entity: SurveillanceCameraGeneral, dir: 1}
+/obj/machinery/camera/motion/directional/south: {entity: SurveillanceCameraGeneral, dir: 2}
+/obj/machinery/camera/motion/directional/east: {entity: SurveillanceCameraGeneral, dir: 4}
+/obj/machinery/camera/motion/directional/west: {entity: SurveillanceCameraGeneral, dir: 8}
 
 /obj/machinery/power/apc/auto_name/directional/north: {entity: APCBasic, wall: north, onWall: true}
 /obj/machinery/power/apc/auto_name/directional/south: {entity: APCBasic, wall: south, onWall: true}
@@ -275,10 +282,10 @@
 /obj/machinery/door/window/right/directional/west: {entity: Windoor, dir: 8}
 
 # ---- camera/autoname: same physical camera as camera/directional ----
-/obj/machinery/camera/autoname/directional/north: {entity: SurveillanceCameraGeneral, wall: north}
-/obj/machinery/camera/autoname/directional/south: {entity: SurveillanceCameraGeneral, wall: south}
-/obj/machinery/camera/autoname/directional/east: {entity: SurveillanceCameraGeneral, wall: east}
-/obj/machinery/camera/autoname/directional/west: {entity: SurveillanceCameraGeneral, wall: west}
+/obj/machinery/camera/autoname/directional/north: {entity: SurveillanceCameraGeneral, dir: 1}
+/obj/machinery/camera/autoname/directional/south: {entity: SurveillanceCameraGeneral, dir: 2}
+/obj/machinery/camera/autoname/directional/east: {entity: SurveillanceCameraGeneral, dir: 4}
+/obj/machinery/camera/autoname/directional/west: {entity: SurveillanceCameraGeneral, dir: 8}
 
 # ---- mounted on the wall itself, not the floor in front of it ----
 /obj/structure/mirror/directional/north: {entity: Mirror, wall: north, onWall: true}
@@ -1498,17 +1505,17 @@
 # ---- remaining cameras ----
 /obj/machinery/camera: SurveillanceCameraGeneral
 /obj/machinery/camera/emp_proof: SurveillanceCameraGeneral
-/obj/machinery/camera/emp_proof/directional/north: {entity: SurveillanceCameraGeneral, wall: north}
-/obj/machinery/camera/emp_proof/directional/south: {entity: SurveillanceCameraGeneral, wall: south}
-/obj/machinery/camera/emp_proof/directional/east: {entity: SurveillanceCameraGeneral, wall: east}
-/obj/machinery/camera/emp_proof/directional/west: {entity: SurveillanceCameraGeneral, wall: west}
+/obj/machinery/camera/emp_proof/directional/north: {entity: SurveillanceCameraGeneral, dir: 1}
+/obj/machinery/camera/emp_proof/directional/south: {entity: SurveillanceCameraGeneral, dir: 2}
+/obj/machinery/camera/emp_proof/directional/east: {entity: SurveillanceCameraGeneral, dir: 4}
+/obj/machinery/camera/emp_proof/directional/west: {entity: SurveillanceCameraGeneral, dir: 8}
 /obj/machinery/camera/preset/ordnance: SurveillanceCameraGeneral
 /obj/machinery/camera/motion: SurveillanceCameraGeneral
 /obj/machinery/camera/autoname: SurveillanceCameraGeneral
-/obj/machinery/camera/autoname/motion/directional/north: {entity: SurveillanceCameraGeneral, wall: north}
-/obj/machinery/camera/autoname/motion/directional/south: {entity: SurveillanceCameraGeneral, wall: south}
-/obj/machinery/camera/autoname/motion/directional/east: {entity: SurveillanceCameraGeneral, wall: east}
-/obj/machinery/camera/autoname/motion/directional/west: {entity: SurveillanceCameraGeneral, wall: west}
+/obj/machinery/camera/autoname/motion/directional/north: {entity: SurveillanceCameraGeneral, dir: 1}
+/obj/machinery/camera/autoname/motion/directional/south: {entity: SurveillanceCameraGeneral, dir: 2}
+/obj/machinery/camera/autoname/motion/directional/east: {entity: SurveillanceCameraGeneral, dir: 4}
+/obj/machinery/camera/autoname/motion/directional/west: {entity: SurveillanceCameraGeneral, dir: 8}
 
 # ---- remaining flashlights ----
 /obj/item/flashlight: FlashlightLantern
