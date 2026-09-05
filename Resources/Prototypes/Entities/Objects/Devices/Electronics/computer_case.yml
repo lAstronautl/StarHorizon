@@ -63,10 +63,6 @@
     - type: Icon
       sprite: Structures/Machines/computers.rsi
       state: computer
-    - type: IconSmooth
-      key: computer
-      base: computer_
-      mode: Corners
     - type: GenericVisualizer
       visuals:
         enum.ComputerCaseVisuals.On:
