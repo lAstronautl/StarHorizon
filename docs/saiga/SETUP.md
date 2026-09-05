@@ -161,7 +161,7 @@ vLLM используй `--backend openai --backend-url http://127.0.0.1:1234/v1
 Подробности всех флагов (`--listen`, `--tool-mode prompt`, бэкенд `openai` для LM Studio/vLLM) —
 в `Tools/saiga-agent-runner/README.md`.
 
-## 3.5. Облачные OpenAI-совместимые провайдеры (OpenRouter, Google AI Studio, ...) для встроенного мозга
+## 3.5. Облачные OpenAI-совместимые провайдеры (OpenRouter, Google AI Studio, Groq, ...) для встроенного мозга
 
 Способы 1 и 2 (встроенный C#-мозг: NPC и клиент-агент, без внешней MCP-модели) поддерживают ключ
 через CVar `saiga.api_key` — он уходит заголовком `Authorization: Bearer <ключ>` при
@@ -191,6 +191,20 @@ model      = "gemini-3.6-flash"      # проверено вживую на 2026
 Путь `.../v1beta/openai/chat/completions` подтверждён напрямую (реальный запрос, `200 OK`) — если
 всё равно ловишь `NotFound`, проблема не в URL, а в конкретном `model` (см. следующий абзац) или в
 ключе.
+
+**Groq (быстрый инференс открытых моделей, есть бесплатный тариф):**
+```toml
+[saiga]
+enabled    = true
+api_format = "openai"
+api_url    = "https://api.groq.com/openai/v1"
+api_key    = "gsk_..."                    # твой ключ с console.groq.com/keys
+model      = "llama-3.3-70b-versatile"
+```
+Путь `.../openai/v1/chat/completions` подтверждён напрямую (фейковый ключ → `401 Invalid API Key`,
+т.е. роут существует и реально проверяет ключ, а не отдаёт 404). Из трёх провайдеров в этом разделе
+у Groq заметно ниже задержка ответа — за счёт специализированного инференс-железа, а не размера
+модели — что для реакции на речь в реальном времени может ощущаться быстрее остальных.
 
 Для `agent-runner` (способ 3) то же самое делается флагами `--backend openai --backend-url <url>
 --api-key <ключ> --model <id>` — см. раздел 3.
