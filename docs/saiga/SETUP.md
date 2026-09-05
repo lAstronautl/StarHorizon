@@ -185,8 +185,12 @@ enabled    = true
 api_format = "openai"
 api_url    = "https://generativelanguage.googleapis.com/v1beta/openai"
 api_key    = "AQ...."                # твой ключ с aistudio.google.com/apikey
-model      = "gemini-2.5-flash"      # точный id модели — сверь в консоли Google AI Studio
+model      = "gemini-3.6-flash"      # проверено вживую на 2026-09-05; сверяй актуальный id в консоли —
+                                      # старые теги (напр. gemini-2.5-flash) Google снимает с обслуживания
 ```
+Путь `.../v1beta/openai/chat/completions` подтверждён напрямую (реальный запрос, `200 OK`) — если
+всё равно ловишь `NotFound`, проблема не в URL, а в конкретном `model` (см. следующий абзац) или в
+ключе.
 
 Для `agent-runner` (способ 3) то же самое делается флагами `--backend openai --backend-url <url>
 --api-key <ключ> --model <id>` — см. раздел 3.
@@ -198,7 +202,9 @@ model      = "gemini-2.5-flash"      # точный id модели — свер
 модели сняли — тело ответа прямо называло замену (`google/gemma-3-27b-it`, платный слаг). Список
 бесплатных моделей на OpenRouter меняется без предупреждения — сверяйся с
 https://openrouter.ai/models?max_price=0, а не с любым слагом из старого примера (в т.ч. из этого
-файла).
+файла). То же самое поймали и на Google AI Studio: `gemini-2.5-flash` дал `404 NOT_FOUND` с текстом
+«no longer available to new users, use models/gemini-3.6-flash» прямо в теле ответа — модели у
+провайдеров устаревают быстрее, чем обновляются гайды, доверяй ответу провайдера, а не примеру.
 
 **Диагностика в обход игры целиком** — если `saiga <текст>` в консоли сервера тоже даёт `bad status
 code`, дёрни тот же запрос напрямую curl'ом (без ключа в истории шелла, если это общая машина):
