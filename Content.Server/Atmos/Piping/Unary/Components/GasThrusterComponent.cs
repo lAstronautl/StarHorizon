@@ -42,5 +42,5 @@ public sealed partial class GasThrusterComponent : Component
     /// linearly with the current thrust ratio, so a barely-firing engine sips gas rather than dumping it.
     /// </summary>
     [DataField]
-    public float MaxTransferRate = 20f;
+    public float MaxTransferRate = 40f;
 }
