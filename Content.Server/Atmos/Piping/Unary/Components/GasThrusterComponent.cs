@@ -35,7 +35,7 @@ public sealed partial class GasThrusterComponent : Component
     /// </summary>
     [DataField]
     [GuidebookData]
-    public float MaxThrust = 100f;
+    public float MaxThrust = 200f;
 
     /// <summary>
     /// Fraction of the inlet pipe's gas volume vented per second while firing at maximum thrust. Scales down
