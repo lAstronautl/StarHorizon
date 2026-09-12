@@ -691,7 +691,19 @@ def merge_table(
         if value.lower() == mapping_rules.SKIP:
             skips.append(dmm_path)
         elif kind == "turf":
-            additions["turf"][dmm_path] = value
+            # A turf answer may combine a tile and a wall entity with '+' (see
+            # apply_table) -- writing `value` back verbatim would merge that
+            # whole string as one bogus tile id and silently drop the entity,
+            # since _parse_turf only splits a dict, never a plain string.
+            parts = [part.strip() for part in value.split(MULTI_SEPARATOR) if part.strip()]
+            tile = next((part for part in parts if index.has(protoindex.TILE, part)), None)
+            entities = [part for part in parts if part != tile]
+            if tile and entities:
+                additions["turf"][dmm_path] = {"tile": tile, "entity": entities[0]}
+            elif tile:
+                additions["turf"][dmm_path] = tile
+            elif entities:
+                additions["turf"][dmm_path] = {"entity": entities[0]}
         elif kind == "decal" and all(
             index.has(protoindex.DECAL, part) for part in value.split(MULTI_SEPARATOR)
         ):

@@ -429,6 +429,54 @@ def check_decal_color_override() -> Result:
     )
 
 
+def check_merge_table(index) -> Result:
+    """merge_table must split a combined 'Tile+Entity' turf answer, not write it
+    back as one string. _parse_turf only ever splits a *dict* rule -- a plain
+    string is taken whole as a tile id, so writing 'FloorSteel+WallSolid'
+    verbatim silently turns into a nonexistent tile on the next load, with the
+    wall entity dropped entirely. apply_table (used for a one-off convert)
+    already split this correctly; merge_table (used to persist the same
+    answer) did not."""
+    dmm2yml = dmm2yml_module()
+    problems = []
+
+    with tempfile.TemporaryDirectory() as directory:
+        for name in ("turfs.yml", "decals.yml", "entities.yml", "ignore.yml"):
+            open(os.path.join(directory, name), "w", encoding="utf-8").close()
+
+        table = {
+            "/turf/open/floor/test_combo": {
+                "dmm_path": "/turf/open/floor/test_combo", "kind": "turf",
+                "ss14_id": "FloorSteel+WallSolid", "color": "",
+            },
+            "/turf/open/floor/test_plain": {
+                "dmm_path": "/turf/open/floor/test_plain", "kind": "turf",
+                "ss14_id": "FloorSteel", "color": "",
+            },
+        }
+        dmm2yml.merge_table(table, directory, index, lambda *a: None)
+        reloaded = mapping_rules.load(directory)
+
+        combo = reloaded.turfs.get("/turf/open/floor/test_combo")
+        if combo is None:
+            problems.append("combined tile+entity answer did not round-trip at all")
+        else:
+            if combo.tile != "FloorSteel":
+                problems.append(f"combined answer: tile={combo.tile!r}, expected 'FloorSteel'")
+            if combo.entity != "WallSolid":
+                problems.append(f"combined answer: entity={combo.entity!r}, expected 'WallSolid' (dropped?)")
+
+        plain = reloaded.turfs.get("/turf/open/floor/test_plain")
+        if plain is None or plain.tile != "FloorSteel":
+            problems.append(f"plain tile answer round-tripped as {plain!r}, expected tile='FloorSteel'")
+
+    return Result(
+        "merge_table: combined tile+entity turf answers split correctly",
+        not problems,
+        "; ".join(problems) or "'Tile+Entity' and plain 'Tile' both round-trip through merge_table",
+    )
+
+
 def check_dictionaries(mapping_set, index) -> Result:
     """Every id the shipped mapping files name must still exist."""
     problems = []
@@ -871,6 +919,7 @@ def run(repo_root: str, mapping_dir: str, prototypes_dir: str) -> list[Result]:
         ("decals: corner accents match their quadrant", lambda: check_decal_corners(mapping_set)),
         ("decals: line edges match their sprite", lambda: check_decal_line_edges(mapping_set, prototypes_dir)),
         ("decals: per-instance color= overrides the rule default", lambda: check_decal_color_override()),
+        ("merge_table: combined tile+entity turf answers split correctly", lambda: check_merge_table(index)),
         ("chunks: cell indexing", lambda: check_chunk_indexing()),
         ("chunks: no empty chunks", lambda: check_no_empty_chunks(mapping_set, index)),
         ("chunks: round-trip vs repo maps", lambda: check_chunk_roundtrip(repo_root)),

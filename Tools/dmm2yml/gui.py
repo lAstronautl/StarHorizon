@@ -363,7 +363,7 @@ class App(ttk.Frame):
         }
 
         def work():
-            written = dmm2yml.merge_table(table, self.mapping_dir, self.prototypes, self._thread_log)
+            written = dmm2yml.merge_table(table, self.mapping_dir, self.index, self._thread_log)
             return ("merged", written)
 
         self._run_async("merge", work)
