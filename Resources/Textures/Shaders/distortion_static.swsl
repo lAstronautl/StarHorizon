@@ -1,8 +1,17 @@
 // Vignette-shaped interference static: a clean "peephole" in the middle that
 // shrinks and gets noisier the stronger Intensity is, so there's always
 // something visible ahead even at full strength.
+//
+// MinClearRadius/MaxClearRadius/EdgeWidth/MaxAlpha shape the vignette, so the
+// same shader can be drawn twice with different params for a layered effect:
+// once as the close-range noise that closes in toward the center, and once
+// as a fainter, farther-reaching ring confined to the edges of the screen.
 
 uniform highp float Intensity; // 0..1
+uniform highp float MinClearRadius; // clear radius at Intensity = 1
+uniform highp float MaxClearRadius; // clear radius at Intensity = 0
+uniform highp float EdgeWidth; // thickness of the noisy gradient band
+uniform highp float MaxAlpha; // cap on how opaque the noise gets
 
 void fragment() {
     highp vec2 screenSize = vec2(1.0 / SCREEN_PIXEL_SIZE.x, 1.0 / SCREEN_PIXEL_SIZE.y);
@@ -11,8 +20,8 @@ void fragment() {
     highp vec2 diff = (FRAGCOORD.xy - center) / minDimension;
     highp float dist = length(diff);
 
-    highp float clearRadius = mix(1.0, 0.2, Intensity);
-    highp float edgeRadius = clearRadius + 0.4;
+    highp float clearRadius = mix(MaxClearRadius, MinClearRadius, Intensity);
+    highp float edgeRadius = clearRadius + EdgeWidth;
     highp float vignette = smoothstep(clearRadius, edgeRadius, dist);
 
     // Re-roll the noise in discrete steps (like a TV picking up interference) instead of
@@ -27,8 +36,7 @@ void fragment() {
     highp float flicker = zRandom(vec2(frame * 0.137, 7.0)).x;
     highp float flickerAmount = mix(1.0, flicker, Intensity * 0.6);
 
-    highp float maxAlpha = 0.8;
-    highp float alpha = vignette * Intensity * flickerAmount * maxAlpha;
+    highp float alpha = vignette * Intensity * flickerAmount * MaxAlpha;
 
     COLOR = vec4(noiseColor, alpha);
 }

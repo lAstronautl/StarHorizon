@@ -17,6 +17,14 @@ public sealed partial class DistortionAffectedComponent : Component
     public float Intensity;
 
     /// <summary>
+    /// Intensity of a farther-reaching, faint early-warning static ring shown at the very
+    /// edges of the screen. Ramps up starting from 1.5x <see cref="DistortionFieldComponent.Range"/>,
+    /// well before <see cref="Intensity"/> kicks in.
+    /// </summary>
+    [DataField, AutoNetworkedField, ViewVariables(VVAccess.ReadOnly)]
+    public float OuterIntensity;
+
+    /// <summary>
     /// Whether the source(s) affecting this shuttle also want the noise shown
     /// on the screens of players aboard it.
     /// </summary>

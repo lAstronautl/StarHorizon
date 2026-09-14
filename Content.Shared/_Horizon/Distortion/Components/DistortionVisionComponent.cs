@@ -14,4 +14,11 @@ public sealed partial class DistortionVisionComponent : Component
     /// </summary>
     [DataField, AutoNetworkedField, ViewVariables(VVAccess.ReadOnly)]
     public float Intensity;
+
+    /// <summary>
+    /// Mirrors <see cref="DistortionAffectedComponent.OuterIntensity"/> - the faint, edge-of-screen
+    /// early-warning ring that appears before <see cref="Intensity"/> does.
+    /// </summary>
+    [DataField, AutoNetworkedField, ViewVariables(VVAccess.ReadOnly)]
+    public float OuterIntensity;
 }

@@ -19,6 +19,10 @@ public sealed class DistortionFieldSystem : EntitySystem
     [Dependency] private readonly SharedTransformSystem _xform = default!;
 
     private const float ScanInterval = 0.5f;
+
+    // The faint edge-of-screen warning ring reaches 1.5x farther than the main effect.
+    private const float OuterRangeMultiplier = 1.5f;
+
     private float _accumulator;
 
     public override void Update(float frameTime)
@@ -37,7 +41,7 @@ public sealed class DistortionFieldSystem : EntitySystem
             fields.Add((xform, comp));
         }
 
-        var affectedEntities = new Dictionary<EntityUid, (float Intensity, bool AffectPlayers)>();
+        var affectedEntities = new Dictionary<EntityUid, (float Intensity, float OuterIntensity, bool AffectPlayers)>();
 
         if (fields.Count > 0)
         {
@@ -52,7 +56,7 @@ public sealed class DistortionFieldSystem : EntitySystem
     // so the entire ship glitches out once the field is anywhere inside it.
     private void ScanShuttleGrids(
         List<(TransformComponent Xform, DistortionFieldComponent Comp)> fields,
-        Dictionary<EntityUid, (float Intensity, bool AffectPlayers)> affectedEntities)
+        Dictionary<EntityUid, (float Intensity, float OuterIntensity, bool AffectPlayers)> affectedEntities)
     {
         var shuttleQuery = EntityQueryEnumerator<ShuttleComponent, TransformComponent>();
         while (shuttleQuery.MoveNext(out var gridUid, out _, out var gridXform))
@@ -62,6 +66,7 @@ public sealed class DistortionFieldSystem : EntitySystem
 
             var gridAabb = _physics.GetWorldAABB(gridUid);
             var best = 0f;
+            var bestOuter = 0f;
             var affectPlayers = false;
 
             foreach (var (fieldXform, field) in fields)
@@ -74,18 +79,20 @@ public sealed class DistortionFieldSystem : EntitySystem
                 var distance = (fieldPos - closest).Length();
 
                 var intensity = Math.Clamp(1f - distance / field.Range, 0f, 1f);
-                if (intensity <= 0f)
-                    continue;
+                var outerIntensity = Math.Clamp(1f - distance / (field.Range * OuterRangeMultiplier), 0f, 1f);
 
                 if (intensity > best)
                     best = intensity;
 
-                if (field.AffectPlayers)
+                if (outerIntensity > bestOuter)
+                    bestOuter = outerIntensity;
+
+                if (intensity > 0f && field.AffectPlayers)
                     affectPlayers = true;
             }
 
-            if (best > 0f)
-                MergeBest(affectedEntities, gridUid, best, affectPlayers);
+            if (best > 0f || bestOuter > 0f)
+                MergeBest(affectedEntities, gridUid, best, bestOuter, affectPlayers);
         }
     }
 
@@ -94,7 +101,7 @@ public sealed class DistortionFieldSystem : EntitySystem
     // just from being carried near a field, without needing to be aboard a shuttle.
     private void ScanRadarConsoles(
         List<(TransformComponent Xform, DistortionFieldComponent Comp)> fields,
-        Dictionary<EntityUid, (float Intensity, bool AffectPlayers)> affectedEntities)
+        Dictionary<EntityUid, (float Intensity, float OuterIntensity, bool AffectPlayers)> affectedEntities)
     {
         var consoleQuery = EntityQueryEnumerator<RadarConsoleComponent, TransformComponent>();
         while (consoleQuery.MoveNext(out var consoleUid, out _, out var consoleXform))
@@ -104,6 +111,7 @@ public sealed class DistortionFieldSystem : EntitySystem
 
             var consolePos = _xform.GetWorldPosition(consoleXform);
             var best = 0f;
+            var bestOuter = 0f;
             var affectPlayers = false;
 
             foreach (var (fieldXform, field) in fields)
@@ -115,38 +123,44 @@ public sealed class DistortionFieldSystem : EntitySystem
                 var distance = (fieldPos - consolePos).Length();
 
                 var intensity = Math.Clamp(1f - distance / field.Range, 0f, 1f);
-                if (intensity <= 0f)
-                    continue;
+                var outerIntensity = Math.Clamp(1f - distance / (field.Range * OuterRangeMultiplier), 0f, 1f);
 
                 if (intensity > best)
                     best = intensity;
 
-                if (field.AffectPlayers)
+                if (outerIntensity > bestOuter)
+                    bestOuter = outerIntensity;
+
+                if (intensity > 0f && field.AffectPlayers)
                     affectPlayers = true;
             }
 
-            if (best > 0f)
-                MergeBest(affectedEntities, consoleUid, best, affectPlayers);
+            if (best > 0f || bestOuter > 0f)
+                MergeBest(affectedEntities, consoleUid, best, bestOuter, affectPlayers);
         }
     }
 
     private static void MergeBest(
-        Dictionary<EntityUid, (float Intensity, bool AffectPlayers)> affectedEntities,
+        Dictionary<EntityUid, (float Intensity, float OuterIntensity, bool AffectPlayers)> affectedEntities,
         EntityUid uid,
         float intensity,
+        float outerIntensity,
         bool affectPlayers)
     {
         if (affectedEntities.TryGetValue(uid, out var existing))
         {
-            affectedEntities[uid] = (Math.Max(existing.Intensity, intensity), existing.AffectPlayers || affectPlayers);
+            affectedEntities[uid] = (
+                Math.Max(existing.Intensity, intensity),
+                Math.Max(existing.OuterIntensity, outerIntensity),
+                existing.AffectPlayers || affectPlayers);
         }
         else
         {
-            affectedEntities[uid] = (intensity, affectPlayers);
+            affectedEntities[uid] = (intensity, outerIntensity, affectPlayers);
         }
     }
 
-    private void ApplyEffects(Dictionary<EntityUid, (float Intensity, bool AffectPlayers)> affectedEntities)
+    private void ApplyEffects(Dictionary<EntityUid, (float Intensity, float OuterIntensity, bool AffectPlayers)> affectedEntities)
     {
         var noLongerAffected = new List<EntityUid>();
 
@@ -155,9 +169,12 @@ public sealed class DistortionFieldSystem : EntitySystem
         {
             if (affectedEntities.Remove(uid, out var data))
             {
-                if (!MathHelper.CloseTo(affected.Intensity, data.Intensity) || affected.AffectPlayers != data.AffectPlayers)
+                if (!MathHelper.CloseTo(affected.Intensity, data.Intensity) ||
+                    !MathHelper.CloseTo(affected.OuterIntensity, data.OuterIntensity) ||
+                    affected.AffectPlayers != data.AffectPlayers)
                 {
                     affected.Intensity = data.Intensity;
+                    affected.OuterIntensity = data.OuterIntensity;
                     affected.AffectPlayers = data.AffectPlayers;
                     Dirty(uid, affected);
                 }
@@ -177,6 +194,7 @@ public sealed class DistortionFieldSystem : EntitySystem
         {
             var affected = EnsureComp<DistortionAffectedComponent>(uid);
             affected.Intensity = data.Intensity;
+            affected.OuterIntensity = data.OuterIntensity;
             affected.AffectPlayers = data.AffectPlayers;
             Dirty(uid, affected);
         }
@@ -195,9 +213,11 @@ public sealed class DistortionFieldSystem : EntitySystem
                 data.AffectPlayers)
             {
                 var vision = EnsureComp<DistortionVisionComponent>(uid);
-                if (!MathHelper.CloseTo(vision.Intensity, data.Intensity))
+                if (!MathHelper.CloseTo(vision.Intensity, data.Intensity) ||
+                    !MathHelper.CloseTo(vision.OuterIntensity, data.OuterIntensity))
                 {
                     vision.Intensity = data.Intensity;
+                    vision.OuterIntensity = data.OuterIntensity;
                     Dirty(uid, vision);
                 }
             }

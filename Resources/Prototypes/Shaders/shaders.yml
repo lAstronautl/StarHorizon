@@ -64,6 +64,10 @@
   path: "/Textures/Shaders/distortion_static.swsl"
   params:
     Intensity: 0.0
+    MinClearRadius: 0.2
+    MaxClearRadius: 1.0
+    EdgeWidth: 0.4
+    MaxAlpha: 0.8
 
 - type: shader
   id: Drunk
