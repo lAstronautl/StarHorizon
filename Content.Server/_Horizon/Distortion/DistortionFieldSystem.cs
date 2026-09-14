@@ -2,6 +2,7 @@ using System.Numerics;
 using Content.Server.Shuttles.Components;
 using Content.Shared._Horizon.Distortion.Components;
 using Content.Shared.Shuttles.Components;
+using Robust.Server.GameObjects;
 using Robust.Shared.Physics.Systems;
 
 namespace Content.Server._Horizon.Distortion;
