@@ -11,12 +11,15 @@ namespace Content.Server._Horizon.Distortion;
 /// Scans for shuttles, radar/mass-scanner consoles, and players near <see cref="DistortionFieldComponent"/>
 /// sources and glitches them out with static, scaling with proximity - full noise once a shuttle
 /// has flown all the way into the field, or once a handheld scanner or player stands right on top of it.
-/// Player screens are only affected by fields with <see cref="DistortionFieldComponent.AffectPlayers"/> set.
+/// Player screens are only affected by fields with <see cref="DistortionFieldComponent.AffectPlayers"/> set,
+/// and separately get a small amount of the same static from <see cref="RadiationDistortionSystem"/>
+/// while taking radiation damage.
 /// </summary>
 public sealed class DistortionFieldSystem : EntitySystem
 {
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly SharedTransformSystem _xform = default!;
+    [Dependency] private readonly RadiationDistortionSystem _radiationDistortion = default!;
 
     private const float ScanInterval = 0.5f;
 
@@ -223,6 +226,10 @@ public sealed class DistortionFieldSystem : EntitySystem
                         bestOuter = outerIntensity;
                 }
             }
+
+            var radiationIntensity = _radiationDistortion.GetIntensity(uid);
+            if (radiationIntensity > best)
+                best = radiationIntensity;
 
             if (best > 0f || bestOuter > 0f)
             {
