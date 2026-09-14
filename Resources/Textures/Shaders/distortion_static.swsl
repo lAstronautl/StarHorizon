@@ -26,15 +26,18 @@ void fragment() {
 
     // Re-roll the noise in discrete steps (like a TV picking up interference) instead of
     // drifting smoothly with TIME, so it actually flickers rather than looking like a wave.
-    highp float frame = floor(TIME * 20.0);
+    // Kept slow and the flicker band narrow (below) to stay well clear of photosensitive
+    // epilepsy triggers - no fast, high-contrast full-screen flashing.
+    highp float frame = floor(TIME * 6.0);
     highp vec2 noiseSeed = FRAGCOORD.xy * SCREEN_PIXEL_SIZE + frame;
     highp vec2 noiseValue = zRandom(noiseSeed);
     highp vec3 noiseColor = vec3(noiseValue.x);
 
-    // Random flicker on top of the base intensity - interference isn't a steady signal,
-    // it cuts in and out.
-    highp float flicker = zRandom(vec2(frame * 0.137, 7.0)).x;
-    highp float flickerAmount = mix(1.0, flicker, Intensity * 0.6);
+    // Gentle flicker on the overall opacity - interference isn't perfectly steady, but this
+    // stays slow and narrow-range rather than strobing between fully on and off.
+    highp float flickerFrame = floor(TIME * 2.5);
+    highp float flickerRandom = zRandom(vec2(flickerFrame * 0.137, 7.0)).x;
+    highp float flickerAmount = mix(0.9, 1.0, flickerRandom);
 
     highp float alpha = vignette * Intensity * flickerAmount * MaxAlpha;
 
