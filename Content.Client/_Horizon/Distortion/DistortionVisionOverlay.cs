@@ -40,6 +40,11 @@ public sealed class DistortionVisionOverlay : Overlay
     {
         IoCManager.InjectDependencies(this);
 
+        // Draw after other vision-affecting overlays (blurry vision, drunk, night vision,
+        // the AI eye, etc. all default to 0) so the cataracts pass warps whatever they've
+        // already drawn too, instead of getting drawn over and hidden by them.
+        ZIndex = 20;
+
         _innerShader = _prototypeManager.Index(DistortionStaticShader).InstanceUnique();
 
         _outerShader = _prototypeManager.Index(DistortionStaticShader).InstanceUnique();
