@@ -9,9 +9,10 @@ namespace Content.Client._Horizon.Distortion;
 /// <summary>
 /// Draws a vignette of static around the edges of the screen for a player standing on a
 /// shuttle caught in a distortion field that has its <c>AffectPlayers</c> option enabled.
-/// Stays semi-transparent and leaves a clear patch in the middle so the player can still
-/// see something ahead of them, even at full intensity. Layered with a fainter, farther-
-/// reaching ring confined to the very edges of the screen as an early warning.
+/// Starts semi-transparent with a clear patch in the middle, but the closer the player
+/// gets the more it closes in and darkens, until it fully blinds them at max intensity.
+/// Layered with a fainter, farther-reaching ring confined to the very edges of the screen
+/// as an early warning.
 /// </summary>
 public sealed class DistortionVisionOverlay : Overlay
 {
@@ -33,6 +34,10 @@ public sealed class DistortionVisionOverlay : Overlay
         IoCManager.InjectDependencies(this);
 
         _innerShader = _prototypeManager.Index(DistortionStaticShader).InstanceUnique();
+        // Unlike the console overlay, the player's own screen should be able to go fully
+        // blind at max intensity - close the peephole all the way and let the noise go opaque.
+        _innerShader.SetParameter("MinClearRadius", 0.0f);
+        _innerShader.SetParameter("MaxAlpha", 1.0f);
 
         _outerShader = _prototypeManager.Index(DistortionStaticShader).InstanceUnique();
         _outerShader.SetParameter("MinClearRadius", 0.75f);
