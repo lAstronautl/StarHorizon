@@ -1,15 +1,16 @@
 using System.Numerics;
 using Content.Server.Shuttles.Components;
 using Content.Shared._Horizon.Distortion.Components;
+using Content.Shared.Shuttles.Components;
 using Robust.Shared.Physics.Systems;
 
 namespace Content.Server._Horizon.Distortion;
 
 /// <summary>
-/// Scans for shuttles near <see cref="DistortionFieldComponent"/> sources and glitches
-/// out their consoles with static, scaling with proximity - full noise once the shuttle
-/// has flown all the way into the field. Optionally also puts the noise on the screens
-/// of players aboard the affected shuttle.
+/// Scans for shuttles and radar/mass-scanner consoles near <see cref="DistortionFieldComponent"/>
+/// sources and glitches them out with static, scaling with proximity - full noise once a shuttle
+/// has flown all the way into the field, or once a handheld scanner is right on top of it.
+/// Optionally also puts the noise on the screens of players aboard an affected shuttle.
 /// </summary>
 public sealed class DistortionFieldSystem : EntitySystem
 {
@@ -28,8 +29,6 @@ public sealed class DistortionFieldSystem : EntitySystem
             return;
         _accumulator -= ScanInterval;
 
-        var affectedGrids = new Dictionary<EntityUid, (float Intensity, bool AffectPlayers)>();
-
         var fieldQuery = EntityQueryEnumerator<DistortionFieldComponent, TransformComponent>();
         var fields = new List<(TransformComponent Xform, DistortionFieldComponent Comp)>();
         while (fieldQuery.MoveNext(out _, out var comp, out var xform))
@@ -37,79 +36,148 @@ public sealed class DistortionFieldSystem : EntitySystem
             fields.Add((xform, comp));
         }
 
+        var affectedEntities = new Dictionary<EntityUid, (float Intensity, bool AffectPlayers)>();
+
         if (fields.Count > 0)
         {
-            var shuttleQuery = EntityQueryEnumerator<ShuttleComponent, TransformComponent>();
-            while (shuttleQuery.MoveNext(out var gridUid, out _, out var gridXform))
-            {
-                if (gridXform.MapUid == null)
-                    continue;
-
-                var gridAabb = _physics.GetWorldAABB(gridUid);
-                var best = 0f;
-                var affectPlayers = false;
-
-                foreach (var (fieldXform, field) in fields)
-                {
-                    if (fieldXform.MapUid != gridXform.MapUid || field.Range <= 0f)
-                        continue;
-
-                    var fieldPos = _xform.GetWorldPosition(fieldXform);
-                    var closest = Vector2.Clamp(fieldPos, gridAabb.BottomLeft, gridAabb.TopRight);
-                    var distance = (fieldPos - closest).Length();
-
-                    var intensity = Math.Clamp(1f - distance / field.Range, 0f, 1f);
-                    if (intensity <= 0f)
-                        continue;
-
-                    if (intensity > best)
-                        best = intensity;
-
-                    if (field.AffectPlayers)
-                        affectPlayers = true;
-                }
-
-                if (best > 0f)
-                    affectedGrids[gridUid] = (best, affectPlayers);
-            }
+            ScanShuttleGrids(fields, affectedEntities);
+            ScanRadarConsoles(fields, affectedEntities);
         }
 
-        ApplyGridEffects(affectedGrids);
+        ApplyEffects(affectedEntities);
     }
 
-    private void ApplyGridEffects(Dictionary<EntityUid, (float Intensity, bool AffectPlayers)> affectedGrids)
+    // Whole-ship coverage: intensity is based on the field's distance to the shuttle's hull,
+    // so the entire ship glitches out once the field is anywhere inside it.
+    private void ScanShuttleGrids(
+        List<(TransformComponent Xform, DistortionFieldComponent Comp)> fields,
+        Dictionary<EntityUid, (float Intensity, bool AffectPlayers)> affectedEntities)
+    {
+        var shuttleQuery = EntityQueryEnumerator<ShuttleComponent, TransformComponent>();
+        while (shuttleQuery.MoveNext(out var gridUid, out _, out var gridXform))
+        {
+            if (gridXform.MapUid == null)
+                continue;
+
+            var gridAabb = _physics.GetWorldAABB(gridUid);
+            var best = 0f;
+            var affectPlayers = false;
+
+            foreach (var (fieldXform, field) in fields)
+            {
+                if (fieldXform.MapUid != gridXform.MapUid || field.Range <= 0f)
+                    continue;
+
+                var fieldPos = _xform.GetWorldPosition(fieldXform);
+                var closest = Vector2.Clamp(fieldPos, gridAabb.BottomLeft, gridAabb.TopRight);
+                var distance = (fieldPos - closest).Length();
+
+                var intensity = Math.Clamp(1f - distance / field.Range, 0f, 1f);
+                if (intensity <= 0f)
+                    continue;
+
+                if (intensity > best)
+                    best = intensity;
+
+                if (field.AffectPlayers)
+                    affectPlayers = true;
+            }
+
+            if (best > 0f)
+                MergeBest(affectedEntities, gridUid, best, affectPlayers);
+        }
+    }
+
+    // Per-device coverage: also glitches out standalone radar consoles and handheld mass
+    // scanners based on their own exact position, so a mass scanner picks up interference
+    // just from being carried near a field, without needing to be aboard a shuttle.
+    private void ScanRadarConsoles(
+        List<(TransformComponent Xform, DistortionFieldComponent Comp)> fields,
+        Dictionary<EntityUid, (float Intensity, bool AffectPlayers)> affectedEntities)
+    {
+        var consoleQuery = EntityQueryEnumerator<RadarConsoleComponent, TransformComponent>();
+        while (consoleQuery.MoveNext(out var consoleUid, out _, out var consoleXform))
+        {
+            if (consoleXform.MapUid == null)
+                continue;
+
+            var consolePos = _xform.GetWorldPosition(consoleXform);
+            var best = 0f;
+            var affectPlayers = false;
+
+            foreach (var (fieldXform, field) in fields)
+            {
+                if (fieldXform.MapUid != consoleXform.MapUid || field.Range <= 0f)
+                    continue;
+
+                var fieldPos = _xform.GetWorldPosition(fieldXform);
+                var distance = (fieldPos - consolePos).Length();
+
+                var intensity = Math.Clamp(1f - distance / field.Range, 0f, 1f);
+                if (intensity <= 0f)
+                    continue;
+
+                if (intensity > best)
+                    best = intensity;
+
+                if (field.AffectPlayers)
+                    affectPlayers = true;
+            }
+
+            if (best > 0f)
+                MergeBest(affectedEntities, consoleUid, best, affectPlayers);
+        }
+    }
+
+    private static void MergeBest(
+        Dictionary<EntityUid, (float Intensity, bool AffectPlayers)> affectedEntities,
+        EntityUid uid,
+        float intensity,
+        bool affectPlayers)
+    {
+        if (affectedEntities.TryGetValue(uid, out var existing))
+        {
+            affectedEntities[uid] = (Math.Max(existing.Intensity, intensity), existing.AffectPlayers || affectPlayers);
+        }
+        else
+        {
+            affectedEntities[uid] = (intensity, affectPlayers);
+        }
+    }
+
+    private void ApplyEffects(Dictionary<EntityUid, (float Intensity, bool AffectPlayers)> affectedEntities)
     {
         var noLongerAffected = new List<EntityUid>();
 
         var existing = EntityQueryEnumerator<DistortionAffectedComponent>();
-        while (existing.MoveNext(out var gridUid, out var affected))
+        while (existing.MoveNext(out var uid, out var affected))
         {
-            if (affectedGrids.Remove(gridUid, out var data))
+            if (affectedEntities.Remove(uid, out var data))
             {
                 if (!MathHelper.CloseTo(affected.Intensity, data.Intensity) || affected.AffectPlayers != data.AffectPlayers)
                 {
                     affected.Intensity = data.Intensity;
                     affected.AffectPlayers = data.AffectPlayers;
-                    Dirty(gridUid, affected);
+                    Dirty(uid, affected);
                 }
             }
             else
             {
-                noLongerAffected.Add(gridUid);
+                noLongerAffected.Add(uid);
             }
         }
 
-        foreach (var gridUid in noLongerAffected)
+        foreach (var uid in noLongerAffected)
         {
-            RemComp<DistortionAffectedComponent>(gridUid);
+            RemComp<DistortionAffectedComponent>(uid);
         }
 
-        foreach (var (gridUid, data) in affectedGrids)
+        foreach (var (uid, data) in affectedEntities)
         {
-            var affected = EnsureComp<DistortionAffectedComponent>(gridUid);
+            var affected = EnsureComp<DistortionAffectedComponent>(uid);
             affected.Intensity = data.Intensity;
             affected.AffectPlayers = data.AffectPlayers;
-            Dirty(gridUid, affected);
+            Dirty(uid, affected);
         }
 
         UpdatePlayerVision();

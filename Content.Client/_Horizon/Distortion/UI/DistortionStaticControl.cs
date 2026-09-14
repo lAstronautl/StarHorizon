@@ -50,11 +50,21 @@ public sealed class DistortionStaticControl : Control
         if (Console is not { } console || !_entManager.EntityExists(console))
             return 0f;
 
-        if (!_entManager.TryGetComponent(console, out TransformComponent? xform) || xform.GridUid is not { } grid)
-            return 0f;
+        // The console itself may be directly affected (e.g. a handheld mass scanner
+        // picking up interference on its own), or it may be a console mounted on a
+        // shuttle whose whole grid is affected.
+        var intensity = 0f;
 
-        return _entManager.TryGetComponent(grid, out DistortionAffectedComponent? affected)
-            ? affected.Intensity
-            : 0f;
+        if (_entManager.TryGetComponent(console, out DistortionAffectedComponent? direct))
+            intensity = direct.Intensity;
+
+        if (_entManager.TryGetComponent(console, out TransformComponent? xform) &&
+            xform.GridUid is { } grid &&
+            _entManager.TryGetComponent(grid, out DistortionAffectedComponent? affected))
+        {
+            intensity = MathF.Max(intensity, affected.Intensity);
+        }
+
+        return intensity;
     }
 }
