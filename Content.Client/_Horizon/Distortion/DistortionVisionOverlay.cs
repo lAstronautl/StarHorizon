@@ -11,13 +11,14 @@ namespace Content.Client._Horizon.Distortion;
 /// shuttle caught in a distortion field that has its <c>AffectPlayers</c> option enabled.
 /// Stays semi-transparent and leaves a clear patch in the middle so the player can still
 /// see something ahead of them, even at full intensity. Layered with a fainter, farther-
-/// reaching ring confined to the very edges of the screen as an early warning, and a
-/// wavy screen warp (like the Drunk effect) that kicks in up close.
+/// reaching ring confined to the very edges of the screen as an early warning, and the
+/// Cataracts shader (same hazy, swimmy distortion used for blurry vision and the
+/// underwater effect) up close, for a disorienting, drug-like wobble.
 /// </summary>
 public sealed class DistortionVisionOverlay : Overlay
 {
     private static readonly ProtoId<ShaderPrototype> DistortionStaticShader = "DistortionStatic";
-    private static readonly ProtoId<ShaderPrototype> DistortionWarpShader = "DistortionWarp";
+    private static readonly ProtoId<ShaderPrototype> CataractsShader = "Cataracts";
 
     [Dependency] private readonly IEntityManager _entityManager = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
@@ -28,9 +29,12 @@ public sealed class DistortionVisionOverlay : Overlay
 
     private readonly ShaderInstance _innerShader;
     private readonly ShaderInstance _outerShader;
-    private readonly ShaderInstance _warpShader;
+    private readonly ShaderInstance _cataractsShader;
     private float _intensity;
     private float _outerIntensity;
+
+    // Caps how strong the cataracts distortion/cloudiness gets at Intensity = 1.
+    private const float MaxWarpStrength = 0.18f;
 
     public DistortionVisionOverlay()
     {
@@ -44,7 +48,7 @@ public sealed class DistortionVisionOverlay : Overlay
         _outerShader.SetParameter("EdgeWidth", 0.25f);
         _outerShader.SetParameter("MaxAlpha", 0.45f);
 
-        _warpShader = _prototypeManager.Index(DistortionWarpShader).InstanceUnique();
+        _cataractsShader = _prototypeManager.Index(CataractsShader).InstanceUnique();
     }
 
     protected override bool BeforeDraw(in OverlayDrawArgs args)
@@ -64,13 +68,27 @@ public sealed class DistortionVisionOverlay : Overlay
 
     protected override void Draw(in OverlayDrawArgs args)
     {
-        var worldHandle = args.WorldHandle;
+        if (ScreenTexture == null)
+            return;
 
-        if (_intensity > 0f && ScreenTexture != null)
+        var worldHandle = args.WorldHandle;
+        var playerEntity = _playerManager.LocalSession?.AttachedEntity;
+
+        if (_intensity > 0f)
         {
-            _warpShader.SetParameter("SCREEN_TEXTURE", ScreenTexture);
-            _warpShader.SetParameter("Intensity", _intensity);
-            worldHandle.UseShader(_warpShader);
+            var zoom = 1.0f;
+            if (_entityManager.TryGetComponent<EyeComponent>(playerEntity, out var eyeComponent))
+                zoom = eyeComponent.Zoom.X;
+
+            var strength = _intensity * MaxWarpStrength;
+
+            _cataractsShader.SetParameter("SCREEN_TEXTURE", ScreenTexture);
+            _cataractsShader.SetParameter("LIGHT_TEXTURE", args.Viewport.LightRenderTarget.Texture);
+            _cataractsShader.SetParameter("Zoom", zoom);
+            _cataractsShader.SetParameter("DistortionScalar", MathF.Pow(strength, 2f));
+            _cataractsShader.SetParameter("CloudinessScalar", MathF.Pow(strength, 2f));
+
+            worldHandle.UseShader(_cataractsShader);
             worldHandle.DrawRect(args.WorldBounds, Color.White);
         }
 

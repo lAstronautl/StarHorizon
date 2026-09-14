@@ -23,11 +23,4 @@ public sealed partial class DistortionAffectedComponent : Component
     /// </summary>
     [DataField, AutoNetworkedField, ViewVariables(VVAccess.ReadOnly)]
     public float OuterIntensity;
-
-    /// <summary>
-    /// Whether the source(s) affecting this shuttle also want the noise shown
-    /// on the screens of players aboard it.
-    /// </summary>
-    [DataField, AutoNetworkedField, ViewVariables(VVAccess.ReadOnly)]
-    public bool AffectPlayers;
 }

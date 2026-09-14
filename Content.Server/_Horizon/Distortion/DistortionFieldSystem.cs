@@ -8,10 +8,10 @@ using Robust.Shared.Player;
 namespace Content.Server._Horizon.Distortion;
 
 /// <summary>
-/// Scans for shuttles and radar/mass-scanner consoles near <see cref="DistortionFieldComponent"/>
+/// Scans for shuttles, radar/mass-scanner consoles, and players near <see cref="DistortionFieldComponent"/>
 /// sources and glitches them out with static, scaling with proximity - full noise once a shuttle
-/// has flown all the way into the field, or once a handheld scanner is right on top of it.
-/// Optionally also puts the noise on the screens of players aboard an affected shuttle.
+/// has flown all the way into the field, or once a handheld scanner or player stands right on top of it.
+/// Player screens are only affected by fields with <see cref="DistortionFieldComponent.AffectPlayers"/> set.
 /// </summary>
 public sealed class DistortionFieldSystem : EntitySystem
 {
@@ -41,7 +41,7 @@ public sealed class DistortionFieldSystem : EntitySystem
             fields.Add((xform, comp));
         }
 
-        var affectedEntities = new Dictionary<EntityUid, (float Intensity, float OuterIntensity, bool AffectPlayers)>();
+        var affectedEntities = new Dictionary<EntityUid, (float Intensity, float OuterIntensity)>();
 
         if (fields.Count > 0)
         {
@@ -50,13 +50,14 @@ public sealed class DistortionFieldSystem : EntitySystem
         }
 
         ApplyEffects(affectedEntities);
+        ScanPlayers(fields);
     }
 
     // Whole-ship coverage: intensity is based on the field's distance to the shuttle's hull,
     // so the entire ship glitches out once the field is anywhere inside it.
     private void ScanShuttleGrids(
         List<(TransformComponent Xform, DistortionFieldComponent Comp)> fields,
-        Dictionary<EntityUid, (float Intensity, float OuterIntensity, bool AffectPlayers)> affectedEntities)
+        Dictionary<EntityUid, (float Intensity, float OuterIntensity)> affectedEntities)
     {
         var shuttleQuery = EntityQueryEnumerator<ShuttleComponent, TransformComponent>();
         while (shuttleQuery.MoveNext(out var gridUid, out _, out var gridXform))
@@ -67,7 +68,6 @@ public sealed class DistortionFieldSystem : EntitySystem
             var gridAabb = _physics.GetWorldAABB(gridUid);
             var best = 0f;
             var bestOuter = 0f;
-            var affectPlayers = false;
 
             foreach (var (fieldXform, field) in fields)
             {
@@ -86,13 +86,10 @@ public sealed class DistortionFieldSystem : EntitySystem
 
                 if (outerIntensity > bestOuter)
                     bestOuter = outerIntensity;
-
-                if (intensity > 0f && field.AffectPlayers)
-                    affectPlayers = true;
             }
 
             if (best > 0f || bestOuter > 0f)
-                MergeBest(affectedEntities, gridUid, best, bestOuter, affectPlayers);
+                MergeBest(affectedEntities, gridUid, best, bestOuter);
         }
     }
 
@@ -101,7 +98,7 @@ public sealed class DistortionFieldSystem : EntitySystem
     // just from being carried near a field, without needing to be aboard a shuttle.
     private void ScanRadarConsoles(
         List<(TransformComponent Xform, DistortionFieldComponent Comp)> fields,
-        Dictionary<EntityUid, (float Intensity, float OuterIntensity, bool AffectPlayers)> affectedEntities)
+        Dictionary<EntityUid, (float Intensity, float OuterIntensity)> affectedEntities)
     {
         var consoleQuery = EntityQueryEnumerator<RadarConsoleComponent, TransformComponent>();
         while (consoleQuery.MoveNext(out var consoleUid, out _, out var consoleXform))
@@ -112,7 +109,6 @@ public sealed class DistortionFieldSystem : EntitySystem
             var consolePos = _xform.GetWorldPosition(consoleXform);
             var best = 0f;
             var bestOuter = 0f;
-            var affectPlayers = false;
 
             foreach (var (fieldXform, field) in fields)
             {
@@ -130,37 +126,32 @@ public sealed class DistortionFieldSystem : EntitySystem
 
                 if (outerIntensity > bestOuter)
                     bestOuter = outerIntensity;
-
-                if (intensity > 0f && field.AffectPlayers)
-                    affectPlayers = true;
             }
 
             if (best > 0f || bestOuter > 0f)
-                MergeBest(affectedEntities, consoleUid, best, bestOuter, affectPlayers);
+                MergeBest(affectedEntities, consoleUid, best, bestOuter);
         }
     }
 
     private static void MergeBest(
-        Dictionary<EntityUid, (float Intensity, float OuterIntensity, bool AffectPlayers)> affectedEntities,
+        Dictionary<EntityUid, (float Intensity, float OuterIntensity)> affectedEntities,
         EntityUid uid,
         float intensity,
-        float outerIntensity,
-        bool affectPlayers)
+        float outerIntensity)
     {
         if (affectedEntities.TryGetValue(uid, out var existing))
         {
             affectedEntities[uid] = (
                 Math.Max(existing.Intensity, intensity),
-                Math.Max(existing.OuterIntensity, outerIntensity),
-                existing.AffectPlayers || affectPlayers);
+                Math.Max(existing.OuterIntensity, outerIntensity));
         }
         else
         {
-            affectedEntities[uid] = (intensity, outerIntensity, affectPlayers);
+            affectedEntities[uid] = (intensity, outerIntensity);
         }
     }
 
-    private void ApplyEffects(Dictionary<EntityUid, (float Intensity, float OuterIntensity, bool AffectPlayers)> affectedEntities)
+    private void ApplyEffects(Dictionary<EntityUid, (float Intensity, float OuterIntensity)> affectedEntities)
     {
         var noLongerAffected = new List<EntityUid>();
 
@@ -170,12 +161,10 @@ public sealed class DistortionFieldSystem : EntitySystem
             if (affectedEntities.Remove(uid, out var data))
             {
                 if (!MathHelper.CloseTo(affected.Intensity, data.Intensity) ||
-                    !MathHelper.CloseTo(affected.OuterIntensity, data.OuterIntensity) ||
-                    affected.AffectPlayers != data.AffectPlayers)
+                    !MathHelper.CloseTo(affected.OuterIntensity, data.OuterIntensity))
                 {
                     affected.Intensity = data.Intensity;
                     affected.OuterIntensity = data.OuterIntensity;
-                    affected.AffectPlayers = data.AffectPlayers;
                     Dirty(uid, affected);
                 }
             }
@@ -195,29 +184,53 @@ public sealed class DistortionFieldSystem : EntitySystem
             var affected = EnsureComp<DistortionAffectedComponent>(uid);
             affected.Intensity = data.Intensity;
             affected.OuterIntensity = data.OuterIntensity;
-            affected.AffectPlayers = data.AffectPlayers;
             Dirty(uid, affected);
         }
-
-        UpdatePlayerVision();
     }
 
-    private void UpdatePlayerVision()
+    // Per-player coverage: computed straight from each player's own distance to a field
+    // (only fields with AffectPlayers set), independent of the whole-grid effect above -
+    // otherwise everyone aboard a shuttle would get the same, near-maximum intensity the
+    // moment any part of the ship entered a small field, no matter how far into the ship
+    // they actually are.
+    private void ScanPlayers(List<(TransformComponent Xform, DistortionFieldComponent Comp)> fields)
     {
-        var affected = GetEntityQuery<DistortionAffectedComponent>();
         var mobQuery = EntityQueryEnumerator<ActorComponent, TransformComponent>();
-        while (mobQuery.MoveNext(out var uid, out _, out var xform))
+        while (mobQuery.MoveNext(out var uid, out _, out var mobXform))
         {
-            if (xform.GridUid is { } gridUid &&
-                affected.TryGetComponent(gridUid, out var data) &&
-                data.AffectPlayers)
+            var best = 0f;
+            var bestOuter = 0f;
+
+            if (mobXform.MapUid != null)
+            {
+                var mobPos = _xform.GetWorldPosition(mobXform);
+
+                foreach (var (fieldXform, field) in fields)
+                {
+                    if (!field.AffectPlayers || fieldXform.MapUid != mobXform.MapUid || field.Range <= 0f)
+                        continue;
+
+                    var fieldPos = _xform.GetWorldPosition(fieldXform);
+                    var distance = (fieldPos - mobPos).Length();
+
+                    var intensity = Math.Clamp(1f - distance / field.Range, 0f, 1f);
+                    var outerIntensity = Math.Clamp(1f - distance / (field.Range * OuterRangeMultiplier), 0f, 1f);
+
+                    if (intensity > best)
+                        best = intensity;
+
+                    if (outerIntensity > bestOuter)
+                        bestOuter = outerIntensity;
+                }
+            }
+
+            if (best > 0f || bestOuter > 0f)
             {
                 var vision = EnsureComp<DistortionVisionComponent>(uid);
-                if (!MathHelper.CloseTo(vision.Intensity, data.Intensity) ||
-                    !MathHelper.CloseTo(vision.OuterIntensity, data.OuterIntensity))
+                if (!MathHelper.CloseTo(vision.Intensity, best) || !MathHelper.CloseTo(vision.OuterIntensity, bestOuter))
                 {
-                    vision.Intensity = data.Intensity;
-                    vision.OuterIntensity = data.OuterIntensity;
+                    vision.Intensity = best;
+                    vision.OuterIntensity = bestOuter;
                     Dirty(uid, vision);
                 }
             }
