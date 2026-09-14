@@ -17,7 +17,7 @@ public sealed partial class DistortionFieldComponent : Component
     /// once the shuttle has flown all the way into the field.
     /// </summary>
     [DataField, AutoNetworkedField, ViewVariables(VVAccess.ReadWrite)]
-    public float Range = 20f;
+    public float Range = 2.5f;
 
     /// <summary>
     /// If true, the static also shows up on the screens of players aboard the
