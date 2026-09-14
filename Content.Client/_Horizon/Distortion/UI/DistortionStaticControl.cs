@@ -7,13 +7,13 @@ using Robust.Shared.Prototypes;
 namespace Content.Client._Horizon.Distortion.UI;
 
 /// <summary>
-/// Transparent overlay control that glitches out a shuttle console's screen with
-/// static, scaling with how close the shuttle's grid currently is to a
+/// Transparent overlay control that glitches out a shuttle console's screen with a
+/// vignette of static, scaling with how close the shuttle's grid currently is to a
 /// distortion field. Place it as the topmost layer over a console window's contents.
 /// </summary>
 public sealed class DistortionStaticControl : Control
 {
-    private static readonly ProtoId<ShaderPrototype> CameraStaticShader = "CameraStatic";
+    private static readonly ProtoId<ShaderPrototype> DistortionStaticShader = "DistortionStatic";
 
     [Dependency] private readonly IEntityManager _entManager = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
@@ -28,7 +28,7 @@ public sealed class DistortionStaticControl : Control
     public DistortionStaticControl()
     {
         IoCManager.InjectDependencies(this);
-        _shader = _proto.Index(CameraStaticShader).Instance();
+        _shader = _proto.Index(DistortionStaticShader).InstanceUnique();
         MouseFilter = MouseFilterMode.Ignore;
     }
 
@@ -40,8 +40,9 @@ public sealed class DistortionStaticControl : Control
         if (intensity <= 0f)
             return;
 
+        _shader.SetParameter("Intensity", intensity);
         handle.UseShader(_shader);
-        handle.DrawRect(PixelSizeBox, Color.White.WithAlpha(intensity));
+        handle.DrawRect(PixelSizeBox, Color.White);
         handle.UseShader(null);
     }
 

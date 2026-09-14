@@ -59,6 +59,13 @@
   path: "/Textures/Shaders/camera_static.swsl"
 
 - type: shader
+  id: DistortionStatic
+  kind: source
+  path: "/Textures/Shaders/distortion_static.swsl"
+  params:
+    Intensity: 0.0
+
+- type: shader
   id: Drunk
   kind: source
   path: "/Textures/Shaders/drunk.swsl"

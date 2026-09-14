@@ -7,12 +7,14 @@ using Robust.Shared.Prototypes;
 namespace Content.Client._Horizon.Distortion;
 
 /// <summary>
-/// Draws full-screen static for a player standing on a shuttle caught in a
-/// distortion field that has its <c>AffectPlayers</c> option enabled.
+/// Draws a vignette of static around the edges of the screen for a player standing on a
+/// shuttle caught in a distortion field that has its <c>AffectPlayers</c> option enabled.
+/// Stays semi-transparent and leaves a clear patch in the middle so the player can still
+/// see something ahead of them, even at full intensity.
 /// </summary>
 public sealed class DistortionVisionOverlay : Overlay
 {
-    private static readonly ProtoId<ShaderPrototype> CameraStaticShader = "CameraStatic";
+    private static readonly ProtoId<ShaderPrototype> DistortionStaticShader = "DistortionStatic";
 
     [Dependency] private readonly IEntityManager _entityManager = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
@@ -26,7 +28,7 @@ public sealed class DistortionVisionOverlay : Overlay
     public DistortionVisionOverlay()
     {
         IoCManager.InjectDependencies(this);
-        _shader = _prototypeManager.Index(CameraStaticShader).InstanceUnique();
+        _shader = _prototypeManager.Index(DistortionStaticShader).InstanceUnique();
     }
 
     protected override bool BeforeDraw(in OverlayDrawArgs args)
@@ -43,8 +45,9 @@ public sealed class DistortionVisionOverlay : Overlay
     protected override void Draw(in OverlayDrawArgs args)
     {
         var worldHandle = args.WorldHandle;
+        _shader.SetParameter("Intensity", _intensity);
         worldHandle.UseShader(_shader);
-        worldHandle.DrawRect(args.WorldBounds, Color.White.WithAlpha(_intensity));
+        worldHandle.DrawRect(args.WorldBounds, Color.White);
         worldHandle.UseShader(null);
     }
 }

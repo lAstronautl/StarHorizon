@@ -1,0 +1,26 @@
+// Vignette-shaped interference static: a clean "peephole" in the middle that
+// shrinks and gets noisier the stronger Intensity is, so there's always
+// something visible ahead even at full strength.
+
+uniform highp float Intensity; // 0..1
+
+void fragment() {
+    highp vec2 screenSize = vec2(1.0 / SCREEN_PIXEL_SIZE.x, 1.0 / SCREEN_PIXEL_SIZE.y);
+    highp vec2 center = screenSize * 0.5;
+    highp float minDimension = min(screenSize.x, screenSize.y);
+    highp vec2 diff = (FRAGCOORD.xy - center) / minDimension;
+    highp float dist = length(diff);
+
+    highp float clearRadius = mix(1.0, 0.2, Intensity);
+    highp float edgeRadius = clearRadius + 0.4;
+    highp float vignette = smoothstep(clearRadius, edgeRadius, dist);
+
+    highp vec2 noiseSeed = FRAGCOORD.xy * SCREEN_PIXEL_SIZE * sin(TIME * 0.6);
+    highp vec2 noiseValue = zRandom(noiseSeed);
+    highp vec3 noiseColor = vec3(noiseValue.x);
+
+    highp float maxAlpha = 0.8;
+    highp float alpha = vignette * Intensity * maxAlpha;
+
+    COLOR = vec4(noiseColor, alpha);
+}
