@@ -11,20 +11,24 @@ namespace Content.Client._Horizon.Distortion;
 /// shuttle caught in a distortion field that has its <c>AffectPlayers</c> option enabled.
 /// Stays semi-transparent and leaves a clear patch in the middle so the player can still
 /// see something ahead of them, even at full intensity. Layered with a fainter, farther-
-/// reaching ring confined to the very edges of the screen as an early warning.
+/// reaching ring confined to the very edges of the screen as an early warning, and a
+/// wavy screen warp (like the Drunk effect) that kicks in up close.
 /// </summary>
 public sealed class DistortionVisionOverlay : Overlay
 {
     private static readonly ProtoId<ShaderPrototype> DistortionStaticShader = "DistortionStatic";
+    private static readonly ProtoId<ShaderPrototype> DistortionWarpShader = "DistortionWarp";
 
     [Dependency] private readonly IEntityManager _entityManager = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
 
     public override OverlaySpace Space => OverlaySpace.WorldSpace;
+    public override bool RequestScreenTexture => true;
 
     private readonly ShaderInstance _innerShader;
     private readonly ShaderInstance _outerShader;
+    private readonly ShaderInstance _warpShader;
     private float _intensity;
     private float _outerIntensity;
 
@@ -39,6 +43,8 @@ public sealed class DistortionVisionOverlay : Overlay
         _outerShader.SetParameter("MaxClearRadius", 1.3f);
         _outerShader.SetParameter("EdgeWidth", 0.25f);
         _outerShader.SetParameter("MaxAlpha", 0.45f);
+
+        _warpShader = _prototypeManager.Index(DistortionWarpShader).InstanceUnique();
     }
 
     protected override bool BeforeDraw(in OverlayDrawArgs args)
@@ -59,6 +65,14 @@ public sealed class DistortionVisionOverlay : Overlay
     protected override void Draw(in OverlayDrawArgs args)
     {
         var worldHandle = args.WorldHandle;
+
+        if (_intensity > 0f && ScreenTexture != null)
+        {
+            _warpShader.SetParameter("SCREEN_TEXTURE", ScreenTexture);
+            _warpShader.SetParameter("Intensity", _intensity);
+            worldHandle.UseShader(_warpShader);
+            worldHandle.DrawRect(args.WorldBounds, Color.White);
+        }
 
         if (_outerIntensity > 0f)
         {

@@ -70,6 +70,13 @@
     MaxAlpha: 0.8
 
 - type: shader
+  id: DistortionWarp
+  kind: source
+  path: "/Textures/Shaders/distortion_warp.swsl"
+  params:
+    Intensity: 0.0
+
+- type: shader
   id: Drunk
   kind: source
   path: "/Textures/Shaders/drunk.swsl"

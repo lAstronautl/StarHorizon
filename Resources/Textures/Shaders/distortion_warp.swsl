@@ -1,0 +1,29 @@
+// Wavy screen warp, same idea as the Drunk shader - samples the screen with a
+// wobbling UV offset - so getting close to a distortion field feels like
+// the world itself is bending, on top of the static overlay.
+
+uniform sampler2D SCREEN_TEXTURE;
+uniform highp float Intensity; // 0..1
+
+const highp float TimeScale = 0.6;
+const highp float DistortionScale = 0.014;
+
+void fragment() {
+    highp float mod = mix(0.0, DistortionScale, Intensity);
+    highp vec2 coord = FRAGCOORD.xy * SCREEN_PIXEL_SIZE.xy;
+    highp float time = TIME * TimeScale;
+
+    highp vec2 offsetA = vec2(
+        (mod * 1.5) * sin(time * 1.7 + coord.y * 12.0),
+        (mod * 2.0) * cos(time * 1.3 - coord.x * 10.0)
+    );
+    highp vec4 texA = zTextureSpec(SCREEN_TEXTURE, coord + offsetA);
+
+    highp vec2 offsetB = vec2(
+        (mod * 1.0) * sin(time * 0.9 + 0.4),
+        (mod * 1.2) * cos(time * 1.1)
+    );
+    highp vec4 texB = zTextureSpec(SCREEN_TEXTURE, coord + offsetB);
+
+    COLOR = mix(texA, texB, 0.5);
+}
