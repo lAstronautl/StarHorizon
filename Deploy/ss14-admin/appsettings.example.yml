@@ -1,0 +1,52 @@
+# Template config for SS14.Admin (https://github.com/space-wizards/SS14.Admin).
+#
+# Copy this file to `appsettings.yml` next to docker-compose.yml, fill in
+# the placeholders below, and DO NOT commit the filled-in copy — it will
+# contain real secrets. `appsettings.yml` is gitignored for that reason.
+
+Serilog:
+  Using: ["Serilog.Sinks.Console"]
+  MinimumLevel:
+    Default: Information
+    Override:
+      SS14: Debug
+      Microsoft: "Warning"
+      Microsoft.Hosting.Lifetime: "Information"
+      Microsoft.AspNetCore: Warning
+      IdentityServer4: Warning
+  WriteTo:
+    - Name: Console
+      Args:
+        OutputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3} {SourceContext}] {Message:lj}{NewLine}{Exception}"
+  Enrich: ["FromLogContext"]
+
+ConnectionStrings:
+  # Same PostgreSQL database as the game server's [database] section in
+  # server_config.toml (pg_database "ss14"). Use a DEDICATED postgres role
+  # for SS14.Admin rather than reusing the game server's ss14_user —
+  # e.g. `CREATE USER ss14_admin WITH PASSWORD '...'; GRANT ALL ON DATABASE ss14 TO ss14_admin;`
+  DefaultConnection: "Server=database;Port=5432;Database=ss14;User Id=ss14_admin;Password=CHANGE_ME"
+
+# Domain SS14.Admin is hosted under.
+AllowedHosts: "admin.starhorizon.ru"
+
+# Internal listen address; the reverse proxy terminates TLS in front of this.
+urls: "http://0.0.0.0:8080/"
+
+# Leave commented out if hosting on its own subdomain (recommended: admin.starhorizon.ru).
+# PathBase: "/admin"
+
+# IPs/subnets allowed to reverse-proxy the site. Add the docker network's
+# subnet here when running the reverse proxy from another container.
+ForwardProxies:
+  - 127.0.0.1
+  - 172.16.0.0/12
+
+# OAuth client registered at https://account.spacestation14.com/Identity/Account/Manage/Developer
+# Callback URL to register: https://admin.starhorizon.ru/signin-oidc
+Auth:
+  Authority: "https://account.spacestation14.com/"
+  ClientId: "CHANGE_ME"
+  ClientSecret: "CHANGE_ME"
+
+authServer: "https://auth.spacestation14.com"

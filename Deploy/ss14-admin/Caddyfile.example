@@ -1,0 +1,7 @@
+admin.starhorizon.ru {
+    log {
+        output file /var/log/caddy/access-ss14-admin.log
+    }
+
+    reverse_proxy 127.0.0.1:27689
+}

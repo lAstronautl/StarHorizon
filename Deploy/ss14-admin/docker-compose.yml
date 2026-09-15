@@ -1,0 +1,22 @@
+services:
+  ss14_admin:
+    image: ghcr.io/space-wizards/ss14.admin:1
+    container_name: ss14_admin
+    user: "1654:1654"
+    volumes:
+      - ./appsettings.yml:/app/appsettings.yml:ro
+    ports:
+      # Bind only to localhost; the reverse proxy (nginx/Caddy) handles
+      # public TLS traffic and forwards to this port.
+      - "127.0.0.1:27689:8080"
+    restart: unless-stopped
+    networks:
+      - ss14_backend
+
+networks:
+  ss14_backend:
+    # Must be the same docker network the game server's PostgreSQL
+    # container ("database") is attached to, so SS14.Admin can resolve
+    # and reach it by service name.
+    external: true
+    name: starhorizon_default
