@@ -158,6 +158,42 @@ def direction_of(atom: dmmparser.Atom) -> int:
         return DEFAULT_DIR
 
 
+def _pixel(atom: dmmparser.Atom, name: str) -> float:
+    value = atom.vars.get(name, 0) or 0
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def pixel_direction_of(atom: dmmparser.Atom) -> int | None:
+    """Which wall a legacy wall mount was shoved against, going by its own
+    pixel_x/pixel_y instead of its dir var.
+
+    Before the /directional subtype refactor (see MAPPING_DIRECTIONAL_HELPERS
+    in tgstation's code/__DEFINES/directional.dm), a mapper wall-mounted an
+    object by hand-setting pixel_x/pixel_y and left dir at its default -- and
+    ruins in particular still do this: on this repo's ruin maps, /obj/
+    structure/mirror sits at dir=SOUTH (the bare default) for every single
+    instance while its pixel offset visibly varies per instance. The engine
+    itself agrees dir isn't it: /obj/proc/get_turfs_to_mount_on() (code/
+    datums/components/atom_mounted.dm) locates the wall from pixel_x/pixel_y
+    at Initialize, with the same 16px (half an icon) threshold used here.
+    Returns None when neither axis clears that threshold -- nothing to go on.
+    """
+    px, py = _pixel(atom, "pixel_x"), _pixel(atom, "pixel_y")
+    if abs(px) >= abs(py):
+        if px > 16:
+            return mapping_rules.EAST
+        if px < -16:
+            return mapping_rules.WEST
+    if py > 16:
+        return mapping_rules.NORTH
+    if py < -16:
+        return mapping_rules.SOUTH
+    return None
+
+
 _HEX_COLOR = re.compile(r"^#?([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$")
 
 
@@ -345,18 +381,25 @@ def walk(
                     variant = 0 if variant_mode == "zero" else tile_variant(tile_x, tile_y, variants)
                     builder.set_tile(tile_x, tile_y, rule.tile, variant)
 
-                # A dir on the dmm atom does not always mean "facing" -- a
-                # disposal pipe segment with a diagonal dir is BYOND's way of
-                # saying "this is a bend", a different prototype entirely. See
-                # EntityRule.by_dir.
-                variant_rule = rule.by_dir.get(direction)
-                entities = variant_rule.entities if variant_rule is not None else rule.entities
-                if variant_rule is not None and variant_rule.direction is not None:
-                    facing = variant_rule.direction
-                elif rule.direction is not None:
-                    facing = rule.direction
+                if rule.auto_wall:
+                    # wall: auto -- the wall side isn't fixed by the rule, it
+                    # is worked out per instance (see pixel_direction_of()).
+                    entities = rule.entities
+                    wall_side = pixel_direction_of(atom) or direction
+                    facing = mapping_rules.OPPOSITE_DIR.get(wall_side, wall_side)
                 else:
-                    facing = direction
+                    # A dir on the dmm atom does not always mean "facing" -- a
+                    # disposal pipe segment with a diagonal dir is BYOND's way of
+                    # saying "this is a bend", a different prototype entirely. See
+                    # EntityRule.by_dir.
+                    variant_rule = rule.by_dir.get(direction)
+                    entities = variant_rule.entities if variant_rule is not None else rule.entities
+                    if variant_rule is not None and variant_rule.direction is not None:
+                        facing = variant_rule.direction
+                    elif rule.direction is not None:
+                        facing = rule.direction
+                    else:
+                        facing = direction
 
                 # SS13 leaves a wall-mounted object on the room's floor tile; SS14
                 # embeds it in the wall's own tile instead. Walk one tile against

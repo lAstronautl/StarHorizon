@@ -271,6 +271,71 @@ def check_orientation(mapping_set) -> Result:
     return Result("orientation: wall vs dir", not problems, "; ".join(problems) or "wall inverts, dir does not")
 
 
+def check_pixel_direction() -> Result:
+    """wall: auto (EntityRule.auto_wall) -- a legacy wall mount whose dir is
+    stuck at its default and whose real wall side only shows up in
+    pixel_x/pixel_y. Confirmed against this repo's own ruin maps: every
+    /obj/structure/mirror instance sits at dir=SOUTH (untouched default)
+    while pixel_x/pixel_y visibly differ per instance -- and against
+    tgstation's own /obj/proc/get_turfs_to_mount_on(), which locates the wall
+    the same way, off pixel_x/pixel_y with the same 16px threshold."""
+    dmm2yml = dmm2yml_module()
+    problems = []
+
+    cases = [
+        ({"pixel_y": 24}, mapping_rules.NORTH, "north push"),
+        ({"pixel_y": -24}, mapping_rules.SOUTH, "south push"),
+        ({"pixel_x": 24}, mapping_rules.EAST, "east push"),
+        ({"pixel_x": -24}, mapping_rules.WEST, "west push"),
+        ({"pixel_x": -26, "pixel_y": 8}, mapping_rules.WEST, "larger axis wins when both are set"),
+        ({"pixel_x": 8, "pixel_y": 8}, None, "neither axis clears the 16px threshold"),
+        ({}, None, "no pixel offset at all"),
+    ]
+    for extra_vars, expected, description in cases:
+        atom = dmmparser.Atom(path="/obj/structure/mirror", vars=dict(extra_vars))
+        got = dmm2yml.pixel_direction_of(atom)
+        if got != expected:
+            problems.append(f"{description}: {extra_vars} -> {got!r}, expected {expected!r}")
+
+    # End to end: a mirror stuck at dir=SOUTH (the bare default -- as every
+    # instance on this repo's own ruin maps is) but pushed east by pixel_x
+    # must still end up embedded in the EAST wall's tile, facing WEST (away
+    # from it) -- not south, and not left floating on the floor tile.
+    mapping_set = mapping_rules.MappingSet(
+        entities={"/obj/structure/mirror": mapping_rules.EntityRule(
+            entities=["Mirror"], auto_wall=True, on_wall=True,
+        )}
+    )
+    fixture = '"aa" = (\n/obj/structure/mirror{\n\tpixel_x = 24\n\t},\n/turf/open/floor/iron,\n/area/station)\n\n(1,1,1) = {"\naa\n"}\n'
+    with tempfile.TemporaryDirectory() as directory:
+        path = os.path.join(directory, "fixture.dmm")
+        with open(path, "w", encoding="utf-8") as handle:
+            handle.write(fixture)
+        dmm = dmmparser.parse(path)
+
+    template = yaml.safe_load(
+        open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "mapping", "grid_template.yml"),
+             encoding="utf-8")
+    )
+    builder = ss14map.MapBuilder(template["map_entity"], template["grid_entity"], "0.0.0")
+    dmm2yml.walk(dmm, mapping_set, None, 1, builder, "deterministic")
+
+    if len(builder.entities) != 1:
+        problems.append(f"expected exactly 1 entity, got {len(builder.entities)}")
+    else:
+        placed = builder.entities[0]
+        if (placed.x, placed.y) != (1.5, 0.5):
+            problems.append(f"position {(placed.x, placed.y)}, expected (1.5, 0.5) (shifted onto the east wall's tile)")
+        if placed.rotation != ss14map.rotation_for_dir(mapping_rules.WEST):
+            problems.append(f"rotation {placed.rotation}, expected facing west (away from the east wall)")
+
+    return Result(
+        "orientation: wall: auto derives the wall side from pixel_x/pixel_y",
+        not problems,
+        "; ".join(problems) or f"{len(cases)} pixel_direction_of cases, plus one end-to-end mirror placement",
+    )
+
+
 def check_decal_corners(mapping_set) -> Result:
     """A corner decal's dir names the edge it touches, not the quadrant its
     accent sits in -- those are diagonally opposite. See the comment at the
@@ -916,6 +981,7 @@ def run(repo_root: str, mapping_dir: str, prototypes_dir: str) -> list[Result]:
         ("rules: exact, inherited, ignored", lambda: check_rules(mapping_set)),
         ("problems: one line per path", lambda: check_problem_reporting(mapping_set, index)),
         ("orientation: wall vs dir", lambda: check_orientation(mapping_set)),
+        ("orientation: wall: auto derives the wall side from pixel_x/pixel_y", lambda: check_pixel_direction()),
         ("decals: corner accents match their quadrant", lambda: check_decal_corners(mapping_set)),
         ("decals: line edges match their sprite", lambda: check_decal_line_edges(mapping_set, prototypes_dir)),
         ("decals: per-instance color= overrides the rule default", lambda: check_decal_color_override()),

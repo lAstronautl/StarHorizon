@@ -112,6 +112,10 @@
 /obj/machinery/firealarm/directional/south: {entity: FireAlarm, wall: south, onWall: true}
 /obj/machinery/firealarm/directional/east: {entity: FireAlarm, wall: east, onWall: true}
 /obj/machinery/firealarm/directional/west: {entity: FireAlarm, wall: west, onWall: true}
+# Bare (pre-/directional-refactor) placement, seen on ruin maps: dir is
+# frequently left at its default and does not track the wall side; wall:
+# auto reads it from pixel_x/pixel_y instead (see pixel_direction_of()).
+/obj/machinery/firealarm: {entity: FireAlarm, wall: auto, onWall: true}
 
 /obj/machinery/light/directional/north: {entity: Poweredlight, wall: north}
 /obj/machinery/light/directional/south: {entity: Poweredlight, wall: south}
@@ -162,6 +166,10 @@
 /obj/structure/extinguisher_cabinet/directional/south: {entity: ExtinguisherCabinetFilled, wall: south, onWall: true}
 /obj/structure/extinguisher_cabinet/directional/east: {entity: ExtinguisherCabinetFilled, wall: east, onWall: true}
 /obj/structure/extinguisher_cabinet/directional/west: {entity: ExtinguisherCabinetFilled, wall: west, onWall: true}
+# Bare placement (see the firealarm comment above) -- every instance on this
+# repo's ruin maps sits at dir=SOUTH regardless of which wall it is actually
+# against; wall: auto reads pixel_x/pixel_y instead.
+/obj/structure/extinguisher_cabinet: {entity: ExtinguisherCabinetFilled, wall: auto, onWall: true}
 
 /obj/structure/sign/warning/secure_area/directional/north: {entity: SignSecureMed, wall: north, onWall: true}
 /obj/structure/sign/warning/secure_area/directional/south: {entity: SignSecureMed, wall: south, onWall: true}
@@ -292,6 +300,10 @@
 /obj/structure/mirror/directional/south: {entity: Mirror, wall: south, onWall: true}
 /obj/structure/mirror/directional/east: {entity: Mirror, wall: east, onWall: true}
 /obj/structure/mirror/directional/west: {entity: Mirror, wall: west, onWall: true}
+# Bare placement (see the firealarm comment above) -- every single mirror on
+# this repo's ruin maps sits at dir=SOUTH regardless of which wall it is
+# actually against; wall: auto reads pixel_x/pixel_y instead.
+/obj/structure/mirror: {entity: Mirror, wall: auto, onWall: true}
 /obj/structure/sign/clock/directional/north: {entity: WallClock, wall: north, onWall: true}
 /obj/structure/sign/clock/directional/south: {entity: WallClock, wall: south, onWall: true}
 /obj/structure/sign/clock/directional/east: {entity: WallClock, wall: east, onWall: true}
@@ -499,6 +511,9 @@
 /obj/structure/noticeboard/directional/south: {entity: NoticeBoard, wall: south, onWall: true}
 /obj/structure/noticeboard/directional/east: {entity: NoticeBoard, wall: east, onWall: true}
 /obj/structure/noticeboard/directional/west: {entity: NoticeBoard, wall: west, onWall: true}
+# Bare placement (see the firealarm comment above) -- wall: auto reads
+# pixel_x/pixel_y instead of a dir that may be stuck at its default.
+/obj/structure/noticeboard: {entity: NoticeBoard, wall: auto, onWall: true}
 /obj/effect/spawner/random/decoration/poster/random: RandomPosterAny
 /obj/structure/sign/poster/random/directional/north: {entity: RandomPosterAny, wall: north, onWall: true}
 /obj/structure/sign/poster/random/directional/south: {entity: RandomPosterAny, wall: south, onWall: true}
@@ -1484,6 +1499,9 @@
 /obj/machinery/vending/wallmed/directional/south: {entity: VendingMachineWallMedical, wall: south, onWall: true}
 /obj/machinery/vending/wallmed/directional/east: {entity: VendingMachineWallMedical, wall: east, onWall: true}
 /obj/machinery/vending/wallmed/directional/west: {entity: VendingMachineWallMedical, wall: west, onWall: true}
+# Bare placement (see the firealarm comment above) -- wall: auto reads
+# pixel_x/pixel_y instead of a dir that may be stuck at its default.
+/obj/machinery/vending/wallmed: {entity: VendingMachineWallMedical, wall: auto, onWall: true}
 /obj/machinery/vending/sovietsoda: VendingMachineSovietSoda
 
 # ---- suit storage units ----

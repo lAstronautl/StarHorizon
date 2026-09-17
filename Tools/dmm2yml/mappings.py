@@ -34,6 +34,10 @@ DECAL_DIRECTIONS = DIRECTIONS + (NORTHEAST, NORTHWEST, SOUTHEAST, SOUTHWEST)
 # north); SS14 writes the facing, so that alarm looks south, away from it.
 # A rule says which it means, and this table converts one to the other.
 WALL_TO_FACING = {"north": SOUTH, "south": NORTH, "east": WEST, "west": EAST}
+# Same table, but keyed and valued by the raw dir ints -- for "wall: auto"
+# (EntityRule.auto_wall), where the wall side is worked out per instance
+# instead of being fixed by the rule.
+OPPOSITE_DIR = {NORTH: SOUTH, SOUTH: NORTH, EAST: WEST, WEST: EAST}
 
 
 class MappingError(Exception):
@@ -100,6 +104,16 @@ class EntityRule:
     # Raw dmm dir -> a different prototype/facing entirely, for paths where
     # dir does not mean "facing" (see EntityVariant).
     by_dir: dict[int, EntityVariant] = field(default_factory=dict)
+    # "wall: auto" (as opposed to a fixed wall: north/south/east/west): this
+    # path is placed the pre-/directional-refactor way, where a mapper set
+    # pixel_x/pixel_y by hand to shove the sprite against a wall and left
+    # `dir` at its untouched default. Confirmed against tgstation's own
+    # /obj/proc/get_turfs_to_mount_on() (code/datums/components/atom_mounted.dm):
+    # the engine itself locates the wall from the pixel offset at Initialize,
+    # not from dir -- and on this repo's own ruin maps `dir` is frequently
+    # stuck at its default (SOUTH) while pixel_x/pixel_y visibly vary per
+    # instance. See dmm2yml.pixel_direction_of().
+    auto_wall: bool = False
 
 
 @dataclass
@@ -183,15 +197,19 @@ def _parse_entity(path: str, raw: Any) -> EntityRule:
         if "dir" in raw and "wall" in raw:
             raise MappingError(f"{path}: set either dir or wall, not both")
 
+        auto_wall = False
         direction = raw.get("dir")
         if direction is not None:
             direction = int(direction)
             if direction not in DIRECTIONS:
                 raise MappingError(f"{path}: dir {direction} is not one of {DIRECTIONS}")
         elif (wall := raw.get("wall")) is not None:
-            if wall not in WALL_TO_FACING:
-                raise MappingError(f"{path}: wall must be one of {sorted(WALL_TO_FACING)}, got '{wall}'")
-            direction = WALL_TO_FACING[wall]
+            if wall == "auto":
+                auto_wall = True
+            elif wall not in WALL_TO_FACING:
+                raise MappingError(f"{path}: wall must be one of {sorted(WALL_TO_FACING)} or 'auto', got '{wall}'")
+            else:
+                direction = WALL_TO_FACING[wall]
         tile = raw.get("tile")
         # onWall does not require wall: here -- the shift uses whichever
         # facing is finally in play, and for a path with no /directional
@@ -206,6 +224,7 @@ def _parse_entity(path: str, raw: Any) -> EntityRule:
                 tile=tile,
                 on_wall=on_wall,
                 by_dir=by_dir,
+                auto_wall=auto_wall,
             )
         return EntityRule(
             entities=[str(raw["entity"])] if raw.get("entity") else [],
@@ -213,6 +232,7 @@ def _parse_entity(path: str, raw: Any) -> EntityRule:
             tile=tile,
             on_wall=on_wall,
             by_dir=by_dir,
+            auto_wall=auto_wall,
         )
     raise MappingError(f"{path}: an entity rule must be a prototype id or a list, got {type(raw).__name__}")
 
