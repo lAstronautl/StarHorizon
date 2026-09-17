@@ -359,3 +359,136 @@
 # /obj/structure/transit_tube_pod: decorative transit-tube-system prop; this
 # fork has no transit tube system at all (no TransitTube* id anywhere).
 - /obj/structure/transit_tube_pod
+
+# ---- closing every remaining tgstation /turf/ type against
+# Resources/Prototypes/Tiles: checked all 900 turf type definitions in
+# tgstation source (not just what one map happened to use). Anything not
+# listed here or added to turfs.yml has a real SS14 target; everything below
+# genuinely doesn't, for the reason given. ----
+
+# /turf/open and /turf/closed themselves are abstract_type in tgstation
+# source and BYOND can never instantiate them directly, so they need no
+# ignore entry at all -- and must not get one, since ignore.yml matches by
+# prefix (path == entry or path.startswith(entry + "/")), so "/turf/open"
+# here would silently swallow every open turf in the game.
+# /turf/baseturf_skipover (+ /shuttle, /trapdoor): tgstation's own source
+# says "This shouldn't exist" and Initialize() stack_traces and deletes
+# itself on the spot if one is ever instanced.
+- /turf/baseturf_skipover
+# /turf/open/floor/mineral (bare): icon_state is explicitly null in source --
+# doesn't render at all unless a concrete subtype is used.
+- /turf/open/floor/mineral
+# /turf/open/floor/material (+ /meat, /meat/airless): a dynamic-material
+# floor whose colour comes from whatever custom_materials built it
+# (MATERIAL_COLOR flag) -- a runtime tinting mechanic, not a fixed sprite.
+- /turf/open/floor/material
+# /turf/open/misc (bare): tgstation's own placeholder for "coder/mapper
+# fucked up", same as /turf/open/genturf above.
+- /turf/open/misc
+- /turf/open/floor/emissive_test
+# /turf/open/floor/bluespace (bare, not the mineral one below): "micro-
+# teleports [that] let people move at incredible speeds" -- a speed-boost
+# mechanic, not a floor material.
+- /turf/open/floor/bluespace
+# /turf/open/floor/sepia: "Time seems to flow very slowly around these
+# tiles" -- a time-dilation mechanic.
+- /turf/open/floor/sepia
+# /turf/open/floor/fakeice: holodeck illusion, deliberately NOT slippery
+# despite looking like ice -- the opposite of what FloorIce would imply.
+- /turf/open/floor/fakeice
+# /turf/open/floor/fakepit: holodeck illusion, deliberately walkable despite
+# looking like a bottomless pit.
+- /turf/open/floor/fakepit
+# /turf/open/floor/light (+ /colour_cycle, /colour_cycle/dancefloor_a/_b)
+# and /turf/open/indestructible/light: an interactive light-emitting floor,
+# colour set with a multitool, some variants auto-cycling -- a mechanic, not
+# a sprite.
+- /turf/open/floor/light
+- /turf/open/indestructible/light
+# /turf/open/misc/beach/coast (+ /corner): tied to the tide mechanic, same
+# reasoning as /turf/open/water above.
+- /turf/open/misc/beach/coast
+# /turf/open/floor/black: paired in source with greenscreen (a camera/film
+# gimmick set), no equivalent.
+- /turf/open/floor/black
+- /turf/open/floor/greenscreen
+# /turf/open/floor/hauntium (+ /ghostbricked): Halloween event floor.
+- /turf/open/floor/hauntium
+# /turf/open/floor/neo (+ cyan/orange/purple/red): a joke tile family
+# ("Radiates with the power of being pedantic about colour names"), no
+# equivalent.
+- /turf/open/floor/neo
+# /turf/open/floor/sandstone (+ /basalt, /cobbled, /tiled): each variant is
+# its own unique brick/vault pattern (checked icon_state per variant, none
+# match anything in the SS14 tile catalog, including the coincidentally
+# similarly-named "vault" tile which turned out to be a different sprite).
+- /turf/open/floor/sandstone
+# /turf/open/floor/silvergold (+ /flow, /sword, /void): unique decorative
+# wizard-vault patterns (a sword, a starfield, a flowing pattern), no
+# equivalent.
+- /turf/open/floor/silvergold
+# /turf/open/floor/bone (+ /corner, /meaty and all its children): lavaland
+# dungeon dressing, no equivalent.
+- /turf/open/floor/bone
+# /turf/open/floor/meat: "Floor is meat!" -- dragon-lair/heretic event floor.
+- /turf/open/floor/meat
+- /turf/open/mirage
+# /turf/open/misc/ashplanet (+ /ash, /rocky, /wateryrock and its children):
+# no Ash-family tile anywhere in the catalog.
+- /turf/open/misc/ashplanet
+# /turf/open/misc/hay (+ /icemoon, /lavaland): no Hay tile anywhere.
+- /turf/open/misc/hay
+# /turf/open/cliff (+ /snowrock and its children): elevation-change cliff
+# dressing, not a floor material.
+- /turf/open/cliff
+# The rest of /turf/open/indestructible/*: boss arenas, minigames and
+# events, each checked individually and confirmed gimmick-only.
+- /turf/open/indestructible/airblock
+- /turf/open/indestructible/binary
+- /turf/open/indestructible/bitrunning_transport
+- /turf/open/indestructible/boss/air
+- /turf/open/indestructible/hierophant
+- /turf/open/indestructible/honk
+- /turf/open/indestructible/hoteltile
+- /turf/open/indestructible/hotelwood
+- /turf/open/indestructible/meat
+- /turf/open/indestructible/necropolis
+- /turf/open/indestructible/paper
+- /turf/open/indestructible/rockyground
+# /turf/open/indestructible/tram and /turf/open/floor/tram (+ /plate and its
+# children): the tram transport system doesn't exist in SS14 at all.
+- /turf/open/indestructible/tram
+- /turf/open/floor/tram
+# lavaland ore-vein floors with no matching SS14 tile (gold/uranium/plasma
+# are mapped above; these have nothing).
+- /turf/open/floor/mineral/abductor
+- /turf/open/floor/mineral/adamantine
+- /turf/open/floor/mineral/bananium
+- /turf/open/floor/mineral/bluespace
+- /turf/open/floor/mineral/diamond
+- /turf/open/floor/mineral/metal_hydrogen
+- /turf/open/floor/mineral/mythril
+- /turf/open/floor/mineral/plasteel
+- /turf/open/floor/mineral/runite
+- /turf/open/floor/mineral/telecrystal
+# titanium/yellow (plain and /tiled): no SS14 shuttle-floor tile is yellow.
+- /turf/open/floor/mineral/titanium/yellow
+- /turf/open/floor/mineral/titanium/tiled/yellow
+# /turf/open/floor/cult (+ /airless): cultist ritual-room engraved floor, no
+# equivalent.
+- /turf/open/floor/cult
+# concrete/pavement ("hot, coarse pavement") and /reinforced ("hexacrete",
+# a hexagonal pattern): distinct textures from the tile/slab/smooth family
+# mapped above, no matching SS14 variant.
+- /turf/open/floor/concrete/pavement
+- /turf/open/floor/concrete/reinforced
+# holodeck states that are themselves a mechanic, not just a sprite:
+# beach/water ("gives the impression you can walk on water"), chess pattern,
+# hyperspace ("may induce motion sickness"), space ("deadly aspects of space
+# are not emulated here"), and stairs (a 3D structure, not a floor tile).
+- /turf/open/floor/holofloor/beach/water
+- /turf/open/floor/holofloor/chess_black
+- /turf/open/floor/holofloor/chess_white
+- /turf/open/floor/holofloor/hyperspace
+- /turf/open/floor/holofloor/space
+- /turf/open/floor/holofloor/stairs

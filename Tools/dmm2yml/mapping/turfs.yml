@@ -120,3 +120,77 @@
 /turf/open/misc/sandy_dirt: FloorLowDesert
 /turf/open/floor/bronze: FloorBrassFilled
 /turf/open/floor/stone: FloorSteelPavement
+
+# ---- closing every remaining tgstation turf against Resources/Prototypes:
+# each one checked in source for its own name/icon_state/mechanic before
+# picking a target, same rigor as the entity work. Anything left out of this
+# file after this point has no sane SS14 target and is in ignore.yml instead,
+# with the reasoning noted there. ----
+
+/turf/open/floor: FloorSteel
+/turf/open/floor/iron/kitchen: FloorKitchen
+/turf/open/indestructible/kitchen: FloorKitchen
+/turf/open/indestructible/stone: FloorSteelPavement
+/turf/open/indestructible: FloorSteel
+/turf/open/indestructible/large: FloorSteel
+/turf/open/floor/white: FloorWhite
+/turf/open/floor/oldshuttle: FloorSteel
+/turf/baseturf_bottom: Space
+
+# concrete: tgstation's own icon names line up almost 1:1 with SS14's
+# concrete-tile/-slab/-smooth naming (conc_tiles/conc_slab_N/conc_smooth_1).
+/turf/open/floor/concrete: FloorConcreteSmooth
+/turf/open/floor/concrete/tiles: FloorConcrete
+/turf/open/floor/concrete/slab_1: FloorConcreteMono
+/turf/open/floor/concrete/slab_2: FloorConcreteMono
+/turf/open/floor/concrete/slab_3: FloorConcreteMono
+/turf/open/floor/concrete/slab_4: FloorConcreteMono
+
+# mined-out lavaland ore-vein floors: these are static map tiles either way,
+# so matched by material identity even though SS14 reaches the same tile via
+# player construction rather than mining. Only gold/uranium/plasma have an
+# SS14 tile at all (checked the rest -- diamond/bananium/adamantine/mythril/
+# runite/telecrystal/bluespace/metal_hydrogen/abductor/plasteel have none,
+# see ignore.yml).
+/turf/open/floor/mineral/gold: FloorGold
+/turf/open/floor/mineral/uranium: FloorUraniumMarble
+/turf/open/floor/mineral/plasma: FloorPlasmaMarble
+
+# titanium (shuttle floor material, distinct from plastitanium above): bare
+# is a plain grey/silver metal look -> Grey; colour variants map to their
+# matching FloorShuttle* colour. No SS14 tile is yellow, so titanium/yellow
+# (plain and /tiled) stays unresolved rather than force it onto Orange --
+# see ignore.yml.
+/turf/open/floor/mineral/titanium: FloorShuttleGrey
+/turf/open/floor/mineral/titanium/blue: FloorShuttleBlue
+/turf/open/floor/mineral/titanium/white: FloorShuttleWhite
+/turf/open/floor/mineral/titanium/purple: FloorShuttlePurple
+
+# bamboo/tatami mats: black is already above; green (bare) and purple are
+# the same "mat" family, just a different colour.
+/turf/open/floor/bamboo: FloorWoodTile
+/turf/open/floor/bamboo/planks: FloorWood
+
+/turf/open/misc/dirt: FloorDirt
+/turf/open/misc/basalt: FloorBasalt
+/turf/open/misc/beach: FloorDesert
+/turf/open/misc/ironsand: FloorAsteroidIronsand
+/turf/open/floor/fakesand: FloorAsteroidSand
+/turf/open/floor/fakesand/red: FloorAsteroidSandRed
+
+# holodeck default/idle floor states: some of these already appeared as
+# static map placements before this pass (plating/chapel above), so the
+# rest get the same visual-identity treatment. The ones that are actually a
+# mechanic (space/hyperspace pretending to be safe, chess pattern, stairs,
+# water) are left in ignore.yml instead.
+/turf/open/floor/holofloor: FloorSteel
+/turf/open/floor/holofloor/asteroid: FloorAsteroidSand
+/turf/open/floor/holofloor/basalt: FloorBasalt
+/turf/open/floor/holofloor/beach: FloorDesert
+/turf/open/floor/holofloor/carpet: FloorCarpetOffice
+/turf/open/floor/holofloor/dark: FloorDark
+/turf/open/floor/holofloor/grass: FloorGrass
+/turf/open/floor/holofloor/pure_white: FloorWhite
+/turf/open/floor/holofloor/snow: FloorSnow
+/turf/open/floor/holofloor/white: FloorWhite
+/turf/open/floor/holofloor/wood: FloorWood
