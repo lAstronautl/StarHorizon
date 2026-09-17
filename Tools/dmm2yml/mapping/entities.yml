@@ -2587,7 +2587,17 @@
 /obj/machinery/modular_computer/preset/cargochat/security: ComputerCargoOrdersSecurity
 /obj/machinery/oven: KitchenMicrowave
 /obj/machinery/rnd/server: ResearchAndDevelopmentServer
-/obj/structure/fireaxecabinet/directional/north: FireAxeCabinetFilled
+# Was mapped bare (no wall:/onWall:) with only the north variant covered --
+# south/east/west fell through unresolved, and even north sat on the floor
+# tile facing the wrong way. Same MAPPING_DIRECTIONAL_HELPERS + find_and_
+# mount_on_atom() pattern as extinguisher_cabinet (code/game/objects/
+# structures/fireaxe.dm), so the same wall:/onWall: treatment applies; the
+# bare (pre-refactor) path gets wall: auto for the same reason too.
+/obj/structure/fireaxecabinet/directional/north: {entity: FireAxeCabinetFilled, wall: north, onWall: true}
+/obj/structure/fireaxecabinet/directional/south: {entity: FireAxeCabinetFilled, wall: south, onWall: true}
+/obj/structure/fireaxecabinet/directional/east: {entity: FireAxeCabinetFilled, wall: east, onWall: true}
+/obj/structure/fireaxecabinet/directional/west: {entity: FireAxeCabinetFilled, wall: west, onWall: true}
+/obj/structure/fireaxecabinet: {entity: FireAxeCabinetFilled, wall: auto, onWall: true}
 /obj/structure/secure_safe/caps_spare: GunSafe
 /obj/structure/sign/departments/aiupload/directional/south: SignAiUpload
 /obj/structure/sign/directions/arrival/directional/west: SignDirectionalEvac
@@ -2625,3 +2635,37 @@
 /obj/machinery/rnd/destructive_analyzer: MachineArtifactCrusher
 /obj/machinery/rnd/server/master: ResearchAndDevelopmentServer
 /obj/machinery/vending/wardrobe/coroner_wardrobe: VendingMachineMediDrobe
+
+# ---- b0ee8406-sq3mub.dmm ruin (verified against tgstation source + full
+# Resources/Prototypes tree, forks included) ----
+/obj/item/modular_computer/pda/clear: ClearPDA
+/obj/item/coin/diamond: TreasureCoinDiamond3
+/obj/item/coin/silver: TreasureCoinSilver3
+/obj/item/coin/iron: TreasureCoinIron3
+/obj/item/clothing/under/rank/captain: ClothingUniformJumpsuitCaptain
+/obj/item/clothing/suit/jacket/det_suit: ClothingOuterCoatDetective
+/obj/item/katana: Katana
+# mundane variant explicitly disables the banner's inspiration buff
+# (inspiration_available = FALSE in tgstation source), so it's purely
+# decorative here - safe to map onto the plain decorative banner.
+/obj/item/banner/command/mundane: BannerNanotrasen
+/mob/living/basic/hivebot: MobHivebot
+/mob/living/basic/hivebot/range: MobHivebotRanged
+/obj/item/surgicaldrill: Drill
+/obj/machinery/atmospherics/miner/carbon_dioxide: GasMinerCarbonDioxide
+/obj/machinery/atmospherics/miner/n2o: GasMinerNitrousOxide
+/obj/machinery/atmospherics/miner/nitrogen: GasMinerNitrogen
+/obj/machinery/atmospherics/miner/oxygen: GasMinerOxygen
+/obj/machinery/atmospherics/miner/plasma: GasMinerPlasma
+/obj/machinery/rnd/production/protolathe: Protolathe
+/obj/item/storage/belt/security: ClothingBeltSecurity
+/obj/item/stack/medical/bruise_pack: Brutepack
+/obj/item/trash/raisins: FoodPacketRaisinsTrash
+/obj/item/trash/can/food/beans: FoodTinBeansTrash
+/obj/item/grenade/clusterbuster/soap: SlipocalypseClusterSoap
+/obj/machinery/power/turbine: Turbine
+# Nyanotrasen fork id (main tree has no deep fryer); found via the
+# circuit board's prototype: construction-result field, not a name match.
+/obj/machinery/deepfryer: KitchenDeepFryer
+/obj/structure/sign/poster/official/random: {entity: RandomPosterLegit, wall: auto, onWall: true}
+/obj/structure/sign/poster/random: {entity: RandomPosterAny, wall: auto, onWall: true}

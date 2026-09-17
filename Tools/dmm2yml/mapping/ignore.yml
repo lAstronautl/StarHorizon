@@ -257,3 +257,105 @@
 # procedurally chosen biome turf before a round starts -- it is never the
 # tile a player actually sees, so there is no fixed sprite to convert it to.
 - /turf/open/genturf
+
+# ---- b0ee8406-sq3mub.dmm ruin: checked against tgstation source and the
+# full Resources/Prototypes tree (forks included), no match found ----
+
+# /obj/effect/mob_spawn/ghost_role/human: a generic ghost-role spawn point
+# whose name/outfit/flavour_text/gender are all set per-instance directly in
+# the map file (9 distinct instances here, each customized). No SS14 marker
+# supports that level of ad-hoc per-instance customization.
+- /obj/effect/mob_spawn/ghost_role/human
+# /obj/item/poster/random_contraband: the *portable, rolled-up* poster item
+# (game/objects/effects/posters/poster.dm) -- SS14's poster spawners
+# (RandomPosterContraband et al.) are wall-mounted structure spawners only,
+# there is no held/loose poster item form to match against.
+- /obj/item/poster/random_contraband
+- /obj/structure/urinal
+# /obj/structure/disposaloutlet: SS14's disposal system has no outlet
+# structure at the far end of the pipe network (checked Entities/Structures/
+# Piping/Disposal/*.yml -- only units, pipes and fittings, no outlet).
+- /obj/structure/disposaloutlet
+# /obj/item/pipe_dispenser: the RPD (rapid pipe dispenser) hand tool
+# (game/objects/items/rcd/RPD.dm) -- no RPD/RapidPipe id anywhere.
+- /obj/item/pipe_dispenser
+- /obj/item/surgical_drapes
+- /obj/item/trash/can
+- /obj/machinery/dna_scannernew
+- /obj/machinery/mech_bay_recharge_port
+# /obj/item/coin (bare): the concrete base coin type itself (not abstract),
+# but SS14 has no generic "coin" -- only the specific treasure coins already
+# mapped (TreasureCoinDiamond3/Silver3/Iron3) and fork-specific currencies.
+- /obj/item/coin
+- /obj/item/gun/ballistic/automatic/pistol/suppressed
+- /obj/item/gun/medbeam
+# /obj/item/megaphone: no Loudspeaker/Bullhorn/Megaphone id anywhere.
+- /obj/item/megaphone
+# /obj/item/razor: no shaving razor item; only unrelated cosmetic/hair
+# matches (BarberScissors, HumanHairShaved, SignBarbershop, ...).
+- /obj/item/razor
+- /obj/item/seeds/harebell
+# /obj/item/stock_parts/micro_laser, /scanning_module: SS14 only models
+# three stock-part families (Capacitor/Manipulator/MatterBin), tgstation's
+# extra micro-laser/scanning-module tiers have no equivalent.
+- /obj/item/stock_parts/micro_laser
+- /obj/item/stock_parts/scanning_module
+# /obj/item/storage/belt (bare): abstract_type in tgstation source -- never
+# placed directly, so its presence here is itself a bug in the source map.
+- /obj/item/storage/belt
+- /obj/item/surgery_tray/full
+- /obj/item/trash/sosjerky
+# /obj/item/wallframe/camera: tgstation's portable "camera assembly" item
+# you carry and apply to a wall. SS14's nearest equivalent,
+# SurveillanceCameraAssembly, is instead a permanently anchored, wall-snapped
+# structure (Transform.anchored: true, placement snap: Wallmount) with no
+# item form -- and this instance has no dir/pixel_x/pixel_y in the source
+# map, i.e. it's loose floor loot, not something already on a wall.
+- /obj/item/wallframe/camera
+# /obj/machinery/airlock_controller/incinerator_atmos: part of tgstation's
+# tag-linked embedded-controller airlock automation (wires up doors/pumps/
+# sensors by id_tag) -- this fork has no equivalent tag-based system.
+- /obj/machinery/airlock_controller/incinerator_atmos
+- /obj/machinery/bookbinder
+- /obj/machinery/chem_heater
+# /obj/machinery/conveyor_switch: no ConveyorSwitch id -- conveyor belts are
+# interacted with directly (ConveyorBelt), no separate switch entity.
+- /obj/machinery/conveyor_switch
+- /obj/machinery/gibber
+- /obj/machinery/libraryscanner
+# /obj/machinery/processor: dices/slices solid food items into sub-items
+# (food_and_drinks/machinery/processor.dm). KitchenReagentGrinder was
+# considered and rejected -- it juices items into liquid reagents, a
+# different item-to-reagent mechanic, not item-to-item slicing.
+- /obj/machinery/processor
+- /obj/machinery/monkey_recycler
+# /obj/machinery/pipedispenser (and /disposal, /disposal/transit_tube): the
+# machine form of the pipe dispenser -- no PipeDispenser/PipeVend id anywhere.
+- /obj/machinery/pipedispenser
+- /obj/machinery/pipedispenser/disposal
+- /obj/machinery/pipedispenser/disposal/transit_tube
+# /obj/machinery/sleeper: the real automated-treatment sleeper machine.
+# Substituting CryoPod was considered and rejected -- CryoPod is a
+# stasis/preservation mechanic, not the sleeper's active reagent-based
+# healing, so this is left unresolved rather than force a different mechanic.
+- /obj/machinery/sleeper
+# /obj/machinery/vending (bare): abstract_type in tgstation source -- never
+# placed directly, so its presence here is itself a bug in the source map.
+- /obj/machinery/vending
+- /obj/machinery/washing_machine
+- /obj/structure/displaycase
+- /obj/structure/reagent_dispensers/cooking_oil
+# /obj/structure/safe, /obj/structure/safe/floor: a generic loot safe (and
+# its floor-hidden variant). GunSafe was considered and rejected -- it's
+# weapon-specific loot dressing, not a generic safe, so this is left
+# unresolved rather than force a mismatched mechanic.
+- /obj/structure/safe
+- /obj/structure/safe/floor
+# /obj/structure/sign/departments/evac: a plain, non-directional evacuation
+# department sign (icon_state "evac"). Distinct from the arrow-shaped
+# /obj/structure/sign/directions/evac (icon_state "direction_evac") that
+# SignDirectionalEvac already covers -- no plain equivalent exists.
+- /obj/structure/sign/departments/evac
+# /obj/structure/transit_tube_pod: decorative transit-tube-system prop; this
+# fork has no transit tube system at all (no TransitTube* id anywhere).
+- /obj/structure/transit_tube_pod
