@@ -336,6 +336,56 @@ def check_pixel_direction() -> Result:
     )
 
 
+def check_stopgap_tile(index) -> Result:
+    """A turf matched by an ignore rule must still get a floor -- Plating,
+    not nothing. Leaving the cell unwritten defaults it to Space (tilemap id
+    0), turning a floor a human deliberately chose not to translate into a
+    hole that leaks atmosphere and drops anything standing on it. A skipped
+    *entity* must not get this treatment -- only the turf under it decides
+    what the tile is."""
+    dmm2yml = dmm2yml_module()
+    problems = []
+
+    mapping_set = mapping_rules.MappingSet(
+        turfs={"/turf/open/floor/iron": mapping_rules.TurfRule(tile="FloorSteel", entity=None)},
+        entities={},
+        ignore=["/turf/open/floor/unmappable_test_stub", "/obj/item/unmappable_test_item"],
+    )
+    fixture = (
+        '"aa" = (\n/turf/open/floor/unmappable_test_stub,\n/area/station)\n'
+        '"ab" = (\n/obj/item/unmappable_test_item,\n/turf/open/floor/iron,\n/area/station)\n\n'
+        '(1,1,1) = {"\naa\n"}\n(2,1,1) = {"\nab\n"}\n'
+    )
+    with tempfile.TemporaryDirectory() as directory:
+        path = os.path.join(directory, "fixture.dmm")
+        with open(path, "w", encoding="utf-8") as handle:
+            handle.write(fixture)
+        dmm = dmmparser.parse(path)
+
+    template = yaml.safe_load(
+        open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "mapping", "grid_template.yml"),
+             encoding="utf-8")
+    )
+    builder = ss14map.MapBuilder(template["map_entity"], template["grid_entity"], "0.0.0")
+    survey = dmm2yml.walk(dmm, mapping_set, index, 1, builder, "deterministic")
+
+    tiles = {position: tile_id for position, (tile_id, _, _) in builder.tiles.items()}
+    if tiles.get((0, 0)) != dmm2yml.FALLBACK_TURF_TILE:
+        problems.append(f"skipped turf at (0,0): {tiles.get((0, 0))!r}, expected {dmm2yml.FALLBACK_TURF_TILE!r}")
+    if tiles.get((1, 0)) != "FloorSteel":
+        problems.append(f"skipped entity must not disturb its own resolvable turf: {tiles.get((1, 0))!r}, expected 'FloorSteel'")
+    if survey.skipped_count != 2:
+        problems.append(f"skipped_count {survey.skipped_count}, expected 2 (one turf, one entity)")
+    if survey.stopgap_count != 1:
+        problems.append(f"stopgap_count {survey.stopgap_count}, expected 1 (the turf only, not the entity)")
+
+    return Result(
+        "turfs: a skipped turf is covered with a stopgap tile, not left as a hole",
+        not problems,
+        "; ".join(problems) or "skipped turf -> Plating; skipped entity leaves its own turf alone",
+    )
+
+
 def check_decal_corners(mapping_set) -> Result:
     """A corner decal's dir names the edge it touches, not the quadrant its
     accent sits in -- those are diagonally opposite. See the comment at the
@@ -982,6 +1032,7 @@ def run(repo_root: str, mapping_dir: str, prototypes_dir: str) -> list[Result]:
         ("problems: one line per path", lambda: check_problem_reporting(mapping_set, index)),
         ("orientation: wall vs dir", lambda: check_orientation(mapping_set)),
         ("orientation: wall: auto derives the wall side from pixel_x/pixel_y", lambda: check_pixel_direction()),
+        ("turfs: a skipped turf is covered with a stopgap tile, not left as a hole", lambda: check_stopgap_tile(index)),
         ("decals: corner accents match their quadrant", lambda: check_decal_corners(mapping_set)),
         ("decals: line edges match their sprite", lambda: check_decal_line_edges(mapping_set, prototypes_dir)),
         ("decals: per-instance color= overrides the rule default", lambda: check_decal_color_override()),

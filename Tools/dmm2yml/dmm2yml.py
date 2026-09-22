@@ -41,6 +41,14 @@ CSV_COLUMNS = ["dmm_path", "kind", "count", "example", "suggestion", "ss14_id", 
 MULTI_SEPARATOR = "+"
 DEFAULT_DIR = 2  # BYOND entities face south unless they say otherwise
 
+# A turf marked skip in ignore.yml has no SS14 tile to become -- but leaving
+# that cell entirely unwritten defaults it to Space (tilemap id 0), turning a
+# floor a human deliberately chose not to translate into a hole that leaks
+# atmosphere and drops anything standing on it. Plating is the same "we don't
+# have specifics, but here is a solid substrate" stopgap already used under
+# walls (see turfs.yml), so a skipped turf gets it too instead of a void.
+FALLBACK_TURF_TILE = "Plating"
+
 # Tile offset to walk from a floor tile onto the wall in that direction.
 DIR_OFFSET = {
     mapping_rules.NORTH: (0, 1),
@@ -74,6 +82,7 @@ class Survey:
     inherited: dict[str, str] = field(default_factory=dict)
     resolved_count: int = 0
     skipped_count: int = 0
+    stopgap_count: int = 0
 
     def note_unresolved(self, path: str, kind: str, x: int, y: int, variables, map_label: str = "") -> None:
         report = self.unresolved.get(path)
@@ -87,6 +96,7 @@ class Survey:
         """Fold another map's survey into this one, for cataloguing several maps."""
         self.resolved_count += other.resolved_count
         self.skipped_count += other.skipped_count
+        self.stopgap_count += other.stopgap_count
         self.inherited.update(other.inherited)
         for path, report in other.unresolved.items():
             existing = self.unresolved.get(path)
@@ -339,6 +349,10 @@ def walk(
 
             if resolution.skipped:
                 survey.skipped_count += 1
+                if kind == "turf":
+                    survey.stopgap_count += 1
+                    if builder is not None:
+                        builder.set_tile(tile_x, tile_y, FALLBACK_TURF_TILE, 0)
                 continue
             if resolution.rule is None:
                 survey.note_unresolved(atom.path, kind, x, y, atom.vars, map_label)
@@ -478,6 +492,9 @@ def command_catalog(args) -> int:
     print(f"{scanned} map(s) scanned ({len(files) - scanned} skipped)")
     print(f"  resolved   {merged.resolved_count} atoms")
     print(f"  skipped    {merged.skipped_count} atoms (ignore rules)")
+    if merged.stopgap_count:
+        print(f"             of which {merged.stopgap_count} were turfs -- covered with "
+              f"'{FALLBACK_TURF_TILE}' instead of left as a Space hole")
     print(
         f"  unresolved {sum(r.count for r in merged.unresolved.values())} atoms "
         f"across {len(merged.unresolved)} distinct paths"
@@ -511,6 +528,9 @@ def command_scan(args) -> int:
     print(f"{args.dmm}: {dmm.width}x{dmm.height}, {scanned}")
     print(f"  resolved   {survey.resolved_count} atoms")
     print(f"  skipped    {survey.skipped_count} atoms (ignore rules)")
+    if survey.stopgap_count:
+        print(f"             of which {survey.stopgap_count} were turfs -- covered with "
+              f"'{FALLBACK_TURF_TILE}' instead of left as a Space hole")
     print(f"  unresolved {sum(r.count for r in survey.unresolved.values())} atoms "
           f"across {len(survey.unresolved)} distinct paths")
     if survey.inherited:
@@ -620,6 +640,10 @@ def command_convert(args) -> int:
     if lines:
         _report_refusal(lines)
         return 1
+
+    if survey.stopgap_count:
+        print(f"note: {survey.stopgap_count} turf(s) matched an ignore rule with no SS14 tile of their "
+              f"own -- covered with '{FALLBACK_TURF_TILE}' rather than left as a Space hole.")
 
     exit_code = 0
     for z_level in z_levels:
