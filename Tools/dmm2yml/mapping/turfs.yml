@@ -137,6 +137,24 @@
 /turf/open/floor/oldshuttle: FloorSteel
 /turf/baseturf_bottom: Space
 
+# indestructible variants that turned out to reuse an existing sprite
+# (Resources/Textures/Tiles/*.png) under a different name/context, found by
+# matching icon_state to filename rather than guessing from the mechanic:
+/turf/open/indestructible/hoteltile: FloorShowroom
+/turf/open/indestructible/hotelwood: FloorWood
+/turf/open/indestructible/meat: FloorFlesh
+/turf/open/indestructible/rockyground: FloorCave
+# honk (bananium floor): a "fake tile" entity on top of a base tile, the
+# same pattern as FloorLavaEntity/FloorChasmEntity above -- confirmed
+# against two real maps using FloorBananiumEntity (Shuttles/ShuttleEvent/
+# honki.yml, _Horizon/Dungeon/lavadunges.yml): the honki.yml one sits on
+# FloorClown, but that shuttle is clown-themed everywhere, not a
+# requirement of the entity; lavadunges.yml (unthemed) sits on plain
+# Plating, which is the correct general default.
+/turf/open/indestructible/honk:
+  tile: Plating
+  entity: FloorBananiumEntity
+
 # concrete: tgstation's own icon names line up almost 1:1 with SS14's
 # concrete-tile/-slab/-smooth naming (conc_tiles/conc_slab_N/conc_smooth_1).
 /turf/open/floor/concrete: FloorConcreteSmooth
@@ -145,16 +163,20 @@
 /turf/open/floor/concrete/slab_2: FloorConcreteMono
 /turf/open/floor/concrete/slab_3: FloorConcreteMono
 /turf/open/floor/concrete/slab_4: FloorConcreteMono
+# reinforced ("hexacrete", a hexagonal pattern): turned out to be the exact
+# same sprite (Resources/Textures/Tiles/reinforced.png) as FloorReinforced,
+# already used for /turf/open/floor/engine above.
+/turf/open/floor/concrete/reinforced: FloorReinforced
 
 # mined-out lavaland ore-vein floors: these are static map tiles either way,
 # so matched by material identity even though SS14 reaches the same tile via
-# player construction rather than mining. Only gold/uranium/plasma have an
-# SS14 tile at all (checked the rest -- diamond/bananium/adamantine/mythril/
-# runite/telecrystal/bluespace/metal_hydrogen/abductor/plasteel have none,
-# see ignore.yml).
+# player construction rather than mining. gold/uranium/plasma/plasteel have
+# an SS14 tile; the rest (diamond/bananium/adamantine/mythril/runite/
+# telecrystal/bluespace/metal_hydrogen/abductor) have none, see ignore.yml.
 /turf/open/floor/mineral/gold: FloorGold
 /turf/open/floor/mineral/uranium: FloorUraniumMarble
 /turf/open/floor/mineral/plasma: FloorPlasmaMarble
+/turf/open/floor/mineral/plasteel: FloorHull
 
 # titanium (shuttle floor material, distinct from plastitanium above): bare
 # is a plain grey/silver metal look -> Grey; colour variants map to their

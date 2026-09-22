@@ -462,19 +462,14 @@
 - /turf/open/indestructible/bitrunning_transport
 - /turf/open/indestructible/boss/air
 - /turf/open/indestructible/hierophant
-- /turf/open/indestructible/honk
-- /turf/open/indestructible/hoteltile
-- /turf/open/indestructible/hotelwood
-- /turf/open/indestructible/meat
 - /turf/open/indestructible/necropolis
 - /turf/open/indestructible/paper
-- /turf/open/indestructible/rockyground
 # /turf/open/indestructible/tram and /turf/open/floor/tram (+ /plate and its
 # children): the tram transport system doesn't exist in SS14 at all.
 - /turf/open/indestructible/tram
 - /turf/open/floor/tram
 # lavaland ore-vein floors with no matching SS14 tile (gold/uranium/plasma
-# are mapped above; these have nothing).
+# and plasteel are mapped above; these have nothing).
 - /turf/open/floor/mineral/abductor
 - /turf/open/floor/mineral/adamantine
 - /turf/open/floor/mineral/bananium
@@ -482,7 +477,6 @@
 - /turf/open/floor/mineral/diamond
 - /turf/open/floor/mineral/metal_hydrogen
 - /turf/open/floor/mineral/mythril
-- /turf/open/floor/mineral/plasteel
 - /turf/open/floor/mineral/runite
 - /turf/open/floor/mineral/telecrystal
 # titanium/yellow (plain and /tiled): no SS14 shuttle-floor tile is yellow.
@@ -491,11 +485,11 @@
 # /turf/open/floor/cult (+ /airless): cultist ritual-room engraved floor, no
 # equivalent.
 - /turf/open/floor/cult
-# concrete/pavement ("hot, coarse pavement") and /reinforced ("hexacrete",
-# a hexagonal pattern): distinct textures from the tile/slab/smooth family
-# mapped above, no matching SS14 variant.
+# concrete/pavement ("hot, coarse pavement"): a distinct texture from the
+# tile/slab/smooth family mapped above, no matching SS14 variant.
+# (concrete/reinforced -- "hexacrete" -- turned out to share FloorReinforced's
+# sprite, see turfs.yml.)
 - /turf/open/floor/concrete/pavement
-- /turf/open/floor/concrete/reinforced
 # holodeck states that are themselves a mechanic, not just a sprite:
 # beach/water ("gives the impression you can walk on water"), chess pattern,
 # hyperspace ("may induce motion sickness"), space ("deadly aspects of space
