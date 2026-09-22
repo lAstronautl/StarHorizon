@@ -468,11 +468,10 @@
 # children): the tram transport system doesn't exist in SS14 at all.
 - /turf/open/indestructible/tram
 - /turf/open/floor/tram
-# lavaland ore-vein floors with no matching SS14 tile (gold/uranium/plasma
-# and plasteel are mapped above; these have nothing).
+# lavaland ore-vein floors with no matching SS14 tile (gold/uranium/plasma,
+# plasteel and bananium are mapped above; these have nothing).
 - /turf/open/floor/mineral/abductor
 - /turf/open/floor/mineral/adamantine
-- /turf/open/floor/mineral/bananium
 - /turf/open/floor/mineral/bluespace
 - /turf/open/floor/mineral/diamond
 - /turf/open/floor/mineral/metal_hydrogen

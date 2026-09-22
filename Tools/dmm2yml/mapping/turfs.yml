@@ -154,6 +154,11 @@
 /turf/open/indestructible/honk:
   tile: Plating
   entity: FloorBananiumEntity
+# the mineral vein version reuses the exact same icon_state ("bananium")
+# as honk above -- same fix.
+/turf/open/floor/mineral/bananium:
+  tile: Plating
+  entity: FloorBananiumEntity
 
 # concrete: tgstation's own icon names line up almost 1:1 with SS14's
 # concrete-tile/-slab/-smooth naming (conc_tiles/conc_slab_N/conc_smooth_1).
