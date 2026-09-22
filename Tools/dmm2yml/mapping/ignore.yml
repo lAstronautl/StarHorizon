@@ -339,6 +339,20 @@
 # stasis/preservation mechanic, not the sleeper's active reagent-based
 # healing, so this is left unresolved rather than force a different mechanic.
 - /obj/machinery/sleeper
+# /obj/machinery/power/turbine (bare -- itself abstract_type in tgstation
+# source, so its presence here is a bug in the source map -- and all real
+# subtypes: /inlet_compressor, /turbine_outlet, /core_rotor): a standalone
+# atmospheric turbine that turns a gas pressure differential from a pipe
+# network into power (code/modules/power/turbine/turbine.dm). "Turbine" was
+# mapped here for three of these paths and had to be undone -- SS14's only
+# "Turbine" id (_FarHorizons/Entities/Structures/Power/Generation/
+# FissionGenerator/turbine.yml) is a completely different apparatus: a
+# gas turbine that is part of the fission/nuclear reactor generation
+# complex (GuideHelp points at NuclearReactor, DeviceLinkSource/Sink drive
+# a stator-load UI, PowerSupplier ramps up to 75000 W) -- a nuclear-reactor
+# component, not a general-purpose atmos-to-power converter, so it is the
+# wrong mechanic even though the name matches exactly.
+- /obj/machinery/power/turbine
 # /obj/machinery/vending (bare): abstract_type in tgstation source -- never
 # placed directly, so its presence here is itself a bug in the source map.
 - /obj/machinery/vending

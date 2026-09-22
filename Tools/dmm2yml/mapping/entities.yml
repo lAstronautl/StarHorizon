@@ -2452,7 +2452,6 @@
 /obj/machinery/modular_computer/preset/cargochat/science: ComputerCargoOrdersScience
 /obj/machinery/modular_computer/preset/research: ComputerResearchAndDevelopment
 /obj/machinery/ore_silo: MachineMaterialSilo
-/obj/machinery/power/turbine/core_rotor: Turbine
 /obj/structure/mannequin/skeleton: Mannequin
 /obj/structure/sign/departments/aisat/directional/north: SignAi
 /obj/structure/sign/departments/telecomms/directional/south: SignTelecomms
@@ -2631,7 +2630,6 @@
 /obj/machinery/air_sensor/mix_tank: AirSensor
 /obj/machinery/air_sensor/oxygen_tank: AirSensor
 /obj/machinery/door/window/brigdoor/security/cell/left/directional/north: {entity: WindoorSecureBrigLocked, dir: 1}
-/obj/machinery/power/turbine/turbine_outlet: Turbine
 /obj/machinery/rnd/destructive_analyzer: MachineArtifactCrusher
 /obj/machinery/rnd/server/master: ResearchAndDevelopmentServer
 /obj/machinery/vending/wardrobe/coroner_wardrobe: VendingMachineMediDrobe
@@ -2663,7 +2661,6 @@
 /obj/item/trash/raisins: FoodPacketRaisinsTrash
 /obj/item/trash/can/food/beans: FoodTinBeansTrash
 /obj/item/grenade/clusterbuster/soap: SlipocalypseClusterSoap
-/obj/machinery/power/turbine: Turbine
 # Nyanotrasen fork id (main tree has no deep fryer); found via the
 # circuit board's prototype: construction-result field, not a name match.
 /obj/machinery/deepfryer: KitchenDeepFryer
