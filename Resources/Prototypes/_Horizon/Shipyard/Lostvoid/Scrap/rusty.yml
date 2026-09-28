@@ -11,7 +11,7 @@
   category: Micro
   group: Custom
   shuttlePath: /Maps/_Horizon/Lostvoid/Shipyard/Shuttles/Scrap/rusty.yml
-  guidebookPage: ShipyardRusty
+  guidebookPage: null # Horizon: no guidebook page exists yet
   class:
   - Scrapyard
   - Civilian
