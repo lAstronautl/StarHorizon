@@ -271,7 +271,12 @@
 # (RandomPosterContraband et al.) are wall-mounted structure spawners only,
 # there is no held/loose poster item form to match against.
 - /obj/item/poster/random_contraband
-- /obj/structure/urinal
+# /obj/structure/urinal (bare) has no entry here at all: ignore.yml matches
+# by prefix, and /obj/structure/urinal/directional/north already has a real
+# mapping (ToiletDirtyWater) in entities.yml -- an entry here would have
+# silently swallowed it before entities.yml was ever consulted, the same
+# class of bug as /turf/open swallowing its children above. Bare urinal
+# itself still has no match, so it correctly surfaces as unresolved instead.
 # /obj/structure/disposaloutlet: SS14's disposal system has no outlet
 # structure at the far end of the pipe network (checked Entities/Structures/
 # Piping/Disposal/*.yml -- only units, pipes and fittings, no outlet).
@@ -280,13 +285,16 @@
 # (game/objects/items/rcd/RPD.dm) -- no RPD/RapidPipe id anywhere.
 - /obj/item/pipe_dispenser
 - /obj/item/surgical_drapes
-- /obj/item/trash/can
+# /obj/item/trash/can (bare) has no entry here either, same reason as
+# urinal above: /obj/item/trash/can/food/beans and /food/envirochow both
+# already map to FoodTinBeansTrash in entities.yml.
 - /obj/machinery/dna_scannernew
 - /obj/machinery/mech_bay_recharge_port
 # /obj/item/coin (bare): the concrete base coin type itself (not abstract),
 # but SS14 has no generic "coin" -- only the specific treasure coins already
 # mapped (TreasureCoinDiamond3/Silver3/Iron3) and fork-specific currencies.
-- /obj/item/coin
+# No entry for the bare path itself, same reasoning as urinal/trash-can
+# above -- it would swallow those three specific mappings by prefix.
 - /obj/item/gun/ballistic/automatic/pistol/suppressed
 - /obj/item/gun/medbeam
 # /obj/item/megaphone: no Loudspeaker/Bullhorn/Megaphone id anywhere.
@@ -302,7 +310,10 @@
 - /obj/item/stock_parts/scanning_module
 # /obj/item/storage/belt (bare): abstract_type in tgstation source -- never
 # placed directly, so its presence here is itself a bug in the source map.
-- /obj/item/storage/belt
+# No entry for the bare path here: it would swallow the many real
+# /obj/item/storage/belt/* mappings already in entities.yml (utility,
+# medical, security, ...) by prefix. The bare form still surfaces as
+# unresolved if it's ever actually placed, which is correct -- it's a bug.
 - /obj/item/surgery_tray/full
 - /obj/item/trash/sosjerky
 # /obj/item/wallframe/camera: tgstation's portable "camera assembly" item
@@ -317,17 +328,21 @@
 # sensors by id_tag) -- this fork has no equivalent tag-based system.
 - /obj/machinery/airlock_controller/incinerator_atmos
 - /obj/machinery/bookbinder
-- /obj/machinery/chem_heater
-# /obj/machinery/conveyor_switch: no ConveyorSwitch id -- conveyor belts are
-# interacted with directly (ConveyorBelt), no separate switch entity.
-- /obj/machinery/conveyor_switch
+# /obj/machinery/chem_heater (bare) has no entry: /chem_heater/withbuffer
+# already maps to ChemistryHotplate in entities.yml, and a bare entry would
+# swallow it by prefix. Bare chem_heater itself still has no match.
+# /obj/machinery/conveyor_switch (bare) has no entry either:
+# /conveyor_switch/oneway already maps to TwoWayLever in entities.yml.
 - /obj/machinery/gibber
 - /obj/machinery/libraryscanner
-# /obj/machinery/processor: dices/slices solid food items into sub-items
-# (food_and_drinks/machinery/processor.dm). KitchenReagentGrinder was
-# considered and rejected -- it juices items into liquid reagents, a
-# different item-to-reagent mechanic, not item-to-item slicing.
-- /obj/machinery/processor
+# /obj/machinery/processor (bare): dices/slices solid food items into
+# sub-items (food_and_drinks/machinery/processor.dm). KitchenReagentGrinder
+# was considered and rejected for the *bare* type -- it juices items into
+# liquid reagents, a different item-to-reagent mechanic, not item-to-item
+# slicing. No entry for the bare path here though: /processor/slime
+# specifically already maps to KitchenReagentGrinder in entities.yml (slime
+# processing genuinely is reagent extraction, unlike generic food dicing),
+# and a bare entry would swallow that by prefix.
 - /obj/machinery/monkey_recycler
 # /obj/machinery/pipedispenser (and /disposal, /disposal/transit_tube): the
 # machine form of the pipe dispenser -- no PipeDispenser/PipeVend id anywhere.
@@ -355,7 +370,11 @@
 - /obj/machinery/power/turbine
 # /obj/machinery/vending (bare): abstract_type in tgstation source -- never
 # placed directly, so its presence here is itself a bug in the source map.
-- /obj/machinery/vending
+# No entry for the bare path here: it would swallow every real
+# /obj/machinery/vending/* mapping already in entities.yml (dozens of them,
+# every actual vending machine on a map) by prefix -- this is the same bug
+# class as /turf/open swallowing its children above, just far more costly
+# since vending machines appear on nearly every station map.
 - /obj/machinery/washing_machine
 - /obj/structure/displaycase
 - /obj/structure/reagent_dispensers/cooking_oil
@@ -365,11 +384,13 @@
 # unresolved rather than force a mismatched mechanic.
 - /obj/structure/safe
 - /obj/structure/safe/floor
-# /obj/structure/sign/departments/evac: a plain, non-directional evacuation
-# department sign (icon_state "evac"). Distinct from the arrow-shaped
-# /obj/structure/sign/directions/evac (icon_state "direction_evac") that
-# SignDirectionalEvac already covers -- no plain equivalent exists.
-- /obj/structure/sign/departments/evac
+# /obj/structure/sign/departments/evac (bare): a plain, non-directional
+# evacuation department sign (icon_state "evac"). Distinct from the
+# arrow-shaped /obj/structure/sign/directions/evac (icon_state
+# "direction_evac") that SignDirectionalEvac already covers -- no plain
+# equivalent exists for the bare path. No entry for it here though:
+# /obj/structure/sign/departments/evac/directional/west already maps to
+# SignShipDock in entities.yml, and a bare entry would swallow it.
 # /obj/structure/transit_tube_pod: decorative transit-tube-system prop; this
 # fork has no transit tube system at all (no TransitTube* id anywhere).
 - /obj/structure/transit_tube_pod
@@ -391,14 +412,17 @@
 - /turf/baseturf_skipover
 # /turf/open/floor/mineral (bare): icon_state is explicitly null in source --
 # doesn't render at all unless a concrete subtype is used.
-- /turf/open/floor/mineral
-# /turf/open/floor/material (+ /meat, /meat/airless): a dynamic-material
-# floor whose colour comes from whatever custom_materials built it
-# (MATERIAL_COLOR flag) -- a runtime tinting mechanic, not a fixed sprite.
+# /turf/open/floor/mineral and /turf/open/misc (both bare) themselves get NO
+# entry here at all, same reasoning as /turf/open and /turf/closed above:
+# ignore.yml matches by prefix, and both are the parent of a whole family of
+# real, individually-mapped turfs.yml rules (every /turf/open/floor/mineral/*
+# ore floor, every /turf/open/misc/* natural-terrain tile) -- an entry here
+# would silently swallow all of them before turfs.yml is ever consulted.
+# Neither is abstract_type, so if the bare type is ever placed directly it
+# correctly shows up as unresolved instead of silently becoming Plating --
+# which, for /turf/open/misc, is exactly right: its own name is "coder/
+# mapper fucked up" and its own desc says "report on GitHub please".
 - /turf/open/floor/material
-# /turf/open/misc (bare): tgstation's own placeholder for "coder/mapper
-# fucked up", same as /turf/open/genturf above.
-- /turf/open/misc
 - /turf/open/floor/emissive_test
 # /turf/open/floor/bluespace (bare, not the mineral one below): "micro-
 # teleports [that] let people move at incredible speeds" -- a speed-boost
@@ -419,9 +443,8 @@
 # a sprite.
 - /turf/open/floor/light
 - /turf/open/indestructible/light
-# /turf/open/misc/beach/coast (+ /corner): tied to the tide mechanic, same
-# reasoning as /turf/open/water above.
-- /turf/open/misc/beach/coast
+# /turf/open/misc/beach/coast (+ /corner): the actual shoreline; see
+# turfs.yml -- moved there.
 # /turf/open/floor/black: paired in source with greenscreen (a camera/film
 # gimmick set), no equivalent.
 - /turf/open/floor/black
@@ -444,14 +467,10 @@
 # /turf/open/floor/bone (+ /corner, /meaty and all its children): lavaland
 # dungeon dressing, no equivalent.
 - /turf/open/floor/bone
-# /turf/open/floor/meat: "Floor is meat!" -- dragon-lair/heretic event floor.
-- /turf/open/floor/meat
 - /turf/open/mirage
 # /turf/open/misc/ashplanet (+ /ash, /rocky, /wateryrock and its children):
 # no Ash-family tile anywhere in the catalog.
 - /turf/open/misc/ashplanet
-# /turf/open/misc/hay (+ /icemoon, /lavaland): no Hay tile anywhere.
-- /turf/open/misc/hay
 # /turf/open/cliff (+ /snowrock and its children): elevation-change cliff
 # dressing, not a floor material.
 - /turf/open/cliff
@@ -459,7 +478,6 @@
 # events, each checked individually and confirmed gimmick-only.
 - /turf/open/indestructible/airblock
 - /turf/open/indestructible/binary
-- /turf/open/indestructible/bitrunning_transport
 - /turf/open/indestructible/boss/air
 - /turf/open/indestructible/hierophant
 - /turf/open/indestructible/necropolis
@@ -469,26 +487,17 @@
 - /turf/open/indestructible/tram
 - /turf/open/floor/tram
 # lavaland ore-vein floors with no matching SS14 tile (gold/uranium/plasma,
-# plasteel and bananium are mapped above; these have nothing).
+# plasteel, bananium and diamond are mapped above; these have nothing).
 - /turf/open/floor/mineral/abductor
 - /turf/open/floor/mineral/adamantine
 - /turf/open/floor/mineral/bluespace
-- /turf/open/floor/mineral/diamond
 - /turf/open/floor/mineral/metal_hydrogen
 - /turf/open/floor/mineral/mythril
 - /turf/open/floor/mineral/runite
 - /turf/open/floor/mineral/telecrystal
-# titanium/yellow (plain and /tiled): no SS14 shuttle-floor tile is yellow.
-- /turf/open/floor/mineral/titanium/yellow
-- /turf/open/floor/mineral/titanium/tiled/yellow
 # /turf/open/floor/cult (+ /airless): cultist ritual-room engraved floor, no
 # equivalent.
 - /turf/open/floor/cult
-# concrete/pavement ("hot, coarse pavement"): a distinct texture from the
-# tile/slab/smooth family mapped above, no matching SS14 variant.
-# (concrete/reinforced -- "hexacrete" -- turned out to share FloorReinforced's
-# sprite, see turfs.yml.)
-- /turf/open/floor/concrete/pavement
 # holodeck states that are themselves a mechanic, not just a sprite:
 # beach/water ("gives the impression you can walk on water"), chess pattern,
 # hyperspace ("may induce motion sickness"), space ("deadly aspects of space
