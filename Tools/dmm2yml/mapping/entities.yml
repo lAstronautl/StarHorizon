@@ -2685,3 +2685,84 @@
 /obj/machinery/deepfryer: KitchenDeepFryer
 /obj/structure/sign/poster/official/random: {entity: RandomPosterLegit, wall: auto, onWall: true}
 /obj/structure/sign/poster/random: {entity: RandomPosterAny, wall: auto, onWall: true}
+
+# ---- closing gaps from the other direction: SS14 prototype ids that no tg
+# path mapped to yet, cross-checked against tgstation source for the type
+# that should target each one (rather than scanning tg paths outward, this
+# batch started from the SS14 side and worked backward). Every id below was
+# confirmed via matching name/description/mechanic text against the tg
+# source file, not by name similarity alone. ----
+
+# the battle arcade (turn-based fight against a randomly-named boss) is
+# tgstation's actual analogue of Space Villain -- both are the "beat up a
+# procedurally-named enemy" arcade minigame. orion_trail (an Oregon-Trail
+# parody) and amputation (a rhythm minigame) are different games entirely,
+# so they're left unmapped.
+/obj/machinery/computer/arcade/battle: SpaceVillainArcade
+
+# fax machines: tg's fax.dm literally shares SS14's flavour text ("Bluespace
+# technologies on the application of bureaucracy."), confirming they're the
+# same feature. The bare path is already FaxMachineShip (fork-specific); these
+# three are more specific overrides for the department/global variants SS14
+# actually has distinct sprites for.
+/obj/machinery/fax/heads/captain: FaxMachineCaptain
+/obj/machinery/fax/admin/syndicate: FaxMachineSyndie
+/obj/machinery/fax/admin: FaxMachineCentcom
+
+# gas canisters: SS14 (via this fork) ported tgstation's own exotic gas list
+# wholesale (zauker, proto-nitrate, hyper-noblium, healium, etc. are not
+# generic SS14 content), so matching by which gas the canister holds is a
+# real identity check, not a name-similarity guess. tg's "freon" and SS14's
+# "frezon" are confirmed the same gas -- both are formed from
+# plasma+CO2+BZ at high temperature and both react with BZ to form Healium
+# (code/modules/atmospherics/gasmixtures/reactions.dm); "frezon" is just the
+# trademark-safe respelling. tg's "nob" is GAS_HYPER_NOBLIUM per
+# code/_globalvars/lists/canisters.dm. tg's "miasma" and SS14's "ammonia"
+# canisters have no counterpart on the other side, so both stay unmapped.
+/obj/machinery/portable_atmospherics/canister/plasma: PlasmaCanister
+/obj/machinery/portable_atmospherics/canister/carbon_dioxide: CarbonDioxideCanister
+/obj/machinery/portable_atmospherics/canister/tritium: TritiumCanister
+/obj/machinery/portable_atmospherics/canister/water_vapor: WaterVaporCanister
+/obj/machinery/portable_atmospherics/canister/nitrous_oxide: NitrousOxideCanister
+/obj/machinery/portable_atmospherics/canister/bz: BZCanister
+/obj/machinery/portable_atmospherics/canister/pluoxium: PluoxiumCanister
+/obj/machinery/portable_atmospherics/canister/hydrogen: HydrogenCanister
+/obj/machinery/portable_atmospherics/canister/nitrium: NitriumCanister
+/obj/machinery/portable_atmospherics/canister/healium: HealiumCanister
+/obj/machinery/portable_atmospherics/canister/nob: HyperNobliumCanister
+/obj/machinery/portable_atmospherics/canister/proto_nitrate: ProtoNitrateCanister
+/obj/machinery/portable_atmospherics/canister/zauker: ZaukerCanister
+/obj/machinery/portable_atmospherics/canister/halon: HalonCanister
+/obj/machinery/portable_atmospherics/canister/helium: HeliumCanister
+/obj/machinery/portable_atmospherics/canister/antinoblium: AntiNobliumCanister
+/obj/machinery/portable_atmospherics/canister/freon: FrezonCanister
+
+# department/job lockers: tg keeps these as secure_closet or wardrobe
+# subtypes, one per job, the same split SS14 makes. Matched by comparing the
+# tg `name` string directly against the SS14 prototype's own name field --
+# most of these are exact string matches (e.g. "booze storage",
+# "detective's cabinet", "armory closet"), not just similar wording.
+/obj/structure/closet/secure_closet/quartermaster: LockerQuarterMaster
+/obj/structure/closet/secure_closet/captains: LockerCaptain
+/obj/structure/closet/secure_closet/hop: LockerHeadOfPersonnel
+/obj/structure/closet/secure_closet/engineering_chief: LockerChiefEngineer
+/obj/structure/closet/secure_closet/engineering_electrical: LockerElectricalSupplies
+/obj/structure/closet/secure_closet/engineering_welding: LockerWeldingSupplies
+/obj/structure/closet/secure_closet/atmospherics: LockerAtmospherics
+/obj/structure/closet/secure_closet/medical1: LockerMedicine
+/obj/structure/closet/secure_closet/medical3: LockerMedical
+/obj/structure/closet/secure_closet/chemical: LockerChemistry
+/obj/structure/closet/secure_closet/paramedic: LockerParamedic
+/obj/structure/closet/secure_closet/hydroponics: LockerBotanist
+/obj/structure/closet/secure_closet/bar: LockerBooze
+/obj/structure/closet/secure_closet/detective: LockerDetective
+/obj/structure/closet/secure_closet/evidence: LockerEvidence
+/obj/structure/closet/secure_closet/brig/genpop: LockerPrisoner
+/obj/structure/closet/syndicate: LockerSyndicatePersonal
+/obj/structure/closet/wardrobe/miner: LockerSalvageSpecialist
+# freezer: the bare path (icon_state "freezer", unmodified) covers the
+# money/gulag/meat/empty variants that don't need their own SS14 sprite;
+# /kitchen specifically is locked to kitchen access ("Kitchen, Locked" in
+# SS14's own suffix), matching LockerFreezer over the unlocked base.
+/obj/structure/closet/secure_closet/freezer: LockerFreezerBase
+/obj/structure/closet/secure_closet/freezer/kitchen: LockerFreezer
