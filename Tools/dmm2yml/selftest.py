@@ -628,6 +628,36 @@ def check_dictionaries(mapping_set, index) -> Result:
     return Result("dictionaries: ids resolve", not problems, detail)
 
 
+def check_ignore_does_not_swallow_mappings(mapping_set) -> Result:
+    """An ignore.yml prefix must not sit above a real mapping.
+
+    is_ignored() matches by path prefix and is checked before turfs.yml/
+    entities.yml/decals.yml are ever consulted (see MappingSet.resolve). A
+    "bare type is itself a bug" entry like /obj/machinery/vending silently
+    swallows every one of its own mapped children -- /obj/machinery/
+    vending/cola and every other real vending machine -- if it sits in
+    ignore.yml at the same time. This happened for real: /turf/open/misc
+    and /turf/open/floor/mineral swallowed their entire mapped families,
+    and nine bare object paths (vending, storage/belt, coin, urinal,
+    trash/can, chem_heater, conveyor_switch, processor, sign/departments/
+    evac) swallowed dozens of real entities.yml mappings, some pre-dating
+    this converter's own history. Only 20/20 selftest checks passed the
+    whole time because a wrongly-*skipped* path never shows up as
+    *unresolved* -- this check is the only thing that would have caught
+    it."""
+    mapped_paths = list(mapping_set.turfs) + list(mapping_set.entities) + list(mapping_set.decals)
+    problems = []
+    for prefix in mapping_set.ignore:
+        for path in mapped_paths:
+            if path != prefix and path.startswith(prefix + "/"):
+                problems.append(f"ignore {prefix!r} swallows the mapping at {path!r}")
+
+    detail = "; ".join(problems[:5]) if problems else f"{len(mapping_set.ignore)} ignore prefixes, none swallow a mapped path"
+    if len(problems) > 5:
+        detail += f" (and {len(problems) - 5} more)"
+    return Result("ignore.yml: no prefix swallows a real mapping", not problems, detail)
+
+
 def check_conversion(mapping_set, index) -> Result:
     """The fixture must convert to exactly the map worked out by hand."""
     builder, survey = _build_fixture(mapping_set, index)
@@ -1041,6 +1071,7 @@ def run(repo_root: str, mapping_dir: str, prototypes_dir: str) -> list[Result]:
         ("chunks: no empty chunks", lambda: check_no_empty_chunks(mapping_set, index)),
         ("chunks: round-trip vs repo maps", lambda: check_chunk_roundtrip(repo_root)),
         ("dictionaries: ids resolve", lambda: check_dictionaries(mapping_set, index)),
+        ("ignore.yml: no prefix swallows a real mapping", lambda: check_ignore_does_not_swallow_mappings(mapping_set)),
         ("dictionaries: indented prototype lists", lambda: check_protoindex_indentation()),
         ("dictionaries: trailing comments on id/abstract lines", lambda: check_protoindex_trailing_comments()),
         ("conversion: fixture map", lambda: check_conversion(mapping_set, index)),
