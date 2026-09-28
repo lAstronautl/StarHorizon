@@ -508,3 +508,40 @@
 - /turf/open/floor/holofloor/hyperspace
 - /turf/open/floor/holofloor/space
 - /turf/open/floor/holofloor/stairs
+
+# ---- closing every remaining tgstation decal against Resources/Prototypes,
+# same rigor as the turf pass above. Everything with a real match is in
+# decals.yml/entities.yml instead; these have none. Note: bare abstract
+# parents (/obj/effect/decal/cleanable itself is abstract_type; /obj/effect/
+# decal/cleanable/food and /obj/effect/decal/remains have no icon_state of
+# their own) get NO entry at all here, same reasoning as /turf/open and the
+# entity-side bare paths above -- they would swallow the real mappings on
+# their own children by prefix. ----
+
+# /obj/effect/decal/chempuff: a spray-bottle projectile puff with
+# layer = FLY_LAYER, fired and flying through the air -- a transient
+# gameplay effect, not something placed statically on a map.
+- /obj/effect/decal/chempuff
+# /obj/effect/decal/cleanable/brimdust: rare brimdemon mob loot, uses a
+# mining-ore icon rather than a floor-mess one; not a real map decal.
+- /obj/effect/decal/cleanable/brimdust
+# /obj/effect/decal/cleanable/grand_remains (+ /cheese): a wizard grand
+# ritual's drawn ash pattern -- antag-specific ritual content, no
+# equivalent rune-pattern decal.
+- /obj/effect/decal/cleanable/grand_remains
+# /obj/effect/decal/cleanable/traitor_rune: syndicate spray-can graffiti,
+# no equivalent.
+- /obj/effect/decal/cleanable/traitor_rune
+# /obj/effect/decal/fakelattice: a decal that only *looks* like a lattice
+# grid -- SS14's Lattice is a real tile with real catwalk mechanics, so
+# using it here would misrepresent a purely decorative sprite as the real
+# structural mechanic.
+- /obj/effect/decal/fakelattice
+# /obj/effect/decal/hammerandsickle: a novelty shuttle decal, no equivalent.
+- /obj/effect/decal/hammerandsickle
+# /obj/effect/decal/necropolis_gate_decal: ties to the already-skipped
+# necropolis ruin boss content.
+- /obj/effect/decal/necropolis_gate_decal
+# /obj/effect/decal/puzzle_dots: a minigame puzzle-board decal, no
+# equivalent.
+- /obj/effect/decal/puzzle_dots

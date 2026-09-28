@@ -359,6 +359,25 @@
 /obj/effect/decal/cleanable/vomit/old: PuddleVomit
 /obj/effect/decal/cleanable/greenglow: Puddle
 /obj/effect/decal/cleanable/chem_pile: Puddle
+# fresh vomit -- same reagent/visual identity as vomit/old above, just not
+# aged yet; the nanite/nebula variants are still fundamentally vomit.
+/obj/effect/decal/cleanable/vomit: PuddleVomit
+/obj/effect/decal/cleanable/vomit/nanites: PuddleVomit
+/obj/effect/decal/cleanable/vomit/nebula: PuddleVomit
+# egg has its own reagent-matched puddle; insect guts is closer to gib
+# debris (PuddleSmear, like the robot/xeno gib puddles above) than a plain
+# liquid. Ink, fuel and stabilized plasma have no reagent-matched puddle --
+# PuddleFlour/PuddleTomato exist but only because tgstation happens to
+# reuse those sprites for unrelated content, and picking them would show
+# the wrong reagent on examine, so these fall back to the unlabelled
+# generic Puddle instead (the same choice already made for blood/oil above).
+/obj/effect/decal/cleanable/food/egg_smudge: PuddleEgg
+/obj/effect/decal/cleanable/insectguts: PuddleSmear
+/obj/effect/decal/cleanable/food/squid_ink: Puddle
+/obj/effect/decal/cleanable/fuel_pool: Puddle
+/obj/effect/decal/cleanable/fuel_pool/hivis: Puddle
+/obj/effect/decal/cleanable/plasma: Puddle
+/obj/effect/decal/cleanable/leaper_sludge: Puddle
 
 # ---- job spawn points ----
 /obj/effect/landmark/start/assistant: SpawnPointPassenger

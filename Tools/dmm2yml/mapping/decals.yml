@@ -1613,6 +1613,24 @@
 /obj/effect/decal/cleanable/food/plant_smudge: Remains
 /obj/effect/decal/cleanable/food/tomato_smudge: Remains
 
+# ---- closing the rest of tgstation's cleanable/remains decals against
+# Resources/Prototypes: SS14's own "cleanable filth" catalog (Decals/
+# dirty.yml) is deliberately abstract -- Dirt/DirtLight/DirtHeavy/Remains/
+# Rust, no content-specific sprite for what made the mess -- so anything
+# dry and debris-like folds into the closest existing category above
+# rather than force a new one. Liquid messes go to entities.yml instead
+# (the Puddle family), same as blood/vomit already do above.
+/obj/effect/decal/cleanable/ants: Remains
+/obj/effect/decal/cleanable/ants/fire: Remains
+/obj/effect/decal/cleanable/can_bits: Remains
+/obj/effect/decal/cleanable/concrete_dust: DirtLight
+/obj/effect/decal/cleanable/generic: Remains
+/obj/effect/decal/cleanable/molten_object: Remains
+/obj/effect/decal/cleanable/rubble: Remains
+/obj/effect/decal/remains/plasma: Remains
+/obj/effect/decal/remains/robot: Remains
+/obj/effect/decal/remains/xeno: Remains
+
 /obj/effect/decal/cleanable/ash: burnt1
 /obj/effect/decal/cleanable/ash/large: burnt3
 
