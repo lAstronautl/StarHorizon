@@ -77,6 +77,7 @@ public sealed class ChatSanitizationManager : IChatSanitizationManager
         Entry("kek", "chatsan-laughs"),
         Entry("rofl", "chatsan-laughs"),
         Entry("o7", "chatsan-salutes"),
+        Entry("о7", "chatsan-salutes"), // Horizon: Cyrillic "о" for the Russian keyboard layout
         Entry(";_;7", "chatsan-tearfully-salutes"),
         Entry("idk", "chatsan-shrugs"),
         Entry(";)", "chatsan-winks"),

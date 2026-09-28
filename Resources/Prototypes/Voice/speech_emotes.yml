@@ -313,6 +313,10 @@
     - salutes
     - saluted # Frontier
     - saluting # Frontier
+    - салютует # Horizon
+    - отдаёт честь # Horizon: matches the "o7" chat shorthand
+    - отдает честь # Horizon
+    - отдаёт честь со слезами на глазах # Horizon: matches the "o7" chat shorthand
 
 - type: emote
   id: Gasp
