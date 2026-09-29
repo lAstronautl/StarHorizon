@@ -1638,6 +1638,19 @@
 /obj/machinery/power/energy_accumulator/tesla_coil: TeslaCoil
 /obj/machinery/power/energy_accumulator/grounding_rod: TeslaGroundingRod
 /obj/machinery/power/shieldwallgen: ContainmentFieldGenerator
+# tg's own name for this is literally "gravitational singularity".
+/obj/singularity: Singularity
+# the force-field beam segment between two field generators -- tg's name is
+# literally "containment field", not the generator pole itself (already
+# mapped above/below).
+/obj/machinery/field/containment: ContainmentField
+# tg's thermoelectric generator (TEG) engine: the core unit and its hot/cold
+# circulator pair. Names match verbatim ("thermoelectric generator",
+# "circulator/heat exchanger" vs "circulator") -- this is a machine that
+# sits on the atmos pipe network, same as vents/scrubbers/pumps, so it's
+# still worth converting even though the network's own pipes are not.
+/obj/machinery/power/thermoelectric_generator: TegCenter
+/obj/machinery/atmospherics/components/binary/circulator: TegCirculator
 /obj/machinery/power/apc: APCBasic
 /obj/machinery/power/apc/worn_out/directional/north: {entity: APCBasic, wall: north, onWall: true}
 /obj/machinery/power/apc/worn_out/directional/south: {entity: APCBasic, wall: south, onWall: true}
