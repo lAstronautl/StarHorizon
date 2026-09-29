@@ -530,6 +530,21 @@
 /obj/item/circuitboard/machine/chem_dispenser/drinks: SodaDispenserMachineCircuitboard
 /obj/item/circuitboard/machine/recharger: WeaponCapacitorRechargerCircuitboard # tg name "Weapon Recharger"
 /obj/item/circuitboard/machine/electrolyzer: ElectrolysisUnitMachineCircuitboard
+# tg's computer circuitboard family (computer_circuitboards.dm), each checked
+# against tg's own name= field.
+/obj/item/circuitboard/computer/atmos_alert: AlertsComputerCircuitboard
+/obj/item/circuitboard/computer/atmos_control/nocontrol/master: AtmosMonitoringComputerCircuitboard
+/obj/item/circuitboard/computer/communications: CommsComputerCircuitboard
+/obj/item/circuitboard/computer/communications/syndicate: SyndicateCommsComputerCircuitboard
+/obj/item/circuitboard/computer/crew: CrewMonitoringComputerCircuitboard
+/obj/item/circuitboard/computer/med_data: MedicalRecordsComputerCircuitboard
+/obj/item/circuitboard/computer/rdconsole: ResearchComputerCircuitboard
+/obj/item/circuitboard/computer/security: SurveillanceCameraMonitorCircuitboard # tg name "Security Cameras"
+/obj/item/circuitboard/computer/cargo/request: CargoRequestComputerCircuitboard
+/obj/item/circuitboard/computer/solar_control: SolarControlComputerCircuitboard
+/obj/item/circuitboard/computer/powermonitor: PowerComputerCircuitboard
+/obj/item/circuitboard/computer/secure_data: CriminalRecordsComputerCircuitboard # tg name "Security Records Console"
+/obj/item/circuitboard/computer/syndicate_shuttle: SyndicateShuttleConsoleCircuitboard
 /obj/item/circuitboard/machine/cell_charger: CellRechargerCircuitboard
 /obj/item/melee/baton/telescopic: TelescopicShield
 /obj/item/clothing/head/helmet: ClothingHeadHelmetBasic
