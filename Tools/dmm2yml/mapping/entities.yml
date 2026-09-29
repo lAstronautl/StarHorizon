@@ -14,6 +14,21 @@
 /obj/effect/spawner/structure/window/reinforced: [Grille, ReinforcedWindow]
 /obj/structure/window: Window
 /obj/structure/window/reinforced: ReinforcedWindow
+# material window variants: exact/near-exact tg name matches. tg has no
+# uranium- or mining-material window (checked the whole codebase, only a
+# stray comment mentions "mining pods"), unlike the floor-tile mineral
+# family, so those SS14 ids stay unmapped rather than forced.
+/obj/structure/window/plasma: PlasmaWindow
+/obj/structure/window/reinforced/plasma: ReinforcedPlasmaWindow
+/obj/structure/window/reinforced/plasma/plastitanium: PlastitaniumWindow
+# tg's tinted window is a step up from plain reinforced (SS14's TintedWindow
+# parents plain Window instead), but "tinted" -- not the reinforcement tier
+# -- is the visual property being matched here.
+/obj/structure/window/reinforced/tinted: TintedWindow
+/obj/structure/window/reinforced/shuttle: ShuttleWindow
+# same tg name ("shuttle window") as the titanium-material shuttle hull
+# variant above -- same SS14 sprite either way.
+/obj/structure/window/reinforced/titanium: ShuttleWindow
 /obj/structure/railing: Railing
 
 # ---- doors ----
@@ -746,6 +761,7 @@
 /obj/item/hemostat: Hemostat
 /obj/item/storage/medkit: Medkit
 /obj/structure/mop_bucket: MopBucket
+/obj/structure/mop_bucket/janitorialcart: JanitorialTrolley
 /obj/item/chair/stool: Stool
 /obj/item/chair/wood: ChairWood
 /obj/item/fishing_rod: FishingRod
@@ -2867,3 +2883,23 @@
 # foldable-item concept (parent BaseDeployFoldable), not the deployed
 # /obj/structure/bed/medical/emergency structure.
 /obj/item/emergency_bed: RollerBed
+
+# Specific/Anomaly: only the 4 anomaly kinds whose actual in-game effect (not
+# just its name) matches an SS14 one were mapped. tg's bluespace anomaly has
+# a real Portal/teleport component matching SS14's BluespaceAnomaly; flux
+# causes an EMP zap, matching SS14's Electrified/ElectricityAnomaly. tg's
+# ectoplasm/dimensional/hallucination/weather/vortex/bioscrambler anomalies
+# were checked and each does something conceptually different from any
+# remaining SS14 anomaly (e.g. bioscrambler mutates a chased target's DNA,
+# it does not spawn flesh terrain/mobs like SS14's AnomalyFlesh does) --
+# left unmapped rather than matched on name alone. The whole anomaly core/
+# injection/trap/inert-core item family supports SS14's anomaly-refinement
+# research machines, which this fork's tg has no equivalent of at all
+# (checked in the Machines pass earlier), so none of those get an entry.
+/obj/effect/anomaly/pyro: AnomalyPyroclastic
+/obj/effect/anomaly/grav: AnomalyGravity
+/obj/effect/anomaly/bluespace: AnomalyBluespace
+/obj/effect/anomaly/flux: AnomalyElectricity
+
+# tg's own name for this is literally "carp rift".
+/obj/structure/carp_rift: CarpRift
