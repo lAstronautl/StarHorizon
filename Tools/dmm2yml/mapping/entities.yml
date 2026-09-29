@@ -747,6 +747,17 @@
 # tg's own name is literally "station atmospherics monitoring".
 /obj/machinery/computer/atmos_control/nocontrol/master: ComputerAtmosMonitoring
 /obj/machinery/smartfridge: SmartFridge
+# "smart organ storage" -- the medical-context smartfridge variant.
+/obj/machinery/smartfridge/organ: SmartFridgeMedical
+# tg's own name for this is literally "nuclear fission explosive". The
+# /syndicate nukeop reskin has no name/sprite override, so it inherits the
+# same NuclearBomb via this bare rule.
+/obj/machinery/nuclearbomb: NuclearBomb
+# visually identical to Protolathe (same icon_state "protolathe"); only the
+# security/medical department variants have their own distinct SS14 sprite
+# (already mapped below), so the rest (engineering/service/cargo/science/
+# bare) fall back to this.
+/obj/machinery/rnd/production/techfab: Protolathe
 /obj/item/kitchen/spoon/plastic: SpoonPlastic
 /obj/item/clothing/glasses/blindfold: ClothingEyesBlindfold
 /obj/item/target: TargetHuman
