@@ -26,9 +26,20 @@ public abstract partial class SharedSurgerySystem
         SubscribeLocalEvent<SurgeryLimbSlotConditionComponent, SurgeryValidEvent>(OnLimbSlotConditionValid);
     }
 
+    /// <summary>
+    /// Horizon: organ presence conditions gate starting a surgery, not finishing it.
+    /// Otherwise inserting/extracting the organ mid-surgery invalidates the remaining steps (e.g. closing the incision).
+    /// </summary>
+    private bool IsSurgeryInProgress(EntityUid surgery, EntityUid part)
+    {
+        return TryComp<SurgeryProgressComponent>(part, out var progress)
+            && Prototype(surgery) is { } proto
+            && progress.StartedSurgeries.Contains(proto.ID);
+    }
+
     private void OnOrganDontExistConditionValid(Entity<SurgeryOrganDontExistConditionComponent> ent, ref SurgeryValidEvent args)
     {
-        if (ent.Comp.Organ?.Count != 1)
+        if (ent.Comp.Organ?.Count != 1 || IsSurgeryInProgress(ent, args.Part)) // Horizon: in-progress check
             return;
         var type = ent.Comp.Organ.Values.First().Component.GetType();
 
@@ -65,7 +76,7 @@ public abstract partial class SharedSurgerySystem
     }
     private void OnOrganExistConditionValid(Entity<SurgeryOrganExistConditionComponent> ent, ref SurgeryValidEvent args)
     {
-        if (ent.Comp.Organ?.Count != 1)
+        if (ent.Comp.Organ?.Count != 1 || IsSurgeryInProgress(ent, args.Part)) // Horizon: in-progress check
             return;
 
         var type = ent.Comp.Organ.Values.First().Component.GetType();
