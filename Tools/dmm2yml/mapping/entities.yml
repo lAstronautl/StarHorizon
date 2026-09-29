@@ -528,6 +528,24 @@
 /obj/structure/closet/crate/freezer: CrateFreezer
 /obj/structure/closet/crate/preopen: CrateGenericSteel
 /obj/structure/closet/crate/bin: CrateTrashCart
+# department crate variants: matched by tg's own name string, verbatim in
+# most cases ("medical crate", "hydroponics crate", "engineering crate",
+# "science crate", "secure crate", "plasma crate", "secure hydroponics/
+# engineering/science crate"). "internals" (tg's oxygen-mask breathing gear)
+# matches CrateInternals' own name "oxygen crate".
+/obj/structure/closet/crate/coffin: CrateCoffin
+/obj/structure/closet/crate/internals: CrateInternals
+/obj/structure/closet/crate/medical: CrateMedical
+/obj/structure/closet/crate/radiation: CrateRadiation
+/obj/structure/closet/crate/hydroponics: CrateHydroponics
+/obj/structure/closet/crate/engineering: CrateEngineering
+/obj/structure/closet/crate/science: CrateScience
+/obj/structure/closet/crate/secure: CrateSecure
+/obj/structure/closet/crate/secure/weapon: CrateWeaponSecure
+/obj/structure/closet/crate/secure/plasma: CratePlasma
+/obj/structure/closet/crate/secure/hydroponics: CrateHydroSecure
+/obj/structure/closet/crate/secure/engineering: CrateEngineeringSecure
+/obj/structure/closet/crate/secure/science: CrateScienceSecure
 /obj/structure/closet/secure_closet/security: LockerSecurity
 /obj/structure/closet/secure_closet/engineering_personal: LockerEngineer
 /obj/structure/closet/secure_closet/personal/cabinet: LockerSteel
