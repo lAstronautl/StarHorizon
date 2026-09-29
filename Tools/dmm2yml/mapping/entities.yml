@@ -2766,3 +2766,49 @@
 # SS14's own suffix), matching LockerFreezer over the unlocked base.
 /obj/structure/closet/secure_closet/freezer: LockerFreezerBase
 /obj/structure/closet/secure_closet/freezer/kitchen: LockerFreezer
+
+# ---- continuing the SS14-side gap-check into Furniture/Tables,Beds,Chairs
+# and the potted-plant item family. Same discipline: matched by comparing
+# tg's own `name` string against the SS14 prototype's name, not guessed. ----
+/obj/structure/table/optable: OperatingTable
+/obj/structure/table/reinforced/rglass: TableReinforcedGlass
+/obj/structure/table/glass/plasmaglass: TablePlasmaGlass
+# tg's own name for this is literally "gambling table" -- SS14's id says
+# "Carpet" but its name field is the same "gambling table".
+/obj/structure/table/wood/poker: TableCarpet
+# bronze/brass are the same reused metal-table look under a different name.
+/obj/structure/table/bronze: TableBrass
+/obj/structure/table/wood/fancy/black: TableFancyBlack
+/obj/structure/table/wood/fancy/blue: TableFancyBlue
+/obj/structure/table/wood/fancy/cyan: TableFancyCyan
+/obj/structure/table/wood/fancy/green: TableFancyGreen
+/obj/structure/table/wood/fancy/orange: TableFancyOrange
+/obj/structure/table/wood/fancy/purple: TableFancyPurple
+/obj/structure/table/wood/fancy/red: TableFancyRed
+# tg also has fancy/royalblack and /royalblue (no SS14 counterpart) and SS14
+# has Pink and White (no tg counterpart) -- neither side forces a guess here.
+
+/obj/structure/bed/medical: MedicalBed
+/obj/structure/bed/dogbed: DogBed
+# "dirty mattress" (tg's maintenance-area bed) is the same bare mattress
+# object as SS14's Mattress, just flavoured as neglected.
+/obj/structure/bed/maint: Mattress
+
+/obj/structure/chair/bronze: ChairBrass
+/obj/structure/chair/comfy/shuttle: ChairPilotSeat
+
+# potted plants: the generic /obj/item/kirbyplants is already mapped to
+# PottedPlantRandom (any-of-many), which correctly covers the ~20 numbered
+# SS14 variants without picking one -- these three are the named subtypes
+# tg gives a *specific* sprite/story to, which the random rule can't express.
+/obj/item/kirbyplants/random/dead/research_director: PottedPlantRD
+/obj/item/kirbyplants/random/fullysynthetic: PottedPlant27
+# tg's desc for this one is literally "A bioluminescent plant."
+/obj/item/kirbyplants/photosynthetic: PottedPlantBioluminscent
+
+# tg's name for this is literally "Tomb of the Unknown Employee".
+/obj/structure/fluff/arc: SS13Memorial
+# tg's folded/carryable medical bed item -- SS14's RollerBed is the same
+# foldable-item concept (parent BaseDeployFoldable), not the deployed
+# /obj/structure/bed/medical/emergency structure.
+/obj/item/emergency_bed: RollerBed
