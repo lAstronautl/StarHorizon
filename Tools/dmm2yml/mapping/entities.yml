@@ -340,6 +340,10 @@
 /obj/structure/frame/computer: ComputerFrame
 /obj/structure/girder: Girder
 /obj/structure/reagent_dispensers/watertank: WaterTank
+# tg's own names are literally "high-capacity water tank" and "high
+# capacity fuel tank".
+/obj/structure/reagent_dispensers/watertank/high: WaterTankHighCapacity
+/obj/structure/reagent_dispensers/fueltank/large: WeldingFuelTankHighCapacity
 /obj/structure/toilet: ToiletEmpty
 
 /obj/machinery/door/window/left/directional/north: {entity: Windoor, dir: 1}
@@ -574,6 +578,18 @@
 /obj/structure/closet/wardrobe/virology_white: WardrobeVirology
 /obj/structure/closet/wardrobe/science_white: WardrobeScience
 /obj/structure/closet/wardrobe/botanist: WardrobeBotanist
+# utility closets: tg's own names match verbatim ("tool closet", "radiation
+# suit closet", "EOD closet") or near-verbatim ("level 3 biohazard gear
+# closet" -- ClosetL3's own name; scientist/virology/security/janitor
+# sub-variants match the same-named ClosetL3* ids).
+/obj/structure/closet/toolcloset: ClosetTool
+/obj/structure/closet/radiation: ClosetRadiationSuit
+/obj/structure/closet/bombcloset: ClosetBomb
+/obj/structure/closet/l3closet: ClosetL3
+/obj/structure/closet/l3closet/scientist: ClosetL3Science
+/obj/structure/closet/l3closet/virology: ClosetL3Virology
+/obj/structure/closet/l3closet/security: ClosetL3Security
+/obj/structure/closet/l3closet/janitor: ClosetL3Janitor
 /obj/structure/barricade/security: Barricade
 /obj/structure/frame/machine: MachineFrame
 /obj/structure/plaque/static_plaque/golden: SignPlaque
