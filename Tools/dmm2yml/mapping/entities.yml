@@ -2678,7 +2678,14 @@
 /obj/machinery/air_sensor/carbon_tank: AirSensor
 /obj/machinery/air_sensor/nitrous_tank: AirSensor
 /obj/machinery/atmospherics/components/binary/crystallizer: BaseGasCondenser
-/obj/machinery/door/window/brigdoor/security/cell/left/directional/west: {entity: WindoorSecure, dir: 8}
+# fixed: tg's own req_access is hardcoded to ACCESS_BRIG, matching the
+# pre-stocked WindoorSecureBrigLocked (board: DoorElectronicsBrig), not the
+# unconfigured bare WindoorSecure -- same "Locked" pre-stocked-board pattern
+# as the department airlocks fixed earlier. The bare rule right below covers
+# every direction/subtype that doesn't have its own explicit override.
+/obj/machinery/door/window/brigdoor/security/cell: WindoorSecureBrigLocked
+/obj/machinery/door/window/brigdoor/security/holding: WindoorSecureSecurityLocked
+/obj/machinery/door/window/brigdoor/security/cell/left/directional/west: {entity: WindoorSecureBrigLocked, dir: 8}
 /obj/structure/light_construct/directional/north: PoweredlightEmpty
 /obj/structure/showcase/perfect_employee: ShowcaseRobot
 /obj/structure/sign/departments/telecomms/alt/directional/south: SignTelecomms
@@ -2730,13 +2737,15 @@
 /obj/machinery/atmospherics/components/tank/plasma: PlasmaCanister
 /obj/machinery/bouldertech/refinery: OreProcessor
 /obj/machinery/coffeemaker/impressa: ImpCoffeeMachine
-/obj/machinery/door/window/brigdoor/security/cell/left/directional/south: {entity: WindoorSecure, dir: 2}
+/obj/machinery/door/window/brigdoor/security/cell/left/directional/south: {entity: WindoorSecureBrigLocked, dir: 2}
 /obj/machinery/grill: KitchenElectricGrill
 /obj/machinery/mineral/ore_redemption: OreProcessor
 /obj/machinery/modular_computer/preset/cargochat/engineering: ComputerCargoOrdersEngineering
 /obj/machinery/modular_computer/preset/command: ComputerComms
 /obj/machinery/ntnet_relay: TelecomServer
-/obj/machinery/prisongate: WindoorSecure
+# fixed: req_one_access is hardcoded to ACCESS_BRIG, same as the cell door
+# fix above.
+/obj/machinery/prisongate: WindoorSecureBrigLocked
 /obj/machinery/telecomms/bus/preset_four: TelecomServer
 /obj/machinery/telecomms/message_server/preset: TelecomServer
 /obj/machinery/telecomms/receiver/preset_left: TelecomServer
