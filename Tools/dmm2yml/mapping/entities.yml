@@ -2931,6 +2931,12 @@
 /obj/structure/closet/secure_closet/bar: LockerBooze
 /obj/structure/closet/secure_closet/detective: LockerDetective
 /obj/structure/closet/secure_closet/evidence: LockerEvidence
+# more department-head lockers, same exact-name-match pattern as the batch
+# above.
+/obj/structure/closet/secure_closet/hos: LockerHeadOfSecurity
+/obj/structure/closet/secure_closet/warden: LockerWarden
+/obj/structure/closet/secure_closet/chief_medical: LockerChiefMedicalOfficer
+/obj/structure/closet/secure_closet/research_director: LockerResearchDirector
 /obj/structure/closet/secure_closet/brig/genpop: LockerPrisoner
 /obj/structure/closet/syndicate: LockerSyndicatePersonal
 /obj/structure/closet/wardrobe/miner: LockerSalvageSpecialist
