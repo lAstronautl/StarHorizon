@@ -515,6 +515,22 @@
 /obj/item/storage/fancy/cigarettes/dromedaryco: CigPackRed
 /obj/item/paper_bin: PaperBin
 /obj/item/circuitboard/machine/smes: SMESMachineCircuitboard
+/obj/item/circuitboard/machine/smes/super: SMESAdvancedMachineCircuitboard # higher-capacity battery variant of the same board
+/obj/item/circuitboard/machine/fat_sucker: FatExtractorMachineCircuitboard # tg name "Lipid Extractor"
+/obj/item/circuitboard/machine/cryo_tube: CryoPodMachineCircuitboard
+/obj/item/circuitboard/machine/stasis: StasisBedMachineCircuitboard # tg name "Lifeform Stasis Unit"
+/obj/item/circuitboard/machine/cyborgrecharger: BorgChargerCircuitboard
+/obj/item/circuitboard/machine/mechfab: ExosuitFabricatorMachineCircuitboard
+/obj/item/circuitboard/machine/seed_extractor: SeedExtractorMachineCircuitboard
+/obj/item/circuitboard/machine/sheetifier: SheetifierMachineCircuitboard # tg name "Sheet-meister 2000"
+/obj/item/circuitboard/machine/flatpacker: FlatpackerMachineCircuitboard
+/obj/item/circuitboard/machine/scrubber: PortableScrubberMachineCircuitBoard
+/obj/item/circuitboard/machine/biogenerator: BiogeneratorMachineCircuitboard
+/obj/item/circuitboard/machine/chem_dispenser/drinks/beer: BoozeDispenserMachineCircuitboard
+/obj/item/circuitboard/machine/chem_dispenser/drinks: SodaDispenserMachineCircuitboard
+/obj/item/circuitboard/machine/recharger: WeaponCapacitorRechargerCircuitboard # tg name "Weapon Recharger"
+/obj/item/circuitboard/machine/electrolyzer: ElectrolysisUnitMachineCircuitboard
+/obj/item/circuitboard/machine/cell_charger: CellRechargerCircuitboard
 /obj/item/melee/baton/telescopic: TelescopicShield
 /obj/item/clothing/head/helmet: ClothingHeadHelmetBasic
 /obj/item/clothing/head/helmet/alt: ClothingHeadHelmetBasic
