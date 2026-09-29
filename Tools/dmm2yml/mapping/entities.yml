@@ -549,6 +549,22 @@
 /obj/machinery/power/port_gen/pacman: PortableGeneratorPacman
 /obj/machinery/vending/cola: VendingMachineCola
 /obj/machinery/vending/security: VendingMachineSec
+# tg's own name for this is literally "Liberation Station".
+/obj/machinery/vending/liberationstation: VendingMachineAmmo
+# cola color/brand variants: tg's own names match verbatim ("Space Cola
+# Vendor", "Space-up! Vendor", "Star-kist Vendor", "Pwr Game Vendor"); black
+# and sodie have no name override in tg either, same as their SS14 targets.
+/obj/machinery/vending/cola/black: VendingMachineColaBlack
+/obj/machinery/vending/cola/red: VendingMachineColaRed
+/obj/machinery/vending/cola/space_up: VendingMachineSpaceUp
+/obj/machinery/vending/cola/sodie: VendingMachineSoda
+/obj/machinery/vending/cola/starkist: VendingMachineStarkist
+/obj/machinery/vending/cola/pwr_game: VendingMachinePwrGame
+# tg's own desc is "Shake me up some of that Shambler's Juice!", icon_state
+# "shamblers_juice".
+/obj/machinery/vending/cola/shamblers: VendingMachineShamblersJuice
+# same syndicate-restocked booze vendor concept as SS14's punned rename.
+/obj/machinery/vending/boozeomat/syndicate: VendingMachineBoozeSyndicate
 /obj/machinery/vending/snack: VendingMachineSnack
 /obj/machinery/power/shuttle_engine/heater: Thruster
 /obj/machinery/power/shuttle_engine/propulsion/burst: Thruster
@@ -734,7 +750,12 @@
 /obj/item/reagent_containers/cup/glass/mug: DrinkMug
 /obj/item/reagent_containers/cup/glass/shaker: DrinkShaker
 /obj/item/mining_scanner: MineralScanner
-/obj/machinery/vending/autodrobe: VendingMachineClothing
+# fixed from an earlier mistake: this was pointed at VendingMachineClothing
+# (name "ClothesMate"), which is a DIFFERENT tg vendor
+# (/obj/machinery/vending/clothing, already correctly mapped to it below).
+# tg's own name for autodrobe is literally "AutoDrobe", matching
+# VendingMachineTheater's own name field.
+/obj/machinery/vending/autodrobe: VendingMachineTheater
 
 # ---- sixth catalog-wide pass ----
 /obj/item/stock_parts/matter_bin: MatterBinStockPart
