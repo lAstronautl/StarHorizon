@@ -2626,7 +2626,27 @@
 /obj/machinery/vending/robotics: VendingMachineRobotics
 /obj/machinery/barsign: BarSign
 /obj/structure/noticeboard/ce: NoticeBoard
-/obj/structure/door_assembly/door_assembly_med: AirlockAssembly
+# fixed: AirlockAssemblyMedical is a distinct SS14 id, not the generic
+# AirlockAssembly this was pointed at.
+/obj/structure/door_assembly/door_assembly_med: AirlockAssemblyMedical
+# door_assembly department variants: same tg naming convention as the
+# finished department airlocks above, matched the same way.
+/obj/structure/door_assembly/door_assembly_public: AirlockAssembly
+/obj/structure/door_assembly/door_assembly_com: AirlockAssemblyCommand
+/obj/structure/door_assembly/door_assembly_sec: AirlockAssemblySecurity
+/obj/structure/door_assembly/door_assembly_eng: AirlockAssemblyEngineering
+/obj/structure/door_assembly/door_assembly_min: AirlockAssemblyMining
+/obj/structure/door_assembly/door_assembly_atmo: AirlockAssemblyAtmospherics
+/obj/structure/door_assembly/door_assembly_research: AirlockAssemblyScience
+/obj/structure/door_assembly/door_assembly_science: AirlockAssemblyScience
+/obj/structure/door_assembly/door_assembly_hydro: AirlockAssemblyHydroponics
+/obj/structure/door_assembly/door_assembly_mai: AirlockAssemblyMaintenance
+/obj/structure/door_assembly/door_assembly_ext: AirlockAssemblyExternal
+/obj/structure/door_assembly/door_assembly_fre: AirlockAssemblyFreezer
+/obj/structure/door_assembly/door_assembly_viro: AirlockAssemblyVirology
+/obj/structure/door_assembly/door_assembly_centcom: AirlockAssemblyCentralCommand
+/obj/structure/door_assembly/door_assembly_highsecurity: AirlockAssemblyHighSec
+/obj/structure/door_assembly/door_assembly_shuttle: AirlockAssemblyShuttle
 /obj/vehicle/ridden/janicart: VehicleJanicart
 
 /obj/machinery/conveyor_switch/oneway: TwoWayLever
