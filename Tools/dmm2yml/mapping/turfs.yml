@@ -141,6 +141,68 @@
   tile: FloorBasalt
   entity: WallRockBananium
 
+# constructed material walls (built from refined sheets, not ore veins --
+# tg's own /turf/closed/wall/mineral/<material> family). Matched by tg's own
+# `name` string, which for most of these is a literal "<material> wall".
+/turf/closed/wall/mineral/gold:
+  tile: Plating
+  entity: WallGold
+/turf/closed/wall/mineral/silver:
+  tile: Plating
+  entity: WallSilver
+/turf/closed/wall/mineral/diamond:
+  tile: Plating
+  entity: WallDiamond
+# tg's own name is "bananium wall", same as the id despite SS14 calling the
+# id itself WallClown.
+/turf/closed/wall/mineral/bananium:
+  tile: Plating
+  entity: WallClown
+/turf/closed/wall/mineral/sandstone:
+  tile: Plating
+  entity: WallSandstone
+/turf/closed/wall/mineral/uranium:
+  tile: Plating
+  entity: WallUranium
+/turf/closed/wall/mineral/plasma:
+  tile: Plating
+  entity: WallPlasma
+/turf/closed/wall/mineral/wood:
+  tile: Plating
+  entity: WallWood
+# tg's own comment: "has to use this path due to how building walls works" --
+# titanium is tg's shuttle hull wall material.
+/turf/closed/wall/mineral/titanium:
+  tile: Plating
+  entity: WallShuttle
+# "runed metal wall" -- the Nar'Sie cult's wall, matching WallCult.
+/turf/closed/wall/mineral/cult:
+  tile: Plating
+  entity: WallCult
+# "living wall" -- matches WallMeat.
+/turf/closed/wall/material/meat:
+  tile: Plating
+  entity: WallMeat
+# tg's lavaland necropolis ruin's "tomb wall" -- matches WallNecropolis
+# (sprite file necropolis.rsi, same ruin theme).
+/turf/closed/wall/tomb:
+  tile: Plating
+  entity: WallNecropolis
+# tg's own desc: "A wall covered in a thick sheet of ice."
+/turf/closed/wall/ice:
+  tile: Plating
+  entity: WallIce
+# real, distinct map-placeable rusted-wall turfs in tg (their own
+# Initialize proc, not just a damage animation on the plain wall) -- match
+# SS14's WallSolidRust/WallReinforcedRust rather than falling back to the
+# pristine WallSolid/WallReinforced look.
+/turf/closed/wall/rust:
+  tile: Plating
+  entity: WallSolidRust
+/turf/closed/wall/r_wall/rust:
+  tile: Plating
+  entity: WallReinforcedRust
+
 /turf/open/lava:
   tile: FloorBasalt
   entity: FloorLavaEntity

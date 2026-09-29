@@ -86,6 +86,11 @@
 /obj/machinery/door/poddoor/preopen: BlastDoorOpen
 /obj/machinery/door/poddoor/shutters: ShuttersNormal
 /obj/machinery/door/poddoor/shutters/preopen: ShuttersNormalOpen
+# tg's own names are literally "radiation shutters" and "windowed shutters".
+/obj/machinery/door/poddoor/shutters/radiation: ShuttersRadiation
+/obj/machinery/door/poddoor/shutters/radiation/preopen: ShuttersRadiationOpen
+/obj/machinery/door/poddoor/shutters/window: ShuttersWindow
+/obj/machinery/door/poddoor/shutters/window/preopen: ShuttersWindowOpen
 
 # ---- atmospherics ----
 /obj/machinery/atmospherics/components/unary/vent_pump: GasVentPump
@@ -661,8 +666,12 @@
 /obj/item/flashlight/lamp: Lamp
 /obj/item/tank/internals/emergency_oxygen: EmergencyOxygenTank
 /obj/effect/spawner/random/structure/closet_maintenance: ClosetMaintenance
-/obj/structure/plasticflaps: PlasticFlapsClear
-/obj/structure/plasticflaps/opaque: PlasticFlapsOpaque
+# tg's own desc is "Heavy duty, airtight, plastic flaps" and it sets
+# can_atmos_pass = ATMOS_PASS_NO -- a real airtight mechanic, not just
+# flavour text, so the correct target is the Airtight variant, not the
+# plain one (fixed from an earlier, non-airtight mapping).
+/obj/structure/plasticflaps: PlasticFlapsAirtightClear
+/obj/structure/plasticflaps/opaque: PlasticFlapsAirtightOpaque
 /obj/machinery/recharge_station: BorgCharger
 /obj/machinery/portable_atmospherics/scrubber: PortableScrubber
 /obj/machinery/portable_atmospherics/pump: PortablePump
@@ -2903,3 +2912,28 @@
 
 # tg's own name for this is literally "carp rift".
 /obj/structure/carp_rift: CarpRift
+
+# ---- final sweep pass: remaining Doors/Walls/Wallmounts gaps ----
+# tg's shutters/radiation and shutters/window are literally "radiation
+# shutters" and "windowed shutters".
+/obj/machinery/door/poddoor/shutters/radiation: ShuttersRadiation
+/obj/machinery/door/poddoor/shutters/radiation/preopen: ShuttersRadiationOpen
+/obj/machinery/door/poddoor/shutters/window: ShuttersWindow
+/obj/machinery/door/poddoor/shutters/window/preopen: ShuttersWindowOpen
+
+# department signs: matched by tg's own `name` field, not id/folder-name
+# guessing. tg has no equivalent for most of SS14's other department signs
+# (courtroom, telecomms, AI upload/satellite, vault, etc. all checked, none
+# have a corresponding SS14 sign in this fork) or per-gas warning placards
+# (CO2/N2/N2O/O2/plasma/tritium waste), so those stay unmapped.
+/obj/structure/sign/departments/virology: SignVirology
+/obj/structure/sign/departments/morgue: SignMorgue
+/obj/structure/sign/departments/bar: SignBar
+/obj/structure/sign/departments/exam_room: SignExamroom
+/obj/structure/sign/warning/explosives: SignExplosives
+/obj/structure/sign/warning/doors: SignDoors
+
+# tg's own name is literally "Telescreen"; the entertainment sub-type plays
+# media, matching SS14's WallmountTelevision.
+/obj/machinery/computer/security/telescreen: WallmountTelescreen
+/obj/machinery/computer/security/telescreen/entertainment: WallmountTelevision
