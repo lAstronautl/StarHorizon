@@ -2497,6 +2497,29 @@
 /obj/item/stack/sheet/animalhide/bear: MaterialHideBear
 /obj/item/stack/sheet/animalhide/corgi: MaterialHideCorgi
 /obj/item/stack/tile/iron/dark: FloorTileItemDark
+# tg's iron/mineral tile stack family (code/game/objects/items/stacks/tiles/)
+# has a pattern-variant tree (diagonal/herringbone/small="mini") that lines up
+# with SS14's per-pattern FloorTileItem* ids -- checked against tg's own name=
+# for each. SS14's decorative pattern variants that tg has no equivalent for
+# (mono/offset/pavement/checker-light-vs-dark, since tg's one "checker tile"
+# can't be told apart) are intentionally left unmapped.
+/obj/item/stack/tile/iron: FloorTileItemSteel
+/obj/item/stack/tile/iron/diagonal: FloorTileItemSteelDiagonal
+/obj/item/stack/tile/iron/herringbone: FloorTileItemSteelHerringbone
+/obj/item/stack/tile/iron/small: FloorTileItemSteelMini
+/obj/item/stack/tile/iron/dark/diagonal: FloorTileItemDarkDiagonal
+/obj/item/stack/tile/iron/dark/herringbone: FloorTileItemDarkHerringbone
+/obj/item/stack/tile/iron/dark/small: FloorTileItemDarkMini
+/obj/item/stack/tile/iron/white/diagonal: FloorTileItemWhiteDiagonal
+/obj/item/stack/tile/iron/white/herringbone: FloorTileItemWhiteHerringbone
+/obj/item/stack/tile/iron/white/small: FloorTileItemWhiteMini
+/obj/item/stack/tile/iron/kitchen: FloorTileItemKitchen
+/obj/item/stack/tile/iron/freezer: FloorTileItemFreezer
+/obj/item/stack/tile/iron/showroomfloor: FloorTileItemShowroom
+/obj/item/stack/tile/mineral/gold: FloorTileItemGold
+/obj/item/stack/tile/mineral/silver: FloorTileItemSilver
+/obj/item/stack/tile/mineral/snow: FloorTileItemSnow
+/obj/item/stack/tile/grass: FloorTileItemGrass
 /obj/item/stack/wrapping_paper: PresentTrash
 /obj/item/stack/wrapping_paper/xmas: PresentTrash
 /obj/item/stamp/head/captain: RubberStampCaptain
