@@ -23,6 +23,48 @@
 /obj/machinery/door/airlock/external/glass: AirlockExternalGlass
 /obj/machinery/door/airlock/public/glass: AirlockGlass
 /obj/machinery/door/airlock/security/glass: AirlockSecurityGlassLocked
+# department airlocks: tg hardcodes the department restriction directly into
+# the type (no configurable board), which is what SS14's "Locked" suffix
+# variant is -- the same sprite as the bare department id, pre-stocked with
+# that department's DoorElectronics board (Doors/Airlocks/access.yml). The
+# bare (non-Locked) id is for a department-look door with no access
+# configured yet, which no tg path corresponds to.
+/obj/machinery/door/airlock/glass: AirlockGlass
+/obj/machinery/door/airlock/command: AirlockCommandLocked
+/obj/machinery/door/airlock/command/glass: AirlockCommandGlassLocked
+/obj/machinery/door/airlock/security: AirlockSecurityLocked
+/obj/machinery/door/airlock/engineering: AirlockEngineeringLocked
+/obj/machinery/door/airlock/engineering/glass: AirlockEngineeringGlassLocked
+/obj/machinery/door/airlock/medical: AirlockMedicalLocked
+/obj/machinery/door/airlock/medical/glass: AirlockMedicalGlassLocked
+/obj/machinery/door/airlock/hydroponics: AirlockHydroponicsLocked
+/obj/machinery/door/airlock/hydroponics/glass: AirlockHydroGlassLocked
+/obj/machinery/door/airlock/mining: AirlockMiningLocked
+/obj/machinery/door/airlock/mining/glass: AirlockMiningGlassLocked
+/obj/machinery/door/airlock/atmos: AirlockAtmosphericsLocked
+/obj/machinery/door/airlock/atmos/glass: AirlockAtmosphericsGlassLocked
+# tg keeps "research" and "science" as two separate historical type paths for
+# the same department; SS14 only has one Science id, so both point to it.
+/obj/machinery/door/airlock/research: AirlockScienceLocked
+/obj/machinery/door/airlock/research/glass: AirlockScienceGlassLocked
+/obj/machinery/door/airlock/science: AirlockScienceLocked
+/obj/machinery/door/airlock/science/glass: AirlockScienceGlassLocked
+/obj/machinery/door/airlock/freezer: AirlockFreezerLocked
+/obj/machinery/door/airlock/virology: AirlockVirologyLocked
+/obj/machinery/door/airlock/virology/glass: AirlockVirologyGlassLocked
+/obj/machinery/door/airlock/maintenance/glass: AirlockMaintGlassLocked
+# tg's own names are literally "airtight hatch" and "maintenance hatch".
+/obj/machinery/door/airlock/hatch: AirlockHatch
+/obj/machinery/door/airlock/maintenance_hatch: AirlockHatchMaintenance
+# "vault door" -- a security-context heavy door, same family as
+# AirlockSecurityLocked above.
+/obj/machinery/door/airlock/vault: AirlockVaultLocked
+/obj/machinery/door/airlock/shuttle: AirlockShuttle
+/obj/machinery/door/airlock/xenoborg: AirlockXenoborgLocked
+# tg's fancy material airlocks (gold/silver/diamond/uranium/plasma/bananium/
+# sandstone/wood/titanium/bronze) and abductor/cult-themed airlocks have no
+# SS14 counterpart -- unlike floor tiles, airlocks don't have a material-skin
+# system there, so these are left unmapped rather than forced.
 /obj/machinery/door/firedoor: Firelock
 /obj/machinery/door/firedoor/glass: FirelockGlass
 /obj/machinery/door/poddoor: BlastDoor
