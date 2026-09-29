@@ -1223,6 +1223,13 @@
 /obj/item/reagent_containers/blood: Bloodpack
 /obj/item/reagent_containers/cup/bottle/chlorine: ChlorineChemistryVial
 /obj/item/reagent_containers/cup/glass/drinkingglass: DrinkGlass
+# tg's mixed cocktails are all ONE generic drinkingglass whose name/desc is set
+# dynamically from its reagent contents at runtime -- not distinct .dm paths --
+# so almost none of SS14's per-cocktail DrinkXGlass ids have a tg path to map
+# from. These two are the exceptions: tg's own drinkingglass/filled/* family has
+# exactly these two with matching names (list_reagents = pina_colada/irish_cream).
+/obj/item/reagent_containers/cup/glass/drinkingglass/filled/pina_colada: DrinkPinaColadaGlass
+/obj/item/reagent_containers/cup/glass/drinkingglass/filled/irish_cream: DrinkIrishCreamGlass
 
 # ---- clothing ----
 /obj/item/clothing/glasses/hud/health: ClothingEyesHudMedical
