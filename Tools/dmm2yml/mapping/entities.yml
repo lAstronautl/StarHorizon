@@ -2615,6 +2615,55 @@
 /obj/item/toy/plush/rouny: PlushieRouny
 /obj/item/trash/cheesie: FoodPacketCheesieTrash
 /obj/item/card/id/advanced/prisoner: PrisonerIDCard
+# tg's per-job ID cards are all one generic /obj/item/card/id with access/name set
+# dynamically at spawn, not distinct .dm paths -- so most SS14 per-department id
+# card ids (BartenderIDCard, BotanistIDCard, etc.) have no tg path to map from.
+# These are the specific named subtypes that DO exist as their own tg paths,
+# verified against tg's own name/desc/registered_name fields:
+/obj/item/card/id/advanced/gold/captains_spare: CaptainIDCard # tg name "captain's spare ID", trim = job/captain
+/obj/item/card/id/advanced/centcom: CentcomIDCard # tg desc "An ID straight from Central Command."
+/obj/item/card/id/advanced/centcom/ert/commander: ERTLeaderIDCard
+/obj/item/card/id/advanced/centcom/ert/security: ERTSecurityIDCard
+/obj/item/card/id/advanced/centcom/ert/engineer: ERTEngineerIDCard
+/obj/item/card/id/advanced/centcom/ert/medical: ERTMedicIDCard
+/obj/item/card/id/advanced/centcom/ert/chaplain: ERTChaplainIDCard
+/obj/item/card/id/advanced/centcom/ert/janitor: ERTJanitorIDCard
+/obj/item/card/id/advanced/black/deathsquad: CentcomIDCardDeathsquad # tg name "Death Squad ID"
+/obj/item/card/id/advanced/black/syndicate_command: SyndicateIDCard # tg name/desc "syndicate ID card"/"An ID straight from the Syndicate."
+# tg's per-department PDAs DO have their own dm paths, unlike the id cards above
+# (see code/modules/modular_computers/computers/item/role_tablet_presets.dm) --
+# each verified against its own tg name= field.
+/obj/item/modular_computer/pda/crew/heads/captain: CaptainPDA
+/obj/item/modular_computer/pda/crew/heads/hop: HoPPDA
+/obj/item/modular_computer/pda/crew/heads/hos: HoSPDA
+/obj/item/modular_computer/pda/crew/heads/ce: CEPDA
+/obj/item/modular_computer/pda/crew/heads/cmo: CMOPDA
+/obj/item/modular_computer/pda/crew/heads/rd: RnDPDA
+/obj/item/modular_computer/pda/crew/heads/quartermaster: QuartermasterPDA
+/obj/item/modular_computer/pda/crew/security: SecurityPDA
+/obj/item/modular_computer/pda/crew/detective: DetectivePDA
+/obj/item/modular_computer/pda/crew/warden: WardenPDA
+/obj/item/modular_computer/pda/crew/engineering: EngineerPDA
+/obj/item/modular_computer/pda/crew/atmos: AtmosPDA
+/obj/item/modular_computer/pda/crew/science: SciencePDA
+/obj/item/modular_computer/pda/crew/medical: MedicalPDA
+/obj/item/modular_computer/pda/crew/medical/paramedic: ParamedicPDA
+/obj/item/modular_computer/pda/crew/chemist: ChemistryPDA
+/obj/item/modular_computer/pda/crew/cargo: CargoPDA
+/obj/item/modular_computer/pda/crew/shaftminer: SalvagePDA
+/obj/item/modular_computer/pda/crew/janitor: JanitorPDA
+/obj/item/modular_computer/pda/crew/chaplain: ChaplainPDA
+/obj/item/modular_computer/pda/crew/lawyer: LawyerPDA
+/obj/item/modular_computer/pda/crew/botanist: BotanistPDA
+/obj/item/modular_computer/pda/crew/cook: ChefPDA
+/obj/item/modular_computer/pda/crew/bar: BartenderPDA
+/obj/item/modular_computer/pda/crew/clown: ClownPDA
+/obj/item/modular_computer/pda/crew/mime: MimePDA
+/obj/item/modular_computer/pda/crew/curator: LibrarianPDA # tg's "curator" role is SS14's "librarian" role
+/obj/item/modular_computer/pda/crew/psychologist: PsychologistPDA
+/obj/item/modular_computer/pda/crew/assistant: PassengerPDA # tg's generic no-department "assistant" role is SS14's "passenger"
+/obj/item/modular_computer/pda/syndicate: SyndiPDA # device_theme = PDA_THEME_SYNDICATE, matches SS14's SyndiPDA (id: SyndicateIDCard)
+/obj/item/modular_computer/pda/clear: ClearPDA
 /obj/item/food/baguette: FoodBreadBaguette
 /obj/item/food/donkpocket/warm/berry: FoodDonkpocketBerryWarm
 /obj/item/food/energybar: FoodSnackEnergyBar
