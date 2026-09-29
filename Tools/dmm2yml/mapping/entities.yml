@@ -1,6 +1,9 @@
 # ---- power ----
 /obj/machinery/power/solar: SolarPanel
-/obj/item/solar_assembly: SolarPanel
+# fixed from an earlier mistake: this is the UNBUILT construction kit item
+# ("A solar panel assembly kit, allows construction of a solar panel"), not
+# the finished panel -- SolarAssembly, not SolarPanel.
+/obj/item/solar_assembly: SolarAssembly
 /obj/machinery/power/smes: SMESBasic
 /obj/machinery/power/emitter: Emitter
 /obj/machinery/field/generator: ContainmentFieldGenerator
