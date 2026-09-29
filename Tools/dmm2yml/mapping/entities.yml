@@ -743,6 +743,9 @@
 /obj/structure/sign/directions/supply: SignDirectionalSupply
 /obj/machinery/chem_dispenser: ChemDispenser
 /obj/machinery/computer/communications: ComputerComms
+/obj/machinery/computer/communications/syndicate: SyndicateComputerComms
+# tg's own name is literally "station atmospherics monitoring".
+/obj/machinery/computer/atmos_control/nocontrol/master: ComputerAtmosMonitoring
 /obj/machinery/smartfridge: SmartFridge
 /obj/item/kitchen/spoon/plastic: SpoonPlastic
 /obj/item/clothing/glasses/blindfold: ClothingEyesBlindfold
