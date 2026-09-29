@@ -44,4 +44,17 @@ public sealed partial class MirageBorderComponent : Component
     /// </summary>
     [DataField, AutoNetworkedField]
     public float ViewRange = 20f;
+
+    /// <summary>
+    /// Whether the mirage is rendered with lighting. Lighting is by far the most expensive part of
+    /// rendering a mirage, turn it off for mirages of places that are lit well anyway.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public bool RenderLighting = true;
+
+    /// <summary>
+    /// How many times a second the mirage is re-rendered. Rendering it every frame is rarely needed.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public float RenderRate = 20f;
 }

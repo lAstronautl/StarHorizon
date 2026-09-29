@@ -2,6 +2,7 @@ using System.Numerics;
 using Content.Shared._Horizon.Mirage;
 using Robust.Client.Graphics;
 using Robust.Shared.Map;
+using Robust.Shared.Timing;
 
 namespace Content.Client._Horizon.Mirage;
 
@@ -14,6 +15,7 @@ public sealed class MirageBorderSystem : SharedMirageBorderSystem
     [Dependency] private readonly IClyde _clyde = default!;
     [Dependency] private readonly IEyeManager _eye = default!;
     [Dependency] private readonly IOverlayManager _overlay = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     /// <summary>
@@ -21,6 +23,11 @@ public sealed class MirageBorderSystem : SharedMirageBorderSystem
     /// so it doesn't pop in and out right at the edge.
     /// </summary>
     private const float RangeMargin = 4f;
+
+    /// <summary>
+    /// Mirages this far outside of the screen still count as visible, so they are rendered before they scroll in.
+    /// </summary>
+    private const float ScreenMargin = 2f;
 
     internal readonly Dictionary<EntityUid, MirageView> Views = new();
 
@@ -78,10 +85,12 @@ public sealed class MirageBorderSystem : SharedMirageBorderSystem
         var eyePos = _eye.CurrentEye.Position;
         if (eyePos.MapId != MapId.Nullspace)
         {
+            var screen = _eye.GetWorldViewport().Enlarged(ScreenMargin);
+
             var query = EntityQueryEnumerator<MirageBorderComponent, TransformComponent>();
             while (query.MoveNext(out var uid, out var border, out var xform))
             {
-                if (UpdateView((uid, border, xform), eyePos))
+                if (UpdateView((uid, border, xform), eyePos, screen))
                     _active.Add(uid);
             }
         }
@@ -99,7 +108,7 @@ public sealed class MirageBorderSystem : SharedMirageBorderSystem
         }
     }
 
-    private bool UpdateView(Entity<MirageBorderComponent, TransformComponent> ent, MapCoordinates eyePos)
+    private bool UpdateView(Entity<MirageBorderComponent, TransformComponent> ent, MapCoordinates eyePos, Box2 screen)
     {
         var (uid, border, xform) = ent;
 
@@ -112,7 +121,7 @@ public sealed class MirageBorderSystem : SharedMirageBorderSystem
         if (targetXform.MapID == MapId.Nullspace)
             return false;
 
-        var borderPos = _transform.GetWorldPosition(xform);
+        var (borderPos, borderRot) = _transform.GetWorldPositionRotation(xform);
         var range = border.ViewRange + RangeMargin + border.Size.Length() / 2f;
         if ((borderPos - eyePos.Position).LengthSquared() > range * range)
             return false;
@@ -140,7 +149,6 @@ public sealed class MirageBorderSystem : SharedMirageBorderSystem
             var viewport = _clyde.CreateViewport(pixelSize, $"Mirage-{uid}");
             viewport.Eye = eye;
             viewport.ClearColor = Color.Transparent;
-            viewport.AutomaticRender = true;
 
             view = new MirageView(viewport, eye);
             Views[uid] = view;
@@ -150,6 +158,21 @@ public sealed class MirageBorderSystem : SharedMirageBorderSystem
         var (targetPos, targetRot) = _transform.GetWorldPositionRotation(targetXform);
         view.Eye.Position = new MapCoordinates(targetPos + targetRot.RotateVec(border.Offset), targetXform.MapID);
         view.Eye.Rotation = -targetRot;
+        view.Eye.DrawLight = border.RenderLighting;
+
+        // Only re-render mirages that are on screen, and not more often than they need to be.
+        var area = new Box2Rotated(Box2.CenteredAround(borderPos + border.Offset, size), borderRot, borderPos);
+        view.Visible = area.CalcBoundingBox().Intersects(screen);
+
+        var now = _timing.RealTime;
+        var render = view.Visible && (!view.Rendered || now >= view.NextRender);
+        view.Viewport.AutomaticRender = render;
+
+        if (render)
+        {
+            view.Rendered = true;
+            view.NextRender = now + TimeSpan.FromSeconds(1f / Math.Max(border.RenderRate, 1f));
+        }
 
         return true;
     }
@@ -167,4 +190,16 @@ internal sealed class MirageView(IClydeViewport viewport, FixedEye eye)
 {
     public readonly IClydeViewport Viewport = viewport;
     public readonly FixedEye Eye = eye;
+
+    /// <summary>
+    /// Whether the mirage is on screen this frame.
+    /// </summary>
+    public bool Visible;
+
+    /// <summary>
+    /// Whether the viewport has been rendered at least once, before that its texture is garbage.
+    /// </summary>
+    public bool Rendered;
+
+    public TimeSpan NextRender;
 }

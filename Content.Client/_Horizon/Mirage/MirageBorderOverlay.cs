@@ -42,6 +42,9 @@ public sealed class MirageBorderOverlay : Overlay
 
         foreach (var (uid, view) in _mirage.Views)
         {
+            if (!view.Visible || !view.Rendered)
+                continue;
+
             if (!_entManager.TryGetComponent<MirageBorderComponent>(uid, out var border)
                 || !_entManager.TryGetComponent<TransformComponent>(uid, out var xform)
                 || xform.MapID != args.MapId)
