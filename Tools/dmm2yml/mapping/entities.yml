@@ -552,6 +552,28 @@
 /obj/structure/closet/wardrobe/green: WardrobeGreen
 /obj/structure/closet/wardrobe/grey: WardrobeGrey
 /obj/structure/closet/wardrobe/mixed: WardrobeMixed
+# job wardrobes: tg's own names match verbatim ("security wardrobe", "cargo
+# wardrobe", "atmospherics wardrobe", "engineering wardrobe", "medical
+# doctor's wardrobe", "robotics wardrobe", "chemistry/genetics/virology/
+# science wardrobe", "custodial closet", "chef's closet", "legal closet").
+# "chapel wardrobe" is close enough to WardrobeChapel's own "chaplain's
+# wardrobe"; "formal closet" matches WardrobeFormal's own name exactly.
+/obj/structure/closet/gmcloset: WardrobeFormal
+/obj/structure/closet/chefcloset: ClosetChef
+/obj/structure/closet/jcloset: ClosetJanitor
+/obj/structure/closet/lawcloset: ClosetLegal
+/obj/structure/closet/wardrobe/chaplain_black: WardrobeChapel
+/obj/structure/closet/wardrobe/red: WardrobeSecurity
+/obj/structure/closet/wardrobe/cargotech: WardrobeCargo
+/obj/structure/closet/wardrobe/atmospherics_yellow: WardrobeAtmospherics
+/obj/structure/closet/wardrobe/engineering_yellow: WardrobeEngineering
+/obj/structure/closet/wardrobe/white/medical: WardrobeMedicalDoctor
+/obj/structure/closet/wardrobe/robotics_black: WardrobeRobotics
+/obj/structure/closet/wardrobe/chemistry_white: WardrobeChemistry
+/obj/structure/closet/wardrobe/genetics_white: WardrobeGenetics
+/obj/structure/closet/wardrobe/virology_white: WardrobeVirology
+/obj/structure/closet/wardrobe/science_white: WardrobeScience
+/obj/structure/closet/wardrobe/botanist: WardrobeBotanist
 /obj/structure/barricade/security: Barricade
 /obj/structure/frame/machine: MachineFrame
 /obj/structure/plaque/static_plaque/golden: SignPlaque
