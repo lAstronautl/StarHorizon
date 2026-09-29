@@ -86,6 +86,61 @@
   tile: FloorAsteroidSand
   entity: WallRock
 
+# ore veins: tg's own per-ore turf types (minerals.dm) overlap with SS14's
+# WallRock<Ore> family for exactly gold/diamond/plasma/silver/uranium/
+# bananium (tg's titanium and bscrystal, and SS14's coal/quartz/tin/salt/
+# artifact_fragment, have no counterpart on the other side -- same pattern
+# as the floor-tile mineral family earlier). WallRockGold and friends carry
+# an EntityRemap component that swaps in the basalt/snow-biome look on their
+# own, so the same bare ore id is used under every tg biome variant rather
+# than guessing at a WallRockBasalt/WallRockSnow id by hand; only the base
+# `tile:` changes to match the biome, same as the plain rules above.
+/turf/closed/mineral/gold:
+  tile: FloorAsteroidSand
+  entity: WallRockGold
+/turf/closed/mineral/gold/volcanic:
+  tile: FloorBasalt
+  entity: WallRockGold
+/turf/closed/mineral/diamond:
+  tile: FloorAsteroidSand
+  entity: WallRockDiamond
+/turf/closed/mineral/diamond/volcanic:
+  tile: FloorBasalt
+  entity: WallRockDiamond
+/turf/closed/mineral/diamond/ice:
+  tile: FloorSnow
+  entity: WallRockDiamond
+/turf/closed/mineral/plasma:
+  tile: FloorAsteroidSand
+  entity: WallRockPlasma
+/turf/closed/mineral/plasma/volcanic:
+  tile: FloorBasalt
+  entity: WallRockPlasma
+/turf/closed/mineral/plasma/ice:
+  tile: FloorSnow
+  entity: WallRockPlasma
+/turf/closed/mineral/silver:
+  tile: FloorAsteroidSand
+  entity: WallRockSilver
+/turf/closed/mineral/silver/volcanic:
+  tile: FloorBasalt
+  entity: WallRockSilver
+/turf/closed/mineral/silver/ice/icemoon:
+  tile: FloorSnow
+  entity: WallRockSilver
+/turf/closed/mineral/uranium:
+  tile: FloorAsteroidSand
+  entity: WallRockUranium
+/turf/closed/mineral/uranium/volcanic:
+  tile: FloorBasalt
+  entity: WallRockUranium
+/turf/closed/mineral/bananium:
+  tile: FloorAsteroidSand
+  entity: WallRockBananium
+/turf/closed/mineral/bananium/volcanic:
+  tile: FloorBasalt
+  entity: WallRockBananium
+
 /turf/open/lava:
   tile: FloorBasalt
   entity: FloorLavaEntity
