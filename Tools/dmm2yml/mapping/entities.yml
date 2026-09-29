@@ -545,6 +545,19 @@
 /obj/item/circuitboard/computer/powermonitor: PowerComputerCircuitboard
 /obj/item/circuitboard/computer/secure_data: CriminalRecordsComputerCircuitboard # tg name "Security Records Console"
 /obj/item/circuitboard/computer/syndicate_shuttle: SyndicateShuttleConsoleCircuitboard
+# tg's per-mob meat slab family (meatslab.dm), checked against tg's own name=.
+/obj/item/food/meat/slab/goliath: FoodMeatGoliath
+/obj/item/food/meat/slab/killertomato: FoodMeatTomato
+/obj/item/food/meat/slab/meatwheat: FoodMeatWheat
+/obj/item/food/meat/slab/xeno: FoodMeatXeno
+/obj/item/food/meat/slab/spider: FoodMeatSpider
+/obj/item/food/meat/slab/penguin: FoodMeatPenguin
+/obj/item/food/meat/crab: FoodMeatCrabCooked
+/obj/item/food/meat/bacon: FoodMeatBaconCooked
+/obj/item/food/meat/slab/corgi: FoodMeatCorgi
+/obj/item/food/meat/slab/human/mutant/zombie: FoodMeatRotten # tg name "meat (rotten)"
+/obj/item/food/meatclown: FoodMeatClown
+/obj/item/food/meatball: FoodMeatMeatballCooked # tg's meatball is a finished ready-to-eat dish, not the raw form
 /obj/item/circuitboard/machine/cell_charger: CellRechargerCircuitboard
 /obj/item/melee/baton/telescopic: TelescopicShield
 /obj/item/clothing/head/helmet: ClothingHeadHelmetBasic
