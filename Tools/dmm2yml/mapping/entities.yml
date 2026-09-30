@@ -1815,6 +1815,20 @@
 # ---- guns ----
 /obj/item/gun/energy/laser: WeaponLaserCarbine
 /obj/item/gun/ballistic/revolver/mateba: WeaponRevolverMateba
+/obj/item/gun/energy/taser: WeaponTaser
+/obj/item/gun/energy/e_gun/advtaser: WeaponTaserSuper # "hybrid taser", an upgraded taser variant
+/obj/item/gun/energy/disabler/smg: WeaponDisablerSMG
+/obj/item/gun/energy/laser/scatter/shotty: WeaponEnergyShotgun
+/obj/item/gun/energy/lasercannon: WeaponLaserCannon # tg's own type name is literally "lasercannon"
+/obj/item/gun/energy/laser/carbine/practice: WeaponLaserCarbinePractice
+/obj/item/gun/energy/laser/musket: WeaponMakeshiftLaser # crank-powered low-tech laser gun
+/obj/item/gun/energy/laser/captain: WeaponAntiqueLaser # tg name "antique laser gun"
+/obj/item/gun/energy/pulse/carbine: WeaponPulseCarbine
+/obj/item/gun/energy/pulse/pistol: WeaponPulsePistol
+/obj/item/gun/energy/pulse: WeaponPulseRifle
+/obj/item/gun/energy/temperature: WeaponTemperatureGun
+/obj/item/gun/energy/tesla_cannon: WeaponTeslaGun
+/obj/item/gun/energy/laser/xray: WeaponXrayCannon
 
 # ---- action figures ----
 /obj/item/toy/figure/syndie: ToyFigurineNukie
