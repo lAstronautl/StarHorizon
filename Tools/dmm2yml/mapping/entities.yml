@@ -2630,6 +2630,7 @@
 /obj/item/clothing/head/wizard: ClothingHeadHatWizard
 /obj/item/clothing/head/wizard/fake: ClothingHeadHatWizard
 /obj/item/clothing/head/wizard/red: ClothingHeadHatRedwizard
+/obj/item/spellbook: WizardsGrimoire # tg's single generic spellbook, spells chosen via its own shop UI
 /obj/item/clothing/mask/animal/small/bear: ClothingMaskBear
 /obj/item/clothing/mask/animal/small/jackal: ClothingMaskJackal
 /obj/item/clothing/mask/animal/small/rat: ClothingMaskRat
