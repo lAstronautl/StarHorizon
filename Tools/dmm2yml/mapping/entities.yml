@@ -2954,6 +2954,17 @@
 /obj/item/toy/mecha/marauder: ToyMarauder
 /obj/item/toy/mecha/seraph: ToySeraph
 /obj/item/toy/mecha/firefighter: ToyFireRipley
+/obj/item/stack/tile/carpet/black: FloorCarpetItemBlack
+/obj/item/stack/tile/carpet/blue: FloorCarpetItemBlue
+/obj/item/stack/tile/carpet/cyan: FloorCarpetItemCyan
+/obj/item/stack/tile/carpet/green: FloorCarpetItemGreen
+/obj/item/stack/tile/carpet/orange: FloorCarpetItemOrange
+/obj/item/stack/tile/carpet/purple: FloorCarpetItemPurple
+/obj/item/stack/tile/carpet/red: FloorCarpetItemRed
+/obj/item/stack/telecrystal: Telecrystal
+/obj/item/stack/telecrystal/five: Telecrystal5
+/obj/item/coin/gold: TreasureCoinGold
+/obj/item/coin/adamantine: TreasureCoinAdamantine
 /obj/item/toy/nuke: ToyNuke
 /obj/item/toy/plush/rouny: PlushieRouny
 /obj/item/trash/cheesie: FoodPacketCheesieTrash
