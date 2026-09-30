@@ -647,6 +647,11 @@
 /obj/item/toy/plush/ratplush: PlushieRatvar
 /obj/item/toy/plush/lizard_plushie/space: PlushieSpaceLizard
 /obj/item/toy/plush/shark: PlushieSharkBlue # tg's shark plushie has no color qualifier -- matches the base/default blue variant
+/obj/item/toy/talking/owl: ToyOwlman
+/obj/item/toy/talking/griffin: ToyGriffin
+/obj/item/toy/talking/ai: ToyAi
+/obj/item/toy/balloon/syndicate: BalloonSyn
+/obj/item/bikehorn/rubberducky: ToyRubberDuck
 /obj/item/circuitboard/machine/cell_charger: CellRechargerCircuitboard
 /obj/item/melee/baton/telescopic: TelescopicShield
 /obj/item/clothing/head/helmet: ClothingHeadHelmetBasic
