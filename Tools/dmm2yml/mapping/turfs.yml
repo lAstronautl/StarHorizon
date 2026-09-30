@@ -140,6 +140,22 @@
 /turf/closed/mineral/bananium/volcanic:
   tile: FloorBasalt
   entity: WallRockBananium
+# gibtonite ore vein, same tile/entity split as the other ore veins above.
+/turf/closed/mineral/gibtonite:
+  tile: FloorAsteroidSand
+  entity: AsteroidRockGibtonite
+/turf/closed/mineral/gibtonite/volcanic:
+  tile: FloorBasalt
+  entity: AsteroidRockGibtonite
+/turf/closed/mineral/gibtonite/volcanic/red_rock:
+  tile: FloorBasalt
+  entity: AsteroidRockGibtonite
+/turf/closed/mineral/gibtonite/volcanic/shale:
+  tile: FloorBasalt
+  entity: AsteroidRockGibtonite
+/turf/closed/mineral/gibtonite/ice/icemoon:
+  tile: FloorSnow
+  entity: AsteroidRockGibtonite
 
 # constructed material walls (built from refined sheets, not ore veins --
 # tg's own /turf/closed/wall/mineral/<material> family). Matched by tg's own
