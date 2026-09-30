@@ -2719,6 +2719,9 @@
 /obj/item/food/dough: FoodDough
 /obj/item/food/eggplantparm: FoodMealEggplantParm
 /obj/item/food/enchiladas: FoodMealEnchiladas
+/obj/item/food/taco: FoodMealSoftTaco
+/obj/item/food/taco/fish: FoodTacoFish
+/obj/item/food/hard_taco_shell: FoodTacoShell
 /obj/item/food/fortunecookie: FoodSnackCookieFortune
 /obj/item/food/frenchtoast: FoodBreadFrenchToast
 /obj/item/food/fried_chicken: FoodMeatChickenFried
