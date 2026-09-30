@@ -1841,6 +1841,9 @@
 /obj/item/gun/energy/pulse: WeaponPulseRifle
 /obj/item/gun/energy/temperature: WeaponTemperatureGun
 /obj/item/gun/energy/tesla_cannon: WeaponTeslaGun
+/obj/item/gun/magic/wand/death: WeaponWandDeath
+/obj/item/gun/magic/wand/fireball: WeaponWandFireball
+/obj/item/gun/magic/wand/door: WeaponWandPolymorphDoor # tg name "wand of door creation" matches "wand of entrance"
 /obj/item/gun/energy/laser/xray: WeaponXrayCannon
 
 # ---- action figures ----
