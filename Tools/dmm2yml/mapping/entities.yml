@@ -433,6 +433,16 @@
 /obj/item/ammo_casing/c46x30mm: CartridgePistol
 /obj/item/ammo_box/magazine/m45: MagazineMagnum
 /obj/item/ammo_box/magazine/wt550m9: MagazinePistolSubMachineGunTopMounted
+/obj/item/ammo_box/magazine/m7mm: MagazineLightRifleBox
+/obj/item/ammo_box/magazine/m7mm/incen: MagazineLightRifleIncendiary
+/obj/item/ammo_box/speedloader/c357: SpeedLoaderMagnum
+/obj/item/ammo_box/magazine/m12g: MagazineShotgun
+/obj/item/ammo_box/magazine/m12g/slug: MagazineShotgunSlug
+/obj/item/ammo_box/magazine/m12g/dragon: MagazineShotgunIncendiary
+/obj/item/ammo_box/magazine/m223: MagazineRifle
+/obj/item/gun/ballistic/shotgun/toy: WeaponRifleFoam
+/obj/item/gun/ballistic/automatic/m90: WeaponRifleM90GrenadeLauncher
+/obj/item/gun/ballistic/shotgun/musket: Musket
 /obj/item/gun/ballistic/automatic/pistol/m1911: WeaponPistolN1984
 /obj/item/gun/ballistic/automatic/wt550: WeaponSubMachineGunWt550
 /obj/item/grenade/c4: C4
