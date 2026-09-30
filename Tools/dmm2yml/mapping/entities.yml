@@ -716,6 +716,19 @@
 /obj/item/stack/sheet/cotton: MaterialCotton # tg name "raw cotton bundle"
 /obj/item/stack/sheet/bone: MaterialBones # tg name "bones"
 /obj/item/stack/sheet/animalhide/goliath_hide: MaterialGoliathHide # tg name "goliath hide plates"
+/obj/item/stock_parts/power_store/cell/hyper: PowerCellHyper
+# tg's mecha construction parts (mecha_parts.dm) -- Ripley and H.O.N.K. exist
+# in tg with matching names; HAMTR and Vim are SS14-original mechs.
+/obj/item/mecha_parts/chassis/ripley: RipleyHarness # tg name "Ripley chassis"; SS14 desc "the core of the Ripley APLU"
+/obj/item/mecha_parts/part/ripley_left_arm: RipleyLArm
+/obj/item/mecha_parts/part/ripley_right_arm: RipleyRArm
+/obj/item/mecha_parts/part/ripley_left_leg: RipleyLLeg
+/obj/item/mecha_parts/part/ripley_right_leg: RipleyRLeg
+/obj/item/mecha_parts/chassis/honker: HonkerHarness
+/obj/item/mecha_parts/part/honker_left_arm: HonkerLArm
+/obj/item/mecha_parts/part/honker_right_arm: HonkerRArm
+/obj/item/mecha_parts/part/honker_left_leg: HonkerLLeg
+/obj/item/mecha_parts/part/honker_right_leg: HonkerRLeg
 /obj/item/circuitboard/machine/cell_charger: CellRechargerCircuitboard
 /obj/item/melee/baton/telescopic: TelescopicShield
 /obj/item/clothing/head/helmet: ClothingHeadHelmetBasic
