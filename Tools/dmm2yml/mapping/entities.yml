@@ -2867,6 +2867,10 @@
 /obj/item/scythe: HydroponicsToolScythe
 /obj/item/shield/buckler: WoodenBuckler
 /obj/item/shield/riot: RiotShield
+/obj/item/shield/ballistic: RiotBulletShield
+/obj/item/shield/improvised: MakeshiftShield
+/obj/item/shield/energy: EnergyShield
+/obj/item/shield/energy/advanced: RiotLaserShield # 100% energy-projectile reflection, the closest match to a laser-specific shield
 /obj/item/skub: Skub
 /obj/item/spear: Spear
 /obj/item/spear/bamboospear: Spear
