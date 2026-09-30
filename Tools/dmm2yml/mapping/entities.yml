@@ -729,6 +729,19 @@
 /obj/item/mecha_parts/part/honker_right_arm: HonkerRArm
 /obj/item/mecha_parts/part/honker_left_leg: HonkerLLeg
 /obj/item/mecha_parts/part/honker_right_leg: HonkerRLeg
+# tg's prefilled reagent bottles (cups/bottle.dm), checked against tg's own
+# name=/list_reagents=.
+/obj/item/reagent_containers/cup/bottle/epinephrine: ChemistryBottleEpinephrine
+/obj/item/reagent_containers/cup/bottle/toxin: ChemistryBottleToxin
+/obj/item/reagent_containers/cup/bottle/mutagen: ChemistryBottleUnstableMutagen # tg name "unstable mutagen bottle"
+/obj/item/reagent_containers/cup/bottle/hydrogen: ChemistryBottleHydrogen
+/obj/item/reagent_containers/cup/bottle/aluminium: ChemistryBottleAluminium
+/obj/item/reagent_containers/cup/bottle/silicon: ChemistryBottleSilicon
+/obj/item/reagent_containers/cup/bottle/sulfur: ChemistryBottleSulfur
+/obj/item/reagent_containers/cup/bottle/chlorine: ChemistryBottleChlorine
+/obj/item/reagent_containers/cup/bottle/copper: ChemistryBottleCopper
+/obj/item/reagent_containers/cup/bottle/radium: ChemistryBottleRadium
+/obj/item/reagent_containers/cup/bottle/sugar: ChemistryBottleSugar
 /obj/item/circuitboard/machine/cell_charger: CellRechargerCircuitboard
 /obj/item/melee/baton/telescopic: TelescopicShield
 /obj/item/clothing/head/helmet: ClothingHeadHelmetBasic
