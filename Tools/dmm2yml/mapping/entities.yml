@@ -297,6 +297,7 @@
 /obj/item/restraints/handcuffs: Handcuffs
 /obj/item/screwdriver: Screwdriver
 /obj/item/stack/cable_coil: CableApcStack
+/obj/item/stack/cannonball: CannonBall
 /obj/item/stack/sheet/glass/fifty: SheetGlass
 /obj/item/stack/sheet/iron/fifty: SheetSteel
 /obj/item/stack/sheet/mineral/plasma: SheetPlasma
@@ -3304,6 +3305,7 @@
 /obj/item/food/energybar: FoodSnackEnergyBar
 /obj/item/food/ready_donk: FoodDonkpocket
 /obj/item/gun/ballistic/shotgun/doublebarrel: WeaponShotgunDoubleBarreled
+/obj/item/gun/ballistic/shotgun/bulldog: WeaponShotgunBulldog
 /obj/item/clothing/gloves/boxing/blue: ClothingHandsGlovesBoxingBlue
 /obj/item/clothing/head/rasta: ClothingHeadRastaHat
 /obj/machinery/gravity_generator/main: GravityGenerator
