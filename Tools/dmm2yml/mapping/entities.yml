@@ -754,6 +754,28 @@
 /obj/item/bedsheet/green: BedsheetGreen
 /obj/item/bedsheet/purple: BedsheetPurple
 /obj/item/bedsheet/rainbow: BedsheetRainbow
+/obj/item/bedsheet/grey: BedsheetGrey
+/obj/item/bedsheet/red: BedsheetRed
+/obj/item/bedsheet/yellow: BedsheetYellow
+/obj/item/bedsheet/mime: BedsheetMime
+/obj/item/bedsheet/captain: BedsheetCaptain
+/obj/item/bedsheet/rd: BedsheetRD
+/obj/item/bedsheet/medical: BedsheetMedical
+/obj/item/bedsheet/cmo: BedsheetCMO
+/obj/item/bedsheet/hos: BedsheetHOS
+/obj/item/bedsheet/hop: BedsheetHOP
+/obj/item/bedsheet/ce: BedsheetCE
+/obj/item/bedsheet/qm: BedsheetQM
+/obj/item/bedsheet/brown: BedsheetBrown
+/obj/item/bedsheet/black: BedsheetBlack
+/obj/item/bedsheet/centcom: BedsheetCentcom
+/obj/item/bedsheet/syndie: BedsheetSyndie
+/obj/item/bedsheet/cult: BedsheetCult
+/obj/item/bedsheet/wiz: BedsheetWiz
+/obj/item/bedsheet/ian: BedsheetIan
+/obj/item/bedsheet/cosmos: BedsheetCosmos
+/obj/item/bedsheet/patriot: BedsheetUSA # tg's "patriot" theme is SS14's "USA" theme
+/obj/item/bedsheet/nanotrasen: BedsheetNT
 
 /obj/structure/closet: ClosetMaintenance
 /obj/structure/closet/crate: CrateGenericSteel
