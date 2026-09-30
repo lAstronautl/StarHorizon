@@ -1148,6 +1148,24 @@
 /obj/item/reagent_containers/cup/glass/flask/det: DrinkDetFlask
 /obj/item/reagent_containers/cup/glass/shaker: DrinkShaker
 /obj/item/mining_scanner: MineralScanner
+/obj/item/t_scanner/adv_mining_scanner: AdvancedMineralScannerUnpowered
+/obj/item/storage/box/matches: Matchbox
+/obj/item/match: Matchstick
+/obj/item/restraints/handcuffs/cable: Cablecuffs
+/obj/item/restraints/handcuffs/cable/zipties: Zipties
+/obj/item/restraints/handcuffs/cable/zipties/used: ZiptiesBroken
+/obj/item/weldingtool/abductor: RefuelingWelder
+/obj/item/weldingtool/experimental: WelderExperimental
+/obj/item/weldingtool/largetank: WelderIndustrial
+/obj/item/weldingtool/hugetank: WelderIndustrialAdvanced
+/obj/item/weldingtool/mini: WelderMini
+/obj/effect/mine/explosive: LandMineExplosiveUnarmed
+/obj/effect/mine/kickmine: LandMineKickUnarmed
+/obj/item/mop/advanced: AdvMopItem
+/obj/item/clothing/suit/caution: WetFloorSign
+/obj/item/reagent_containers/spray: SprayBottleWater
+/obj/item/reagent_containers/spray/chemsprayer: MegaSprayBottle
+/obj/item/reagent_containers/spray/chemsprayer/janitor: BorgMegaSprayBottle
 # fixed from an earlier mistake: this was pointed at VendingMachineClothing
 # (name "ClothesMate"), which is a DIFFERENT tg vendor
 # (/obj/machinery/vending/clothing, already correctly mapped to it below).
