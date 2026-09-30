@@ -2979,6 +2979,21 @@
 /obj/projectile/grapple_hook: GrapplingHook
 /obj/projectile/bullet/rocket: BulletRocket
 /obj/projectile/bullet/rocket/weak: BulletWeakRocket
+# tg's specific hardcoded bowl/salad food items (soup.dm/salad.dm); most of
+# tg's other named soups are just the generic bowl filled with a dynamically-
+# named "Soup" reagent, not distinct .dm items, so they have no tg source.
+/obj/item/food/bowled/spacylibertyduff: FoodJellyDuff
+/obj/item/food/bowled/amanitajelly: FoodJellyAmanita
+/obj/item/food/salad/aesirsalad: FoodSaladAesir
+/obj/item/food/salad/herbsalad: FoodSaladHerb
+/obj/item/food/salad/validsalad: FoodSaladValid
+/obj/item/food/salad/jungle: FoodSaladJungle
+/obj/item/food/salad/citrusdelight: FoodSaladCitrus
+/obj/item/food/salad/ricepudding: FoodRicePudding
+/obj/item/food/salad/ricepork: FoodRicePork
+/obj/item/food/salad/edensalad: FoodSaladEden
+/obj/item/food/salad/gumbo: FoodRiceGumbo
+/obj/item/food/salad/caesar_salad: FoodSaladCaesar
 /obj/item/toy/nuke: ToyNuke
 /obj/item/toy/plush/rouny: PlushieRouny
 /obj/item/trash/cheesie: FoodPacketCheesieTrash
