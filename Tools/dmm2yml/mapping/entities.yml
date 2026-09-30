@@ -558,6 +558,59 @@
 /obj/item/food/meat/slab/human/mutant/zombie: FoodMeatRotten # tg name "meat (rotten)"
 /obj/item/food/meatclown: FoodMeatClown
 /obj/item/food/meatball: FoodMeatMeatballCooked # tg's meatball is a finished ready-to-eat dish, not the raw form
+# tg's per-department radio encryption keys (encryptionkey.dm), checked
+# against tg's own name= and channels= for each.
+/obj/item/encryptionkey: EncryptionKeyCommon # base key, no special channels -- matches the "used by anyone" common key
+/obj/item/encryptionkey/binary: EncryptionKeyBinary
+/obj/item/encryptionkey/headset_sec: EncryptionKeySecurity
+/obj/item/encryptionkey/headset_eng: EncryptionKeyEngineering
+/obj/item/encryptionkey/headset_med: EncryptionKeyMedical
+/obj/item/encryptionkey/headset_sci: EncryptionKeyScience
+/obj/item/encryptionkey/headset_medsci: EncryptionKeyMedicalScience # tg name "medical research radio encryption key"
+/obj/item/encryptionkey/headset_rob: EncryptionKeyRobo # tg name "robotics radio encryption key"
+/obj/item/encryptionkey/headset_cargo: EncryptionKeyCargo # tg name "supply radio encryption key"
+/obj/item/encryptionkey/headset_service: EncryptionKeyService
+/obj/item/encryptionkey/headset_cent: EncryptionKeyCentCom
+/obj/item/encryptionkey/headset_com: EncryptionKeyCommand
+/obj/item/encryptionkey/syndicate: EncryptionKeySyndie # channels = [Syndicate] only, matches exactly
+/obj/item/encryptionkey/ai/evil: EncryptionKeyBinarySyndicate # tg's own name is "syndicate binary encryption key"; same red/AI-labeled sprite theme as SS14's binary translator key
+# tg's hydroponics seed family (code/modules/hydroponics/grown/), checked
+# against tg's own name= ("X seed/mycelium/pit pack") for each.
+/obj/item/seeds/ambrosia/deus: AmbrosiaDeusSeeds
+/obj/item/seeds/banana/mime: MimanaSeeds # tg's own name= is "mimana seed pack" despite the /mime path
+/obj/item/seeds/soya/koi: KoibeanSeeds
+/obj/item/seeds/wheat/meat: MeatwheatSeeds
+/obj/item/seeds/wheat/oat: OatSeeds
+/obj/item/seeds/wheat/rice: RiceSeeds
+/obj/item/seeds/chili: ChiliSeeds
+/obj/item/seeds/chili/ice: ChillySeeds # tg name "chilly pepper seed pack"
+/obj/item/seeds/lime: LimeSeeds
+/obj/item/seeds/lemon: LemonSeeds
+/obj/item/seeds/orange_3d: ExtradimensionalOrangeSeeds
+/obj/item/seeds/cocoapod/bungotree: BungoSeeds
+/obj/item/seeds/corn: CornSeeds
+/obj/item/seeds/cotton: CottonSeeds
+/obj/item/seeds/eggplant: EggplantSeeds
+/obj/item/seeds/eggplant/eggy: EggySeeds
+/obj/item/seeds/poppy/lily: LilySeeds
+/obj/item/seeds/poppy/lily/trumpet: SpacemansTrumpetSeeds
+/obj/item/seeds/apple/gold: GoldenAppleSeeds
+/obj/item/seeds/cannabis/rainbow: RainbowCannabisSeeds
+/obj/item/seeds/cocoapod: CocoaSeeds
+/obj/item/seeds/peas: PeaSeeds
+/obj/item/seeds/peas/laugh: LaughinPeaSeeds
+/obj/item/seeds/peas/laugh/peace: WorldPeaSeeds
+/obj/item/seeds/tomato/blood: BloodTomatoSeeds
+/obj/item/seeds/tomato/blue: BlueTomatoSeeds
+/obj/item/seeds/tomato/killer: KillerTomatoSeeds
+/obj/item/seeds/onion/red: OnionRedSeeds
+/obj/item/seeds/pineapple: PineappleSeeds
+/obj/item/seeds/tower/steel: SteelcapSeeds
+/obj/item/seeds/cherry: CherrySeeds
+/obj/item/seeds/amanita: FlyAmanitaSeeds
+/obj/item/seeds/galaxythistle: GalaxythistleSeeds
+/obj/item/seeds/nettle/death: DeathNettleSeeds
+/obj/item/seeds/gatfruit: GatfruitSeeds
 /obj/item/circuitboard/machine/cell_charger: CellRechargerCircuitboard
 /obj/item/melee/baton/telescopic: TelescopicShield
 /obj/item/clothing/head/helmet: ClothingHeadHelmetBasic
