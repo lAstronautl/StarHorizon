@@ -1181,6 +1181,15 @@
 /obj/item/stack/sheet/mineral/silver: IngotSilver
 /obj/item/hot_potato: HotPotato
 /obj/item/grown/bananapeel/bombanana: TrashBananaPeelExplosive
+/obj/item/ammo_casing/a223: CartridgeRifle
+/obj/item/ammo_casing/c9mm/fire: CartridgePistolIncendiary
+/obj/item/ammo_casing/m7mm: CartridgeLightRifle
+/obj/item/ammo_casing/m7mm/incen: CartridgeLightRifleIncendiary
+/obj/item/ammo_box/c9mm: MagazineBoxPistol
+/obj/item/gun/ballistic/automatic/c20r: WeaponSubMachineGunC20r
+/obj/item/gun/energy/alien: WeaponAdvancedLaser
+/obj/item/gun/energy/laser/retro: WeaponLaserGun
+/obj/item/pneumatic_cannon: WeaponImprovisedPneumaticCannon
 /obj/item/storage/box/matches: Matchbox
 /obj/item/match: Matchstick
 /obj/item/restraints/handcuffs/cable: Cablecuffs
