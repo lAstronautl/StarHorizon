@@ -1771,6 +1771,9 @@
 /obj/item/melee/energy/sword/holographic/green: EnergySword
 /obj/item/melee/energy/sword/holographic/red: EnergySword
 /obj/item/melee/energy/sword/pirate: EnergySword
+/obj/item/melee/energy/sword/nullrod/pirate: EnergyCutlass # tg name "nautical energy cutlass"
+/obj/item/dualsaber: EnergySwordDouble
+/obj/item/melee/energy/sword/saber/cyborg: CyborgEnergySword
 
 # ---- plates and stasis beds ----
 /obj/item/plate: FoodPlate
