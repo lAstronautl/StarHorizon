@@ -1227,6 +1227,8 @@
 /obj/item/reagent_containers/spray/pestspray: PestSpray
 /obj/item/secateurs: HydroponicsToolClippers
 /obj/item/ammo_box/foambox: BoxDonkSoftBox
+/obj/item/gps/cyborg: BorgHandheldGPSBasic
+/obj/structure/stairs/wood: StairWood
 /obj/item/storage/box/matches: Matchbox
 /obj/item/match: Matchstick
 /obj/item/restraints/handcuffs/cable: Cablecuffs
