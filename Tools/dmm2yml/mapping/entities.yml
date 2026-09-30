@@ -261,6 +261,9 @@
 /obj/item/analyzer: GasAnalyzer
 /obj/item/assembly/flash/handheld: Flash
 /obj/item/assembly/timer: TimerTrigger
+# tg's single, generically ID-programmable airlock controller (not
+# hardcoded per-department) matches the one adjustable SS14 slot.
+/obj/item/assembly/control/airlock: DoorRemoteCustom
 /obj/item/cigbutt: CigaretteSpent
 /obj/item/clothing/belt/utility: ClothingBeltUtility
 /obj/item/clothing/glasses/meson: ClothingEyesGlassesMeson
