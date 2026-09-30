@@ -788,6 +788,26 @@
 /obj/item/reagent_containers/cup/glass/bottle/absinthe: DrinkBottleAbsinthe
 /obj/item/reagent_containers/cup/glass/bottle/kahlua: DrinkBottleCoffeeLiqueur # tg name "Robert Robust's coffee liqueur"
 /obj/item/reagent_containers/cup/glass/bottle/goldschlager: DrinkBottleGildlager # goldschlager = gildlager (renamed to dodge trademark)
+# tg's glass drink bottles (glassbottle.dm) not covered by the older DrinkBottleX ids above.
+/obj/item/reagent_containers/cup/glass/bottle/curacao: DrinkBlueCuracaoBottleFull # tg name "Beekhof Blauw Curaçao" (Blauw = Dutch for blue)
+/obj/item/reagent_containers/cup/glass/bottle/champagne: DrinkChampagneBottleFull
+/obj/item/reagent_containers/cup/glass/bottle/grenadine: DrinkGrenadineBottleFull
+/obj/item/reagent_containers/cup/glass/bottle/juice/limejuice: DrinkCartonLime
+# tg's soda cans (soda.dm); several flavors also have a bottle/jug id elsewhere with no separate tg source.
+/obj/item/reagent_containers/cup/soda_cans/cola: DrinkColaCan
+/obj/item/reagent_containers/cup/soda_cans/dr_gibb: DrinkDrGibbCan
+/obj/item/reagent_containers/cup/soda_cans/grey_bull: DrinkEnergyDrinkCan # "Grey Bull" parodies Red Bull, matching SS14's "Red Bool"
+/obj/item/reagent_containers/cup/soda_cans/lemon_lime: DrinkLemonLimeCan # tg's Sprite-parody -> SS14's Smite-branded can
+/obj/item/reagent_containers/cup/soda_cans/sodawater: DrinkSodaWaterCan
+/obj/item/reagent_containers/cup/soda_cans/space_mountain_wind: DrinkSpaceMountainWindCan
+/obj/item/reagent_containers/cup/soda_cans/space_up: DrinkSpaceUpCan
+/obj/item/reagent_containers/cup/soda_cans/tonic: DrinkTonicWaterCan
+/obj/item/reagent_containers/cup/soda_cans/beer: DrinkBeerCan
+/obj/item/reagent_containers/cup/soda_cans/thirteenloko: DrinkFourteenLokoCan # Thirteen Loko -> Fourteen Loko (trademark dodge, one up from Four Loko)
+/obj/item/reagent_containers/cup/soda_cans/pwr_game: DrinkPwrGameCan
+/obj/item/reagent_containers/cup/soda_cans/shamblers: DrinkShamblersJuiceCan
+/obj/item/reagent_containers/cup/soda_cans/starkist: DrinkStarkistCan
+/obj/item/reagent_containers/cup/soda_cans/sol_dry: DrinkSolDryCan
 
 /obj/structure/closet: ClosetMaintenance
 /obj/structure/closet/crate: CrateGenericSteel
