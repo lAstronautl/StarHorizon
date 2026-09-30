@@ -611,6 +611,35 @@
 /obj/item/seeds/galaxythistle: GalaxythistleSeeds
 /obj/item/seeds/nettle/death: DeathNettleSeeds
 /obj/item/seeds/gatfruit: GatfruitSeeds
+# tg's harvested produce items (same code/modules/hydroponics/grown/ files as
+# the seeds above), checked against tg's own name=.
+/obj/item/grown/cotton: CottonBol # tg name "cotton bundle"
+/obj/item/food/grown/nettle/death: DeathNettle
+/obj/item/food/grown/ambrosia/deus: FoodAmbrosiaDeus
+/obj/item/food/grown/berries: FoodBerries
+/obj/item/food/grown/tomato/blood: FoodBloodTomato
+/obj/item/food/grown/tomato/blue: FoodBlueTomato
+/obj/item/food/grown/bungofruit: FoodBungo
+/obj/item/food/grown/bungopit: FoodBungoPit
+/obj/item/food/grown/cherries: FoodCherry
+/obj/item/food/grown/galaxythistle: FoodGalaxythistle
+/obj/item/food/grown/gatfruit: FoodGatfruit
+/obj/item/food/grown/apple/gold: FoodGoldenApple
+/obj/item/food/grown/mushroom/reishi: FoodLingzhi # lingzhi is the real-world Chinese name for the reishi mushroom
+/obj/item/food/grown/flower/poppy/lily: FoodLily
+/obj/item/food/grown/banana/mime: FoodMimana
+/obj/item/food/grown/onion/red: FoodOnionRed
+/obj/item/food/onion_slice/red: FoodOnionRedSlice
+/obj/item/food/onion_slice: FoodOnionSlice
+/obj/item/food/grown/peas: FoodPeaPod
+/obj/item/food/grown/laugh: FoodLaughinPeaPod
+/obj/item/food/grown/peace: FoodWorldPeas
+/obj/item/food/grown/flower/trumpet: FoodSpacemansTrumpet
+/obj/item/food/grown/meatwheat: MeatwheatBushel
+/obj/item/food/grown/nettle: Nettle
+/obj/item/food/grown/oat: OatBushel
+/obj/item/food/grown/rice: RiceBushel
+/obj/item/grown/log/steel: SteelLog
 /obj/item/circuitboard/machine/cell_charger: CellRechargerCircuitboard
 /obj/item/melee/baton/telescopic: TelescopicShield
 /obj/item/clothing/head/helmet: ClothingHeadHelmetBasic
