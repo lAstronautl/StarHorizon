@@ -294,6 +294,10 @@
 /obj/item/reagent_containers/cup/beaker/large: LargeBeaker
 /obj/item/reagent_containers/cup/glass/drinkingglass/shotglass: DrinkShotGlass
 /obj/item/reagent_containers/dropper: Dropper
+/obj/item/reagent_containers/cup/beaker/bluespace: BluespaceBeaker
+/obj/item/reagent_containers/cup/beaker/noreact: CryostasisBeaker
+/obj/item/reagent_containers/cup/beaker/cryoxadone: CryoxadoneBeakerSmall
+/obj/item/reagent_containers/syringe/bluespace: SyringeBluespace
 /obj/item/reagent_containers/spray/cleaner: SprayBottleSpaceCleaner
 /obj/item/reagent_containers/syringe: Syringe
 /obj/item/restraints/handcuffs: Handcuffs
