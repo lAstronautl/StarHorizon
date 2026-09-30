@@ -285,6 +285,8 @@
 /obj/item/healthanalyzer: HandheldHealthAnalyzer
 /obj/item/multitool: Multitool
 /obj/item/paper: Paper
+/obj/item/paper/crumpled: PaperScrap
+/obj/item/mail/envelope: Envelope
 /obj/item/pen: Pen
 /obj/item/pickaxe: Pickaxe
 /obj/item/radio: RadioHandheld
