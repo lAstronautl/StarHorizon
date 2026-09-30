@@ -776,6 +776,18 @@
 /obj/item/bedsheet/cosmos: BedsheetCosmos
 /obj/item/bedsheet/patriot: BedsheetUSA # tg's "patriot" theme is SS14's "USA" theme
 /obj/item/bedsheet/nanotrasen: BedsheetNT
+/obj/item/reagent_containers/cup/glass/trophy/gold_cup: DrinkGoldenCup
+/obj/item/reagent_containers/cup/glass/coffee_cup: DrinkHotCoffee
+/obj/item/reagent_containers/cup/glass/mug/coco: DrinkHotCoco # tg name "Dutch hot coco"
+/obj/item/reagent_containers/cup/glass/colocup/lean: DrinkLean # tg name/reagent both literally "lean"
+/obj/item/reagent_containers/cup/glass/bottle/ale: DrinkBottleAle
+/obj/item/reagent_containers/cup/glass/bottle/tequila: DrinkBottleTequila
+/obj/item/reagent_containers/cup/glass/bottle/patron: DrinkBottlePatron
+/obj/item/reagent_containers/cup/glass/bottle/vermouth: DrinkBottleVermouth
+/obj/item/reagent_containers/cup/glass/bottle/cognac: DrinkBottleCognac
+/obj/item/reagent_containers/cup/glass/bottle/absinthe: DrinkBottleAbsinthe
+/obj/item/reagent_containers/cup/glass/bottle/kahlua: DrinkBottleCoffeeLiqueur # tg name "Robert Robust's coffee liqueur"
+/obj/item/reagent_containers/cup/glass/bottle/goldschlager: DrinkBottleGildlager # goldschlager = gildlager (renamed to dodge trademark)
 
 /obj/structure/closet: ClosetMaintenance
 /obj/structure/closet/crate: CrateGenericSteel
