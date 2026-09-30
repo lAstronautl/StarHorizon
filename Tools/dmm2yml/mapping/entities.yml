@@ -511,6 +511,12 @@
 /obj/item/storage/medkit/toxin: MedkitToxin
 /obj/item/storage/toolbox/syndicate: ToolboxSyndicate
 /obj/item/storage/box/donkpockets: FoodBoxDonkpocket
+/obj/item/storage/box/donkpockets/donkpocketspicy: FoodBoxDonkpocketSpicy
+/obj/item/storage/box/donkpockets/donkpocketteriyaki: FoodBoxDonkpocketTeriyaki
+/obj/item/storage/box/donkpockets/donkpocketpizza: FoodBoxDonkpocketPizza
+/obj/item/storage/box/donkpockets/donkpocketberry: FoodBoxDonkpocketBerry
+/obj/item/storage/box/donkpockets/donkpockethonk: FoodBoxDonkpocketHonk # tg name "box of banana-flavoured donk-pockets" matches exactly
+/obj/item/pizzabox: FoodBoxPizza
 /obj/item/storage/fancy/donut_box: FoodBoxDonut
 /obj/item/storage/fancy/cigarettes/dromedaryco: CigPackRed
 /obj/item/paper_bin: PaperBin
