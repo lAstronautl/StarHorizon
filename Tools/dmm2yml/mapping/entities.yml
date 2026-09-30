@@ -2738,6 +2738,21 @@
 /obj/item/food/spaghetti/raw: FoodNoodles
 /obj/item/food/tofu: FoodTofu
 /obj/item/food/waffles: FoodBakedWaffle
+/obj/item/food/rofflewaffles: FoodBakedWaffleRoffle
+/obj/item/food/soylentgreen: FoodBakedWaffleSoylent
+/obj/item/food/muffin: FoodBakedMuffin
+/obj/item/food/brownie: FoodBakedBrownie
+/obj/item/food/brownie_sheet: FoodBakedBrownieBatch
+/obj/item/food/meatbun: FoodBakedBunMeat
+/obj/item/food/cannoli: FoodBakedCannoli
+/obj/item/food/cookie/oatmeal: FoodBakedCookieOatmeal
+/obj/item/food/cookie/raisin: FoodBakedCookieRaisin
+/obj/item/food/cookie/sugar: FoodBakedCookieSugar
+/obj/item/food/croissant: FoodBakedCroissant
+/obj/item/food/lizard_dumplings: FoodBakedDumplings # "Tiziran dumplings"
+/obj/item/food/nugget: FoodBakedNugget
+/obj/item/food/pancakes: FoodBakedPancake
+/obj/item/food/onionrings: FoodOnionRings
 /obj/item/food/watermelonslice: FoodWatermelonSlice
 /obj/item/gavelhammer: Gavel
 /obj/item/grenade/chem_grenade/holy: HolyHandGrenade
