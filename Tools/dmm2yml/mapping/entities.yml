@@ -1972,6 +1972,24 @@
 /obj/machinery/vending/wallmed: {entity: VendingMachineWallMedical, wall: auto, onWall: true}
 /obj/machinery/vending/sovietsoda: VendingMachineSovietSoda
 
+# tg's vending machine refill_canister items, matched to the SS14 machine
+# whose own vendor name the SS14 restock box's name= names.
+/obj/item/vending_refill/boozeomat: VendingMachineRestockBooze
+/obj/item/vending_refill/clothing: VendingMachineRestockClothes
+/obj/item/vending_refill/autodrobe: VendingMachineRestockCostumes
+/obj/item/vending_refill/dinnerware: VendingMachineRestockDinnerware
+/obj/item/vending_refill/engivend: VendingMachineRestockEngineering
+/obj/item/vending_refill/games: VendingMachineRestockGames
+/obj/item/vending_refill/snack: VendingMachineRestockGetmoreChocolateCorp
+/obj/item/vending_refill/coffee: VendingMachineRestockHotDrinks
+/obj/item/vending_refill/medical: VendingMachineRestockMedical
+/obj/item/vending_refill/hydronutrients: VendingMachineRestockNutriMax
+/obj/item/vending_refill/cart: VendingMachineRestockPTech
+/obj/item/vending_refill/robotics: VendingMachineRestockRobotics
+/obj/item/vending_refill/cola: VendingMachineRestockRobustSoftdrinks
+/obj/item/vending_refill/security: VendingMachineRestockSecTech
+/obj/item/vending_refill/cigarette: VendingMachineRestockSmokes
+
 # ---- suit storage units ----
 /obj/machinery/suit_storage_unit: SuitStorageBase
 
