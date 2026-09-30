@@ -1006,6 +1006,7 @@
 /obj/item/mmi: MMI
 /obj/item/storage/bag/ore: OreBag
 /obj/item/book/bible: Bible
+/obj/item/book/bible/syndicate: BibleNecronomicon # tg name "syndicate tome", the syndicate-contraband evil counterpart holy book
 /obj/item/flashlight/flare/candle: Candle
 /obj/item/rag: RagItem
 /obj/item/storage/box/syringes: BoxSyringe
@@ -1711,6 +1712,7 @@
 /obj/item/knife/combat: CombatKnife
 /obj/item/knife/combat/survival: SurvivalKnife
 /obj/item/knife/shiv: Shiv
+/obj/item/knife/shiv/plasma: PlasmaShiv
 /obj/structure/statue/bananium/clown: StatueBananiumClown
 /obj/structure/spider/stickyweb: SpiderWeb
 
