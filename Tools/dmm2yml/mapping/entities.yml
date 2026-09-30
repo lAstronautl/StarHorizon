@@ -3043,6 +3043,18 @@
 /obj/item/food/bread/corn: FoodBreadCorn
 /obj/item/food/breadslice/corn: FoodBreadCornSlice
 /obj/item/food/butteredtoast: FoodBreadButteredToast
+# tg's vending snack family (snacks.dm/spaghetti.dm/sweets.dm), checked
+# against tg's own name=.
+/obj/item/food/chips: FoodSnackChips
+/obj/item/food/no_raisin: FoodSnackRaisins # tg name is literally "4no raisins"
+/obj/item/food/cheesiehonkers: FoodSnackCheesie
+/obj/item/food/pistachios: FoodSnackPistachios
+/obj/item/food/semki: FoodSnackSemki
+/obj/item/food/cornchips: FoodSnackBoritos
+/obj/item/food/spaghetti/chowmein: FoodSnackChowMein
+/obj/item/food/swirl_lollipop: FoodSnackSwirlLollipop
+/obj/item/food/cnds: FoodSnackCnDs
+/obj/item/food/sosjerky: FoodSnackSus # tg's only jerky item; SS14 "sus jerky" has no other candidate
 /obj/item/toy/nuke: ToyNuke
 /obj/item/toy/plush/rouny: PlushieRouny
 /obj/item/trash/cheesie: FoodPacketCheesieTrash
