@@ -694,6 +694,20 @@
 /obj/structure/chess/blackbishop: BlackBishop
 /obj/structure/chess/blackqueen: BlackQueen
 /obj/structure/chess/blackking: BlackKing
+# tg's AI core lawset modules (AI_modules/full_lawsets.dm), matched by tg's
+# own name=/law_id= against SS14's "law board (X)" naming.
+/obj/item/ai_module/law/core/full/custom: NTDefaultCircuitBoard # tg name "Default Core AI Module"
+/obj/item/ai_module/law/core/full/asimov: AsimovCircuitBoard # tg's "Asimov" is SS13/tg's name for the modified crew-protecting lawset SS14 calls "Crewsimov"
+/obj/item/ai_module/law/core/full/corp: CorporateCircuitBoard
+/obj/item/ai_module/law/core/full/paladin: PaladinCircuitBoard
+/obj/item/ai_module/law/core/full/robocop: RobocopCircuitBoard # law_id is literally "robocop"
+/obj/item/ai_module/law/core/full/antimov: AntimovCircuitBoard
+/obj/item/ai_module/law/core/full/liveandletlive: LiveLetLiveCircuitBoard
+/obj/item/ai_module/law/core/full/maintain: StationEfficiencyCircuitBoard # tg name "Station Efficiency"
+/obj/item/ai_module/law/core/full/ten_commandments: CommandmentCircuitBoard
+/obj/item/ai_module/law/core/full/nutimov: NutimovCircuitBoard
+/obj/item/ai_module/law/core/full/dungeon_master: GameMasterCircuitBoard # Dungeon Master = Game Master
+/obj/item/ai_module/law/core/full/painter: ArtistCircuitBoard # Painter = Artist
 /obj/item/circuitboard/machine/cell_charger: CellRechargerCircuitboard
 /obj/item/melee/baton/telescopic: TelescopicShield
 /obj/item/clothing/head/helmet: ClothingHeadHelmetBasic
