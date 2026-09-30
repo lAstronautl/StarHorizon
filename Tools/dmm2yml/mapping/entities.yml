@@ -3519,6 +3519,10 @@
 /obj/structure/fake_stairs/directional/south: Stairs
 /obj/effect/spawner/random/decoration/carpet: FloorTileItemCarpetOffice
 /obj/item/holosign_creator/atmos: HolofanProjector
+/obj/item/holosign_creator: Holoprojector
+/obj/item/holosign_creator/security: HoloprojectorSecurity
+/obj/item/holosign_creator/cyborg: HoloprojectorField # tg name "Energy Barrier Projector", the closest match to a force field
+/obj/structure/flora/tree/stump: FloraTreeStump
 /obj/machinery/quantumpad: CargoTelepad
 /obj/structure/fluff/oldturret: WeaponTurretSyndicateBroken
 /obj/structure/sign/departments/court: SignLawyer
