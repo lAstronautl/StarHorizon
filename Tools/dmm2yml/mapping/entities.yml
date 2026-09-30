@@ -640,6 +640,13 @@
 /obj/item/food/grown/oat: OatBushel
 /obj/item/food/grown/rice: RiceBushel
 /obj/item/grown/log/steel: SteelLog
+# tg's plushie family (code/game/objects/items/plushes.dm), checked against
+# tg's own name= for each.
+/obj/item/toy/plush/human: PlushieHuman
+/obj/item/toy/plush/narplush: PlushieNar
+/obj/item/toy/plush/ratplush: PlushieRatvar
+/obj/item/toy/plush/lizard_plushie/space: PlushieSpaceLizard
+/obj/item/toy/plush/shark: PlushieSharkBlue # tg's shark plushie has no color qualifier -- matches the base/default blue variant
 /obj/item/circuitboard/machine/cell_charger: CellRechargerCircuitboard
 /obj/item/melee/baton/telescopic: TelescopicShield
 /obj/item/clothing/head/helmet: ClothingHeadHelmetBasic
