@@ -3552,6 +3552,12 @@
 /obj/effect/spawner/random/techstorage/medical_all: RandomBoard
 /obj/effect/spawner/random/techstorage/tcomms_all: RandomBoard
 /obj/item/ammo_casing/shotgun/beanbag: ShellShotgunBeanbag
+/obj/item/ammo_casing/shotgun/buckshot: ShellShotgun
+/obj/item/ammo_casing/shotgun: ShellShotgunSlug
+/obj/item/ammo_casing/shotgun/incendiary: ShellShotgunIncendiary
+/obj/item/storage/box/beanbag: BoxBeanbag
+/obj/item/storage/box/lethalshot: BoxLethalshot
+/obj/item/storage/box/slugs: BoxShotgunSlug
 /obj/item/clothing/suit/hooded/ablative: ClothingOuterArmorReflective
 /obj/item/flamethrower: FirethrowerGun
 /obj/item/food/pizzaslice/moldy: FoodPizzaMoldySlice
