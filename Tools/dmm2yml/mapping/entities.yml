@@ -1204,6 +1204,8 @@
 /obj/item/grenade/chem_grenade/incendiary: GrenadeIncendiary
 /obj/item/grenade/frag: GrenadeShrapnel
 /obj/item/grenade/stingbang: GrenadeStinger
+/obj/item/flashlight/lamp/bananalamp: LampBanana
+/obj/item/reagent_containers/cup/glass/bottle/juice/lemonjuice: DrinkJuiceLemonCarton
 /obj/item/storage/box/matches: Matchbox
 /obj/item/match: Matchstick
 /obj/item/restraints/handcuffs/cable: Cablecuffs
