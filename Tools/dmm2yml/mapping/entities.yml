@@ -3442,6 +3442,13 @@
 /obj/structure/showcase/perfect_employee: ShowcaseRobot
 /obj/structure/sign/departments/telecomms/alt/directional/south: SignTelecomms
 /obj/vehicle/sealed/mecha/ripley/cargo: MechRipleyMk2Hauler
+/obj/vehicle/sealed/mecha/honker: MechHonker
+/obj/vehicle/sealed/mecha/vim: MechVim
+/obj/item/circuitboard/mecha/honker/main: HonkerCentralElectronics
+/obj/item/circuitboard/mecha/honker/peripherals: HonkerPeripheralsElectronics
+/obj/item/circuitboard/mecha/honker/targeting: HonkerTargetingElectronics
+/obj/item/circuitboard/mecha/ripley/main: RipleyCentralElectronics
+/obj/item/circuitboard/mecha/ripley/peripherals: RipleyPeripheralsElectronics
 
 /obj/structure/emergency_shield/regenerating: HolosignForcefield
 /obj/machinery/shieldgen: ContainmentFieldGenerator
