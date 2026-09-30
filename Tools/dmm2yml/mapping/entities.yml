@@ -3020,6 +3020,29 @@
 /obj/item/food/cakeslice/pumpkinspice: FoodCakePumpkinSlice
 /obj/item/food/cake/vanilla_cake: FoodCakeVanilla
 /obj/item/food/cakeslice/vanilla_slice: FoodCakeVanillaSlice
+# tg's bread family (bread.dm + moth.dm cornbread + sandwichtoast.dm), checked
+# against tg's own name=.
+/obj/item/food/bread/empty: FoodBreadPlain
+/obj/item/food/breadslice/moldy: FoodBreadMoldySlice
+/obj/item/food/bread/meat: FoodBreadMeat
+/obj/item/food/breadslice/meat: FoodBreadMeatSlice
+/obj/item/food/bread/sausage: FoodBreadSausage
+/obj/item/food/breadslice/sausage: FoodBreadSausageSlice
+/obj/item/food/bread/xenomeat: FoodBreadMeatXeno
+/obj/item/food/breadslice/xenomeat: FoodBreadMeatXenoSlice
+/obj/item/food/bread/spidermeat: FoodBreadMeatSpider
+/obj/item/food/breadslice/spidermeat: FoodBreadMeatSpiderSlice
+/obj/item/food/bread/banana: FoodBreadBanana
+/obj/item/food/breadslice/banana: FoodBreadBananaSlice
+/obj/item/food/bread/tofu: FoodBreadTofu
+/obj/item/food/breadslice/tofu: FoodBreadTofuSlice
+/obj/item/food/bread/creamcheese: FoodBreadCreamcheese
+/obj/item/food/breadslice/creamcheese: FoodBreadCreamcheeseSlice
+/obj/item/food/bread/mimana: FoodBreadMimana
+/obj/item/food/breadslice/mimana: FoodBreadMimanaSlice
+/obj/item/food/bread/corn: FoodBreadCorn
+/obj/item/food/breadslice/corn: FoodBreadCornSlice
+/obj/item/food/butteredtoast: FoodBreadButteredToast
 /obj/item/toy/nuke: ToyNuke
 /obj/item/toy/plush/rouny: PlushieRouny
 /obj/item/trash/cheesie: FoodPacketCheesieTrash
