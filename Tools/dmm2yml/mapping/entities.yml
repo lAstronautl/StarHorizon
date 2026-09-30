@@ -1167,6 +1167,7 @@
 /obj/structure/table_frame: TableFrame
 /obj/item/instrument/harmonica: HarmonicaInstrument
 /obj/structure/musician/piano: PianoInstrument
+/obj/structure/musician/piano/minimoog: MinimoogInstrument
 /obj/item/bodybag: BodyBag
 /obj/item/cigarette: Cigarette
 /obj/effect/spawner/random/entertainment/cigarette: Cigarette
