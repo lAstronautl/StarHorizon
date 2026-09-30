@@ -606,6 +606,7 @@
 /obj/item/seeds/poppy/lily/trumpet: SpacemansTrumpetSeeds
 /obj/item/seeds/apple/gold: GoldenAppleSeeds
 /obj/item/seeds/cannabis/rainbow: RainbowCannabisSeeds
+/obj/item/food/grown/cannabis/rainbow: LeavesCannabisRainbow
 /obj/item/seeds/cocoapod: CocoaSeeds
 /obj/item/seeds/peas: PeaSeeds
 /obj/item/seeds/peas/laugh: LaughinPeaSeeds
