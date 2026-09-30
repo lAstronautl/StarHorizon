@@ -1215,6 +1215,8 @@
 /obj/item/food/boiledegg: FoodEggBoiled
 /obj/item/food/spaghetti/butternoodles: FoodNoodlesButter
 /obj/item/food/spaghetti/spesslaw: FoodNoodlesSpesslaw
+/obj/item/gun/magic/staff/healing: WeaponStaffHealing
+/obj/item/melee/baton: Truncheon
 /obj/item/storage/box/matches: Matchbox
 /obj/item/match: Matchstick
 /obj/item/restraints/handcuffs/cable: Cablecuffs
