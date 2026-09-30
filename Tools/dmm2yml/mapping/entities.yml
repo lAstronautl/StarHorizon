@@ -3562,6 +3562,13 @@
 /obj/item/stack/medical/bruise_pack: Brutepack
 /obj/item/trash/raisins: FoodPacketRaisinsTrash
 /obj/item/trash/can/food/beans: FoodTinBeansTrash
+/obj/item/food/canned/beans: FoodTinBeans
+/obj/item/food/canned/chap: FoodTinMRE # tg name "can of CHAP" (Chopped Ham And Pork), a generic tinned meat
+/obj/item/trash/can/food/chap: FoodTinMRETrash
+/obj/item/food/canned/peaches: FoodTinPeaches
+/obj/item/food/canned/peaches/maint: FoodTinPeachesMaint
+/obj/item/trash/can/food/peaches/maint: FoodTinPeachesMaintTrash
+/obj/item/trash/can/food/peaches: FoodTinPeachesTrash
 /obj/item/grenade/clusterbuster/soap: SlipocalypseClusterSoap
 # Nyanotrasen fork id (main tree has no deep fryer); found via the
 # circuit board's prototype: construction-result field, not a name match.
