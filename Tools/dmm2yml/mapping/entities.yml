@@ -2769,6 +2769,18 @@
 /obj/item/food/salami: FoodMeatSalami
 /obj/item/food/sandwich/grilled_cheese: FoodBakedGrilledCheeseSandwich
 /obj/item/food/snowcones/berry: FoodFrozenSnowconeBerry
+/obj/item/food/snowcones: FoodFrozenSnowconeBase
+/obj/item/food/snowcones/clown: FoodFrozenSnowconeClown
+/obj/item/food/snowcones/fruitsalad: FoodFrozenSnowconeFruit
+/obj/item/food/snowcones/mime: FoodFrozenSnowconeMime
+/obj/item/food/snowcones/rainbow: FoodFrozenSnowconeRainbow
+/obj/item/reagent_containers/cup/glass/sillycup: FoodFrozenSnowconeTrash # tg name "paper cup", the snowcone's own trash_type
+/obj/item/food/cornuto: FoodFrozenCornuto
+/obj/item/food/spacefreezy: FoodFrozenFreezy
+/obj/item/food/popsicle/jumbo: FoodFrozenPopsicleJumbo
+/obj/item/food/icecreamsandwich: FoodFrozenSandwich
+/obj/item/food/strawberryicecreamsandwich: FoodFrozenSandwichStrawberry
+/obj/item/food/sundae: FoodFrozenSundae
 /obj/item/food/spaghetti/boiledspaghetti: FoodNoodlesBoiled
 /obj/item/food/spaghetti/copypasta: FoodNoodlesCopy
 /obj/item/food/spaghetti/meatballspaghetti: FoodNoodlesMeatball
