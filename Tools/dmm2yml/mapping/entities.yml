@@ -2994,6 +2994,32 @@
 /obj/item/food/salad/edensalad: FoodSaladEden
 /obj/item/food/salad/gumbo: FoodRiceGumbo
 /obj/item/food/salad/caesar_salad: FoodSaladCaesar
+# tg's cake family (cake.dm), checked against tg's own name= for the whole
+# cake and its matching slice.
+/obj/item/food/cake/empty: FoodCakePlain
+/obj/item/food/cakeslice/empty: FoodCakePlainSlice
+/obj/item/food/cake/carrot: FoodCakeCarrot
+/obj/item/food/cakeslice/carrot: FoodCakeCarrotSlice
+/obj/item/food/cake/brain: FoodCakeBrain
+/obj/item/food/cakeslice/brain: FoodCakeBrainSlice
+/obj/item/food/cake/cheese: FoodCakeCheese
+/obj/item/food/cakeslice/cheese: FoodCakeCheeseSlice
+/obj/item/food/cake/orange: FoodCakeOrange
+/obj/item/food/cakeslice/orange: FoodCakeOrangeSlice
+/obj/item/food/cake/lime: FoodCakeLime
+/obj/item/food/cakeslice/lime: FoodCakeLimeSlice
+/obj/item/food/cake/lemon: FoodCakeLemon
+/obj/item/food/cakeslice/lemon: FoodCakeLemonSlice
+/obj/item/food/cakeslice/chocolate: FoodCakeChocolateSlice
+/obj/item/food/cakeslice/birthday: FoodCakeBirthdaySlice
+/obj/item/food/cake/apple: FoodCakeApple
+/obj/item/food/cakeslice/apple: FoodCakeAppleSlice
+/obj/item/food/cake/slimecake: FoodCakeSlime
+/obj/item/food/cakeslice/slimecake: FoodCakeSlimeSlice
+/obj/item/food/cake/pumpkinspice: FoodCakePumpkin
+/obj/item/food/cakeslice/pumpkinspice: FoodCakePumpkinSlice
+/obj/item/food/cake/vanilla_cake: FoodCakeVanilla
+/obj/item/food/cakeslice/vanilla_slice: FoodCakeVanillaSlice
 /obj/item/toy/nuke: ToyNuke
 /obj/item/toy/plush/rouny: PlushieRouny
 /obj/item/trash/cheesie: FoodPacketCheesieTrash
