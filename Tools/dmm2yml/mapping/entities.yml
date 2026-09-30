@@ -625,7 +625,6 @@
 /obj/item/food/grown/galaxythistle: FoodGalaxythistle
 /obj/item/food/grown/gatfruit: FoodGatfruit
 /obj/item/food/grown/apple/gold: FoodGoldenApple
-/obj/item/food/grown/mushroom/reishi: FoodLingzhi # lingzhi is the real-world Chinese name for the reishi mushroom
 /obj/item/food/grown/flower/poppy/lily: FoodLily
 /obj/item/food/grown/banana/mime: FoodMimana
 /obj/item/food/grown/onion/red: FoodOnionRed
@@ -731,14 +730,12 @@
 /obj/item/mecha_parts/part/honker_right_leg: HonkerRLeg
 # tg's prefilled reagent bottles (cups/bottle.dm), checked against tg's own
 # name=/list_reagents=.
-/obj/item/reagent_containers/cup/bottle/epinephrine: ChemistryBottleEpinephrine
 /obj/item/reagent_containers/cup/bottle/toxin: ChemistryBottleToxin
 /obj/item/reagent_containers/cup/bottle/mutagen: ChemistryBottleUnstableMutagen # tg name "unstable mutagen bottle"
 /obj/item/reagent_containers/cup/bottle/hydrogen: ChemistryBottleHydrogen
 /obj/item/reagent_containers/cup/bottle/aluminium: ChemistryBottleAluminium
 /obj/item/reagent_containers/cup/bottle/silicon: ChemistryBottleSilicon
 /obj/item/reagent_containers/cup/bottle/sulfur: ChemistryBottleSulfur
-/obj/item/reagent_containers/cup/bottle/chlorine: ChemistryBottleChlorine
 /obj/item/reagent_containers/cup/bottle/copper: ChemistryBottleCopper
 /obj/item/reagent_containers/cup/bottle/radium: ChemistryBottleRadium
 /obj/item/reagent_containers/cup/bottle/sugar: ChemistryBottleSugar
@@ -2921,7 +2918,6 @@
 /obj/item/modular_computer/pda/crew/psychologist: PsychologistPDA
 /obj/item/modular_computer/pda/crew/assistant: PassengerPDA # tg's generic no-department "assistant" role is SS14's "passenger"
 /obj/item/modular_computer/pda/syndicate: SyndiPDA # device_theme = PDA_THEME_SYNDICATE, matches SS14's SyndiPDA (id: SyndicateIDCard)
-/obj/item/modular_computer/pda/clear: ClearPDA
 /obj/item/food/baguette: FoodBreadBaguette
 /obj/item/food/donkpocket/warm/berry: FoodDonkpocketBerryWarm
 /obj/item/food/energybar: FoodSnackEnergyBar
