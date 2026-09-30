@@ -1157,6 +1157,13 @@
 /obj/item/instrument/glockenspiel: GlockenspielInstrument
 /obj/item/antag_spawner/nuke_ops: ReinforcementRadioSyndicateNukeops
 /obj/item/antag_spawner/nuke_ops/borg_tele/assault: ReinforcementRadioSyndicateCyborgAssault
+/obj/item/grenade/clusterbuster: ClusterBang
+/obj/item/cane: Cane
+/obj/item/pickaxe/drill: MiningDrill
+/obj/item/pickaxe/drill/diamonddrill: MiningDrillDiamond
+/obj/item/kinetic_crusher: WeaponCrusher
+/obj/machinery/door/airlock/shuttle/glass: AirlockGlassShuttle
+/obj/machinery/door/airlock/abductor: AirlockShuttleXenoborg
 /obj/item/mail: PackageDelivery
 /obj/item/storage/box/matches: Matchbox
 /obj/item/match: Matchstick
