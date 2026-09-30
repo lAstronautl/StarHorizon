@@ -1223,6 +1223,10 @@
 /obj/item/gun/energy/minigun: WeaponMinigun
 /obj/item/gun/ballistic/bow/shortbow: BowImprovised
 /obj/item/reagent_containers/spray/mister/pepperspray: WeaponSprayNozzle
+/obj/item/reagent_containers/spray/weedspray: WeedSpray
+/obj/item/reagent_containers/spray/pestspray: PestSpray
+/obj/item/secateurs: HydroponicsToolClippers
+/obj/item/ammo_box/foambox: BoxDonkSoftBox
 /obj/item/storage/box/matches: Matchbox
 /obj/item/match: Matchstick
 /obj/item/restraints/handcuffs/cable: Cablecuffs
