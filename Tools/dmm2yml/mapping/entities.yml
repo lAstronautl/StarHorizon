@@ -1149,6 +1149,10 @@
 /obj/item/reagent_containers/cup/glass/shaker: DrinkShaker
 /obj/item/mining_scanner: MineralScanner
 /obj/item/t_scanner/adv_mining_scanner: AdvancedMineralScannerUnpowered
+/obj/item/pen/fountain/captain: PenCap
+/obj/item/stack/spacecash/c10000: SpaceCash10000
+/obj/item/storage/fancy/rollingpapers: PackPaperRolling
+/obj/item/rollingpaper: PaperRolling
 /obj/item/storage/box/matches: Matchbox
 /obj/item/match: Matchstick
 /obj/item/restraints/handcuffs/cable: Cablecuffs
