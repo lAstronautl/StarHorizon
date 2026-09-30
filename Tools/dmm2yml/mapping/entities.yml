@@ -2931,6 +2931,16 @@
 /obj/item/food/cheesynachos: FoodMealNachosCheesy
 /obj/item/food/cubannachos: FoodMealNachosCuban
 /obj/item/food/monkeycube: MonkeyCube
+/obj/item/reagent_containers/hypospray/medipen/survival: EmergencyMedipen # tg's own name is "survival emergency medipen"
+/obj/item/hemostat/cyborg: HemostatCyber
+/obj/item/cautery/cyborg: CauteryCyber
+/obj/item/surgicaldrill/cyborg: DrillCyber
+/obj/item/scalpel/cyborg: ScalpelCyber
+/obj/item/retractor/cyborg: RetractorCyber
+/obj/item/bonesetter/cyborg: BoneSetterCyber
+/obj/item/circular_saw/cyborg: SawCyber
+/obj/item/scalpel/advanced: ScalpelLaser # tg's own name is "laser scalpel"
+/obj/item/retractor/advanced: RetractorAdvanced
 /obj/item/toy/nuke: ToyNuke
 /obj/item/toy/plush/rouny: PlushieRouny
 /obj/item/trash/cheesie: FoodPacketCheesieTrash
