@@ -2941,6 +2941,19 @@
 /obj/item/circular_saw/cyborg: SawCyber
 /obj/item/scalpel/advanced: ScalpelLaser # tg's own name is "laser scalpel"
 /obj/item/retractor/advanced: RetractorAdvanced
+# tg's mecha toy figurines (toy_mechs.dm), checked against tg's own name=.
+/obj/item/toy/mecha/ripley: ToyRipley
+/obj/item/toy/mecha/odysseus: ToyOdysseus
+/obj/item/toy/mecha/gygax: ToyGygax
+/obj/item/toy/mecha/durand: ToyDurand
+/obj/item/toy/mecha/phazon: ToyPhazon
+/obj/item/toy/mecha/honk: ToyHonk
+/obj/item/toy/mecha/mauler: ToyMauler
+/obj/item/toy/mecha/deathripley: ToyDeathRipley
+/obj/item/toy/mecha/reticence: ToyReticence
+/obj/item/toy/mecha/marauder: ToyMarauder
+/obj/item/toy/mecha/seraph: ToySeraph
+/obj/item/toy/mecha/firefighter: ToyFireRipley
 /obj/item/toy/nuke: ToyNuke
 /obj/item/toy/plush/rouny: PlushieRouny
 /obj/item/trash/cheesie: FoodPacketCheesieTrash
