@@ -3063,6 +3063,27 @@
 /obj/item/food/rawpastrybase: FoodDoughPastryBaseRaw
 /obj/item/food/pastrybase: FoodDoughPastryBase
 /obj/item/food/tortilla: FoodDoughTortilla # the only tortilla-stage id in SS14's whole food system; tg's tortilla plays the same raw taco-base role
+# tg's burger family (burgers.dm), checked against tg's own name=.
+/obj/item/food/burger/plain: FoodBurgerPlain
+/obj/item/food/burger/appendix: FoodBurgerAppendix
+/obj/item/food/burger/fish: FoodBurgerCarp
+/obj/item/food/burger/tofu: FoodBurgerTofu
+/obj/item/food/burger/roburger: FoodBurgerRobot
+/obj/item/food/burger/bearger: FoodBurgerBear
+/obj/item/food/burger/brain: FoodBurgerBrain
+/obj/item/food/burger/ghost: FoodBurgerGhost
+/obj/item/food/burger/jelly: FoodBurgerJelly
+/obj/item/food/burger/superbite: FoodBurgerSuper
+/obj/item/food/burger/fivealarm: FoodBurgerFive
+/obj/item/food/burger/baseball: FoodBurgerBaseball
+/obj/item/food/burger/empoweredburger: FoodBurgerEmpowered
+/obj/item/food/burger/catburger: FoodBurgerCat
+/obj/item/food/burger/crab: FoodBurgerCrab
+/obj/item/food/burger/soylent: FoodBurgerSoy
+/obj/item/food/burger/rib: FoodBurgerMcrib
+/obj/item/food/burger/mcguffin: FoodBurgerMcguffin
+/obj/item/food/burger/crazy: FoodBurgerCrazy
+/obj/item/food/burger/corgi: FoodBurgerCorgi
 /obj/item/toy/nuke: ToyNuke
 /obj/item/toy/plush/rouny: PlushieRouny
 /obj/item/trash/cheesie: FoodPacketCheesieTrash
