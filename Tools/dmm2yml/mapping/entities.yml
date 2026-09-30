@@ -3085,6 +3085,9 @@
 /obj/item/food/cheesynachos: FoodMealNachosCheesy
 /obj/item/food/cubannachos: FoodMealNachosCuban
 /obj/item/food/monkeycube: MonkeyCube
+/obj/item/storage/box/monkeycubes: MonkeyCubeBox
+/obj/item/storage/box/monkeycubes/syndicate: SyndicateSpongeBox
+/obj/item/storage/box/monkeycubes/random: VariantCubeBox # tg name "monster cube box", a box of random cube flavors
 /obj/item/reagent_containers/hypospray/medipen/survival: EmergencyMedipen # tg's own name is "survival emergency medipen"
 /obj/item/hemostat/cyborg: HemostatCyber
 /obj/item/cautery/cyborg: CauteryCyber
