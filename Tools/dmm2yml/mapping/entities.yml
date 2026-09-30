@@ -708,6 +708,14 @@
 /obj/item/ai_module/law/core/full/nutimov: NutimovCircuitBoard
 /obj/item/ai_module/law/core/full/dungeon_master: GameMasterCircuitBoard # Dungeon Master = Game Master
 /obj/item/ai_module/law/core/full/painter: ArtistCircuitBoard # Painter = Artist
+# tg's raw material stack sheets (sheet_types.dm/leather.dm), checked
+# against tg's own name=. The numbered SS14 variants (MaterialCloth1/10 etc)
+# are fixed stack-count presets with no distinct tg path -- only the base,
+# already-flexible-count id is mappable.
+/obj/item/stack/sheet/durathread: MaterialDurathread
+/obj/item/stack/sheet/cotton: MaterialCotton # tg name "raw cotton bundle"
+/obj/item/stack/sheet/bone: MaterialBones # tg name "bones"
+/obj/item/stack/sheet/animalhide/goliath_hide: MaterialGoliathHide # tg name "goliath hide plates"
 /obj/item/circuitboard/machine/cell_charger: CellRechargerCircuitboard
 /obj/item/melee/baton/telescopic: TelescopicShield
 /obj/item/clothing/head/helmet: ClothingHeadHelmetBasic
