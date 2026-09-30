@@ -2044,6 +2044,8 @@
 /obj/machinery/camera/preset/ordnance: SurveillanceCameraGeneral
 /obj/machinery/camera/motion: SurveillanceCameraGeneral
 /obj/machinery/camera/autoname: SurveillanceCameraGeneral
+/obj/machinery/camera/autoname/deconstructed: SurveillanceCameraConstructed
+/obj/item/wallframe/camera: SurveillanceCameraAssembly
 /obj/machinery/camera/autoname/motion/directional/north: {entity: SurveillanceCameraGeneral, dir: 1}
 /obj/machinery/camera/autoname/motion/directional/south: {entity: SurveillanceCameraGeneral, dir: 2}
 /obj/machinery/camera/autoname/motion/directional/east: {entity: SurveillanceCameraGeneral, dir: 4}
