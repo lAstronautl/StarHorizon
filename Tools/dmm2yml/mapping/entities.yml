@@ -518,6 +518,8 @@
 /obj/item/circular_saw: Saw
 /obj/item/scalpel: Scalpel
 /obj/item/bikehorn: BikeHorn
+/obj/item/bikehorn/golden: BikeHornInstrument # tg name "golden bike horn" matches "gilded bike horn"
+/obj/item/pai_card: PersonalAI
 /obj/item/storage/dice: DiceBag
 /obj/item/storage/medkit/brute: MedkitBrute
 /obj/item/storage/medkit/toxin: MedkitToxin
@@ -1124,6 +1126,8 @@
 /obj/item/clothing/glasses/blindfold: ClothingEyesBlindfold
 /obj/item/target: TargetHuman
 /obj/item/reagent_containers/cup/glass/mug: DrinkMug
+/obj/item/reagent_containers/cup/glass/flask: DrinkFlaskOld
+/obj/item/reagent_containers/cup/glass/flask/det: DrinkDetFlask
 /obj/item/reagent_containers/cup/glass/shaker: DrinkShaker
 /obj/item/mining_scanner: MineralScanner
 # fixed from an earlier mistake: this was pointed at VendingMachineClothing
