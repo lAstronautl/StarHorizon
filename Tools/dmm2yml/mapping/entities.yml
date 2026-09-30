@@ -1153,6 +1153,11 @@
 /obj/item/stack/spacecash/c10000: SpaceCash10000
 /obj/item/storage/fancy/rollingpapers: PackPaperRolling
 /obj/item/rollingpaper: PaperRolling
+/obj/item/instrument/recorder: RecorderInstrument
+/obj/item/instrument/glockenspiel: GlockenspielInstrument
+/obj/item/antag_spawner/nuke_ops: ReinforcementRadioSyndicateNukeops
+/obj/item/antag_spawner/nuke_ops/borg_tele/assault: ReinforcementRadioSyndicateCyborgAssault
+/obj/item/mail: PackageDelivery
 /obj/item/storage/box/matches: Matchbox
 /obj/item/match: Matchstick
 /obj/item/restraints/handcuffs/cable: Cablecuffs
