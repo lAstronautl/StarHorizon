@@ -652,6 +652,32 @@
 /obj/item/toy/talking/ai: ToyAi
 /obj/item/toy/balloon/syndicate: BalloonSyn
 /obj/item/bikehorn/rubberducky: ToyRubberDuck
+# tg's subdermal implant/implanter family (code/game/objects/items/implants/),
+# checked against tg's own name= for each.
+/obj/item/implant/emp: EmpImplant
+/obj/item/implant/radio: RadioImplantCentcomm # tg's plain (non-syndicate) radio implant, name literally "radio implant"
+/obj/item/implant/radio/syndicate: RadioImplant # tg name "syndicate radio implant"
+/obj/item/implant/freedom: FreedomImplant
+/obj/item/implant/explosive: MicroBombImplant # tg's base explosive implant is itself named "microbomb implant"
+/obj/item/implant/explosive/macro: MacroBombImplant
+/obj/item/implant/deathrattle: DeathRattleImplant
+/obj/item/implant/storage: StorageImplant
+/obj/item/implant/uplink: UplinkImplant
+/obj/item/implant/mindshield: MindShieldImplant
+/obj/item/implant/tracking: TrackingImplant
+/obj/item/implant/sad_trombone: SadTromboneImplant
+/obj/item/implant/chem: ChemImplant
+/obj/item/implanter: Implanter
+/obj/item/implanter/sad_trombone: SadTromboneImplanter
+/obj/item/implanter/explosive: MicroBombImplanter
+/obj/item/implanter/explosive_macro: MacroBombImplanter
+/obj/item/implanter/freedom: FreedomImplanter
+/obj/item/implanter/emp: EmpImplanter
+/obj/item/implanter/radio: RadioImplanterCentcomm
+/obj/item/implanter/radio/syndicate: RadioImplanter
+/obj/item/implanter/storage: StorageImplanter
+/obj/item/implanter/uplink: UplinkImplanter
+/obj/item/implanter/tracking: TrackingImplanter
 /obj/item/circuitboard/machine/cell_charger: CellRechargerCircuitboard
 /obj/item/melee/baton/telescopic: TelescopicShield
 /obj/item/clothing/head/helmet: ClothingHeadHelmetBasic
