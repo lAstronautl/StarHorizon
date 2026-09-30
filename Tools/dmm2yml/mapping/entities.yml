@@ -304,6 +304,8 @@
 /obj/item/screwdriver: Screwdriver
 /obj/item/stack/cable_coil: CableApcStack
 /obj/item/stack/cannonball: CannonBall
+/obj/structure/cannon: ShuttleGunPirateCannon
+/obj/structure/windoor_assembly: WindoorAssembly
 /obj/item/construction/rcd: RCD
 /obj/item/rcd_ammo: RCDAmmo
 /obj/item/construction/rcd/arcd: RCDExperimental # "prototype RCD with ranged capability" matches "experimental RCD"
