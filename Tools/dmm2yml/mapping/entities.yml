@@ -1005,6 +1005,11 @@
 /obj/item/storage/box/syringes: BoxSyringe
 /obj/item/binoculars: Binoculars
 /obj/item/tank/internals/oxygen: OxygenTank
+/obj/item/tank/internals/generic: AirTank
+/obj/item/tank/internals/emergency_oxygen/double: DoubleEmergencyOxygenTank
+/obj/item/tank/internals/emergency_oxygen/engi/clown: EmergencyFunnyOxygenTank
+/obj/item/tank/internals/emergency_oxygen/engi: ExtendedEmergencyOxygenTank
+/obj/item/flashlight/glowstick/blue: GlowstickBlue
 /obj/item/flashlight/seclite: FlashlightSeclite
 /obj/item/stack/sheet/rglass: SheetRGlass
 /obj/item/cigarette/cigar: Cigar
