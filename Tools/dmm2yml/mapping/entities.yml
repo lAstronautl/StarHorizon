@@ -1450,6 +1450,7 @@
 /obj/item/seeds/carrot: CarrotSeeds
 /obj/item/seeds/garlic: GarlicSeeds
 /obj/item/seeds/pumpkin: PumpkinSeeds
+/obj/item/seeds/pumpkin/blumpkin: BluePumpkinSeeds
 /obj/item/seeds/watermelon: WatermelonSeeds
 /obj/item/seeds/cannabis: CannabisSeeds
 /obj/item/seeds/ambrosia: AmbrosiaVulgarisSeeds
@@ -1474,6 +1475,7 @@
 /obj/item/food/grown/apple: FoodApple
 /obj/item/food/grown/carrotlike/carrot: FoodCarrot
 /obj/item/food/grown/pumpkin: FoodPumpkin
+/obj/item/food/grown/pumpkin/blumpkin: FoodBluePumpkin
 /obj/item/food/grown/melonlike/watermelon: FoodWatermelon
 /obj/item/food/grown/grapes: FoodGrape
 /obj/item/food/grown/corn: FoodCorn
@@ -2638,6 +2640,24 @@
 /obj/item/food/donut/choco: FoodDonutChocolate
 /obj/item/food/donut/meat: FoodDonutMeat
 /obj/item/food/donut/trumpet: FoodDonutSpaceman
+# tg's donut family (donuts.dm), checked against tg's own name= and icon_state=.
+/obj/item/food/donut/plain: FoodDonutHomer
+/obj/item/food/donut/matcha: FoodDonut
+/obj/item/food/donut/chaos: FoodDonutChaos
+/obj/item/food/donut/berry: FoodDonutPink
+/obj/item/food/donut/bungo: FoodDonutBungo
+/obj/item/food/donut/laugh: FoodDonutSweetpea
+/obj/item/food/donut/blumpkin: FoodDonutBluePumpkin
+/obj/item/food/donut/jelly: FoodDonutJellyHomer
+/obj/item/food/donut/jelly/matcha: FoodDonutJelly
+/obj/item/food/donut/jelly/berry: FoodDonutJellyPink
+/obj/item/food/donut/jelly/trumpet: FoodDonutJellySpaceman
+/obj/item/food/donut/jelly/apple: FoodDonutJellyApple
+/obj/item/food/donut/jelly/caramel: FoodDonutJellyCaramel
+/obj/item/food/donut/jelly/choco: FoodDonutJellyChocolate
+/obj/item/food/donut/jelly/blumpkin: FoodDonutJellyBluePumpkin
+/obj/item/food/donut/jelly/bungo: FoodDonutJellyBungo
+/obj/item/food/donut/jelly/laugh: FoodDonutJellySweetpea
 /obj/item/food/dough: FoodDough
 /obj/item/food/eggplantparm: FoodMealEggplantParm
 /obj/item/food/enchiladas: FoodMealEnchiladas
