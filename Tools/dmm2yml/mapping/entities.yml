@@ -2912,6 +2912,15 @@
 /obj/item/tank/jetpack/void: JetpackVoidFilled # tg's jetpacks always come pre-filled with gas, matching the established Filled-variant pattern for this family
 /obj/item/tank/jetpack/security: JetpackSecurityFilled
 /obj/item/tank/jetpack/harness: JetpackMiniFilled # tg's lightweight "jet harness" matches SS14's mini jetpack
+/obj/item/stack/sheet/plasmaglass: SheetPGlass
+/obj/item/stack/sheet/plasmarglass: SheetRPGlass
+/obj/item/radio/intercom/departmental/cargo: IntercomSupply
+/obj/item/radio/intercom/departmental/command: IntercomCommand
+/obj/item/radio/intercom/departmental/engineering: IntercomEngineering
+/obj/item/radio/intercom/departmental/medical: IntercomMedical
+/obj/item/radio/intercom/departmental/science: IntercomScience
+/obj/item/radio/intercom/departmental/security: IntercomSecurity
+/obj/item/radio/intercom/departmental/service: IntercomService
 /obj/item/toy/nuke: ToyNuke
 /obj/item/toy/plush/rouny: PlushieRouny
 /obj/item/trash/cheesie: FoodPacketCheesieTrash
