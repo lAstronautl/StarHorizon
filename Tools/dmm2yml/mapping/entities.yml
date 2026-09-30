@@ -1843,6 +1843,8 @@
 # ---- guns ----
 /obj/item/gun/energy/laser: WeaponLaserCarbine
 /obj/item/gun/ballistic/revolver/mateba: WeaponRevolverMateba
+/obj/item/gun/ballistic/revolver/c38/detective: WeaponRevolverInspector # "Colt Detective Special"
+/obj/item/gun/ballistic/revolver/badass: WeaponRevolverPython # "Badass Revolver", Waffle Corp operative/syndicate gun
 /obj/item/gun/energy/taser: WeaponTaser
 /obj/item/gun/energy/e_gun/advtaser: WeaponTaserSuper # "hybrid taser", an upgraded taser variant
 /obj/item/gun/energy/disabler/smg: WeaponDisablerSMG
@@ -1856,6 +1858,7 @@
 /obj/item/gun/energy/pulse: WeaponPulseRifle
 /obj/item/gun/energy/temperature: WeaponTemperatureGun
 /obj/item/gun/energy/tesla_cannon: WeaponTeslaGun
+/obj/item/grapple_gun: WeaponGrapplingGun
 /obj/item/gun/magic/wand/death: WeaponWandDeath
 /obj/item/gun/magic/wand/fireball: WeaponWandFireball
 /obj/item/gun/magic/wand/door: WeaponWandPolymorphDoor # tg name "wand of door creation" matches "wand of entrance"
