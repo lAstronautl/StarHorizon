@@ -3084,6 +3084,44 @@
 /obj/item/food/burger/mcguffin: FoodBurgerMcguffin
 /obj/item/food/burger/crazy: FoodBurgerCrazy
 /obj/item/food/burger/corgi: FoodBurgerCorgi
+# tg's pizza family (pizza.dm), checked against tg's own name= for the whole
+# pizza and its matching slice.
+/obj/item/food/pizza/margherita: FoodPizzaMargherita
+/obj/item/food/pizza/meat: FoodPizzaMeat
+/obj/item/food/pizzaslice/meat: FoodPizzaMeatSlice
+/obj/item/food/pizza/mushroom: FoodPizzaMushroom
+/obj/item/food/pizzaslice/mushroom: FoodPizzaMushroomSlice
+/obj/item/food/pizza/vegetable: FoodPizzaVegetable
+/obj/item/food/pizzaslice/vegetable: FoodPizzaVegetableSlice
+/obj/item/food/pizza/donkpocket: FoodPizzaDonkpocket
+/obj/item/food/pizzaslice/donkpocket: FoodPizzaDonkpocketSlice
+/obj/item/food/pizzaslice/dank: FoodPizzaDankSlice
+/obj/item/food/pizza/sassysage: FoodPizzaSassysage
+/obj/item/food/pizzaslice/sassysage: FoodPizzaSassysageSlice
+/obj/item/food/pizza/pineapple: FoodPizzaPineapple
+/obj/item/food/pizzaslice/pineapple: FoodPizzaPineappleSlice
+/obj/item/food/pizza/arnold: FoodPizzaArnold
+/obj/item/food/pizzaslice/arnold: FoodPizzaArnoldSlice
+# tg's pie family (pie.dm), checked against tg's own name=.
+/obj/item/food/pie/berryclafoutis: FoodPieClafoutis
+/obj/item/food/pie/meatpie: FoodPieMeat
+/obj/item/food/pieslice/meatpie: FoodPieMeatSlice
+/obj/item/food/pie/amanita_pie: FoodPieAmanita
+/obj/item/food/pie/plump_pie: FoodPiePlump
+/obj/item/food/pie/xemeatpie: FoodPieXeno
+/obj/item/food/pieslice/xemeatpie: FoodPieXenoSlice
+/obj/item/food/pie/applepie: FoodPieApple
+/obj/item/food/pieslice/apple: FoodPieAppleSlice
+/obj/item/food/pieslice/cherry: FoodPieCherrySlice
+/obj/item/food/pie/pumpkinpie: FoodPiePumpkin
+/obj/item/food/pieslice/pumpkin: FoodPiePumpkinSlice
+/obj/item/food/pie/appletart: FoodTartGapple
+/obj/item/food/pie/grapetart: FoodTartGrape
+/obj/item/food/pie/cocolavatart: FoodTartCoco
+/obj/item/food/pie/frostypie: FoodPieFrosty
+/obj/item/food/pieslice/frostypie: FoodPieFrostySlice
+/obj/item/food/pie/baklava: FoodPieBaklava
+/obj/item/food/pieslice/baklava: FoodPieBaklavaSlice
 /obj/item/toy/nuke: ToyNuke
 /obj/item/toy/plush/rouny: PlushieRouny
 /obj/item/trash/cheesie: FoodPacketCheesieTrash
