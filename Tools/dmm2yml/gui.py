@@ -100,6 +100,7 @@ class App(ttk.Frame):
         self.z_choice = tk.StringVar()
         self.filter_text = tk.StringVar()
         self.only_unfilled = tk.BooleanVar(value=False)
+        self.auto_skip_empty = tk.BooleanVar(value=False)
         self.status = tk.StringVar(value="индекс прототипов загружается...")
 
         self._editor: ttk.Entry | None = None
@@ -148,6 +149,13 @@ class App(ttk.Frame):
             button = ttk.Button(actions, text=text, command=command)
             button.pack(side="left", padx=(0, 6))
             self.buttons[key] = button
+
+        options = ttk.Frame(self, padding=(0, 0, 0, 6))
+        options.pack(fill="x")
+        ttk.Checkbutton(
+            options, text="при сборке карты автоматически пропускать незаполненные пути",
+            variable=self.auto_skip_empty,
+        ).pack(side="left")
 
         table = ttk.LabelFrame(self, text="Не сопоставлено", padding=6)
         table.pack(fill="both", expand=True)
@@ -313,8 +321,14 @@ class App(ttk.Frame):
             messagebox.showwarning("Некуда сохранять", "Укажите файл результата .yml")
             return
 
+        auto_skip = self.auto_skip_empty.get()
         table = {
-            row.path: {"dmm_path": row.path, "kind": row.kind, "ss14_id": row.value, "color": row.color}
+            row.path: {
+                "dmm_path": row.path,
+                "kind": row.kind,
+                "ss14_id": row.value or (mapping_rules.SKIP if auto_skip else ""),
+                "color": row.color,
+            }
             for row in self.rows.values()
         }
         output = self.output_path.get()
@@ -433,8 +447,9 @@ class App(ttk.Frame):
                     self.log(f"  ... и ещё {len(data) - 15}")
                 messagebox.showwarning(
                     "Не хватает решений",
-                    f"{len(data)} путь(ей) без замены. Заполните колонку «id SS14» "
-                    f"или отметьте их как «{mapping_rules.SKIP}».",
+                    f"{len(data)} путь(ей) без замены. Заполните колонку «id SS14», "
+                    f"отметьте их как «{mapping_rules.SKIP}», или включите "
+                    "«автоматически пропускать незаполненные пути» выше.",
                 )
             else:
                 messagebox.showinfo("Готово", f"Карта записана:\n{data}")
