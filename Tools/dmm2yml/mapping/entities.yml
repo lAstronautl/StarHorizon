@@ -1244,6 +1244,12 @@
 /obj/item/ammo_casing/p50: CartridgeAntiMateriel
 /obj/item/ammo_casing/foam_dart: BulletFoam
 /obj/item/ammo_box/magazine/toy: MagazineFoamBox
+/obj/structure/holosign/wetsign: HolosignWetFloor
+/obj/item/wallframe/firealarm: FireAlarmAssembly
+/obj/item/wallframe/airalarm: AirAlarmAssembly
+/obj/item/wallframe/telescreen: WallmountTelescreenFrame
+/obj/structure/window/reinforced/tinted/frosted: WindowFrostedDirectional
+/obj/structure/window/reinforced/plasma/plastitanium/indestructible: PlastitaniumWindowIndestructible
 /obj/item/storage/box/matches: Matchbox
 /obj/item/match: Matchstick
 /obj/item/restraints/handcuffs/cable: Cablecuffs
