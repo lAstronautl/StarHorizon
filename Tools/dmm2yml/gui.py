@@ -36,8 +36,8 @@ COLUMNS = (
     ("kind", "тип", 70, "w"),
     ("count", "шт.", 60, "e"),
     ("example", "пример", 80, "e"),
-    ("suggestion", "подсказка", 180, "w"),
-    ("value", "замена в SS14", 230, "w"),
+    ("suggestion", "возможный вариант", 180, "w"),
+    ("value", "id SS14", 230, "w"),
 )
 EDIT_COLUMN = "value"
 
@@ -181,7 +181,7 @@ class App(ttk.Frame):
         bulk = ttk.Frame(table)
         bulk.pack(fill="x", pady=(6, 0))
         ttk.Button(bulk, text="Пропустить выбранные", command=self._bulk_skip).pack(side="left")
-        ttk.Button(bulk, text="Взять подсказку", command=self._bulk_suggestion).pack(side="left", padx=6)
+        ttk.Button(bulk, text="Взять возможный вариант", command=self._bulk_suggestion).pack(side="left", padx=6)
         ttk.Button(bulk, text="Очистить выбранные", command=self._bulk_clear).pack(side="left")
         ttk.Label(bulk, text="двойной клик по строке — ввод замены").pack(side="right")
 
@@ -433,7 +433,7 @@ class App(ttk.Frame):
                     self.log(f"  ... и ещё {len(data) - 15}")
                 messagebox.showwarning(
                     "Не хватает решений",
-                    f"{len(data)} путь(ей) без замены. Заполните колонку «замена в SS14» "
+                    f"{len(data)} путь(ей) без замены. Заполните колонку «id SS14» "
                     f"или отметьте их как «{mapping_rules.SKIP}».",
                 )
             else:
