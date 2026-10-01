@@ -1229,6 +1229,9 @@
 /obj/item/ammo_box/foambox: BoxDonkSoftBox
 /obj/item/gps/cyborg: BorgHandheldGPSBasic
 /obj/structure/stairs/wood: StairWood
+/obj/item/storage/bag/ore/holding: OreBagOfHolding
+/obj/item/storage/bag/ore/cyborg: BorgOreBag
+/obj/item/pet_carrier: PetCarrier
 /obj/item/storage/box/matches: Matchbox
 /obj/item/match: Matchstick
 /obj/item/restraints/handcuffs/cable: Cablecuffs
