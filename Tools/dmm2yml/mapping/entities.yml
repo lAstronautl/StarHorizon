@@ -334,6 +334,7 @@
 /obj/machinery/atmospherics/components/unary/passive_vent: GasPassiveVent
 /obj/machinery/cell_charger: PowerCellRecharger
 /obj/machinery/fax: FaxMachineShip
+/obj/machinery/hydroponics: hydroponicsTray
 /obj/machinery/hydroponics/constructable: hydroponicsTray
 /obj/machinery/hydroponics/soil: hydroponicsSoil
 /obj/machinery/microwave: KitchenMicrowave
@@ -3951,3 +3952,30 @@
 # media, matching SS14's WallmountTelevision.
 /obj/machinery/computer/security/telescreen: WallmountTelescreen
 /obj/machinery/computer/security/telescreen/entertainment: WallmountTelevision
+
+# found via a catalog scan of real tg maps cross-checked against the fork's
+# full entity-prototype inventory; verified against tg source individually.
+/obj/machinery/air_sensor: AirSensor
+/obj/machinery/jukebox: Jukebox
+/obj/item/defibrillator: Defibrillator
+/obj/item/wallframe/button: ButtonFrame
+/obj/item/clothing/mask/joy: ClothingMaskJoy
+/obj/item/food/donkpocket: FoodDonkpocket
+/obj/item/melee/energy/sword: EnergySword
+/obj/item/storage/bag/mail: MailBag
+/obj/item/wirebrush: WireBrush
+/obj/machinery/sheetifier: Sheetifier
+/obj/vehicle/sealed/mecha/ripley: MechRipley
+# showcase/* are tg's own "fake object for display rooms" structures;
+# mapped to the real entity they depict, same as the existing
+# showcase/perfect_employee and showcase/cyborg/old rules above.
+/obj/structure/showcase/mecha/ripley: MechRipley
+/obj/structure/showcase/machinery/implanter: Implanter
+/obj/structure/showcase/machinery/cloning_pod: CloningPod
+/obj/structure/showcase/katana: Katana
+# sibling of the already-mapped entertainment/plushie rule -- same generic
+# toy-prize pool concept, no SS14 equivalent more specific than ToySpawner.
+/obj/effect/spawner/random/entertainment/toy: ToySpawner
+# abstract parent of the already-mapped vending/snackvend and
+# vending/colavend rules; matches SS14's generic RandomVending marker.
+/obj/effect/spawner/random/vending: RandomVending
