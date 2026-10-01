@@ -1241,6 +1241,9 @@
 /obj/item/bedsheet/orange: BedsheetOrange
 /obj/item/storage/briefcase/sniper: BriefcaseSyndie
 /obj/item/sensor_device: HandheldCrewMonitor
+/obj/item/ammo_casing/p50: CartridgeAntiMateriel
+/obj/item/ammo_casing/foam_dart: BulletFoam
+/obj/item/ammo_box/magazine/toy: MagazineFoamBox
 /obj/item/storage/box/matches: Matchbox
 /obj/item/match: Matchstick
 /obj/item/restraints/handcuffs/cable: Cablecuffs
