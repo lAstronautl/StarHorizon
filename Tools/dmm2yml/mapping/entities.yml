@@ -1237,6 +1237,10 @@
 /obj/item/circuitboard/machine/holopad: HolopadMachineCircuitboard
 /obj/item/circuitboard/machine/thermomachine: FreezerElectronics
 /obj/item/reagent_containers/cup/glass/bottle/rootbeer: DrinkRootBeerJug
+/obj/item/storage/box/snappops: SnapPopBox
+/obj/item/bedsheet/orange: BedsheetOrange
+/obj/item/storage/briefcase/sniper: BriefcaseSyndie
+/obj/item/sensor_device: HandheldCrewMonitor
 /obj/item/storage/box/matches: Matchbox
 /obj/item/match: Matchstick
 /obj/item/restraints/handcuffs/cable: Cablecuffs
