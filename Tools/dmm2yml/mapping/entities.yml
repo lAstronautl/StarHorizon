@@ -1232,6 +1232,11 @@
 /obj/item/storage/bag/ore/holding: OreBagOfHolding
 /obj/item/storage/bag/ore/cyborg: BorgOreBag
 /obj/item/pet_carrier: PetCarrier
+/obj/item/geiger_counter: GeigerCounter
+/obj/item/nuclear_challenge/literally_just_does_the_message: NukeOpsDeclarationOfWar
+/obj/item/circuitboard/machine/holopad: HolopadMachineCircuitboard
+/obj/item/circuitboard/machine/thermomachine: FreezerElectronics
+/obj/item/reagent_containers/cup/glass/bottle/rootbeer: DrinkRootBeerJug
 /obj/item/storage/box/matches: Matchbox
 /obj/item/match: Matchstick
 /obj/item/restraints/handcuffs/cable: Cablecuffs
