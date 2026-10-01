@@ -41,6 +41,8 @@ COLUMNS = (
 )
 EDIT_COLUMN = "value"
 
+AUTO_SKIP_LABEL = "при сборке карты автоматически пропускать незаполненные пути"
+
 VALID_BG = "#e4f3e4"
 INVALID_BG = "#fbe0e0"
 SKIP_FG = "#8a8a8a"
@@ -67,16 +69,27 @@ class Row:
             return "skip"
         if index is None:
             return "empty"
-        wanted = {"turf": protoindex.TILE, "decal": protoindex.DECAL}.get(self.kind, protoindex.ENTITY)
         parts = [part.strip() for part in self.value.split(dmm2yml.MULTI_SEPARATOR) if part.strip()]
-        # A turf may name a tile, an entity, or one of each.
+        # Mirrors apply_table()'s own acceptance rules exactly, so a row never
+        # shows green here and then gets refused at conversion time.
         if self.kind == "turf":
-            ok = all(
-                index.has(protoindex.TILE, part) or index.has(protoindex.ENTITY, part)
-                for part in parts
+            # A turf may name a tile, an entity, or one of each -- never more
+            # than one entity, since TurfRule.entity holds a single id.
+            tile = next((part for part in parts if index.has(protoindex.TILE, part)), None)
+            entities = [part for part in parts if part != tile]
+            ok = (
+                len(entities) <= 1
+                and all(index.has(protoindex.ENTITY, part) for part in entities)
+                and (tile is not None or entities)
+            )
+        elif self.kind == "decal":
+            # Either every part is a decal, or (falling back the same way
+            # apply_table does) every part is an entity -- never a mix.
+            ok = all(index.has(protoindex.DECAL, part) for part in parts) or all(
+                index.has(protoindex.ENTITY, part) for part in parts
             )
         else:
-            ok = all(index.has(wanted, part) or index.has(protoindex.ENTITY, part) for part in parts)
+            ok = all(index.has(protoindex.ENTITY, part) for part in parts)
         return "ok" if ok and parts else "bad"
 
 
@@ -120,24 +133,29 @@ class App(ttk.Frame):
     # ---------------------------------------------------------------- layout
 
     def _build(self) -> None:
+        self.buttons: dict[str, ttk.Button] = {}
+
         files = ttk.LabelFrame(self, text="Файлы", padding=6)
         files.pack(fill="x")
         files.columnconfigure(1, weight=1)
 
         ttk.Label(files, text="Карта .dmm").grid(row=0, column=0, sticky="w", padx=(0, 6))
         ttk.Entry(files, textvariable=self.dmm_path).grid(row=0, column=1, sticky="ew")
-        ttk.Button(files, text="Обзор...", command=self._pick_dmm).grid(row=0, column=2, padx=(6, 0))
+        browse_dmm = ttk.Button(files, text="Обзор...", command=self._pick_dmm)
+        browse_dmm.grid(row=0, column=2, padx=(6, 0))
+        self.buttons["browse_dmm"] = browse_dmm
         ttk.Label(files, text="Уровень (z)").grid(row=0, column=3, sticky="w", padx=(12, 6))
         self.z_combo = ttk.Combobox(files, textvariable=self.z_choice, width=5, state="readonly")
         self.z_combo.grid(row=0, column=4)
 
         ttk.Label(files, text="Результат .yml").grid(row=1, column=0, sticky="w", pady=(4, 0), padx=(0, 6))
         ttk.Entry(files, textvariable=self.output_path).grid(row=1, column=1, sticky="ew", pady=(4, 0))
-        ttk.Button(files, text="Обзор...", command=self._pick_output).grid(row=1, column=2, pady=(4, 0), padx=(6, 0))
+        browse_output = ttk.Button(files, text="Обзор...", command=self._pick_output)
+        browse_output.grid(row=1, column=2, pady=(4, 0), padx=(6, 0))
+        self.buttons["browse_output"] = browse_output
 
         actions = ttk.Frame(self, padding=(0, 6))
         actions.pack(fill="x")
-        self.buttons: dict[str, ttk.Button] = {}
         for key, text, command in (
             ("scan", "Разобрать карту", self._do_scan),
             ("convert", "Собрать карту", self._do_convert),
@@ -153,7 +171,7 @@ class App(ttk.Frame):
         options = ttk.Frame(self, padding=(0, 0, 0, 6))
         options.pack(fill="x")
         ttk.Checkbutton(
-            options, text="при сборке карты автоматически пропускать незаполненные пути",
+            options, text=AUTO_SKIP_LABEL,
             variable=self.auto_skip_empty,
         ).pack(side="left")
 
@@ -268,6 +286,9 @@ class App(ttk.Frame):
             self.dmm_cache = None
             self.z_choice.set("")
             self.z_combo["values"] = ()
+            # A new map means a brand new set of unresolved rows nobody has
+            # reviewed yet -- never carry the flag that silently skips them over.
+            self.auto_skip_empty.set(False)
             self._probe_z_levels()
 
     def _probe_z_levels(self) -> None:
@@ -322,6 +343,7 @@ class App(ttk.Frame):
             return
 
         auto_skip = self.auto_skip_empty.get()
+        auto_skipped_count = sum(1 for row in self.rows.values() if not row.value) if auto_skip else 0
         table = {
             row.path: {
                 "dmm_path": row.path,
@@ -350,9 +372,14 @@ class App(ttk.Frame):
             with open(output, "w", encoding="utf-8", newline="\n") as handle:
                 handle.write(builder.render())
             self._thread_log(f"записано: {output}")
+            if auto_skipped_count:
+                self._thread_log(
+                    f"автоматически пропущено как незаполненные: {auto_skipped_count} путь(ей) "
+                    "-- в таблице они по-прежнему показаны пустыми и не сохранятся в словари как skip"
+                )
             dmm2yml.describe_map(builder, self._thread_log)
             dmm2yml.verify(builder, self._thread_log)
-            return ("written", output)
+            return ("written", output, auto_skipped_count)
 
         self._run_async("convert", work)
 
@@ -418,6 +445,7 @@ class App(ttk.Frame):
             return
 
         if name == "scan":
+            previous = self.rows
             self.rows = {
                 report.path: Row(
                     path=report.path,
@@ -425,6 +453,8 @@ class App(ttk.Frame):
                     count=report.count,
                     example=report.example,
                     suggestion=dmm2yml.suggest_for(self.index, report.path, report.kind),
+                    value=previous[report.path].value if report.path in previous else "",
+                    color=previous[report.path].color if report.path in previous else "",
                 )
                 for report in payload.unresolved.values()
             }
@@ -438,8 +468,9 @@ class App(ttk.Frame):
             return
 
         if name == "convert":
-            outcome, data = payload
+            outcome = payload[0]
             if outcome == "refused":
+                data = payload[1]
                 self.log(f"конвертация отменена: {len(data)} путь(ей) без решения")
                 for line in data[:15]:
                     self.log(f"  {line}")
@@ -449,10 +480,18 @@ class App(ttk.Frame):
                     "Не хватает решений",
                     f"{len(data)} путь(ей) без замены. Заполните колонку «id SS14», "
                     f"отметьте их как «{mapping_rules.SKIP}», или включите "
-                    "«автоматически пропускать незаполненные пути» выше.",
+                    f"«{AUTO_SKIP_LABEL}» выше.",
                 )
             else:
-                messagebox.showinfo("Готово", f"Карта записана:\n{data}")
+                _, output, auto_skipped_count = payload
+                message = f"Карта записана:\n{output}"
+                if auto_skipped_count:
+                    message += (
+                        f"\n\nАвтоматически пропущено как незаполненные: {auto_skipped_count} "
+                        "путь(ей). Это решение не сохранено -- в таблице и в словарях эти пути "
+                        "по-прежнему числятся незаполненными."
+                    )
+                messagebox.showinfo("Готово", message)
             return
 
         if name == "merge":

@@ -298,6 +298,12 @@ def apply_table(
             if unknown:
                 problems.append((dmm_path, f"unknown entity prototype(s) {', '.join(unknown)}"))
                 continue
+            if len(entities) > 1:
+                problems.append((
+                    dmm_path,
+                    f"a turf can only carry one entity on top, got {len(entities)}: {', '.join(entities)}",
+                ))
+                continue
             mapping_set.turfs[dmm_path] = mapping_rules.TurfRule(
                 tile=tile, entity=entities[0] if entities else None
             )
@@ -328,6 +334,9 @@ def walk(
     map_label: str = "",
 ) -> Survey:
     """Visit every atom once; collect a survey and, if given a builder, the map."""
+    if z_level not in dmm.z_levels:
+        levels = ", ".join(str(z) for z in dmm.z_levels)
+        raise dmmparser.DmmParseError(f"z-level {z_level} does not exist on this map (has: {levels})")
     survey = Survey()
     origin_x = min(x for x, _, z in dmm.grid if z == z_level)
     origin_y = min(y for _, y, z in dmm.grid if z == z_level)
@@ -481,7 +490,7 @@ def command_catalog(args) -> int:
     for path in files:
         try:
             dmm = dmmparser.parse(path)
-        except dmmparser.DmmParseError as error:
+        except (dmmparser.DmmParseError, OSError) as error:
             print(f"skipping {path}: {error}", file=sys.stderr)
             continue
         label = os.path.splitext(os.path.basename(path))[0]
@@ -765,6 +774,9 @@ def merge_table(
             parts = [part.strip() for part in value.split(MULTI_SEPARATOR) if part.strip()]
             tile = next((part for part in parts if index.has(protoindex.TILE, part)), None)
             entities = [part for part in parts if part != tile]
+            if len(entities) > 1:
+                log(f"skipped {dmm_path}: a turf can only carry one entity, got {len(entities)}")
+                continue
             if tile and entities:
                 additions["turf"][dmm_path] = {"tile": tile, "entity": entities[0]}
             elif tile:
@@ -919,7 +931,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         return args.func(args)
-    except (dmmparser.DmmParseError, mapping_rules.MappingError) as error:
+    except (dmmparser.DmmParseError, mapping_rules.MappingError, OSError) as error:
         print(f"error: {error}", file=sys.stderr)
         return 2
 
