@@ -22,6 +22,11 @@ public sealed class ShiftStartIntroOverlay : Overlay
     private const float FadeIn = 0.8f;
     private const float CompanyAt = 1.0f;
     private const int ThreatLineIndex = 2;
+    private const float TerminalAt = 0.4f;
+    private const float TerminalRate = 8f;
+    private const float TerminalRowHeight = 16f;
+    private const int TerminalRows = 10;
+    private const int TerminalColumns = 24;
     private const float LogoScale = 4f;
     private const float TitleAt = 2.0f;
     private const float TitleCharTime = 0.09f;
@@ -83,6 +88,8 @@ public sealed class ShiftStartIntroOverlay : Overlay
         var bar = t * 180f % (size.Y + 120f) - 60f;
         h.DrawRect(new UIBox2(0, bar, size.X, bar + 40f), Text.WithAlpha(0.03f * alpha));
 
+        DrawTerminal(h, t, alpha);
+
         var logoSize = (Vector2) _logo.Size * LogoScale;
         var logoTop = size.Y * 0.04f;
         // Заголовок идёт сразу под логотипом.
@@ -114,6 +121,36 @@ public sealed class ShiftStartIntroOverlay : Overlay
         }
 
         DrawManifest(h, t, alpha, size, ly + _data.Lines.Length * 30f + 24f);
+    }
+
+    /// <summary>
+    /// Терминал слева сверху: номер записи, субъект и бегущие случайные цифры.
+    /// </summary>
+    private void DrawTerminal(DrawingHandleScreen h, float t, float alpha)
+    {
+        if (t < TerminalAt)
+            return;
+
+        var a = alpha * Fade(t, TerminalAt);
+        var pos = new Vector2(24f, 24f);
+
+        h.DrawString(_monoSmall, pos, _data.RecordLine, Text.WithAlpha(a));
+        h.DrawString(_monoSmall, pos + new Vector2(0, TerminalRowHeight), _data.SubjectLine, Text.WithAlpha(a));
+
+        // Каждая строка показывает цифры, сгенерированные для соседнего "кадра", так что поток ползёт вниз.
+        var frame = (int) (t * TerminalRate);
+        for (var row = 0; row < TerminalRows; row++)
+        {
+            var rng = new Random(unchecked(frame - row) * 7919 + 13);
+            var chars = new char[TerminalColumns];
+            for (var i = 0; i < chars.Length; i++)
+                chars[i] = i % 5 == 4 ? ' ' : (char) ('0' + rng.Next(10));
+
+            // Старые строки тускнеют.
+            var fade = 1f - row / (float) TerminalRows * 0.7f;
+            h.DrawString(_monoSmall, pos + new Vector2(0, TerminalRowHeight * (row + 3)),
+                new string(chars), Dim.WithAlpha(a * fade));
+        }
     }
 
     private void DrawManifest(DrawingHandleScreen h, float t, float alpha, Vector2 size, float top)

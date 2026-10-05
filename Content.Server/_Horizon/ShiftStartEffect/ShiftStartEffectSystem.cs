@@ -9,6 +9,7 @@ using Content.Shared.Ghost;
 using Content.Shared.Roles;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Random;
 
 namespace Content.Server._Horizon.ShiftStartEffect;
 
@@ -23,6 +24,7 @@ public sealed class ShiftStartEffectSystem : EntitySystem
     [Dependency] private readonly GameTicker _ticker = default!;
     [Dependency] private readonly IPlayerManager _players = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly StationSystem _station = default!;
 
     private const int MaxColumns = 3;
@@ -73,13 +75,17 @@ public sealed class ShiftStartEffectSystem : EntitySystem
         var lines = new[]
         {
             Loc.GetString("shift-start-intro-line-corp", ("round", _ticker.RoundId)),
-            Loc.GetString("shift-start-intro-line-pop", ("online", _players.PlayerCount), ("time", _ticker.RoundDuration().ToString(@"hh\:mm"))),
+            Loc.GetString("shift-start-intro-line-pop", ("sessions", _players.PlayerCount), ("time", _ticker.RoundDuration().ToString(@"hh\:mm"))),
             Loc.GetString("shift-start-intro-line-threat", ("level", threat)),
-            Loc.GetString("shift-start-intro-line-manifest", ("count", total)),
+            Loc.GetString("shift-start-intro-line-manifest"),
         };
 
+        var recordLine = Loc.GetString("shift-start-intro-record",
+            ("id", $"{_ticker.RoundId}-{_random.Next(1000, 10000)}"));
+        var subjectLine = Loc.GetString("shift-start-intro-subject", ("name", MetaData(ev.Mob).EntityName));
+
         RaiseNetworkEvent(
-            new ShiftStartIntroEvent(title, Loc.GetString("shift-start-intro-company"), lines, threatColor, columns),
+            new ShiftStartIntroEvent(title, Loc.GetString("shift-start-intro-company"), lines, threatColor, recordLine, subjectLine, columns),
             ev.Player);
     }
 

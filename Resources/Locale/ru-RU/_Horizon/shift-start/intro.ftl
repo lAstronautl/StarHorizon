@@ -1,8 +1,10 @@
 shift-start-intro-unknown-station = Неизвестная станция
 shift-start-intro-company = Nanotrasen Corp.
 shift-start-intro-line-corp = NANOTRASEN CORP // СМЕНА { $round }
-shift-start-intro-line-pop = ОНЛАЙН { $online } // ВРЕМЯ { $time }
+shift-start-intro-line-pop = АКТИВНЫХ СЕССИЙ { $sessions } // ВРЕМЯ { $time }
 shift-start-intro-line-threat = УРОВЕНЬ УГРОЗЫ: { $level }
-shift-start-intro-line-manifest = СПИСОК ЭКИПАЖА // АКТИВНАЯ СМЕНА // ДУШ: { $count }
+shift-start-intro-line-manifest = СПИСОК ЭКИПАЖА // АКТИВНАЯ СМЕНА
 shift-start-intro-department-other = ПРОЧИЕ
 shift-start-intro-more = + ЕЩЁ { $count }
+shift-start-intro-record = ПРОСМОТР ЗАПИСИ: { $id }
+shift-start-intro-subject = СУБЪЕКТ: { $name }
