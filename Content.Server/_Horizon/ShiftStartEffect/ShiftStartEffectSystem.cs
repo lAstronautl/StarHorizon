@@ -81,12 +81,21 @@ public sealed class ShiftStartEffectSystem : EntitySystem
         };
 
         var recordLine = Loc.GetString("shift-start-intro-record",
-            ("id", $"{_ticker.RoundId}-{_random.Next(1000, 10000)}"));
+            ("id", $"{_ticker.RoundId}-{RandomLetters(4)}"));
         var subjectLine = Loc.GetString("shift-start-intro-subject", ("name", MetaData(ev.Mob).EntityName));
 
         RaiseNetworkEvent(
             new ShiftStartIntroEvent(title, Loc.GetString("shift-start-intro-company"), lines, threatColor, _ticker.RoundDuration(), recordLine, subjectLine, columns),
             ev.Player);
+    }
+
+    private string RandomLetters(int count)
+    {
+        var chars = new char[count];
+        for (var i = 0; i < count; i++)
+            chars[i] = (char) ('A' + _random.Next(26));
+
+        return new string(chars);
     }
 
     private (string, Color) GetThreat(EntityUid mob)
