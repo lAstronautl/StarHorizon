@@ -21,7 +21,7 @@ public sealed class ShiftStartIntroOverlay : Overlay
     // Таймлайн, секунды.
     private const float FadeIn = 0.8f;
     private const float CompanyAt = 1.0f;
-    private const float LogoScale = 2f;
+    private const float LogoScale = 4f;
     private const float TitleAt = 2.0f;
     private const float TitleCharTime = 0.09f;
     private const float LinesAt = 3.6f;
@@ -82,12 +82,13 @@ public sealed class ShiftStartIntroOverlay : Overlay
         var bar = t * 180f % (size.Y + 120f) - 60f;
         h.DrawRect(new UIBox2(0, bar, size.X, bar + 40f), Text.WithAlpha(0.03f * alpha));
 
-        var y0 = size.Y * 0.14f;
+        var logoSize = (Vector2) _logo.Size * LogoScale;
+        var logoTop = size.Y * 0.04f;
+        // Заголовок идёт сразу под логотипом.
+        var y0 = logoTop + logoSize.Y - 40f;
 
         if (t > CompanyAt)
         {
-            var logoSize = (Vector2) _logo.Size * LogoScale;
-            var logoTop = y0 - 30f;
             h.DrawTextureRect(_logo,
                 UIBox2.FromDimensions(new Vector2(mid - logoSize.X / 2f, logoTop), logoSize),
                 Color.White.WithAlpha(alpha * Fade(t, CompanyAt)));
