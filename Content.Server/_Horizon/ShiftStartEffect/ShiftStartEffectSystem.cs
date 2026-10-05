@@ -7,6 +7,7 @@ using Content.Shared._Horizon.ShiftStartEffect;
 using Content.Shared.GameTicking;
 using Content.Shared.Ghost;
 using Content.Shared.Roles;
+using Robust.Server.Player;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
