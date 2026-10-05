@@ -21,6 +21,7 @@ public sealed class ShiftStartIntroOverlay : Overlay
     // Таймлайн, секунды.
     private const float FadeIn = 0.8f;
     private const float CompanyAt = 1.0f;
+    private const float LogoScale = 2f;
     private const float TitleAt = 2.0f;
     private const float TitleCharTime = 0.09f;
     private const float LinesAt = 3.6f;
@@ -32,13 +33,13 @@ public sealed class ShiftStartIntroOverlay : Overlay
 
     private static readonly Color Text = Color.FromHex("#bfffd0");
     private static readonly Color Dim = Color.FromHex("#4fa06a");
-    private static readonly Color Accent = Color.FromHex("#8a8420");
 
     /// <summary>Интро доиграло, система может убрать оверлей.</summary>
     public bool Finished;
 
     private readonly ShiftStartIntroEvent _data;
     private readonly TimeSpan _start;
+    private readonly Texture _logo;
     private readonly Font _pixel;
     private readonly Font _mono;
     private readonly Font _monoSmall;
@@ -49,6 +50,7 @@ public sealed class ShiftStartIntroOverlay : Overlay
         _data = data;
         _start = _timing.RealTime;
 
+        _logo = _cache.GetTexture("/Textures/_Horizon/Interface/ShiftStart/nanotrasen.png");
         var pixel = _cache.GetResource<FontResource>("/Fonts/_Horizon/Pixelizer.ttf");
         var mono = _cache.GetResource<FontResource>("/Fonts/RobotoMono/RobotoMono-Bold.ttf");
         _pixel = new VectorFont(pixel, 56);
@@ -83,7 +85,13 @@ public sealed class ShiftStartIntroOverlay : Overlay
         var y0 = size.Y * 0.14f;
 
         if (t > CompanyAt)
-            DrawCentered(h, _mono, _data.Company.ToUpperInvariant(), mid, y0, Accent.WithAlpha(alpha * Fade(t, CompanyAt)));
+        {
+            var logoSize = (Vector2) _logo.Size * LogoScale;
+            var logoTop = y0 - 30f;
+            h.DrawTextureRect(_logo,
+                UIBox2.FromDimensions(new Vector2(mid - logoSize.X / 2f, logoTop), logoSize),
+                Color.White.WithAlpha(alpha * Fade(t, CompanyAt)));
+        }
 
         if (t > TitleAt)
         {
