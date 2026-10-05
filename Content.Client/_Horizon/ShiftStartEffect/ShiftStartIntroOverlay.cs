@@ -3,6 +3,7 @@ using Content.Shared._Horizon.ShiftStartEffect;
 using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
 using Robust.Shared.Enums;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 
 namespace Content.Client._Horizon.ShiftStartEffect;
@@ -14,8 +15,10 @@ namespace Content.Client._Horizon.ShiftStartEffect;
 public sealed class ShiftStartIntroOverlay : Overlay
 {
     [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly IResourceCache _cache = default!;
 
+    public override bool RequestScreenTexture => true;
     public override OverlaySpace Space => OverlaySpace.ScreenSpace;
 
     // Таймлайн, секунды.
@@ -43,6 +46,7 @@ public sealed class ShiftStartIntroOverlay : Overlay
 
     private readonly ShiftStartIntroEvent _data;
     private readonly TimeSpan _start;
+    private readonly ShaderInstance _shader;
     private readonly Texture _logo;
     private readonly Font _pixel;
     private readonly Font _mono;
@@ -54,6 +58,7 @@ public sealed class ShiftStartIntroOverlay : Overlay
         _data = data;
         _start = _timing.RealTime;
 
+        _shader = _prototype.Index<ShaderPrototype>("ShiftStartIntro").InstanceUnique();
         _logo = _cache.GetResource<TextureResource>("/Textures/_Horizon/Interface/ShiftStart/nanotrasen.png").Texture;
         var pixel = _cache.GetResource<FontResource>("/Fonts/_Horizon/Pixelizer.ttf");
         var mono = _cache.GetResource<FontResource>("/Fonts/RobotoMono/RobotoMono-Bold.ttf");
@@ -76,15 +81,28 @@ public sealed class ShiftStartIntroOverlay : Overlay
         var size = (Vector2) args.ViewportBounds.Size;
         var mid = size.X / 2f;
 
-        h.DrawRect(new UIBox2(Vector2.Zero, size), Color.Black.WithAlpha(0.88f * alpha));
+        // Фон: игра, пропущенная через шейдер. Появляется из чёрного, а в конце раскрывает обычную картинку.
+        var fadeIn = Math.Clamp(t / FadeIn, 0f, 1f);
+        var fadeOut = Math.Clamp((Total - t) / (Total - FadeOutAt), 0f, 1f);
+        var bounds = new UIBox2(Vector2.Zero, size);
 
-        // Строки развёртки.
-        for (var y = 0f; y < size.Y; y += 3f)
-            h.DrawLine(new Vector2(0, y), new Vector2(size.X, y), Color.Black.WithAlpha(0.25f * alpha));
+        if (ScreenTexture != null)
+        {
+            _shader.SetParameter("SCREEN_TEXTURE", ScreenTexture);
+            _shader.SetParameter("Strength", fadeOut);
+            // Сбои сильнее в начале, потом экран успокаивается.
+            _shader.SetParameter("Glitch", 0.35f + 0.65f * (1f - Math.Clamp(t / 4f, 0f, 1f)));
+            h.UseShader(_shader);
+            h.DrawRect(bounds, Color.White);
+            h.UseShader(null);
+        }
+        else
+        {
+            h.DrawRect(bounds, Color.Black.WithAlpha(0.88f * fadeOut));
+        }
 
-        // Яркая полоса, бегущая по экрану.
-        var bar = t * 180f % (size.Y + 120f) - 60f;
-        h.DrawRect(new UIBox2(0, bar, size.X, bar + 40f), Text.WithAlpha(0.03f * alpha));
+        if (fadeIn < 1f)
+            h.DrawRect(bounds, Color.Black.WithAlpha(1f - fadeIn));
 
         DrawTerminal(h, t, alpha, size);
 
