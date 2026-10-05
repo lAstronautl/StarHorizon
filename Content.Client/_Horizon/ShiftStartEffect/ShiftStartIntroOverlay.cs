@@ -21,6 +21,7 @@ public sealed class ShiftStartIntroOverlay : Overlay
     // Таймлайн, секунды.
     private const float FadeIn = 0.8f;
     private const float CompanyAt = 1.0f;
+    private const int ThreatLineIndex = 2;
     private const float LogoScale = 4f;
     private const float TitleAt = 2.0f;
     private const float TitleCharTime = 0.09f;
@@ -107,7 +108,8 @@ public sealed class ShiftStartIntroOverlay : Overlay
             if (t < at)
                 continue;
 
-            var color = i == _data.Lines.Length - 1 ? Dim : Text;
+            // Третья строка — уровень угрозы, красится в цвет уровня.
+            var color = i == ThreatLineIndex ? _data.ThreatColor : i == _data.Lines.Length - 1 ? Dim : Text;
             DrawCentered(h, _mono, _data.Lines[i], mid, ly + i * 30f, color.WithAlpha(alpha * Fade(t, at)));
         }
 

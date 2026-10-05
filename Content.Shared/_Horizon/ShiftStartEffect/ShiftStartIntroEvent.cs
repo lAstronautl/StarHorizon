@@ -11,13 +11,15 @@ public sealed class ShiftStartIntroEvent : EntityEventArgs
     public string Title;
     public string Company;
     public string[] Lines;
+    public Color ThreatColor;
     public ShiftStartIntroColumn[] Columns;
 
-    public ShiftStartIntroEvent(string title, string company, string[] lines, ShiftStartIntroColumn[] columns)
+    public ShiftStartIntroEvent(string title, string company, string[] lines, Color threatColor, ShiftStartIntroColumn[] columns)
     {
         Title = title;
         Company = company;
         Lines = lines;
+        ThreatColor = threatColor;
         Columns = columns;
     }
 }

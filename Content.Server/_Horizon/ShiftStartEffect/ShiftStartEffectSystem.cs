@@ -1,4 +1,5 @@
 using System.Linq;
+using Content.Server.AlertLevel;
 using Content.Server.CrewManifest;
 using Content.Server.GameTicking;
 using Content.Server.Station.Systems;
@@ -6,6 +7,7 @@ using Content.Shared._Horizon.ShiftStartEffect;
 using Content.Shared.GameTicking;
 using Content.Shared.Ghost;
 using Content.Shared.Roles;
+using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 
 namespace Content.Server._Horizon.ShiftStartEffect;
@@ -16,8 +18,10 @@ namespace Content.Server._Horizon.ShiftStartEffect;
 /// </summary>
 public sealed class ShiftStartEffectSystem : EntitySystem
 {
+    [Dependency] private readonly AlertLevelSystem _alertLevel = default!;
     [Dependency] private readonly CrewManifestSystem _crewManifest = default!;
     [Dependency] private readonly GameTicker _ticker = default!;
+    [Dependency] private readonly IPlayerManager _players = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly StationSystem _station = default!;
 
@@ -36,6 +40,7 @@ public sealed class ShiftStartEffectSystem : EntitySystem
             return;
 
         var title = Loc.GetString("shift-start-intro-unknown-station");
+        var (threat, threatColor) = GetThreat(ev.Mob);
         var groups = new Dictionary<string, List<ShiftStartIntroEntry>>();
         var total = 0;
 
@@ -68,14 +73,34 @@ public sealed class ShiftStartEffectSystem : EntitySystem
         var lines = new[]
         {
             Loc.GetString("shift-start-intro-line-corp", ("round", _ticker.RoundId)),
-            Loc.GetString("shift-start-intro-line-pop", ("count", total), ("time", _ticker.RoundDuration().ToString(@"hh\:mm"))),
-            Loc.GetString("shift-start-intro-line-quarantine"),
+            Loc.GetString("shift-start-intro-line-pop", ("online", _players.PlayerCount), ("time", _ticker.RoundDuration().ToString(@"hh\:mm"))),
+            Loc.GetString("shift-start-intro-line-threat", ("level", threat)),
             Loc.GetString("shift-start-intro-line-manifest", ("count", total)),
         };
 
         RaiseNetworkEvent(
-            new ShiftStartIntroEvent(title, Loc.GetString("shift-start-intro-company"), lines, columns),
+            new ShiftStartIntroEvent(title, Loc.GetString("shift-start-intro-company"), lines, threatColor, columns),
             ev.Player);
+    }
+
+    private (string, Color) GetThreat(EntityUid mob)
+    {
+        var id = _alertLevel.GetLevel(mob);
+        if (string.IsNullOrEmpty(id))
+            return (Loc.GetString("alert-level-unknown").TrimEnd('.').ToUpperInvariant(), Color.White);
+
+        var color = Color.White;
+        var query = EntityQueryEnumerator<AlertLevelComponent>();
+        while (query.MoveNext(out _, out var comp))
+        {
+            if (comp.AlertLevels != null && comp.AlertLevels.Levels.TryGetValue(id, out var detail))
+            {
+                color = detail.Color;
+                break;
+            }
+        }
+
+        return (Loc.GetString($"alert-level-{id}").ToUpperInvariant(), color);
     }
 
     private string GetDepartmentName(string jobId)
