@@ -22,9 +22,3 @@
   id: PixelBlackHole
   kind: source
   path: "/Textures/_Horizon/Shaders/pixel_blackhole.swsl"
-
-# Фон интро появления: тёмный зелёный CRT-вид игры.
-- type: shader
-  id: ShiftStartIntro
-  kind: source
-  path: "/Textures/_Horizon/Shaders/shift_start_intro.swsl"
