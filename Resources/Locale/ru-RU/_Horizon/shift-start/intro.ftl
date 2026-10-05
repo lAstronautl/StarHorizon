@@ -9,3 +9,4 @@ shift-start-intro-more = + ЕЩЁ { $count }
 shift-start-intro-record = ПРОСМОТР ЗАПИСИ: { $id }
 shift-start-intro-subject = СУБЪЕКТ: { $name }
 shift-start-intro-time = ВРЕМЯ { $days }Д { $hours }Ч { $minutes }М { $seconds }С
+shift-start-intro-terminal = ТЕРМИНАЛ: { $id }

@@ -9,3 +9,4 @@ shift-start-intro-more = + { $count } MORE
 shift-start-intro-record = RECORD PLAYBACK: { $id }
 shift-start-intro-subject = SUBJECT: { $name }
 shift-start-intro-time = TIME { $days }D { $hours }H { $minutes }M { $seconds }S
+shift-start-intro-terminal = TERMINAL: { $id }
