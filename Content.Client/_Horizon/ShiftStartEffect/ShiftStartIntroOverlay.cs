@@ -123,7 +123,7 @@ public sealed class ShiftStartIntroOverlay : Overlay
             if (t < headerAt)
                 continue;
 
-            h.DrawString(_monoSmall, $"{col.Header.ToUpperInvariant()} // {col.Total}", new Vector2(x, top + 14f), Dim.WithAlpha(alpha));
+            h.DrawString(_monoSmall, new Vector2(x, top + 14f), $"{col.Header.ToUpperInvariant()} // {col.Total}", Dim.WithAlpha(alpha));
             h.DrawLine(new Vector2(x, top + 36f), new Vector2(x + colWidth - 20f, top + 36f), Dim.WithAlpha(0.4f * alpha));
 
             for (var i = 0; i < col.Entries.Length; i++)
@@ -137,16 +137,16 @@ public sealed class ShiftStartIntroOverlay : Overlay
                 var job = col.Entries[i].Job;
                 var a = alpha * Fade(t, at);
                 var nameWidth = h.GetDimensions(_mono, name.ToUpperInvariant(), 1f).X;
-                h.DrawString(_mono, name.ToUpperInvariant(), new Vector2(x + 14f, ey), Text.WithAlpha(a));
-                h.DrawString(_monoSmall, job.ToLowerInvariant(), new Vector2(x + 14f + nameWidth + 8f, ey + 3f), Dim.WithAlpha(a));
+                h.DrawString(_mono, new Vector2(x + 14f, ey), name.ToUpperInvariant(), Text.WithAlpha(a));
+                h.DrawString(_monoSmall, new Vector2(x + 14f + nameWidth + 8f, ey + 3f), job.ToLowerInvariant(), Dim.WithAlpha(a));
             }
 
             var hidden = col.Total - col.Entries.Length;
             var moreAt = ManifestAt + 0.4f + (col.Entries.Length * _data.Columns.Length + c) * EntryStep;
             if (hidden > 0 && t >= moreAt)
             {
-                h.DrawString(_monoSmall, Loc.GetString("shift-start-intro-more", ("count", hidden)),
-                    new Vector2(x + 14f, top + 50f + col.Entries.Length * 26f), Dim.WithAlpha(alpha * Fade(t, moreAt)));
+                h.DrawString(_monoSmall, new Vector2(x + 14f, top + 50f + col.Entries.Length * 26f),
+                    Loc.GetString("shift-start-intro-more", ("count", hidden)), Dim.WithAlpha(alpha * Fade(t, moreAt)));
             }
         }
     }
@@ -156,6 +156,6 @@ public sealed class ShiftStartIntroOverlay : Overlay
     private static void DrawCentered(DrawingHandleScreen h, Font font, string text, float midX, float y, Color color)
     {
         var width = h.GetDimensions(font, text, 1f).X;
-        h.DrawString(font, text, new Vector2(midX - width / 2f, y), color);
+        h.DrawString(font, new Vector2(midX - width / 2f, y), text, color);
     }
 }
