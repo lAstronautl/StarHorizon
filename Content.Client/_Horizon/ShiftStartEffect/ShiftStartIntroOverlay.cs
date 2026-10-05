@@ -50,7 +50,7 @@ public sealed class ShiftStartIntroOverlay : Overlay
         _data = data;
         _start = _timing.RealTime;
 
-        _logo = _cache.GetTexture("/Textures/_Horizon/Interface/ShiftStart/nanotrasen.png");
+        _logo = _cache.GetResource<TextureResource>("/Textures/_Horizon/Interface/ShiftStart/nanotrasen.png").Texture;
         var pixel = _cache.GetResource<FontResource>("/Fonts/_Horizon/Pixelizer.ttf");
         var mono = _cache.GetResource<FontResource>("/Fonts/RobotoMono/RobotoMono-Bold.ttf");
         _pixel = new VectorFont(pixel, 56);
