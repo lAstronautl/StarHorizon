@@ -75,7 +75,7 @@ public sealed class ShiftStartEffectSystem : EntitySystem
         var lines = new[]
         {
             Loc.GetString("shift-start-intro-line-corp", ("round", _ticker.RoundId)),
-            Loc.GetString("shift-start-intro-line-pop", ("sessions", _players.PlayerCount), ("time", _ticker.RoundDuration().ToString(@"hh\:mm"))),
+            Loc.GetString("shift-start-intro-line-pop", ("sessions", _players.PlayerCount)),
             Loc.GetString("shift-start-intro-line-threat", ("level", threat)),
             Loc.GetString("shift-start-intro-line-manifest"),
         };
@@ -85,7 +85,7 @@ public sealed class ShiftStartEffectSystem : EntitySystem
         var subjectLine = Loc.GetString("shift-start-intro-subject", ("name", MetaData(ev.Mob).EntityName));
 
         RaiseNetworkEvent(
-            new ShiftStartIntroEvent(title, Loc.GetString("shift-start-intro-company"), lines, threatColor, recordLine, subjectLine, columns),
+            new ShiftStartIntroEvent(title, Loc.GetString("shift-start-intro-company"), lines, threatColor, _ticker.RoundDuration(), recordLine, subjectLine, columns),
             ev.Player);
     }
 

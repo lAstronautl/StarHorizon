@@ -21,6 +21,7 @@ public sealed class ShiftStartIntroOverlay : Overlay
     // Таймлайн, секунды.
     private const float FadeIn = 0.8f;
     private const float CompanyAt = 1.0f;
+    private const int TimeLineIndex = 1;
     private const int ThreatLineIndex = 2;
     private const float TerminalAt = 0.4f;
     private const float TerminalRate = 8f;
@@ -117,7 +118,8 @@ public sealed class ShiftStartIntroOverlay : Overlay
 
             // Третья строка — уровень угрозы, красится в цвет уровня.
             var color = i == ThreatLineIndex ? _data.ThreatColor : i == _data.Lines.Length - 1 ? Dim : Text;
-            DrawCentered(h, _mono, _data.Lines[i], mid, ly + i * 30f, color.WithAlpha(alpha * Fade(t, at)));
+            var text = i == TimeLineIndex ? $"{_data.Lines[i]} // {FormatTime(t)}" : _data.Lines[i];
+            DrawCentered(h, _mono, text, mid, ly + i * 30f, color.WithAlpha(alpha * Fade(t, at)));
         }
 
         DrawManifest(h, t, alpha, size, ly + _data.Lines.Length * 30f + 24f);
@@ -197,6 +199,17 @@ public sealed class ShiftStartIntroOverlay : Overlay
                     Loc.GetString("shift-start-intro-more", ("count", hidden)), Dim.WithAlpha(alpha * Fade(t, moreAt)));
             }
         }
+    }
+
+    /// <summary>Время раунда на момент появления плюс прошедшее с начала интро — идёт вживую.</summary>
+    private string FormatTime(float t)
+    {
+        var time = _data.RoundTime + TimeSpan.FromSeconds(t);
+        return Loc.GetString("shift-start-intro-time",
+            ("days", time.Days),
+            ("hours", time.Hours.ToString("D2")),
+            ("minutes", time.Minutes.ToString("D2")),
+            ("seconds", time.Seconds.ToString("D2")));
     }
 
     private static float Fade(float t, float at) => Math.Clamp((t - at) / 0.25f, 0f, 1f);
