@@ -1,0 +1,161 @@
+using System.Numerics;
+using Content.Shared._Horizon.ShiftStartEffect;
+using Robust.Client.Graphics;
+using Robust.Client.ResourceManagement;
+using Robust.Shared.Enums;
+using Robust.Shared.Timing;
+
+namespace Content.Client._Horizon.ShiftStartEffect;
+
+/// <summary>
+/// Полноэкранное интро при появлении: зелёный CRT-экран, название станции, строки брифинга
+/// и список экипажа по отделам, после чего экран затухает в игру.
+/// </summary>
+public sealed class ShiftStartIntroOverlay : Overlay
+{
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly IResourceCache _cache = default!;
+
+    public override OverlaySpace Space => OverlaySpace.ScreenSpace;
+
+    // Таймлайн, секунды.
+    private const float FadeIn = 0.8f;
+    private const float CompanyAt = 1.0f;
+    private const float TitleAt = 2.0f;
+    private const float TitleCharTime = 0.09f;
+    private const float LinesAt = 3.6f;
+    private const float LineStep = 0.6f;
+    private const float ManifestAt = 6.2f;
+    private const float EntryStep = 0.3f;
+    private const float FadeOutAt = 10.4f;
+    private const float Total = 11.6f;
+
+    private static readonly Color Text = Color.FromHex("#bfffd0");
+    private static readonly Color Dim = Color.FromHex("#4fa06a");
+    private static readonly Color Accent = Color.FromHex("#8a8420");
+
+    /// <summary>Интро доиграло, система может убрать оверлей.</summary>
+    public bool Finished;
+
+    private readonly ShiftStartIntroEvent _data;
+    private readonly TimeSpan _start;
+    private readonly Font _pixel;
+    private readonly Font _mono;
+    private readonly Font _monoSmall;
+
+    public ShiftStartIntroOverlay(ShiftStartIntroEvent data)
+    {
+        IoCManager.InjectDependencies(this);
+        _data = data;
+        _start = _timing.RealTime;
+
+        var pixel = _cache.GetResource<FontResource>("/Fonts/_Horizon/Pixelizer.ttf");
+        var mono = _cache.GetResource<FontResource>("/Fonts/RobotoMono/RobotoMono-Bold.ttf");
+        _pixel = new VectorFont(pixel, 56);
+        _mono = new VectorFont(mono, 16);
+        _monoSmall = new VectorFont(mono, 12);
+    }
+
+    protected override void Draw(in OverlayDrawArgs args)
+    {
+        var t = (float) (_timing.RealTime - _start).TotalSeconds;
+        if (t >= Total)
+        {
+            Finished = true;
+            return;
+        }
+
+        var alpha = Math.Clamp(t / FadeIn, 0f, 1f) * Math.Clamp((Total - t) / (Total - FadeOutAt), 0f, 1f);
+        var h = args.ScreenHandle;
+        var size = (Vector2) args.ViewportBounds.Size;
+        var mid = size.X / 2f;
+
+        h.DrawRect(new UIBox2(Vector2.Zero, size), Color.Black.WithAlpha(0.88f * alpha));
+
+        // Строки развёртки.
+        for (var y = 0f; y < size.Y; y += 3f)
+            h.DrawLine(new Vector2(0, y), new Vector2(size.X, y), Color.Black.WithAlpha(0.25f * alpha));
+
+        // Яркая полоса, бегущая по экрану.
+        var bar = t * 180f % (size.Y + 120f) - 60f;
+        h.DrawRect(new UIBox2(0, bar, size.X, bar + 40f), Text.WithAlpha(0.03f * alpha));
+
+        var y0 = size.Y * 0.14f;
+
+        if (t > CompanyAt)
+            DrawCentered(h, _mono, _data.Company.ToUpperInvariant(), mid, y0, Accent.WithAlpha(alpha * Fade(t, CompanyAt)));
+
+        if (t > TitleAt)
+        {
+            var chars = Math.Min(_data.Title.Length, (int) ((t - TitleAt) / TitleCharTime) + 1);
+            DrawCentered(h, _pixel, _data.Title.ToUpperInvariant()[..chars], mid, y0 + 60f, Color.White.WithAlpha(alpha));
+        }
+
+        var ly = y0 + 160f;
+        for (var i = 0; i < _data.Lines.Length; i++)
+        {
+            var at = LinesAt + i * LineStep;
+            if (t < at)
+                continue;
+
+            var color = i == _data.Lines.Length - 1 ? Dim : Text;
+            DrawCentered(h, _mono, _data.Lines[i], mid, ly + i * 30f, color.WithAlpha(alpha * Fade(t, at)));
+        }
+
+        DrawManifest(h, t, alpha, size, ly + _data.Lines.Length * 30f + 24f);
+    }
+
+    private void DrawManifest(DrawingHandleScreen h, float t, float alpha, Vector2 size, float top)
+    {
+        if (t < ManifestAt || _data.Columns.Length == 0)
+            return;
+
+        var margin = size.X * 0.06f;
+        h.DrawLine(new Vector2(margin, top), new Vector2(size.X - margin, top), Dim.WithAlpha(0.6f * alpha));
+
+        var colWidth = (size.X - margin * 2f) / _data.Columns.Length;
+
+        for (var c = 0; c < _data.Columns.Length; c++)
+        {
+            var col = _data.Columns[c];
+            var x = margin + c * colWidth;
+            var headerAt = ManifestAt + c * 0.2f;
+            if (t < headerAt)
+                continue;
+
+            h.DrawString(_monoSmall, $"{col.Header.ToUpperInvariant()} // {col.Total}", new Vector2(x, top + 14f), Dim.WithAlpha(alpha));
+            h.DrawLine(new Vector2(x, top + 36f), new Vector2(x + colWidth - 20f, top + 36f), Dim.WithAlpha(0.4f * alpha));
+
+            for (var i = 0; i < col.Entries.Length; i++)
+            {
+                var at = ManifestAt + 0.4f + (i * _data.Columns.Length + c) * EntryStep;
+                if (t < at)
+                    continue;
+
+                var ey = top + 50f + i * 26f;
+                var name = col.Entries[i].Name;
+                var job = col.Entries[i].Job;
+                var a = alpha * Fade(t, at);
+                var nameWidth = h.GetDimensions(_mono, name.ToUpperInvariant(), 1f).X;
+                h.DrawString(_mono, name.ToUpperInvariant(), new Vector2(x + 14f, ey), Text.WithAlpha(a));
+                h.DrawString(_monoSmall, job.ToLowerInvariant(), new Vector2(x + 14f + nameWidth + 8f, ey + 3f), Dim.WithAlpha(a));
+            }
+
+            var hidden = col.Total - col.Entries.Length;
+            var moreAt = ManifestAt + 0.4f + (col.Entries.Length * _data.Columns.Length + c) * EntryStep;
+            if (hidden > 0 && t >= moreAt)
+            {
+                h.DrawString(_monoSmall, Loc.GetString("shift-start-intro-more", ("count", hidden)),
+                    new Vector2(x + 14f, top + 50f + col.Entries.Length * 26f), Dim.WithAlpha(alpha * Fade(t, moreAt)));
+            }
+        }
+    }
+
+    private static float Fade(float t, float at) => Math.Clamp((t - at) / 0.25f, 0f, 1f);
+
+    private static void DrawCentered(DrawingHandleScreen h, Font font, string text, float midX, float y, Color color)
+    {
+        var width = h.GetDimensions(font, text, 1f).X;
+        h.DrawString(font, text, new Vector2(midX - width / 2f, y), color);
+    }
+}

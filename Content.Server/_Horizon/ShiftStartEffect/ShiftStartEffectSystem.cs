@@ -1,29 +1,28 @@
-using System.Numerics;
-using Content.Shared.Ghost;
+using System.Linq;
+using Content.Server.CrewManifest;
+using Content.Server.GameTicking;
+using Content.Server.Station.Systems;
+using Content.Shared._Horizon.ShiftStartEffect;
 using Content.Shared.GameTicking;
-using Content.Shared.Movement.Components;
-using Content.Shared.Movement.Systems;
+using Content.Shared.Ghost;
+using Content.Shared.Roles;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Timing;
 
 namespace Content.Server._Horizon.ShiftStartEffect;
 
 /// <summary>
-/// Проигрывает эффект появления.
+/// Отправляет игроку данные для интро появления (станция, экипаж по отделам).
 /// Не применяется к наблюдателям/призракам.
 /// </summary>
 public sealed class ShiftStartEffectSystem : EntitySystem
 {
-    [Dependency] private readonly SharedContentEyeSystem _contentEye = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly CrewManifestSystem _crewManifest = default!;
+    [Dependency] private readonly GameTicker _ticker = default!;
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
+    [Dependency] private readonly StationSystem _station = default!;
 
-    private static readonly EntProtoId ShadowEchoProto = "ShiftStartShadowEcho";
-    private static readonly Vector2 ZoomedIn = SharedContentEyeSystem.DefaultZoom / 2f;
-    private static readonly TimeSpan EffectDuration = TimeSpan.FromSeconds(3);
-
-    private const float EchoVerticalOffset = 0.3f;
-
-    private readonly Dictionary<EntityUid, TimeSpan> _activeZoomEffects = new();
+    private const int MaxColumns = 3;
+    private const int MaxEntriesPerColumn = 6;
 
     public override void Initialize()
     {
@@ -33,61 +32,60 @@ public sealed class ShiftStartEffectSystem : EntitySystem
 
     private void OnPlayerSpawnComplete(PlayerSpawnCompleteEvent ev)
     {
-        if (ev.Silent)
+        if (ev.Silent || HasComp<GhostComponent>(ev.Mob))
             return;
 
-        if (HasComp<GhostComponent>(ev.Mob))
-            return;
+        var title = Loc.GetString("shift-start-intro-unknown-station");
+        var groups = new Dictionary<string, List<ShiftStartIntroEntry>>();
+        var total = 0;
 
-        SpawnShadowEcho(ev.Mob);
-        ApplyCameraZoom(ev.Mob);
-    }
-
-    private void SpawnShadowEcho(EntityUid mob)
-    {
-        var coords = Transform(mob).Coordinates.Offset(new Vector2(0, EchoVerticalOffset));
-        Spawn(ShadowEchoProto, coords);
-    }
-
-    private void ApplyCameraZoom(EntityUid mob)
-    {
-        if (!TryComp<ContentEyeComponent>(mob, out var eye))
-            return;
-
-        _contentEye.SetZoom(mob, ZoomedIn, ignoreLimits: true, eye: eye);
-        _activeZoomEffects[mob] = _timing.CurTime + EffectDuration;
-    }
-
-    public override void Update(float frameTime)
-    {
-        base.Update(frameTime);
-
-        if (_activeZoomEffects.Count == 0)
-            return;
-
-        var now = _timing.CurTime;
-        List<EntityUid>? finished = null;
-
-        foreach (var (uid, expiresAt) in _activeZoomEffects)
+        if (_station.GetOwningStation(ev.Mob) is { } station)
         {
-            if (now < expiresAt)
-                continue;
+            var (name, entries) = _crewManifest.GetCrewManifest(station);
+            if (!string.IsNullOrEmpty(name))
+                title = name;
 
-            finished ??= new List<EntityUid>();
-            finished.Add(uid);
+            foreach (var entry in entries?.Entries ?? Array.Empty<Content.Shared.CrewManifest.CrewManifestEntry>())
+            {
+                var header = GetDepartmentName(entry.JobPrototype);
+                if (!groups.TryGetValue(header, out var list))
+                    groups[header] = list = new();
+
+                list.Add(new ShiftStartIntroEntry(entry.Name, entry.JobTitle));
+                total++;
+            }
         }
 
-        if (finished == null)
-            return;
+        var columns = groups
+            .OrderByDescending(g => g.Value.Count)
+            .Take(MaxColumns)
+            .Select(g => new ShiftStartIntroColumn(
+                g.Key,
+                g.Value.Count,
+                g.Value.Take(MaxEntriesPerColumn).ToArray()))
+            .ToArray();
 
-        foreach (var uid in finished)
+        var lines = new[]
         {
-            _activeZoomEffects.Remove(uid);
+            Loc.GetString("shift-start-intro-line-corp", ("round", _ticker.RoundId)),
+            Loc.GetString("shift-start-intro-line-pop", ("count", total), ("time", _ticker.RoundDuration().ToString(@"hh\:mm"))),
+            Loc.GetString("shift-start-intro-line-quarantine"),
+            Loc.GetString("shift-start-intro-line-manifest", ("count", total)),
+        };
 
-            if (Deleted(uid) || !TryComp<ContentEyeComponent>(uid, out var eye))
-                continue;
+        RaiseNetworkEvent(
+            new ShiftStartIntroEvent(title, Loc.GetString("shift-start-intro-company"), lines, columns),
+            ev.Player);
+    }
 
-            _contentEye.SetZoom(uid, SharedContentEyeSystem.DefaultZoom, ignoreLimits: true, eye: eye);
+    private string GetDepartmentName(string jobId)
+    {
+        foreach (var dept in _prototype.EnumeratePrototypes<DepartmentPrototype>())
+        {
+            if (dept.Roles.Contains(jobId))
+                return Loc.GetString(dept.Name);
         }
+
+        return Loc.GetString("shift-start-intro-department-other");
     }
 }
