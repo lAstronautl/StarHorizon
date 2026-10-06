@@ -38,7 +38,7 @@ DEFAULT_MAPPING_DIR = os.path.join(HERE, "mapping")
 DEFAULT_PROTOTYPES = os.path.join(REPO_ROOT, "Resources", "Prototypes")
 
 CSV_COLUMNS = ["dmm_path", "kind", "count", "example", "suggestion", "ss14_id", "color", "notes"]
-MULTI_SEPARATOR = "+"
+MULTI_SEPARATOR = mapping_rules.MULTI_SEPARATOR  # re-exported: gui.py still reads it from here
 DEFAULT_DIR = 2  # BYOND entities face south unless they say otherwise
 
 # A turf marked skip in ignore.yml has no SS14 tile to become -- but leaving
@@ -276,47 +276,23 @@ def apply_table(
 
     for dmm_path, row in table.items():
         kind = row.get("kind") or "entity"
-        value = row.get("ss14_id", "")
+        result = mapping_rules.classify_answer(kind, row.get("ss14_id", ""), index)
 
-        if not value:
-            problems.append((dmm_path, f"ss14_id is empty (write a prototype id, or '{mapping_rules.SKIP}')"))
+        if result.state in ("empty", "bad"):
+            problems.append((dmm_path, result.problem))
             continue
-
-        if value.lower() == mapping_rules.SKIP:
+        if result.state == "skip":
             mapping_set.ignore.append(dmm_path)
             continue
 
-        parts = [part.strip() for part in value.split(MULTI_SEPARATOR) if part.strip()]
-
-        if kind == "turf":
-            tile = next((part for part in parts if index.has(protoindex.TILE, part)), None)
-            entities = [part for part in parts if part != tile]
-            unknown = [part for part in entities if not index.has(protoindex.ENTITY, part)]
-            if tile is None and not entities:
-                problems.append((dmm_path, f"'{value}' is neither a tile nor an entity prototype"))
-                continue
-            if unknown:
-                problems.append((dmm_path, f"unknown entity prototype(s) {', '.join(unknown)}"))
-                continue
-            if len(entities) > 1:
-                problems.append((
-                    dmm_path,
-                    f"a turf can only carry one entity on top, got {len(entities)}: {', '.join(entities)}",
-                ))
-                continue
-            mapping_set.turfs[dmm_path] = mapping_rules.TurfRule(
-                tile=tile, entity=entities[0] if entities else None
-            )
-        elif kind == "decal" and all(index.has(protoindex.DECAL, part) for part in parts):
+        if result.kind == "turf":
+            mapping_set.turfs[dmm_path] = mapping_rules.TurfRule(tile=result.tile, entity=result.entity)
+        elif result.kind == "decal":
             mapping_set.decals[dmm_path] = mapping_rules.DecalRule(
-                ids=parts, color=row.get("color") or "#FFFFFFFF"
+                ids=result.decal_ids, color=row.get("color") or "#FFFFFFFF"
             )
         else:
-            unknown = [part for part in parts if not index.has(protoindex.ENTITY, part)]
-            if unknown:
-                problems.append((dmm_path, f"unknown entity prototype(s) {', '.join(unknown)}"))
-                continue
-            mapping_set.entities[dmm_path] = mapping_rules.EntityRule(entities=parts)
+            mapping_set.entities[dmm_path] = mapping_rules.EntityRule(entities=result.entities)
 
     return problems
 
@@ -407,9 +383,13 @@ def walk(
                 if rule.auto_wall:
                     # wall: auto -- the wall side isn't fixed by the rule, it
                     # is worked out per instance (see pixel_direction_of()).
+                    # Only invert a *wall side* into a facing; with nothing to
+                    # go on, `direction` is already a facing (DEFAULT_DIR's
+                    # own comment), same as the non-auto_wall branch below --
+                    # inverting it a second time pointed these 180' wrong.
                     entities = rule.entities
-                    wall_side = pixel_direction_of(atom) or direction
-                    facing = mapping_rules.OPPOSITE_DIR.get(wall_side, wall_side)
+                    wall_side = pixel_direction_of(atom)
+                    facing = mapping_rules.OPPOSITE_DIR.get(wall_side, wall_side) if wall_side is not None else direction
                 else:
                     # A dir on the dmm atom does not always mean "facing" -- a
                     # disposal pipe segment with a diagonal dir is BYOND's way of
@@ -761,40 +741,42 @@ def merge_table(
 
     for dmm_path, row in table.items():
         kind = row.get("kind") or "entity"
-        value = (row.get("ss14_id") or "").strip()
-        if not value:
+        result = mapping_rules.classify_answer(kind, row.get("ss14_id", ""), index)
+
+        if result.state == "empty":
             continue
-        if value.lower() == mapping_rules.SKIP:
+        if result.state == "bad":
+            log(f"skipped {dmm_path}: {result.problem}")
+            continue
+        if result.state == "skip":
             skips.append(dmm_path)
-        elif kind == "turf":
+        elif result.kind == "turf":
             # A turf answer may combine a tile and a wall entity with '+' (see
-            # apply_table) -- writing `value` back verbatim would merge that
-            # whole string as one bogus tile id and silently drop the entity,
-            # since _parse_turf only splits a dict, never a plain string.
-            parts = [part.strip() for part in value.split(MULTI_SEPARATOR) if part.strip()]
-            tile = next((part for part in parts if index.has(protoindex.TILE, part)), None)
-            entities = [part for part in parts if part != tile]
-            if len(entities) > 1:
-                log(f"skipped {dmm_path}: a turf can only carry one entity, got {len(entities)}")
-                continue
-            if tile and entities:
-                additions["turf"][dmm_path] = {"tile": tile, "entity": entities[0]}
-            elif tile:
-                additions["turf"][dmm_path] = tile
-            elif entities:
-                additions["turf"][dmm_path] = {"entity": entities[0]}
-        elif kind == "decal" and all(
-            index.has(protoindex.DECAL, part) for part in value.split(MULTI_SEPARATOR)
-        ):
+            # classify_answer) -- writing the raw string back verbatim would
+            # merge that whole thing as one bogus tile id and silently drop
+            # the entity, since _parse_turf only splits a dict, never a
+            # plain string.
+            if result.tile and result.entity:
+                additions["turf"][dmm_path] = {"tile": result.tile, "entity": result.entity}
+            elif result.tile:
+                additions["turf"][dmm_path] = result.tile
+            elif result.entity:
+                additions["turf"][dmm_path] = {"entity": result.entity}
+        elif result.kind == "decal":
             entry: dict = (
-                {"id": value} if MULTI_SEPARATOR not in value
-                else {"decals": [part.strip() for part in value.split(MULTI_SEPARATOR)]}
+                {"id": result.decal_ids[0]} if len(result.decal_ids) == 1
+                else {"decals": result.decal_ids}
             )
             if row.get("color"):
                 entry["color"] = row["color"]
             additions["decal"][dmm_path] = entry
         else:
-            additions["entity"][dmm_path] = value
+            # A multi-entity answer must persist as a YAML list -- _parse_entity
+            # only splits on '+' for the live apply_table() path; a plain
+            # string here would be read back as one single, never-matching id.
+            additions["entity"][dmm_path] = (
+                result.entities[0] if len(result.entities) == 1 else result.entities
+            )
 
     written = 0
     for name, key in (("turfs.yml", "turf"), ("decals.yml", "decal"), ("entities.yml", "entity")):
@@ -931,7 +913,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         return args.func(args)
-    except (dmmparser.DmmParseError, mapping_rules.MappingError, OSError) as error:
+    except (dmmparser.DmmParseError, mapping_rules.MappingError, OSError, yaml.YAMLError) as error:
         print(f"error: {error}", file=sys.stderr)
         return 2
 

@@ -111,10 +111,27 @@ def _split_top_level(text: str, separator: str) -> list[str]:
     return [part.strip() for part in parts if part.strip()]
 
 
+def _unescape_string(body: str) -> str:
+    """Undo BYOND's \\" and \\\\ escaping, walking left-to-right so an escaped
+    backslash immediately before an escaped quote isn't misread -- a plain
+    ``.replace('\\"', '"')`` corrupts that case (and leaves \\\\ alone)."""
+    out: list[str] = []
+    i = 0
+    while i < len(body):
+        char = body[i]
+        if char == "\\" and i + 1 < len(body) and body[i + 1] in ('"', "\\"):
+            out.append(body[i + 1])
+            i += 2
+            continue
+        out.append(char)
+        i += 1
+    return "".join(out)
+
+
 def _parse_value(raw: str) -> Any:
     raw = raw.strip()
     if raw.startswith('"') and raw.endswith('"') and len(raw) >= 2:
-        return raw[1:-1].replace('\\"', '"')
+        return _unescape_string(raw[1:-1])
     if raw.startswith("list(") and raw.endswith(")"):
         return [_parse_value(item) for item in _split_top_level(raw[5:-1], ",")]
     lowered = raw.lower()
@@ -141,7 +158,10 @@ def _parse_atom(raw: str) -> Atom:
         return Atom(path=raw.strip())
 
     path = raw[:brace].strip()
-    body = raw[brace + 1 : raw.rindex("}")]
+    try:
+        body = raw[brace + 1 : raw.rindex("}")]
+    except ValueError:
+        raise DmmParseError(f"atom has an unmatched '{{': {raw!r}") from None
     variables: dict[str, Any] = {}
     for assignment in _split_top_level(body, ";"):
         name, _, value = assignment.partition("=")

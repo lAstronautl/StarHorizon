@@ -63,34 +63,18 @@ class Row:
     color: str = ""
 
     def state(self, index: protoindex.ProtoIndex | None) -> str:
-        if not self.value:
-            return "empty"
-        if self.value.lower() == mapping_rules.SKIP:
-            return "skip"
         if index is None:
+            # Can't validate yet (the prototype index is still loading) --
+            # still distinguish "nothing typed" / "typed skip" from the rest.
+            value = self.value.strip()
+            if not value:
+                return "empty"
+            if value.lower() == mapping_rules.SKIP:
+                return "skip"
             return "empty"
-        parts = [part.strip() for part in self.value.split(dmm2yml.MULTI_SEPARATOR) if part.strip()]
-        # Mirrors apply_table()'s own acceptance rules exactly, so a row never
-        # shows green here and then gets refused at conversion time.
-        if self.kind == "turf":
-            # A turf may name a tile, an entity, or one of each -- never more
-            # than one entity, since TurfRule.entity holds a single id.
-            tile = next((part for part in parts if index.has(protoindex.TILE, part)), None)
-            entities = [part for part in parts if part != tile]
-            ok = (
-                len(entities) <= 1
-                and all(index.has(protoindex.ENTITY, part) for part in entities)
-                and (tile is not None or entities)
-            )
-        elif self.kind == "decal":
-            # Either every part is a decal, or (falling back the same way
-            # apply_table does) every part is an entity -- never a mix.
-            ok = all(index.has(protoindex.DECAL, part) for part in parts) or all(
-                index.has(protoindex.ENTITY, part) for part in parts
-            )
-        else:
-            ok = all(index.has(protoindex.ENTITY, part) for part in parts)
-        return "ok" if ok and parts else "bad"
+        # Delegates to the one place that decides what a value means, so this
+        # never again drifts out of sync with what convert/merge accept.
+        return mapping_rules.classify_answer(self.kind, self.value, index).state
 
 
 class App(ttk.Frame):
@@ -387,15 +371,31 @@ class App(ttk.Frame):
         if self.index is None or not self.rows:
             messagebox.showinfo("Нечего сохранять", "Сначала разберите карту и заполните замены.")
             return
-        decided = {path: row for path, row in self.rows.items() if row.value}
+        # Same gate the CLI's command_merge gives apply_table() -- a row still
+        # showing red/"bad" must never reach merge_table(), which validates
+        # far less than apply_table() does.
+        decided = {
+            path: row for path, row in self.rows.items()
+            if row.value and row.state(self.index) in ("ok", "skip")
+        }
+        invalid = [row for row in self.rows.values() if row.value and row.state(self.index) == "bad"]
         if not decided:
-            messagebox.showinfo("Нечего сохранять", "Ни одной замены не заполнено.")
+            if invalid:
+                messagebox.showwarning(
+                    "Нечего сохранять",
+                    f"{len(invalid)} запись(ей) заполнена, но не проходит проверку "
+                    "(невалидный id, или сочетание). Исправьте их перед сохранением.",
+                )
+            else:
+                messagebox.showinfo("Нечего сохранять", "Ни одной замены не заполнено.")
             return
-        if not messagebox.askyesno(
-            "Сохранить в словари",
+        confirm_message = (
             f"Дописать {len(decided)} правил(о) в {self.mapping_dir}?\n"
-            "Они начнут применяться ко всем картам.",
-        ):
+            "Они начнут применяться ко всем картам."
+        )
+        if invalid:
+            confirm_message += f"\n\n{len(invalid)} заполненная, но невалидная запись(ей) будет пропущена."
+        if not messagebox.askyesno("Сохранить в словари", confirm_message):
             return
 
         table = {
@@ -540,7 +540,7 @@ class App(ttk.Frame):
         return rows
 
     def _refill(self) -> None:
-        self._close_editor()
+        self._close_editor_if_open()  # commit, don't discard, whatever's being typed
         self.tree.delete(*self.tree.get_children())
         for row in self._visible_rows():
             self.tree.insert("", "end", iid=row.path, values=self._row_values(row), tags=(row.state(self.index),))
@@ -577,7 +577,7 @@ class App(ttk.Frame):
             "suggestion": lambda r: (r.suggestion == "", r.suggestion),
             "value": lambda r: (r.value == "", r.value),
         }[column]
-        self._close_editor()
+        self._close_editor_if_open()  # commit, don't discard, whatever's being typed
         self.tree.delete(*self.tree.get_children())
         for row in sorted(rows, key=key):
             self.tree.insert("", "end", iid=row.path, values=self._row_values(row), tags=(row.state(self.index),))
@@ -610,7 +610,7 @@ class App(ttk.Frame):
     # ---------------------------------------------------------------- editing
 
     def _begin_edit(self, event=None) -> str | None:
-        self._close_editor()
+        self._close_editor_if_open()  # commit, don't discard, whatever row was being edited
         iid = self.tree.identify_row(event.y) if event and event.type == "4" else self.tree.focus()
         if not iid or iid not in self.rows:
             return None
@@ -768,13 +768,14 @@ class App(ttk.Frame):
         if not path:
             return
         loaded = dmm2yml.read_table(path)
+        bootstrap = not self.rows  # evaluated once -- nothing scanned yet, so trust the whole file
         applied = added = 0
         for dmm_path, values in loaded.items():
             if dmm_path in self.rows:
                 self.rows[dmm_path].value = values.get("ss14_id", "")
                 self.rows[dmm_path].color = values.get("color", "")
                 applied += 1
-            elif not self.rows:
+            elif bootstrap:
                 self.rows[dmm_path] = Row(
                     path=dmm_path, kind=values.get("kind", "entity"),
                     count=int(values.get("count") or 0), example=values.get("example", ""),

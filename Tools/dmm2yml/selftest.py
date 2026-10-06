@@ -329,10 +329,32 @@ def check_pixel_direction() -> Result:
         if placed.rotation != ss14map.rotation_for_dir(mapping_rules.WEST):
             problems.append(f"rotation {placed.rotation}, expected facing west (away from the east wall)")
 
+    # Same rule, but no pixel offset at all -- pixel_direction_of() returns
+    # None, so the only information left is the atom's own dir (SOUTH, the
+    # bare BYOND default). That's already a facing, not a wall side: it must
+    # come through unchanged, not get inverted a second time into NORTH.
+    fixture_no_offset = '"aa" = (\n/obj/structure/mirror,\n/turf/open/floor/iron,\n/area/station)\n\n(1,1,1) = {"\naa\n"}\n'
+    with tempfile.TemporaryDirectory() as directory:
+        path = os.path.join(directory, "fixture.dmm")
+        with open(path, "w", encoding="utf-8") as handle:
+            handle.write(fixture_no_offset)
+        dmm = dmmparser.parse(path)
+    builder = ss14map.MapBuilder(template["map_entity"], template["grid_entity"], "0.0.0")
+    dmm2yml.walk(dmm, mapping_set, None, 1, builder, "deterministic")
+
+    if len(builder.entities) != 1:
+        problems.append(f"no-offset case: expected exactly 1 entity, got {len(builder.entities)}")
+    else:
+        placed = builder.entities[0]
+        if (placed.x, placed.y) != (0.5, 1.5):
+            problems.append(f"no-offset case: position {(placed.x, placed.y)}, expected (0.5, 1.5) (shifted onto the north wall's tile)")
+        if placed.rotation != ss14map.rotation_for_dir(mapping_rules.SOUTH):
+            problems.append(f"no-offset case: rotation {placed.rotation}, expected facing south (the atom's own default dir, unchanged)")
+
     return Result(
         "orientation: wall: auto derives the wall side from pixel_x/pixel_y",
         not problems,
-        "; ".join(problems) or f"{len(cases)} pixel_direction_of cases, plus one end-to-end mirror placement",
+        "; ".join(problems) or f"{len(cases)} pixel_direction_of cases, plus two end-to-end mirror placements",
     )
 
 
@@ -644,12 +666,19 @@ def check_ignore_does_not_swallow_mappings(mapping_set) -> Result:
     this converter's own history. Only 20/20 selftest checks passed the
     whole time because a wrongly-*skipped* path never shows up as
     *unresolved* -- this check is the only thing that would have caught
-    it."""
+    it.
+
+    An exact duplicate (the same path in both ignore.yml and a mapping
+    file) is the same bug at depth zero, and happened for real too:
+    /obj/item/pai_card and /obj/item/wallframe/camera each had a mapping
+    silently dead because a later ignore.yml entry for the identical path
+    was added without removing it -- so this also flags path == prefix,
+    not just a strict descendant."""
     mapped_paths = list(mapping_set.turfs) + list(mapping_set.entities) + list(mapping_set.decals)
     problems = []
     for prefix in mapping_set.ignore:
         for path in mapped_paths:
-            if path != prefix and path.startswith(prefix + "/"):
+            if path == prefix or path.startswith(prefix + "/"):
                 problems.append(f"ignore {prefix!r} swallows the mapping at {path!r}")
 
     detail = "; ".join(problems[:5]) if problems else f"{len(mapping_set.ignore)} ignore prefixes, none swallow a mapped path"

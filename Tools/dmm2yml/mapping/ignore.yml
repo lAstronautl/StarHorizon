@@ -76,7 +76,6 @@
 - /obj/structure/transit_tube
 - /obj/structure/transport/linear
 - /obj/structure/marker_beacon
-- /obj/item/pai_card
 - /obj/item/newspaper
 
 # Every /obj/effect/landmark is invisible by construction --

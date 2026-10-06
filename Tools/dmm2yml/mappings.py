@@ -15,7 +15,10 @@ from typing import Any
 
 import yaml
 
+import protoindex
+
 SKIP = "skip"  # what a human writes to say "drop this on purpose"
+MULTI_SEPARATOR = "+"  # how a human stacks more than one id onto one answer
 NORTH, SOUTH, EAST, WEST = 1, 2, 4, 8
 DIRECTIONS = (NORTH, SOUTH, EAST, WEST)
 # BYOND also OR's two cardinals together for a diagonal facing. Entities in
@@ -126,6 +129,69 @@ class Resolution:
     skipped: bool = False
 
 
+@dataclass
+class Classification:
+    """What a human-typed ss14_id answer for one path means.
+
+    The single place that decides whether an answer is acceptable, so
+    apply_table(), merge_table() and the GUI's Row.state() -- which all used
+    to reimplement this by hand and had already drifted out of sync with each
+    other more than once -- share one definition of "valid" instead.
+    """
+
+    state: str  # "empty" | "skip" | "ok" | "bad"
+    kind: str = ""  # "turf" | "decal" | "entity", once state == "ok"
+    tile: str | None = None  # turf only
+    entity: str | None = None  # turf's single optional entity on top
+    entities: list[str] = field(default_factory=list)  # entity-kind rule
+    decal_ids: list[str] = field(default_factory=list)  # decal only
+    problem: str = ""  # human-readable reason, when state == "empty"/"bad"
+
+
+def classify_answer(kind: str, value: str, index: protoindex.ProtoIndex) -> Classification:
+    """Work out what a table/GUI answer for a given dmm_path `kind` means.
+
+    `kind` is "turf", "decal", or anything else (entity/mob/area, all three
+    resolved against the same entity table). `value` is the raw, possibly
+    ``+``-joined ss14_id string a human wrote.
+    """
+    value = (value or "").strip()
+    if not value:
+        return Classification(state="empty", problem=f"ss14_id is empty (write a prototype id, or '{SKIP}')")
+    if value.lower() == SKIP:
+        return Classification(state="skip")
+
+    parts = [part.strip() for part in value.split(MULTI_SEPARATOR) if part.strip()]
+
+    if kind == "turf":
+        tile = next((part for part in parts if index.has(protoindex.TILE, part)), None)
+        entities = [part for part in parts if part != tile]
+        if tile is None and not entities:
+            return Classification(state="bad", kind="turf", problem=f"'{value}' is neither a tile nor an entity prototype")
+        unknown = [part for part in entities if not index.has(protoindex.ENTITY, part)]
+        if unknown:
+            return Classification(state="bad", kind="turf", problem=f"unknown entity prototype(s) {', '.join(unknown)}")
+        if len(entities) > 1:
+            return Classification(
+                state="bad", kind="turf",
+                problem=f"a turf can only carry one entity on top, got {len(entities)}: {', '.join(entities)}",
+            )
+        return Classification(state="ok", kind="turf", tile=tile, entity=entities[0] if entities else None)
+
+    if kind == "decal" and parts and all(index.has(protoindex.DECAL, part) for part in parts):
+        return Classification(state="ok", kind="decal", decal_ids=parts)
+
+    # Not everything SS13 calls a decal has an SS14 decal to become -- a
+    # decal-kind row falls back to the entity table here, same as resolve()
+    # does for a path with no decal rule of its own.
+    if not parts:
+        return Classification(state="bad", kind=kind, problem=f"'{value}' is empty")
+    unknown = [part for part in parts if not index.has(protoindex.ENTITY, part)]
+    if unknown:
+        return Classification(state="bad", kind=kind, problem=f"unknown entity prototype(s) {', '.join(unknown)}")
+    return Classification(state="ok", kind="entity", entities=parts)
+
+
 def _as_bool(value: Any) -> bool | None:
     return None if value is None else bool(value)
 
@@ -146,7 +212,10 @@ def _parse_decal(path: str, raw: Any) -> DecalRule:
     if not isinstance(raw, dict):
         raise MappingError(f"{path}: a decal rule must be an id or a mapping, got {type(raw).__name__}")
 
-    dirs = {int(key): str(value) for key, value in (raw.get("dirs") or {}).items()}
+    dirs_raw = raw.get("dirs")
+    if dirs_raw is not None and not isinstance(dirs_raw, dict):
+        raise MappingError(f"{path}: dirs must be a mapping, got {type(dirs_raw).__name__}")
+    dirs = {int(key): str(value) for key, value in (dirs_raw or {}).items()}
     for direction in dirs:
         if direction not in DECAL_DIRECTIONS:
             raise MappingError(f"{path}: dir {direction} is not one of {DECAL_DIRECTIONS}")
@@ -216,7 +285,12 @@ def _parse_entity(path: str, raw: Any) -> EntityRule:
         # suffix that facing comes from the atom's own dir var at conversion
         # time (see walk() in dmm2yml.py), not from a fixed override.
         on_wall = bool(raw.get("onWall", False))
-        by_dir = _parse_by_dir(path, raw.get("byDir") or {})
+        by_dir_raw = raw.get("byDir")
+        if by_dir_raw is not None and not isinstance(by_dir_raw, dict):
+            raise MappingError(f"{path}: byDir must be a mapping, got {type(by_dir_raw).__name__}")
+        by_dir = _parse_by_dir(path, by_dir_raw or {})
+        if auto_wall and by_dir:
+            raise MappingError(f"{path}: wall: auto and byDir can't both be set -- walk() only consults one")
         if "entities" in raw:
             return EntityRule(
                 entities=[str(i) for i in raw["entities"]],
@@ -237,11 +311,29 @@ def _parse_entity(path: str, raw: Any) -> EntityRule:
     raise MappingError(f"{path}: an entity rule must be a prototype id or a list, got {type(raw).__name__}")
 
 
+class _UniqueKeyLoader(yaml.SafeLoader):
+    """SafeLoader, but a repeated top-level (or nested) mapping key is an
+    error instead of silently keeping the last one -- a hand-edited
+    turfs.yml/decals.yml/entities.yml has no other way to notice a
+    copy-paste duplicate before it quietly drops an earlier rule."""
+
+    def construct_mapping(self, node, deep=False):
+        seen: set[Any] = set()
+        for key_node, _ in node.value:
+            key = self.construct_object(key_node, deep=deep)
+            if key in seen:
+                raise MappingError(
+                    f"{key_node.start_mark.name}:{key_node.start_mark.line + 1}: duplicate key {key!r}"
+                )
+            seen.add(key)
+        return super().construct_mapping(node, deep=deep)
+
+
 def _load_yaml(path: str) -> dict[str, Any]:
     if not os.path.exists(path):
         return {}
     with open(path, encoding="utf-8") as handle:
-        data = yaml.safe_load(handle)
+        data = yaml.load(handle, Loader=_UniqueKeyLoader)
     if data is None:
         return {}
     if not isinstance(data, dict):
