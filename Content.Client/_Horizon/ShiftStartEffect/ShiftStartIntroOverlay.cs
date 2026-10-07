@@ -3,6 +3,7 @@ using Content.Shared._Horizon.ShiftStartEffect;
 using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
 using Robust.Shared.Enums;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 
 namespace Content.Client._Horizon.ShiftStartEffect;
@@ -14,6 +15,7 @@ namespace Content.Client._Horizon.ShiftStartEffect;
 public sealed class ShiftStartIntroOverlay : Overlay
 {
     [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly IResourceCache _cache = default!;
 
     public override OverlaySpace Space => OverlaySpace.ScreenSpace;
@@ -43,6 +45,7 @@ public sealed class ShiftStartIntroOverlay : Overlay
 
     private readonly ShiftStartIntroEvent _data;
     private readonly TimeSpan _start;
+    private readonly ShaderInstance _background;
     private readonly Texture _logo;
     private readonly Font _pixel;
     private readonly Font _mono;
@@ -54,6 +57,7 @@ public sealed class ShiftStartIntroOverlay : Overlay
         _data = data;
         _start = _timing.RealTime;
 
+        _background = _prototype.Index<ShaderPrototype>("ShiftStartBackground").InstanceUnique();
         _logo = _cache.GetResource<TextureResource>("/Textures/_Horizon/Interface/ShiftStart/nanotrasen.png").Texture;
         var pixel = _cache.GetResource<FontResource>("/Fonts/_Horizon/Pixelizer.ttf");
         var mono = _cache.GetResource<FontResource>("/Fonts/RobotoMono/RobotoMono-Bold.ttf");
@@ -76,15 +80,11 @@ public sealed class ShiftStartIntroOverlay : Overlay
         var size = (Vector2) args.ViewportBounds.Size;
         var mid = size.X / 2f;
 
-        h.DrawRect(new UIBox2(Vector2.Zero, size), Color.Black.WithAlpha(0.88f * alpha));
-
-        // Строки развёртки.
-        for (var y = 0f; y < size.Y; y += 3f)
-            h.DrawLine(new Vector2(0, y), new Vector2(size.X, y), Color.Black.WithAlpha(0.25f * alpha));
-
-        // Яркая полоса, бегущая по экрану.
-        var bar = t * 180f % (size.Y + 120f) - 60f;
-        h.DrawRect(new UIBox2(0, bar, size.X, bar + 40f), Text.WithAlpha(0.03f * alpha));
+        // Фон: искажающийся тёмно-зелёный экран с движущимися полосками и помехами.
+        _background.SetParameter("Alpha", 0.92f * alpha);
+        h.UseShader(_background);
+        h.DrawRect(new UIBox2(Vector2.Zero, size), Color.White);
+        h.UseShader(null);
 
         DrawTerminal(h, t, alpha, size);
 

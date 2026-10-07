@@ -22,3 +22,9 @@
   id: PixelBlackHole
   kind: source
   path: "/Textures/_Horizon/Shaders/pixel_blackhole.swsl"
+
+# Фон интро появления: искажающийся тёмно-зелёный экран с движущимися полосками.
+- type: shader
+  id: ShiftStartBackground
+  kind: source
+  path: "/Textures/_Horizon/Shaders/shift_start_bg.swsl"
