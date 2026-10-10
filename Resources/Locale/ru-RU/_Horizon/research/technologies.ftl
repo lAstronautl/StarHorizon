@@ -74,6 +74,7 @@ research-technology-advanced-shuttlecraft = Продвинутое шаттло�
 research-technology-universal-translator = Универсальный переводчик [диск]
 research-technology-rare-translator = Продвинутый переводчик
 research-technology-translator-implants = Языковые импланты
+research-technology-gray-unathi-study = Изучение серого унатха [все диски]
 # Combat Cyborg Technologies
 nf-research-technology-remote-control-monitoring = Удалённое управление и мониторинг
 nf-research-technology-combat-cyborgs = Боевые киборги [диск]

@@ -63,6 +63,13 @@
   - RareTranslator
   # Horizon end
 
+  # Horizon start
+- type: latheRecipePack
+  id: AnomalyPlushies
+  recipes:
+  - PlushieLizardAnomaly
+  # Horizon end
+
 - type: latheRecipePack
   id: ServiceBoards
   recipes:

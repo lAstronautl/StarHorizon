@@ -80,3 +80,26 @@
   technologyPrerequisites:
   - UniversalTranslator
   position: 3, 41
+
+- type: technology
+  id: GrayUnathiStudy
+  name: research-technology-gray-unathi-study
+  entityIcon: PlushieLizardAnomaly
+  discipline: NFService
+  tier: 3
+  cost: 30000
+  recipeUnlocks:
+  - PlushieLizardAnomaly
+  technologyPrerequisites:
+  - UniversalTranslator
+  position: 4, 40
+  researchTargets:
+  - TechnologyDiscAdvancedPKAModules
+  - TechnologyDiscDurandTechnology
+  - TechnologyDiscPhazonTechnology
+  - TechnologyDiscArsenalAmmoModules
+  - TechnologyDiscArsenalAmmunition
+  - TechnologyDiscHydroponicsDNAManip
+  - TechnologyDiscUniversalTranslator
+  - TechnologyDiscCombatCybernetics
+  - TechnologyDiscCombatCyborgs
