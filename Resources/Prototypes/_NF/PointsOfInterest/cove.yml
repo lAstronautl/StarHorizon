@@ -23,6 +23,9 @@
   addMapComponents:
   - type: FTLDestination
     requireCoordinateDisk: true
+  # Only reachable next to a random expedition planet; coming back is only possible into that planet's zone.
+  - type: SecretTunnelMap
+    id: pirate
   addComponents:
   - type: IFF
     color: "#C83737"
