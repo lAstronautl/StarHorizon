@@ -4,6 +4,7 @@
 
 using System.Numerics;
 using Content.Shared._Horizon.SpaceHazards;
+using Content.Shared.Radiation.Components;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Prototypes;
@@ -57,6 +58,7 @@ public sealed class SectorCelestialPlacerSystem : EntitySystem
         RandomizeShaderParams(ent, body, map.MapId);
         Dirty(ent, body);
         _lights.ApplyCelestial(ent, body);
+        SyncRadiationSource(ent, body);
         _landmarks.LockToMap(ent);
         placer.Spawned = true;
         Log.Info($"Spawned sector {kind} palette={body.Palette} seed={body.Seed:F2} at {pos} on {ToPrettyString(mapUid)}");
@@ -71,7 +73,17 @@ public sealed class SectorCelestialPlacerSystem : EntitySystem
         }
         Dirty(uid, body);
         _lights.ApplyCelestial(uid, body);
+        SyncRadiationSource(uid, body);
         _landmarks.LockToMap(uid);
+    }
+
+    private void SyncRadiationSource(EntityUid uid, SectorCelestialBodyComponent body)
+    {
+        if (!TryComp(uid, out RadiationSourceComponent? source)) return;
+        var peak = SectorCelestialMobDamage.GetDamageAmount(
+            body.MobRadiationDamage,
+            SectorCelestialMobDamage.RadiationDamageType);
+        SectorCelestialMobDamage.SyncRadiationSource(uid, source, body.RadiationRange, peak);
     }
 
     private void RandomizeShaderParams(EntityUid uid, SectorCelestialBodyComponent body, MapId mapId)
