@@ -13,3 +13,13 @@
         - HRZNWhite
         - HRZNVoid
 # Horizon end
+# Horizon start: ported sector celestial bodies and background planets
+    - type: SectorCelestialPlacerController
+      spawnDistance: 8000
+    - type: SectorBackgroundPlanetPlacerController
+      minCount: 2
+      maxCount: 4
+      minDistance: 6000
+      maxDistance: 12000
+      planetPrototype: SectorBackgroundPlanet
+# Horizon end
