@@ -1,0 +1,54 @@
+<DefaultWindow xmlns="https://spacestation14.io"
+            xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
+            Title="{Loc 'payment-terminal-ui-title'}"
+            MinSize="320 300"
+            SetSize="320 300">
+    <BoxContainer Orientation="Vertical"
+                  HorizontalExpand="True"
+                  VerticalExpand="True">
+        <!-- Owner -->
+        <PanelContainer Margin="0 0 0 5">
+            <PanelContainer.PanelOverride>
+                <gfx:StyleBoxFlat BackgroundColor="#001c00" />
+            </PanelContainer.PanelOverride>
+            <Label Name="OwnerLabel" ClipText="True"/>
+        </PanelContainer>
+        <!-- Amounts -->
+        <PanelContainer Margin="0 0 0 5">
+            <PanelContainer.PanelOverride>
+                <gfx:StyleBoxFlat BackgroundColor="#001c00" />
+            </PanelContainer.PanelOverride>
+            <BoxContainer Orientation="Vertical">
+                <Label Name="PriceLabel"/>
+                <Label Name="TipLabel"/>
+                <Label Name="TotalLabel"/>
+            </BoxContainer>
+        </PanelContainer>
+        <BoxContainer Orientation="Horizontal">
+            <GridContainer Columns="3"
+                           Name="KeypadGrid">
+                <!-- Keypad is filled by code -->
+            </GridContainer>
+            <BoxContainer Orientation="Vertical"
+                          HorizontalExpand="True"
+                          Margin="5 0">
+                <Button Name="PriceButton"
+                        Text="{Loc 'payment-terminal-ui-price-button'}"
+                        ToggleMode="True"
+                        Margin="0 0 0 5"/>
+                <Button Name="TipButton"
+                        Text="{Loc 'payment-terminal-ui-tip-button'}"
+                        ToggleMode="True"
+                        Margin="0 0 0 5"/>
+                <Button Name="ModeButton"
+                        Margin="0 0 0 5"/>
+                <Button Name="UnbindButton"
+                        Text="{Loc 'payment-terminal-ui-unbind-button'}"
+                        StyleClasses="Caution"/>
+            </BoxContainer>
+        </BoxContainer>
+        <Label Name="HintLabel"
+               Margin="0 5 0 0"
+               FontColorOverride="#a0a0a0"/>
+    </BoxContainer>
+</DefaultWindow>

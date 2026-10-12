@@ -1,0 +1,26 @@
+- type: entity
+  parent: BaseItem
+  id: PaymentTerminal
+  name: терминал безналичной оплаты
+  description: Переводит кредиты со счёта покупателя на счёт владельца. Проведите своей ID-картой, чтобы привязать терминал к своему счёту или оплатить покупку. Можно прикрутить ключом.
+  placement:
+    mode: SnapgridCenter
+  components:
+  # TODO: needs its own sprite
+  - type: Sprite
+    sprite: Objects/Devices/forensic_scanner.rsi
+    state: icon
+  - type: Item
+    sprite: Objects/Devices/forensic_scanner.rsi
+    size: Small
+  - type: Anchorable
+  - type: CollideOnAnchor
+  - type: PaymentTerminal
+  - type: ActivatableUI
+    key: enum.PaymentTerminalUiKey.Key
+  - type: UserInterface
+    interfaces:
+      enum.PaymentTerminalUiKey.Key:
+        type: PaymentTerminalBoundUserInterface
+  - type: StaticPrice
+    price: 1000
