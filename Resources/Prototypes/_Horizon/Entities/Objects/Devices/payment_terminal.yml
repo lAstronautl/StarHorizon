@@ -6,12 +6,10 @@
   placement:
     mode: SnapgridCenter
   components:
-  # TODO: needs its own sprite
   - type: Sprite
-    sprite: Objects/Devices/forensic_scanner.rsi
+    sprite: _Horizon/Objects/Devices/payment_terminal.rsi
     state: icon
   - type: Item
-    sprite: Objects/Devices/forensic_scanner.rsi
     size: Small
   - type: Anchorable
   - type: CollideOnAnchor
