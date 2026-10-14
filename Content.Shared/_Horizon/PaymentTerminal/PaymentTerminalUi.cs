@@ -12,7 +12,7 @@ public enum PaymentTerminalUiKey : byte
 public enum PaymentTerminalMode : byte
 {
     /// <summary>
-    /// The owner sets the price, the buyer only adds a tip.
+    /// The owner sets the price once and it stays until they clear it; buyers only add a tip.
     /// </summary>
     Fixed,
 
@@ -22,27 +22,37 @@ public enum PaymentTerminalMode : byte
     Free,
 }
 
+/// <summary>
+/// What the keypad is currently entering. Each step is confirmed with the enter key.
+/// </summary>
 [Serializable, NetSerializable]
-public enum PaymentTerminalField : byte
+public enum PaymentTerminalStage : byte
 {
     Price,
     Tip,
+
+    /// <summary>
+    /// Price and tip are confirmed, waiting for an ID swipe.
+    /// </summary>
+    Ready,
 }
 
 [Serializable, NetSerializable]
 public sealed class PaymentTerminalBoundUserInterfaceState(
     string? ownerName,
     PaymentTerminalMode mode,
-    PaymentTerminalField selectedField,
+    PaymentTerminalStage stage,
     int price,
     int tip,
+    int tax,
     float taxRate) : BoundUserInterfaceState
 {
     public readonly string? OwnerName = ownerName;
     public readonly PaymentTerminalMode Mode = mode;
-    public readonly PaymentTerminalField SelectedField = selectedField;
+    public readonly PaymentTerminalStage Stage = stage;
     public readonly int Price = price;
     public readonly int Tip = tip;
+    public readonly int Tax = tax;
     public readonly float TaxRate = taxRate;
 }
 
@@ -56,13 +66,4 @@ public sealed class PaymentTerminalKeypadMessage(int digit) : BoundUserInterface
 public sealed class PaymentTerminalClearMessage : BoundUserInterfaceMessage;
 
 [Serializable, NetSerializable]
-public sealed class PaymentTerminalSelectFieldMessage(PaymentTerminalField field) : BoundUserInterfaceMessage
-{
-    public readonly PaymentTerminalField Field = field;
-}
-
-[Serializable, NetSerializable]
-public sealed class PaymentTerminalToggleModeMessage : BoundUserInterfaceMessage;
-
-[Serializable, NetSerializable]
-public sealed class PaymentTerminalUnbindMessage : BoundUserInterfaceMessage;
+public sealed class PaymentTerminalEnterMessage : BoundUserInterfaceMessage;

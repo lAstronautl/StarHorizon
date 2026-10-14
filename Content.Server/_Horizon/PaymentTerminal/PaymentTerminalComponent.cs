@@ -34,7 +34,13 @@ public sealed partial class PaymentTerminalComponent : Component
     public PaymentTerminalMode Mode = PaymentTerminalMode.Fixed;
 
     [ViewVariables]
-    public PaymentTerminalField SelectedField = PaymentTerminalField.Tip;
+    public PaymentTerminalStage Stage = PaymentTerminalStage.Price;
+
+    /// <summary>
+    /// In <see cref="PaymentTerminalMode.Fixed"/> mode, set once the owner confirms a price; it stays until they clear it.
+    /// </summary>
+    [ViewVariables]
+    public bool PriceLocked;
 
     [ViewVariables]
     public int Price;
@@ -47,6 +53,7 @@ public sealed partial class PaymentTerminalComponent : Component
 
     /// <summary>
     /// Fraction of each payment withheld from the owner and sent to <see cref="TaxAccount"/>.
+    /// Shown to the buyer in the total.
     /// </summary>
     [DataField]
     public float TaxRate = 0.1f;

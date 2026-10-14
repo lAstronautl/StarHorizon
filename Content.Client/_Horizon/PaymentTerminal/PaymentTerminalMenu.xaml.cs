@@ -11,23 +11,16 @@ public sealed partial class PaymentTerminalMenu : DefaultWindow
 {
     public event Action<int>? OnKeypadButtonPressed;
     public event Action? OnClearButtonPressed;
-    public event Action<PaymentTerminalField>? OnFieldSelected;
-    public event Action? OnToggleModePressed;
-    public event Action? OnUnbindPressed;
+    public event Action? OnEnterButtonPressed;
 
     public PaymentTerminalMenu()
     {
         RobustXamlLoader.Load(this);
         FillKeypadGrid();
-
-        PriceButton.OnPressed += _ => OnFieldSelected?.Invoke(PaymentTerminalField.Price);
-        TipButton.OnPressed += _ => OnFieldSelected?.Invoke(PaymentTerminalField.Tip);
-        ModeButton.OnPressed += _ => OnToggleModePressed?.Invoke();
-        UnbindButton.OnPressed += _ => OnUnbindPressed?.Invoke();
     }
 
     /// <summary>
-    /// Same layout as the nuke keypad: 1-9, then clear, 0 and an empty slot.
+    /// Same layout as the nuke keypad: 1-9, then clear, 0 and enter.
     /// </summary>
     private void FillKeypadGrid()
     {
@@ -41,6 +34,10 @@ public sealed partial class PaymentTerminalMenu : DefaultWindow
         KeypadGrid.AddChild(clearBtn);
 
         AddKeypadButton(0);
+
+        var enterBtn = new Button { Text = "E" };
+        enterBtn.OnPressed += _ => OnEnterButtonPressed?.Invoke();
+        KeypadGrid.AddChild(enterBtn);
     }
 
     private void AddKeypadButton(int i)
@@ -56,22 +53,34 @@ public sealed partial class PaymentTerminalMenu : DefaultWindow
             ? Loc.GetString("payment-terminal-ui-owner", ("name", owner))
             : Loc.GetString("payment-terminal-ui-no-owner");
 
-        var priceSelected = state.SelectedField == PaymentTerminalField.Price;
-        PriceLabel.Text = (priceSelected ? "> " : "  ") + Loc.GetString("payment-terminal-ui-price", ("amount", state.Price));
-        TipLabel.Text = (!priceSelected ? "> " : "  ") + Loc.GetString("payment-terminal-ui-tip", ("amount", state.Tip));
-        TotalLabel.Text = "  " + Loc.GetString("payment-terminal-ui-total", ("amount", state.Price + state.Tip));
-
-        PriceButton.Pressed = priceSelected;
-        TipButton.Pressed = !priceSelected;
-
-        ModeButton.Text = Loc.GetString(state.Mode == PaymentTerminalMode.Fixed
+        ModeLabel.Text = Loc.GetString(state.Mode == PaymentTerminalMode.Fixed
             ? "payment-terminal-ui-mode-fixed"
             : "payment-terminal-ui-mode-free");
 
-        UnbindButton.Disabled = state.OwnerName == null;
+        PriceLabel.Text = Marker(state.Stage == PaymentTerminalStage.Price)
+                          + Loc.GetString("payment-terminal-ui-price", ("amount", state.Price));
+        TipLabel.Text = Marker(state.Stage == PaymentTerminalStage.Tip)
+                        + Loc.GetString("payment-terminal-ui-tip", ("amount", state.Tip));
+        TotalLabel.Text = Marker(state.Stage == PaymentTerminalStage.Ready)
+                          + Loc.GetString("payment-terminal-ui-total", ("amount", state.Price + state.Tip));
+        TaxLabel.Text = "  " + Loc.GetString("payment-terminal-ui-tax",
+            ("rate", (int) MathF.Round(state.TaxRate * 100)),
+            ("amount", state.Tax));
 
         HintLabel.Text = state.OwnerName == null
             ? Loc.GetString("payment-terminal-ui-hint-bind")
-            : Loc.GetString("payment-terminal-ui-hint-pay", ("tax", (int) MathF.Round(state.TaxRate * 100)));
+            : state.Stage switch
+            {
+                PaymentTerminalStage.Price => Loc.GetString(state.Mode == PaymentTerminalMode.Fixed
+                    ? "payment-terminal-ui-hint-owner-price"
+                    : "payment-terminal-ui-hint-price"),
+                PaymentTerminalStage.Tip => Loc.GetString("payment-terminal-ui-hint-tip"),
+                _ => Loc.GetString("payment-terminal-ui-hint-pay"),
+            };
+    }
+
+    private static string Marker(bool active)
+    {
+        return active ? "> " : "  ";
     }
 }

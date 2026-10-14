@@ -11,6 +11,7 @@ using Content.Shared.Database;
 using Content.Shared.Examine;
 using Content.Shared.Interaction;
 using Content.Shared.Preferences;
+using Content.Shared.Verbs;
 using Robust.Server.GameObjects;
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
@@ -35,15 +36,14 @@ public sealed class PaymentTerminalSystem : EntitySystem
 
         SubscribeLocalEvent<PaymentTerminalComponent, InteractUsingEvent>(OnInteractUsing);
         SubscribeLocalEvent<PaymentTerminalComponent, ExaminedEvent>(OnExamined);
+        SubscribeLocalEvent<PaymentTerminalComponent, GetVerbsEvent<Verb>>(OnGetVerbs);
 
         Subs.BuiEvents<PaymentTerminalComponent>(PaymentTerminalUiKey.Key, subs =>
         {
             subs.Event<BoundUIOpenedEvent>(OnUiOpened);
             subs.Event<PaymentTerminalKeypadMessage>(OnKeypad);
             subs.Event<PaymentTerminalClearMessage>(OnClear);
-            subs.Event<PaymentTerminalSelectFieldMessage>(OnSelectField);
-            subs.Event<PaymentTerminalToggleModeMessage>(OnToggleMode);
-            subs.Event<PaymentTerminalUnbindMessage>(OnUnbind);
+            subs.Event<PaymentTerminalEnterMessage>(OnEnter);
         });
     }
 
@@ -98,9 +98,9 @@ public sealed class PaymentTerminalSystem : EntitySystem
     {
         var comp = ent.Comp;
 
-        if (comp.Price <= 0)
+        if (comp.Stage != PaymentTerminalStage.Ready || comp.Price <= 0)
         {
-            Deny(ent, user, "payment-terminal-no-price");
+            Deny(ent, user, "payment-terminal-not-ready");
             return;
         }
 
@@ -123,7 +123,7 @@ public sealed class PaymentTerminalSystem : EntitySystem
             return;
         }
 
-        var tax = (int) Math.Floor(total * comp.TaxRate);
+        var tax = GetTax(comp, total);
         var payout = total - tax;
 
         // Look the owner up again: the withdrawal may have replaced their cached preferences if they share a player account.
@@ -150,10 +150,7 @@ public sealed class PaymentTerminalSystem : EntitySystem
         _adminLog.Add(LogType.ATMUsage, LogImpact.Low,
             $"{ToPrettyString(user):actor} paid {total} (price {comp.Price}, tip {comp.Tip}, tax {tax}) to {comp.OwnerCharacterName} via payment terminal {ToPrettyString(ent):entity}");
 
-        comp.Tip = 0;
-        if (comp.Mode == PaymentTerminalMode.Free)
-            comp.Price = 0;
-
+        ResetForNextBuyer(comp);
         UpdateUi(ent);
     }
 
@@ -222,12 +219,37 @@ public sealed class PaymentTerminalSystem : EntitySystem
         return comp.OwnerUserId == null || IsOwner(comp, user);
     }
 
-    private bool CanEdit(PaymentTerminalComponent comp, PaymentTerminalField field, EntityUid user)
+    private static int GetTax(PaymentTerminalComponent comp, int total)
     {
-        return field == PaymentTerminalField.Tip
-               || comp.Mode == PaymentTerminalMode.Free
-               || CanConfigure(comp, user);
+        return (int) Math.Floor(total * Math.Clamp(comp.TaxRate, 0f, 1f));
     }
+
+    /// <summary>
+    /// After a payment: a fixed price stays for the next buyer, a free one starts over.
+    /// </summary>
+    private static void ResetForNextBuyer(PaymentTerminalComponent comp)
+    {
+        comp.Tip = 0;
+
+        if (comp.Mode == PaymentTerminalMode.Fixed && comp.PriceLocked)
+        {
+            comp.Stage = PaymentTerminalStage.Tip;
+            return;
+        }
+
+        comp.Price = 0;
+        comp.Stage = PaymentTerminalStage.Price;
+    }
+
+    private static void ResetAll(PaymentTerminalComponent comp)
+    {
+        comp.PriceLocked = false;
+        comp.Price = 0;
+        comp.Tip = 0;
+        comp.Stage = PaymentTerminalStage.Price;
+    }
+
+    #region Keypad
 
     private void OnKeypad(Entity<PaymentTerminalComponent> ent, ref PaymentTerminalKeypadMessage args)
     {
@@ -235,90 +257,198 @@ public sealed class PaymentTerminalSystem : EntitySystem
             return;
 
         var comp = ent.Comp;
-        if (!CanEdit(comp, comp.SelectedField, args.Actor))
+        switch (comp.Stage)
         {
-            Deny(ent, args.Actor, "payment-terminal-owner-only");
-            return;
+            case PaymentTerminalStage.Price:
+                if (comp.Mode == PaymentTerminalMode.Fixed && !CanConfigure(comp, args.Actor))
+                {
+                    Deny(ent, args.Actor, "payment-terminal-owner-only");
+                    return;
+                }
+
+                if (!TryAppendDigit(comp, comp.Price, args.Digit, out var price))
+                    return;
+
+                comp.Price = price;
+                break;
+            case PaymentTerminalStage.Tip:
+                if (!TryAppendDigit(comp, comp.Tip, args.Digit, out var tip))
+                    return;
+
+                comp.Tip = tip;
+                break;
+            default:
+                return;
         }
 
-        var current = comp.SelectedField == PaymentTerminalField.Price ? comp.Price : comp.Tip;
-        var next = (long) current * 10 + args.Digit;
-        if (next > comp.MaxAmount)
-            return;
-
-        if (comp.SelectedField == PaymentTerminalField.Price)
-            comp.Price = (int) next;
-        else
-            comp.Tip = (int) next;
-
-        _audio.PlayPvs(comp.KeypadSound, ent, AudioParams.Default.WithVolume(-5f));
+        PlayKeypad(ent);
         UpdateUi(ent);
     }
 
+    private static bool TryAppendDigit(PaymentTerminalComponent comp, int current, int digit, out int result)
+    {
+        var next = (long) current * 10 + digit;
+        result = (int) Math.Min(next, int.MaxValue);
+        return next <= comp.MaxAmount;
+    }
+
+    /// <summary>
+    /// Confirms the current step: price, then tip, then the terminal waits for an ID swipe.
+    /// </summary>
+    private void OnEnter(Entity<PaymentTerminalComponent> ent, ref PaymentTerminalEnterMessage args)
+    {
+        var comp = ent.Comp;
+        switch (comp.Stage)
+        {
+            case PaymentTerminalStage.Price:
+                if (comp.Mode == PaymentTerminalMode.Fixed && !CanConfigure(comp, args.Actor))
+                {
+                    Deny(ent, args.Actor, "payment-terminal-owner-only");
+                    return;
+                }
+
+                if (comp.Price <= 0)
+                {
+                    Deny(ent, args.Actor, "payment-terminal-no-price");
+                    return;
+                }
+
+                if (comp.Mode == PaymentTerminalMode.Fixed)
+                {
+                    comp.PriceLocked = true;
+                    _popup.PopupEntity(Loc.GetString("payment-terminal-price-locked", ("amount", comp.Price)), ent, args.Actor);
+                }
+
+                comp.Stage = PaymentTerminalStage.Tip;
+                break;
+            case PaymentTerminalStage.Tip:
+                comp.Stage = PaymentTerminalStage.Ready;
+                break;
+            default:
+                return;
+        }
+
+        PlayKeypad(ent);
+        UpdateUi(ent);
+    }
+
+    /// <summary>
+    /// A free price starts over from the price; a fixed one only drops the tip, the price stays until the owner clears it.
+    /// </summary>
     private void OnClear(Entity<PaymentTerminalComponent> ent, ref PaymentTerminalClearMessage args)
     {
         var comp = ent.Comp;
-        if (!CanEdit(comp, comp.SelectedField, args.Actor))
+
+        if (comp.Mode == PaymentTerminalMode.Fixed && comp.PriceLocked)
         {
-            Deny(ent, args.Actor, "payment-terminal-owner-only");
-            return;
+            comp.Tip = 0;
+            comp.Stage = PaymentTerminalStage.Tip;
+        }
+        else
+        {
+            if (comp.Mode == PaymentTerminalMode.Fixed && !CanConfigure(comp, args.Actor))
+            {
+                Deny(ent, args.Actor, "payment-terminal-owner-only");
+                return;
+            }
+
+            ResetAll(comp);
         }
 
-        if (comp.SelectedField == PaymentTerminalField.Price)
-            comp.Price = 0;
-        else
-            comp.Tip = 0;
-
+        PlayKeypad(ent);
         UpdateUi(ent);
     }
 
-    private void OnSelectField(Entity<PaymentTerminalComponent> ent, ref PaymentTerminalSelectFieldMessage args)
+    private void PlayKeypad(EntityUid uid)
     {
-        if (!Enum.IsDefined(args.Field))
+        _audio.PlayPvs(Comp<PaymentTerminalComponent>(uid).KeypadSound, uid, AudioParams.Default.WithVolume(-5f));
+    }
+
+    #endregion
+
+    #region Verbs
+
+    private void OnGetVerbs(Entity<PaymentTerminalComponent> ent, ref GetVerbsEvent<Verb> args)
+    {
+        if (!args.CanAccess || !args.CanInteract || !CanConfigure(ent.Comp, args.User))
             return;
 
-        ent.Comp.SelectedField = args.Field;
-        UpdateUi(ent);
+        var user = args.User;
+        var comp = ent.Comp;
+
+        args.Verbs.Add(new Verb
+        {
+            Text = Loc.GetString(comp.Mode == PaymentTerminalMode.Fixed
+                ? "payment-terminal-verb-mode-to-free"
+                : "payment-terminal-verb-mode-to-fixed"),
+            Act = () => ToggleMode(ent, user),
+            Priority = 2,
+        });
+
+        if (comp.Mode == PaymentTerminalMode.Fixed)
+        {
+            args.Verbs.Add(new Verb
+            {
+                Text = Loc.GetString("payment-terminal-verb-clear"),
+                Act = () => ClearPrice(ent, user),
+                Priority = 1,
+            });
+        }
+
+        if (comp.OwnerUserId != null)
+        {
+            args.Verbs.Add(new Verb
+            {
+                Text = Loc.GetString("payment-terminal-verb-unbind"),
+                Act = () => Unbind(ent, user),
+                Priority = 0,
+            });
+        }
     }
 
-    private void OnToggleMode(Entity<PaymentTerminalComponent> ent, ref PaymentTerminalToggleModeMessage args)
+    private void ToggleMode(Entity<PaymentTerminalComponent> ent, EntityUid user)
     {
         var comp = ent.Comp;
-        if (!CanConfigure(comp, args.Actor))
-        {
-            Deny(ent, args.Actor, "payment-terminal-owner-only");
+        if (!CanConfigure(comp, user))
             return;
-        }
 
         comp.Mode = comp.Mode == PaymentTerminalMode.Fixed ? PaymentTerminalMode.Free : PaymentTerminalMode.Fixed;
-        comp.Price = 0;
-        comp.Tip = 0;
+        ResetAll(comp);
+
+        _popup.PopupEntity(Loc.GetString(comp.Mode == PaymentTerminalMode.Fixed
+            ? "payment-terminal-mode-fixed"
+            : "payment-terminal-mode-free"), ent, user);
         UpdateUi(ent);
     }
 
-    private void OnUnbind(Entity<PaymentTerminalComponent> ent, ref PaymentTerminalUnbindMessage args)
+    private void ClearPrice(Entity<PaymentTerminalComponent> ent, EntityUid user)
+    {
+        if (!CanConfigure(ent.Comp, user))
+            return;
+
+        ResetAll(ent.Comp);
+        _popup.PopupEntity(Loc.GetString("payment-terminal-cleared"), ent, user);
+        UpdateUi(ent);
+    }
+
+    private void Unbind(Entity<PaymentTerminalComponent> ent, EntityUid user)
     {
         var comp = ent.Comp;
-        if (comp.OwnerUserId == null)
+        if (comp.OwnerUserId == null || !IsOwner(comp, user))
             return;
 
-        if (!IsOwner(comp, args.Actor))
-        {
-            Deny(ent, args.Actor, "payment-terminal-owner-only");
-            return;
-        }
-
-        _adminLog.Add(LogType.ATMUsage, LogImpact.Low, $"{ToPrettyString(args.Actor):actor} unbound payment terminal {ToPrettyString(ent):entity}");
+        _adminLog.Add(LogType.ATMUsage, LogImpact.Low, $"{ToPrettyString(user):actor} unbound payment terminal {ToPrettyString(ent):entity}");
 
         comp.OwnerUserId = null;
         comp.OwnerCharacterName = null;
         comp.OwnerIdName = null;
-        comp.Price = 0;
-        comp.Tip = 0;
+        ResetAll(comp);
 
-        _popup.PopupEntity(Loc.GetString("payment-terminal-unbound"), ent, args.Actor);
+        _popup.PopupEntity(Loc.GetString("payment-terminal-unbound"), ent, user);
         UpdateUi(ent);
     }
+
+    #endregion
 
     private void Deny(EntityUid terminal, EntityUid user, string message, params (string, object)[] args)
     {
@@ -332,9 +462,10 @@ public sealed class PaymentTerminalSystem : EntitySystem
         var state = new PaymentTerminalBoundUserInterfaceState(
             comp.OwnerIdName,
             comp.Mode,
-            comp.SelectedField,
+            comp.Stage,
             comp.Price,
             comp.Tip,
+            GetTax(comp, comp.Price + comp.Tip),
             comp.TaxRate);
 
         _ui.SetUiState(ent.Owner, PaymentTerminalUiKey.Key, state);

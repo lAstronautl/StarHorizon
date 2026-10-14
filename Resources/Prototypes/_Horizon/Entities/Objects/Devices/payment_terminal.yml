@@ -14,6 +14,7 @@
   - type: Anchorable
   - type: CollideOnAnchor
   - type: PaymentTerminal
+    taxRate: 0.1 # fraction of each payment withheld from the owner
   - type: ActivatableUI
     key: enum.PaymentTerminalUiKey.Key
   - type: UserInterface

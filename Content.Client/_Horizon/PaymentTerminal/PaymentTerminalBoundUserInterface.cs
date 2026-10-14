@@ -15,9 +15,7 @@ public sealed class PaymentTerminalBoundUserInterface(EntityUid owner, Enum uiKe
         _menu = this.CreateWindow<PaymentTerminalMenu>();
         _menu.OnKeypadButtonPressed += digit => SendMessage(new PaymentTerminalKeypadMessage(digit));
         _menu.OnClearButtonPressed += () => SendMessage(new PaymentTerminalClearMessage());
-        _menu.OnFieldSelected += field => SendMessage(new PaymentTerminalSelectFieldMessage(field));
-        _menu.OnToggleModePressed += () => SendMessage(new PaymentTerminalToggleModeMessage());
-        _menu.OnUnbindPressed += () => SendMessage(new PaymentTerminalUnbindMessage());
+        _menu.OnEnterButtonPressed += () => SendMessage(new PaymentTerminalEnterMessage());
     }
 
     protected override void UpdateState(BoundUserInterfaceState state)
