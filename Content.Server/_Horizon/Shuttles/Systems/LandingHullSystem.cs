@@ -23,8 +23,13 @@ public sealed class LandingHullSystem : EntitySystem
     [Dependency] private readonly FixtureSystem _fixtures = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;
 
-    private const string HullPrefix = "landing_hull_";
+    public const string HullPrefix = "landing_hull_";
     private const float HalfSize = 0.49f;
+
+    private static readonly int HullLayer = (int) (CollisionGroup.Impassable | CollisionGroup.MidImpassable |
+                                                    CollisionGroup.HighImpassable | CollisionGroup.LowImpassable);
+    private static readonly int HullMask = (int) CollisionGroup.FullTileMask;
+
 
     private readonly HashSet<(EntityUid Grid, Vector2i Tile)> _dirty = new();
 
@@ -33,7 +38,6 @@ public sealed class LandingHullSystem : EntitySystem
         base.Initialize();
 
         SubscribeLocalEvent<LandableShuttleComponent, ComponentStartup>((uid, _, _) => MarkGridDirty(uid));
-        SubscribeLocalEvent<LandingPadComponent, ComponentStartup>((uid, _, _) => MarkGridDirty(uid));
         SubscribeLocalEvent<AnchorStateChangedEvent>(OnAnchorChanged);
     }
 
@@ -58,7 +62,7 @@ public sealed class LandingHullSystem : EntitySystem
         _dirty.Add((gridUid, _map.TileIndicesFor(gridUid, grid, xform.Coordinates)));
     }
 
-    private bool IsHullGrid(EntityUid uid) => HasComp<LandableShuttleComponent>(uid) || HasComp<LandingPadComponent>(uid);
+    private bool IsHullGrid(EntityUid uid) => HasComp<LandableShuttleComponent>(uid);
 
     public override void Update(float frameTime)
     {
@@ -118,15 +122,16 @@ public sealed class LandingHullSystem : EntitySystem
         if (exists)
             return;
 
-        var isShuttle = HasComp<LandableShuttleComponent>(gridUid);
         var shape = new PolygonShape();
         shape.SetAsBox(HalfSize, HalfSize, new Vector2(tile.X + 0.5f, tile.Y + 0.5f), 0f);
 
+        // Same idea as a vehicle bumper: a hull fixture on the (dynamic) grid body collides with the static wall
+        // entities of other grids, while the grid floors themselves pass through each other.
         _fixtures.TryCreateFixture(gridUid, shape, id,
             density: 0f,
             hard: true,
-            collisionLayer: (int) (isShuttle ? CollisionGroup.ShuttleHull : CollisionGroup.PadHull),
-            collisionMask: (int) (isShuttle ? CollisionGroup.PadHull : CollisionGroup.ShuttleHull),
+            collisionLayer: HullLayer,
+            collisionMask: HullMask,
             manager: manager,
             body: body);
     }

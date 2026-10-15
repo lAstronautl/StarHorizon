@@ -12,8 +12,7 @@ namespace Content.Server._Horizon.Shuttles.Systems;
 
 /// <summary>
 /// Open (space-type) tiles of a landable shuttle, e.g. lattice, have no air of their own. While they lie over a
-/// landing pad they share the gas mixture of the pad tile underneath, so a person standing there is not in a vacuum
-/// and gas is exchanged between both grids.
+/// landing pad they take the air of the pad tile underneath, so a person standing there is not in a vacuum.
 /// </summary>
 public sealed class LandedGridAtmosSystem : EntitySystem
 {
@@ -68,16 +67,16 @@ public sealed class LandedGridAtmosSystem : EntitySystem
             if (_atmos.IsTileSpace(padUid, mapUid, padTile))
                 continue;
 
-            // Share the very same gas mixture with the pad tile (no copy) so gas really moves between both grids.
-            if (!TryComp<GridAtmosphereComponent>(padUid, out var padAtmos) ||
-                !padAtmos.Tiles.TryGetValue(padTile, out var padTileAtmos) ||
-                padTileAtmos.Air is not { } air)
-            {
+            // Map-atmosphere tiles must hold an immutable mixture, so the pad air is mirrored as an immutable copy.
+            var mix = _atmos.GetTileMixture(padUid, mapUid, padTile);
+            if (mix == null)
                 continue;
-            }
+
+            var air = mix.Clone();
+            air.MarkImmutable();
 
             tile.Air = air;
-            tile.AirArchived = padTileAtmos.AirArchived ?? air;
+            tile.AirArchived = air.Clone();
             tile.Space = false;
             _current.Add(tile.GridIndices);
         }

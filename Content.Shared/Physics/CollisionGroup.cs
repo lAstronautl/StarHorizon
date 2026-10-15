@@ -25,10 +25,6 @@ public enum CollisionGroup
     // Y dis door passable when all the others impassable / collision.
     DoorPassable       = 1 << 8, // 256 Allows door to close over top, Like blast doors over conveyors for disposals rooms/cargo.
 
-    // Hull colliders of landable shuttles / landing pads, see LandingHullSystem.
-    ShuttleHull        = 1 << 9,
-    PadHull            = 1 << 10,
-
     MapGrid = MapGridHelpers.CollisionGroup, // Map grids, like shuttles. This is the actual grid itself, not the walls or other entities connected to the grid.
 
     // 32 possible groups

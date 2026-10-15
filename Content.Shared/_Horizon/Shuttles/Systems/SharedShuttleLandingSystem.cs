@@ -19,6 +19,13 @@ public abstract class SharedShuttleLandingSystem : EntitySystem
 
     private void OnPreventCollide(Entity<LandableShuttleComponent> ent, ref PreventCollideEvent args)
     {
+        // The hull fixtures must only hit foreign walls, never the walls of the shuttle itself.
+        if (Transform(args.OtherEntity).GridUid == ent.Owner)
+        {
+            args.Cancelled = true;
+            return;
+        }
+
         if (!HasComp<LandingPadComponent>(args.OtherEntity))
             return;
 
