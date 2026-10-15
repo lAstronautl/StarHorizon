@@ -126,7 +126,7 @@ public sealed class LandingHullSystem : EntitySystem
             density: 0f,
             hard: true,
             collisionLayer: (int) (isShuttle ? CollisionGroup.ShuttleHull : CollisionGroup.PadHull),
-            collisionMask: isShuttle ? (int) CollisionGroup.PadHull : 0,
+            collisionMask: (int) (isShuttle ? CollisionGroup.PadHull : CollisionGroup.ShuttleHull),
             manager: manager,
             body: body);
     }

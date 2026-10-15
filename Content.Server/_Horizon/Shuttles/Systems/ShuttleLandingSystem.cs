@@ -25,6 +25,8 @@ public sealed class ShuttleLandingSystem : SharedShuttleLandingSystem
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly ShuttleConsoleSystem _console = default!;
 
+    /// <summary>Fraction of the shuttle bounds that must lie over the landing zone to land.</summary>
+    private const float MinLandingOverlap = 0.5f;
     private const int GridBit = (int) CollisionGroup.MapGrid;
     private TimeSpan _nextMaskCheck;
 
@@ -132,18 +134,18 @@ public sealed class ShuttleLandingSystem : SharedShuttleLandingSystem
             var zone = pad.Zone ?? padGrid.LocalAABB;
             var toPad = _transform.GetInvWorldMatrix(padXform) * shuttleMatrix;
 
-            // The whole shuttle must be inside the landing zone.
-            var inside = true;
-            foreach (var corner in new[] { corners.BottomLeft, corners.BottomRight, corners.TopLeft, corners.TopRight })
-            {
-                if (!zone.Contains(Vector2.Transform(corner, toPad)))
-                {
-                    inside = false;
-                    break;
-                }
-            }
+            // Bounds of the shuttle in the pad's local space; at least half of it must lie over the landing zone.
+            var shuttleBounds = new Box2(
+                Vector2.Transform(corners.BottomLeft, toPad),
+                Vector2.Transform(corners.TopRight, toPad));
+            var min = Vector2.Min(Vector2.Min(Vector2.Transform(corners.BottomLeft, toPad), Vector2.Transform(corners.BottomRight, toPad)),
+                Vector2.Min(Vector2.Transform(corners.TopLeft, toPad), Vector2.Transform(corners.TopRight, toPad)));
+            var max = Vector2.Max(Vector2.Max(Vector2.Transform(corners.BottomLeft, toPad), Vector2.Transform(corners.BottomRight, toPad)),
+                Vector2.Max(Vector2.Transform(corners.TopLeft, toPad), Vector2.Transform(corners.TopRight, toPad)));
+            shuttleBounds = new Box2(min, max);
 
-            if (!inside)
+            var overlap = zone.Intersect(shuttleBounds);
+            if (overlap.IsEmpty() || overlap.Width * overlap.Height < shuttleBounds.Width * shuttleBounds.Height * MinLandingOverlap)
                 continue;
 
             _physics.SetLinearVelocity(shuttle, Vector2.Zero, body: body);
