@@ -12,7 +12,8 @@ namespace Content.Server._Horizon.Shuttles.Systems;
 
 /// <summary>
 /// Open (space-type) tiles of a landable shuttle, e.g. lattice, have no air of their own. While they lie over a
-/// landing pad they take the air of the pad tile underneath, so a person standing there is not in a vacuum.
+/// landing pad they share the gas mixture of the pad tile underneath, so a person standing there is not in a vacuum
+/// and gas is exchanged between both grids.
 /// </summary>
 public sealed class LandedGridAtmosSystem : EntitySystem
 {
@@ -67,15 +68,16 @@ public sealed class LandedGridAtmosSystem : EntitySystem
             if (_atmos.IsTileSpace(padUid, mapUid, padTile))
                 continue;
 
-            var mix = _atmos.GetTileMixture(padUid, mapUid, padTile);
-            if (mix == null)
+            // Share the very same gas mixture with the pad tile (no copy) so gas really moves between both grids.
+            if (!TryComp<GridAtmosphereComponent>(padUid, out var padAtmos) ||
+                !padAtmos.Tiles.TryGetValue(padTile, out var padTileAtmos) ||
+                padTileAtmos.Air is not { } air)
+            {
                 continue;
-
-            var air = mix.Clone();
-            air.MarkImmutable();
+            }
 
             tile.Air = air;
-            tile.AirArchived = air.Clone();
+            tile.AirArchived = padTileAtmos.AirArchived ?? air;
             tile.Space = false;
             _current.Add(tile.GridIndices);
         }
@@ -85,8 +87,23 @@ public sealed class LandedGridAtmosSystem : EntitySystem
         {
             foreach (var indices in previous)
             {
-                if (!_current.Contains(indices))
-                    _atmos.InvalidateTile((uid, atmos), indices);
+                if (_current.Contains(indices) || !atmos.Tiles.TryGetValue(indices, out var tile))
+                    continue;
+
+                // Stop sharing the pad's gas and fall back to the map atmosphere (space unless the map says otherwise).
+                if (TryComp<MapAtmosphereComponent>(mapUid, out var mapAtmos))
+                {
+                    tile.Air = mapAtmos.Mixture;
+                    tile.Space = mapAtmos.Space;
+                }
+                else
+                {
+                    tile.Air = GasMixture.SpaceGas;
+                    tile.Space = true;
+                }
+
+                tile.AirArchived = tile.Air.Clone();
+                _atmos.InvalidateTile((uid, atmos), indices);
             }
         }
 
