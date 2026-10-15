@@ -1,3 +1,4 @@
+using Content.Shared._Horizon.Shuttles.Events;
 using Content.Client.Shuttles.UI;
 using Content.Shared.Shuttles.BUIStates;
 using Content.Shared.Shuttles.Events;
@@ -50,6 +51,7 @@ public sealed partial class ShuttleConsoleBoundUserInterface : BoundUserInterfac
         { SendMessage(new ShuttleConsoleRefreshFireControlMessage()); };
         // End Lua
         NfOpen(); // Frontier
+        _window.OnLandingRequested += takeOff => SendMessage(new ShuttleLandingRequest { TakeOff = takeOff }); // Horizon
     }
 
     private void OnUndockAllRequest(List<NetEntity> dockEntities)

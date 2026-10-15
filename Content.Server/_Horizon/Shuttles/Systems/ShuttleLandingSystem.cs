@@ -1,9 +1,13 @@
 using System.Numerics;
 using Content.Server.Shuttles.Systems;
 using Content.Shared._Horizon.Shuttles.Components;
+using Content.Shared._Horizon.Shuttles.Events;
 using Content.Shared._Horizon.Shuttles.Systems;
+using Content.Shared.Popups;
+using Content.Shared.Shuttles.Components;
 using Content.Shared.Physics;
 using Robust.Shared.Map.Components;
+using Robust.Shared.Physics;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Timing;
 using Robust.Shared.Physics.Systems;
@@ -17,8 +21,41 @@ public sealed class ShuttleLandingSystem : SharedShuttleLandingSystem
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
 
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly ShuttleConsoleSystem _console = default!;
+
     private const int GridBit = (int) CollisionGroup.MapGrid;
     private TimeSpan _nextMaskCheck;
+
+    public override void Initialize()
+    {
+        base.Initialize();
+
+        SubscribeLocalEvent<ShuttleConsoleComponent, ShuttleLandingRequest>(OnLandingRequest);
+    }
+
+    private void OnLandingRequest(Entity<ShuttleConsoleComponent> ent, ShuttleLandingRequest args)
+    {
+        if (Transform(ent).GridUid is not { } grid)
+            return;
+
+        string? failure = null;
+
+        if (args.TakeOff)
+        {
+            if (!TryTakeOff(grid))
+                failure = "shuttle-landing-fail-not-landed";
+        }
+        else if (!TryLand(grid, out var reason))
+        {
+            failure = reason;
+        }
+
+        if (failure != null)
+            _popup.PopupEntity(Loc.GetString(failure), ent, args.Actor);
+        else
+            _console.RefreshShuttleConsoles(grid);
+    }
 
     public override void Update(float frameTime)
     {
@@ -65,19 +102,19 @@ public sealed class ShuttleLandingSystem : SharedShuttleLandingSystem
             !TryComp<MapGridComponent>(shuttle, out var shuttleGrid) ||
             !TryComp<PhysicsComponent>(shuttle, out var body))
         {
-            reason = "Not a landable shuttle.";
+            reason = "shuttle-landing-fail-not-landable";
             return false;
         }
 
         if (shuttle.Comp.State == LandState.Landed)
         {
-            reason = "Already landed.";
+            reason = "shuttle-landing-fail-already-landed";
             return false;
         }
 
         if (body.LinearVelocity.Length() > shuttle.Comp.MaxLandingSpeed)
         {
-            reason = "Moving too fast.";
+            reason = "shuttle-landing-fail-too-fast";
             return false;
         }
 
@@ -118,7 +155,7 @@ public sealed class ShuttleLandingSystem : SharedShuttleLandingSystem
             return true;
         }
 
-        reason = "Not inside a landing zone.";
+        reason = "shuttle-landing-fail-no-zone";
         return false;
     }
 

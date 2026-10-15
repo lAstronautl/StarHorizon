@@ -96,6 +96,7 @@ public sealed partial class ShuttleConsoleWindow : FancyWindow,
         // End Lua
 
         NfInitialize(); // Frontier Initialization for the ShuttleConsoleWindow
+        NavContainer.OnLandingRequested += takeOff => OnLandingRequested?.Invoke(takeOff); // Horizon
     }
 
     private void ClearModes(ShuttleConsoleMode mode)

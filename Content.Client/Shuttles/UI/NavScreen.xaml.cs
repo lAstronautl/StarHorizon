@@ -58,6 +58,7 @@ public sealed partial class NavScreen : BoxContainer
         RefreshButton.OnPressed += _ => OnFireControlRefresh?.Invoke();
         // End Lua
         NfInitialize(); // Frontier Initialization for the NavScreen
+        HorizonLandingInitialize(); // Horizon
     }
 
     // Frontier - IFF search
@@ -109,6 +110,7 @@ public sealed partial class NavScreen : BoxContainer
         NavRadar.UpdateState(scc);
 
         NfUpdateState(scc); // Frontier Update State
+        HorizonLandingUpdate(); // Horizon
     }
 
     /// <summary>

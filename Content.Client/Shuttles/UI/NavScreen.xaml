@@ -192,6 +192,29 @@
                     </controls:BoxContainer>
                     <!-- End Frontier - Inertia dampener controls-->
 
+                    <!-- Horizon - landing on landing pads -->
+                    <controls:BoxContainer Name="LandingButtons"
+                                  Orientation="Horizontal"
+                                  HorizontalAlignment="Stretch"
+                                  HorizontalExpand="True"
+                                  Align="Center"
+                                  Visible="False"
+                                  Margin="0 0 0 3">
+                        <controls:Button Name="LandButton"
+                                         Text="{controls:Loc 'shuttle-console-land'}"
+                                         TextAlign="Center"
+                                         MinWidth="128"
+                                         StyleClasses="OpenRight"
+                                         Margin="0"/>
+                        <controls:Button Name="TakeOffButton"
+                                         Text="{controls:Loc 'shuttle-console-takeoff'}"
+                                         TextAlign="Center"
+                                         MinWidth="128"
+                                         StyleClasses="OpenLeft"
+                                         Margin="0"/>
+                    </controls:BoxContainer>
+                    <!-- End Horizon - landing -->
+
                     <!-- Frontier - settable target -->
                     <controls:BoxContainer Orientation="Vertical" HorizontalExpand="True" Name="TargetCoordsBox">
                         <controls:Label Text="{controls:Loc 'shuttle-console-target'}"/>
