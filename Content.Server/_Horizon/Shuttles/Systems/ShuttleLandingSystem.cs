@@ -35,9 +35,9 @@ public sealed class ShuttleLandingSystem : SharedShuttleLandingSystem
         SubscribeLocalEvent<ShuttleConsoleComponent, ShuttleLandingRequest>(OnLandingRequest);
     }
 
-    private void OnLandingRequest(Entity<ShuttleConsoleComponent> ent, ShuttleLandingRequest args)
+    private void OnLandingRequest(EntityUid uid, ShuttleConsoleComponent component, ShuttleLandingRequest args)
     {
-        if (Transform(ent).GridUid is not { } grid)
+        if (Transform(uid).GridUid is not { } grid)
             return;
 
         string? failure = null;
@@ -53,7 +53,7 @@ public sealed class ShuttleLandingSystem : SharedShuttleLandingSystem
         }
 
         if (failure != null)
-            _popup.PopupEntity(Loc.GetString(failure), ent, args.Actor);
+            _popup.PopupEntity(Loc.GetString(failure), uid, args.Actor);
         else
             _console.RefreshShuttleConsoles(grid);
     }

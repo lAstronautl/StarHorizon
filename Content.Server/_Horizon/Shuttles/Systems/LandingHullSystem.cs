@@ -120,7 +120,7 @@ public sealed class LandingHullSystem : EntitySystem
 
         var isShuttle = HasComp<LandableShuttleComponent>(gridUid);
         var shape = new PolygonShape();
-        shape.SetAsBox(HalfSize, HalfSize, new Vector2(tile.X + 0.5f, tile.Y + 0.5f), Angle.Zero);
+        shape.SetAsBox(HalfSize, HalfSize, new Vector2(tile.X + 0.5f, tile.Y + 0.5f), 0f);
 
         _fixtures.TryCreateFixture(gridUid, shape, id,
             density: 0f,
