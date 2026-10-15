@@ -10,7 +10,7 @@ namespace Content.Server.Atmos
     ///     Internal Atmos class that stores data about the atmosphere in a grid.
     ///     You shouldn't use this directly, use <see cref="AtmosphereSystem"/> instead.
     /// </summary>
-    [Access(typeof(AtmosphereSystem), typeof(GasTileOverlaySystem), typeof(AtmosDebugOverlaySystem))]
+    [Access(typeof(AtmosphereSystem), typeof(GasTileOverlaySystem), typeof(AtmosDebugOverlaySystem), typeof(Content.Server._Horizon.Shuttles.Systems.LandedGridAtmosSystem))] // Horizon: landed grid atmos
     public sealed class TileAtmosphere : IGasMixtureHolder
     {
         [ViewVariables]
@@ -87,7 +87,7 @@ namespace Content.Server.Atmos
         /// This can be immutable if the tile is spaced.
         /// </summary>
         [ViewVariables]
-        [Access(typeof(AtmosphereSystem), Other = AccessPermissions.ReadExecute)] // FIXME Friends
+        [Access(typeof(AtmosphereSystem), typeof(Content.Server._Horizon.Shuttles.Systems.LandedGridAtmosSystem), Other = AccessPermissions.ReadExecute)] // FIXME Friends // Horizon: landed grid atmos
         public GasMixture? Air { get; set; }
 
         /// <summary>

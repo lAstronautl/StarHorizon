@@ -25,7 +25,7 @@ public sealed class LandedGridAtmosSystem : EntitySystem
     private static readonly TimeSpan SyncInterval = TimeSpan.FromSeconds(0.25);
 
     private TimeSpan _nextSync;
-    private readonly List<Entity<MapGridComponent>> _gridsBuffer = new();
+    private List<Entity<MapGridComponent>> _gridsBuffer = new();
     private readonly List<TileAtmosphere> _tilesBuffer = new();
 
     /// <summary>Shuttle tiles currently showing pad air, per shuttle.</summary>
