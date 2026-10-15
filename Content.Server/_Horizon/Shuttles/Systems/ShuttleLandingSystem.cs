@@ -1,4 +1,5 @@
 using System.Numerics;
+using Content.Server.Shuttles.Components;
 using Content.Server.Shuttles.Systems;
 using Content.Shared._Horizon.Shuttles.Components;
 using Content.Shared._Horizon.Shuttles.Events;
