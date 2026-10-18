@@ -88,7 +88,7 @@ research-technology-advanced-shuttlecraft = Advanced Shuttlecraft
 research-technology-universal-translator = Universal Translator
 research-technology-rare-translator = Rare Translator
 research-technology-translator-implants = Translator Implants
-research-technology-gray-unathi-study = Gray Unathi Study [all discs]
+research-technology-gray-unathi-study = Gray Unathi Study [all research and discs]
 
 # Combat Cyborg Technologies
 nf-research-technology-remote-control-monitoring = Remote Control & Monitoring
