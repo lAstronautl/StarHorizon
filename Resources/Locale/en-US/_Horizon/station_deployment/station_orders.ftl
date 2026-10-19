@@ -12,6 +12,9 @@ station-task-console-recall-no-match = No active order was fulfilled - check the
 station-task-console-order-fulfilled = Order fulfilled ({ $category })! New level: { $level }.
 station-task-console-capsule-sold = Capsule sold for { $amount } credits.
 station-task-console-item-line = { $amount }x { $item }
+station-task-console-category-label = { $category }: [color=limegreen]Level { $level }[/color]
+station-task-console-manifest-label = Manifest: [color=orange]{ $items }[/color]
+station-task-console-description-label = [color=gray]{ $description }[/color]
 station-task-console-capsule-none = No cargo capsule deployed.
 station-task-console-capsule-en-route = Capsule en route...
 station-task-console-capsule-docked = Capsule docked - load crates and recall when ready.

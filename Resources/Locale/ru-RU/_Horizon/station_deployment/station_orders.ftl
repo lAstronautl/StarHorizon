@@ -12,6 +12,9 @@ station-task-console-recall-no-match = Ни один активный заказ
 station-task-console-order-fulfilled = Заказ выполнен ({ $category })! Новый уровень: { $level }.
 station-task-console-capsule-sold = Капсула продана за { $amount } кредитов.
 station-task-console-item-line = { $amount }x { $item }
+station-task-console-category-label = { $category }: [color=limegreen]Уровень { $level }[/color]
+station-task-console-manifest-label = Манифест: [color=orange]{ $items }[/color]
+station-task-console-description-label = [color=gray]{ $description }[/color]
 station-task-console-capsule-none = Грузовая капсула призвана.
 station-task-console-capsule-en-route = Капсула в пути...
 station-task-console-capsule-docked = Капсула пристыкована.
