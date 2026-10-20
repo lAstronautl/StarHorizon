@@ -39,8 +39,19 @@ public sealed class ScrapProcessorSystem : EntitySystem
         if (Transform(other).Anchored || HasComp<MobStateComponent>(other))
             return;
 
-        if (!_whitelist.CheckBoth(other, ent.Comp.Blacklist, ent.Comp.Whitelist))
+        // Protected entities are never touched.
+        if (_whitelist.IsWhitelistPass(ent.Comp.Blacklist, other))
             return;
+
+        // Wrong kind of scrap for this machine: it is destroyed, but nothing is paid.
+        if (!_whitelist.IsWhitelistPassOrNull(ent.Comp.Whitelist, other))
+        {
+            if (!ent.Comp.DestroyRejected)
+                return;
+
+            QueueDel(other);
+            return;
+        }
 
         var payout = (int) (_pricing.GetPrice(other) * ent.Comp.PayoutMultiplier);
         if (payout > 0)

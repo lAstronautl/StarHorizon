@@ -14,16 +14,23 @@ namespace Content.Shared._Horizon.Shipbreaking;
 public sealed partial class ScrapProcessorComponent : Component
 {
     /// <summary>
-    /// What may be processed. Entities that are not on the whitelist are left alone.
+    /// What may be processed correctly. Entities that touch the machine but are not on the whitelist
+    /// are processed wrongly: destroyed without payment (see <see cref="DestroyRejected"/>).
     /// </summary>
     [DataField]
     public EntityWhitelist? Whitelist;
 
     /// <summary>
-    /// What may never be processed, even if it is on the whitelist.
+    /// Entities the machine never touches at all (e.g. mobs), neither paying nor destroying them.
     /// </summary>
     [DataField]
     public EntityWhitelist? Blacklist;
+
+    /// <summary>
+    /// Whether entities that fail the whitelist are destroyed for nothing. If false they are left alone.
+    /// </summary>
+    [DataField]
+    public bool DestroyRejected = true;
 
     /// <summary>
     /// Multiplier applied to the appraised price of the entity.
