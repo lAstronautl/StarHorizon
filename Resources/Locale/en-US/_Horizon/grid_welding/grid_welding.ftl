@@ -14,3 +14,4 @@ grid-welding-sealing-seam = You begin sealing the seam.
 grid-welding-seam-sealed = You weld the seam shut.
 grid-welding-hull-fully-sealed = The hull is fully sealed - no more seams remain.
 grid-welding-no-seam = There is no seam here to weld shut.
+grid-welding-edge-not-open = Only an edge that faces open space can be welded to another hull.

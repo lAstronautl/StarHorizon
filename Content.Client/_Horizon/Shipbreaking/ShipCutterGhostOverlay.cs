@@ -109,7 +109,7 @@ public sealed class ShipCutterGhostOverlay : Overlay
 
         // The edge a click would pick now.
         if (!_cutter.TryGetSeam(mapPos, welder.EdgeSelectTolerance, out var gridUid, out var grid, out var tile, out var edge) ||
-            !_map.TryGetTile(grid, tile, out var tileData) || tileData.IsEmpty)
+            !_cutter.IsOpenEdge(grid, tile, edge))
             return;
 
         if (firstGrid == null || firstGridComp == null)

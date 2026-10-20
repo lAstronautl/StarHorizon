@@ -63,6 +63,16 @@ public abstract class SharedShipCutterSystem : EntitySystem
     }
 
     /// <summary>
+    /// Whether the edge faces open space: the tile is floor and the tile on the other side of the edge is not.
+    /// Only such edges can be joined to another grid.
+    /// </summary>
+    public bool IsOpenEdge(MapGridComponent grid, Vector2i tile, CutEdges edge)
+    {
+        return MapSystem.TryGetTile(grid, tile, out var a) && !a.IsEmpty &&
+               !(MapSystem.TryGetTile(grid, tile + edge.Offset(), out var b) && !b.IsEmpty);
+    }
+
+    /// <summary>
     /// Whether the given edge of the tile is cut.
     /// </summary>
     public bool HasCut(EntityUid gridUid, Vector2i tile, CutEdges edge)

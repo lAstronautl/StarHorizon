@@ -14,3 +14,4 @@ grid-welding-sealing-seam = Вы начинаете заваривать шов.
 grid-welding-seam-sealed = Вы заделываете шов сваркой.
 grid-welding-hull-fully-sealed = Корпус полностью герметичен - швов больше не осталось.
 grid-welding-no-seam = Здесь нет шва, который можно заварить.
+grid-welding-edge-not-open = К другому корпусу можно приварить только край, за которым открытый космос.
