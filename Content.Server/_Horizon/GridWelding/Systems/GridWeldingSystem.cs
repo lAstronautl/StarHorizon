@@ -5,6 +5,7 @@ using Content.Shared._Horizon.GridWelding.Events;
 using Content.Shared._Horizon.GridWelding.Systems;
 using Content.Shared._Horizon.Shipbreaking;
 using Content.Shared.Database;
+using Content.Shared.Gravity;
 using Content.Shared.Interaction;
 using Content.Shared.Popups;
 using Content.Shared.Tools.Systems;
@@ -35,6 +36,7 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly GridCutsSystem _cuts = default!;
     [Dependency] private readonly SharedShipCutterSystem _cutter = default!;
+    [Dependency] private readonly GridGravitySystem _gridGravity = default!;
 
     public override void Initialize()
     {
@@ -165,10 +167,22 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
             ? new Dictionary<Vector2i, CutEdges>(bCuts.Cuts)
             : null;
 
+        // The gravity of grid B goes with it too.
+        var bInherentGravity = false;
+        var bGravityEnabled = false;
+        if (TryComp<GravityComponent>(gridBUid, out var bGravity))
+        {
+            bInherentGravity = bGravity.Inherent;
+            bGravityEnabled = bGravity.Enabled;
+        }
+
         gridA.CanSplit = false;
         _gridFixtures.Merge(gridAUid, gridBUid, offset, rotation, gridA, gridB, xformA, xformB);
         gridA.CanSplit = true;
         _gridFixtures.CheckSplits(gridAUid);
+
+        // The generators of grid B now stand on grid A, which has to count them.
+        _gridGravity.AfterMerge(gridAUid, bInherentGravity, bGravityEnabled);
 
         ApplyMergeSeams(gridAUid, gridA, gridAFootprint, gridBTiles, gridBCuts, offset, rotation, args.TileA, args.TileB);
 

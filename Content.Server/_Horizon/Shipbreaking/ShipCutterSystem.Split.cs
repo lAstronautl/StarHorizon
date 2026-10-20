@@ -110,6 +110,11 @@ public sealed partial class ShipCutterSystem
             }
         }
 
+        // Like the engine does when it splits a grid: tell content before the old tiles are cleared, so decals move
+        // to the new grid and it joins the station of the old one.
+        var postSplit = new PostGridSplitEvent(oldUid, newGrid.Owner);
+        RaiseLocalEvent(oldUid, ref postSplit, true);
+
         MapSystem.SetTiles(oldUid, oldGrid, emptyTiles);
 
         _cuts.MoveCuts(oldUid, oldCuts, newGrid.Owner, moved);
