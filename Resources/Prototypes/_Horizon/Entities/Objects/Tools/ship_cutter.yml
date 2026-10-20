@@ -1,13 +1,22 @@
-# Shipbreaking cutter. A welder: it has to be lit and every cut burns fuel (refuel it at a welding tank).
+# Shipbreaking cutter. Battery powered (power cell slot), not a welder.
 # Click a wall to cut it loose (then move it with a gravity gun), click the seam between two floor tiles to cut
 # a slit along it: the slit leaks air, shows as a gap, and a part with no connections left breaks off into its own grid.
+# Every click queues a target and the user works through the queue; use it in hand to drop the queue.
 # A ghost of the cut is shown under the cursor while it is held. Sprite is a placeholder (welder).
 - type: entity
   id: ShipCutter
-  parent: Welder
+  parent:
+  - BaseItem
+  - PowerCellSlotMediumItem
   name: ship cutter
-  description: A heavy plasma cutter for taking ships apart. Light it, then cut a wall loose or click the seam between two floor tiles to cut along it.
+  description: A heavy battery powered plasma cutter for taking ships apart. Click walls and seams to queue cuts, and it works through them one by one.
   components:
+  - type: Item
+    size: Normal
+  - type: Sprite
+    sprite: Objects/Tools/welder.rsi
+    layers:
+    - state: icon
   - type: ShipCutter
     wallWhitelist:
       tags:

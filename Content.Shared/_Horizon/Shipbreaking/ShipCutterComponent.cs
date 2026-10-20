@@ -8,10 +8,12 @@ using Robust.Shared.Serialization;
 namespace Content.Shared._Horizon.Shipbreaking;
 
 /// <summary>
-/// A cutter for shipbreaking. Using it on a wall cuts the wall loose so it can be moved with a gravity gun.
-/// Using it on the seam between two floor tiles cuts a slit along it (see <see cref="GridCutsComponent"/>).
+/// A battery powered cutter for shipbreaking. Clicking a wall cuts it loose so it can be moved with a gravity gun,
+/// clicking the seam between two floor tiles cuts a slit along it (see <see cref="GridCutsComponent"/>).
+/// Every click adds a target to a queue and the user works through the queue one target at a time without
+/// having to start each cut again.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
 public sealed partial class ShipCutterComponent : Component
 {
     /// <summary>
@@ -27,16 +29,16 @@ public sealed partial class ShipCutterComponent : Component
     public float TileDelay = 3f;
 
     /// <summary>
-    /// Fuel taken from the cutter (it is a welder) for cutting a wall loose.
+    /// Charge taken from the power cell for cutting a wall loose.
     /// </summary>
     [DataField]
-    public float WallFuel = 3f;
+    public float WallCharge = 40f;
 
     /// <summary>
-    /// Fuel taken from the cutter (it is a welder) for one cut between tiles.
+    /// Charge taken from the power cell for one cut between tiles.
     /// </summary>
     [DataField]
-    public float TileFuel = 2f;
+    public float TileCharge = 25f;
 
     /// <summary>
     /// How close to a tile edge the click has to be to count as a click on the seam, in tiles.
@@ -45,31 +47,67 @@ public sealed partial class ShipCutterComponent : Component
     public float EdgeTolerance = 0.15f;
 
     /// <summary>
-    /// Played when the cutting starts. When it finishes the usual tool sound of the cutter plays.
+    /// How many targets can wait in the queue.
+    /// </summary>
+    [DataField]
+    public int MaxQueue = 20;
+
+    /// <summary>
+    /// Played when a cut starts.
     /// </summary>
     [DataField]
     public SoundSpecifier? Sound = new SoundPathSpecifier("/Audio/Items/welder.ogg");
+
+    /// <summary>
+    /// Played when a cut is done.
+    /// </summary>
+    [DataField]
+    public SoundSpecifier? DoneSound = new SoundPathSpecifier("/Audio/Items/welder2.ogg");
+
+    /// <summary>
+    /// What is waiting to be cut, in the order it was picked. The first one is being cut.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public List<ShipCutterTarget> Queue = new();
+
+    /// <summary>
+    /// Whether a cut is in progress.
+    /// </summary>
+    [ViewVariables]
+    public bool Working;
+
+    [ViewVariables]
+    public DoAfterId? ActiveDoAfter;
+}
+
+/// <summary>
+/// One thing to cut: a wall, or an edge of a tile on a grid.
+/// </summary>
+[Serializable, NetSerializable]
+public readonly record struct ShipCutterTarget(NetEntity Entity, Vector2i Tile, CutEdges Edge)
+{
+    /// <summary>
+    /// A wall is a target without an edge, the entity is the wall. For a seam the entity is the grid.
+    /// </summary>
+    public bool IsWall => Edge == CutEdges.None;
+
+    public static ShipCutterTarget Wall(NetEntity wall) => new(wall, default, CutEdges.None);
+
+    public static ShipCutterTarget Seam(NetEntity grid, Vector2i tile, CutEdges edge) => new(grid, tile, edge);
 }
 
 [Serializable, NetSerializable]
-public sealed partial class ShipCutterWallDoAfterEvent : SimpleDoAfterEvent;
-
-[Serializable, NetSerializable]
-public sealed partial class ShipCutterTileDoAfterEvent : DoAfterEvent
+public sealed partial class ShipCutterDoAfterEvent : DoAfterEvent
 {
-    public NetEntity Grid;
-    public Vector2i Tile;
-    public CutEdges Edge;
+    public ShipCutterTarget Cut;
 
-    private ShipCutterTileDoAfterEvent()
+    private ShipCutterDoAfterEvent()
     {
     }
 
-    public ShipCutterTileDoAfterEvent(NetEntity grid, Vector2i tile, CutEdges edge)
+    public ShipCutterDoAfterEvent(ShipCutterTarget cut)
     {
-        Grid = grid;
-        Tile = tile;
-        Edge = edge;
+        Cut = cut;
     }
 
     public override DoAfterEvent Clone() => this;

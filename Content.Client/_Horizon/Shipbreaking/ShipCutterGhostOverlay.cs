@@ -18,6 +18,7 @@ public sealed class ShipCutterGhostOverlay : Overlay
 {
     private static readonly Color ValidColor = Color.Lime.WithAlpha(0.7f);
     private static readonly Color InvalidColor = Color.Red.WithAlpha(0.6f);
+    private static readonly Color QueuedColor = Color.Yellow.WithAlpha(0.6f);
 
     // The ghost is drawn a bit wider than the cut itself, so it can be seen.
     private const float GhostWidthPixels = GridCutsComponent.CutWidthPixels * 2f;
@@ -54,6 +55,9 @@ public sealed class ShipCutterGhostOverlay : Overlay
         if (!cutting && !welding)
             return;
 
+        if (cutting)
+            DrawQueue(args, cutter!);
+
         var mouse = _input.MouseScreenPosition;
         if (!mouse.IsValid)
             return;
@@ -86,6 +90,38 @@ public sealed class ShipCutterGhostOverlay : Overlay
         var handle = args.WorldHandle;
         handle.SetTransform(_transform.GetWorldMatrix(gridUid));
         handle.DrawRect(edge.GetRect(tile, grid.TileSize, half), valid ? ValidColor : InvalidColor);
+        handle.SetTransform(Matrix3x2.Identity);
+    }
+
+    /// <summary>
+    /// Marks what is waiting in the queue of the cutter: a frame around a wall, a strip along a seam.
+    /// </summary>
+    private void DrawQueue(in OverlayDrawArgs args, ShipCutterComponent cutter)
+    {
+        var handle = args.WorldHandle;
+
+        foreach (var target in cutter.Queue)
+        {
+            if (!_entManager.TryGetEntity(target.Entity, out var uid) ||
+                !_entManager.TryGetComponent(uid, out TransformComponent? xform) ||
+                xform.MapID != args.MapId)
+                continue;
+
+            handle.SetTransform(_transform.GetWorldMatrix(xform));
+
+            if (target.IsWall)
+            {
+                handle.DrawRect(Box2.CenteredAround(Vector2.Zero, Vector2.One), QueuedColor, filled: false);
+                continue;
+            }
+
+            if (!_entManager.TryGetComponent(uid, out MapGridComponent? grid))
+                continue;
+
+            var half = GhostWidthPixels / 32f / 2f * grid.TileSize;
+            handle.DrawRect(target.Edge.GetRect(target.Tile, grid.TileSize, half), QueuedColor);
+        }
+
         handle.SetTransform(Matrix3x2.Identity);
     }
 }
