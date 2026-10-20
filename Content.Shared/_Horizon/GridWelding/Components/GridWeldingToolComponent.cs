@@ -1,4 +1,5 @@
 using Content.Shared._Horizon.GridWelding.Systems;
+using Content.Shared._Horizon.Shipbreaking;
 using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
 using Robust.Shared.Maths;
@@ -32,6 +33,12 @@ public sealed partial class GridWeldingToolComponent : Component
     /// </summary>
     [DataField, AutoNetworkedField]
     public Vector2i PendingTile;
+
+    /// <summary>
+    /// The edge of <see cref="PendingTile"/> that is to be joined.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public CutEdges PendingEdge;
 
     /// <summary>
     /// When the pending first selection expires if a second point isn't picked in time.
@@ -71,16 +78,23 @@ public sealed partial class GridWeldingToolComponent : Component
 
     /// <summary>
     /// How far apart (in world meters) the two selected tiles' facing edges are allowed to be for
-    /// a weld to be attempted. 8px at the standard 32px-per-tile scale.
+    /// a weld to be attempted. 16px (half a tile) at the standard 32px-per-tile scale: the grids snap onto each other's tile grid.
     /// </summary>
     [DataField]
-    public float TileProximityTolerance = 8f / 32f;
+    public float TileProximityTolerance = 16f / 32f;
 
     /// <summary>
     /// How far off a clean 90-degree snap the two grids' relative rotation is allowed to be.
     /// </summary>
     [DataField]
-    public Angle RotationSnapTolerance = Angle.FromDegrees(5);
+    public Angle RotationSnapTolerance = Angle.FromDegrees(10);
+
+    /// <summary>
+    /// How close to a tile edge a click has to be to pick that edge for welding, in tiles. Half a tile always picks the
+    /// nearest edge of the clicked tile.
+    /// </summary>
+    [DataField]
+    public float EdgeSelectTolerance = 0.5f;
 
     /// <summary>
     /// How close to a cut seam between two tiles a click has to be to weld it shut, in tiles.

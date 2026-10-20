@@ -79,11 +79,16 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
             return;
         }
 
+        // Welding two grids joins an edge of one with an edge of the other: the click picks the nearest edge of the tile.
+        if (!_cutter.TryGetSeam(clickCoords, comp.EdgeSelectTolerance, out _, out _, out _, out var edge))
+            return;
+
         if (!comp.HasPendingSelection || comp.PendingSelectionExpiry is not { } expiry || _timing.CurTime > expiry)
         {
             comp.HasPendingSelection = true;
             comp.PendingGrid = GetNetEntity(gridUid);
             comp.PendingTile = tile;
+            comp.PendingEdge = edge;
             comp.PendingSelectionExpiry = _timing.CurTime + comp.SelectionTimeout;
             Dirty(ent);
             _popup.PopupEntity(Loc.GetString("grid-welding-first-point-selected"), ent, args.User, PopupType.Medium);
@@ -92,13 +97,14 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
 
         var gridA = GetEntity(comp.PendingGrid!.Value);
         var tileA = comp.PendingTile;
+        var edgeA = comp.PendingEdge;
 
         // Clear the pending selection up front - any failure past this point resets it, rather than
         // leaving the tool armed against a target we already know is bad.
         ClearPendingSelection(comp);
         Dirty(ent);
 
-        if (!TryValidateWeld(comp, args.User, gridA, tileA, gridUid, tile, out var offset, out var rotation, out var errorKey))
+        if (!TryValidateWeld(comp, args.User, gridA, tileA, edgeA, gridUid, tile, edge, out _, out _, out var errorKey))
         {
             if (errorKey != null)
                 _popup.PopupEntity(Loc.GetString(errorKey), ent, args.User, PopupType.SmallCaution);
@@ -106,7 +112,7 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
             return;
         }
 
-        var ev = new GridWeldMergeDoAfterEvent(GetNetEntity(gridA), tileA, GetNetEntity(gridUid), tile);
+        var ev = new GridWeldMergeDoAfterEvent(GetNetEntity(gridA), tileA, edgeA, GetNetEntity(gridUid), tile, edge);
         // The tool is the target, so the finished do-after is raised on it (a null target would broadcast it).
         _tool.UseTool(ent, args.User, ent, (float) comp.WeldMergeDelay.TotalSeconds, "Welding", ev, comp.MergeFuelCost);
     }
@@ -128,7 +134,7 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
         var gridAUid = GetEntity(args.GridA);
         var gridBUid = GetEntity(args.GridB);
 
-        if (!TryValidateWeld(ent.Comp, args.User, gridAUid, args.TileA, gridBUid, args.TileB, out var offset, out var rotation, out var errorKey))
+        if (!TryValidateWeld(ent.Comp, args.User, gridAUid, args.TileA, args.EdgeA, gridBUid, args.TileB, args.EdgeB, out var offset, out var rotation, out var errorKey))
         {
             if (errorKey != null)
                 _popup.PopupEntity(Loc.GetString(errorKey), ent, args.User, PopupType.SmallCaution);
@@ -195,6 +201,7 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
     {
         comp.HasPendingSelection = false;
         comp.PendingGrid = null;
+        comp.PendingEdge = CutEdges.None;
         comp.PendingSelectionExpiry = null;
     }
 }

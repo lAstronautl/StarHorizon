@@ -1,4 +1,4 @@
-grid-welding-first-point-selected = Вы отмечаете эту точку для сварки.
+grid-welding-first-point-selected = Вы отметили этот край. Теперь выберите край другого корпуса, с которым его соединить.
 grid-welding-selection-expired = Метка угасла - заварите эту точку снова.
 grid-welding-same-grid = Нельзя сварить грид с самим собой!
 grid-welding-no-tile = Здесь нет корпуса для сварки.

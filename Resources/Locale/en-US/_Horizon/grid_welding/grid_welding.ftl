@@ -1,4 +1,4 @@
-grid-welding-first-point-selected = You mark this point for welding.
+grid-welding-first-point-selected = You mark this edge. Now pick the edge of the other hull to join it to.
 grid-welding-selection-expired = Your mark has faded - weld this point again.
 grid-welding-same-grid = You can't weld a grid to itself!
 grid-welding-no-tile = There's no hull here to weld.

@@ -1,4 +1,5 @@
 using System.Numerics;
+using Content.Shared._Horizon.Shipbreaking;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 
@@ -20,6 +21,8 @@ public abstract class SharedGridWeldingSystem : EntitySystem
     /// to be welded together, and if so, the offset+rotation <see cref="Robust.Server.Physics.GridFixtureSystem.Merge"/>
     /// needs to make <paramref name="tileB"/> land immediately adjacent to <paramref name="tileA"/>.
     /// </summary>
+    /// <param name="edgeA">The edge of <paramref name="tileA"/> that is to be joined.</param>
+    /// <param name="edgeB">The edge of <paramref name="tileB"/> that is to be joined. It has to face <paramref name="edgeA"/>.</param>
     /// <param name="proximityTolerance">Maximum allowed gap/overlap at the shared edge, in world meters.</param>
     /// <param name="rotationTolerance">Maximum allowed deviation from a clean 90-degree snap.</param>
     /// <param name="offset">Grid-A-local tile offset to pass into <c>Merge</c>.</param>
@@ -31,10 +34,12 @@ public abstract class SharedGridWeldingSystem : EntitySystem
         MapGridComponent gridA,
         TransformComponent xformA,
         Vector2i tileA,
+        CutEdges edgeA,
         EntityUid gridBUid,
         MapGridComponent gridB,
         TransformComponent xformB,
         Vector2i tileB,
+        CutEdges edgeB,
         float proximityTolerance,
         Angle rotationTolerance,
         out Vector2i offset,
@@ -69,33 +74,28 @@ public abstract class SharedGridWeldingSystem : EntitySystem
 
         rotation = snappedAngle;
 
+        // The edge of B that is picked has to face back at the edge of A once B is turned into A's frame.
+        var direction = edgeA.Offset();
+        var rotatedEdge = rotation.RotateVec(new Vector2(edgeB.Offset().X, edgeB.Offset().Y));
+        var facing = new Vector2i((int) MathF.Round(rotatedEdge.X), (int) MathF.Round(rotatedEdge.Y));
+        if (direction == Vector2i.Zero || facing != new Vector2i(-direction.X, -direction.Y))
+        {
+            errorKey = "grid-welding-not-facing";
+            return false;
+        }
+
         var tileCenterA = _map.GridTileToWorldPos(gridAUid, gridA, tileA);
         var tileCenterB = _map.GridTileToWorldPos(gridBUid, gridB, tileB);
         var delta = tileCenterB - tileCenterA;
 
-        // Express the gap between the two tiles in grid A's own local orientation, so we can read
-        // off which cardinal direction (in A's frame) grid B is sitting in.
+        // Express the gap between the two tiles in grid A's own local orientation. B has to sit one tile
+        // ahead of the picked edge of A, and in line with it.
         var localDelta = (-worldRotA).RotateVec(delta);
-
         var tileSize = gridA.TileSize;
-        Vector2i direction;
-        float axial;
-        float lateral;
+        var axial = direction.X != 0 ? localDelta.X * direction.X : localDelta.Y * direction.Y;
+        var lateral = direction.X != 0 ? localDelta.Y : localDelta.X;
 
-        if (Math.Abs(localDelta.X) >= Math.Abs(localDelta.Y))
-        {
-            direction = localDelta.X >= 0 ? new Vector2i(1, 0) : new Vector2i(-1, 0);
-            axial = localDelta.X;
-            lateral = localDelta.Y;
-        }
-        else
-        {
-            direction = localDelta.Y >= 0 ? new Vector2i(0, 1) : new Vector2i(0, -1);
-            axial = localDelta.Y;
-            lateral = localDelta.X;
-        }
-
-        if (Math.Abs(Math.Abs(axial) - tileSize) > proximityTolerance)
+        if (Math.Abs(axial - tileSize) > proximityTolerance)
         {
             errorKey = "grid-welding-too-far";
             return false;
