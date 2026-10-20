@@ -1,3 +1,4 @@
+using Content.Shared._NF.Bank.Components;
 using Content.Shared.Maps;
 using Content.Shared.Whitelist;
 using Robust.Shared.Audio;
@@ -51,10 +52,16 @@ public sealed partial class TileReclaimerComponent : Component
     public Box2 RecyclingBox = new(-0.5f, 0.5f, 0.5f, 1.5f);
 
     /// <summary>
-    /// Multiplier for the material being extracted from the tile, as defined in the tile's <see cref="ContentTileDefinition.MaterialComposition"/>
+    /// Multiplier for the value being extracted from the tile, as defined in the tile's <see cref="ContentTileDefinition.MaterialComposition"/>
     /// </summary>
     [DataField, AutoNetworkedField]
     public float Efficiency = 1f;
+
+    /// <summary>
+    /// The bank account that receives the money for reclaimed tiles.
+    /// </summary>
+    [DataField]
+    public SectorBankAccount Account = SectorBankAccount.Frontier;
 
     /// <summary>
     /// How strong impulse the reclaimer should apply to a grid after it has destroyed one of its tiles.

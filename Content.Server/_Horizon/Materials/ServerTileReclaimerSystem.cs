@@ -1,45 +1,37 @@
-using Content.Server.Materials;
-using Content.Server.Stack;
+using Content.Server._NF.Bank;
 using Content.Shared._Horizon.Materials;
+using Content.Shared._NF.Bank.BUI;
 using Content.Shared.Maps;
 using Content.Shared.Materials;
+using Robust.Shared.Prototypes;
 
 namespace Content.Server._Horizon.Materials;
 
 /// <summary>
-/// Server side of <see cref="TileReclaimerSystem"/>: puts the tile materials into the reclaimer's storage and ejects them as stacks.
+/// Server side of <see cref="TileReclaimerSystem"/>: pays the station bank account for the materials
+/// a reclaimed tile is made of, instead of producing the materials themselves.
 /// </summary>
 public sealed class ServerTileReclaimerSystem : TileReclaimerSystem
 {
-    [Dependency] private readonly MaterialStorageSystem _materialStorage = default!;
-    [Dependency] private readonly StackSystem _stack = default!;
+    [Dependency] private readonly BankSystem _bank = default!;
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
 
     protected override void SpawnMaterialsFromComposition(Entity<MaterialStorageComponent?, TransformComponent?> ent,
         ContentTileDefinition tileDefinition,
         float efficiency)
     {
-        var (uid, storage, xform) = ent;
-        if (!Resolve(uid, ref storage, ref xform, false))
+        if (!TryComp<TileReclaimerComponent>(ent, out var reclaimer))
             return;
 
+        var value = 0.0;
         foreach (var (material, amount) in tileDefinition.MaterialComposition)
         {
-            var outputAmount = (int) (amount * efficiency);
-            _materialStorage.TryChangeMaterialAmount(uid, material, outputAmount, storage);
+            if (_prototype.TryIndex<MaterialPrototype>(material, out var proto))
+                value += proto.Price * amount;
         }
 
-        foreach (var (storedMaterial, storedAmount) in storage.Storage)
-        {
-            var stacks = _materialStorage.SpawnMultipleFromMaterial(storedAmount,
-                storedMaterial,
-                xform.Coordinates,
-                out var materialOverflow);
-            var amountConsumed = storedAmount - materialOverflow;
-            _materialStorage.TryChangeMaterialAmount(uid, storedMaterial, -amountConsumed, storage);
-            foreach (var stack in stacks)
-            {
-                _stack.TryMergeToContacts(stack);
-            }
-        }
+        var payout = (int) (value * efficiency);
+        if (payout > 0)
+            _bank.TrySectorDeposit(reclaimer.Account, payout, LedgerEntryType.StationDepositAssetsSold);
     }
 }
