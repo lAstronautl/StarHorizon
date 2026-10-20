@@ -262,14 +262,33 @@ public static class PixelPlanetPalettes
         shader.SetParameter("ring_c4", c[7]);
     }
 
-    public static void ApplyPlanet(ShaderInstance shader, PixelPlanetKind kind, byte paletteIndex)
+    public static Vector3[] GetPalette(PixelPlanetKind kind, byte paletteIndex)
     {
         var i = ClampIndex(paletteIndex);
+        return kind switch
+        {
+            PixelPlanetKind.LandRivers => LandRivers[i],
+            PixelPlanetKind.TerranDry => TerranDry[i],
+            PixelPlanetKind.LandMasses => LandMasses[i],
+            PixelPlanetKind.NoAtmosphere => NoAtmosphere[i],
+            PixelPlanetKind.GasPlanet => GasPlanet[i],
+            PixelPlanetKind.GasPlanetLayers => GasPlanet[i],
+            PixelPlanetKind.IceWorld => IceWorld[i],
+            PixelPlanetKind.LavaWorld => LavaWorld[i],
+            _ => LandRivers[i],
+        };
+    }
+
+    public static void ApplyPlanet(ShaderInstance shader, PixelPlanetKind kind, byte paletteIndex)
+        => ApplyPlanetColors(shader, kind, GetPalette(kind, paletteIndex));
+
+    /// <summary>Palette slot layout is the one used by the built-in tables (see <see cref="GetPalette"/>).</summary>
+    public static void ApplyPlanetColors(ShaderInstance shader, PixelPlanetKind kind, Vector3[] c)
+    {
         switch (kind)
         {
             case PixelPlanetKind.LandRivers:
                 {
-                    var c = LandRivers[i];
                     shader.SetParameter("color0", c[0]);
                     shader.SetParameter("color1", c[1]);
                     shader.SetParameter("color2", c[2]);
@@ -284,7 +303,6 @@ public static class PixelPlanetPalettes
                 }
             case PixelPlanetKind.TerranDry:
                 {
-                    var c = TerranDry[i];
                     shader.SetParameter("color0", c[0]);
                     shader.SetParameter("color1", c[1]);
                     shader.SetParameter("color2", c[2]);
@@ -294,7 +312,6 @@ public static class PixelPlanetPalettes
                 }
             case PixelPlanetKind.LandMasses:
                 {
-                    var c = LandMasses[i];
                     shader.SetParameter("color0", c[0]);
                     shader.SetParameter("color1", c[1]);
                     shader.SetParameter("color2", c[2]);
@@ -309,7 +326,6 @@ public static class PixelPlanetPalettes
                 }
             case PixelPlanetKind.NoAtmosphere:
                 {
-                    var c = NoAtmosphere[i];
                     shader.SetParameter("color0", c[0]);
                     shader.SetParameter("color1", c[1]);
                     shader.SetParameter("color2", c[2]);
@@ -319,7 +335,6 @@ public static class PixelPlanetPalettes
                 }
             case PixelPlanetKind.GasPlanet:
                 {
-                    var c = GasPlanet[i];
                     shader.SetParameter("inner_color0", c[0]);
                     shader.SetParameter("inner_color1", c[1]);
                     shader.SetParameter("inner_color2", c[2]);
@@ -332,7 +347,6 @@ public static class PixelPlanetPalettes
                 }
             case PixelPlanetKind.GasPlanetLayers:
                 {
-                    var c = GasPlanet[i];
                     shader.SetParameter("color0", c[4]);
                     shader.SetParameter("color1", c[5]);
                     shader.SetParameter("color2", c[6]);
@@ -343,7 +357,6 @@ public static class PixelPlanetPalettes
                 }
             case PixelPlanetKind.IceWorld:
                 {
-                    var c = IceWorld[i];
                     shader.SetParameter("color0", c[0]);
                     shader.SetParameter("color1", c[1]);
                     shader.SetParameter("color2", c[2]);
@@ -358,7 +371,6 @@ public static class PixelPlanetPalettes
                 }
             case PixelPlanetKind.LavaWorld:
                 {
-                    var c = LavaWorld[i];
                     shader.SetParameter("color0", c[0]);
                     shader.SetParameter("color1", c[1]);
                     shader.SetParameter("color2", c[2]);
