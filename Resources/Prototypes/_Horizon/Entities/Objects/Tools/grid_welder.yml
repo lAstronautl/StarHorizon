@@ -1,7 +1,0 @@
-- type: entity
-  name: hull splicing torch
-  parent: WelderIndustrial
-  id: GridWeldingTorch
-  description: A heavy-duty welding torch for splicing two separate hulls into one, and sealing the seam between them afterwards.
-  components:
-  - type: GridWeldingTool

@@ -13,7 +13,7 @@ namespace Content.Shared._Horizon.GridWelding.Components;
 /// </summary>
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
 [Access(typeof(SharedGridWeldingSystem))]
-public sealed partial class GridWeldingToolComponent : Component
+public sealed partial class SeamWelderComponent : Component
 {
     /// <summary>
     /// Whether the player has already picked a first point (on some grid) and is now waiting on

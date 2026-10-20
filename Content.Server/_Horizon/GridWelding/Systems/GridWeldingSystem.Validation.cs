@@ -19,7 +19,7 @@ public sealed partial class GridWeldingSystem
     /// move/change during the DoAfter.
     /// </summary>
     private bool TryValidateWeld(
-        GridWeldingToolComponent comp,
+        SeamWelderComponent comp,
         EntityUid user,
         EntityUid gridAUid,
         Vector2i tileA,

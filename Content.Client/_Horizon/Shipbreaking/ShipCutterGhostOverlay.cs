@@ -16,7 +16,7 @@ namespace Content.Client._Horizon.Shipbreaking;
 /// <summary>
 /// While a <see cref="ShipCutterComponent"/> is held, shows where a click would cut, the way the entity
 /// placement ghost works in the admin spawn menu: green where a cut can be made, red where it can not.
-/// While a <see cref="GridWeldingToolComponent"/> is held, shows the cut that would be welded shut, or the edge
+/// While a <see cref="SeamWelderComponent"/> is held, shows the cut that would be welded shut, or the edge
 /// that a click picks for joining two grids, the edge already picked, and whether the two can be joined.
 /// </summary>
 public sealed class ShipCutterGhostOverlay : Overlay
@@ -76,7 +76,7 @@ public sealed class ShipCutterGhostOverlay : Overlay
             if (_cutter.TryGetSeam(mapPos, cutter.EdgeTolerance, out var gridUid, out var grid, out var tile, out var edge))
                 DrawEdge(handle, gridUid, grid, tile, edge, _cutter.CanCut(gridUid, grid, tile, edge) ? ValidColor : InvalidColor);
         }
-        else if (_entManager.TryGetComponent(held, out GridWeldingToolComponent? welder))
+        else if (_entManager.TryGetComponent(held, out SeamWelderComponent? welder))
         {
             DrawWelding(handle, welder, mapPos);
         }
@@ -84,7 +84,7 @@ public sealed class ShipCutterGhostOverlay : Overlay
         handle.SetTransform(Matrix3x2.Identity);
     }
 
-    private void DrawWelding(DrawingHandleWorld handle, GridWeldingToolComponent welder, MapCoordinates mapPos)
+    private void DrawWelding(DrawingHandleWorld handle, SeamWelderComponent welder, MapCoordinates mapPos)
     {
         // A cut under the cursor is what a click would weld shut.
         if (_cutter.TryGetSeam(mapPos, welder.SeamTolerance, out var sealGrid, out var sealGridComp, out var sealTile, out var sealEdge) &&

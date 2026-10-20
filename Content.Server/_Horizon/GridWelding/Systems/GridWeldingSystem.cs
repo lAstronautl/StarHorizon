@@ -42,12 +42,12 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
     {
         base.Initialize();
 
-        SubscribeLocalEvent<GridWeldingToolComponent, AfterInteractEvent>(OnAfterInteract);
-        SubscribeLocalEvent<GridWeldingToolComponent, GridWeldMergeDoAfterEvent>(OnMergeDoAfter);
-        SubscribeLocalEvent<GridWeldingToolComponent, GridWeldSealDoAfterEvent>(OnSealDoAfter);
+        SubscribeLocalEvent<SeamWelderComponent, AfterInteractEvent>(OnAfterInteract);
+        SubscribeLocalEvent<SeamWelderComponent, GridWeldMergeDoAfterEvent>(OnMergeDoAfter);
+        SubscribeLocalEvent<SeamWelderComponent, GridWeldSealDoAfterEvent>(OnSealDoAfter);
     }
 
-    private void OnAfterInteract(Entity<GridWeldingToolComponent> ent, ref AfterInteractEvent args)
+    private void OnAfterInteract(Entity<SeamWelderComponent> ent, ref AfterInteractEvent args)
     {
         if (args.Handled || !args.CanReach)
             return;
@@ -126,14 +126,14 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
         _tool.UseTool(ent, args.User, ent, (float) comp.WeldMergeDelay.TotalSeconds, "Welding", ev, comp.MergeFuelCost);
     }
 
-    private void StartSeal(Entity<GridWeldingToolComponent> ent, EntityUid user, EntityUid gridUid, Vector2i tile, CutEdges edge, GridWeldingToolComponent comp)
+    private void StartSeal(Entity<SeamWelderComponent> ent, EntityUid user, EntityUid gridUid, Vector2i tile, CutEdges edge, SeamWelderComponent comp)
     {
         _popup.PopupEntity(Loc.GetString("grid-welding-sealing-seam"), ent, user, PopupType.Medium);
         var ev = new GridWeldSealDoAfterEvent(GetNetEntity(gridUid), tile, edge);
         _tool.UseTool(ent, user, ent, (float) comp.WeldSealDelay.TotalSeconds, "Welding", ev, comp.SealFuelCost);
     }
 
-    private void OnMergeDoAfter(Entity<GridWeldingToolComponent> ent, ref GridWeldMergeDoAfterEvent args)
+    private void OnMergeDoAfter(Entity<SeamWelderComponent> ent, ref GridWeldMergeDoAfterEvent args)
     {
         if (args.Cancelled || args.Handled)
             return;
@@ -202,7 +202,7 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
         ApplyMergeSeams(gridAUid, gridA, gridAFootprint, gridBTiles, gridBCuts, offset, rotation, tileA, tileB);
     }
 
-    private void OnSealDoAfter(Entity<GridWeldingToolComponent> ent, ref GridWeldSealDoAfterEvent args)
+    private void OnSealDoAfter(Entity<SeamWelderComponent> ent, ref GridWeldSealDoAfterEvent args)
     {
         if (args.Cancelled || args.Handled)
             return;
@@ -227,7 +227,7 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
             $"{ToPrettyString(args.User):player} welded a seam shut on {ToPrettyString(gridUid):grid}");
     }
 
-    private static void ClearPendingSelection(GridWeldingToolComponent comp)
+    private static void ClearPendingSelection(SeamWelderComponent comp)
     {
         comp.HasPendingSelection = false;
         comp.PendingGrid = null;
