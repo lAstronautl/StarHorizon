@@ -1,8 +1,8 @@
-ent-IndustrialSmelter = промышленная плавильня
-    .desc = Огромная машина, которая затягивает гриды и переплавляет их тайлы в материалы.
-ent-IndustrialSmelterAdmeme = { ent-IndustrialSmelter }
-    .desc = { ent-IndustrialSmelter.desc }
+ent-ShipbreakingFurnace = печь
+    .desc = Сжигает плитку, поданную конвейером, и платит станции деньги.
 ent-ShipbreakingProcessor = процессор лома
-    .desc = Измельчает обломки стен, поданные конвейером, и платит станции деньги.
+    .desc = Затягивает гриды шаттлов, перерабатывает их тайлы и скупает стены, платя станции.
+ent-ShipbreakingProcessorAdmeme = { ent-ShipbreakingProcessor }
+    .desc = { ent-ShipbreakingProcessor.desc }
 ent-ShipbreakingBarge = баржа
     .desc = Принимает мебель, поданную конвейером, и платит станции деньги.

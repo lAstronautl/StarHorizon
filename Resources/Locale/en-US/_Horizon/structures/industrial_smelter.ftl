@@ -1,8 +1,8 @@
-ent-IndustrialSmelter = industrial smelter
-    .desc = A huge machine that pulls in grids and melts their tiles down into materials.
-ent-IndustrialSmelterAdmeme = { ent-IndustrialSmelter }
-    .desc = { ent-IndustrialSmelter.desc }
+ent-ShipbreakingFurnace = furnace
+    .desc = Burns loose floor tiles fed in by conveyors and pays the station for them.
 ent-ShipbreakingProcessor = shipbreaking processor
-    .desc = Shreds wall scrap fed in by conveyors and pays the station for it.
+    .desc = Pulls in shuttle grids, shreds their tiles and buys loose walls, paying the station.
+ent-ShipbreakingProcessorAdmeme = { ent-ShipbreakingProcessor }
+    .desc = { ent-ShipbreakingProcessor.desc }
 ent-ShipbreakingBarge = salvage barge
     .desc = Takes furniture fed in by conveyors and pays the station for it.
