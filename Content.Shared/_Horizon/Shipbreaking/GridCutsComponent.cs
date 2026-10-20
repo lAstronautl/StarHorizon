@@ -49,6 +49,45 @@ public static class CutEdgesExtensions
     }
 
     /// <summary>
+    /// The edge that faces the tile at the given offset (one of the four cardinal offsets).
+    /// </summary>
+    public static CutEdges FromOffset(Vector2i offset)
+    {
+        if (offset == new Vector2i(0, 1))
+            return CutEdges.North;
+        if (offset == new Vector2i(1, 0))
+            return CutEdges.East;
+        if (offset == new Vector2i(0, -1))
+            return CutEdges.South;
+        if (offset == new Vector2i(-1, 0))
+            return CutEdges.West;
+
+        return CutEdges.None;
+    }
+
+    // Counter-clockwise order, so a quarter turn moves an edge one step along it.
+    private static readonly CutEdges[] CounterClockwise = { CutEdges.North, CutEdges.West, CutEdges.South, CutEdges.East };
+
+    /// <summary>
+    /// Rotates a set of edges counter-clockwise by the given number of quarter turns.
+    /// </summary>
+    public static CutEdges Rotate(this CutEdges edges, int quarterTurns)
+    {
+        quarterTurns = ((quarterTurns % 4) + 4) % 4;
+        if (quarterTurns == 0 || edges == CutEdges.None)
+            return edges;
+
+        var result = CutEdges.None;
+        for (var i = 0; i < CounterClockwise.Length; i++)
+        {
+            if (edges.HasFlag(CounterClockwise[i]))
+                result |= CounterClockwise[(i + quarterTurns) % 4];
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// The rectangle of a cut along the given edge of a tile, in grid local coordinates.
     /// </summary>
     public static Box2 GetRect(this CutEdges edge, Vector2i tile, float tileSize, float halfWidth)

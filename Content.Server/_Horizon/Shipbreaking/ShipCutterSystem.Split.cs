@@ -100,7 +100,7 @@ public sealed partial class ShipCutterSystem
 
         MapSystem.SetTiles(oldUid, oldGrid, emptyTiles);
 
-        MoveCuts(oldUid, oldCuts, newGrid.Owner, moved);
+        _cuts.MoveCuts(oldUid, oldCuts, newGrid.Owner, moved);
 
         // The piece is loose debris: movable, keeping the momentum of what it was cut from.
         EnsureComp<ShuttleComponent>(newGrid.Owner);
@@ -112,53 +112,5 @@ public sealed partial class ShipCutterSystem
 
         var ev = new GridSplitEvent(new[] { newGrid.Owner }, oldUid);
         RaiseLocalEvent(oldUid, ref ev, true);
-    }
-
-    /// <summary>
-    /// Moves the cuts inside the moved part to the new grid and drops the ones that ran along the split.
-    /// </summary>
-    private void MoveCuts(EntityUid oldUid, GridCutsComponent oldCuts, EntityUid newUid, HashSet<Vector2i> moved)
-    {
-        var newCuts = EnsureComp<GridCutsComponent>(newUid);
-
-        foreach (var indices in moved)
-        {
-            if (!oldCuts.Cuts.Remove(indices, out var flags))
-                continue;
-
-            var kept = CutEdges.None;
-            foreach (var edge in CutEdgesExtensions.All)
-            {
-                if (flags.HasFlag(edge) && moved.Contains(indices + edge.Offset()))
-                    kept |= edge;
-            }
-
-            if (kept != CutEdges.None)
-                newCuts.Cuts[indices] = kept;
-        }
-
-        // The tiles left behind no longer have a neighbour across the split: their cut is now just an open edge.
-        foreach (var indices in moved)
-        {
-            foreach (var edge in CutEdgesExtensions.All)
-            {
-                var neighbor = indices + edge.Offset();
-                if (moved.Contains(neighbor) ||
-                    !oldCuts.Cuts.TryGetValue(neighbor, out var flags) ||
-                    !flags.HasFlag(edge.Opposite()))
-                    continue;
-
-                flags &= ~edge.Opposite();
-                if (flags == CutEdges.None)
-                    oldCuts.Cuts.Remove(neighbor);
-                else
-                    oldCuts.Cuts[neighbor] = flags;
-
-                _atmos.InvalidateTile(oldUid, neighbor);
-            }
-        }
-
-        Dirty(oldUid, oldCuts);
-        Dirty(newUid, newCuts);
     }
 }

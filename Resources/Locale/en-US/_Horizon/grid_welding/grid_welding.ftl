@@ -1,0 +1,16 @@
+grid-welding-first-point-selected = You mark this point for welding.
+grid-welding-selection-expired = Your mark has faded - weld this point again.
+grid-welding-same-grid = You can't weld a grid to itself!
+grid-welding-no-tile = There's no hull here to weld.
+grid-welding-invalid-target = You can't weld to that.
+grid-welding-too-far = The hulls are too far apart to weld together!
+grid-welding-not-aligned = The ships aren't lined up squarely enough to weld!
+grid-welding-not-facing = Those points don't actually face each other!
+grid-welding-too-large = The combined hull would be too large to weld!
+grid-welding-obstructed = Something is blocking the hulls from joining there!
+grid-welding-out-of-range = You need to be closer to both points to weld them!
+grid-welding-merge-success = The hulls groan and lock together!
+grid-welding-sealing-seam = You begin sealing the seam.
+grid-welding-seam-sealed = You weld the seam shut.
+grid-welding-hull-fully-sealed = The hull is fully sealed - no more seams remain.
+grid-welding-no-seam = There is no seam here to weld shut.

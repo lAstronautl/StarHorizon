@@ -1,4 +1,5 @@
 using System.Numerics;
+using Content.Shared._Horizon.GridWelding.Components;
 using Content.Shared._Horizon.Shipbreaking;
 using Content.Shared.Hands.EntitySystems;
 using Robust.Client.Graphics;
@@ -44,21 +45,42 @@ public sealed class ShipCutterGhostOverlay : Overlay
 
     protected override void Draw(in OverlayDrawArgs args)
     {
-        if (_player.LocalEntity is not { } player ||
-            !_hands.TryGetActiveItem(player, out var held) ||
-            !_entManager.TryGetComponent(held, out ShipCutterComponent? cutter))
+        if (_player.LocalEntity is not { } player || !_hands.TryGetActiveItem(player, out var held))
+            return;
+
+        // The cutter shows where it would cut; the grid welder shows the cut it would weld shut.
+        var cutting = _entManager.TryGetComponent(held, out ShipCutterComponent? cutter);
+        var welding = !cutting && _entManager.TryGetComponent(held, out GridWeldingToolComponent? welder);
+        if (!cutting && !welding)
             return;
 
         var mouse = _input.MouseScreenPosition;
         if (!mouse.IsValid)
             return;
 
+        var tolerance = cutting
+            ? cutter!.EdgeTolerance
+            : _entManager.GetComponent<GridWeldingToolComponent>(held.Value).SeamTolerance;
+
         var mapPos = _eye.PixelToMap(mouse);
         if (mapPos.MapId != args.MapId ||
-            !_cutter.TryGetSeam(mapPos, cutter.EdgeTolerance, out var gridUid, out var grid, out var tile, out var edge))
+            !_cutter.TryGetSeam(mapPos, tolerance, out var gridUid, out var grid, out var tile, out var edge))
             return;
 
-        var valid = _cutter.CanCut(gridUid, grid, tile, edge);
+        bool valid;
+        if (cutting)
+        {
+            valid = _cutter.CanCut(gridUid, grid, tile, edge);
+        }
+        else
+        {
+            // Nothing to show where there is no cut to weld.
+            if (!_cutter.HasCut(gridUid, tile, edge))
+                return;
+
+            valid = true;
+        }
+
         var half = GhostWidthPixels / 32f / 2f * grid.TileSize;
 
         var handle = args.WorldHandle;

@@ -1,4 +1,3 @@
-using Content.Server.Atmos.EntitySystems;
 using Content.Shared._Horizon.Shipbreaking;
 using Content.Shared.DoAfter;
 using Content.Shared.Interaction;
@@ -21,7 +20,7 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
 {
     private const string CutterQuality = "Welding";
 
-    [Dependency] private readonly AtmosphereSystem _atmos = default!;
+    [Dependency] private readonly GridCutsSystem _cuts = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
@@ -120,17 +119,10 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
 
     private void AddCut(EntityUid gridUid, MapGridComponent grid, Vector2i tile, CutEdges edge)
     {
-        var cuts = EnsureComp<GridCutsComponent>(gridUid);
+        _cuts.AddCut(gridUid, tile, edge);
+
+        // GridCutsComponent exists now.
         var other = tile + edge.Offset();
-
-        cuts.Cuts[tile] = cuts.Cuts.GetValueOrDefault(tile) | edge;
-        cuts.Cuts[other] = cuts.Cuts.GetValueOrDefault(other) | edge.Opposite();
-        Dirty(gridUid, cuts);
-
-        // The tiles on both sides now leak to space, see AtmosphereSystem.UpdateTileData.
-        _atmos.InvalidateTile(gridUid, tile);
-        _atmos.InvalidateTile(gridUid, other);
-
-        TrySplit(gridUid, grid, cuts, tile, other);
+        TrySplit(gridUid, grid, Comp<GridCutsComponent>(gridUid), tile, other);
     }
 }

@@ -49,6 +49,14 @@ public abstract class SharedShipCutterSystem : EntitySystem
     }
 
     /// <summary>
+    /// Whether the given edge of the tile is cut.
+    /// </summary>
+    public bool HasCut(EntityUid gridUid, Vector2i tile, CutEdges edge)
+    {
+        return TryComp<GridCutsComponent>(gridUid, out var cuts) && cuts.Cuts.GetValueOrDefault(tile).HasFlag(edge);
+    }
+
+    /// <summary>
     /// Whether the seam can be cut: both sides have to be floor and the seam must not be cut already.
     /// </summary>
     public bool CanCut(EntityUid gridUid, MapGridComponent grid, Vector2i tile, CutEdges edge)
@@ -57,7 +65,6 @@ public abstract class SharedShipCutterSystem : EntitySystem
             !MapSystem.TryGetTile(grid, tile + edge.Offset(), out var b) || b.IsEmpty)
             return false;
 
-        return !(TryComp<GridCutsComponent>(gridUid, out var cuts) &&
-                 cuts.Cuts.GetValueOrDefault(tile).HasFlag(edge));
+        return !HasCut(gridUid, tile, edge);
     }
 }
