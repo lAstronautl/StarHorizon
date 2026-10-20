@@ -1,12 +1,13 @@
 # Shipbreaking gravity gun. Standalone: does not use the tether/force gun components.
-# Use in hand to switch mode (pull / push / fire). Light loose targets are moved; heavy ones (grids,
-# anchored structures) stay put and move the user instead - fire at a heavy hull and you get thrown back hard.
+# Click to grab a loose item or a whole grid and drag it with the cursor; the mouse wheel holds it further or closer,
+# click again to launch it, use in hand to let go. A target too heavy to move stays put and pulls the user instead -
+# launching at it throws the user back hard.
 # Sprite is a placeholder (tether gun).
 - type: entity
   id: WeaponGravityGun
   parent: BaseItem
   name: gravity gun
-  description: Manipulates gravity to pull, push or launch scrap. Use it on something too heavy and you will be the one who moves.
+  description: Manipulates gravity to move scrap and hulls.
   components:
   - type: Item
     size: Normal

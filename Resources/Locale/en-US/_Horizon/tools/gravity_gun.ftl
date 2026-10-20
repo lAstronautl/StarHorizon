@@ -1,6 +1,7 @@
 ent-WeaponGravityGun = gravity gun
-    .desc = Manipulates gravity to pull, push or launch scrap. Use it on something too heavy and you will be the one who moves.
+    .desc = Manipulates gravity. Click to grab loose scrap or a whole hull and drag it with the cursor, use the mouse wheel to push it away or pull it closer, click again to launch it, use the gun in hand to let go. If the target is too heavy to move, you are the one who moves.
 
-gravity-gun-mode-pull = Mode: pull
-gravity-gun-mode-push = Mode: push
-gravity-gun-mode-fire = Mode: fire
+gravity-gun-grabbed = Grabbed. Wheel: closer / further. Click: launch.
+gravity-gun-heavy = Too heavy to move: it pulls you instead. Wheel: closer / further.
+gravity-gun-released = You let go.
+gravity-gun-nothing = There is nothing to grab there.
