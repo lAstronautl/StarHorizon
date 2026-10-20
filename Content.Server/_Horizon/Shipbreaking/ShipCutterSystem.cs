@@ -139,8 +139,8 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
 
         if (args.Cut.IsWall)
             CutLoose(entity);
-        else if (TryComp<MapGridComponent>(entity, out var grid))
-            AddCut(entity, grid, args.Cut.Tile, args.Cut.Edge);
+        else
+            CutSeam(entity, args.Cut.Tile, args.Cut.Edge);
 
         _audio.PlayPvs(ent.Comp.DoneSound, ent);
     }
@@ -160,8 +160,14 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
         _physics.WakeBody(wall, body: body);
     }
 
-    private void AddCut(EntityUid gridUid, MapGridComponent grid, Vector2i tile, CutEdges edge)
+    /// <summary>
+    /// Cuts the seam and, if that cuts a part of the grid off, splits it into its own grid.
+    /// </summary>
+    public void CutSeam(EntityUid gridUid, Vector2i tile, CutEdges edge)
     {
+        if (!TryComp<MapGridComponent>(gridUid, out var grid))
+            return;
+
         _cuts.AddCut(gridUid, tile, edge);
 
         // GridCutsComponent exists now.

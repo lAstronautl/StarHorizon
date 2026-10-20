@@ -81,33 +81,44 @@ public sealed partial class ShipCutterSystem
         // so local positions stay the same.
         var oldGridXform = Transform(oldUid);
         var newGridXform = Transform(newGrid.Owner);
-        var entities = new HashSet<EntityUid>();
+        // Anchored things are read from the tile itself (cables and pipes have no fixtures, so the lookup could miss them),
+        // loose things from the lookup, and a loose thing belongs to the tile its centre is on.
+        var anchoredEntities = new List<(EntityUid Uid, Vector2i Tile)>();
+        var looseEntities = new HashSet<EntityUid>();
         foreach (var indices in moved)
         {
-            _lookup.GetLocalEntitiesIntersecting(oldUid, indices, entities);
+            foreach (var uid in MapSystem.GetAnchoredEntities(oldUid, oldGrid, indices))
+            {
+                anchoredEntities.Add((uid, indices));
+            }
+
+            _lookup.GetLocalEntitiesIntersecting(oldUid, indices, looseEntities, 0f,
+                LookupFlags.All | ~LookupFlags.Uncontained | LookupFlags.Approximate);
         }
 
-        foreach (var uid in entities)
+        foreach (var (uid, indices) in anchoredEntities)
         {
             var xform = Transform(uid);
-            if (xform.ParentUid != oldUid || HasComp<MapGridComponent>(uid))
+            if (HasComp<MapGridComponent>(uid))
+                continue;
+
+            // Moved the way the engine does when it splits a grid: the entity stays anchored and only gets a
+            // ReAnchorEvent. Unanchoring it would make things react as if it was torn off (a cable would drop
+            // as a coil and delete itself, machines would switch off).
+            ReAnchor(uid, xform, oldGrid, newGrid.Comp, indices, oldUid, newGrid.Owner, oldGridXform, newGridXform);
+        }
+
+        foreach (var uid in looseEntities)
+        {
+            var xform = Transform(uid);
+            if (xform.Anchored || xform.ParentUid != oldUid || HasComp<MapGridComponent>(uid))
                 continue;
 
             var indices = MapSystem.LocalToTile(oldUid, oldGrid, xform.Coordinates);
             if (!moved.Contains(indices))
                 continue;
 
-            if (xform.Anchored)
-            {
-                // Moved the way the engine does when it splits a grid: the entity stays anchored and only gets a
-                // ReAnchorEvent. Unanchoring it would make things react as if it was torn off (a cable would drop
-                // as a coil and delete itself, machines would switch off).
-                ReAnchor(uid, xform, oldGrid, newGrid.Comp, indices, oldUid, newGrid.Owner, oldGridXform, newGridXform);
-            }
-            else
-            {
-                TransformSystem.SetCoordinates(uid, xform, new EntityCoordinates(newGrid.Owner, xform.LocalPosition));
-            }
+            TransformSystem.SetCoordinates(uid, xform, new EntityCoordinates(newGrid.Owner, xform.LocalPosition));
         }
 
         // Like the engine does when it splits a grid: tell content before the old tiles are cleared, so decals move

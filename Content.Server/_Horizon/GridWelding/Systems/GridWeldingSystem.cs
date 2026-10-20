@@ -151,6 +151,21 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
             return;
         }
 
+        MergeGrids(gridAUid, gridBUid, offset, rotation, args.TileA, args.TileB);
+
+        _popup.PopupEntity(Loc.GetString("grid-welding-merge-success"), ent, args.User, PopupType.Medium);
+        _audio.PlayPvs(ent.Comp.WeldSound, ent);
+
+        _adminLogger.Add(LogType.Construction, LogImpact.High,
+            $"{ToPrettyString(args.User):player} welded {ToPrettyString(gridBUid):grid} into {ToPrettyString(gridAUid):grid}");
+    }
+
+    /// <summary>
+    /// Merges grid B into grid A at the given offset and rotation (from <see cref="TryValidateWeld"/>). Every border
+    /// between the two grids, besides the welded pair of tiles, is left as a cut that has to be welded shut.
+    /// </summary>
+    public void MergeGrids(EntityUid gridAUid, EntityUid gridBUid, Vector2i offset, Angle rotation, Vector2i tileA, Vector2i tileB)
+    {
         var gridA = Comp<MapGridComponent>(gridAUid);
         var gridB = Comp<MapGridComponent>(gridBUid);
         var xformA = Transform(gridAUid);
@@ -184,13 +199,7 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
         // The generators of grid B now stand on grid A, which has to count them.
         _gridGravity.AfterMerge(gridAUid, bInherentGravity, bGravityEnabled);
 
-        ApplyMergeSeams(gridAUid, gridA, gridAFootprint, gridBTiles, gridBCuts, offset, rotation, args.TileA, args.TileB);
-
-        _popup.PopupEntity(Loc.GetString("grid-welding-merge-success"), ent, args.User, PopupType.Medium);
-        _audio.PlayPvs(ent.Comp.WeldSound, ent);
-
-        _adminLogger.Add(LogType.Construction, LogImpact.High,
-            $"{ToPrettyString(args.User):player} welded {ToPrettyString(gridBUid):grid} into {ToPrettyString(gridAUid):grid}");
+        ApplyMergeSeams(gridAUid, gridA, gridAFootprint, gridBTiles, gridBCuts, offset, rotation, tileA, tileB);
     }
 
     private void OnSealDoAfter(Entity<GridWeldingToolComponent> ent, ref GridWeldSealDoAfterEvent args)
