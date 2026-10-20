@@ -85,7 +85,7 @@ public sealed class GravityGunSystem : EntitySystem
         if (CanMove(ent.Comp, target, out var targetPhysics))
             MoveTarget(ent.Comp, target, targetPhysics, direction);
         else
-            MoveUser(ent.Comp, user, userPhysics, target, direction);
+            MoveUser(ent.Comp, user, userPhysics, direction);
 
         _audio.PlayPredicted(ent.Comp.Sound, ent, user);
     }
@@ -124,9 +124,9 @@ public sealed class GravityGunSystem : EntitySystem
     }
 
     /// <summary>
-    /// The target is too heavy to move (a grid or something anchored to it), so the user is moved instead.
+    /// The target is too heavy to move (a grid or something anchored to it), so only the user is moved. The target is left alone.
     /// </summary>
-    private void MoveUser(GravityGunComponent gun, EntityUid user, PhysicsComponent userPhysics, EntityUid target, Vector2 towardsTarget)
+    private void MoveUser(GravityGunComponent gun, EntityUid user, PhysicsComponent userPhysics, Vector2 towardsTarget)
     {
         var (dir, strength) = gun.Mode switch
         {
@@ -141,13 +141,5 @@ public sealed class GravityGunSystem : EntitySystem
         var impulse = dir * speed * mass;
 
         _physics.ApplyLinearImpulse(user, impulse, body: userPhysics);
-
-        // Newton's third law: a free-floating hull is nudged the other way.
-        if (Transform(target).GridUid is { } grid &&
-            _physicsQuery.TryComp(grid, out var gridPhysics) &&
-            gridPhysics.BodyType == BodyType.Dynamic)
-        {
-            _physics.ApplyLinearImpulse(grid, -impulse, body: gridPhysics);
-        }
     }
 }
