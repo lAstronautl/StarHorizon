@@ -41,7 +41,7 @@ public sealed partial class ShipCutterSystem
                     continue;
 
                 var next = current + edge.Offset();
-                if (result.Contains(next) || !_map.TryGetTile(grid, next, out var tile) || tile.IsEmpty)
+                if (result.Contains(next) || !MapSystem.TryGetTile(grid, next, out var tile) || tile.IsEmpty)
                     continue;
 
                 result.Add(next);
@@ -54,21 +54,21 @@ public sealed partial class ShipCutterSystem
 
     private void SplitOff(EntityUid oldUid, MapGridComponent oldGrid, GridCutsComponent oldCuts, HashSet<Vector2i> moved)
     {
-        var newGrid = _mapManager.CreateGridEntity(Transform(oldUid).MapID);
-        var (position, rotation) = _transform.GetWorldPositionRotation(oldUid);
-        _transform.SetWorldPositionRotation(newGrid.Owner, position, rotation);
+        var newGrid = MapManager.CreateGridEntity(Transform(oldUid).MapID);
+        var (position, rotation) = TransformSystem.GetWorldPositionRotation(oldUid);
+        TransformSystem.SetWorldPositionRotation(newGrid.Owner, position, rotation);
 
         var newTiles = new List<(Vector2i, Tile)>(moved.Count);
         var emptyTiles = new List<(Vector2i, Tile)>(moved.Count);
         foreach (var indices in moved)
         {
-            if (_map.TryGetTile(oldGrid, indices, out var tile))
+            if (MapSystem.TryGetTile(oldGrid, indices, out var tile))
                 newTiles.Add((indices, tile));
 
             emptyTiles.Add((indices, Tile.Empty));
         }
 
-        _map.SetTiles(newGrid.Owner, newGrid.Comp, newTiles);
+        MapSystem.SetTiles(newGrid.Owner, newGrid.Comp, newTiles);
 
         // Everything standing on the moved tiles goes with them. Both grids share the same transform,
         // so local positions stay the same.
@@ -84,21 +84,21 @@ public sealed partial class ShipCutterSystem
             if (xform.ParentUid != oldUid || HasComp<MapGridComponent>(uid))
                 continue;
 
-            var indices = _map.LocalToTile(oldUid, oldGrid, xform.Coordinates);
+            var indices = MapSystem.LocalToTile(oldUid, oldGrid, xform.Coordinates);
             if (!moved.Contains(indices))
                 continue;
 
             var anchored = xform.Anchored;
             if (anchored)
-                _transform.Unanchor(uid, xform);
+                TransformSystem.Unanchor(uid, xform);
 
-            _transform.SetCoordinates(uid, xform, new EntityCoordinates(newGrid.Owner, xform.LocalPosition));
+            TransformSystem.SetCoordinates(uid, xform, new EntityCoordinates(newGrid.Owner, xform.LocalPosition));
 
             if (anchored)
-                _transform.AnchorEntity((uid, xform), newGrid, indices);
+                TransformSystem.AnchorEntity((uid, xform), newGrid, indices);
         }
 
-        _map.SetTiles(oldUid, oldGrid, emptyTiles);
+        MapSystem.SetTiles(oldUid, oldGrid, emptyTiles);
 
         MoveCuts(oldUid, oldCuts, newGrid.Owner, moved);
 

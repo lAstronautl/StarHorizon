@@ -49,6 +49,23 @@ public static class CutEdgesExtensions
     }
 
     /// <summary>
+    /// The rectangle of a cut along the given edge of a tile, in grid local coordinates.
+    /// </summary>
+    public static Box2 GetRect(this CutEdges edge, Vector2i tile, float tileSize, float halfWidth)
+    {
+        var x = tile.X * tileSize;
+        var y = tile.Y * tileSize;
+
+        return edge switch
+        {
+            CutEdges.North => new Box2(x, y + tileSize - halfWidth, x + tileSize, y + tileSize + halfWidth),
+            CutEdges.South => new Box2(x, y - halfWidth, x + tileSize, y + halfWidth),
+            CutEdges.East => new Box2(x + tileSize - halfWidth, y, x + tileSize + halfWidth, y + tileSize),
+            _ => new Box2(x - halfWidth, y, x + halfWidth, y + tileSize),
+        };
+    }
+
+    /// <summary>
     /// The indices offset to the tile on the other side of the edge.
     /// </summary>
     public static Vector2i Offset(this CutEdges edge)

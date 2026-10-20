@@ -21,10 +21,22 @@ public sealed partial class ShipCutterComponent : Component
     public EntityWhitelist? WallWhitelist;
 
     [DataField]
-    public TimeSpan WallDelay = TimeSpan.FromSeconds(4);
+    public float WallDelay = 4f;
 
     [DataField]
-    public TimeSpan TileDelay = TimeSpan.FromSeconds(3);
+    public float TileDelay = 3f;
+
+    /// <summary>
+    /// Fuel taken from the cutter (it is a welder) for cutting a wall loose.
+    /// </summary>
+    [DataField]
+    public float WallFuel = 3f;
+
+    /// <summary>
+    /// Fuel taken from the cutter (it is a welder) for one cut between tiles.
+    /// </summary>
+    [DataField]
+    public float TileFuel = 2f;
 
     /// <summary>
     /// How close to a tile edge the click has to be to count as a click on the seam, in tiles.
@@ -32,6 +44,9 @@ public sealed partial class ShipCutterComponent : Component
     [DataField]
     public float EdgeTolerance = 0.15f;
 
+    /// <summary>
+    /// Played when the cutting starts. When it finishes the usual tool sound of the cutter plays.
+    /// </summary>
     [DataField]
     public SoundSpecifier? Sound = new SoundPathSpecifier("/Audio/Items/welder.ogg");
 }

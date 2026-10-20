@@ -1,12 +1,11 @@
-using System.Numerics;
 using Content.Server.Atmos.EntitySystems;
 using Content.Shared._Horizon.Shipbreaking;
 using Content.Shared.DoAfter;
 using Content.Shared.Interaction;
 using Content.Shared.Popups;
+using Content.Shared.Tools.Systems;
 using Content.Shared.Whitelist;
 using Robust.Shared.Audio.Systems;
-using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Components;
@@ -16,28 +15,29 @@ namespace Content.Server._Horizon.Shipbreaking;
 
 /// <summary>
 /// Handles <see cref="ShipCutterComponent"/>: cutting walls loose and cutting slits between floor tiles,
-/// which leak air and eventually split the grid.
+/// which leak air and eventually split the grid. The cutter is a welder: it has to be lit and every cut burns fuel.
 /// </summary>
-public sealed partial class ShipCutterSystem : EntitySystem
+public sealed partial class ShipCutterSystem : SharedShipCutterSystem
 {
+    private const string CutterQuality = "Welding";
+
     [Dependency] private readonly AtmosphereSystem _atmos = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
-    [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly SharedMapSystem _map = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly SharedToolSystem _tool = default!;
 
     public override void Initialize()
     {
         base.Initialize();
 
         SubscribeLocalEvent<ShipCutterComponent, AfterInteractEvent>(OnAfterInteract);
-        SubscribeLocalEvent<ShipCutterComponent, ShipCutterWallDoAfterEvent>(OnWallDone);
-        SubscribeLocalEvent<ShipCutterComponent, ShipCutterTileDoAfterEvent>(OnTileDone);
+
+        // The tool system directs the finished do-after at its target: the wall, or the grid for a cut between tiles.
+        SubscribeLocalEvent<TransformComponent, ShipCutterWallDoAfterEvent>(OnWallDone);
+        SubscribeLocalEvent<MapGridComponent, ShipCutterTileDoAfterEvent>(OnTileDone);
     }
 
     private void OnAfterInteract(Entity<ShipCutterComponent> ent, ref AfterInteractEvent args)
@@ -51,12 +51,13 @@ public sealed partial class ShipCutterSystem : EntitySystem
             _whitelist.IsWhitelistPass(ent.Comp.WallWhitelist, wall))
         {
             args.Handled = true;
-            StartDoAfter(ent, args.User, ent.Comp.WallDelay, new ShipCutterWallDoAfterEvent(), wall);
+            Cut(ent, args.User, wall, ent.Comp.WallDelay, ent.Comp.WallFuel, new ShipCutterWallDoAfterEvent());
             return;
         }
 
         // The seam between two floor tiles: cut a slit along it.
-        if (!TryGetSeam(args.ClickLocation, ent.Comp.EdgeTolerance, out var gridUid, out var grid, out var tile, out var edge))
+        if (!TryGetSeam(TransformSystem.ToMapCoordinates(args.ClickLocation), ent.Comp.EdgeTolerance,
+                out var gridUid, out var grid, out var tile, out var edge))
             return;
 
         args.Handled = true;
@@ -67,25 +68,22 @@ public sealed partial class ShipCutterSystem : EntitySystem
             return;
         }
 
-        StartDoAfter(ent, args.User, ent.Comp.TileDelay, new ShipCutterTileDoAfterEvent(GetNetEntity(gridUid), tile, edge), null);
+        Cut(ent, args.User, gridUid, ent.Comp.TileDelay, ent.Comp.TileFuel,
+            new ShipCutterTileDoAfterEvent(GetNetEntity(gridUid), tile, edge));
     }
 
-    private void StartDoAfter(Entity<ShipCutterComponent> ent, EntityUid user, TimeSpan delay, DoAfterEvent ev, EntityUid? target)
+    /// <summary>
+    /// Starts a tool do-after that checks the cutter is lit and takes <paramref name="fuel"/> from it.
+    /// </summary>
+    private void Cut(Entity<ShipCutterComponent> ent, EntityUid user, EntityUid target, float delay, float fuel, DoAfterEvent ev)
     {
-        var args = new DoAfterArgs(EntityManager, user, delay, ev, ent, target: target, used: ent)
-        {
-            BreakOnDamage = true,
-            BreakOnMove = true,
-            NeedHand = true,
-        };
-
-        if (_doAfter.TryStartDoAfter(args))
+        if (_tool.UseTool(ent, user, target, delay, CutterQuality, ev, fuel))
             _audio.PlayPvs(ent.Comp.Sound, ent);
     }
 
-    private void OnWallDone(Entity<ShipCutterComponent> ent, ref ShipCutterWallDoAfterEvent args)
+    private void OnWallDone(Entity<TransformComponent> wall, ref ShipCutterWallDoAfterEvent args)
     {
-        if (args.Cancelled || args.Handled || args.Target is not { } wall)
+        if (args.Cancelled || args.Handled)
             return;
 
         args.Handled = true;
@@ -97,7 +95,7 @@ public sealed partial class ShipCutterSystem : EntitySystem
     /// </summary>
     private void CutLoose(EntityUid wall)
     {
-        _transform.Unanchor(wall);
+        TransformSystem.Unanchor(wall);
 
         if (!TryComp<PhysicsComponent>(wall, out var body))
             return;
@@ -107,64 +105,17 @@ public sealed partial class ShipCutterSystem : EntitySystem
         _physics.WakeBody(wall, body: body);
     }
 
-    private void OnTileDone(Entity<ShipCutterComponent> ent, ref ShipCutterTileDoAfterEvent args)
+    private void OnTileDone(Entity<MapGridComponent> grid, ref ShipCutterTileDoAfterEvent args)
     {
         if (args.Cancelled || args.Handled)
             return;
 
         args.Handled = true;
 
-        var gridUid = GetEntity(args.Grid);
-        if (!TryComp<MapGridComponent>(gridUid, out var grid) || !CanCut(gridUid, grid, args.Tile, args.Edge))
+        if (!CanCut(grid, grid.Comp, args.Tile, args.Edge))
             return;
 
-        AddCut(gridUid, grid, args.Tile, args.Edge);
-    }
-
-    /// <summary>
-    /// Finds the grid tile edge the click was close to.
-    /// </summary>
-    private bool TryGetSeam(EntityCoordinates click, float tolerance, out EntityUid gridUid, out MapGridComponent grid, out Vector2i tile, out CutEdges edge)
-    {
-        edge = CutEdges.None;
-        tile = default;
-        grid = default!;
-
-        var mapPos = _transform.ToMapCoordinates(click);
-        if (!_mapManager.TryFindGridAt(mapPos, out gridUid, out grid!))
-            return false;
-
-        var local = Vector2.Transform(mapPos.Position, _transform.GetInvWorldMatrix(gridUid)) / grid.TileSize;
-        tile = new Vector2i((int) MathF.Floor(local.X), (int) MathF.Floor(local.Y));
-        var fraction = local - new Vector2(tile.X, tile.Y);
-
-        var best = tolerance;
-        void Consider(float distance, CutEdges candidate)
-        {
-            if (distance > best)
-                return;
-
-            best = distance;
-            edge = candidate;
-        }
-
-        Consider(fraction.X, CutEdges.West);
-        Consider(1f - fraction.X, CutEdges.East);
-        Consider(fraction.Y, CutEdges.South);
-        Consider(1f - fraction.Y, CutEdges.North);
-
-        return edge != CutEdges.None;
-    }
-
-    private bool CanCut(EntityUid gridUid, MapGridComponent grid, Vector2i tile, CutEdges edge)
-    {
-        // Both sides have to be floor, and the seam must not be cut already.
-        if (!_map.TryGetTile(grid, tile, out var a) || a.IsEmpty ||
-            !_map.TryGetTile(grid, tile + edge.Offset(), out var b) || b.IsEmpty)
-            return false;
-
-        return !(TryComp<GridCutsComponent>(gridUid, out var cuts) &&
-                 cuts.Cuts.GetValueOrDefault(tile).HasFlag(edge));
+        AddCut(grid, grid.Comp, args.Tile, args.Edge);
     }
 
     private void AddCut(EntityUid gridUid, MapGridComponent grid, Vector2i tile, CutEdges edge)

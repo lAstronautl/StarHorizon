@@ -40,17 +40,14 @@ public sealed class GridCutOverlay : Overlay
             var size = grid.TileSize;
             var half = GridCutsComponent.CutWidthPixels / 32f / 2f * size;
 
-            // Every cut is stored on both tiles, so only draw the north and east ones.
             foreach (var (tile, edges) in cuts.Cuts)
             {
-                var x = tile.X * size;
-                var y = tile.Y * size;
-
+                // Every cut is stored on both tiles, so only draw the north and east ones.
                 if (edges.HasFlag(CutEdges.North))
-                    handle.DrawRect(new Box2(x, y + size - half, x + size, y + size + half), GapColor);
+                    handle.DrawRect(CutEdges.North.GetRect(tile, size, half), GapColor);
 
                 if (edges.HasFlag(CutEdges.East))
-                    handle.DrawRect(new Box2(x + size - half, y, x + size + half, y + size), GapColor);
+                    handle.DrawRect(CutEdges.East.GetRect(tile, size, half), GapColor);
             }
         }
 
