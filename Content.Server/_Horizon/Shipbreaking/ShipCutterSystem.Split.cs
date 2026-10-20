@@ -17,9 +17,13 @@ public sealed partial class ShipCutterSystem
     {
         var sideA = Flood(grid, cuts, a);
         if (sideA.Contains(b))
+        {
+            Log.Debug($"Cut between {a} and {b} on {ToPrettyString(gridUid)}: still connected ({sideA.Count} tiles reachable), no split.");
             return;
+        }
 
         var sideB = Flood(grid, cuts, b);
+        Log.Info($"Cut between {a} and {b} on {ToPrettyString(gridUid)}: sides of {sideA.Count} and {sideB.Count} tiles, splitting off the smaller one.");
         SplitOff(gridUid, grid, cuts, sideA.Count <= sideB.Count ? sideA : sideB);
     }
 
