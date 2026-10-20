@@ -1,3 +1,4 @@
+using System.Reflection;
 using Content.Server.Shuttles.Components;
 using Content.Shared._Horizon.Shipbreaking;
 using Robust.Shared.Map;
@@ -9,6 +10,12 @@ namespace Content.Server._Horizon.Shipbreaking;
 // Splitting a grid along cuts.
 public sealed partial class ShipCutterSystem
 {
+    // The engine moves anchored entities between grids with SharedTransformSystem.ReAnchor, which keeps them anchored
+    // and sends only a ReAnchorEvent. It is internal to the engine, so it is called by reflection.
+    private static readonly MethodInfo? ReAnchorMethod = typeof(SharedTransformSystem).GetMethod(
+        "ReAnchor",
+        BindingFlags.Instance | BindingFlags.NonPublic);
+
     /// <summary>
     /// After a cut between <paramref name="a"/> and <paramref name="b"/>, checks whether the two tiles are still
     /// connected through tiles and uncut seams. If not, the smaller side is split off into a new grid.
@@ -95,8 +102,7 @@ public sealed partial class ShipCutterSystem
                 // Moved the way the engine does when it splits a grid: the entity stays anchored and only gets a
                 // ReAnchorEvent. Unanchoring it would make things react as if it was torn off (a cable would drop
                 // as a coil and delete itself, machines would switch off).
-                TransformSystem.ReAnchor(uid, xform, oldGrid, newGrid.Comp, indices, oldUid, newGrid.Owner,
-                    oldGridXform, newGridXform, xform.LocalRotation);
+                ReAnchor(uid, xform, oldGrid, newGrid.Comp, indices, oldUid, newGrid.Owner, oldGridXform, newGridXform);
             }
             else
             {
@@ -118,5 +124,24 @@ public sealed partial class ShipCutterSystem
 
         var ev = new GridSplitEvent(new[] { newGrid.Owner }, oldUid);
         RaiseLocalEvent(oldUid, ref ev, true);
+    }
+
+    private void ReAnchor(
+        EntityUid uid,
+        TransformComponent xform,
+        MapGridComponent oldGrid,
+        MapGridComponent newGrid,
+        Vector2i tile,
+        EntityUid oldGridUid,
+        EntityUid newGridUid,
+        TransformComponent oldGridXform,
+        TransformComponent newGridXform)
+    {
+        if (ReAnchorMethod == null)
+            throw new InvalidOperationException("SharedTransformSystem.ReAnchor was not found, the engine changed.");
+
+        // Same tile on both grids and no rotation: the new grid takes the place of the old one.
+        ReAnchorMethod.Invoke(TransformSystem,
+            new object[] { uid, xform, oldGrid, newGrid, tile, tile, oldGridUid, newGridUid, oldGridXform, newGridXform, Angle.Zero });
     }
 }
