@@ -12,17 +12,15 @@
                              TextureScale="2 2"
                              VerticalAlignment="Center"
                              Margin="0 0 8 0"/>
-                <BoxContainer Orientation="Vertical" HorizontalExpand="True">
-                    <RichTextLabel Name="CategoryLabel"/>
-                    <RichTextLabel Name="ManifestLabel"/>
-                </BoxContainer>
+                <RichTextLabel Name="CategoryLabel" VerticalAlignment="Center" HorizontalExpand="True"/>
                 <Control MinWidth="10"/>
                 <Button Name="CancelButton"
                         Text="{Loc 'station-task-console-cancel-button'}"
                         VerticalAlignment="Center"/>
             </BoxContainer>
             <customControls:HSeparator Margin="5 10 5 10"/>
-            <BoxContainer>
+            <BoxContainer Name="ManifestContainer" Orientation="Vertical" HorizontalExpand="True"/>
+            <BoxContainer Margin="0 6 0 0">
                 <RichTextLabel Name="DescriptionLabel"/>
             </BoxContainer>
         </BoxContainer>

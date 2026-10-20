@@ -1,4 +1,4 @@
-using System.Linq;
+using System.Numerics;
 using Content.Client.Message;
 using Content.Shared._Horizon.StationDeployment.Prototypes;
 using Content.Shared.Research.Prototypes;
@@ -7,6 +7,7 @@ using Robust.Client.GameObjects;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.XAML;
+using Robust.Shared.Maths;
 using Robust.Shared.Prototypes;
 
 namespace Content.Client._Horizon.StationDeployment;
@@ -34,8 +35,29 @@ public sealed partial class StationOrderCardControl : BoxContainer
         var categoryName = discipline != null ? Loc.GetString(discipline.Name) : order.Category.Id;
         CategoryLabel.SetMarkup(Loc.GetString("station-task-console-category-label", ("category", categoryName), ("level", currentLevel)));
 
-        var items = order.Entries.Select(e => Loc.GetString("station-task-console-item-line", ("amount", e.Amount), ("item", Loc.GetString(e.Name))));
-        ManifestLabel.SetMarkup(Loc.GetString("station-task-console-manifest-label", ("items", string.Join(", ", items))));
+        ManifestContainer.Children.Clear();
+        foreach (var entry in order.Entries)
+        {
+            if (!prototypeManager.TryIndex<EntityPrototype>(entry.Item, out var itemProto))
+                continue;
+
+            var icon = new TextureRect
+            {
+                TextureScale = new Vector2(1.5f, 1.5f),
+                VerticalAlignment = VAlignment.Center,
+                Margin = new Thickness(0, 0, 6, 2),
+            };
+            icon.Texture = spriteSys.GetPrototypeIcon(itemProto).Default;
+
+            var itemLabel = new RichTextLabel();
+            itemLabel.SetMarkup(Loc.GetString("station-task-console-item-line", ("amount", entry.Amount), ("item", itemProto.Name)));
+
+            ManifestContainer.AddChild(new BoxContainer
+            {
+                Orientation = BoxContainer.LayoutOrientation.Horizontal,
+                Children = { icon, itemLabel },
+            });
+        }
 
         if (order.Description != string.Empty)
             DescriptionLabel.SetMarkup(Loc.GetString("station-task-console-description-label", ("description", Loc.GetString(order.Description))));
