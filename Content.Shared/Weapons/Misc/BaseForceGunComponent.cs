@@ -52,19 +52,5 @@ public abstract partial class BaseForceGunComponent : Component
         Params = AudioParams.Default.WithLoop(true).WithVolume(-8f),
     };
 
-    // Horizon: gravity gun - heavy targets pull the user instead of being moved
-    /// <summary>
-    /// If true, targets heavier than <see cref="MassLimit"/> are not refused: the user is pulled towards them instead.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField, AutoNetworkedField]
-    public bool PullUserWhenHeavy;
-
-    /// <summary>
-    /// The user currently being pulled towards <see cref="Tethered"/> (a target that was too heavy to move).
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), AutoNetworkedField]
-    public EntityUid? PulledUser;
-    // End Horizon
-
     public EntityUid? Stream;
 }
