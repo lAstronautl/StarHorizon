@@ -79,8 +79,7 @@ public abstract class TileReclaimerSystem : EntitySystem
 
         var mapId = xform.MapID;
         var worldMatrix = _transform.GetWorldMatrix(uid);
-        var box = worldMatrix.TransformBox(reclaimer.RecyclingBox);
-        var bounds = box.CalcBoundingBox();
+        var bounds = worldMatrix.TransformBox(reclaimer.RecyclingBox);
 
         var grids = new List<Entity<MapGridComponent>>();
         _mapManager.FindGridsIntersecting(mapId, bounds, ref grids);

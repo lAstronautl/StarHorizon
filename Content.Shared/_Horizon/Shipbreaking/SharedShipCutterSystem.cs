@@ -30,21 +30,35 @@ public abstract class SharedShipCutterSystem : EntitySystem
         tile = new Vector2i((int) MathF.Floor(local.X), (int) MathF.Floor(local.Y));
         var fraction = local - new Vector2(tile.X, tile.Y);
 
+        // Not a local function: out parameters can't be used inside one.
         var best = tolerance;
-        void Consider(float distance, CutEdges candidate)
-        {
-            if (distance > best)
-                return;
+        var bestEdge = CutEdges.None;
 
-            best = distance;
-            edge = candidate;
+        if (fraction.X <= best)
+        {
+            best = fraction.X;
+            bestEdge = CutEdges.West;
         }
 
-        Consider(fraction.X, CutEdges.West);
-        Consider(1f - fraction.X, CutEdges.East);
-        Consider(fraction.Y, CutEdges.South);
-        Consider(1f - fraction.Y, CutEdges.North);
+        if (1f - fraction.X <= best)
+        {
+            best = 1f - fraction.X;
+            bestEdge = CutEdges.East;
+        }
 
+        if (fraction.Y <= best)
+        {
+            best = fraction.Y;
+            bestEdge = CutEdges.South;
+        }
+
+        if (1f - fraction.Y <= best)
+        {
+            best = 1f - fraction.Y;
+            bestEdge = CutEdges.North;
+        }
+
+        edge = bestEdge;
         return edge != CutEdges.None;
     }
 
