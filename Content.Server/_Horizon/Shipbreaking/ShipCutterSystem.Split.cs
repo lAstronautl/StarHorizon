@@ -17,13 +17,9 @@ public sealed partial class ShipCutterSystem
     {
         var sideA = Flood(grid, cuts, a);
         if (sideA.Contains(b))
-        {
-            Log.Debug($"Cut between {a} and {b} on {ToPrettyString(gridUid)}: still connected ({sideA.Count} tiles reachable), no split.");
             return;
-        }
 
         var sideB = Flood(grid, cuts, b);
-        Log.Info($"Cut between {a} and {b} on {ToPrettyString(gridUid)}: sides of {sideA.Count} and {sideB.Count} tiles, splitting off the smaller one.");
         SplitOff(gridUid, grid, cuts, sideA.Count <= sideB.Count ? sideA : sideB);
     }
 
@@ -76,6 +72,8 @@ public sealed partial class ShipCutterSystem
 
         // Everything standing on the moved tiles goes with them. Both grids share the same transform,
         // so local positions stay the same.
+        var oldGridXform = Transform(oldUid);
+        var newGridXform = Transform(newGrid.Owner);
         var entities = new HashSet<EntityUid>();
         foreach (var indices in moved)
         {
@@ -92,14 +90,18 @@ public sealed partial class ShipCutterSystem
             if (!moved.Contains(indices))
                 continue;
 
-            var anchored = xform.Anchored;
-            if (anchored)
-                TransformSystem.Unanchor(uid, xform);
-
-            TransformSystem.SetCoordinates(uid, xform, new EntityCoordinates(newGrid.Owner, xform.LocalPosition));
-
-            if (anchored)
-                TransformSystem.AnchorEntity((uid, xform), newGrid, indices);
+            if (xform.Anchored)
+            {
+                // Moved the way the engine does when it splits a grid: the entity stays anchored and only gets a
+                // ReAnchorEvent. Unanchoring it would make things react as if it was torn off (a cable would drop
+                // as a coil and delete itself, machines would switch off).
+                TransformSystem.ReAnchor(uid, xform, oldGrid, newGrid.Comp, indices, oldUid, newGrid.Owner,
+                    oldGridXform, newGridXform, xform.LocalRotation);
+            }
+            else
+            {
+                TransformSystem.SetCoordinates(uid, xform, new EntityCoordinates(newGrid.Owner, xform.LocalPosition));
+            }
         }
 
         MapSystem.SetTiles(oldUid, oldGrid, emptyTiles);

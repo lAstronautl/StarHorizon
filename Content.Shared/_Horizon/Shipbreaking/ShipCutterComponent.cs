@@ -10,10 +10,8 @@ namespace Content.Shared._Horizon.Shipbreaking;
 /// <summary>
 /// A battery powered cutter for shipbreaking. Clicking a wall cuts it loose so it can be moved with a gravity gun,
 /// clicking the seam between two floor tiles cuts a slit along it (see <see cref="GridCutsComponent"/>).
-/// Every click adds a target to a queue and the user works through the queue one target at a time without
-/// having to start each cut again.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent, NetworkedComponent]
 public sealed partial class ShipCutterComponent : Component
 {
     /// <summary>
@@ -47,12 +45,6 @@ public sealed partial class ShipCutterComponent : Component
     public float EdgeTolerance = 0.15f;
 
     /// <summary>
-    /// How many targets can wait in the queue.
-    /// </summary>
-    [DataField]
-    public int MaxQueue = 20;
-
-    /// <summary>
     /// Played when a cut starts.
     /// </summary>
     [DataField]
@@ -63,21 +55,6 @@ public sealed partial class ShipCutterComponent : Component
     /// </summary>
     [DataField]
     public SoundSpecifier? DoneSound = new SoundPathSpecifier("/Audio/Items/welder2.ogg");
-
-    /// <summary>
-    /// What is waiting to be cut, in the order it was picked. The first one is being cut.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public List<ShipCutterTarget> Queue = new();
-
-    /// <summary>
-    /// Whether a cut is in progress.
-    /// </summary>
-    [ViewVariables]
-    public bool Working;
-
-    [ViewVariables]
-    public DoAfterId? ActiveDoAfter;
 }
 
 /// <summary>
