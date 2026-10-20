@@ -83,6 +83,22 @@ public abstract partial class SharedTetherGunSystem : EntitySystem
     {
         base.Update(frameTime);
 
+        // Horizon: gravity gun - stop pulling when the user lets go, gets too far or the target is gone
+        var pullQuery = EntityQueryEnumerator<TetherGunComponent>();
+        while (pullQuery.MoveNext(out var gunUid, out var gun))
+        {
+            if (gun.PulledUser is not { } puller)
+                continue;
+
+            if (TerminatingOrDeleted(puller) || gun.Tethered == null || TerminatingOrDeleted(gun.Tethered.Value) ||
+                !_hands.IsHolding(puller, gunUid) ||
+                !TransformSystem.InRange(Transform(puller).Coordinates, Transform(gun.Tethered.Value).Coordinates, gun.MaxDistance * 2f))
+            {
+                StopTether(gunUid, gun);
+            }
+        }
+        // End Horizon
+
         // Just to set the angular velocity due to joint funnies
         var tetheredQuery = EntityQueryEnumerator<TetheredComponent, PhysicsComponent>();
 
@@ -181,8 +197,10 @@ public abstract partial class SharedTetherGunSystem : EntitySystem
             _container.IsEntityInContainer(target))
             return false;
 
-        if (physics.Mass > component.MassLimit)
+        // Horizon: gravity gun - heavy targets are fine when they pull the user instead
+        if (physics.Mass > component.MassLimit && !(component.PullUserWhenHeavy && user != null))
             return false;
+        // End Horizon
 
         if (!component.CanTetherAlive && _mob.IsAlive(target))
             return false;
@@ -203,6 +221,31 @@ public abstract partial class SharedTetherGunSystem : EntitySystem
         {
             StopTether(gunUid, component, true);
         }
+
+        // Horizon: gravity gun - too heavy to move, so the user is pulled towards the target instead
+        if (component.PullUserWhenHeavy && user != null && targetPhysics.Mass > component.MassLimit &&
+            TryComp<PhysicsComponent>(user.Value, out var userPhysics))
+        {
+            component.Tethered = target;
+            component.PulledUser = user;
+
+            var pullJoint = _joints.CreateMouseJoint(target, user.Value, id: TetherJoint);
+            SharedJointSystem.LinearStiffness(component.Frequency, component.DampingRatio, userPhysics.Mass, userPhysics.Mass, out var pullStiffness, out var pullDamping);
+            pullJoint.Stiffness = pullStiffness;
+            pullJoint.Damping = pullDamping;
+            pullJoint.MaxForce = component.MaxForce;
+
+            TryComp<AppearanceComponent>(gunUid, out var pullAppearance);
+            _appearance.SetData(gunUid, TetherVisualsStatus.Key, true, pullAppearance);
+            _appearance.SetData(gunUid, ToggleableVisuals.Enabled, true, pullAppearance);
+
+            if (_netManager.IsServer && component.Stream == null)
+                component.Stream = _audio.PlayPredicted(component.Sound, gunUid, null)?.Entity;
+
+            Dirty(gunUid, component);
+            return;
+        }
+        // End Horizon
 
         TryComp<AppearanceComponent>(gunUid, out var appearance);
         _appearance.SetData(gunUid, TetherVisualsStatus.Key, true, appearance);
@@ -249,6 +292,27 @@ public abstract partial class SharedTetherGunSystem : EntitySystem
     {
         if (component.Tethered == null)
             return;
+
+        // Horizon: gravity gun - release the pulled user, nothing to land
+        if (component.PulledUser is { } pulledUser)
+        {
+            _joints.RemoveJoint(pulledUser, TetherJoint);
+            component.PulledUser = null;
+            component.Tethered = null;
+
+            if (!transfer)
+            {
+                _audio.Stop(component.Stream);
+                component.Stream = null;
+            }
+
+            TryComp<AppearanceComponent>(gunUid, out var pullAppearance);
+            _appearance.SetData(gunUid, TetherVisualsStatus.Key, false, pullAppearance);
+            _appearance.SetData(gunUid, ToggleableVisuals.Enabled, false, pullAppearance);
+            Dirty(gunUid, component);
+            return;
+        }
+        // End Horizon
 
         if (component.TetherEntity != null)
         {
