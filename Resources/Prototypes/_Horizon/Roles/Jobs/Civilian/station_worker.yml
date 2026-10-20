@@ -12,16 +12,5 @@
   supervisors: job-supervisors-hire
   accessGroups:
   - GeneralAccess
-  jobEntity: InterviewHologramMercenaryStation
+  jobEntity: InterviewHologramMercenary
   newPlayerMessage: false
-
-# This job's own hologram - InterviewHologramMercenary (the vanilla one) hardcodes
-# `job: Mercenary`, so reusing it here granted the real Mercenary job/access on approval
-# instead of MercenaryStation once hired, bypassing Mercenary's own playtime requirement.
-- type: entity
-  id: InterviewHologramMercenaryStation
-  parent: InterviewHologram
-  categories: [ HideSpawnMenu, DoNotMap ]
-  components:
-  - type: InterviewHologram
-    job: MercenaryStation
