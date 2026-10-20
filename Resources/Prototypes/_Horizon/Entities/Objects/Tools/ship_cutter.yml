@@ -1,0 +1,20 @@
+# Shipbreaking cutter. Click a wall to cut it loose (then move it with a gravity gun),
+# click the seam between two floor tiles to cut a slit along it: the slit leaks air, shows as a gap,
+# and a part with no connections left breaks off into its own grid.
+# Sprite and sound are placeholders (welder).
+- type: entity
+  id: ShipCutter
+  parent: BaseItem
+  name: ship cutter
+  description: A heavy plasma cutter for taking ships apart. Cut a wall loose, or click the seam between two floor tiles to cut along it.
+  components:
+  - type: Item
+    size: Normal
+  - type: Sprite
+    sprite: Objects/Tools/welder.rsi
+    layers:
+    - state: icon
+  - type: ShipCutter
+    wallWhitelist:
+      tags:
+      - Wall
