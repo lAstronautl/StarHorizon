@@ -17,19 +17,10 @@
     kind: Star
     spriteRadius: 32
     pixels: 1024
-    hazardRadius: 400
-    radiationRange: 500
-    starDamage:
-      types:
-        Structural: 500
-        Blunt: 200
-        Heat: 150
-    mobHazardDamage:
-      types:
-        Heat: 12
-    mobRadiationDamage:
-      types:
-        Radiation: 8
+    # The star is harmless: ships and crew can stay next to it. Panels near it work 3x better.
+    harmless: true
+    solarBoostRadius: 4000
+    solarBoostMultiplier: 3
   - type: PointLight
     enabled: true
     color: "#77D6C1"
@@ -37,9 +28,6 @@
     energy: 9
     softness: 1.2
     castShadows: false
-  - type: RadiationSource
-    intensity: 8
-    slope: 0.016
   - type: RadarBlip
     radarColor: "#FFB020"
     highlightedRadarColor: "#FFE080"
@@ -47,8 +35,6 @@
     shape: Circle
     visibleFromOtherGrids: true
     requireNoGrid: true
-  - type: FTLExclusion
-    range: 500
 
 - type: entity
   id: SectorCelestialBlackHole

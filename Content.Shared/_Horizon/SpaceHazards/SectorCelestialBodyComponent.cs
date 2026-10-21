@@ -73,6 +73,20 @@ public sealed partial class SectorCelestialBodyComponent : Component
     [DataField, AutoNetworkedField]
     public float PullAcceleration = 18f;
 
+    /// <summary>
+    /// Horizon: a harmless body deals no damage at all (hull, mobs, tiles). Ships can stay next to it, e.g. to profit
+    /// from the solar boost.
+    /// </summary>
+    [DataField]
+    public bool Harmless;
+
+    /// <summary>Solar panels within this distance of the star produce <see cref="SolarBoostMultiplier"/> times more power.</summary>
+    [DataField]
+    public float SolarBoostRadius = 4000f;
+
+    [DataField]
+    public float SolarBoostMultiplier = 3f;
+
     /// <summary>Horizon: no worldgen debris is placed (and existing debris is removed) within this distance of the body.</summary>
     [DataField]
     public float DebrisClearance = 2500f;
