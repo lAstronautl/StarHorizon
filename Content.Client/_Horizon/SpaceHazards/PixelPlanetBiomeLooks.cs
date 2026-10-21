@@ -43,12 +43,12 @@ public static class PixelPlanetBiomeLooks
             ],
             new Dictionary<string, float>
             {
-                ["cloud_cover"] = 0.705f,
-                ["land_cutoff"] = 0.397f,
-                ["land_light_border_1"] = 0.142f,
-                ["land_light_border_2"] = 0.973f,
-                ["light_border_1"] = 0.86f,
-                ["light_border_2"] = 0.715f,
+                ["cloud_cover"] = 0.595f,
+                ["land_cutoff"] = 0.401f,
+                ["land_light_border_1"] = 0.1f,
+                ["land_light_border_2"] = 1.071f,
+                ["light_border_1"] = 0.975f,
+                ["light_border_2"] = 0.712f,
             }),
             ["Lava"] = new(PixelPlanetKind.LavaWorld,
             [
@@ -63,13 +63,18 @@ public static class PixelPlanetBiomeLooks
             ],
             new Dictionary<string, float>
             {
-                ["crater_light_border"] = 0.122f,
-                ["lava_border_1"] = 0.093f,
-                ["lava_border_2"] = 0.03f,
-                ["lava_cutoff"] = 0.497f,
-                ["lava_size"] = 4.589f,
-                ["light_border_1"] = 0.442f,
-                ["light_border_2"] = 0.542f,
+                ["crater_light_border"] = 0.294f,
+                ["crater_size"] = 3.087f,
+                ["dither_size"] = 2.59f,
+                ["lava_border_1"] = 0.026f,
+                ["lava_border_2"] = 0.046f,
+                ["lava_cutoff"] = 0.456f,
+                ["lava_detail"] = 6.659f,
+                ["lava_octaves"] = 3.411f,
+                ["lava_size"] = 7.216f,
+                ["light_border_1"] = 0.341f,
+                ["light_border_2"] = 0.52f,
+                ["size"] = 11.685f,
             }),
             ["Snow"] = new(PixelPlanetKind.IceWorld,
             [
@@ -86,11 +91,11 @@ public static class PixelPlanetBiomeLooks
             ],
             new Dictionary<string, float>
             {
-                ["cloud_cover"] = 0.492f,
-                ["lake_cutoff"] = 0.413f,
-                ["lake_size"] = 12.491f,
-                ["light_border_1"] = 0.534f,
-                ["light_border_2"] = 0.643f,
+                ["cloud_cover"] = 0.478f,
+                ["lake_cutoff"] = 0.407f,
+                ["lake_size"] = 11.843f,
+                ["light_border_1"] = 0.537f,
+                ["light_border_2"] = 0.625f,
             }),
             ["LowDesert"] = new(PixelPlanetKind.LandMasses,
             [
@@ -108,11 +113,11 @@ public static class PixelPlanetBiomeLooks
             new Dictionary<string, float>
             {
                 ["cloud_cover"] = 0.429f,
-                ["land_cutoff"] = 0.378f,
-                ["land_light_border_1"] = 0.768f,
-                ["land_light_border_2"] = 0.652f,
-                ["light_border_1"] = 0.618f,
-                ["light_border_2"] = 0.663f,
+                ["land_cutoff"] = 0.351f,
+                ["land_light_border_1"] = 0.71f,
+                ["land_light_border_2"] = 0.766f,
+                ["light_border_1"] = 0.644f,
+                ["light_border_2"] = 0.711f,
             }),
             ["Caves"] = new(PixelPlanetKind.NoAtmosphere,
             [
@@ -124,10 +129,13 @@ public static class PixelPlanetBiomeLooks
             ],
             new Dictionary<string, float>
             {
-                ["crater_light_border"] = 0.282f,
-                ["crater_size"] = 8.269f,
-                ["light_border_1"] = 0.378f,
-                ["light_border_2"] = 0.54f,
+                ["crater_light_border"] = 0.48f,
+                ["crater_size"] = 9.471f,
+                ["dither_size"] = 0f,
+                ["light_border_1"] = 0.375f,
+                ["light_border_2"] = 0.545f,
+                ["octaves"] = 2.483f,
+                ["size"] = 9.071f,
             }),
             ["Shadow"] = new(PixelPlanetKind.NoAtmosphere,
             [
@@ -139,10 +147,13 @@ public static class PixelPlanetBiomeLooks
             ],
             new Dictionary<string, float>
             {
-                ["crater_light_border"] = 0.257f,
-                ["crater_size"] = 2.735f,
-                ["light_border_1"] = 0.372f,
-                ["light_border_2"] = 0.586f,
+                ["crater_light_border"] = 0.986f,
+                ["crater_size"] = 7.631f,
+                ["dither_size"] = 0f,
+                ["light_border_1"] = 0.382f,
+                ["light_border_2"] = 0.542f,
+                ["octaves"] = 2.921f,
+                ["size"] = 9.002f,
             }),
             ["GateJungle"] = new(PixelPlanetKind.LandMasses,
             [
@@ -160,11 +171,18 @@ public static class PixelPlanetBiomeLooks
             new Dictionary<string, float>
             {
                 ["cloud_cover"] = 3f,
-                ["land_cutoff"] = 0.437f,
-                ["land_light_border_1"] = 0.804f,
-                ["land_light_border_2"] = 0.956f,
-                ["light_border_1"] = 1.364f,
-                ["light_border_2"] = 0.75f,
+                ["cloud_octaves"] = 4.276f,
+                ["cloud_size"] = 9.167f,
+                ["dither_size"] = 1.556f,
+                ["land_cutoff"] = 0.506f,
+                ["land_light_border_1"] = 0.845f,
+                ["land_light_border_2"] = 0.796f,
+                ["land_octaves"] = 6.683f,
+                ["land_size"] = 4.974f,
+                ["light_border_1"] = 1.008f,
+                ["light_border_2"] = 0.824f,
+                ["size"] = 10.571f,
+                ["stretch"] = 1.793f,
             }),
             ["GateInferno"] = new(PixelPlanetKind.LavaWorld,
             [
@@ -179,12 +197,12 @@ public static class PixelPlanetBiomeLooks
             ],
             new Dictionary<string, float>
             {
-                ["crater_light_border"] = 0.89f,
+                ["crater_light_border"] = 0.902f,
                 ["lava_border_1"] = 0.005f,
-                ["lava_border_2"] = 0.161f,
-                ["lava_cutoff"] = 0.847f,
-                ["light_border_1"] = 0.38f,
-                ["light_border_2"] = 0.525f,
+                ["lava_border_2"] = 0.173f,
+                ["lava_cutoff"] = 0.861f,
+                ["light_border_1"] = 0.387f,
+                ["light_border_2"] = 0.53f,
             }),
         };
         presets["Lavalight"] = presets["Lava"];

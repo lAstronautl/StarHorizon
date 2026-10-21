@@ -100,7 +100,7 @@ highp float pp_turbulence(highp float size, highp vec2 sizeMod, highp float seed
     return c_noise;
 }
 bool pp_dither(highp float pixels, highp float dither_size, highp vec2 uv_pixel, highp vec2 uv_real) {
-    return false;
+    return mod(uv_pixel.x + uv_real.y, 2.0 / pixels) <= 1.0 / pixels;
 }
 highp vec2 pp_spherify(highp vec2 uv) {
     highp vec2 centered = uv * 2.0 - 1.0;

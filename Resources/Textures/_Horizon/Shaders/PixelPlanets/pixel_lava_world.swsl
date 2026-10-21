@@ -20,6 +20,7 @@ uniform highp float lava_seed;
 uniform highp float lava_time_speed;
 uniform highp float lava_border_1;
 uniform highp float lava_border_2;
+uniform highp float lava_detail;
 uniform highp vec3 color0;
 uniform highp vec3 color1;
 uniform highp vec3 color2;
@@ -102,7 +103,7 @@ highp float pp_turbulence(highp float size, highp vec2 sizeMod, highp float seed
     return c_noise;
 }
 bool pp_dither(highp float pixels, highp float dither_size, highp vec2 uv_pixel, highp vec2 uv_real) {
-    return false;
+    return mod(uv_pixel.x + uv_real.y, 2.0 / pixels) <= 1.0 / pixels;
 }
 highp vec2 pp_spherify(highp vec2 uv) {
     highp vec2 centered = uv * 2.0 - 1.0;
@@ -128,7 +129,7 @@ void fragment() {
     luv = pp_rotate(luv, rotation);
     luv = pp_spherify(luv);
     highp float fbm1 = pp_fbm(lava_size, vec2(2.0, 1.0), lava_seed, lava_octaves, luv * lava_size + vec2(time * lava_time_speed, 0.0));
-    highp float river_fbm = pp_fbm(lava_size, vec2(2.0, 1.0), lava_seed, lava_octaves, luv + fbm1 * 2.5);
+    highp float river_fbm = pp_fbm(lava_size, vec2(2.0, 1.0), lava_seed, lava_octaves, luv * lava_detail + fbm1 * 2.5);
     d_light_l = pow(d_light_l, 2.0) * 0.4;
     d_light_l -= d_light_l * river_fbm;
     highp vec3 lcol = lava_color0;

@@ -187,6 +187,7 @@ public static class PixelPlanetShaderSetup
                 s.SetParameter("lava_time_speed", 0.2f * AnimSpeedScale);
                 s.SetParameter("lava_border_1", 0.019f);
                 s.SetParameter("lava_border_2", 0.036f);
+                s.SetParameter("lava_detail", 1f);
                 break;
             }
         }
