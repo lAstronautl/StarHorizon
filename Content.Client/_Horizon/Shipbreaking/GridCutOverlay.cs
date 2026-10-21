@@ -51,6 +51,30 @@ public sealed class GridCutOverlay : Overlay
             }
         }
 
+        // Cut edges of walls are drawn in the frame of the wall, so they stay on it when it is loose.
+        var walls = _entManager.EntityQueryEnumerator<WallCutsComponent, TransformComponent>();
+        while (walls.MoveNext(out var wall, out var wallCuts, out var wallXform))
+        {
+            if (wallXform.MapID != args.MapId)
+                continue;
+
+            handle.SetTransform(_transform.GetWorldMatrix(wall));
+
+            const float size = 1f;
+            var half = GridCutsComponent.CutWidthPixels / 32f / 2f;
+            var centre = new Vector2i(0, 0);
+
+            foreach (var edge in CutEdgesExtensions.All)
+            {
+                if (!wallCuts.Cuts.HasFlag(edge))
+                    continue;
+
+                // The rectangle of the edge for a tile whose lower left corner is at -0.5, -0.5.
+                var rect = edge.GetRect(centre, size, half);
+                handle.DrawRect(rect.Translated(new Vector2(-0.5f, -0.5f)), GapColor);
+            }
+        }
+
         handle.SetTransform(Matrix3x2.Identity);
     }
 }

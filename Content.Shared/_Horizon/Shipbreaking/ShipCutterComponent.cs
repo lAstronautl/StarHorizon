@@ -113,19 +113,20 @@ public sealed partial class ShipCutterComponent : Component
 }
 
 /// <summary>
-/// One thing to cut: a wall, or an edge of a tile on a grid.
+/// One thing to cut: an edge of a wall, or an edge of a tile on a grid.
 /// </summary>
 [Serializable, NetSerializable]
-public readonly record struct ShipCutterTarget(NetEntity Entity, Vector2i Tile, CutEdges Edge)
+public readonly record struct ShipCutterTarget(NetEntity Entity, Vector2i Tile, CutEdges Edge, bool IsWall)
 {
     /// <summary>
-    /// A wall is a target without an edge, the entity is the wall. For a seam the entity is the grid.
+    /// The entity is the wall. An edge of <see cref="CutEdges.None"/> means the wall is free already and just comes loose.
     /// </summary>
-    public bool IsWall => Edge == CutEdges.None;
+    public static ShipCutterTarget Wall(NetEntity wall, CutEdges edge) => new(wall, default, edge, true);
 
-    public static ShipCutterTarget Wall(NetEntity wall) => new(wall, default, CutEdges.None);
-
-    public static ShipCutterTarget Seam(NetEntity grid, Vector2i tile, CutEdges edge) => new(grid, tile, edge);
+    /// <summary>
+    /// For a seam the entity is the grid.
+    /// </summary>
+    public static ShipCutterTarget Seam(NetEntity grid, Vector2i tile, CutEdges edge) => new(grid, tile, edge, false);
 }
 
 [Serializable, NetSerializable]

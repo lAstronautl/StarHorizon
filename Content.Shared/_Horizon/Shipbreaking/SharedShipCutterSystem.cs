@@ -98,9 +98,62 @@ public abstract class SharedShipCutterSystem : EntitySystem
             return new ShipCutterPick(ShipCutterPickKind.Seam, gridUid, grid, tile, edge, null, canCut);
 
         if (wall != null)
-            return new ShipCutterPick(ShipCutterPickKind.Wall, gridUid, grid, tilePos, CutEdges.None, wall, true);
+        {
+            // The edge of the wall closest to the click that still holds it, none if the wall is free already.
+            var offset = local - new Vector2(tilePos.X + 0.5f, tilePos.Y + 0.5f);
+            var wallEdge = PickWallEdge(WallHeldEdges(cutter, gridUid, grid, tilePos, wall.Value), offset);
+            return new ShipCutterPick(ShipCutterPickKind.Wall, gridUid, grid, tilePos, wallEdge, wall, true);
+        }
 
         return default;
+    }
+
+    /// <summary>
+    /// The edges of the wall by which it still holds on to other walls: those facing an anchored wall next to it
+    /// and not cut yet. Floor does not hold a wall.
+    /// </summary>
+    public CutEdges WallHeldEdges(ShipCutterComponent cutter, EntityUid gridUid, MapGridComponent grid, Vector2i tile, EntityUid wall)
+    {
+        var cuts = TryComp<WallCutsComponent>(wall, out var wallCuts) ? wallCuts.Cuts : CutEdges.None;
+        var held = CutEdges.None;
+
+        foreach (var edge in CutEdgesExtensions.All)
+        {
+            if (cuts.HasFlag(edge))
+                continue;
+
+            foreach (var other in MapSystem.GetAnchoredEntities((gridUid, grid), tile + edge.Offset()))
+            {
+                if (other != wall && Whitelist.IsWhitelistPass(cutter.WallWhitelist, other))
+                {
+                    held |= edge;
+                    break;
+                }
+            }
+        }
+
+        return held;
+    }
+
+    private static CutEdges PickWallEdge(CutEdges held, Vector2 offset)
+    {
+        var best = CutEdges.None;
+        var bestScore = float.MinValue;
+
+        foreach (var edge in CutEdgesExtensions.All)
+        {
+            if (!held.HasFlag(edge))
+                continue;
+
+            var score = offset.X * edge.Offset().X + offset.Y * edge.Offset().Y;
+            if (score > bestScore)
+            {
+                bestScore = score;
+                best = edge;
+            }
+        }
+
+        return best;
     }
 
     /// <summary>

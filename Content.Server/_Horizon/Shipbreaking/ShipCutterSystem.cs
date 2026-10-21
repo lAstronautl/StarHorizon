@@ -1,3 +1,4 @@
+using System.Linq;
 using Content.Server.PowerCell;
 using Content.Shared._Horizon.Shipbreaking;
 using Content.Shared.DoAfter;
@@ -98,7 +99,7 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
         }
 
         var target = pick.Kind == ShipCutterPickKind.Wall
-            ? ShipCutterTarget.Wall(GetNetEntity(pick.Wall!.Value))
+            ? ShipCutterTarget.Wall(GetNetEntity(pick.Wall!.Value), pick.Edge)
             : ShipCutterTarget.Seam(GetNetEntity(pick.Grid), pick.Tile, pick.Edge);
 
         if (!TryResolve(ent.Comp, target, out var entity, out var delay, out var charge))
@@ -154,7 +155,13 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
 
         if (target.IsWall)
         {
-            if (!Transform(entity).Anchored || !Whitelist.IsWhitelistPass(cutter.WallWhitelist, entity))
+            if (!Transform(entity).Anchored || !Whitelist.IsWhitelistPass(cutter.WallWhitelist, entity) ||
+                !TryGetWallTile(entity, out var wallGrid, out var wallGridComp, out var wallTile))
+                return false;
+
+            // The edge has to still hold the wall; a wall that is free already just comes loose.
+            var held = WallHeldEdges(cutter, wallGrid, wallGridComp, wallTile, entity);
+            if (target.Edge == CutEdges.None ? held != CutEdges.None : !held.HasFlag(target.Edge))
                 return false;
 
             delay = cutter.WallDelay;
@@ -187,11 +194,55 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
         }
 
         if (args.Cut.IsWall)
-            CutLoose(entity);
+            CutWall(ent.Comp, entity, args.Cut.Edge);
         else
             CutSeam(entity, args.Cut.Tile, args.Cut.Edge);
 
         _audio.PlayPvs(ent.Comp.DoneSound, ent);
+    }
+
+    private bool TryGetWallTile(EntityUid wall, out EntityUid gridUid, out MapGridComponent grid, out Vector2i tile)
+    {
+        grid = default!;
+        tile = default;
+        gridUid = default;
+
+        var xform = Transform(wall);
+        if (xform.GridUid is not { } uid || !TryComp(uid, out MapGridComponent? gridComp))
+            return false;
+
+        gridUid = uid;
+        grid = gridComp;
+        tile = MapSystem.TileIndicesFor(uid, gridComp, xform.Coordinates);
+        return true;
+    }
+
+    /// <summary>
+    /// Cuts one edge of the wall, on the wall next to it as well, and comes the wall loose once nothing holds it.
+    /// </summary>
+    public void CutWall(ShipCutterComponent cutter, EntityUid wall, CutEdges edge)
+    {
+        if (edge != CutEdges.None && TryGetWallTile(wall, out var gridUid, out var grid, out var tile))
+        {
+            EnsureComp<WallCutsComponent>(wall).Cuts |= edge;
+            Dirty(wall, Comp<WallCutsComponent>(wall));
+
+            // The cut is between two walls, so the other one is cut off just the same.
+            foreach (var other in MapSystem.GetAnchoredEntities((gridUid, grid), tile + edge.Offset()).ToList())
+            {
+                if (other == wall || !Whitelist.IsWhitelistPass(cutter.WallWhitelist, other))
+                    continue;
+
+                var otherCuts = EnsureComp<WallCutsComponent>(other);
+                otherCuts.Cuts |= edge.Opposite();
+                Dirty(other, otherCuts);
+            }
+
+            if (WallHeldEdges(cutter, gridUid, grid, tile, wall) != CutEdges.None)
+                return;
+        }
+
+        CutLoose(wall);
     }
 
     /// <summary>

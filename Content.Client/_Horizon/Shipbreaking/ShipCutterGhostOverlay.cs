@@ -86,8 +86,10 @@ public sealed class ShipCutterGhostOverlay : Overlay
             var pick = _cutter.Pick(mapPos, cutter);
             if (pick.Kind == ShipCutterPickKind.Seam)
                 DrawEdge(handle, pick.Grid, pick.GridComp!, pick.Tile, pick.Edge, pick.CanCut ? ValidColor : InvalidColor);
+            else if (pick.Kind == ShipCutterPickKind.Wall && pick.Edge != CutEdges.None)
+                DrawEdge(handle, pick.Grid, pick.GridComp!, pick.Tile, pick.Edge, ValidColor);
             else if (pick.Kind == ShipCutterPickKind.Wall)
-                DrawTile(handle, pick.Grid, pick.GridComp!, pick.Tile, ValidColor);
+                DrawTile(handle, pick.Grid, pick.GridComp!, pick.Tile, ValidColor); // free already, comes loose
         }
         else if (_entManager.TryGetComponent(held, out SeamWelderComponent? welder))
         {
