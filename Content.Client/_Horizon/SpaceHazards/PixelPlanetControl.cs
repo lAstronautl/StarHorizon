@@ -59,6 +59,9 @@ public sealed class PixelPlanetControl : Control
 
         var time = (float) _timing.RealTime.TotalSeconds + _seed;
         PixelPlanetShaderSetup.Configure(shader, kind, time, NativePixels, _seed, 0f, new Vector2(0.39f, 0.39f));
+        foreach (var (name, value) in _look.Overrides)
+            shader.SetParameter(name, value);
+
         PixelPlanetPalettes.ApplyPlanetColors(shader, kind, _look.Palette);
 
         var size = MathF.Min(PixelSize.X, PixelSize.Y);
