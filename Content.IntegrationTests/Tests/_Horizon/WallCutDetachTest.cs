@@ -77,7 +77,10 @@ public sealed class WallCutDetachTest
             Assert.That(PickAt(1.3f, 1.5f).Edge, Is.EqualTo(CutEdges.East), "only the right edge is left to cut");
 
             cutters.CutWall(cutter, middle, CutEdges.East);
-            Assert.That(entMan.GetComponent<TransformComponent>(middle).Anchored, Is.False, "cut off from both sides");
+            Assert.That(entMan.GetComponent<TransformComponent>(middle).Anchored, Is.True, "cut off from both sides, but a click is left");
+            Assert.That(PickAt(1.5f, 1.5f).Edge, Is.EqualTo(CutEdges.None));
+            cutters.CutWall(cutter, middle, CutEdges.None);
+            Assert.That(entMan.GetComponent<TransformComponent>(middle).Anchored, Is.False, "the last click unscrews it");
 
             // The wall on the left has nothing holding it any more, a click just unscrews it.
             Assert.That(entMan.GetComponent<TransformComponent>(left).Anchored, Is.True);

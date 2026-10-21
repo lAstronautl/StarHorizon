@@ -218,7 +218,8 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
     }
 
     /// <summary>
-    /// Cuts one edge of the wall, on the wall next to it as well, and comes the wall loose once nothing holds it.
+    /// Cuts one edge of the wall, on the wall next to it as well. With no edge given the wall comes loose, which is what
+    /// the click after the last cut does.
     /// </summary>
     public void CutWall(ShipCutterComponent cutter, EntityUid wall, CutEdges edge)
     {
@@ -238,8 +239,8 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
                 Dirty(other, otherCuts);
             }
 
-            if (WallHeldEdges(cutter, gridUid, grid, tile, wall) != CutEdges.None)
-                return;
+            // The last cut leaves the wall in place; one more click unscrews it.
+            return;
         }
 
         CutLoose(wall);
