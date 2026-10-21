@@ -28,3 +28,16 @@
     state: primed
     drawdepth: Mobs
   - type: ArmedBreachCharge
+    keysIn: [ timer ] # the output of the timer below
+  - type: TimerTrigger
+    delay: 10
+    beepInterval: 1
+    initialBeepDelay: 0
+    popup: null
+    examinable: false
+    beepSound:
+      path: /Audio/Machines/Nuke/general_beep.ogg
+  - type: EmitSoundOnTrigger
+    positional: true
+    sound:
+      path: /Audio/Effects/explosion1.ogg

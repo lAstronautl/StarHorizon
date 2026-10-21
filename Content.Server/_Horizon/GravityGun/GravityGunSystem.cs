@@ -27,10 +27,13 @@ public sealed class GravityGunSystem : EntitySystem
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly SharedJointSystem _joints = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly UseDelaySystem _useDelay = default!;
+
+    private const string TetherJoint = "gravity-gun-tether";
 
     private EntityQuery<PhysicsComponent> _physicsQuery;
 
@@ -50,7 +53,12 @@ public sealed class GravityGunSystem : EntitySystem
 
     private void OnShutdown(Entity<GravityGunComponent> ent, ref ComponentShutdown args)
     {
+        // Everything may be going away at once: the joint goes with the tether body, nothing is touched.
         ent.Comp.Held = null;
+        if (ent.Comp.Tether is { } tether && !TerminatingOrDeleted(tether))
+            QueueDel(tether);
+
+        ent.Comp.Tether = null;
     }
 
     private void OnUseInHand(Entity<GravityGunComponent> ent, ref UseInHandEvent args)
@@ -102,8 +110,8 @@ public sealed class GravityGunSystem : EntitySystem
         gun.Aim = Vector2.Normalize(clickPos.Position - userPos);
         Dirty(ent);
 
-        if (_physicsQuery.TryComp(held, out var body))
-            _physics.WakeBody(held, body: body);
+        if (!heavy)
+            StartTether(gun, held, clickPos);
 
         _audio.PlayPvs(gun.Sound, ent);
         _popup.PopupEntity(Loc.GetString(heavy ? "gravity-gun-heavy" : "gravity-gun-grabbed"), ent, user);
@@ -158,8 +166,50 @@ public sealed class GravityGunSystem : EntitySystem
         if (ent.Comp.Held == null)
             return;
 
+        if (_physicsQuery.TryComp(ent.Comp.Held, out var body))
+            _physics.SetSleepingAllowed(ent.Comp.Held.Value, body, true);
+
         ent.Comp.Held = null;
+        RemoveTether(ent.Comp);
         Dirty(ent);
+    }
+
+    /// <summary>
+    /// Joins the target to an invisible body with a mouse joint, the way the tether gun does, so the physics engine
+    /// does the moving and a heavy target is slow to bring around.
+    /// </summary>
+    private void StartTether(GravityGunComponent gun, EntityUid held, MapCoordinates click)
+    {
+        if (!_physicsQuery.TryComp(held, out var body))
+            return;
+
+        _physics.WakeBody(held, body: body);
+        _physics.SetSleepingAllowed(held, body, false);
+
+        var tether = Spawn("TetherEntity", click);
+        var tetherBody = _physicsQuery.GetComponent(tether);
+        _physics.WakeBody(tether, body: tetherBody);
+
+        var joint = _joints.CreateMouseJoint(tether, held, id: TetherJoint);
+        SharedJointSystem.LinearStiffness(gun.Frequency, gun.DampingRatio, tetherBody.Mass, body.Mass, out var stiffness, out var damping);
+        joint.Stiffness = stiffness;
+        joint.Damping = damping;
+        joint.MaxForce = gun.MaxForce;
+
+        gun.Tether = tether;
+    }
+
+    private void RemoveTether(GravityGunComponent gun)
+    {
+        if (gun.Tether is not { } tether)
+            return;
+
+        gun.Tether = null;
+        if (TerminatingOrDeleted(tether))
+            return;
+
+        _joints.RemoveJoint(tether, TetherJoint);
+        QueueDel(tether);
     }
 
     private void Fire(Entity<GravityGunComponent> ent, EntityUid user)
@@ -172,6 +222,7 @@ public sealed class GravityGunSystem : EntitySystem
         }
 
         var dir = gun.Aim;
+        RemoveTether(gun);
         if (gun.UserIsMoved)
         {
             // Launching at something that will not budge: the user is thrown back, the target stays put.
@@ -264,29 +315,19 @@ public sealed class GravityGunSystem : EntitySystem
             if (gun.UserIsMoved)
                 PullUser(gun, user, userPos, heldPoint, frameTime);
             else
-                MoveHeld(gun, held, userPos, heldPoint, frameTime);
+                MoveHeld(gun, held, userPos, frameTime);
         }
     }
 
     /// <summary>
-    /// Brings the grabbed point to where the user is aiming, at the held distance.
+    /// Moves the tether body to where the user is aiming, at the held distance; the joint brings the target along.
     /// </summary>
-    private void MoveHeld(GravityGunComponent gun, EntityUid held, Vector2 userPos, Vector2 heldPoint, float frameTime)
+    private void MoveHeld(GravityGunComponent gun, EntityUid held, Vector2 userPos, float frameTime)
     {
-        if (!_physicsQuery.TryComp(held, out var body) || body.BodyType != BodyType.Dynamic)
+        if (gun.Tether is not { } tether || !_physicsQuery.TryComp(held, out var body))
             return;
 
-        var anchor = userPos + gun.Aim * gun.HoldDistance;
-        var desired = (anchor - heldPoint) * gun.Gain;
-        if (desired.Length() > gun.HoldSpeed)
-            desired = Vector2.Normalize(desired) * gun.HoldSpeed;
-
-        var impulse = (desired - body.LinearVelocity) * body.Mass * MathF.Min(1f, frameTime * gun.Gain);
-        var limit = gun.MaxForce * frameTime;
-        if (impulse.Length() > limit)
-            impulse = Vector2.Normalize(impulse) * limit;
-
-        _physics.ApplyLinearImpulse(held, impulse, body: body);
+        _transform.SetWorldPosition(tether, userPos + gun.Aim * gun.HoldDistance);
 
         // Don't let a held grid spin about.
         _physics.SetAngularVelocity(held, body.AngularVelocity * (1f - MathF.Min(1f, frameTime * 3f)), body: body);

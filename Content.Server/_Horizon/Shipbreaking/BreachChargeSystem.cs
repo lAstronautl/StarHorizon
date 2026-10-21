@@ -3,10 +3,11 @@ using Content.Shared._Horizon.Shipbreaking;
 using Content.Shared.DoAfter;
 using Content.Shared.Interaction;
 using Content.Shared.Popups;
+using Content.Shared.Trigger;
+using Content.Shared.Trigger.Systems;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
-using Robust.Shared.Timing;
 
 namespace Content.Server._Horizon.Shipbreaking;
 
@@ -16,7 +17,6 @@ namespace Content.Server._Horizon.Shipbreaking;
 /// </summary>
 public sealed class BreachChargeSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;
@@ -24,6 +24,7 @@ public sealed class BreachChargeSystem : EntitySystem
     [Dependency] private readonly SharedShipCutterSystem _seams = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly ShipCutterSystem _cutter = default!;
+    [Dependency] private readonly TriggerSystem _trigger = default!;
 
     public override void Initialize()
     {
@@ -31,6 +32,7 @@ public sealed class BreachChargeSystem : EntitySystem
 
         SubscribeLocalEvent<BreachChargeComponent, AfterInteractEvent>(OnAfterInteract);
         SubscribeLocalEvent<BreachChargeComponent, BreachChargePlaceDoAfterEvent>(OnPlaced);
+        SubscribeLocalEvent<ArmedBreachChargeComponent, TriggerEvent>(OnTrigger);
     }
 
     private void OnAfterInteract(Entity<BreachChargeComponent> ent, ref AfterInteractEvent args)
@@ -87,43 +89,31 @@ public sealed class BreachChargeSystem : EntitySystem
         comp.Tile = args.Tile;
         comp.Edge = args.Edge;
         comp.Segments = ent.Comp.Segments;
-        comp.ExplodeAt = _timing.CurTime + comp.FuseTime;
-        comp.NextBeep = _timing.CurTime;
+
+        // The prototype has the timer trigger that counts the fuse down.
+        _trigger.ActivateTimerTrigger(armed, args.User);
 
         _audio.PlayPvs(ent.Comp.PlaceSound, armed);
         _popup.PopupEntity(Loc.GetString("breach-charge-placed"), armed, args.User);
         QueueDel(ent);
     }
 
-    public override void Update(float frameTime)
-    {
-        base.Update(frameTime);
-
-        var query = EntityQueryEnumerator<ArmedBreachChargeComponent>();
-        while (query.MoveNext(out var uid, out var armed))
-        {
-            if (_timing.CurTime >= armed.ExplodeAt)
-            {
-                Detonate((uid, armed));
-                continue;
-            }
-
-            if (_timing.CurTime >= armed.NextBeep)
-            {
-                armed.NextBeep = _timing.CurTime + TimeSpan.FromSeconds(1);
-                _audio.PlayPvs(armed.BeepSound, uid);
-            }
-        }
-    }
-
     /// <summary>
     /// Cuts the seams of a line along the edge, centred on the charge. Walls and furniture are not touched, only the floor.
     /// </summary>
+    private void OnTrigger(Entity<ArmedBreachChargeComponent> ent, ref TriggerEvent args)
+    {
+        if (args.Key != null && !ent.Comp.KeysIn.Contains(args.Key))
+            return;
+
+        args.Handled = true;
+        Detonate(ent);
+    }
+
     private void Detonate(Entity<ArmedBreachChargeComponent> ent)
     {
         var armed = ent.Comp;
         var gridUid = armed.Grid;
-        _audio.PlayPvs(armed.ExplodeSound, ent);
 
         // If the grid was split since, the charge is on another one and the line is gone with its place.
         if (TryComp<MapGridComponent>(gridUid, out var grid) && Transform(ent).GridUid == gridUid)

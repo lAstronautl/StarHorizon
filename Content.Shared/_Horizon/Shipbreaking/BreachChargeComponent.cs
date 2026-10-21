@@ -1,9 +1,9 @@
 using Content.Shared.DoAfter;
+using Content.Shared.Trigger.Components.Effects;
 using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
-using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
 namespace Content.Shared._Horizon.Shipbreaking;
 
@@ -40,10 +40,11 @@ public sealed partial class BreachChargeComponent : Component
 }
 
 /// <summary>
-/// A charge that hangs on an edge and counts down.
+/// A charge hanging on an edge. When triggered (the timer trigger of the prototype counts the fuse down) it cuts the line
+/// of seams along that edge.
 /// </summary>
-[RegisterComponent, AutoGenerateComponentPause]
-public sealed partial class ArmedBreachChargeComponent : Component
+[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+public sealed partial class ArmedBreachChargeComponent : BaseXOnTriggerComponent
 {
     /// <summary>
     /// The grid, the tile and the edge it hangs on. Only the server sets them.
@@ -52,21 +53,6 @@ public sealed partial class ArmedBreachChargeComponent : Component
     public Vector2i Tile;
     public CutEdges Edge;
     public int Segments = 5;
-
-    [DataField]
-    public TimeSpan FuseTime = TimeSpan.FromSeconds(10);
-
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoPausedField]
-    public TimeSpan ExplodeAt;
-
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoPausedField]
-    public TimeSpan NextBeep;
-
-    [DataField]
-    public SoundSpecifier? BeepSound = new SoundPathSpecifier("/Audio/Machines/Nuke/general_beep.ogg");
-
-    [DataField]
-    public SoundSpecifier? ExplodeSound = new SoundPathSpecifier("/Audio/Effects/explosion1.ogg");
 }
 
 [Serializable, NetSerializable]

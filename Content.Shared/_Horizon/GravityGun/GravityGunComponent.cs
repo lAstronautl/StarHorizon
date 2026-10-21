@@ -46,10 +46,13 @@ public sealed partial class GravityGunComponent : Component
     public float GridMassLimit = 5000f;
 
     /// <summary>
-    /// The fastest a held target is brought to where the gun wants it, in m/s.
+    /// Stiffness of the joint that holds the target, as for the tether gun.
     /// </summary>
     [DataField]
-    public float HoldSpeed = 10f;
+    public float Frequency = 10f;
+
+    [DataField]
+    public float DampingRatio = 2f;
 
     /// <summary>
     /// How hard the gun pulls a held target, in newtons. Heavier targets are slower to bring around.
@@ -131,6 +134,12 @@ public sealed partial class GravityGunComponent : Component
     /// </summary>
     [ViewVariables]
     public Vector2 Aim;
+
+    /// <summary>
+    /// The invisible body the held target is joined to; it is moved to where the gun wants the target.
+    /// </summary>
+    [ViewVariables]
+    public EntityUid? Tether;
 }
 
 /// <summary>

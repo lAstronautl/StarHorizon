@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Content.IntegrationTests.Pair;
 using Content.Shared._Horizon.Shipbreaking;
+using Content.Shared.Trigger.Systems;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Log;
 using Robust.Shared.Map;
@@ -56,7 +57,7 @@ public sealed class BreachChargeTest
         armed.Tile = tile;
         armed.Edge = edge;
         armed.Segments = 5;
-        armed.ExplodeAt = server.ResolveDependency<IGameTiming>().CurTime;
+        entMan.System<TriggerSystem>().Trigger(charge, key: "timer");
     }
 
     [Test]
