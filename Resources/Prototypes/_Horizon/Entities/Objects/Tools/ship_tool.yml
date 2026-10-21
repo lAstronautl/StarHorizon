@@ -3,7 +3,10 @@
 # Cut: click a wall to cut it loose (then move it with a gravity gun), click the seam between two floor tiles to cut a
 # slit along it: the slit leaks air, shows as a gap, and a part with no connections left breaks off into its own grid.
 # Weld: pick an edge of one hull and an edge of another to join them, click a seam or a cut to weld it shut.
-# A ghost of the target is shown under the cursor while it is held. Sprite is a placeholder (welder).
+# A ghost of the target is shown under the cursor while it is held.
+# The look follows the mode like on the omnitool: cutSprite / weldSprite change the icon, cutHeldPrefix / weldHeldPrefix
+# the in-hand states ({prefix}-inhand-left ...). Sprites are placeholders (welders); when the real ones are drawn,
+# point cutSprite / weldSprite at them and set the held prefixes.
 - type: entity
   id: ShipTool
   parent:
@@ -19,6 +22,14 @@
     layers:
     - state: icon
   - type: ShipCutter
+    cutSprite:
+      sprite: Objects/Tools/welder.rsi
+      state: icon
+    weldSprite:
+      sprite: Objects/Tools/welder_industrial.rsi
+      state: icon
+    changeSound:
+      path: /Audio/Items/change_drill.ogg
     wallWhitelist:
       tags:
       - Wall

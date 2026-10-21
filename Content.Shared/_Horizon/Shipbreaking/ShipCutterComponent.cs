@@ -4,6 +4,7 @@ using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Utility;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared._Horizon.Shipbreaking;
@@ -14,7 +15,7 @@ namespace Content.Shared._Horizon.Shipbreaking;
 /// the seam between two floor tiles cuts a slit along it (see <see cref="GridCutsComponent"/>).
 /// In <see cref="ShipToolMode.Weld"/> it works as a seam welder (see the SeamWelder component).
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true)]
 public sealed partial class ShipCutterComponent : Component
 {
     /// <summary>
@@ -34,6 +35,30 @@ public sealed partial class ShipCutterComponent : Component
 
     [DataField]
     public LocId CutDescription = "ship-tool-desc-cut";
+
+    /// <summary>
+    /// How the item looks in each mode (inventory and floor icon). Not set: the sprite of the prototype stays.
+    /// </summary>
+    [DataField]
+    public SpriteSpecifier? CutSprite;
+
+    [DataField]
+    public SpriteSpecifier? WeldSprite;
+
+    /// <summary>
+    /// Prefix of the in-hand states in each mode (<c>{prefix}-inhand-left</c> and so on). Not set: the prefix stays.
+    /// </summary>
+    [DataField]
+    public string? CutHeldPrefix;
+
+    [DataField]
+    public string? WeldHeldPrefix;
+
+    /// <summary>
+    /// Played when the mode is switched.
+    /// </summary>
+    [DataField]
+    public SoundSpecifier? ChangeSound;
 
     [DataField]
     public LocId WeldDescription = "ship-tool-desc-weld";

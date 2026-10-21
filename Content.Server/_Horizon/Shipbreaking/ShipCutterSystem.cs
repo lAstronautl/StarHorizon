@@ -3,6 +3,7 @@ using Content.Shared._Horizon.Shipbreaking;
 using Content.Shared.DoAfter;
 using Content.Shared.Interaction;
 using Content.Shared.Interaction.Events;
+using Content.Shared.Item;
 using Content.Shared.Popups;
 using Content.Shared.Whitelist;
 using Robust.Shared.Audio.Systems;
@@ -25,6 +26,7 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
     [Dependency] private readonly GridCutsSystem _cuts = default!;
     [Dependency] private readonly PowerCellSystem _cell = default!;
     [Dependency] private readonly MetaDataSystem _meta = default!;
+    [Dependency] private readonly SharedItemSystem _item = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
@@ -63,6 +65,7 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
         RaiseLocalEvent(ent, ref changed);
 
         _popup.PopupEntity(Loc.GetString(ent.Comp.Mode == ShipToolMode.Cut ? "ship-tool-mode-cut" : "ship-tool-mode-weld"), ent, args.User);
+        _audio.PlayPvs(ent.Comp.ChangeSound, ent);
     }
 
     private void UpdateName(Entity<ShipCutterComponent> ent)
@@ -70,6 +73,11 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
         var cut = ent.Comp.Mode == ShipToolMode.Cut;
         _meta.SetEntityName(ent, Loc.GetString(cut ? ent.Comp.CutName : ent.Comp.WeldName));
         _meta.SetEntityDescription(ent, Loc.GetString(cut ? ent.Comp.CutDescription : ent.Comp.WeldDescription));
+
+        // What is held in hand looks different too, if the prototype has a look for the mode.
+        var prefix = cut ? ent.Comp.CutHeldPrefix : ent.Comp.WeldHeldPrefix;
+        if (prefix != null)
+            _item.SetHeldPrefix(ent, prefix);
     }
 
     private void OnAfterInteract(Entity<ShipCutterComponent> ent, ref AfterInteractEvent args)
