@@ -1,0 +1,25 @@
+# Shipbreaking tool: a battery powered cutter and seam welder in one item. Use it in hand to switch the mode,
+# the name of the item follows the mode.
+# Cut: click a wall to cut it loose (then move it with a gravity gun), click the seam between two floor tiles to cut a
+# slit along it: the slit leaks air, shows as a gap, and a part with no connections left breaks off into its own grid.
+# Weld: pick an edge of one hull and an edge of another to join them, click a seam or a cut to weld it shut.
+# A ghost of the target is shown under the cursor while it is held. Sprite is a placeholder (welder).
+- type: entity
+  id: ShipTool
+  parent:
+  - BaseItem
+  - PowerCellSlotMediumItem
+  name: ship cutter
+  description: A heavy battery powered plasma cutter for taking ships apart. Use it in hand to switch to welding.
+  components:
+  - type: Item
+    size: Normal
+  - type: Sprite
+    sprite: Objects/Tools/welder.rsi
+    layers:
+    - state: icon
+  - type: ShipCutter
+    wallWhitelist:
+      tags:
+      - Wall
+  - type: SeamWelder

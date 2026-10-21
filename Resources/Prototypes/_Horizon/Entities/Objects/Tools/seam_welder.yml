@@ -1,9 +1,0 @@
-# Seam welder: joins two grids edge to edge and welds shut the seams and cuts between tiles.
-# Sprite is a placeholder (industrial welder).
-- type: entity
-  id: SeamWelder
-  parent: WelderIndustrial
-  name: seam welder
-  description: A heavy-duty welder for joining two hulls edge to edge and welding shut the seams and cuts between tiles.
-  components:
-  - type: SeamWelder

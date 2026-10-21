@@ -7,7 +7,7 @@ using Robust.Shared.Maths;
 namespace Content.Shared._Horizon.GridWelding.Components;
 
 /// <summary>
-/// A welding tool that can splice two separate grids together into one, and afterwards weld shut
+/// The seam welding mode of the ship tool (see <see cref="ShipCutterComponent"/>). Can splice two separate grids together into one, and afterwards weld shut
 /// the remaining seam points along the newly-joined border one at a time. See
 /// <see cref="SharedGridWeldingSystem"/>.
 /// </summary>
@@ -65,16 +65,16 @@ public sealed partial class SeamWelderComponent : Component
     public TimeSpan WeldSealDelay = TimeSpan.FromSeconds(1);
 
     /// <summary>
-    /// Fuel cost of the initial grid-merging weld.
+    /// Charge taken from the power cell for the initial grid-merging weld.
     /// </summary>
     [DataField]
-    public float MergeFuelCost = 5f;
+    public float MergeCharge = 60f;
 
     /// <summary>
-    /// Fuel cost of sealing a single seam point.
+    /// Charge taken from the power cell for sealing a single seam point.
     /// </summary>
     [DataField]
-    public float SealFuelCost = 1f;
+    public float SealCharge = 15f;
 
     /// <summary>
     /// How far apart (in world meters) the two selected tiles' facing edges are allowed to be for

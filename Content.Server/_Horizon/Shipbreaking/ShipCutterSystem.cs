@@ -2,6 +2,7 @@ using Content.Server.PowerCell;
 using Content.Shared._Horizon.Shipbreaking;
 using Content.Shared.DoAfter;
 using Content.Shared.Interaction;
+using Content.Shared.Interaction.Events;
 using Content.Shared.Popups;
 using Content.Shared.Whitelist;
 using Robust.Shared.Audio.Systems;
@@ -23,6 +24,7 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
     [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
     [Dependency] private readonly GridCutsSystem _cuts = default!;
     [Dependency] private readonly PowerCellSystem _cell = default!;
+    [Dependency] private readonly MetaDataSystem _meta = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
@@ -32,13 +34,47 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
     {
         base.Initialize();
 
+        SubscribeLocalEvent<ShipCutterComponent, MapInitEvent>(OnMapInit);
+        SubscribeLocalEvent<ShipCutterComponent, UseInHandEvent>(OnUseInHand);
         SubscribeLocalEvent<ShipCutterComponent, AfterInteractEvent>(OnAfterInteract);
         SubscribeLocalEvent<ShipCutterComponent, ShipCutterDoAfterEvent>(OnDoAfter);
     }
 
+    private void OnMapInit(Entity<ShipCutterComponent> ent, ref MapInitEvent args)
+    {
+        UpdateName(ent);
+    }
+
+    /// <summary>
+    /// Using the tool in hand switches between cutting and welding.
+    /// </summary>
+    private void OnUseInHand(Entity<ShipCutterComponent> ent, ref UseInHandEvent args)
+    {
+        if (args.Handled)
+            return;
+
+        args.Handled = true;
+
+        ent.Comp.Mode = ent.Comp.Mode == ShipToolMode.Cut ? ShipToolMode.Weld : ShipToolMode.Cut;
+        Dirty(ent);
+        UpdateName(ent);
+
+        var changed = new ShipToolModeChangedEvent(ent.Comp.Mode);
+        RaiseLocalEvent(ent, ref changed);
+
+        _popup.PopupEntity(Loc.GetString(ent.Comp.Mode == ShipToolMode.Cut ? "ship-tool-mode-cut" : "ship-tool-mode-weld"), ent, args.User);
+    }
+
+    private void UpdateName(Entity<ShipCutterComponent> ent)
+    {
+        var cut = ent.Comp.Mode == ShipToolMode.Cut;
+        _meta.SetEntityName(ent, Loc.GetString(cut ? ent.Comp.CutName : ent.Comp.WeldName));
+        _meta.SetEntityDescription(ent, Loc.GetString(cut ? ent.Comp.CutDescription : ent.Comp.WeldDescription));
+    }
+
     private void OnAfterInteract(Entity<ShipCutterComponent> ent, ref AfterInteractEvent args)
     {
-        if (args.Handled || !args.CanReach)
+        if (args.Handled || !args.CanReach || ent.Comp.Mode != ShipToolMode.Cut)
             return;
 
         if (!TryPickTarget(ent.Comp, args.Target, args.ClickLocation, out var target))

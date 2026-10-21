@@ -3,17 +3,41 @@ using Content.Shared.Whitelist;
 using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
 using Robust.Shared.Map;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared._Horizon.Shipbreaking;
 
 /// <summary>
-/// A battery powered cutter for shipbreaking. Clicking a wall cuts it loose so it can be moved with a gravity gun,
-/// clicking the seam between two floor tiles cuts a slit along it (see <see cref="GridCutsComponent"/>).
+/// A battery powered shipbreaking tool with two modes, switched by using it in hand.
+/// In <see cref="ShipToolMode.Cut"/> clicking a wall cuts it loose so it can be moved with a gravity gun, and clicking
+/// the seam between two floor tiles cuts a slit along it (see <see cref="GridCutsComponent"/>).
+/// In <see cref="ShipToolMode.Weld"/> it works as a seam welder (see the SeamWelder component).
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
 public sealed partial class ShipCutterComponent : Component
 {
+    /// <summary>
+    /// What the tool does at the moment. The name of the item follows it.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public ShipToolMode Mode = ShipToolMode.Cut;
+
+    /// <summary>
+    /// Name of the item in each mode, localized.
+    /// </summary>
+    [DataField]
+    public LocId CutName = "ship-tool-name-cut";
+
+    [DataField]
+    public LocId WeldName = "ship-tool-name-weld";
+
+    [DataField]
+    public LocId CutDescription = "ship-tool-desc-cut";
+
+    [DataField]
+    public LocId WeldDescription = "ship-tool-desc-weld";
+
     /// <summary>
     /// What counts as a wall that can be cut loose.
     /// </summary>
@@ -89,3 +113,15 @@ public sealed partial class ShipCutterDoAfterEvent : DoAfterEvent
 
     public override DoAfterEvent Clone() => this;
 }
+
+public enum ShipToolMode : byte
+{
+    Cut,
+    Weld,
+}
+
+/// <summary>
+/// Raised on the tool after its mode was switched.
+/// </summary>
+[ByRefEvent]
+public readonly record struct ShipToolModeChangedEvent(ShipToolMode Mode);

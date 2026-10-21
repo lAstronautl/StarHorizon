@@ -70,7 +70,10 @@ public sealed class ShipCutterGhostOverlay : Overlay
 
         var handle = args.WorldHandle;
 
-        if (_entManager.TryGetComponent(held, out ShipCutterComponent? cutter))
+        if (!_entManager.TryGetComponent(held, out ShipCutterComponent? cutter))
+            return;
+
+        if (cutter.Mode == ShipToolMode.Cut)
         {
             // The cutter shows where it would cut.
             if (_cutter.TryGetSeam(mapPos, cutter.EdgeTolerance, out var gridUid, out var grid, out var tile, out var edge))

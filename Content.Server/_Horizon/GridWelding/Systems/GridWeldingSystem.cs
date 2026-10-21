@@ -1,5 +1,6 @@
 using Content.Server._Horizon.Shipbreaking;
 using Content.Server.Administration.Logs;
+using Content.Server.PowerCell;
 using Content.Shared._Horizon.GridWelding.Components;
 using Content.Shared._Horizon.GridWelding.Events;
 using Content.Shared._Horizon.GridWelding.Systems;
@@ -8,7 +9,7 @@ using Content.Shared.Database;
 using Content.Shared.Gravity;
 using Content.Shared.Interaction;
 using Content.Shared.Popups;
-using Content.Shared.Tools.Systems;
+using Content.Shared.DoAfter;
 using Robust.Server.Physics;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Map;
@@ -24,7 +25,8 @@ namespace Content.Server._Horizon.GridWelding.Systems;
 /// </summary>
 public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
 {
-    [Dependency] private readonly SharedToolSystem _tool = default!;
+    [Dependency] private readonly PowerCellSystem _cell = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedInteractionSystem _interaction = default!;
@@ -42,14 +44,51 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
     {
         base.Initialize();
 
+        SubscribeLocalEvent<SeamWelderComponent, ShipToolModeChangedEvent>(OnModeChanged);
         SubscribeLocalEvent<SeamWelderComponent, AfterInteractEvent>(OnAfterInteract);
         SubscribeLocalEvent<SeamWelderComponent, GridWeldMergeDoAfterEvent>(OnMergeDoAfter);
         SubscribeLocalEvent<SeamWelderComponent, GridWeldSealDoAfterEvent>(OnSealDoAfter);
     }
 
+    // Switching the tool away from welding drops the edge that was picked.
+    private void OnModeChanged(Entity<SeamWelderComponent> ent, ref ShipToolModeChangedEvent args)
+    {
+        if (!ent.Comp.HasPendingSelection)
+            return;
+
+        ClearPendingSelection(ent.Comp);
+        Dirty(ent);
+    }
+
+    private bool IsWelding(EntityUid tool)
+    {
+        return TryComp<ShipCutterComponent>(tool, out var mode) && mode.Mode == ShipToolMode.Weld;
+    }
+
+    /// <summary>
+    /// Starts a do-after on the tool itself, if the power cell has the charge.
+    /// </summary>
+    private void StartWeld(Entity<SeamWelderComponent> ent, EntityUid user, TimeSpan delay, float charge, DoAfterEvent ev)
+    {
+        if (!_cell.HasCharge(ent, charge, user: user))
+        {
+            _popup.PopupEntity(Loc.GetString("ship-cutter-no-charge"), ent, user);
+            return;
+        }
+
+        var args = new DoAfterArgs(EntityManager, user, delay, ev, ent, target: ent, used: ent)
+        {
+            BreakOnDamage = true,
+            BreakOnMove = true,
+            NeedHand = true,
+        };
+
+        _doAfter.TryStartDoAfter(args);
+    }
+
     private void OnAfterInteract(Entity<SeamWelderComponent> ent, ref AfterInteractEvent args)
     {
-        if (args.Handled || !args.CanReach)
+        if (args.Handled || !args.CanReach || !IsWelding(ent))
             return;
 
         var comp = ent.Comp;
@@ -122,15 +161,14 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
         }
 
         var ev = new GridWeldMergeDoAfterEvent(GetNetEntity(gridA), tileA, edgeA, GetNetEntity(gridUid), edgeTile, edge);
-        // The tool is the target, so the finished do-after is raised on it (a null target would broadcast it).
-        _tool.UseTool(ent, args.User, ent, (float) comp.WeldMergeDelay.TotalSeconds, "Welding", ev, comp.MergeFuelCost);
+        StartWeld(ent, args.User, comp.WeldMergeDelay, comp.MergeCharge, ev);
     }
 
     private void StartSeal(Entity<SeamWelderComponent> ent, EntityUid user, EntityUid gridUid, Vector2i tile, CutEdges edge, SeamWelderComponent comp)
     {
         _popup.PopupEntity(Loc.GetString("grid-welding-sealing-seam"), ent, user, PopupType.Medium);
         var ev = new GridWeldSealDoAfterEvent(GetNetEntity(gridUid), tile, edge);
-        _tool.UseTool(ent, user, ent, (float) comp.WeldSealDelay.TotalSeconds, "Welding", ev, comp.SealFuelCost);
+        StartWeld(ent, user, comp.WeldSealDelay, comp.SealCharge, ev);
     }
 
     private void OnMergeDoAfter(Entity<SeamWelderComponent> ent, ref GridWeldMergeDoAfterEvent args)
@@ -148,6 +186,12 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
             if (errorKey != null)
                 _popup.PopupEntity(Loc.GetString(errorKey), ent, args.User, PopupType.SmallCaution);
             _audio.PlayPvs(ent.Comp.ErrorSound, ent);
+            return;
+        }
+
+        if (!_cell.TryUseCharge(ent, ent.Comp.MergeCharge, user: args.User))
+        {
+            _popup.PopupEntity(Loc.GetString("ship-cutter-no-charge"), ent, args.User);
             return;
         }
 
@@ -215,6 +259,9 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
             _popup.PopupEntity(Loc.GetString("grid-welding-no-seam"), ent, args.User, PopupType.SmallCaution);
             return;
         }
+
+        // The cut is welded shut, the charge is taken for it.
+        _cell.TryUseCharge(ent, ent.Comp.SealCharge, user: args.User);
 
         _audio.PlayPvs(ent.Comp.SealSound, ent);
 
