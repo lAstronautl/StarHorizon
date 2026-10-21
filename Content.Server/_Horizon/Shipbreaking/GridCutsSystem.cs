@@ -84,7 +84,8 @@ public sealed class GridCutsSystem : EntitySystem
     }
 
     /// <summary>
-    /// Moves the cuts inside the moved part to the new grid and drops the ones that ran along the split.
+    /// Moves the cuts of the moved part to the new grid. The cuts along the split stay on both halves, as gaps on
+    /// their edges.
     /// </summary>
     public void MoveCuts(EntityUid oldUid, GridCutsComponent oldCuts, EntityUid newUid, HashSet<Vector2i> moved)
     {
@@ -92,34 +93,8 @@ public sealed class GridCutsSystem : EntitySystem
 
         foreach (var indices in moved)
         {
-            if (!oldCuts.Cuts.Remove(indices, out var flags))
-                continue;
-
-            var kept = CutEdges.None;
-            foreach (var edge in CutEdgesExtensions.All)
-            {
-                if (flags.HasFlag(edge) && moved.Contains(indices + edge.Offset()))
-                    kept |= edge;
-            }
-
-            if (kept != CutEdges.None)
-                newCuts.Cuts[indices] = kept;
-        }
-
-        // The tiles left behind no longer have a neighbour across the split: their cut is now just an open edge.
-        foreach (var indices in moved)
-        {
-            foreach (var edge in CutEdgesExtensions.All)
-            {
-                var neighbor = indices + edge.Offset();
-                if (moved.Contains(neighbor) ||
-                    !oldCuts.Cuts.TryGetValue(neighbor, out var flags) ||
-                    !flags.HasFlag(edge.Opposite()))
-                    continue;
-
-                ClearEdge(oldCuts, neighbor, edge.Opposite());
-                _atmos.InvalidateTile(oldUid, neighbor);
-            }
+            if (oldCuts.Cuts.Remove(indices, out var flags))
+                newCuts.Cuts[indices] = flags;
         }
 
         if (newCuts.Cuts.Count == 0)

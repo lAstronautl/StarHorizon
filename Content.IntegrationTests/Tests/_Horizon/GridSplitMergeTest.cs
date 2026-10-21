@@ -136,7 +136,8 @@ public sealed class GridSplitMergeTest
 
             Assert.That(entMan.GetComponent<GravityComponent>(newGrid).Enabled, Is.True, "the piece with the generator keeps gravity");
             Assert.That(entMan.GetComponent<GravityComponent>(grid).Enabled, Is.False, "the rest lost its generator");
-            Assert.That(entMan.HasComponent<GridCutsComponent>(grid), Is.False, "the cuts along the split are gone");
+            Assert.That(entMan.GetComponent<GridCutsComponent>(grid).Cuts.GetValueOrDefault(new Vector2i(3, 1)).HasFlag(CutEdges.West), Is.True, "the gap stays on the rest");
+            Assert.That(entMan.GetComponent<GridCutsComponent>(newGrid).Cuts.GetValueOrDefault(new Vector2i(2, 1)).HasFlag(CutEdges.East), Is.True, "and on the piece");
             Assert.That(entMan.GetComponent<TransformComponent>(loose).GridUid, Is.EqualTo(newGrid), "loose things move with the piece");
         });
 
