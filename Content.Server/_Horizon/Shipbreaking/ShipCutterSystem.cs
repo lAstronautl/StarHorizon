@@ -114,23 +114,36 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
     }
 
     /// <summary>
-    /// Works out what a click is aimed at: a wall that can be cut loose, or the seam next to the click.
+    /// Works out what a click is aimed at: the seam next to the click, also where a wall stands on it, or else a wall
+    /// that can be cut loose.
     /// </summary>
     private bool TryPickTarget(ShipCutterComponent cutter, EntityUid? clicked, EntityCoordinates click, out ShipCutterTarget target)
     {
         target = default;
 
+        // A click near the edge of a tile cuts the seam, a wall on the tile does not matter: the gap shows over it.
+        if (TryGetSeam(TransformSystem.ToMapCoordinates(click), cutter.EdgeTolerance, out var gridUid, out var grid, out var tile, out var edge) &&
+            CanCut(gridUid, grid, tile, edge))
+        {
+            target = ShipCutterTarget.Seam(GetNetEntity(gridUid), tile, edge);
+            return true;
+        }
+
+        // A click in the middle of a wall cuts the wall loose.
         if (clicked is { } wall && Transform(wall).Anchored && _whitelist.IsWhitelistPass(cutter.WallWhitelist, wall))
         {
             target = ShipCutterTarget.Wall(GetNetEntity(wall));
             return true;
         }
 
-        if (!TryGetSeam(TransformSystem.ToMapCoordinates(click), cutter.EdgeTolerance, out var gridUid, out _, out var tile, out var edge))
-            return false;
+        // Near an edge that can not be cut (space or already cut): still the seam, so the message says so.
+        if (edge != CutEdges.None)
+        {
+            target = ShipCutterTarget.Seam(GetNetEntity(gridUid), tile, edge);
+            return true;
+        }
 
-        target = ShipCutterTarget.Seam(GetNetEntity(gridUid), tile, edge);
-        return true;
+        return false;
     }
 
     /// <summary>
