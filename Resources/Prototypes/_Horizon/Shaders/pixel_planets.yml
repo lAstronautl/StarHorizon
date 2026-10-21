@@ -57,8 +57,3 @@
   id: PixelLavaWorld
   kind: source
   path: "/Textures/_Horizon/Shaders/PixelPlanets/pixel_lava_world.swsl"
-
-- type: shader
-  id: PixelBiomePlanet
-  kind: source
-  path: "/Textures/_Horizon/Shaders/PixelPlanets/pixel_biome_planet.swsl"

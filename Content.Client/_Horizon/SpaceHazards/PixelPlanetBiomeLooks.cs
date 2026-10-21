@@ -4,355 +4,208 @@
 
 using System.Numerics;
 using Robust.Client.Graphics;
+using Content.Shared._Horizon.SpaceHazards;
 
 namespace Content.Client._Horizon.SpaceHazards;
 
 /// <summary>
-/// Parameters for the <c>PixelBiomePlanet</c> shader: float uniforms (noise scale, color thresholds thr1..thr9,
-/// overlay cover, ...) and color uniforms (color0..9 terrain ramp, ov_c0..2 overlay).
+/// Shader kind, palette and tuned shader parameters for a biome planet.
 /// </summary>
+/// <param name="Palette">Colors in the slot order of <see cref="PixelPlanetPalettes.GetPalette"/>.</param>
+/// <param name="Overrides">Shader float parameters applied after <see cref="PixelPlanetShaderSetup.Configure"/>.</param>
 public readonly record struct PixelPlanetLook(
-    IReadOnlyDictionary<string, float> Floats,
-    IReadOnlyDictionary<string, Vector3> Colors);
+    PixelPlanetKind Kind,
+    Vector3[] Palette,
+    IReadOnlyDictionary<string, float> Overrides);
 
 /// <summary>
-/// Biome planet presets for UI previews (expedition mission cards). Each one was fitted to the pre-rendered
-/// expedition planet sprite of that biome: terrain colors are placed by thresholds so their pixel shares match
-/// the sprite, and noise scale/octaves/dither were tuned so edge density, blob count and blob size match too.
+/// Biome planet presets for UI previews and the in-world expedition planets. The looks are the Pixel Planets shaders
+/// that the expedition planet sprites were rendered with: palette colors come from the sprites, and the noise
+/// parameters were fitted so color shares, edge density, blob count/size and light direction match them.
 /// </summary>
 public static class PixelPlanetBiomeLooks
 {
-    public const string ShaderId = "PixelBiomePlanet";
-
     private static readonly Dictionary<string, PixelPlanetLook> Presets = CreatePresets();
 
     private static Dictionary<string, PixelPlanetLook> CreatePresets()
     {
         var presets = new Dictionary<string, PixelPlanetLook>
         {
-            ["Grasslands"] = new(
+            ["Grasslands"] = new(PixelPlanetKind.LandMasses,
+            [
+                H("#4fa4b8"),
+                H("#4fa4b8"),
+                H("#283540"),
+                H("#63ab3f"),
+                H("#1b832d"),
+                H("#38733b"),
+                H("#38733b"),
+                H("#dfe0e8"),
+                H("#686f99"),
+                H("#404973"),
+            ],
             new Dictionary<string, float>
             {
-                ["detail_mix"] = 0.103f,
-                ["detail_size"] = 3f,
-                ["dither_size"] = 1.3711f,
-                ["light_strength"] = 0.3023f,
-                ["octaves"] = 1f,
-                ["ov_band"] = 0.0001f,
-                ["ov_cover"] = 0.6899f,
-                ["ov_enabled"] = 1f,
-                ["ov_light_border"] = 0.2714f,
-                ["ov_octaves"] = 3.5083f,
-                ["ov_size"] = 11.917f,
-                ["ov_stretch"] = 0.9914f,
-                ["size"] = 7.7272f,
-                ["thr1"] = 0.1483f,
-                ["thr2"] = 0.2793f,
-                ["thr3"] = 0.3712f,
-                ["thr4"] = 0.4761f,
-                ["thr5"] = 99f,
-                ["thr6"] = 99f,
-                ["thr7"] = 99f,
-                ["thr8"] = 99f,
-                ["thr9"] = 99f,
-                ["warp"] = 1.4894f,
-            },
-            new Dictionary<string, Vector3>
-            {
-                ["color0"] = H("#283540"),
-                ["color1"] = H("#38733b"),
-                ["color2"] = H("#4fa4b8"),
-                ["color3"] = H("#63ab3f"),
-                ["color4"] = H("#1b832d"),
-                ["color5"] = H("#1b832d"),
-                ["color6"] = H("#1b832d"),
-                ["color7"] = H("#1b832d"),
-                ["color8"] = H("#1b832d"),
-                ["color9"] = H("#1b832d"),
-                ["ov_c0"] = H("#dfe0e8"),
-                ["ov_c1"] = H("#686f99"),
-                ["ov_c2"] = H("#404973"),
+                ["cloud_cover"] = 0.7068f,
+                ["cloud_curve"] = 1.9583f,
+                ["cloud_octaves"] = 3.4337f,
+                ["cloud_size"] = 9.7514f,
+                ["dither_size"] = 2.2759f,
+                ["land_cutoff"] = 0.4259f,
+                ["land_light_border_1"] = 0.3387f,
+                ["land_light_border_2"] = 0.481f,
+                ["land_octaves"] = 4.2099f,
+                ["land_size"] = 4.8653f,
+                ["light_border_1"] = 0.2299f,
+                ["light_border_2"] = 0.7916f,
+                ["octaves"] = 2.6943f,
+                ["size"] = 9.7386f,
+                ["stretch"] = 2.8768f,
             }),
-            ["Lava"] = new(
+            ["Lava"] = new(PixelPlanetKind.LavaWorld,
+            [
+                H("#8f4d57"),
+                H("#52333f"),
+                H("#3d2936"),
+                H("#52333f"),
+                H("#3d2936"),
+                H("#ff8933"),
+                H("#e64539"),
+                H("#ad2f45"),
+            ],
             new Dictionary<string, float>
             {
-                ["detail_mix"] = 0.0101f,
-                ["detail_size"] = 15.2903f,
-                ["dither_size"] = 0f,
-                ["light_strength"] = 0.0803f,
-                ["octaves"] = 5.8974f,
-                ["ov_cover"] = 99f,
-                ["ov_enabled"] = 0f,
-                ["size"] = 2.6805f,
-                ["thr1"] = 0.4489f,
-                ["thr2"] = 0.4911f,
-                ["thr3"] = 0.5188f,
-                ["thr4"] = 0.5599f,
-                ["thr5"] = 0.5919f,
-                ["thr6"] = 99f,
-                ["thr7"] = 99f,
-                ["thr8"] = 99f,
-                ["thr9"] = 99f,
-                ["warp"] = 0.5808f,
-            },
-            new Dictionary<string, Vector3>
-            {
-                ["color0"] = H("#3d2936"),
-                ["color1"] = H("#52333f"),
-                ["color2"] = H("#8f4d57"),
-                ["color3"] = H("#ad2f45"),
-                ["color4"] = H("#e64539"),
-                ["color5"] = H("#ff8933"),
-                ["color6"] = H("#ff8933"),
-                ["color7"] = H("#ff8933"),
-                ["color8"] = H("#ff8933"),
-                ["color9"] = H("#ff8933"),
-                ["ov_c0"] = H("#000000"),
-                ["ov_c1"] = H("#000000"),
-                ["ov_c2"] = H("#000000"),
+                ["crater_light_border"] = 0.4814f,
+                ["crater_size"] = 2.292f,
+                ["dither_size"] = 1.3707f,
+                ["lava_border_1"] = 0.0201f,
+                ["lava_border_2"] = 0.0288f,
+                ["lava_cutoff"] = 0.4816f,
+                ["lava_detail"] = 2.6182f,
+                ["lava_octaves"] = 5.9204f,
+                ["lava_size"] = 6.4117f,
+                ["light_border_1"] = 0.3961f,
+                ["light_border_2"] = 0.4938f,
+                ["octaves"] = 4.0652f,
+                ["size"] = 7.721f,
             }),
-            ["Snow"] = new(
+            ["Snow"] = new(PixelPlanetKind.IceWorld,
+            [
+                H("#dfe7f2"),
+                H("#d8dcd7"),
+                H("#bfbfbd"),
+                H("#aed1dd"),
+                H("#a4d2f4"),
+                H("#8dafc7"),
+                H("#dfe7f2"),
+                H("#bfc3e6"),
+                H("#d8dcd7"),
+                H("#bfc3e6"),
+            ],
             new Dictionary<string, float>
             {
-                ["detail_mix"] = 0.0437f,
-                ["detail_size"] = 8.5838f,
-                ["dither_size"] = 0.127f,
-                ["light_strength"] = 0.5055f,
-                ["octaves"] = 3.8133f,
-                ["ov_cover"] = 99f,
-                ["ov_enabled"] = 0f,
-                ["size"] = 4.5113f,
-                ["thr1"] = 0.3597f,
-                ["thr2"] = 0.4289f,
-                ["thr3"] = 0.4538f,
-                ["thr4"] = 0.5128f,
-                ["thr5"] = 0.5356f,
-                ["thr6"] = 0.5889f,
-                ["thr7"] = 99f,
-                ["thr8"] = 99f,
-                ["thr9"] = 99f,
-                ["warp"] = 0.5168f,
-            },
-            new Dictionary<string, Vector3>
-            {
-                ["color0"] = H("#8dafc7"),
-                ["color1"] = H("#bfbfbd"),
-                ["color2"] = H("#bfc3e6"),
-                ["color3"] = H("#aed1dd"),
-                ["color4"] = H("#a4d2f4"),
-                ["color5"] = H("#d8dcd7"),
-                ["color6"] = H("#dfe7f2"),
-                ["color7"] = H("#dfe7f2"),
-                ["color8"] = H("#dfe7f2"),
-                ["color9"] = H("#dfe7f2"),
-                ["ov_c0"] = H("#000000"),
-                ["ov_c1"] = H("#000000"),
-                ["ov_c2"] = H("#000000"),
+                ["cloud_cover"] = 0.6476f,
+                ["cloud_octaves"] = 4.535f,
+                ["cloud_size"] = 7.9219f,
+                ["dither_size"] = 1.7386f,
+                ["lake_border_1"] = 0.0701f,
+                ["lake_border_2"] = 0.0293f,
+                ["lake_cutoff"] = 0.5205f,
+                ["lake_size"] = 7.0413f,
+                ["light_border_1"] = 0.5258f,
+                ["light_border_2"] = 0.6138f,
+                ["octaves"] = 7f,
+                ["size"] = 8.8021f,
+                ["stretch"] = 2.7274f,
             }),
-            ["LowDesert"] = new(
+            ["LowDesert"] = new(PixelPlanetKind.LandMasses,
+            [
+                H("#91a3b9"),
+                H("#6d75a1"),
+                H("#6d75a1"),
+                H("#ceb37d"),
+                H("#947c60"),
+                H("#a16c48"),
+                H("#9c5541"),
+                H("#dae8e7"),
+                H("#b6cad0"),
+                H("#908b8e"),
+            ],
             new Dictionary<string, float>
             {
-                ["detail_mix"] = 0.3955f,
-                ["detail_size"] = 7.6474f,
-                ["dither_size"] = 0.9458f,
-                ["light_strength"] = 0.0294f,
-                ["octaves"] = 4.3821f,
-                ["ov_band"] = 0.0283f,
-                ["ov_cover"] = 0.5253f,
-                ["ov_enabled"] = 1f,
-                ["ov_light_border"] = 0.6245f,
-                ["ov_octaves"] = 3.9049f,
-                ["ov_size"] = 4.5447f,
-                ["ov_stretch"] = 2.0692f,
-                ["size"] = 5.8013f,
-                ["thr1"] = 0.312f,
-                ["thr2"] = 0.354f,
-                ["thr3"] = 0.3658f,
-                ["thr4"] = 0.427f,
-                ["thr5"] = 0.4415f,
-                ["thr6"] = 0.5245f,
-                ["thr7"] = 99f,
-                ["thr8"] = 99f,
-                ["thr9"] = 99f,
-                ["warp"] = 0.7717f,
-            },
-            new Dictionary<string, Vector3>
-            {
-                ["color0"] = H("#6d75a1"),
-                ["color1"] = H("#91a3b9"),
-                ["color2"] = H("#4e4723"),
-                ["color3"] = H("#9c5541"),
-                ["color4"] = H("#a16c48"),
-                ["color5"] = H("#947c60"),
-                ["color6"] = H("#ceb37d"),
-                ["color7"] = H("#ceb37d"),
-                ["color8"] = H("#ceb37d"),
-                ["color9"] = H("#ceb37d"),
-                ["ov_c0"] = H("#dae8e7"),
-                ["ov_c1"] = H("#b6cad0"),
-                ["ov_c2"] = H("#908b8e"),
+                ["cloud_cover"] = 0.527f,
+                ["cloud_curve"] = 1.7152f,
+                ["cloud_octaves"] = 4.0023f,
+                ["cloud_size"] = 7.5954f,
+                ["dither_size"] = 0.9568f,
+                ["land_cutoff"] = 0.4f,
+                ["land_light_border_1"] = 0.5108f,
+                ["land_light_border_2"] = 0.5403f,
+                ["land_octaves"] = 7.9095f,
+                ["land_size"] = 6.2366f,
+                ["light_border_1"] = 0.6373f,
+                ["light_border_2"] = 0.9281f,
+                ["octaves"] = 4.0945f,
+                ["size"] = 8.4319f,
+                ["stretch"] = 1.4276f,
             }),
-            ["CavesGrey"] = new(
+            ["Shadow"] = new(PixelPlanetKind.LavaWorld,
+            [
+                H("#191a23"),
+                H("#17101d"),
+                H("#0f091b"),
+                H("#27191f"),
+                H("#220f25"),
+                H("#3f245f"),
+                H("#3e1a31"),
+                H("#2b0b3b"),
+            ],
             new Dictionary<string, float>
             {
-                ["detail_mix"] = 0.0299f,
-                ["detail_size"] = 13.3543f,
-                ["dither_size"] = 0f,
-                ["light_strength"] = 0.1085f,
-                ["octaves"] = 2.8193f,
-                ["ov_cover"] = 99f,
-                ["ov_enabled"] = 0f,
-                ["size"] = 7.4967f,
-                ["thr1"] = 0.2497f,
-                ["thr2"] = 0.2971f,
-                ["thr3"] = 0.4174f,
-                ["thr4"] = 0.5185f,
-                ["thr5"] = 0.5384f,
-                ["thr6"] = 99f,
-                ["thr7"] = 99f,
-                ["thr8"] = 99f,
-                ["thr9"] = 99f,
-                ["warp"] = 1.6085f,
-            },
-            new Dictionary<string, Vector3>
-            {
-                ["color0"] = H("#2b2338"),
-                ["color1"] = H("#2f2f2e"),
-                ["color2"] = H("#5f5e5c"),
-                ["color3"] = H("#818079"),
-                ["color4"] = H("#8e8b8b"),
-                ["color5"] = H("#bdb9b9"),
-                ["color6"] = H("#bdb9b9"),
-                ["color7"] = H("#bdb9b9"),
-                ["color8"] = H("#bdb9b9"),
-                ["color9"] = H("#bdb9b9"),
-                ["ov_c0"] = H("#000000"),
-                ["ov_c1"] = H("#000000"),
-                ["ov_c2"] = H("#000000"),
+                ["crater_light_border"] = 1.0802f,
+                ["crater_size"] = 5.503f,
+                ["dither_size"] = 1.9212f,
+                ["lava_border_1"] = 0.04f,
+                ["lava_border_2"] = 0.0663f,
+                ["lava_cutoff"] = 0.5322f,
+                ["lava_detail"] = 4.9861f,
+                ["lava_octaves"] = 2.053f,
+                ["lava_size"] = 7.0809f,
+                ["light_border_1"] = 0.3126f,
+                ["light_border_2"] = 0.4786f,
+                ["octaves"] = 5f,
+                ["size"] = 7.2765f,
             }),
-            ["Shadow"] = new(
+            ["GateInferno"] = new(PixelPlanetKind.LavaWorld,
+            [
+                H("#6a1010"),
+                H("#4a0808"),
+                H("#2a0404"),
+                H("#3a0606"),
+                H("#1a0202"),
+                H("#ffb020"),
+                H("#ff6010"),
+                H("#ff1808"),
+            ],
             new Dictionary<string, float>
             {
-                ["detail_mix"] = 0.2917f,
-                ["detail_size"] = 6.8664f,
-                ["dither_size"] = 0f,
-                ["light_strength"] = 0.295f,
-                ["octaves"] = 4.7613f,
-                ["ov_cover"] = 99f,
-                ["ov_enabled"] = 0f,
-                ["size"] = 5.5163f,
-                ["thr1"] = 0.4632f,
-                ["thr2"] = 0.5423f,
-                ["thr3"] = 0.5975f,
-                ["thr4"] = 0.6152f,
-                ["thr5"] = 0.6385f,
-                ["thr6"] = 0.6672f,
-                ["thr7"] = 0.692f,
-                ["thr8"] = 0.7126f,
-                ["thr9"] = 0.7416f,
-                ["warp"] = 2.8743f,
-            },
-            new Dictionary<string, Vector3>
-            {
-                ["color0"] = H("#0f091b"),
-                ["color1"] = H("#17101d"),
-                ["color2"] = H("#191a23"),
-                ["color3"] = H("#1b1a1f"),
-                ["color4"] = H("#220f25"),
-                ["color5"] = H("#27191f"),
-                ["color6"] = H("#2a1a26"),
-                ["color7"] = H("#2b0b3b"),
-                ["color8"] = H("#3e1a31"),
-                ["color9"] = H("#3f245f"),
-                ["ov_c0"] = H("#000000"),
-                ["ov_c1"] = H("#000000"),
-                ["ov_c2"] = H("#000000"),
-            }),
-            ["GateJungle"] = new(
-            new Dictionary<string, float>
-            {
-                ["detail_mix"] = 0f,
-                ["detail_size"] = 12.0983f,
-                ["dither_size"] = 0.5322f,
-                ["light_strength"] = 0.0132f,
-                ["octaves"] = 2f,
-                ["ov_cover"] = 99f,
-                ["ov_enabled"] = 0f,
-                ["size"] = 7.4559f,
-                ["thr1"] = 0.2035f,
-                ["thr2"] = 0.3567f,
-                ["thr3"] = 0.3614f,
-                ["thr4"] = 0.3896f,
-                ["thr5"] = 0.417f,
-                ["thr6"] = 99f,
-                ["thr7"] = 99f,
-                ["thr8"] = 99f,
-                ["thr9"] = 99f,
-                ["warp"] = 1.8248f,
-            },
-            new Dictionary<string, Vector3>
-            {
-                ["color0"] = H("#0a2810"),
-                ["color1"] = H("#103818"),
-                ["color2"] = H("#0c3020"),
-                ["color3"] = H("#184830"),
-                ["color4"] = H("#1a4a1c"),
-                ["color5"] = H("#2a6a28"),
-                ["color6"] = H("#2a6a28"),
-                ["color7"] = H("#2a6a28"),
-                ["color8"] = H("#2a6a28"),
-                ["color9"] = H("#2a6a28"),
-                ["ov_c0"] = H("#000000"),
-                ["ov_c1"] = H("#000000"),
-                ["ov_c2"] = H("#000000"),
-            }),
-            ["GateInferno"] = new(
-            new Dictionary<string, float>
-            {
-                ["detail_mix"] = 0.6413f,
-                ["detail_size"] = 5.9868f,
-                ["dither_size"] = 0.2391f,
-                ["light_strength"] = 0.5188f,
-                ["octaves"] = 1.5866f,
-                ["ov_band"] = 0.0475f,
-                ["ov_cover"] = 0.6834f,
-                ["ov_enabled"] = 1f,
-                ["ov_light_border"] = 0.7006f,
-                ["ov_octaves"] = 3.3894f,
-                ["ov_size"] = 10.7213f,
-                ["ov_stretch"] = 3.2705f,
-                ["size"] = 3.6506f,
-                ["thr1"] = 0.3374f,
-                ["thr2"] = 0.4746f,
-                ["thr3"] = 0.5008f,
-                ["thr4"] = 0.6184f,
-                ["thr5"] = 99f,
-                ["thr6"] = 99f,
-                ["thr7"] = 99f,
-                ["thr8"] = 99f,
-                ["thr9"] = 99f,
-                ["warp"] = 2.8755f,
-            },
-            new Dictionary<string, Vector3>
-            {
-                ["color0"] = H("#1a0202"),
-                ["color1"] = H("#2a0404"),
-                ["color2"] = H("#3a0606"),
-                ["color3"] = H("#4a0808"),
-                ["color4"] = H("#6a1010"),
-                ["color5"] = H("#6a1010"),
-                ["color6"] = H("#6a1010"),
-                ["color7"] = H("#6a1010"),
-                ["color8"] = H("#6a1010"),
-                ["color9"] = H("#6a1010"),
-                ["ov_c0"] = H("#ff6010"),
-                ["ov_c1"] = H("#ffb020"),
-                ["ov_c2"] = H("#ff1808"),
+                ["crater_light_border"] = 0.4251f,
+                ["crater_size"] = 3.4052f,
+                ["dither_size"] = 1.7244f,
+                ["lava_border_1"] = 0.0885f,
+                ["lava_border_2"] = 0.0865f,
+                ["lava_cutoff"] = 0.7699f,
+                ["lava_detail"] = 2.2117f,
+                ["lava_octaves"] = 3.4094f,
+                ["lava_size"] = 10.6701f,
+                ["light_border_1"] = 0.3857f,
+                ["light_border_2"] = 0.5324f,
+                ["octaves"] = 4.184f,
+                ["size"] = 7.5625f,
             }),
         };
         presets["Lavalight"] = presets["Lava"];
         presets["ArdoniumWastes"] = presets["GateInferno"];
-        // The Caves expedition planet uses the desert look (the old grey rock look is kept as "CavesGrey").
         presets["Caves"] = presets["LowDesert"];
         return presets;
     }
@@ -369,8 +222,8 @@ public static class PixelPlanetBiomeLooks
         ("savanna", "LowDesert"),
         ("shadow", "Shadow"),
         ("cave", "Caves"),
-        ("jungle", "GateJungle"),
-        ("bioluminescent", "GateJungle"),
+        ("jungle", "Grasslands"),
+        ("bioluminescent", "Grasslands"),
     ];
 
     /// <summary>Resolves a biome/expedition id to a look. Unknown ids fall back to Grasslands.</summary>
@@ -393,23 +246,15 @@ public static class PixelPlanetBiomeLooks
         return Presets["Grasslands"];
     }
 
-    /// <summary>Sets every non-time uniform of the PixelBiomePlanet shader for a look.</summary>
-    public static void Apply(ShaderInstance shader, PixelPlanetLook look, float seed, float pixels)
+    /// <summary>Sets all shader uniforms of a look: base setup for its kind, tuned overrides, then the palette.</summary>
+    public static void Apply(ShaderInstance shader, PixelPlanetLook look, float time, float pixels, float seed)
     {
-        shader.SetParameter("pixels", pixels);
-        shader.SetParameter("seed", seed);
-        shader.SetParameter("rotation", 0f);
-        shader.SetParameter("time_speed", 0.02f);
-        shader.SetParameter("light_origin", new Vector2(0.39f, 0.39f));
-        shader.SetParameter("ov_seed", seed + 1.5f);
-        shader.SetParameter("ov_speed", 0.015f);
-        shader.SetParameter("debug_mode", 0f);
+        PixelPlanetShaderSetup.Configure(shader, look.Kind, time, pixels, seed, 0f, new Vector2(0.39f, 0.39f));
 
-        foreach (var (name, value) in look.Floats)
+        foreach (var (name, value) in look.Overrides)
             shader.SetParameter(name, value);
 
-        foreach (var (name, value) in look.Colors)
-            shader.SetParameter(name, value);
+        PixelPlanetPalettes.ApplyPlanetColors(shader, look.Kind, look.Palette);
     }
 
     private static Vector3 H(string hex)

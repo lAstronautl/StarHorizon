@@ -115,14 +115,14 @@ public sealed class PixelPlanetOverlay : Overlay
             if (!Intersects(aabb, pos, radius))
                 continue;
 
+            var look = PixelPlanetBiomeLooks.Resolve(expedition.BiomeId);
             if (!_expeditionShaders.TryGetValue(uid, out var shader))
             {
-                shader = _prototypes.Index<ShaderPrototype>(PixelPlanetBiomeLooks.ShaderId).InstanceUnique();
-                PixelPlanetBiomeLooks.Apply(shader, PixelPlanetBiomeLooks.Resolve(expedition.BiomeId), expedition.Seed, expedition.Pixels);
+                shader = _prototypes.Index(PixelPlanetShaderSetup.ShaderId(look.Kind)).InstanceUnique();
                 _expeditionShaders[uid] = shader;
             }
 
-            shader.SetParameter("time", timeBase + expedition.Seed);
+            PixelPlanetBiomeLooks.Apply(shader, look, timeBase + expedition.Seed, expedition.Pixels, expedition.Seed);
             DrawQuad(handle, shader, pos, new Vector2(radius * 2f, radius * 2f));
         }
 
