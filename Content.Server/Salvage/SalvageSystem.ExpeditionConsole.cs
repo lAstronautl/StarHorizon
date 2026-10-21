@@ -5,6 +5,7 @@ using Content.Shared.Dataset;
 using Robust.Shared.Prototypes;
 using Content.Server.Salvage.Expeditions; // Frontier
 using Content.Server._NF.Salvage; // Frontier
+using Content.Server._Horizon.SpaceHazards; // Horizon
 using Content.Shared.Mind.Components; // Frontier
 using Content.Shared.Mobs.Components; // Frontier
 using Content.Shared.NPC.Components; // Frontier
@@ -25,6 +26,7 @@ public sealed partial class SalvageSystem
 
     [Dependency] private readonly SharedPopupSystem _popupSystem = default!; // Frontier
     [Dependency] private readonly SalvageSystem _salvage = default!; // Frontier
+    [Dependency] private readonly ExpeditionPlanetSystem _expeditionPlanets = default!; // Horizon
 
     private const float ShuttleFTLMassThreshold = 50f; // Frontier
     private const float ShuttleFTLRange = 150f; // Frontier
@@ -38,6 +40,22 @@ public sealed partial class SalvageSystem
 
         if (!data.Missions.TryGetValue(args.Index, out var missionparams))
             return;
+
+        // Horizon: expeditions can only be started next to a planet, and the planet decides the biome.
+        if (!component.Debug)
+        {
+            if (!_expeditionPlanets.TryGetPlanetNear(uid, out var planet))
+            {
+                PlayDenySound((uid, component));
+                _popupSystem.PopupEntity(Loc.GetString("salvage-expedition-no-planet"), uid, PopupType.MediumCaution);
+                UpdateConsoles((station.Value, data));
+                return;
+            }
+
+            missionparams = missionparams with { Biome = planet.Comp.BiomeId };
+            data.Missions[args.Index] = missionparams;
+        }
+        // End Horizon
 
         // Frontier: prevent expeditions if there are too many out already.
         var activeExpeditionCount = 0;
@@ -110,7 +128,7 @@ public sealed partial class SalvageSystem
         // End Frontier
 
         data.ActiveMission = args.Index;
-        var mission = GetMission(missionparams.MissionType, _prototypeManager.Index<SalvageDifficultyPrototype>(missionparams.Difficulty), missionparams.Seed); // Frontier: add MissionType
+        var mission = GetMission(missionparams.MissionType, _prototypeManager.Index<SalvageDifficultyPrototype>(missionparams.Difficulty), missionparams.Seed, missionparams.Biome); // Frontier: add MissionType; Horizon: planet biome
         // Frontier - TODO: move this to progression for secondary window timer
         data.NextOffer = _timing.CurTime + mission.Duration + TimeSpan.FromSeconds(1);
         data.CooldownTime = mission.Duration + TimeSpan.FromSeconds(1); // Frontier
@@ -205,16 +223,16 @@ public sealed partial class SalvageSystem
 
     private void UpdateConsoles(Entity<SalvageExpeditionDataComponent> component)
     {
-        var state = GetState(component);
-
         var query = AllEntityQuery<SalvageExpeditionConsoleComponent, UserInterfaceComponent, TransformComponent>();
-        while (query.MoveNext(out var uid, out _, out var uiComp, out var xform))
+        while (query.MoveNext(out var uid, out var consoleComp, out var uiComp, out var xform))
         {
             var station = _station.GetOwningStation(uid, xform);
 
             if (station != component.Owner)
                 continue;
 
+            var state = GetState(component); // Horizon: per-console state (planet proximity differs per console)
+            ApplyPlanetState(uid, consoleComp, state);
             _ui.SetUiState((uid, uiComp), SalvageConsoleUiKey.Expedition, state);
         }
     }
@@ -242,8 +260,34 @@ public sealed partial class SalvageSystem
         }
         // End Frontier
 
+        ApplyPlanetState(component.Owner, component.Comp, state); // Horizon
         _ui.SetUiState(component.Owner, SalvageConsoleUiKey.Expedition, state);
     }
+
+    // Horizon: a console only works next to an expedition planet
+    private void ApplyPlanetState(EntityUid console, SalvageExpeditionConsoleComponent comp, SalvageExpeditionConsoleState state)
+    {
+        if (comp.Debug || state.Claimed)
+            return;
+
+        if (_expeditionPlanets.TryGetPlanetNear(console, out var planet))
+        {
+            state.PlanetBiome = planet.Comp.BiomeId;
+        }
+        else
+        {
+            state.NoPlanet = true;
+            state.Cooldown = true;
+        }
+    }
+
+    /// <summary>Re-sends the UI state of a single console, e.g. after the ship moved relative to a planet.</summary>
+    public void RefreshConsole(EntityUid uid)
+    {
+        if (TryComp<SalvageExpeditionConsoleComponent>(uid, out var console))
+            UpdateConsole((uid, console));
+    }
+    // End Horizon
 
     // Frontier: deny sound
     private void PlayDenySound(Entity<SalvageExpeditionConsoleComponent> ent)

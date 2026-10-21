@@ -24,6 +24,8 @@ public sealed class SectorLandmarkAnchorSystem : EntitySystem
         SubscribeLocalEvent<SectorBackgroundPlanetComponent, EntParentChangedMessage>(OnPlanetParent);
         SubscribeLocalEvent<SectorCelestialBodyComponent, ComponentStartup>(OnCelestialStartup);
         SubscribeLocalEvent<SectorBackgroundPlanetComponent, ComponentStartup>(OnPlanetStartup);
+        SubscribeLocalEvent<ExpeditionPlanetComponent, EntParentChangedMessage>(OnExpeditionPlanetParent);
+        SubscribeLocalEvent<ExpeditionPlanetComponent, ComponentStartup>(OnExpeditionPlanetStartup);
     }
 
     private void OnCelestialParent(EntityUid uid, SectorCelestialBodyComponent _, ref EntParentChangedMessage args)
@@ -31,6 +33,12 @@ public sealed class SectorLandmarkAnchorSystem : EntitySystem
 
     private void OnPlanetParent(EntityUid uid, SectorBackgroundPlanetComponent _, ref EntParentChangedMessage args)
         => LockToMap(uid);
+
+    private void OnExpeditionPlanetParent(EntityUid uid, ExpeditionPlanetComponent _, ref EntParentChangedMessage args)
+        => LockToMap(uid);
+
+    private void OnExpeditionPlanetStartup(EntityUid uid, ExpeditionPlanetComponent _, ComponentStartup args)
+        => _pvs.AddGlobalOverride(uid);
 
     private void OnCelestialStartup(EntityUid uid, SectorCelestialBodyComponent _, ComponentStartup args)
         => _pvs.AddGlobalOverride(uid);

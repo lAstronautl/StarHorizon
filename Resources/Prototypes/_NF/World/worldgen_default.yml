@@ -23,3 +23,11 @@
       maxDistance: 12000
       planetPrototype: SectorBackgroundPlanet
 # Horizon end
+# Horizon start: expedition planets (one per biome) scattered around the sector
+    - type: ExpeditionPlanetPlacerController
+      biomes: [ Caves, Grasslands, Snow, Lava, Shadow ]
+      countPerBiome: 1
+      minDistance: 1500
+      maxDistance: 6500
+      minSeparation: 1200
+# Horizon end

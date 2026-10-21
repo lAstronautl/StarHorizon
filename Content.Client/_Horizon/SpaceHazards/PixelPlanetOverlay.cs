@@ -29,6 +29,7 @@ public sealed class PixelPlanetOverlay : Overlay
     private readonly IGameTiming _timing;
     private readonly SharedTransformSystem _transform;
     private readonly Dictionary<string, ShaderInstance> _shaders = new();
+    private readonly Dictionary<EntityUid, ShaderInstance> _expeditionShaders = new();
 
     public PixelPlanetOverlay(IEntityManager entManager, IPrototypeManager prototypes)
     {
@@ -46,6 +47,10 @@ public sealed class PixelPlanetOverlay : Overlay
         foreach (var shader in _shaders.Values)
             shader.Dispose();
         _shaders.Clear();
+
+        foreach (var shader in _expeditionShaders.Values)
+            shader.Dispose();
+        _expeditionShaders.Clear();
     }
 
     protected override void Draw(in OverlayDrawArgs args)
@@ -98,9 +103,33 @@ public sealed class PixelPlanetOverlay : Overlay
             DrawPlanet(handle, pos, planet, timeBase + planet.Seed);
         }
 
+        // Expedition planets: biome-looking planets with their own shader instance each (looks differ per planet).
+        var expeditionQuery = _entManager.EntityQueryEnumerator<ExpeditionPlanetComponent, TransformComponent>();
+        while (expeditionQuery.MoveNext(out var uid, out var expedition, out var xform))
+        {
+            if (xform.MapID != args.MapId)
+                continue;
+
+            var pos = _transform.GetWorldPosition(xform);
+            var radius = MathF.Max(expedition.SpriteRadius, 1f);
+            if (!Intersects(aabb, pos, radius))
+                continue;
+
+            if (!_expeditionShaders.TryGetValue(uid, out var shader))
+            {
+                shader = _prototypes.Index<ShaderPrototype>(PixelPlanetBiomeLooks.ShaderId).InstanceUnique();
+                PixelPlanetBiomeLooks.Apply(shader, PixelPlanetBiomeLooks.Resolve(expedition.BiomeId), expedition.Seed, expedition.Pixels);
+                _expeditionShaders[uid] = shader;
+            }
+
+            shader.SetParameter("time", timeBase + expedition.Seed);
+            DrawQuad(handle, shader, pos, new Vector2(radius * 2f, radius * 2f));
+        }
+
         handle.SetTransform(Matrix3x2.Identity);
         handle.UseShader(null);
     }
+
 
     private void DrawStar(
         DrawingHandleWorld handle,

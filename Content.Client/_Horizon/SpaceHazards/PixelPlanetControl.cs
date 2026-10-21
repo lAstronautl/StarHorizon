@@ -49,20 +49,7 @@ public sealed class PixelPlanetControl : Control
 
     private void ApplyLook()
     {
-        _shader.SetParameter("pixels", (float) NativePixels);
-        _shader.SetParameter("seed", _seed);
-        _shader.SetParameter("rotation", 0f);
-        _shader.SetParameter("time_speed", 0.02f);
-        _shader.SetParameter("light_origin", new Vector2(0.39f, 0.39f));
-        _shader.SetParameter("ov_seed", _seed + 1.5f);
-        _shader.SetParameter("ov_speed", 0.015f);
-        _shader.SetParameter("debug_mode", 0f);
-
-        foreach (var (name, value) in _look.Floats)
-            _shader.SetParameter(name, value);
-
-        foreach (var (name, value) in _look.Colors)
-            _shader.SetParameter(name, value);
+        PixelPlanetBiomeLooks.Apply(_shader, _look, _seed, NativePixels);
     }
 
     protected override void Draw(DrawingHandleScreen handle)

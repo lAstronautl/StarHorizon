@@ -3,6 +3,7 @@
 // See AGPLv3.txt for details.
 
 using System.Numerics;
+using Robust.Client.Graphics;
 
 namespace Content.Client._Horizon.SpaceHazards;
 
@@ -387,6 +388,25 @@ public static class PixelPlanetBiomeLooks
         }
 
         return Presets["Grasslands"];
+    }
+
+    /// <summary>Sets every non-time uniform of the PixelBiomePlanet shader for a look.</summary>
+    public static void Apply(ShaderInstance shader, PixelPlanetLook look, float seed, float pixels)
+    {
+        shader.SetParameter("pixels", pixels);
+        shader.SetParameter("seed", seed);
+        shader.SetParameter("rotation", 0f);
+        shader.SetParameter("time_speed", 0.02f);
+        shader.SetParameter("light_origin", new Vector2(0.39f, 0.39f));
+        shader.SetParameter("ov_seed", seed + 1.5f);
+        shader.SetParameter("ov_speed", 0.015f);
+        shader.SetParameter("debug_mode", 0f);
+
+        foreach (var (name, value) in look.Floats)
+            shader.SetParameter(name, value);
+
+        foreach (var (name, value) in look.Colors)
+            shader.SetParameter(name, value);
     }
 
     private static Vector3 H(string hex)
