@@ -1,0 +1,27 @@
+ent-ComputerDerelictYard = derelict yard console
+    .desc = Sells abandoned shuttles to be taken apart. The wreck is gone when the lease runs out.
+
+derelict-yard-title = Derelict yard
+derelict-yard-balance = Station account:{" "}
+derelict-yard-money = ${$amount}
+derelict-yard-row = {$name} - ${$price}
+derelict-yard-price = Price: ${$price}. Lease: {$minutes} min.
+derelict-yard-buy = Buy
+derelict-yard-legend = Floor, wall, door, window, equipment
+derelict-yard-no-station = The console is not connected to a station.
+derelict-yard-no-funds = The station account can not pay for that.
+derelict-yard-failed = The wreck could not be delivered, the money is returned.
+derelict-yard-sender = Derelict yard
+derelict-yard-bought = The wreck "{$name}" is delivered. It has to be taken apart in {$minutes} minutes, after that it is scrapped with everything left on it.
+derelict-yard-warning = {$minutes} min until the leased wreck is scrapped with everything left on it.
+
+derelict-vessel-small-ship = Small wreck
+derelict-vessel-small-ship-desc = A battered little ship, enough for a quick job.
+derelict-vessel-miner = Wrecked miner
+derelict-vessel-miner-desc = A mining ship with a broken hull.
+derelict-vessel-syndicate = Syndicate wreck
+derelict-vessel-syndicate-desc = A small hostile ship, long dead.
+derelict-vessel-cargo = Wrecked freighter
+derelict-vessel-cargo-desc = A cargo ship with plenty of walls and crates.
+derelict-vessel-crashed = Crashed shuttle
+derelict-vessel-crashed-desc = A medium shuttle that came down hard.

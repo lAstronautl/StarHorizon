@@ -1,0 +1,36 @@
+# Wrecks the derelict yard sells. The price is taken from the station account, what the wreck is scrapped for with the
+# shipbreaking machines pays into the same account. After the lifetime the wreck and everything cut off it is deleted.
+- type: derelictVessel
+  id: DerelictSmallShip
+  name: derelict-vessel-small-ship
+  description: derelict-vessel-small-ship-desc
+  price: 4000
+  shuttlePath: /Maps/_Horizon/Lostvoid/Shuttle/small-ship-1.yml
+
+- type: derelictVessel
+  id: DerelictMiner
+  name: derelict-vessel-miner
+  description: derelict-vessel-miner-desc
+  price: 7000
+  shuttlePath: /Maps/_Horizon/Lostvoid/Shuttle/miner-destroyed.yml
+
+- type: derelictVessel
+  id: DerelictSyndicate
+  name: derelict-vessel-syndicate
+  description: derelict-vessel-syndicate-desc
+  price: 9000
+  shuttlePath: /Maps/_Horizon/Lostvoid/Shuttle/small-syndicate.yml
+
+- type: derelictVessel
+  id: DerelictCargo
+  name: derelict-vessel-cargo
+  description: derelict-vessel-cargo-desc
+  price: 14000
+  shuttlePath: /Maps/_Horizon/Lostvoid/Shuttle/cargo-destroyed.yml
+
+- type: derelictVessel
+  id: DerelictCrashed
+  name: derelict-vessel-crashed
+  description: derelict-vessel-crashed-desc
+  price: 18000
+  shuttlePath: /Maps/_Horizon/Lostvoid/Shuttle/medium-crashed-shuttle.yml
