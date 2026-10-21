@@ -20,6 +20,16 @@ public sealed partial class GridCutsComponent : Component
     /// Width of a drawn cut, in pixels (one tile is 32 pixels).
     /// </summary>
     public const float CutWidthPixels = 3f;
+
+    /// <summary>
+    /// Whether the edge of the tile is cut, as recorded on the tile or on the tile across the edge. A cut along a split
+    /// of the grid is recorded on one side only, the other side is not part of this grid any more.
+    /// </summary>
+    public bool IsCut(Vector2i tile, CutEdges edge)
+    {
+        return Cuts.GetValueOrDefault(tile).HasFlag(edge) ||
+               Cuts.GetValueOrDefault(tile + edge.Offset()).HasFlag(edge.Opposite());
+    }
 }
 
 [Flags]

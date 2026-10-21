@@ -46,10 +46,9 @@ public sealed partial class ShipCutterSystem
 
         while (queue.TryDequeue(out var current))
         {
-            var blocked = cuts.Cuts.GetValueOrDefault(current);
             foreach (var edge in CutEdgesExtensions.All)
             {
-                if (blocked.HasFlag(edge))
+                if (cuts.IsCut(current, edge))
                     continue;
 
                 var next = current + edge.Offset();
@@ -133,6 +132,9 @@ public sealed partial class ShipCutterSystem
 
         MapSystem.SetTiles(oldUid, oldGrid, emptyTiles);
 
+        // The piece takes its cuts along. This is the path of the cutter: the event above comes while the old tiles are
+        // still there, so GridCutsSystem does not move anything for it. The engine splitting a grid on its own
+        // (damage) is handled by GridCutsSystem from the event alone.
         _cuts.MoveCuts(oldUid, oldCuts, newGrid.Owner, moved);
 
         // The piece is loose debris: movable, keeping the momentum of what it was cut from.

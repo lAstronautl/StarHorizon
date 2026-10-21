@@ -153,6 +153,32 @@ public sealed class GridSplitMergeTest
             Assert.That(entMan.GetComponent<GravityAffectedComponent>(loose).Weightless, Is.False, "gravity follows the generator");
         });
 
+        await server.WaitAssertion(() =>
+        {
+            var newGrid = mapMan.GetAllGrids(mapId).First(g => g.Owner != grid.Owner).Owner;
+            var oldCuts = entMan.GetComponent<GridCutsComponent>(grid);
+            var newCuts = entMan.GetComponent<GridCutsComponent>(newGrid);
+
+            // Each cut is recorded once, on the half that owns the tile: no copies of the moved tiles are left behind.
+            Assert.That(oldCuts.Cuts.Keys, Is.EquivalentTo(new[] { new Vector2i(3, 0), new Vector2i(3, 1), new Vector2i(3, 2) }));
+            Assert.That(newCuts.Cuts.Keys, Is.EquivalentTo(new[] { new Vector2i(2, 0), new Vector2i(2, 1), new Vector2i(2, 2) }));
+
+            // Building over the gap does not hide the cut: it is still found from the tile across it.
+            Assert.That(oldCuts.IsCut(new Vector2i(2, 1), CutEdges.East), Is.True);
+
+            // The gaps can be welded shut from either half, and the component goes with the last one.
+            var cuts = server.System<GridCutsSystem>();
+            for (var y = 0; y < 3; y++)
+            {
+                Assert.That(cuts.RemoveCut(grid, new Vector2i(3, y), CutEdges.West), Is.True, $"old half, row {y}");
+                Assert.That(cuts.RemoveCut(newGrid, new Vector2i(2, y), CutEdges.East), Is.True, $"new half, row {y}");
+            }
+
+            Assert.That(cuts.HasCuts(grid), Is.False);
+            Assert.That(cuts.HasCuts(newGrid), Is.False);
+            Assert.That(entMan.HasComponent<GridCutsComponent>(grid), Is.False);
+        });
+
         await pair.CleanReturnAsync();
     }
 

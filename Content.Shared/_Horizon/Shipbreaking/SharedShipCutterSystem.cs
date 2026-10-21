@@ -171,7 +171,7 @@ public abstract class SharedShipCutterSystem : EntitySystem
     /// </summary>
     public bool HasCut(EntityUid gridUid, Vector2i tile, CutEdges edge)
     {
-        return TryComp<GridCutsComponent>(gridUid, out var cuts) && cuts.Cuts.GetValueOrDefault(tile).HasFlag(edge);
+        return TryComp<GridCutsComponent>(gridUid, out var cuts) && cuts.IsCut(tile, edge);
     }
 
     /// <summary>
