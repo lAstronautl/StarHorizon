@@ -192,7 +192,7 @@ public static class PixelPlanetBiomeLooks
                 ["ov_c1"] = H("#b6cad0"),
                 ["ov_c2"] = H("#908b8e"),
             }),
-            ["Caves"] = new(
+            ["CavesGrey"] = new(
             new Dictionary<string, float>
             {
                 ["detail_mix"] = 0.0299f,
@@ -352,6 +352,8 @@ public static class PixelPlanetBiomeLooks
         };
         presets["Lavalight"] = presets["Lava"];
         presets["ArdoniumWastes"] = presets["GateInferno"];
+        // The Caves expedition planet uses the desert look (the old grey rock look is kept as "CavesGrey").
+        presets["Caves"] = presets["LowDesert"];
         return presets;
     }
 
