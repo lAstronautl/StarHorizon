@@ -21,6 +21,7 @@ public sealed class SectorBackgroundPlanetPlacerSystem : EntitySystem
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly SectorPixelPlanetLightSystem _lights = default!;
     [Dependency] private readonly SectorLandmarkAnchorSystem _landmarks = default!;
+    [Dependency] private readonly SectorBodyLayoutSystem _layout = default!;
 
     public override void Initialize()
     {
@@ -67,6 +68,10 @@ public sealed class SectorBackgroundPlanetPlacerSystem : EntitySystem
             var pos = new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * dist;
 
             if (OverlapsStation(pos, placer.MinStationClearance, stationCenters))
+                continue;
+
+            // Keep decorative planets away from stars, black holes and expedition planets.
+            if (!_layout.IsFarFromBodies(map.MapId, pos, 3000f))
                 continue;
 
             var ent = Spawn(placer.PlanetPrototype, new MapCoordinates(pos, map.MapId));

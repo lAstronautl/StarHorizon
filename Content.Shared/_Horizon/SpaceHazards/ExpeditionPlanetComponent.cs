@@ -23,6 +23,10 @@ public sealed partial class ExpeditionPlanetComponent : Component
     [DataField, AutoNetworkedField]
     public float Pixels = 160f;
 
+    /// <summary>No worldgen debris is placed (and existing debris is removed) within this distance of the planet.</summary>
+    [DataField]
+    public float DebrisClearance = 2000f;
+
     /// <summary>Distance from the planet center within which a console can start an expedition.</summary>
     [DataField, AutoNetworkedField]
     public float Range = 450f;

@@ -37,6 +37,10 @@ public sealed partial class ExpeditionPlanetPlacerControllerComponent : Componen
         ["Shadow"] = 7.7f,
     };
 
+    /// <summary>Keep this far from stars, black holes and other planets.</summary>
+    [DataField]
+    public float BodyClearance = 3000f;
+
     [DataField]
     public EntProtoId PlanetPrototype = "ExpeditionPlanet";
 

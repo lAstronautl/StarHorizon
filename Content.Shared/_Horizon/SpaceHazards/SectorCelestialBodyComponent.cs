@@ -73,6 +73,10 @@ public sealed partial class SectorCelestialBodyComponent : Component
     [DataField, AutoNetworkedField]
     public float PullAcceleration = 18f;
 
+    /// <summary>Horizon: no worldgen debris is placed (and existing debris is removed) within this distance of the body.</summary>
+    [DataField]
+    public float DebrisClearance = 2500f;
+
     /// <summary>Horizon: shuttles that reach the black hole's center are FTLed to a random point within this range of the map origin (Frontier).</summary>
     [DataField]
     public float TransitRange = 25000f;

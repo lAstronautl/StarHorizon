@@ -11,6 +11,7 @@ public sealed class ExpeditionPlanetPlacerSystem : EntitySystem
 {
     [Dependency] private readonly IPrototypeManager _prototypes = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SectorBodyLayoutSystem _layout = default!;
 
     public override void Initialize()
     {
@@ -36,7 +37,7 @@ public sealed class ExpeditionPlanetPlacerSystem : EntitySystem
         {
             for (var i = 0; i < component.CountPerBiome; i++)
             {
-                if (!TryPickPosition(component, placed, out var pos))
+                if (!TryPickPosition(component, placed, map.MapId, out var pos))
                 {
                     Log.Warning($"Could not find a free spot for the {biome} expedition planet");
                     continue;
@@ -63,7 +64,7 @@ public sealed class ExpeditionPlanetPlacerSystem : EntitySystem
         Log.Info($"Placed {spawned} expedition planets on {ToPrettyString(uid)}");
     }
 
-    private bool TryPickPosition(ExpeditionPlanetPlacerControllerComponent comp, List<Vector2> placed, out Vector2 pos)
+    private bool TryPickPosition(ExpeditionPlanetPlacerControllerComponent comp, List<Vector2> placed, MapId mapId, out Vector2 pos)
     {
         var minSq = comp.MinSeparation * comp.MinSeparation;
 
@@ -73,7 +74,7 @@ public sealed class ExpeditionPlanetPlacerSystem : EntitySystem
             var dist = _random.NextFloat(comp.MinDistance, comp.MaxDistance);
             pos = new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * dist;
 
-            var free = true;
+            var free = _layout.IsFarFromBodies(mapId, pos, MathF.Max(comp.MinSeparation, comp.BodyClearance));
             foreach (var other in placed)
             {
                 if ((other - pos).LengthSquared() < minSq)
