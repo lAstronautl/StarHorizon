@@ -351,6 +351,7 @@ public static class PixelPlanetBiomeLooks
             }),
         };
         presets["Lavalight"] = presets["Lava"];
+        presets["ArdoniumWastes"] = presets["GateInferno"];
         return presets;
     }
 

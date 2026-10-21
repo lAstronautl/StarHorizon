@@ -9,7 +9,7 @@ namespace Content.Server._Horizon.SpaceHazards;
 public sealed partial class ExpeditionPlanetPlacerControllerComponent : Component
 {
     [DataField]
-    public List<string> Biomes = ["Caves", "Grasslands", "Snow", "Lava", "Shadow"];
+    public List<string> Biomes = ["Caves", "Grasslands", "Snow", "Lava", "Shadow", "ArdoniumWastes"];
 
     /// <summary>How many planets to place for every biome.</summary>
     [DataField]
