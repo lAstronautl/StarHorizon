@@ -51,7 +51,9 @@ public sealed class ExpeditionPlanetPlacerSystem : EntitySystem
                 }
 
                 planet.BiomeId = biome;
-                planet.Seed = 0.01f + _random.NextFloat() * 9.99f;
+                planet.Seed = component.BiomeSeeds.TryGetValue(biome, out var fixedSeed)
+                    ? fixedSeed
+                    : 0.01f + _random.NextFloat() * 9.99f;
                 Dirty(ent, planet);
                 spawned++;
             }

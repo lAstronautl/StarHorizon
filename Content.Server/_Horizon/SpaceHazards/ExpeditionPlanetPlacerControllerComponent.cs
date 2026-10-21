@@ -25,6 +25,18 @@ public sealed partial class ExpeditionPlanetPlacerControllerComponent : Componen
     [DataField]
     public float MinSeparation = 1200f;
 
+    /// <summary>
+    /// Fixed shader seeds for biomes whose look depends strongly on the seed (e.g. a Lava seed with no lava in view).
+    /// Biomes not listed get a random seed.
+    /// </summary>
+    [DataField]
+    public Dictionary<string, float> BiomeSeeds = new()
+    {
+        ["Lava"] = 8.2f,
+        ["Snow"] = 4.1f,
+        ["Shadow"] = 7.7f,
+    };
+
     [DataField]
     public EntProtoId PlanetPrototype = "ExpeditionPlanet";
 
