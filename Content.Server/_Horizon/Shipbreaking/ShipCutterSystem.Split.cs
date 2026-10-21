@@ -22,6 +22,11 @@ public sealed partial class ShipCutterSystem
     /// </summary>
     private void TrySplit(EntityUid gridUid, MapGridComponent grid, GridCutsComponent cuts, Vector2i a, Vector2i b)
     {
+        // The seam may be on a part that was cut off earlier: nothing to split there.
+        if (!MapSystem.TryGetTile(grid, a, out var tileA) || tileA.IsEmpty ||
+            !MapSystem.TryGetTile(grid, b, out var tileB) || tileB.IsEmpty)
+            return;
+
         var sideA = Flood(grid, cuts, a);
         if (sideA.Contains(b))
             return;

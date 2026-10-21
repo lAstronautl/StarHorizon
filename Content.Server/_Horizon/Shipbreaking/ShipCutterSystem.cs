@@ -218,4 +218,28 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
         var other = tile + edge.Offset();
         TrySplit(gridUid, grid, Comp<GridCutsComponent>(gridUid), tile, other);
     }
+
+    /// <summary>
+    /// Cuts several seams at once. All the cuts are made first and only then it is checked what they cut off, so the
+    /// order of the seams does not matter.
+    /// </summary>
+    public void CutSeams(EntityUid gridUid, IReadOnlyList<(Vector2i Tile, CutEdges Edge)> seams)
+    {
+        if (!TryComp<MapGridComponent>(gridUid, out var grid))
+            return;
+
+        foreach (var (tile, edge) in seams)
+        {
+            _cuts.AddCut(gridUid, tile, edge);
+        }
+
+        foreach (var (tile, edge) in seams)
+        {
+            // A split can take the cuts of the part that left with it.
+            if (!TryComp<GridCutsComponent>(gridUid, out var cuts))
+                break;
+
+            TrySplit(gridUid, grid, cuts, tile, tile + edge.Offset());
+        }
+    }
 }

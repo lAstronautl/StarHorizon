@@ -49,6 +49,14 @@ public static class CutEdgesExtensions
     }
 
     /// <summary>
+    /// The direction the seam of this edge runs in: a horizontal seam (north, south) runs along x, a vertical one along y.
+    /// </summary>
+    public static Vector2i Along(this CutEdges edge)
+    {
+        return edge is CutEdges.North or CutEdges.South ? new Vector2i(1, 0) : new Vector2i(0, 1);
+    }
+
+    /// <summary>
     /// The edge that faces the tile at the given offset (one of the four cardinal offsets).
     /// </summary>
     public static CutEdges FromOffset(Vector2i offset)

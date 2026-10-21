@@ -70,6 +70,13 @@ public sealed class ShipCutterGhostOverlay : Overlay
 
         var handle = args.WorldHandle;
 
+        if (_entManager.TryGetComponent(held, out BreachChargeComponent? charge))
+        {
+            DrawCharge(handle, charge, mapPos);
+            handle.SetTransform(Matrix3x2.Identity);
+            return;
+        }
+
         if (!_entManager.TryGetComponent(held, out ShipCutterComponent? cutter))
             return;
 
@@ -85,6 +92,24 @@ public sealed class ShipCutterGhostOverlay : Overlay
         }
 
         handle.SetTransform(Matrix3x2.Identity);
+    }
+
+    /// <summary>
+    /// The line of seams a charge would cut if it was hung on the edge under the cursor: green where a seam can be cut,
+    /// red where it can not.
+    /// </summary>
+    private void DrawCharge(DrawingHandleWorld handle, BreachChargeComponent charge, MapCoordinates mapPos)
+    {
+        if (!_cutter.TryGetSeam(mapPos, charge.EdgeTolerance, out var gridUid, out var grid, out var tile, out var edge))
+            return;
+
+        var along = edge.Along();
+        var first = -(charge.Segments - 1) / 2;
+        for (var k = 0; k < charge.Segments; k++)
+        {
+            var segment = tile + along * (first + k);
+            DrawEdge(handle, gridUid, grid, segment, edge, _cutter.CanCut(gridUid, grid, segment, edge) ? ValidColor : InvalidColor);
+        }
     }
 
     private void DrawWelding(DrawingHandleWorld handle, SeamWelderComponent welder, MapCoordinates mapPos)

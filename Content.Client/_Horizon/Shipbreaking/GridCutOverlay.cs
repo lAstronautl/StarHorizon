@@ -14,7 +14,7 @@ public sealed class GridCutOverlay : Overlay
     // Same as the background seen through a hole in the hull.
     private static readonly Color GapColor = Color.Black;
 
-    public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowEntities;
+    public override OverlaySpace Space => OverlaySpace.WorldSpaceEntities;
 
     private readonly IEntityManager _entManager;
     private readonly SharedTransformSystem _transform;
