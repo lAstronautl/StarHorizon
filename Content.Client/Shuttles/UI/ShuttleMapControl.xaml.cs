@@ -1,6 +1,7 @@
 using System.Buffers;
 using System.Numerics;
 using Content.Client.Shuttles.Systems;
+using Content.Client._Horizon.Shuttles; // Horizon
 using Content.Shared.Shuttles.BUIStates;
 using Content.Shared.Shuttles.Components;
 using Content.Shared.Shuttles.UI.MapObjects;
@@ -44,6 +45,7 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
     private EntityUid? _shuttleEntity;
 
     private readonly Font _font;
+    private readonly PlanetMapCamera _planetCamera = new(); // Horizon: far-away camera instead of the parallax on planets
 
     private readonly EntityQuery<PhysicsComponent> _physicsQuery;
 
@@ -261,8 +263,13 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
 
     private void DrawTacticalMapBackground(DrawingHandleScreen handle, Matrix3x2 mapTransform, Box2 viewBox)
     {
-        DrawParallax(handle);
         var bounds = UIBox2.FromDimensions(Vector2.Zero, PixelSize);
+
+        // Horizon: on a planet show a far-away top-down camera (terrain + structures, no creatures) instead of the parallax.
+        if (!_planetCamera.TryDraw(handle, ViewingMap, _shuttleEntity, viewBox, p => MapToScreen(p, mapTransform), MinimapScale, bounds))
+            DrawParallax(handle);
+        // End Horizon
+
         handle.DrawRect(bounds, Color.FromHex("#243041").WithAlpha(0.7f), filled: false);
 
         DrawCoordinateGrid(handle, mapTransform, viewBox);
