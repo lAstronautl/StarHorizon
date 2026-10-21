@@ -22,7 +22,6 @@ namespace Content.Server._Horizon.Shipbreaking;
 public sealed partial class ShipCutterSystem : SharedShipCutterSystem
 {
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
     [Dependency] private readonly GridCutsSystem _cuts = default!;
     [Dependency] private readonly PowerCellSystem _cell = default!;
     [Dependency] private readonly MetaDataSystem _meta = default!;
@@ -31,6 +30,7 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedInteractionSystem _interaction = default!;
 
     public override void Initialize()
     {
@@ -82,17 +82,42 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
 
     private void OnAfterInteract(Entity<ShipCutterComponent> ent, ref AfterInteractEvent args)
     {
-        if (args.Handled || !args.CanReach || ent.Comp.Mode != ShipToolMode.Cut)
+        if (args.Handled || ent.Comp.Mode != ShipToolMode.Cut)
             return;
 
-        if (!TryPickTarget(ent.Comp, args.Target, args.ClickLocation, out var target))
+        var pick = Pick(TransformSystem.ToMapCoordinates(args.ClickLocation), ent.Comp);
+        if (pick.Kind == ShipCutterPickKind.None)
             return;
 
         args.Handled = true;
 
+        if (!pick.CanCut)
+        {
+            _popup.PopupEntity(Loc.GetString("ship-cutter-cannot-cut"), ent, args.User);
+            return;
+        }
+
+        var target = pick.Kind == ShipCutterPickKind.Wall
+            ? ShipCutterTarget.Wall(GetNetEntity(pick.Wall!.Value))
+            : ShipCutterTarget.Seam(GetNetEntity(pick.Grid), pick.Tile, pick.Edge);
+
         if (!TryResolve(ent.Comp, target, out var entity, out var delay, out var charge))
         {
             _popup.PopupEntity(Loc.GetString("ship-cutter-cannot-cut"), ent, args.User);
+            return;
+        }
+
+        // The click may be on any tile in sight, but the tool still has to reach it. A seam can be under a wall,
+        // so only the distance counts there.
+        var inRange = pick.Kind == ShipCutterPickKind.Wall
+            ? _interaction.InRangeUnobstructed(args.User, pick.Wall!.Value, popup: false)
+            : TransformSystem.InRange(Transform(args.User).Coordinates,
+                MapSystem.GridTileToLocal(pick.Grid, pick.GridComp!, pick.Tile),
+                SharedInteractionSystem.InteractionRange);
+
+        if (!inRange)
+        {
+            _popup.PopupEntity(Loc.GetString("ship-cutter-too-far"), ent, args.User);
             return;
         }
 
@@ -114,39 +139,6 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
     }
 
     /// <summary>
-    /// Works out what a click is aimed at: the seam next to the click, also where a wall stands on it, or else a wall
-    /// that can be cut loose.
-    /// </summary>
-    private bool TryPickTarget(ShipCutterComponent cutter, EntityUid? clicked, EntityCoordinates click, out ShipCutterTarget target)
-    {
-        target = default;
-
-        // A click near the edge of a tile cuts the seam, a wall on the tile does not matter: the gap shows over it.
-        if (TryGetSeam(TransformSystem.ToMapCoordinates(click), cutter.EdgeTolerance, out var gridUid, out var grid, out var tile, out var edge) &&
-            CanCut(gridUid, grid, tile, edge))
-        {
-            target = ShipCutterTarget.Seam(GetNetEntity(gridUid), tile, edge);
-            return true;
-        }
-
-        // A click in the middle of a wall cuts the wall loose.
-        if (clicked is { } wall && Transform(wall).Anchored && _whitelist.IsWhitelistPass(cutter.WallWhitelist, wall))
-        {
-            target = ShipCutterTarget.Wall(GetNetEntity(wall));
-            return true;
-        }
-
-        // Near an edge that can not be cut (space or already cut): still the seam, so the message says so.
-        if (edge != CutEdges.None)
-        {
-            target = ShipCutterTarget.Seam(GetNetEntity(gridUid), tile, edge);
-            return true;
-        }
-
-        return false;
-    }
-
-    /// <summary>
     /// Checks the target can still be cut, and gives the entity to do-after on with the delay and charge it takes.
     /// </summary>
     private bool TryResolve(ShipCutterComponent cutter, ShipCutterTarget target, out EntityUid entity, out float delay, out float charge)
@@ -162,7 +154,7 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
 
         if (target.IsWall)
         {
-            if (!Transform(entity).Anchored || !_whitelist.IsWhitelistPass(cutter.WallWhitelist, entity))
+            if (!Transform(entity).Anchored || !Whitelist.IsWhitelistPass(cutter.WallWhitelist, entity))
                 return false;
 
             delay = cutter.WallDelay;

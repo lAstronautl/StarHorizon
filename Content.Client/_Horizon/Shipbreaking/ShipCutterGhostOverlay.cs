@@ -21,10 +21,10 @@ namespace Content.Client._Horizon.Shipbreaking;
 /// </summary>
 public sealed class ShipCutterGhostOverlay : Overlay
 {
-    private static readonly Color ValidColor = Color.Lime.WithAlpha(0.7f);
-    private static readonly Color InvalidColor = Color.Red.WithAlpha(0.6f);
-    private static readonly Color PickColor = Color.Cyan.WithAlpha(0.6f);
-    private static readonly Color SelectedColor = Color.Orange.WithAlpha(0.8f);
+    private static readonly Color ValidColor = Color.Lime.WithAlpha(0.5f);
+    private static readonly Color InvalidColor = Color.Red.WithAlpha(0.5f);
+    private static readonly Color PickColor = Color.Cyan.WithAlpha(0.5f);
+    private static readonly Color SelectedColor = Color.Orange.WithAlpha(0.5f);
 
     // The ghost is drawn a bit wider than the cut itself, so it can be seen.
     private const float GhostWidthPixels = GridCutsComponent.CutWidthPixels * 2f;
@@ -83,8 +83,11 @@ public sealed class ShipCutterGhostOverlay : Overlay
         if (cutter.Mode == ShipToolMode.Cut)
         {
             // The cutter shows where it would cut.
-            if (_cutter.TryGetSeam(mapPos, cutter.EdgeTolerance, out var gridUid, out var grid, out var tile, out var edge))
-                DrawEdge(handle, gridUid, grid, tile, edge, _cutter.CanCut(gridUid, grid, tile, edge) ? ValidColor : InvalidColor);
+            var pick = _cutter.Pick(mapPos, cutter);
+            if (pick.Kind == ShipCutterPickKind.Seam)
+                DrawEdge(handle, pick.Grid, pick.GridComp!, pick.Tile, pick.Edge, pick.CanCut ? ValidColor : InvalidColor);
+            else if (pick.Kind == ShipCutterPickKind.Wall)
+                DrawTile(handle, pick.Grid, pick.GridComp!, pick.Tile, ValidColor);
         }
         else if (_entManager.TryGetComponent(held, out SeamWelderComponent? welder))
         {
@@ -179,6 +182,13 @@ public sealed class ShipCutterGhostOverlay : Overlay
 
         handle.SetTransform(_transform.GetWorldMatrix(gridUid));
         handle.DrawRect(edge.GetRect(tile, grid.TileSize, half), color);
+        handle.SetTransform(Matrix3x2.Identity);
+    }
+
+    private void DrawTile(DrawingHandleWorld handle, EntityUid gridUid, MapGridComponent grid, Vector2i tile, Color color)
+    {
+        handle.SetTransform(_transform.GetWorldMatrix(gridUid));
+        handle.DrawRect(Box2.FromDimensions(new Vector2(tile.X, tile.Y) * grid.TileSize, new Vector2(grid.TileSize)), color);
         handle.SetTransform(Matrix3x2.Identity);
     }
 }

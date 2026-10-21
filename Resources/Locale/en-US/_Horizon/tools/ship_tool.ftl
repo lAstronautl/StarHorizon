@@ -10,6 +10,7 @@ ship-tool-mode-weld = Mode: welding.
 
 ship-cutter-cannot-cut = There is nothing to cut there.
 ship-cutter-no-charge = The tool is out of charge.
+ship-cutter-too-far = That is too far away.
 
 ship-tool-status-cut = Mode: [color=cyan]cutting[/color]
 ship-tool-status-weld = Mode: [color=orange]welding[/color]

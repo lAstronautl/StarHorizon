@@ -1,4 +1,5 @@
 using System.Numerics;
+using Content.Shared.Whitelist;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 
@@ -12,6 +13,7 @@ public abstract class SharedShipCutterSystem : EntitySystem
     [Dependency] protected readonly IMapManager MapManager = default!;
     [Dependency] protected readonly SharedMapSystem MapSystem = default!;
     [Dependency] protected readonly SharedTransformSystem TransformSystem = default!;
+    [Dependency] protected readonly EntityWhitelistSystem Whitelist = default!;
 
     /// <summary>
     /// Finds the tile edge a point is close to.
@@ -63,6 +65,45 @@ public abstract class SharedShipCutterSystem : EntitySystem
     }
 
     /// <summary>
+    /// Works out what a click with the cutter is aimed at. Used by the server to cut and by the client to draw the ghost,
+    /// so the ghost always shows what the click does.
+    /// A click near the edge of a tile is the seam there, also under a wall: the gap shows over the wall.
+    /// Otherwise a wall on the clicked tile is cut loose. Near an edge that can not be cut (space, already cut)
+    /// it is still the seam, so the player is told that there is nothing to cut.
+    /// </summary>
+    public ShipCutterPick Pick(MapCoordinates click, ShipCutterComponent cutter)
+    {
+        if (!MapManager.TryFindGridAt(click, out var gridUid, out var grid))
+            return default;
+
+        var local = Vector2.Transform(click.Position, TransformSystem.GetInvWorldMatrix(gridUid)) / grid.TileSize;
+        var tilePos = new Vector2i((int) MathF.Floor(local.X), (int) MathF.Floor(local.Y));
+
+        // The wall and the seam are both looked for on the tile under the click.
+        EntityUid? wall = null;
+        foreach (var anchored in MapSystem.GetAnchoredEntities((gridUid, grid), tilePos))
+        {
+            if (Whitelist.IsWhitelistPass(cutter.WallWhitelist, anchored))
+            {
+                wall = anchored;
+                break;
+            }
+        }
+
+        var tolerance = wall != null ? cutter.WallEdgeTolerance : cutter.EdgeTolerance;
+        var hasSeam = TryGetSeam(click, tolerance, out _, out _, out var tile, out var edge);
+        var canCut = hasSeam && CanCut(gridUid, grid, tile, edge);
+
+        if (canCut || (hasSeam && wall == null))
+            return new ShipCutterPick(ShipCutterPickKind.Seam, gridUid, grid, tile, edge, null, canCut);
+
+        if (wall != null)
+            return new ShipCutterPick(ShipCutterPickKind.Wall, gridUid, grid, tilePos, CutEdges.None, wall, true);
+
+        return default;
+    }
+
+    /// <summary>
     /// Whether the edge faces open space: the tile is floor and the tile on the other side of the edge is not.
     /// Only such edges can be joined to another grid.
     /// </summary>
@@ -92,3 +133,22 @@ public abstract class SharedShipCutterSystem : EntitySystem
         return !HasCut(gridUid, tile, edge);
     }
 }
+
+public enum ShipCutterPickKind
+{
+    None,
+    Seam,
+    Wall,
+}
+
+/// <summary>
+/// What a click with the cutter is aimed at, see <see cref="SharedShipCutterSystem.Pick"/>.
+/// </summary>
+public readonly record struct ShipCutterPick(
+    ShipCutterPickKind Kind,
+    EntityUid Grid,
+    MapGridComponent? GridComp,
+    Vector2i Tile,
+    CutEdges Edge,
+    EntityUid? Wall,
+    bool CanCut);

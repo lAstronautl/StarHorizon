@@ -10,6 +10,7 @@ ship-tool-mode-weld = Режим: сварка.
 
 ship-cutter-cannot-cut = Здесь нечего резать.
 ship-cutter-no-charge = У инструмента села батарея.
+ship-cutter-too-far = Слишком далеко.
 
 ship-tool-status-cut = Режим: [color=cyan]резка[/color]
 ship-tool-status-weld = Режим: [color=orange]сварка[/color]

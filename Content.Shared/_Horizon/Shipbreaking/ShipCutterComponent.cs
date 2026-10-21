@@ -94,6 +94,12 @@ public sealed partial class ShipCutterComponent : Component
     public float EdgeTolerance = 0.15f;
 
     /// <summary>
+    /// Same as <see cref="EdgeTolerance"/> on a tile with a wall: narrower, so most of the wall is a click on the wall.
+    /// </summary>
+    [DataField]
+    public float WallEdgeTolerance = 0.1f;
+
+    /// <summary>
     /// Played when a cut starts.
     /// </summary>
     [DataField]
