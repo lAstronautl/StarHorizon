@@ -22,6 +22,10 @@
     - DerelictSyndicate
     - DerelictCargo
     - DerelictCrashed
+    - DerelictHauler
+    - DerelictEmergency
+    - DerelictWhiteship
+    - DerelictKvazar
   - type: ActivatableUI
     key: enum.DerelictYardUiKey.Key
   - type: UserInterface

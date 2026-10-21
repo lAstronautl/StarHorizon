@@ -34,3 +34,32 @@
   description: derelict-vessel-crashed-desc
   price: 18000
   shuttlePath: /Maps/_Horizon/Lostvoid/Shuttle/medium-crashed-shuttle.yml
+
+- type: derelictVessel
+  id: DerelictHauler
+  name: derelict-vessel-hauler
+  description: derelict-vessel-hauler-desc
+  price: 16000
+  shuttlePath: /Maps/_Horizon/Lostvoid/Shuttle/hauling-shuttle.yml
+
+- type: derelictVessel
+  id: DerelictEmergency
+  name: derelict-vessel-emergency
+  description: derelict-vessel-emergency-desc
+  price: 20000
+  shuttlePath: /Maps/_Horizon/Lostvoid/Shuttle/medium-ruined-emergency-shuttle.yml
+
+- type: derelictVessel
+  id: DerelictWhiteship
+  name: derelict-vessel-whiteship
+  description: derelict-vessel-whiteship-desc
+  price: 24000
+  shuttlePath: /Maps/_Horizon/Lostvoid/Shuttle/whiteship-bluespacejumper.yml
+
+
+- type: derelictVessel
+  id: DerelictKvazar
+  name: derelict-vessel-kvazar
+  description: derelict-vessel-kvazar-desc
+  price: 40000
+  shuttlePath: /Maps/_Horizon/Lostvoid/Shuttle/kvazar.yml
