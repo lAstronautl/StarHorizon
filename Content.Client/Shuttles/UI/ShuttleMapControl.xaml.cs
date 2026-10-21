@@ -500,6 +500,8 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
         var realTime = _timing.RealTime;
         var viewBox = GetVisibleWorldBox();
         DrawTacticalMapBackground(handle, matty, viewBox);
+        // Horizon: border rings of stars (solar boost zone) and black holes (pull / hazard / event horizon)
+        SectorBodyRings.Draw(handle, EntManager, _xformSystem, ViewingMap, worldPoint => MapToScreen(worldPoint, matty), MinimapScale, PixelRect);
         var viewportObjects = GetViewportMapObjects(matty, mapObjects);
         _viewportExclusions.Clear();
 

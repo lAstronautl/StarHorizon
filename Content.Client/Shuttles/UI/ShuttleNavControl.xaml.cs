@@ -1,3 +1,4 @@
+using Content.Client._Horizon.Shuttles; // Horizon
 using Content.Client._Mono.Radar;
 using Content.Client.Shuttles.Systems;
 using Content.Client.Station; // Frontier
@@ -410,6 +411,16 @@ public partial class ShuttleNavControl : BaseShuttleControl // Mono
 
         // Draw shields
         DrawShields(handle, xform, worldToShuttle);
+
+        // Horizon: border rings of stars (solar boost zone) and black holes (pull / hazard / event horizon)
+        SectorBodyRings.Draw(
+            handle,
+            EntManager,
+            _transform,
+            xform.MapID,
+            worldPoint => Vector2.Transform(Vector2.Transform(worldPoint, worldToShuttle), shuttleToView),
+            MinimapScale,
+            PixelRect);
 
         // Frontier Corvax: north line drawing
         DrawNorthLine(handle, worldRot);
