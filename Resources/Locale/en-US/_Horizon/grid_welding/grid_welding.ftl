@@ -7,5 +7,4 @@ grid-welding-not-facing = Those points don't actually face each other!
 grid-welding-too-large = The combined hull would be too large to weld!
 grid-welding-obstructed = Something is blocking the hulls from joining there!
 grid-welding-out-of-range = You need to be closer to both points to weld them!
-grid-welding-merge-success = The hulls groan and lock together!
 grid-welding-edge-not-open = Only an edge that faces open space can be welded to another hull.

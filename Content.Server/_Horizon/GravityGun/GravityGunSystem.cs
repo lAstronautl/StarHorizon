@@ -68,7 +68,6 @@ public sealed class GravityGunSystem : EntitySystem
 
         args.Handled = true;
         Release(ent);
-        _popup.PopupEntity(Loc.GetString("gravity-gun-released"), ent, args.User);
     }
 
     private void OnAfterInteract(Entity<GravityGunComponent> ent, ref AfterInteractEvent args)
@@ -114,7 +113,6 @@ public sealed class GravityGunSystem : EntitySystem
             StartTether(gun, held, clickPos);
 
         _audio.PlayPvs(gun.Sound, ent);
-        _popup.PopupEntity(Loc.GetString(heavy ? "gravity-gun-heavy" : "gravity-gun-grabbed"), ent, user);
     }
 
     /// <summary>

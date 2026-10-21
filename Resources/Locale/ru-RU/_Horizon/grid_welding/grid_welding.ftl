@@ -7,5 +7,4 @@ grid-welding-not-facing = Эти точки не обращены друг к д
 grid-welding-too-large = Объединённый корпус получится слишком большим!
 grid-welding-obstructed = Что-то мешает соединению корпусов в этом месте!
 grid-welding-out-of-range = Нужно подойти ближе к обеим точкам, чтобы их сварить!
-grid-welding-merge-success = Корпуса со скрипом сцепляются друг с другом!
 grid-welding-edge-not-open = К другому корпусу можно приварить только край, за которым открытый космос.

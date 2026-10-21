@@ -94,7 +94,6 @@ public sealed class BreachChargeSystem : EntitySystem
         _trigger.ActivateTimerTrigger(armed, args.User);
 
         _audio.PlayPvs(ent.Comp.PlaceSound, armed);
-        _popup.PopupEntity(Loc.GetString("breach-charge-placed"), armed, args.User);
         QueueDel(ent);
     }
 

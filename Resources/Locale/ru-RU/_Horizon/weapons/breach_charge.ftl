@@ -4,4 +4,3 @@ ent-BreachChargeArmed = пробивной заряд
     .desc = Направленный заряд, который вот-вот прорежет линию стыков в полу.
 
 breach-charge-cannot-place = Заряд нельзя повесить на этот край.
-breach-charge-placed = Заряд повешен, отойдите.

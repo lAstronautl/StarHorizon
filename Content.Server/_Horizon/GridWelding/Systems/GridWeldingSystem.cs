@@ -195,7 +195,6 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
 
         MergeGrids(gridAUid, gridBUid, offset, rotation, args.TileA, args.TileB);
 
-        _popup.PopupEntity(Loc.GetString("grid-welding-merge-success"), ent, args.User, PopupType.Medium);
         _audio.PlayPvs(ent.Comp.WeldSound, ent);
 
         _adminLogger.Add(LogType.Construction, LogImpact.High,

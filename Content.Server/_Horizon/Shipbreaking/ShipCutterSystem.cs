@@ -64,7 +64,6 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
         var changed = new ShipToolModeChangedEvent(ent.Comp.Mode);
         RaiseLocalEvent(ent, ref changed);
 
-        _popup.PopupEntity(Loc.GetString(ent.Comp.Mode == ShipToolMode.Cut ? "ship-tool-mode-cut" : "ship-tool-mode-weld"), ent, args.User);
         _audio.PlayPvs(ent.Comp.ChangeSound, ent);
     }
 
