@@ -5,6 +5,7 @@
 using Content.Server._NF.Shuttles.Components;
 using Content.Server.Shuttles.Components;
 using Content.Server.Shuttles.Systems;
+using Content.Shared.Shuttles.Components;
 using Content.Server.StationEvents.Events;
 using Content.Server.Temperature.Systems;
 using Content.Shared._Horizon.SpaceHazards;
@@ -41,6 +42,7 @@ public sealed class SectorBlackHoleSystem : EntitySystem
     [Dependency] private readonly TemperatureSystem _temperature = default!;
     [Dependency] private readonly LinkedLifecycleGridSystem _linkedLifecycle = default!;
     [Dependency] private readonly ShuttleSystem _shuttle = default!;
+    [Dependency] private readonly SingularityTransitSystem _transit = default!;
 
     private TimeSpan _nextTick;
     private readonly List<Entity<MapGridComponent>> _gridScratch = new();
@@ -81,6 +83,14 @@ public sealed class SectorBlackHoleSystem : EntitySystem
                     continue;
 
                 var distClosest = DistanceToGrid(gridUid, grid.Comp, pos);
+
+                // A shuttle that already left through the singularity is on its way out; nothing more to do on this map.
+                if (HasComp<FTLComponent>(gridUid))
+                    continue;
+
+                // Shuttles that reach the center are thrown on a random FTL jump instead of being eaten.
+                if (distClosest <= horizonR && _transit.TrySendThroughSingularity(gridUid, uid, body))
+                    continue;
 
                 if (distClosest <= pullR)
                 {

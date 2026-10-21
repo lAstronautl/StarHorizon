@@ -72,4 +72,20 @@ public sealed partial class SectorCelestialBodyComponent : Component
 
     [DataField, AutoNetworkedField]
     public float PullAcceleration = 18f;
+
+    /// <summary>Horizon: shuttles that reach the black hole's center are FTLed to a random point within this range of the map origin (Frontier).</summary>
+    [DataField]
+    public float TransitRange = 25000f;
+
+    /// <summary>Seconds a shuttle spends in the singularity transit map.</summary>
+    [DataField]
+    public float TransitTime = 25f;
+
+    /// <summary>Parallax prototype shown on the singularity transit map. Change this to restyle the jump.</summary>
+    [DataField]
+    public string TransitParallax = "SingularityTransit";
+
+    /// <summary>Fraction of the event horizon hull damage a shuttle keeps taking while in transit.</summary>
+    [DataField]
+    public float TransitDamageFactor = 0.5f;
 }
