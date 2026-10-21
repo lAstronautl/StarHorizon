@@ -139,7 +139,6 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
             comp.PendingEdge = edge;
             comp.PendingSelectionExpiry = _timing.CurTime + comp.SelectionTimeout;
             Dirty(ent);
-            _popup.PopupEntity(Loc.GetString("grid-welding-first-point-selected"), ent, args.User, PopupType.Medium);
             return;
         }
 
@@ -166,7 +165,6 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
 
     private void StartSeal(Entity<SeamWelderComponent> ent, EntityUid user, EntityUid gridUid, Vector2i tile, CutEdges edge, SeamWelderComponent comp)
     {
-        _popup.PopupEntity(Loc.GetString("grid-welding-sealing-seam"), ent, user, PopupType.Medium);
         var ev = new GridWeldSealDoAfterEvent(GetNetEntity(gridUid), tile, edge);
         StartWeld(ent, user, comp.WeldSealDelay, comp.SealCharge, ev);
     }
@@ -255,20 +253,12 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
 
         var gridUid = GetEntity(args.Grid);
         if (!_cuts.RemoveCut(gridUid, args.Tile, args.Edge))
-        {
-            _popup.PopupEntity(Loc.GetString("grid-welding-no-seam"), ent, args.User, PopupType.SmallCaution);
             return;
-        }
 
         // The cut is welded shut, the charge is taken for it.
         _cell.TryUseCharge(ent, ent.Comp.SealCharge, user: args.User);
 
         _audio.PlayPvs(ent.Comp.SealSound, ent);
-
-        if (_cuts.HasCuts(gridUid))
-            _popup.PopupEntity(Loc.GetString("grid-welding-seam-sealed"), ent, args.User, PopupType.Medium);
-        else
-            _popup.PopupEntity(Loc.GetString("grid-welding-hull-fully-sealed"), ent, args.User, PopupType.Medium);
 
         _adminLogger.Add(LogType.Construction, LogImpact.Low,
             $"{ToPrettyString(args.User):player} welded a seam shut on {ToPrettyString(gridUid):grid}");

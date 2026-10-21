@@ -1,5 +1,3 @@
-grid-welding-first-point-selected = Вы отметили этот край. Теперь выберите край другого корпуса, с которым его соединить.
-grid-welding-selection-expired = Метка угасла - заварите эту точку снова.
 grid-welding-same-grid = Нельзя сварить грид с самим собой!
 grid-welding-no-tile = Здесь нет корпуса для сварки.
 grid-welding-invalid-target = Это нельзя сваривать.
@@ -10,8 +8,4 @@ grid-welding-too-large = Объединённый корпус получитс�
 grid-welding-obstructed = Что-то мешает соединению корпусов в этом месте!
 grid-welding-out-of-range = Нужно подойти ближе к обеим точкам, чтобы их сварить!
 grid-welding-merge-success = Корпуса со скрипом сцепляются друг с другом!
-grid-welding-sealing-seam = Вы начинаете заваривать шов.
-grid-welding-seam-sealed = Вы заделываете шов сваркой.
-grid-welding-hull-fully-sealed = Корпус полностью герметичен - швов больше не осталось.
-grid-welding-no-seam = Здесь нет шва, который можно заварить.
 grid-welding-edge-not-open = К другому корпусу можно приварить только край, за которым открытый космос.

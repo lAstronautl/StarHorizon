@@ -22,6 +22,8 @@ public sealed class GridCutOverlay : Overlay
     public GridCutOverlay(IEntityManager entManager)
     {
         _entManager = entManager;
+        // After the walls and their tops, so the gaps show on walls.
+        ZIndex = (int) Content.Shared.DrawDepth.DrawDepth.WallTops + 1;
         _transform = entManager.System<SharedTransformSystem>();
     }
 

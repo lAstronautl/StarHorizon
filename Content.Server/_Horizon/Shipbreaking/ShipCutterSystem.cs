@@ -31,7 +31,6 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedInteractionSystem _interaction = default!;
 
     public override void Initialize()
     {
@@ -83,7 +82,7 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
 
     private void OnAfterInteract(Entity<ShipCutterComponent> ent, ref AfterInteractEvent args)
     {
-        if (args.Handled || ent.Comp.Mode != ShipToolMode.Cut)
+        if (args.Handled || !args.CanReach || ent.Comp.Mode != ShipToolMode.Cut)
             return;
 
         var pick = Pick(TransformSystem.ToMapCoordinates(args.ClickLocation), ent.Comp);
@@ -105,20 +104,6 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
         if (!TryResolve(ent.Comp, target, out var entity, out var delay, out var charge))
         {
             _popup.PopupEntity(Loc.GetString("ship-cutter-cannot-cut"), ent, args.User);
-            return;
-        }
-
-        // The click may be on any tile in sight, but the tool still has to reach it. A seam can be under a wall,
-        // so only the distance counts there.
-        var inRange = pick.Kind == ShipCutterPickKind.Wall
-            ? _interaction.InRangeUnobstructed(args.User, pick.Wall!.Value, popup: false)
-            : TransformSystem.InRange(Transform(args.User).Coordinates,
-                MapSystem.GridTileToLocal(pick.Grid, pick.GridComp!, pick.Tile),
-                SharedInteractionSystem.InteractionRange);
-
-        if (!inRange)
-        {
-            _popup.PopupEntity(Loc.GetString("ship-cutter-too-far"), ent, args.User);
             return;
         }
 
