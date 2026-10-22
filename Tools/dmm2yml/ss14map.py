@@ -118,6 +118,7 @@ class MapBuilder:
     # Set by dmm2yml.place_gas_pipes(), reported by describe_map().
     gas_pipes_placed: int = 0
     gas_pipes_dropped: int = 0
+    gas_pipes_on_device: int = 0
     _next_uid: int = FIRST_FREE_UID
 
     # -- collection ------------------------------------------------------

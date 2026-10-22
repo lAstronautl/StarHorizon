@@ -565,12 +565,23 @@ def place_gas_pipes(
     fit against each other, the same way independent networks never would
     in-game -- see pipefitting.fit_pipes(). A tg layer missing from
     `layer_map` (not 1/2/3, and declined in the overflow prompt) is left
-    unconverted. Also patches any device (vent, scrubber, pump, ...) whose
-    own open port touches a fitted network onto that network's layer/colour
-    -- see _tag_connected_devices(). Sets builder.gas_pipes_placed/dropped.
+    unconverted. A tile that also carries a device (survey.device_ports) is
+    skipped too, same as a dropped layer -- tg commonly runs a plain pipe
+    atom straight through a pump/scrubber's own tile for routing purposes,
+    but the device's own NodeContainer already is that tile's pipe presence
+    in SS14; fitting a second GasPipe* entity on top of it stacked two
+    unrelated pipe sprites on one cell instead of one correct one. The
+    device still gets fitted *toward* correctly, via device_ports, exactly
+    as any other neighbour. Also patches any device (vent, scrubber, pump,
+    ...) whose own open port touches a fitted network onto that network's
+    layer/colour -- see _tag_connected_devices(). Sets builder.gas_pipes_
+    placed/dropped/on_device.
     """
     groups: dict[tuple[str, str], set[tuple[int, int]]] = {}
     for tile_x, tile_y, color_name, tg_layer in survey.gas_pipe_atoms:
+        if (tile_x, tile_y) in survey.device_ports:
+            builder.gas_pipes_on_device += 1
+            continue
         ss14_layer = layer_map.get(tg_layer)
         if ss14_layer is None:
             builder.gas_pipes_dropped += 1
@@ -818,10 +829,12 @@ def describe_map(builder: ss14map.MapBuilder, log=print) -> None:
     log(f"  tiles    {len(builder.tiles)} ({len(builder.build_tilemap())} distinct)")
     log(f"  decals   {sum(len(v) for v in builder.decals.values())} in {len(builder.decals)} nodes")
     log(f"  entities {len(builder.entities)}")
-    if builder.gas_pipes_placed or builder.gas_pipes_dropped:
+    if builder.gas_pipes_placed or builder.gas_pipes_dropped or builder.gas_pipes_on_device:
         note = f"  pipes    {builder.gas_pipes_placed} gas pipe(s) auto-fitted"
         if builder.gas_pipes_dropped:
             note += f", {builder.gas_pipes_dropped} dropped (tg layer not mapped to a slot)"
+        if builder.gas_pipes_on_device:
+            note += f", {builder.gas_pipes_on_device} absorbed into a device on the same tile"
         log(note)
     report_disconnected(builder, log)
 

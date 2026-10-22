@@ -1211,6 +1211,42 @@ def check_gas_pipe_autofit(mapping_set, index, prototypes_dir) -> Result:
         if not any("AtmosPipeColor" in c and "#990000FF" in c for c in vent2.extra_components):
             problems.append(f"vent missing AtmosPipeColor #990000FF (scrubbers): {vent2.extra_components}")
 
+    # A tg atom commonly runs a plain pipe segment straight through a pump/
+    # scrubber's own tile for routing -- the device's own NodeContainer is
+    # already that tile's pipe presence in SS14, so a second, redundant
+    # GasPipe* entity must not get stacked on top of it (reported for real:
+    # two sprites fighting for the same cell in the map editor). The device
+    # must still join the network through its real neighbour, same as ever.
+    overlap_fixture = (
+        '"A" = (\n/obj/machinery/atmospherics/components/unary/vent_pump{dir = 2},\n'
+        '/obj/machinery/atmospherics/pipe/smart/simple/scrubbers/layer2,\n'
+        '/turf/open/floor/iron,\n/area/station)\n'
+        '"B" = (\n/turf/open/floor/iron,\n/area/station)\n'
+        '"C" = (\n/obj/machinery/atmospherics/pipe/smart/simple/scrubbers/layer2,\n'
+        '/turf/open/floor/iron,\n/area/station)\n'
+        '"D" = (\n/turf/open/floor/iron,\n/area/station)\n\n'
+        '(1,1,1) = {"\nAB\nCD\n"}\n'
+    )
+    with tempfile.TemporaryDirectory() as directory:
+        path = os.path.join(directory, "fixture.dmm")
+        with open(path, "w", encoding="utf-8") as handle:
+            handle.write(overlap_fixture)
+        dmm3 = dmmparser.parse(path)
+    builder3 = ss14map.MapBuilder(template["map_entity"], template["grid_entity"], "0.0.0")
+    survey3 = dmm2yml.walk(dmm3, mapping_set, index, 1, builder3, "deterministic", pipenode_index=pipenode_index)
+    dmm2yml.place_gas_pipes(survey3, builder3, {1: "Primary", 2: "Secondary", 3: "Tertiary"})
+
+    on_device_tile = any(e.proto.startswith("GasPipe") and (e.x, e.y) == (0.5, 1.5) for e in builder3.entities)
+    if on_device_tile:
+        problems.append("a redundant GasPipe* entity was placed on the vent's own tile (0.5,1.5)")
+    if builder3.gas_pipes_on_device != 1:
+        problems.append(f"gas_pipes_on_device: {builder3.gas_pipes_on_device}, expected 1")
+    if builder3.gas_pipes_placed != 1:
+        problems.append(f"gas_pipes_placed: {builder3.gas_pipes_placed}, expected 1 (only C's own tile)")
+    vent3 = next((e for e in builder3.entities if e.proto == "GasVentPump"), None)
+    if vent3 is None or not any("Secondary" in c for c in vent3.extra_components):
+        problems.append(f"vent on an overlapped device tile still must join its real network: {vent3.extra_components if vent3 else None}")
+
     # tg layer 5 has no slot in DEFAULT_LAYER_MAP -- it must be dropped, not
     # silently collide onto whichever of Primary/Secondary/Tertiary is free.
     builder2 = ss14map.MapBuilder(template["map_entity"], template["grid_entity"], "0.0.0")
