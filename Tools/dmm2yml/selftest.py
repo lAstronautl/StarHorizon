@@ -1089,10 +1089,29 @@ def check_gas_pipe_autofit(mapping_set, index, prototypes_dir) -> Result:
     checks device_ports registration and rotation too, not just pipe-to-pipe
     fitting (already covered on its own by pipefitting.py's own test suite).
     A second, standalone case checks that an unmapped tg layer is dropped,
-    not silently placed into whichever slot happens to be free.
+    not silently placed into whichever slot happens to be free. A third
+    checks gaspipes.parse_gas_pipe_path's shape coverage directly: bridge_pipe
+    and layer_manifold parse (folded into the ordinary same-colour/layer
+    run -- see that module's docstring for why there is nothing more faithful
+    a static conversion could do), multiz does not (no SS14 destination
+    exists at all -- a different kind of gap, see ignore.yml's comment).
     """
     dmm2yml = dmm2yml_module()
     problems = []
+
+    for path, want_shape in (
+        ("/obj/machinery/atmospherics/pipe/bridge_pipe/supply/layer2", "bridge_pipe"),
+        ("/obj/machinery/atmospherics/pipe/layer_manifold/scrubbers/layer4", "layer_manifold"),
+    ):
+        parsed = gaspipes.parse_gas_pipe_path(path)
+        if parsed is None or parsed.shape != want_shape:
+            problems.append(f"{path}: parsed as {parsed!r}, expected shape={want_shape!r}")
+    for path in (
+        "/obj/machinery/atmospherics/pipe/multiz/supply",
+        "/obj/machinery/atmospherics/pipe/heat_exchange/junction",
+    ):
+        if gaspipes.parse_gas_pipe_path(path, allow_all_colors=True) is not None:
+            problems.append(f"{path}: expected to stay unhandled (no SS14 destination), but it parsed")
 
     fixture = (
         '"A" = (\n/obj/machinery/atmospherics/components/unary/vent_pump{dir = 2},\n'
@@ -1155,7 +1174,10 @@ def check_gas_pipe_autofit(mapping_set, index, prototypes_dir) -> Result:
     return Result(
         "pipes: gas pipe auto-fit (neighbours + device ports + colour + layer)",
         not problems,
-        "; ".join(problems) or "L-run bends toward a vent's real port, colour/layer carried through, overflow layer dropped",
+        "; ".join(problems) or (
+            "L-run bends toward a vent's real port, colour/layer carried through, overflow layer dropped, "
+            "bridge_pipe/layer_manifold parse, multiz does not"
+        ),
     )
 
 

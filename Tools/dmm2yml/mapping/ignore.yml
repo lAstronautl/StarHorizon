@@ -32,14 +32,17 @@
 - /obj/structure/cable
 - /obj/machinery/power/terminal
 
-# The /smart gas pipe family (simple/manifold/manifold4w) is handled before
-# this file is ever consulted -- see dmm2yml.walk()'s interception and
-# gaspipes.py/pipefitting.py. This rule still catches: a colour not in
-# gaspipes.BASE_COLORS when --pipe-colors=base (the default), and every tg
-# pipe shape this converter doesn't fit yet (layer_manifold, multiz,
-# bridge_pipe, heat_exchange/*) -- those still carry layers/directions that
-# don't survive a straight path lookup, same reasoning as before this
-# exception existed.
+# The /smart pipe family, plus bridge_pipe and layer_manifold (folded into
+# the same colour/layer runs as an ordinary same-layer segment -- this
+# engine has no equivalent for what either actually does, see gaspipes.py's
+# module docstring), are handled before this file is ever consulted -- see
+# dmm2yml.walk()'s interception and gaspipes.py/pipefitting.py. This rule
+# still catches: a colour not in gaspipes.BASE_COLORS when --pipe-colors=base
+# (the default), and multiz -- a connector between two DIFFERENT z-levels,
+# which this converter (like SS14 itself) has no destination for at all:
+# "SS14 has no stacked floors", each z-level becomes its own standalone map
+# file (see command_convert's --all-z message), so there is no second file
+# for a multiz atom to even point at.
 - /obj/machinery/atmospherics/pipe
 
 # tgstation's plumbing subsystem: a second, separate pipe network (fluid
