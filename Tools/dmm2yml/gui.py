@@ -27,7 +27,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import dmm2yml
 import dmmparser
+import gaspipes
 import mappings as mapping_rules
+import pipenodes
 import protoindex
 
 # column id, heading, width, alignment
@@ -42,6 +44,7 @@ COLUMNS = (
 EDIT_COLUMN = "value"
 
 AUTO_SKIP_LABEL = "при сборке карты автоматически пропускать незаполненные пути"
+ALL_PIPE_COLORS_LABEL = "конвертировать трубы всех цветов (не только красные/синие)"
 
 VALID_BG = "#e4f3e4"
 INVALID_BG = "#fbe0e0"
@@ -98,6 +101,7 @@ class App(ttk.Frame):
         self.filter_text = tk.StringVar()
         self.only_unfilled = tk.BooleanVar(value=False)
         self.auto_skip_empty = tk.BooleanVar(value=False)
+        self.convert_all_pipe_colors = tk.BooleanVar(value=False)
         self.status = tk.StringVar(value="индекс прототипов загружается...")
 
         self._editor: ttk.Entry | None = None
@@ -158,6 +162,10 @@ class App(ttk.Frame):
             options, text=AUTO_SKIP_LABEL,
             variable=self.auto_skip_empty,
         ).pack(side="left")
+        ttk.Checkbutton(
+            options, text=ALL_PIPE_COLORS_LABEL,
+            variable=self.convert_all_pipe_colors,
+        ).pack(side="left", padx=(12, 0))
 
         table = ttk.LabelFrame(self, text="Не сопоставлено", padding=6)
         table.pack(fill="both", expand=True)
@@ -310,11 +318,16 @@ class App(ttk.Frame):
 
         z = int(self.z_choice.get())
 
+        allow_all_pipe_colors = self.convert_all_pipe_colors.get()
+
         def work():
             dmm = self._parsed_map()
             mapping_set = mapping_rules.load(self.mapping_dir)
             self._thread_log(f"{os.path.basename(self.dmm_path.get())}: {dmm.width}x{dmm.height}, z={z}")
-            survey = dmm2yml.walk(dmm, mapping_set, self.index, z, None, self.variants)
+            survey = dmm2yml.walk(
+                dmm, mapping_set, self.index, z, None, self.variants,
+                allow_all_pipe_colors=allow_all_pipe_colors,
+            )
             return survey
 
         self._run_async("scan", work)
@@ -339,20 +352,40 @@ class App(ttk.Frame):
         }
         output = self.output_path.get()
         z = int(self.z_choice.get())
+        allow_all_pipe_colors = self.convert_all_pipe_colors.get()
+
+        # Done on the main thread, before work() starts in the background --
+        # a modal dialog can't be shown from the worker thread, and this is
+        # cheap (one pass over the already-parsed atoms, no mapping tables
+        # needed) since it's only deciding whether to ask at all.
+        dmm = self._parsed_map()
+        layer_map = dict(gaspipes.DEFAULT_LAYER_MAP)
+        overflow = dmm2yml.gas_pipe_layer_counts(dmm, z, allow_all_pipe_colors)
+        for tg_layer in sorted(set(overflow) - set(layer_map)):
+            choice = self._ask_pipe_layer_choice(tg_layer, overflow[tg_layer])
+            if choice:
+                layer_map[tg_layer] = choice
 
         def work():
-            dmm = self._parsed_map()
             mapping_set = mapping_rules.load(self.mapping_dir)
+            pipenode_index = pipenodes.build(self.prototypes)
 
             problems = dmm2yml.apply_table(table, mapping_set, self.index)
             problems += dmm2yml.collect_problems(
-                dmm2yml.walk(dmm, mapping_set, self.index, z, None, self.variants)
+                dmm2yml.walk(
+                    dmm, mapping_set, self.index, z, None, self.variants,
+                    allow_all_pipe_colors=allow_all_pipe_colors,
+                )
             )
             lines = dmm2yml.format_problems(problems)
             if lines:
                 return ("refused", lines)
 
-            builder = dmm2yml.build_map(dmm, mapping_set, self.index, z, self.variants, self.mapping_dir)
+            builder = dmm2yml.build_map(
+                dmm, mapping_set, self.index, z, self.variants, self.mapping_dir,
+                pipenode_index=pipenode_index, layer_map=layer_map,
+                allow_all_pipe_colors=allow_all_pipe_colors,
+            )
             with open(output, "w", encoding="utf-8", newline="\n") as handle:
                 handle.write(builder.render())
             self._thread_log(f"записано: {output}")
@@ -366,6 +399,48 @@ class App(ttk.Frame):
             return ("written", output, auto_skipped_count)
 
         self._run_async("convert", work)
+
+    def _ask_pipe_layer_choice(self, tg_layer: int, count: int) -> str | None:
+        """Modal "which SS14 slot?" dialog for a tg piping_layer outside 1/2/3.
+
+        Blocks the caller (main thread only -- see _do_convert) until the
+        person picks a slot or closes the dialog, same choice as the CLI's
+        own --pipe-colors prompt (dmm2yml._ask_pipe_layer_cli), just as
+        buttons instead of typed input.
+        """
+        picked: dict[str, str | None] = {"choice": None}
+        dialog = tk.Toplevel(self)
+        dialog.title("Слой труб")
+        dialog.transient(self.master)
+        dialog.resizable(False, False)
+        ttk.Label(
+            dialog, padding=12, wraplength=320, justify="left",
+            text=(
+                f"{count} труб(а) используют слой {tg_layer} -- для него нет "
+                "готового слота в SS14.\nПеренести их на слот:"
+            ),
+        ).pack()
+        buttons = ttk.Frame(dialog, padding=(12, 0, 12, 12))
+        buttons.pack()
+
+        def pick(value: str | None) -> None:
+            picked["choice"] = value
+            dialog.destroy()
+
+        for label, value in (("1 (Primary)", "Primary"), ("2 (Secondary)", "Secondary"), ("3 (Tertiary)", "Tertiary")):
+            ttk.Button(buttons, text=label, command=lambda v=value: pick(v)).pack(side="left", padx=4)
+        ttk.Button(buttons, text="не конвертировать", command=lambda: pick(None)).pack(side="left", padx=4)
+
+        dialog.protocol("WM_DELETE_WINDOW", lambda: pick(None))
+        dialog.update_idletasks()
+        parent_x, parent_y = self.master.winfo_rootx(), self.master.winfo_rooty()
+        parent_w, parent_h = self.master.winfo_width(), self.master.winfo_height()
+        x = parent_x + (parent_w - dialog.winfo_width()) // 2
+        y = parent_y + (parent_h - dialog.winfo_height()) // 2
+        dialog.geometry(f"+{max(x, 0)}+{max(y, 0)}")
+        dialog.grab_set()
+        dialog.wait_window()
+        return picked["choice"]
 
     def _do_merge(self) -> None:
         if self.index is None or not self.rows:

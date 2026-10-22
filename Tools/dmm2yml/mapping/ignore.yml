@@ -22,18 +22,25 @@
 # to map them to.
 - /area
 
-# Atmospheric pipes and power cables. SS13 and SS14 build these networks
-# differently enough that a converted layout is worth less than the time spent
-# untangling it -- the pipes carry layers, colours and directions that do not
-# survive, and the cable net has to be re-run against SS14's power model anyway.
-# Dropping them leaves clean floors to lay new ones on. On a /tg/ MetaStation
-# this is about a third of all objects: 5857 pipes, 3631 cables.
+# Power cables. SS13 and SS14 build this network differently enough that a
+# converted layout is worth less than the time spent untangling it, and the
+# net has to be re-run against SS14's power model anyway. Dropping them leaves
+# clean floors to lay new ones on.
 #
 # The machines that sit on these networks (vents, scrubbers, pumps, injectors)
 # are still converted -- they are placed correctly and only need connecting up.
-- /obj/machinery/atmospherics/pipe
 - /obj/structure/cable
 - /obj/machinery/power/terminal
+
+# The /smart gas pipe family (simple/manifold/manifold4w) is handled before
+# this file is ever consulted -- see dmm2yml.walk()'s interception and
+# gaspipes.py/pipefitting.py. This rule still catches: a colour not in
+# gaspipes.BASE_COLORS when --pipe-colors=base (the default), and every tg
+# pipe shape this converter doesn't fit yet (layer_manifold, multiz,
+# bridge_pipe, heat_exchange/*) -- those still carry layers/directions that
+# don't survive a straight path lookup, same reasoning as before this
+# exception existed.
+- /obj/machinery/atmospherics/pipe
 
 # tgstation's plumbing subsystem: a second, separate pipe network (fluid
 # ducts, code/modules/plumbing/) that moves chemistry/hydroponics reagents

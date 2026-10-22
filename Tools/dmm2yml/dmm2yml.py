@@ -28,7 +28,10 @@ from dataclasses import dataclass, field
 import yaml
 
 import dmmparser
+import gaspipes
 import mappings as mapping_rules
+import pipefitting
+import pipenodes
 import protoindex
 import ss14map
 
@@ -83,6 +86,17 @@ class Survey:
     resolved_count: int = 0
     skipped_count: int = 0
     stopgap_count: int = 0
+    # Gas pipe atoms (tg's /smart/<shape>/<color>[/layerN]) set aside for the
+    # neighbor-based auto-fit pass in gaspipes.py/pipefitting.py, instead of
+    # being treated as an ordinary unresolved path -- their SS14 prototype
+    # depends on real tile adjacency, not a 1:1 id lookup. (tile_x, tile_y,
+    # color_name, tg_layer) per atom.
+    gas_pipe_atoms: list[tuple[int, int, str, int]] = field(default_factory=list)
+    # Same-tile-position pipe-network devices (vents, pumps, ...) a fitted
+    # pipe may bend toward, keyed by (tile_x, tile_y) -> the world-cardinal
+    # port directions ('N'/'S'/'E'/'W') that device's NodeContainer exposes,
+    # already rotated by its placement facing.
+    device_ports: dict[tuple[int, int], set[str]] = field(default_factory=dict)
 
     def note_unresolved(self, path: str, kind: str, x: int, y: int, variables, map_label: str = "") -> None:
         report = self.unresolved.get(path)
@@ -98,6 +112,13 @@ class Survey:
         self.skipped_count += other.skipped_count
         self.stopgap_count += other.stopgap_count
         self.inherited.update(other.inherited)
+        # Only meaningful for the layer-overflow count (resolve_pipe_layer_map) --
+        # placement itself always walks one z-level into its own fresh Survey
+        # (see build_map()), never this merged one, so tile positions from
+        # different z-levels can never collide into the same pipe network here.
+        self.gas_pipe_atoms.extend(other.gas_pipe_atoms)
+        for position, ports in other.device_ports.items():
+            self.device_ports.setdefault(position, set()).update(ports)
         for path, report in other.unresolved.items():
             existing = self.unresolved.get(path)
             if existing is None:
@@ -300,6 +321,25 @@ def apply_table(
 # ---------------------------------------------------------------- the walk
 
 
+_PIPE_DIR_CYCLE = (mapping_rules.SOUTH, mapping_rules.EAST, mapping_rules.NORTH, mapping_rules.WEST)
+_PIPE_DIR_CHAR = {mapping_rules.NORTH: "N", mapping_rules.SOUTH: "S", mapping_rules.EAST: "E", mapping_rules.WEST: "W"}
+
+
+def _rotate_pipe_bits(bits: int, facing: int | None) -> int:
+    """Rotate a South-baseline NORTH|SOUTH|EAST|WEST bitmask to face `facing`,
+    cycling South->East->North->West->South the same way the reference
+    editor's rotateDirs()/RobustToolbox's pipe rotation convention does."""
+    steps = _PIPE_DIR_CYCLE.index(facing) if facing in _PIPE_DIR_CYCLE else 0
+    if steps == 0:
+        return bits
+    out = 0
+    for d in (mapping_rules.NORTH, mapping_rules.SOUTH, mapping_rules.EAST, mapping_rules.WEST):
+        if bits & d:
+            idx = _PIPE_DIR_CYCLE.index(d)
+            out |= _PIPE_DIR_CYCLE[(idx + steps) % 4]
+    return out
+
+
 def walk(
     dmm: dmmparser.DmmMap,
     mapping_set: mapping_rules.MappingSet,
@@ -308,6 +348,8 @@ def walk(
     builder: ss14map.MapBuilder | None,
     variant_mode: str,
     map_label: str = "",
+    pipenode_index: pipenodes.PipeNodeIndex | None = None,
+    allow_all_pipe_colors: bool = False,
 ) -> Survey:
     """Visit every atom once; collect a survey and, if given a builder, the map."""
     if z_level not in dmm.z_levels:
@@ -329,6 +371,18 @@ def walk(
 
         for atom in atoms:
             kind = atom.kind
+
+            if kind == "entity":
+                # Smart pipes are set aside before the mapping tables ever see
+                # them: ignore.yml drops the whole /pipe tree on purpose (see
+                # its comment), and what SS14 prototype one of these becomes
+                # depends on live tile adjacency, not a 1:1 id lookup -- see
+                # gaspipes.py/pipefitting.py.
+                parsed_pipe = gaspipes.parse_gas_pipe_path(atom.path, allow_all_pipe_colors)
+                if parsed_pipe is not None:
+                    survey.gas_pipe_atoms.append((tile_x, tile_y, parsed_pipe.color_name, parsed_pipe.tg_layer))
+                    continue
+
             lookup_kind = kind if kind in ("turf", "decal") else "entity"
             resolution = mapping_set.resolve(atom.path, lookup_kind)
 
@@ -422,8 +476,114 @@ def walk(
                         rotation=ss14map.rotation_for_dir(facing),
                         name=str(name) if isinstance(name, str) else None,
                     )
+                    if pipenode_index is not None:
+                        bits = pipenode_index.directions(proto)
+                        if bits:
+                            rotated = _rotate_pipe_bits(bits, facing)
+                            ports = {
+                                _PIPE_DIR_CHAR[d] for d in
+                                (mapping_rules.NORTH, mapping_rules.SOUTH, mapping_rules.EAST, mapping_rules.WEST)
+                                if rotated & d
+                            }
+                            survey.device_ports.setdefault((entity_x, entity_y), set()).update(ports)
 
     return survey
+
+
+def _pipe_color_component(color_hex: str | None) -> tuple[str, ...]:
+    if not color_hex:
+        return ()
+    return (f"- type: AtmosPipeColor\n  color: '{color_hex}'",)
+
+
+def place_gas_pipes(
+    survey: Survey,
+    builder: ss14map.MapBuilder,
+    layer_map: dict[int, str],
+) -> None:
+    """Fit survey.gas_pipe_atoms into SS14 gas pipe entities and add them to `builder`.
+
+    Grouped by (colour, SS14 slot) so pipes of different colours/layers never
+    fit against each other, the same way independent networks never would
+    in-game -- see pipefitting.fit_pipes(). A tg layer missing from
+    `layer_map` (not 1/2/3, and declined in the overflow prompt) is left
+    unconverted. Sets builder.gas_pipes_placed/gas_pipes_dropped.
+    """
+    groups: dict[tuple[str, str], set[tuple[int, int]]] = {}
+    for tile_x, tile_y, color_name, tg_layer in survey.gas_pipe_atoms:
+        ss14_layer = layer_map.get(tg_layer)
+        if ss14_layer is None:
+            builder.gas_pipes_dropped += 1
+            continue
+        groups.setdefault((color_name, ss14_layer), set()).add((tile_x, tile_y))
+
+    for (color_name, ss14_layer), tiles in groups.items():
+        color_hex = gaspipes.PIPE_COLOR_HEX[color_name]
+        fitted = pipefitting.fit_pipes(
+            tiles, family="gas", color=color_hex, layer=ss14_layer, device_ports=survey.device_ports
+        )
+        for pipe in fitted:
+            builder.add_entity(
+                pipe.prototype,
+                pipe.x + 0.5,
+                pipe.y + 0.5,
+                rotation=ss14map.rotation_for_dir(pipe.facing),
+                extra_components=_pipe_color_component(pipe.color),
+            )
+            builder.gas_pipes_placed += 1
+
+
+def gas_pipe_layer_counts(dmm: dmmparser.DmmMap, z_level: int, allow_all_pipe_colors: bool = False) -> Counter:
+    """How many /smart pipe atoms on this z-level use each tg piping_layer.
+
+    Mapping-independent and cheap (one pass over the atoms already parsed,
+    no mapping_set/index needed) -- for a caller that has to decide whether a
+    layer-overflow prompt is needed *before* doing the real, mapping-aware
+    walk(), e.g. the GUI, which can't show a modal dialog from its worker
+    thread once that walk is under way.
+    """
+    counts: Counter = Counter()
+    for (x, y, z), key in dmm.grid.items():
+        if z != z_level:
+            continue
+        for atom in dmm.definitions[key]:
+            if atom.kind != "entity":
+                continue
+            parsed = gaspipes.parse_gas_pipe_path(atom.path, allow_all_pipe_colors)
+            if parsed is not None:
+                counts[parsed.tg_layer] += 1
+    return counts
+
+
+def resolve_pipe_layer_map(gas_pipe_atoms, ask) -> dict[int, str]:
+    """gaspipes.DEFAULT_LAYER_MAP, plus a slot for every overflow tg layer `ask` picks one for.
+
+    `ask(tg_layer, count) -> "Primary"|"Secondary"|"Tertiary"|None` is called
+    once per distinct tg layer found that isn't 1/2/3 (never once per atom);
+    None means "don't convert these".
+    """
+    layer_map = dict(gaspipes.DEFAULT_LAYER_MAP)
+    counts = Counter(tg_layer for (_, _, _, tg_layer) in gas_pipe_atoms if tg_layer not in layer_map)
+    for tg_layer in sorted(counts):
+        choice = ask(tg_layer, counts[tg_layer])
+        if choice:
+            layer_map[tg_layer] = choice
+    return layer_map
+
+
+def _ask_pipe_layer_cli(tg_layer: int, count: int) -> str | None:
+    print(
+        f"\n{count} gas pipe(s) use tg piping_layer {tg_layer}, which has no SS14 slot of its own.",
+        file=sys.stderr,
+    )
+    try:
+        answer = input(
+            "Fold them onto slot 1 (Primary), 2 (Secondary), 3 (Tertiary), "
+            "or leave them unconverted [1/2/3/n]? "
+        ).strip()
+    except (EOFError, OSError):
+        answer = ""
+    return {"1": "Primary", "2": "Secondary", "3": "Tertiary"}.get(answer)
 
 
 # ---------------------------------------------------------------- commands
@@ -465,6 +625,7 @@ def command_catalog(args) -> int:
         print("no .dmm files found under the given paths", file=sys.stderr)
         return 2
 
+    allow_all_pipe_colors = args.pipe_colors == "all"
     merged = Survey()
     scanned = 0
     for path in files:
@@ -475,7 +636,10 @@ def command_catalog(args) -> int:
             continue
         label = os.path.splitext(os.path.basename(path))[0]
         for z_level in dmm.z_levels:
-            merged.merge(walk(dmm, mapping_set, index, z_level, None, args.variants, map_label=label))
+            merged.merge(walk(
+                dmm, mapping_set, index, z_level, None, args.variants, map_label=label,
+                allow_all_pipe_colors=allow_all_pipe_colors,
+            ))
         scanned += 1
 
     print(f"{scanned} map(s) scanned ({len(files) - scanned} skipped)")
@@ -497,15 +661,22 @@ def command_catalog(args) -> int:
 def command_scan(args) -> int:
     dmm = dmmparser.parse(args.dmm)
     mapping_set, index = load_context(args)
+    allow_all_pipe_colors = args.pipe_colors == "all"
 
     if args.all_z:
         survey = Survey()
         for z_level in dmm.z_levels:
-            survey.merge(walk(dmm, mapping_set, index, z_level, None, args.variants, map_label=f"z{z_level}"))
+            survey.merge(walk(
+                dmm, mapping_set, index, z_level, None, args.variants, map_label=f"z{z_level}",
+                allow_all_pipe_colors=allow_all_pipe_colors,
+            ))
         scanned = f"z-levels {dmm.z_levels} (all of them)"
     else:
         z_level = args.z if args.z is not None else dmm.z_levels[0]
-        survey = walk(dmm, mapping_set, index, z_level, None, args.variants)
+        survey = walk(
+            dmm, mapping_set, index, z_level, None, args.variants,
+            allow_all_pipe_colors=allow_all_pipe_colors,
+        )
         scanned = f"z-levels {dmm.z_levels} (scanning z={z_level})"
         if len(dmm.z_levels) > 1 and args.z is None:
             print(
@@ -560,6 +731,9 @@ def build_map(
     variant_mode: str,
     mapping_dir: str,
     engine_version: str | None = None,
+    pipenode_index: pipenodes.PipeNodeIndex | None = None,
+    layer_map: dict[int, str] | None = None,
+    allow_all_pipe_colors: bool = False,
 ) -> ss14map.MapBuilder:
     """Walk the map into a builder, ready to render."""
     with open(os.path.join(mapping_dir, "grid_template.yml"), encoding="utf-8") as handle:
@@ -570,7 +744,12 @@ def build_map(
         grid_entity_template=template["grid_entity"],
         engine_version=detect_engine_version(engine_version),
     )
-    walk(dmm, mapping_set, index, z_level, builder, variant_mode)
+    survey = walk(
+        dmm, mapping_set, index, z_level, builder, variant_mode,
+        pipenode_index=pipenode_index, allow_all_pipe_colors=allow_all_pipe_colors,
+    )
+    if survey.gas_pipe_atoms:
+        place_gas_pipes(survey, builder, layer_map if layer_map is not None else gaspipes.DEFAULT_LAYER_MAP)
     return builder
 
 
@@ -578,6 +757,11 @@ def describe_map(builder: ss14map.MapBuilder, log=print) -> None:
     log(f"  tiles    {len(builder.tiles)} ({len(builder.build_tilemap())} distinct)")
     log(f"  decals   {sum(len(v) for v in builder.decals.values())} in {len(builder.decals)} nodes")
     log(f"  entities {len(builder.entities)}")
+    if builder.gas_pipes_placed or builder.gas_pipes_dropped:
+        note = f"  pipes    {builder.gas_pipes_placed} gas pipe(s) auto-fitted"
+        if builder.gas_pipes_dropped:
+            note += f", {builder.gas_pipes_dropped} dropped (tg layer not mapped to a slot)"
+        log(note)
     report_disconnected(builder, log)
 
 
@@ -614,6 +798,7 @@ def command_convert(args) -> int:
         return 1
 
     z_levels = list(dmm.z_levels) if args.all_z else [args.z if args.z is not None else dmm.z_levels[0]]
+    allow_all_pipe_colors = args.pipe_colors == "all"
 
     problems: list[tuple[str, str]] = []
     if args.table:
@@ -622,7 +807,10 @@ def command_convert(args) -> int:
     survey = Survey()
     for z_level in z_levels:
         label = f"z{z_level}" if args.all_z else ""
-        survey.merge(walk(dmm, mapping_set, index, z_level, None, args.variants, map_label=label))
+        survey.merge(walk(
+            dmm, mapping_set, index, z_level, None, args.variants, map_label=label,
+            allow_all_pipe_colors=allow_all_pipe_colors,
+        ))
     problems += collect_problems(survey)
     lines = format_problems(problems)
 
@@ -634,10 +822,16 @@ def command_convert(args) -> int:
         print(f"note: {survey.stopgap_count} turf(s) matched an ignore rule with no SS14 tile of their "
               f"own -- covered with '{FALLBACK_TURF_TILE}' rather than left as a Space hole.")
 
+    layer_map = resolve_pipe_layer_map(survey.gas_pipe_atoms, _ask_pipe_layer_cli)
+    pipenode_index = pipenodes.build(args.prototypes)
+
     exit_code = 0
     for z_level in z_levels:
         output = per_z_output_path(args.output, z_level) if args.all_z else args.output
-        builder = build_map(dmm, mapping_set, index, z_level, args.variants, args.mapping_dir, args.engine_version)
+        builder = build_map(
+            dmm, mapping_set, index, z_level, args.variants, args.mapping_dir, args.engine_version,
+            pipenode_index=pipenode_index, layer_map=layer_map, allow_all_pipe_colors=allow_all_pipe_colors,
+        )
         with open(output, "w", encoding="utf-8", newline="\n") as handle:
             handle.write(builder.render())
 
@@ -867,6 +1061,10 @@ def main(argv: list[str] | None = None) -> int:
         )
         sub.add_argument("--variants", choices=("deterministic", "zero"), default="deterministic",
                          help="tile variant picking (default: deterministic)")
+        sub.add_argument(
+            "--pipe-colors", choices=("base", "all"), default="base",
+            help="which /smart gas pipe colours to convert: base (red/blue only, default) or all",
+        )
 
     scan = subparsers.add_parser("scan", help="report paths that have no rule, as CSV")
     add_common(scan)
@@ -880,6 +1078,10 @@ def main(argv: list[str] | None = None) -> int:
     catalog.add_argument("--mapping-dir", default=DEFAULT_MAPPING_DIR, help="directory holding the mapping files")
     catalog.add_argument("--prototypes", default=DEFAULT_PROTOTYPES, help="Resources/Prototypes to validate against")
     catalog.add_argument("--variants", choices=("deterministic", "zero"), default="deterministic")
+    catalog.add_argument(
+        "--pipe-colors", choices=("base", "all"), default="base",
+        help="which /smart gas pipe colours to convert: base (red/blue only, default) or all",
+    )
     catalog.add_argument("-o", "--output", required=True, help="CSV file to write")
     catalog.set_defaults(func=command_catalog)
 

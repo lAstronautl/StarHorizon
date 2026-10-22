@@ -19,7 +19,9 @@ from dataclasses import dataclass
 import yaml
 
 import dmmparser
+import gaspipes
 import mappings as mapping_rules
+import pipenodes
 import protoindex
 import ss14map
 
@@ -1076,6 +1078,87 @@ def check_entity_name_quoting() -> Result:
     return Result("rendering: entity names quote safely", True, f"{len(tricky)} tricky names round-trip")
 
 
+def check_gas_pipe_autofit(mapping_set, index, prototypes_dir) -> Result:
+    """A /smart gas pipe run must auto-fit from real tile adjacency, including
+    bending toward a placed device's own open port -- see gaspipes.py/
+    pipefitting.py/pipenodes.py and dmm2yml.walk()'s pipe interception.
+
+    Fixture is an L-shaped supply-colour run on tg layer 1: one leg a bare
+    pipe-to-pipe straight, the other ending one tile short of a vent pump (a
+    real NodeContainer device, dir=SOUTH) instead of another pipe -- so this
+    checks device_ports registration and rotation too, not just pipe-to-pipe
+    fitting (already covered on its own by pipefitting.py's own test suite).
+    A second, standalone case checks that an unmapped tg layer is dropped,
+    not silently placed into whichever slot happens to be free.
+    """
+    dmm2yml = dmm2yml_module()
+    problems = []
+
+    fixture = (
+        '"A" = (\n/obj/machinery/atmospherics/components/unary/vent_pump{dir = 2},\n'
+        '/turf/open/floor/iron,\n/area/station)\n'
+        '"B" = (\n/turf/open/floor/iron,\n/area/station)\n'
+        '"C" = (\n/obj/machinery/atmospherics/pipe/smart/simple/supply/layer1,\n'
+        '/turf/open/floor/iron,\n/area/station)\n'
+        '"D" = (\n/obj/machinery/atmospherics/pipe/smart/simple/supply/layer1,\n'
+        '/turf/open/floor/iron,\n/area/station)\n\n'
+        '(1,1,1) = {"\nAB\nCD\n"}\n'
+    )
+    with tempfile.TemporaryDirectory() as directory:
+        path = os.path.join(directory, "fixture.dmm")
+        with open(path, "w", encoding="utf-8") as handle:
+            handle.write(fixture)
+        dmm = dmmparser.parse(path)
+
+    template = yaml.safe_load(
+        open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "mapping", "grid_template.yml"),
+             encoding="utf-8")
+    )
+    builder = ss14map.MapBuilder(template["map_entity"], template["grid_entity"], "0.0.0")
+    pipenode_index = pipenodes.build(prototypes_dir)
+    survey = dmm2yml.walk(dmm, mapping_set, index, 1, builder, "deterministic", pipenode_index=pipenode_index)
+
+    if not survey.gas_pipe_atoms:
+        problems.append("no gas pipe atoms were intercepted by walk() -- ignore.yml swallowing /smart again?")
+    else:
+        dmm2yml.place_gas_pipes(survey, builder, {1: "Primary", 2: "Secondary", 3: "Tertiary"})
+
+    placed = {(e.proto, e.x, e.y): e for e in builder.entities if e.proto.startswith("GasPipe")}
+    bend = placed.get(("GasPipeBend", 0.5, 0.5))
+    straight = placed.get(("GasPipeStraight", 1.5, 0.5))
+
+    if bend is None:
+        problems.append(f"expected GasPipeBend at (0.5,0.5), got: {sorted(placed)}")
+    else:
+        if bend.rotation != ss14map.rotation_for_dir(mapping_rules.NORTH):
+            problems.append(f"bend rotation {bend.rotation!r}, expected facing north (toward the vent's south-facing port)")
+        if not any("AtmosPipeColor" in c and "#0055CCFF" in c for c in bend.extra_components):
+            problems.append(f"bend missing AtmosPipeColor #0055CCFF: {bend.extra_components}")
+
+    if straight is None:
+        problems.append(f"expected GasPipeStraight at (1.5,0.5), got: {sorted(placed)}")
+    elif straight.rotation != ss14map.rotation_for_dir(mapping_rules.EAST):
+        problems.append(f"straight rotation {straight.rotation!r}, expected facing east")
+
+    # tg layer 5 has no slot in DEFAULT_LAYER_MAP -- it must be dropped, not
+    # silently collide onto whichever of Primary/Secondary/Tertiary is free.
+    builder2 = ss14map.MapBuilder(template["map_entity"], template["grid_entity"], "0.0.0")
+    overflow_survey = dmm2yml.Survey()
+    overflow_survey.gas_pipe_atoms.append((9, 9, "supply", 5))
+    dmm2yml.place_gas_pipes(overflow_survey, builder2, gaspipes.DEFAULT_LAYER_MAP)
+    if builder2.gas_pipes_placed or builder2.gas_pipes_dropped != 1:
+        problems.append(
+            f"tg layer 5 (no slot) should be dropped alone: placed={builder2.gas_pipes_placed}, "
+            f"dropped={builder2.gas_pipes_dropped}"
+        )
+
+    return Result(
+        "pipes: gas pipe auto-fit (neighbours + device ports + colour + layer)",
+        not problems,
+        "; ".join(problems) or "L-run bends toward a vent's real port, colour/layer carried through, overflow layer dropped",
+    )
+
+
 def run(repo_root: str, mapping_dir: str, prototypes_dir: str) -> list[Result]:
     try:
         mapping_set = mapping_rules.load(mapping_dir)
@@ -1104,6 +1187,7 @@ def run(repo_root: str, mapping_dir: str, prototypes_dir: str) -> list[Result]:
         ("dictionaries: indented prototype lists", lambda: check_protoindex_indentation()),
         ("dictionaries: trailing comments on id/abstract lines", lambda: check_protoindex_trailing_comments()),
         ("conversion: fixture map", lambda: check_conversion(mapping_set, index)),
+        ("pipes: gas pipe auto-fit", lambda: check_gas_pipe_autofit(mapping_set, index, prototypes_dir)),
         ("rendering: valid map document", lambda: check_rendering(mapping_set, index)),
         ("rendering: entity names quote safely", lambda: check_entity_name_quoting()),
         ("template: components load bare", lambda: check_template_components(repo_root, mapping_dir)),

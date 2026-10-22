@@ -98,6 +98,10 @@ class Entity:
     y: float
     rotation: float | None = None
     name: str | None = None
+    # Pre-rendered component blocks beyond MetaData/Transform, each a
+    # "- type: X\n  field: value" string at the same indent as those two --
+    # e.g. AtmosPipeColor on a fitted gas pipe. See add_entity().
+    extra_components: tuple[str, ...] = ()
 
 
 @dataclass
@@ -111,6 +115,9 @@ class MapBuilder:
     tiles: dict[tuple[int, int], tuple[str, int, int]] = field(default_factory=dict)
     decals: dict[DecalNode, list[tuple[float, float]]] = field(default_factory=dict)
     entities: list[Entity] = field(default_factory=list)
+    # Set by dmm2yml.place_gas_pipes(), reported by describe_map().
+    gas_pipes_placed: int = 0
+    gas_pipes_dropped: int = 0
     _next_uid: int = FIRST_FREE_UID
 
     # -- collection ------------------------------------------------------
@@ -135,10 +142,11 @@ class MapBuilder:
         y: float,
         rotation: float | None = None,
         name: str | None = None,
+        extra_components: tuple[str, ...] = (),
     ) -> int:
         uid = self._next_uid
         self._next_uid += 1
-        self.entities.append(Entity(uid, proto, x, y, rotation, name))
+        self.entities.append(Entity(uid, proto, x, y, rotation, name, tuple(extra_components)))
         return uid
 
     @property
@@ -243,6 +251,8 @@ class MapBuilder:
                     lines.append(f"      rot: {entity.rotation} rad")
                 lines.append(f"      pos: {number(entity.x)},{number(entity.y)}")
                 lines.append(f"      parent: {GRID_ENTITY_UID}")
+                for component in entity.extra_components:
+                    lines.extend("    " + line for line in component.split("\n"))
         return lines
 
     def _expand(self, template: str, replacements: dict[str, list[str]], indent: int = 4) -> list[str]:
