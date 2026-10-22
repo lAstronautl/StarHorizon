@@ -41,8 +41,8 @@ public sealed class PlanetMapCamera
     private readonly SharedTransformSystem _xform;
     private readonly EntityLookupSystem _lookup;
 
-    private readonly Dictionary<ushort, Color> _tileColors = new();
-    private readonly Dictionary<Vector2i, ushort?> _sampled = new();
+    private readonly Dictionary<int, Color> _tileColors = new();
+    private readonly Dictionary<Vector2i, int?> _sampled = new();
     private readonly HashSet<Entity<SpriteComponent>> _entityScratch = new();
     private TimeSpan _cacheExpires;
     private MapId _cachedMap = MapId.Nullspace;
@@ -142,7 +142,7 @@ public sealed class PlanetMapCamera
         }
     }
 
-    private bool TryGetTileId(Vector2i indices, Entity<MapGridComponent> grid, BiomeComponent biome, out ushort tileId)
+    private bool TryGetTileId(Vector2i indices, Entity<MapGridComponent> grid, BiomeComponent biome, out int tileId)
     {
         if (!_sampled.TryGetValue(indices, out var cached))
         {
@@ -157,7 +157,7 @@ public sealed class PlanetMapCamera
         return cached != null;
     }
 
-    private Color GetTileColor(ushort tileId)
+    private Color GetTileColor(int tileId)
     {
         if (_tileColors.TryGetValue(tileId, out var color))
             return color;
@@ -167,7 +167,7 @@ public sealed class PlanetMapCamera
         return color;
     }
 
-    private Color AverageTileColor(ushort tileId)
+    private Color AverageTileColor(int tileId)
     {
         var fallback = Color.FromHsv(new Vector4((tileId * 0.137f) % 1f, 0.25f, 0.45f, 1f));
 
