@@ -1,7 +1,7 @@
 # Shipbreaking machines. All pay the station bank account. Sprites are placeholders (recycler).
 # Ported TileReclaimer from space-wizards/space-station-14#43651.
 
-# Furnace: burns loose floor tile items.
+# Furnace: burns loose floor tile items and pipes.
 - type: entity
   id: ShipbreakingFurnace
   parent: BaseScrapProcessor
@@ -14,8 +14,9 @@
     whitelist:
       components:
       - FloorTile
+      - AtmosPipeLayers
 
-# Processor: eats whole grids (shuttle tiles) pulled into it and buys loose walls.
+# Processor: eats whole grids (shuttle tiles) pulled into it and buys loose walls and cable coils.
 - type: entity
   id: ShipbreakingProcessor
   parent: BaseScrapProcessor
@@ -37,6 +38,7 @@
     whitelist:
       tags:
       - Wall
+      - CableCoil
 
 # No grid whitelist: eats any grid pushed into it, including stations. Admin only.
 - type: entity
