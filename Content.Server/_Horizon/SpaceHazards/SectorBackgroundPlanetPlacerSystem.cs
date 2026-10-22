@@ -3,7 +3,7 @@
 // See AGPLv3.txt for details.
 
 using System.Numerics;
-using Content.Server.Station.Components;
+using Content.Shared.Station.Components;
 using Content.Shared._Horizon.SpaceHazards;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;

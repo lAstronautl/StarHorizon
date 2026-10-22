@@ -107,10 +107,11 @@ public sealed class SingularityTransitSystem : EntitySystem
         }
 
         // And away from other grids.
-        _gridScratch.Clear();
+        var scratch = _gridScratch;
+        scratch.Clear();
         var box = Box2.CenteredAround(pos, new Vector2(DestinationClearance * 2f, DestinationClearance * 2f));
-        _mapManager.FindGridsIntersecting(mapId, box, ref _gridScratch);
-        foreach (var grid in _gridScratch)
+        _mapManager.FindGridsIntersecting(mapId, box, ref scratch);
+        foreach (var grid in scratch)
         {
             if (grid.Owner != self)
                 return false;
