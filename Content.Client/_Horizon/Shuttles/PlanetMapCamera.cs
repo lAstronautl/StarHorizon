@@ -11,6 +11,7 @@ using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
+using Color = Robust.Shared.Maths.Color;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
