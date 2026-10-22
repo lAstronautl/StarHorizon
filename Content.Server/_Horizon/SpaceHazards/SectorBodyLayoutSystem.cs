@@ -18,8 +18,8 @@ public sealed class SectorBodyLayoutSystem : EntitySystem
         base.Initialize();
 
         SubscribeLocalEvent<DebrisFeaturePlacerControllerComponent, PrePlaceDebrisFeatureEvent>(OnPrePlaceDebris);
-        SubscribeLocalEvent<SectorCelestialBodyComponent, ComponentStartup>(OnBodyStartup);
-        SubscribeLocalEvent<ExpeditionPlanetComponent, ComponentStartup>(OnPlanetStartup);
+        SubscribeLocalEvent<SectorCelestialBodyComponent, ComponentInit>(OnBodyInit);
+        SubscribeLocalEvent<ExpeditionPlanetComponent, ComponentInit>(OnPlanetInit);
     }
 
     /// <summary>True when no star, black hole or planet on the map is within <paramref name="minDistance"/> of <paramref name="pos"/>.</summary>
@@ -88,12 +88,12 @@ public sealed class SectorBodyLayoutSystem : EntitySystem
         return false;
     }
 
-    private void OnBodyStartup(EntityUid uid, SectorCelestialBodyComponent body, ComponentStartup args)
+    private void OnBodyInit(EntityUid uid, SectorCelestialBodyComponent body, ComponentInit args)
     {
         ClearDebrisAround(uid, body.DebrisClearance);
     }
 
-    private void OnPlanetStartup(EntityUid uid, ExpeditionPlanetComponent planet, ComponentStartup args)
+    private void OnPlanetInit(EntityUid uid, ExpeditionPlanetComponent planet, ComponentInit args)
     {
         ClearDebrisAround(uid, planet.DebrisClearance);
     }
