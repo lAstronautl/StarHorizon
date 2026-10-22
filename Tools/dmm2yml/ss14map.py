@@ -143,11 +143,16 @@ class MapBuilder:
         rotation: float | None = None,
         name: str | None = None,
         extra_components: tuple[str, ...] = (),
-    ) -> int:
+    ) -> Entity:
+        """Returns the placed Entity itself (not just its uid), so a caller
+        can patch .extra_components later -- see dmm2yml.place_gas_pipes(),
+        which only learns a device's pipe colour/layer after every atom on
+        the map has been walked."""
         uid = self._next_uid
         self._next_uid += 1
-        self.entities.append(Entity(uid, proto, x, y, rotation, name, tuple(extra_components)))
-        return uid
+        entity = Entity(uid, proto, x, y, rotation, name, tuple(extra_components))
+        self.entities.append(entity)
+        return entity
 
     @property
     def entity_count(self) -> int:

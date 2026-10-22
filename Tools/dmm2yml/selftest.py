@@ -1088,8 +1088,15 @@ def check_gas_pipe_autofit(mapping_set, index, prototypes_dir) -> Result:
     real NodeContainer device, dir=SOUTH) instead of another pipe -- so this
     checks device_ports registration and rotation too, not just pipe-to-pipe
     fitting (already covered on its own by pipefitting.py's own test suite).
-    A second, standalone case checks that an unmapped tg layer is dropped,
-    not silently placed into whichever slot happens to be free. A third
+    Also checks that the vent itself joins the network its port touches --
+    AtmosPipeColor always, plus an AtmosPipeLayers override once the network
+    is not Primary (a device has no per-layer prototype variant to pick
+    instead, unlike a pipe) -- see _tag_connected_devices()'s own docstring
+    for why a vent left on the engine's defaults never actually connects to
+    a real Secondary/Tertiary or coloured run even if it looks right.
+
+    A further, standalone case checks that an unmapped tg layer is dropped,
+    not silently placed into whichever slot happens to be free. A last one
     checks gaspipes.parse_gas_pipe_path's shape coverage directly: bridge_pipe
     and layer_manifold parse (folded into the ordinary same-colour/layer
     run -- see that module's docstring for why there is nothing more faithful
@@ -1159,6 +1166,51 @@ def check_gas_pipe_autofit(mapping_set, index, prototypes_dir) -> Result:
     elif straight.rotation != ss14map.rotation_for_dir(mapping_rules.EAST):
         problems.append(f"straight rotation {straight.rotation!r}, expected facing east")
 
+    # The vent's own port touches this network, so it must join it for real
+    # (AtmosPipeColor at least -- the fixture's tg layer 1 is Primary, so no
+    # AtmosPipeLayers override is expected here; the Secondary/Tertiary case
+    # is exercised directly below).
+    vent = next((e for e in builder.entities if e.proto == "GasVentPump"), None)
+    if vent is None:
+        problems.append("expected a GasVentPump entity in the fixture output")
+    elif not any("AtmosPipeColor" in c and "#0055CCFF" in c for c in vent.extra_components):
+        problems.append(f"vent missing AtmosPipeColor #0055CCFF: {vent.extra_components}")
+    elif any("AtmosPipeLayers" in c for c in vent.extra_components):
+        problems.append(f"vent on tg layer 1 (Primary) should carry no AtmosPipeLayers override: {vent.extra_components}")
+
+    # A device on a non-Primary layer needs the AtmosPipeLayers override too
+    # (a pipe expresses its layer by prototype choice instead -- GasPipeBase
+    # subtype -- but a device like a vent has no such per-layer variant, so
+    # this is the only way to actually join a Secondary/Tertiary network;
+    # confirmed against Resources/Maps/exo.yml's own GasOutletInjector/
+    # GasPassiveVent entities, which carry exactly this pair of components).
+    secondary_fixture = (
+        '"A" = (\n/obj/machinery/atmospherics/components/unary/vent_pump{dir = 2},\n'
+        '/turf/open/floor/iron,\n/area/station)\n'
+        '"B" = (\n/turf/open/floor/iron,\n/area/station)\n'
+        '"C" = (\n/obj/machinery/atmospherics/pipe/smart/simple/scrubbers/layer2,\n'
+        '/turf/open/floor/iron,\n/area/station)\n'
+        '"D" = (\n/obj/machinery/atmospherics/pipe/smart/simple/scrubbers/layer2,\n'
+        '/turf/open/floor/iron,\n/area/station)\n\n'
+        '(1,1,1) = {"\nAB\nCD\n"}\n'
+    )
+    with tempfile.TemporaryDirectory() as directory:
+        path = os.path.join(directory, "fixture.dmm")
+        with open(path, "w", encoding="utf-8") as handle:
+            handle.write(secondary_fixture)
+        dmm2 = dmmparser.parse(path)
+    builder2 = ss14map.MapBuilder(template["map_entity"], template["grid_entity"], "0.0.0")
+    survey2 = dmm2yml.walk(dmm2, mapping_set, index, 1, builder2, "deterministic", pipenode_index=pipenode_index)
+    dmm2yml.place_gas_pipes(survey2, builder2, {1: "Primary", 2: "Secondary", 3: "Tertiary"})
+    vent2 = next((e for e in builder2.entities if e.proto == "GasVentPump"), None)
+    if vent2 is None:
+        problems.append("expected a GasVentPump entity in the secondary-layer fixture output")
+    else:
+        if not any("AtmosPipeLayers" in c and "Secondary" in c for c in vent2.extra_components):
+            problems.append(f"vent on tg layer 2 (Secondary) missing AtmosPipeLayers override: {vent2.extra_components}")
+        if not any("AtmosPipeColor" in c and "#990000FF" in c for c in vent2.extra_components):
+            problems.append(f"vent missing AtmosPipeColor #990000FF (scrubbers): {vent2.extra_components}")
+
     # tg layer 5 has no slot in DEFAULT_LAYER_MAP -- it must be dropped, not
     # silently collide onto whichever of Primary/Secondary/Tertiary is free.
     builder2 = ss14map.MapBuilder(template["map_entity"], template["grid_entity"], "0.0.0")
@@ -1175,7 +1227,7 @@ def check_gas_pipe_autofit(mapping_set, index, prototypes_dir) -> Result:
         "pipes: gas pipe auto-fit (neighbours + device ports + colour + layer)",
         not problems,
         "; ".join(problems) or (
-            "L-run bends toward a vent's real port, colour/layer carried through, overflow layer dropped, "
+            "L-run bends toward a vent's real port and joins its layer/colour, overflow layer dropped, "
             "bridge_pipe/layer_manifold parse, multiz does not"
         ),
     )
