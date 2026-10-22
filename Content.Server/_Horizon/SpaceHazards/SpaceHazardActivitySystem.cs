@@ -11,7 +11,7 @@ using Robust.Shared.Timing;
 
 namespace Content.Server._Horizon.SpaceHazards;
 
-public sealed class SpaceHazardActivitySystem : EntitySystem, ISpaceHazardActivitySystem
+public sealed class SpaceHazardActivitySystem : EntitySystem
 {
     private static readonly TimeSpan CheckInterval = TimeSpan.FromSeconds(2);
     private const float CellSize = 512f;
