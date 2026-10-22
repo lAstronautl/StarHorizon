@@ -110,9 +110,7 @@ public sealed class SpawnSectorBodyCommand : IConsoleCommand
         }
         else if (type == "expedition" && _entMan.TryGetComponent(ent, out ExpeditionPlanetComponent? expedition))
         {
-            expedition.BiomeId = option ?? "Grasslands";
-            expedition.Seed = 0.01f + _random.NextFloat() * 9.99f;
-            _entMan.Dirty(ent, expedition);
+            _entMan.System<ExpeditionPlanetSystem>().SetupPlanet(ent, expedition, option ?? "Grasslands", 0.01f + _random.NextFloat() * 9.99f);
         }
 
         shell.WriteLine($"Spawned {proto} ({ent}) at {pos} on map {mapId}.");

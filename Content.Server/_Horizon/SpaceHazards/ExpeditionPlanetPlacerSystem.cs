@@ -12,6 +12,7 @@ public sealed class ExpeditionPlanetPlacerSystem : EntitySystem
     [Dependency] private readonly IPrototypeManager _prototypes = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SectorBodyLayoutSystem _layout = default!;
+    [Dependency] private readonly ExpeditionPlanetSystem _expeditionPlanets = default!;
 
     public override void Initialize()
     {
@@ -51,11 +52,10 @@ public sealed class ExpeditionPlanetPlacerSystem : EntitySystem
                     continue;
                 }
 
-                planet.BiomeId = biome;
-                planet.Seed = component.BiomeSeeds.TryGetValue(biome, out var fixedSeed)
+                var seed = component.BiomeSeeds.TryGetValue(biome, out var fixedSeed)
                     ? fixedSeed
                     : 0.01f + _random.NextFloat() * 9.99f;
-                Dirty(ent, planet);
+                _expeditionPlanets.SetupPlanet(ent, planet, biome, seed);
                 spawned++;
             }
         }

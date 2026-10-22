@@ -124,6 +124,8 @@
   categories: [ HideSpawnMenu ]
   components:
   - type: Transform
+  # A beacon: the planet shows up as a labelled marker on the shuttle console MAP tab.
+  - type: FTLBeacon
   - type: ExpeditionPlanet
     spriteRadius: 40
     range: 450
