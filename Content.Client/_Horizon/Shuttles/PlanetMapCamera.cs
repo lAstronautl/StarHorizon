@@ -5,6 +5,7 @@ using Content.Shared.Maps;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Parallax.Biomes;
 using Robust.Client.GameObjects;
+using Robust.Client.Utility;
 using Robust.Client.Graphics;
 using Robust.Shared.ContentPack;
 using Robust.Shared.Map;
@@ -181,19 +182,15 @@ public sealed class PlanetMapCamera
 
             double r = 0, g = 0, b = 0;
             var count = 0;
-            for (var y = 0; y < image.Height; y++)
+            foreach (var p in image.GetPixelSpan())
             {
-                for (var x = 0; x < image.Width; x++)
-                {
-                    var p = image[x, y];
-                    if (p.A < 128)
-                        continue;
+                if (p.A < 128)
+                    continue;
 
-                    r += p.R;
-                    g += p.G;
-                    b += p.B;
-                    count++;
-                }
+                r += p.R;
+                g += p.G;
+                b += p.B;
+                count++;
             }
 
             return count == 0
