@@ -1,3 +1,4 @@
+using Content.Server._Horizon.Shipbreaking.Derelict;
 using Content.Server._NF.Bank;
 using Content.Server.Cargo.Systems;
 using Content.Server.Power.EntitySystems;
@@ -17,6 +18,7 @@ namespace Content.Server._Horizon.Shipbreaking;
 public sealed class ScrapProcessorSystem : EntitySystem
 {
     [Dependency] private readonly BankSystem _bank = default!;
+    [Dependency] private readonly DerelictYardSystem _derelict = default!;
     [Dependency] private readonly PricingSystem _pricing = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
@@ -54,8 +56,8 @@ public sealed class ScrapProcessorSystem : EntitySystem
         }
 
         var payout = (int) (_pricing.GetPrice(other) * ent.Comp.PayoutMultiplier);
-        if (payout > 0)
-            _bank.TrySectorDeposit(ent.Comp.Account, payout, LedgerEntryType.StationDepositAssetsSold);
+        if (payout > 0 && _bank.TrySectorDeposit(ent.Comp.Account, payout, LedgerEntryType.StationDepositAssetsSold))
+            _derelict.CreditScrap(other, payout);
 
         _audio.PlayPvs(ent.Comp.Sound, ent);
         QueueDel(other);

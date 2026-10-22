@@ -37,6 +37,7 @@
 
 - type: derelictVessel
   id: DerelictHauler
+  minRank: 1
   name: derelict-vessel-hauler
   description: derelict-vessel-hauler-desc
   price: 16000
@@ -44,6 +45,7 @@
 
 - type: derelictVessel
   id: DerelictEmergency
+  minRank: 1
   name: derelict-vessel-emergency
   description: derelict-vessel-emergency-desc
   price: 20000
@@ -51,6 +53,7 @@
 
 - type: derelictVessel
   id: DerelictWhiteship
+  minRank: 2
   name: derelict-vessel-whiteship
   description: derelict-vessel-whiteship-desc
   price: 24000
@@ -59,6 +62,7 @@
 
 - type: derelictVessel
   id: DerelictKvazar
+  minRank: 2
   name: derelict-vessel-kvazar
   description: derelict-vessel-kvazar-desc
   price: 40000

@@ -1,3 +1,4 @@
+using Content.Server._Horizon.Shipbreaking.Derelict;
 using Content.Server._NF.Bank;
 using Content.Shared._Horizon.Materials;
 using Content.Shared._NF.Bank.BUI;
@@ -14,11 +15,13 @@ namespace Content.Server._Horizon.Materials;
 public sealed class ServerTileReclaimerSystem : TileReclaimerSystem
 {
     [Dependency] private readonly BankSystem _bank = default!;
+    [Dependency] private readonly DerelictYardSystem _derelict = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
 
     protected override void SpawnMaterialsFromComposition(Entity<MaterialStorageComponent?, TransformComponent?> ent,
         ContentTileDefinition tileDefinition,
-        float efficiency)
+        float efficiency,
+        EntityUid sourceGrid)
     {
         if (!TryComp<TileReclaimerComponent>(ent, out var reclaimer))
             return;
@@ -31,7 +34,7 @@ public sealed class ServerTileReclaimerSystem : TileReclaimerSystem
         }
 
         var payout = (int) (value * efficiency);
-        if (payout > 0)
-            _bank.TrySectorDeposit(reclaimer.Account, payout, LedgerEntryType.StationDepositAssetsSold);
+        if (payout > 0 && _bank.TrySectorDeposit(reclaimer.Account, payout, LedgerEntryType.StationDepositAssetsSold))
+            _derelict.CreditScrap(sourceGrid, payout);
     }
 }

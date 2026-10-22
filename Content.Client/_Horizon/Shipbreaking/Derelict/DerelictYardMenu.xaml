@@ -9,9 +9,12 @@
                 <Label Text="{Loc 'derelict-yard-balance'}" FontColorOverride="Silver"/>
                 <Label Name="BalanceLabel"/>
             </BoxContainer>
+            <Label Name="RankLabel" FontColorOverride="Silver"/>
             <ScrollContainer VerticalExpand="True" HorizontalExpand="True" Margin="0 4 0 0">
                 <BoxContainer Name="VesselList" Orientation="Vertical" HorizontalExpand="True"/>
             </ScrollContainer>
+            <Label Text="{Loc 'derelict-yard-leases'}" FontColorOverride="Silver" Margin="0 4 0 0"/>
+            <BoxContainer Name="LeaseList" Orientation="Vertical" HorizontalExpand="True" MinHeight="80"/>
         </BoxContainer>
         <BoxContainer Orientation="Vertical" HorizontalExpand="True" VerticalExpand="True">
             <Label Name="NameLabel" StyleClasses="LabelHeading"/>

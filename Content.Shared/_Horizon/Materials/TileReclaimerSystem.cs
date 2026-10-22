@@ -123,7 +123,7 @@ public abstract class TileReclaimerSystem : EntitySystem
 
                 _mapSystem.SetTile(grid.Owner, grid.Comp, tile.GridIndices, Tile.Empty);
                 // TODO: Ideally this should use tile stacking to get materials from every tile in the stack, not only the top one.
-                SpawnMaterialsFromComposition((uid, null, xform), tileDef, reclaimer.Efficiency);
+                SpawnMaterialsFromComposition((uid, null, xform), tileDef, reclaimer.Efficiency, grid.Owner); // Horizon: grid for shipbreaking jobs
                 shredded = true;
 
                 // If it was the last tile, the grid is probably gone.
@@ -147,9 +147,11 @@ public abstract class TileReclaimerSystem : EntitySystem
     /// <param name="ent">Entity performing the spawning action.</param>
     /// <param name="tileDefinition">Tile definition of the tile being reclaimed.</param>
     /// <param name="efficiency">Multiplier of the material amount.</param>
+    /// <param name="sourceGrid">The grid the tile was reclaimed from.</param>
     protected virtual void SpawnMaterialsFromComposition(Entity<MaterialStorageComponent?, TransformComponent?> ent,
         ContentTileDefinition tileDefinition,
-        float efficiency)
+        float efficiency,
+        EntityUid sourceGrid)
     {
         // Handled on the server because that's where MaterialStorageSystem is.
     }

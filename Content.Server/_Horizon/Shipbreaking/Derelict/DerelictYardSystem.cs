@@ -1,11 +1,13 @@
-using Content.Server._NF.Bank;
-using Content.Server._NF.Shipyard.Systems;
+using Content.Server.Cargo.Systems;
 using Content.Server.Chat.Systems;
 using Content.Server.Station.Systems;
+using Content.Server._NF.Bank;
+using Content.Server._NF.Shipyard.Systems;
 using Content.Shared._Horizon.Shipbreaking.Derelict;
-using Content.Shared._NF.Bank.Components;
 using Content.Shared._NF.Bank.BUI;
+using Content.Shared._NF.Bank.Components;
 using Content.Shared.Doors.Components;
+using Content.Shared.GameTicking;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Popups;
 using Content.Shared.Tag;
@@ -21,10 +23,16 @@ namespace Content.Server._Horizon.Shipbreaking.Derelict;
 
 /// <summary>
 /// The derelict yard: sells wrecks for the price of the station account and deletes them, with every piece cut off
-/// them, when the lease is over. What the wreck is scrapped for pays into the account through the scrap machines.
+/// them, when the lease is over. What the wreck is scrapped for pays into the account through the scrap machines and
+/// counts towards the job of that wreck; when the lease is over the share that came back pays a bonus or costs a fee,
+/// and the revenue raises the rank of the yard, which opens the bigger wrecks.
 /// </summary>
 public sealed class DerelictYardSystem : EntitySystem
 {
+    private const int MaxExtensions = 2;
+    private const float ExtendPriceShare = 0.15f;
+    private static readonly TimeSpan ExtendTime = TimeSpan.FromMinutes(10);
+
     private static readonly ProtoId<TagPrototype> WallTag = "Wall";
     private static readonly ProtoId<TagPrototype> WindowTag = "Window";
 
@@ -33,10 +41,12 @@ public sealed class DerelictYardSystem : EntitySystem
 
     [Dependency] private readonly BankSystem _bank = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly MapLoaderSystem _mapLoader = default!;
     [Dependency] private readonly MapSystem _map = default!;
+    [Dependency] private readonly PricingSystem _pricing = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
@@ -44,6 +54,25 @@ public sealed class DerelictYardSystem : EntitySystem
     [Dependency] private readonly StationSystem _station = default!;
     [Dependency] private readonly TagSystem _tag = default!;
     [Dependency] private readonly UserInterfaceSystem _ui = default!;
+
+    /// <summary>
+    /// What the rental of a wreck is about: the time, what it was appraised at and what came back through the scrap
+    /// machines. Kept under the grid that was bought, for the round.
+    /// </summary>
+    private sealed class Job
+    {
+        public EntityUid Station;
+        public string Name = string.Empty;
+        public int Price;
+        public int Appraisal;
+        public int Revenue;
+        public int Extensions;
+        public TimeSpan Expires;
+        public bool Warned5;
+        public bool Warned1;
+    }
+
+    private readonly Dictionary<EntityUid, Job> _jobs = new();
 
     private readonly Dictionary<string, (Vector2i[] Tiles, DerelictPreviewKind[] Kinds)> _previews = new();
 
@@ -54,7 +83,9 @@ public sealed class DerelictYardSystem : EntitySystem
         SubscribeLocalEvent<DerelictYardConsoleComponent, BoundUIOpenedEvent>(OnOpened);
         SubscribeLocalEvent<DerelictYardConsoleComponent, DerelictPurchaseMessage>(OnPurchase);
         SubscribeLocalEvent<DerelictYardConsoleComponent, DerelictPreviewRequestMessage>(OnPreviewRequest);
+        SubscribeLocalEvent<DerelictYardConsoleComponent, DerelictExtendMessage>(OnExtend);
         SubscribeLocalEvent<DerelictLeaseComponent, PostGridSplitEvent>(OnSplit);
+        SubscribeLocalEvent<RoundRestartCleanupEvent>(_ => _jobs.Clear());
     }
 
     private void OnOpened(Entity<DerelictYardConsoleComponent> ent, ref BoundUIOpenedEvent args)
@@ -64,7 +95,16 @@ public sealed class DerelictYardSystem : EntitySystem
 
     private void UpdateUi(Entity<DerelictYardConsoleComponent> ent)
     {
-        var state = new DerelictYardState();
+        var station = _station.GetOwningStation(ent);
+        var rank = station != null ? EnsureComp<DerelictYardRankComponent>(station.Value) : null;
+        var state = new DerelictYardState
+        {
+            Rank = rank?.Rank ?? 0,
+            Experience = rank?.Experience ?? 0,
+        };
+
+        if (state.Rank + 1 < DerelictYardRankComponent.Thresholds.Length)
+            state.NextRankAt = DerelictYardRankComponent.Thresholds[state.Rank + 1];
 
         foreach (var id in ent.Comp.Vessels)
         {
@@ -78,14 +118,43 @@ public sealed class DerelictYardSystem : EntitySystem
                 Description = vessel.Description is { } description ? Loc.GetString(description) : string.Empty,
                 Price = vessel.Price,
                 Lifetime = vessel.Lifetime,
+                MinRank = vessel.MinRank,
+                Locked = vessel.MinRank > state.Rank,
             });
         }
 
-        if (_station.GetOwningStation(ent) != null && _bank.TryGetBalance(SectorBankAccount.Frontier, out var balance))
+        foreach (var (group, job) in _jobs)
+        {
+            if (job.Station != station)
+                continue;
+
+            state.Leases.Add(new DerelictLeaseEntry
+            {
+                Group = GetNetEntity(group),
+                Name = job.Name,
+                Left = job.Expires - _timing.CurTime,
+                Share = job.Appraisal > 0 ? (float) job.Revenue / job.Appraisal : 0f,
+                CanExtend = job.Extensions < MaxExtensions,
+                ExtendPrice = ExtendPrice(job),
+            });
+        }
+
+        if (station != null && _bank.TryGetBalance(SectorBankAccount.Frontier, out var balance))
             state.Balance = balance;
 
         _ui.SetUiState(ent.Owner, DerelictYardUiKey.Key, state);
     }
+
+    private void UpdateAllUis()
+    {
+        var consoles = EntityQueryEnumerator<DerelictYardConsoleComponent>();
+        while (consoles.MoveNext(out var uid, out var console))
+        {
+            UpdateUi((uid, console));
+        }
+    }
+
+    private static int ExtendPrice(Job job) => (int) (job.Price * ExtendPriceShare);
 
     private void OnPurchase(Entity<DerelictYardConsoleComponent> ent, ref DerelictPurchaseMessage args)
     {
@@ -95,6 +164,13 @@ public sealed class DerelictYardSystem : EntitySystem
         if (_station.GetOwningStation(ent) is not { } station)
         {
             _popup.PopupEntity(Loc.GetString("derelict-yard-no-station"), ent, args.Actor);
+            return;
+        }
+
+        var rank = EnsureComp<DerelictYardRankComponent>(station);
+        if (vessel.MinRank > rank.Rank)
+        {
+            _popup.PopupEntity(Loc.GetString("derelict-yard-rank-too-low"), ent, args.Actor);
             return;
         }
 
@@ -112,17 +188,80 @@ public sealed class DerelictYardSystem : EntitySystem
             return;
         }
 
-        var lease = EnsureComp<DerelictLeaseComponent>(shuttle.Value);
-        lease.Expires = _timing.CurTime + vessel.Lifetime;
-        lease.Group = shuttle.Value;
-        lease.Station = station;
+        EnsureComp<DerelictLeaseComponent>(shuttle.Value).Group = shuttle.Value;
+        MarkOrigin(shuttle.Value);
+
+        _jobs[shuttle.Value] = new Job
+        {
+            Station = station,
+            Name = Loc.GetString(vessel.Name),
+            Price = vessel.Price,
+            Appraisal = (int) _pricing.AppraiseGrid(shuttle.Value),
+            Expires = _timing.CurTime + vessel.Lifetime,
+        };
 
         _chat.DispatchStationAnnouncement(station,
             Loc.GetString("derelict-yard-bought", ("name", Loc.GetString(vessel.Name)), ("minutes", (int) vessel.Lifetime.TotalMinutes)),
             Loc.GetString("derelict-yard-sender"),
             playDefaultSound: false);
 
-        UpdateUi(ent);
+        UpdateAllUis();
+    }
+
+    /// <summary>
+    /// Marks everything on the wreck, so what the scrap machines pay for it counts towards the job wherever it ends up.
+    /// </summary>
+    private void MarkOrigin(EntityUid shuttle)
+    {
+        if (!TryComp<MapGridComponent>(shuttle, out var grid))
+            return;
+
+        var found = new HashSet<EntityUid>();
+        _lookup.GetLocalEntitiesIntersecting(shuttle, grid.LocalAABB.Enlarged(1f), found,
+            LookupFlags.Static | LookupFlags.Dynamic | LookupFlags.Sundries | LookupFlags.Uncontained);
+
+        foreach (var uid in found)
+        {
+            if (uid != shuttle)
+                EnsureComp<DerelictScrapOriginComponent>(uid).Group = shuttle;
+        }
+    }
+
+    /// <summary>
+    /// Counts what a scrap machine paid for something towards the job of the wreck it came from.
+    /// </summary>
+    public void CreditScrap(EntityUid source, int amount)
+    {
+        EntityUid? group = null;
+        if (TryComp<DerelictScrapOriginComponent>(source, out var origin))
+            group = origin.Group;
+        else if (TryComp<DerelictLeaseComponent>(source, out var lease))
+            group = lease.Group;
+
+        if (group != null && _jobs.TryGetValue(group.Value, out var job))
+            job.Revenue += amount;
+    }
+
+    private void OnExtend(Entity<DerelictYardConsoleComponent> ent, ref DerelictExtendMessage args)
+    {
+        if (!_jobs.TryGetValue(GetEntity(args.Group), out var job) || job.Extensions >= MaxExtensions ||
+            job.Station != _station.GetOwningStation(ent))
+            return;
+
+        var price = ExtendPrice(job);
+        if (!_bank.TryGetBalance(SectorBankAccount.Frontier, out var balance) || balance < price ||
+            !_bank.TrySectorWithdraw(SectorBankAccount.Frontier, price, LedgerEntryType.StationWithdrawalSupplies))
+        {
+            _popup.PopupEntity(Loc.GetString("derelict-yard-no-funds"), ent, args.Actor);
+            return;
+        }
+
+        job.Extensions++;
+        job.Expires += ExtendTime;
+        job.Warned5 = false;
+        job.Warned1 = false;
+
+        UpdateAllUis();
     }
 
     /// <summary>
@@ -130,82 +269,72 @@ public sealed class DerelictYardSystem : EntitySystem
     /// </summary>
     private void OnSplit(Entity<DerelictLeaseComponent> ent, ref PostGridSplitEvent args)
     {
-        var lease = EnsureComp<DerelictLeaseComponent>(args.Grid);
-        lease.Expires = ent.Comp.Expires;
-        lease.Group = ent.Comp.Group;
-        lease.Station = ent.Comp.Station;
-        lease.Warned5 = ent.Comp.Warned5;
-        lease.Warned1 = ent.Comp.Warned1;
+        EnsureComp<DerelictLeaseComponent>(args.Grid).Group = ent.Comp.Group;
     }
 
     public override void Update(float frameTime)
     {
         base.Update(frameTime);
 
-        var expired = new List<EntityUid>();
-        var warn5 = new HashSet<EntityUid>();
-        var warn1 = new HashSet<EntityUid>();
+        if (_jobs.Count == 0)
+            return;
 
-        var query = EntityQueryEnumerator<DerelictLeaseComponent>();
-        while (query.MoveNext(out var uid, out var lease))
+        List<EntityUid>? finished = null;
+        foreach (var (group, job) in _jobs)
         {
-            var left = lease.Expires - _timing.CurTime;
+            var left = job.Expires - _timing.CurTime;
             if (left <= TimeSpan.Zero)
-                expired.Add(uid);
-            else if (left <= LastWarning && !lease.Warned1)
-                warn1.Add(lease.Group);
-            else if (left <= FirstWarning && !lease.Warned5)
-                warn5.Add(lease.Group);
+            {
+                (finished ??= new()).Add(group);
+            }
+            else if (left <= LastWarning && !job.Warned1)
+            {
+                job.Warned1 = true;
+                Warn(job, 1);
+            }
+            else if (left <= FirstWarning && !job.Warned5)
+            {
+                job.Warned5 = true;
+                Warn(job, 5);
+            }
         }
 
-        foreach (var group in warn5)
+        if (finished == null)
+            return;
+
+        foreach (var group in finished)
         {
-            Warn(group, 5, true);
+            Finish(group, _jobs[group]);
+            _jobs.Remove(group);
         }
 
-        foreach (var group in warn1)
-        {
-            Warn(group, 1, false);
-        }
+        UpdateAllUis();
+    }
 
-        if (expired.Count > 0)
-            Expire(expired);
+    private void Warn(Job job, int minutes)
+    {
+        _chat.DispatchStationAnnouncement(job.Station,
+            Loc.GetString("derelict-yard-warning", ("minutes", minutes)),
+            Loc.GetString("derelict-yard-sender"),
+            playDefaultSound: false);
     }
 
     /// <summary>
-    /// Announces once for the whole group of grids.
+    /// Ends a job: pays the bonus or takes the fee, raises the rank, then deletes the wreck with every piece of it.
+    /// Whoever is still aboard is put out into space first, only the wreck goes.
     /// </summary>
-    private void Warn(EntityUid group, int minutes, bool first)
+    private void Finish(EntityUid group, Job job)
     {
-        EntityUid? station = null;
+        Settle(job);
 
-        var query = EntityQueryEnumerator<DerelictLeaseComponent>();
-        while (query.MoveNext(out _, out var lease))
+        var grids = new HashSet<EntityUid>();
+        var leases = EntityQueryEnumerator<DerelictLeaseComponent>();
+        while (leases.MoveNext(out var uid, out var lease))
         {
-            if (lease.Group != group)
-                continue;
-
-            station ??= lease.Station;
-            if (first)
-                lease.Warned5 = true;
-            else
-                lease.Warned1 = true;
+            if (lease.Group == group)
+                grids.Add(uid);
         }
 
-        if (station != null)
-        {
-            _chat.DispatchStationAnnouncement(station.Value,
-                Loc.GetString("derelict-yard-warning", ("minutes", minutes)),
-                Loc.GetString("derelict-yard-sender"),
-                playDefaultSound: false);
-        }
-    }
-
-    /// <summary>
-    /// Deletes the grids. Whoever is still aboard is put out into space first, only the wreck goes.
-    /// </summary>
-    private void Expire(List<EntityUid> grids)
-    {
         var mobs = EntityQueryEnumerator<MobStateComponent, TransformComponent>();
         var rescued = new List<EntityUid>();
         while (mobs.MoveNext(out var mob, out _, out var xform))
@@ -229,6 +358,56 @@ public sealed class DerelictYardSystem : EntitySystem
         {
             QueueDel(grid);
         }
+    }
+
+    /// <summary>
+    /// The result of a job: the share of the appraisal that came back through the scrap machines pays a bonus
+    /// or costs a fee, and the revenue counts towards the rank.
+    /// </summary>
+    private void Settle(Job job)
+    {
+        var share = job.Appraisal > 0 ? (float) job.Revenue / job.Appraisal : 0f;
+        var percent = (int) MathF.Round(share * 100f);
+        var bonus = 0;
+        var fee = 0;
+
+        if (share >= 0.9f)
+            bonus = (int) (job.Revenue * 0.25f);
+        else if (share >= 0.7f)
+            bonus = (int) (job.Revenue * 0.1f);
+        else if (share < 0.3f)
+            fee = (int) (job.Price * 0.1f);
+
+        if (bonus > 0)
+            _bank.TrySectorDeposit(SectorBankAccount.Frontier, bonus, LedgerEntryType.StationDepositOther);
+
+        if (fee > 0 && !_bank.TrySectorWithdraw(SectorBankAccount.Frontier, fee, LedgerEntryType.StationWithdrawalSupplies))
+            fee = 0;
+
+        _chat.DispatchStationAnnouncement(job.Station,
+            Loc.GetString("derelict-yard-result",
+                ("name", job.Name), ("percent", percent), ("revenue", job.Revenue), ("bonus", bonus), ("fee", fee)),
+            Loc.GetString("derelict-yard-sender"),
+            playDefaultSound: false);
+
+        var rank = EnsureComp<DerelictYardRankComponent>(job.Station);
+        rank.Experience += job.Revenue;
+
+        var newRank = rank.Rank;
+        while (newRank + 1 < DerelictYardRankComponent.Thresholds.Length &&
+               rank.Experience >= DerelictYardRankComponent.Thresholds[newRank + 1])
+        {
+            newRank++;
+        }
+
+        if (newRank == rank.Rank)
+            return;
+
+        rank.Rank = newRank;
+        _chat.DispatchStationAnnouncement(job.Station,
+            Loc.GetString("derelict-yard-rank-up", ("rank", newRank)),
+            Loc.GetString("derelict-yard-sender"),
+            playDefaultSound: false);
     }
 
     private void OnPreviewRequest(Entity<DerelictYardConsoleComponent> ent, ref DerelictPreviewRequestMessage args)

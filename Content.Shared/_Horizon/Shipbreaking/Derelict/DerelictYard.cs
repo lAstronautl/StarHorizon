@@ -2,7 +2,6 @@ using Content.Shared.Whitelist;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
-using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 using Robust.Shared.Utility;
 
 namespace Content.Shared._Horizon.Shipbreaking.Derelict;
@@ -37,6 +36,12 @@ public sealed partial class DerelictVesselPrototype : IPrototype
     /// </summary>
     [DataField]
     public TimeSpan Lifetime = TimeSpan.FromMinutes(30);
+
+    /// <summary>
+    /// The rank of the yard needed to buy this wreck.
+    /// </summary>
+    [DataField]
+    public int MinRank;
 }
 
 /// <summary>
@@ -53,28 +58,40 @@ public sealed partial class DerelictYardConsoleComponent : Component
 }
 
 /// <summary>
-/// On the grid of a bought derelict (and on every piece cut off it). When the time is up all of these grids are deleted.
+/// On the grid of a bought derelict and on every piece cut off it, pointing at the grid that was bought. The job of
+/// the wreck (time, appraisal, revenue) is kept by the derelict yard system under that grid.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentPause]
+[RegisterComponent, NetworkedComponent]
 public sealed partial class DerelictLeaseComponent : Component
 {
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoPausedField]
-    public TimeSpan Expires;
-
-    /// <summary>
-    /// The pieces share one lease: warnings are sent once for all of them.
-    /// </summary>
-    /// <summary>
-    /// The grid that was bought and the station to announce to. Pieces cut off it carry the same values.
-    /// </summary>
     public EntityUid Group;
-    public EntityUid? Station;
+}
 
-    [DataField]
-    public bool Warned5;
+/// <summary>
+/// On everything that was on a leased wreck when it was bought, wherever it ends up. What the scrap machines pay for
+/// it counts towards the job of that wreck.
+/// </summary>
+[RegisterComponent]
+public sealed partial class DerelictScrapOriginComponent : Component
+{
+    public EntityUid Group;
+}
 
-    [DataField]
-    public bool Warned1;
+/// <summary>
+/// The rank of the derelict yard of a station, for the round. It grows with the revenue of finished jobs
+/// and opens the bigger wrecks.
+/// </summary>
+[RegisterComponent]
+public sealed partial class DerelictYardRankComponent : Component
+{
+    public int Experience;
+
+    public int Rank;
+
+    /// <summary>
+    /// Experience needed for each rank, the first one is always 0.
+    /// </summary>
+    public static readonly int[] Thresholds = { 0, 15000, 50000, 120000 };
 }
 
 [Serializable, NetSerializable]
@@ -91,6 +108,24 @@ public sealed class DerelictVesselEntry
     public string Description = string.Empty;
     public int Price;
     public TimeSpan Lifetime;
+    public int MinRank;
+    public bool Locked;
+}
+
+[Serializable, NetSerializable]
+public sealed class DerelictLeaseEntry
+{
+    public NetEntity Group;
+    public string Name = string.Empty;
+    public TimeSpan Left;
+
+    /// <summary>
+    /// Revenue against the appraisal, 0 to 1 and more.
+    /// </summary>
+    public float Share;
+
+    public bool CanExtend;
+    public int ExtendPrice;
 }
 
 [Serializable, NetSerializable]
@@ -102,6 +137,30 @@ public sealed class DerelictYardState : BoundUserInterfaceState
     /// The balance of the station account, null if the console has no station.
     /// </summary>
     public int? Balance;
+
+    public int Rank;
+    public int Experience;
+
+    /// <summary>
+    /// The experience needed for the next rank, null at the top.
+    /// </summary>
+    public int? NextRankAt;
+
+    public List<DerelictLeaseEntry> Leases = new();
+}
+
+/// <summary>
+/// The client wants to extend a lease.
+/// </summary>
+[Serializable, NetSerializable]
+public sealed class DerelictExtendMessage : BoundUserInterfaceMessage
+{
+    public NetEntity Group;
+
+    public DerelictExtendMessage(NetEntity group)
+    {
+        Group = group;
+    }
 }
 
 /// <summary>
