@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using Content.Client._Horizon.GravityGun; // Horizon: gravity gun wheel
 using Robust.Client.Graphics;
 using Robust.Client.Input;
 using Robust.Client.UserInterface;
@@ -134,16 +133,6 @@ namespace Content.Client.Viewport
 
             _inputManager.ViewportKeyEvent(this, args);
         }
-
-        // Horizon: the mouse wheel moves what the gravity gun holds away from or towards the user
-        protected override void MouseWheel(GUIMouseWheelEventArgs args)
-        {
-            base.MouseWheel(args);
-
-            if (_entityManager.System<GravityGunSystem>().OnWheel(args.Delta.Y))
-                args.Handle();
-        }
-        // End Horizon
 
         protected override void KeyBindUp(GUIBoundKeyEventArgs args)
         {

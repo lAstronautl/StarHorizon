@@ -14,6 +14,7 @@ using Robust.Shared.Containers;
 using Robust.Shared.Map;
 using Robust.Shared.Network;
 using Robust.Shared.Physics;
+using Robust.Shared.Map.Components;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Systems;
 using Robust.Shared.Serialization;
@@ -27,6 +28,7 @@ public abstract partial class SharedTetherGunSystem : EntitySystem
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly MobStateSystem _mob = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly IMapManager _mapManager = default!; // Horizon: grids
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly SharedJointSystem _joints = default!;
@@ -88,6 +90,9 @@ public abstract partial class SharedTetherGunSystem : EntitySystem
 
         while (tetheredQuery.MoveNext(out var uid, out _, out var physics))
         {
+            if (HasComp<MapGridComponent>(uid)) // Horizon: a grid does not spin
+                continue;
+
             var sign = Math.Sign(physics.AngularVelocity);
 
             if (sign == 0)
@@ -130,10 +135,16 @@ public abstract partial class SharedTetherGunSystem : EntitySystem
 
     private void OnTetherRanged(EntityUid uid, TetherGunComponent component, AfterInteractEvent args)
     {
-        if (args.Target == null || args.Handled)
+        // Horizon: a click on a floor without a target takes the whole grid under the cursor
+        var target = args.Target;
+        if (target == null && _mapManager.TryFindGridAt(TransformSystem.ToMapCoordinates(args.ClickLocation), out var gridUnder, out _))
+            target = gridUnder;
+        // End Horizon
+
+        if (target == null || args.Handled)
             return;
 
-        TryTether(uid, args.Target.Value, args.User, component);
+        TryTether(uid, target.Value, args.User, component);
     }
 
     protected bool TryGetTetherGun(EntityUid user, [NotNullWhen(true)] out EntityUid? gunUid, [NotNullWhen(true)] out TetherGunComponent? gun)
@@ -209,7 +220,8 @@ public abstract partial class SharedTetherGunSystem : EntitySystem
         _appearance.SetData(gunUid, ToggleableVisuals.Enabled, true, appearance);
 
         // Target updates
-        TransformSystem.Unanchor(target, targetXform);
+        if (!HasComp<MapGridComponent>(target)) // Horizon: a grid is never anchored
+            TransformSystem.Unanchor(target, targetXform);
         component.Tethered = target;
         var tethered = EnsureComp<TetheredComponent>(target);
         _physics.SetBodyStatus(target, targetPhysics, BodyStatus.InAir, false);
@@ -218,10 +230,14 @@ public abstract partial class SharedTetherGunSystem : EntitySystem
         tethered.OriginalAngularDamping = targetPhysics.AngularDamping;
         _physics.SetAngularDamping(target, targetPhysics, 0f);
         _physics.SetLinearDamping(target, targetPhysics, 0f);
-        _physics.SetAngularVelocity(target, SpinVelocity, body: targetPhysics);
+        if (!HasComp<MapGridComponent>(target)) // Horizon: a grid does not spin
+            _physics.SetAngularVelocity(target, SpinVelocity, body: targetPhysics);
         _physics.WakeBody(target, body: targetPhysics);
-        var thrown = EnsureComp<ThrownItemComponent>(component.Tethered.Value);
-        thrown.Thrower = gunUid;
+        if (!HasComp<MapGridComponent>(target)) // Horizon: a grid is not a thrown item
+        {
+            var thrown = EnsureComp<ThrownItemComponent>(component.Tethered.Value);
+            thrown.Thrower = gunUid;
+        }
         _blocker.UpdateCanMove(target);
 
         // Invisible tether entity
@@ -262,7 +278,7 @@ public abstract partial class SharedTetherGunSystem : EntitySystem
 
         if (TryComp<PhysicsComponent>(component.Tethered, out var targetPhysics))
         {
-            if (land)
+            if (land && !HasComp<MapGridComponent>(component.Tethered)) // Horizon: a grid is not a thrown item
             {
                 var thrown = EnsureComp<ThrownItemComponent>(component.Tethered.Value);
                 _thrown.LandComponent(component.Tethered.Value, thrown, targetPhysics, true);
