@@ -1090,8 +1090,10 @@ def check_gas_pipe_autofit(mapping_set, index, prototypes_dir) -> Result:
     fitting (already covered on its own by pipefitting.py's own test suite).
     Also checks that a vent gets its own AtmosPipeLayers override from its
     *own* tg path (gaspipes.device_piping_layer), never from whichever pipe
-    colour happens to be its nearest neighbour, and never any AtmosPipeColor
-    at all -- see _tag_device_layers()'s own docstring for why.
+    colour happens to be its nearest neighbour -- and that AtmosPipeColor,
+    purely cosmetic on this engine, is only ever borrowed from a run that is
+    actually on that same, already-known-correct layer -- see _tag_devices()
+    and _device_color()'s own docstrings for why.
 
     A further, standalone case checks that an unmapped tg layer is dropped,
     not silently placed into whichever slot happens to be free. A last one
@@ -1205,6 +1207,44 @@ def check_gas_pipe_autofit(mapping_set, index, prototypes_dir) -> Result:
             f"vent_pump/layer2 must get AtmosPipeLayers: Secondary from its own path, not its "
             f"Primary-layer neighbour's: {vent2.extra_components}"
         )
+    elif any("AtmosPipeColor" in c for c in vent2.extra_components):
+        problems.append(
+            f"vent_pump/layer2 next to a Primary-layer (mismatched) pipe must stay uncoloured: "
+            f"{vent2.extra_components}"
+        )
+
+    # Now the positive case: the vent's own layer (Secondary, from its path)
+    # actually matches its neighbour's (scrubbers/layer2 -> Secondary too) --
+    # colour is safe to borrow here, same engine-cosmetic reasoning as above,
+    # just no longer blocked by a layer mismatch.
+    matching_layer_fixture = (
+        '"A" = (\n/obj/machinery/atmospherics/components/unary/vent_pump/layer2{dir = 2},\n'
+        '/turf/open/floor/iron,\n/area/station)\n'
+        '"B" = (\n/turf/open/floor/iron,\n/area/station)\n'
+        '"C" = (\n/obj/machinery/atmospherics/pipe/smart/simple/scrubbers/layer2,\n'
+        '/turf/open/floor/iron,\n/area/station)\n'
+        '"D" = (\n/turf/open/floor/iron,\n/area/station)\n\n'
+        '(1,1,1) = {"\nAB\nCD\n"}\n'
+    )
+    with tempfile.TemporaryDirectory() as directory:
+        path = os.path.join(directory, "fixture.dmm")
+        with open(path, "w", encoding="utf-8") as handle:
+            handle.write(matching_layer_fixture)
+        dmm4 = dmmparser.parse(path)
+    builder4 = ss14map.MapBuilder(template["map_entity"], template["grid_entity"], "0.0.0")
+    survey4 = dmm2yml.walk(dmm4, mapping_set, index, 1, builder4, "deterministic", pipenode_index=pipenode_index)
+    dmm2yml.place_gas_pipes(survey4, builder4, {1: "Primary", 2: "Secondary", 3: "Tertiary"})
+    vent4 = next((e for e in builder4.entities if e.proto == "GasVentPump"), None)
+    if vent4 is None:
+        problems.append("expected a GasVentPump entity in the matching-layer fixture output")
+    else:
+        if not any("AtmosPipeLayers" in c and "Secondary" in c for c in vent4.extra_components):
+            problems.append(f"vent_pump/layer2 missing AtmosPipeLayers: Secondary: {vent4.extra_components}")
+        if not any("AtmosPipeColor" in c and "#990000FF" in c for c in vent4.extra_components):
+            problems.append(
+                f"vent_pump/layer2 next to a same-layer scrubbers run should borrow its colour "
+                f"(#990000FF): {vent4.extra_components}"
+            )
 
     # A tg atom commonly runs a plain pipe segment straight through a pump/
     # scrubber's own tile for routing -- the device's own NodeContainer is

@@ -512,7 +512,7 @@ def walk(
 def _pipe_color_component(color_hex: str | None) -> tuple[str, ...]:
     """For a fitted GasPipe* entity -- its layer is already the prototype
     chosen (GasPipeStraightAlt1 *is* the Secondary-layer straight pipe), so
-    unlike a device (see _tag_device_layers) it never needs its own
+    unlike a device (see _tag_devices) it never needs its own
     AtmosPipeLayers override, matching every pipe entity in this repo's own
     maps."""
     if not color_hex:
@@ -520,24 +520,77 @@ def _pipe_color_component(color_hex: str | None) -> tuple[str, ...]:
     return (f"- type: AtmosPipeColor\n  color: '{color_hex}'",)
 
 
-def _tag_device_layers(survey: Survey, layer_map: dict[int, str]) -> None:
+_PORT_OFFSET = {"N": (0, 1), "S": (0, -1), "E": (1, 0), "W": (-1, 0)}
+
+
+def _device_color(
+    position: tuple[int, int],
+    ss14_layer: str,
+    layer_map: dict[int, str],
+    atoms_by_tile: dict[tuple[int, int], list[tuple[str, int]]],
+    device_ports: dict[tuple[int, int], set[str]],
+    groups: dict[tuple[str, str], set[tuple[int, int]]],
+) -> str | None:
+    """A colour to paint a device with, purely cosmetic (PipeColorVisuals;
+    confirmed against PipeNode.GetReachableNodes that connectivity itself
+    never looks at colour) -- safe to borrow from a neighbouring run now
+    that the device's own layer is already known for certain from its own
+    path (see _tag_devices), not guessed from this adjacency check the way
+    an earlier version of this function tried to determine the layer
+    itself: with the layer fixed first, a tile where two different-coloured
+    runs cross can no longer be ambiguous, since only one of them (if any)
+    is actually resolved to this device's own layer.
+
+    Checks the device's own tile first (tg commonly drops a matching-
+    coloured pipe atom directly under a device for this exact purpose --
+    see place_gas_pipes()'s on_device skip) before its open port's real
+    neighbour -- each still gated by that same layer match.
+    """
+    for color_name, tg_layer in atoms_by_tile.get(position, ()):
+        if layer_map.get(tg_layer) == ss14_layer:
+            return gaspipes.PIPE_COLOR_HEX[color_name]
+
+    x, y = position
+    for (color_name, group_layer), tiles in groups.items():
+        if group_layer != ss14_layer:
+            continue
+        if any((x + _PORT_OFFSET[p][0], y + _PORT_OFFSET[p][1]) in tiles for p in device_ports.get(position, ())):
+            return gaspipes.PIPE_COLOR_HEX[color_name]
+    return None
+
+
+def _tag_devices(
+    survey: Survey,
+    layer_map: dict[int, str],
+    groups: dict[tuple[str, str], set[tuple[int, int]]],
+) -> None:
     """Give each device (vent, scrubber, pump, ...) its own AtmosPipeLayers
     override, straight from its own tg path (survey.device_tg_layers --
     see gaspipes.device_piping_layer()) -- never from which pipe colour
-    happens to be physically nearest it. No AtmosPipeColor: tg never records
-    one for a device (only for a pipe's own subtype name), and this engine's
-    connectivity check never looks at colour at all (PipeNode.
-    GetReachableNodes: NodeGroupID + CurrentPipeLayer match, direction --
-    that is the whole list), so there is nothing honest to guess it from.
+    happens to be physically nearest it (that was tried and reported wrong
+    for real: a device whose only neighbour was a different-layer run got
+    silently wired onto it). AtmosPipeColor is still safe to infer, purely
+    as paint -- see _device_color().
     """
+    atoms_by_tile: dict[tuple[int, int], list[tuple[str, int]]] = {}
+    for tile_x, tile_y, color_name, tg_layer in survey.gas_pipe_atoms:
+        atoms_by_tile.setdefault((tile_x, tile_y), []).append((color_name, tg_layer))
+
     for position, tg_layer in survey.device_tg_layers.items():
         ss14_layer = layer_map.get(tg_layer)
-        if ss14_layer is None or ss14_layer == "Primary":
-            continue  # declined, or already every device's own default
-        components = (f"- type: AtmosPipeLayers\n  pipeLayer: {ss14_layer}",)
+        if ss14_layer is None:
+            continue  # declined in the overflow prompt, same as a pipe atom
+        components = []
+        if ss14_layer != "Primary":
+            components.append(f"- type: AtmosPipeLayers\n  pipeLayer: {ss14_layer}")
+        color_hex = _device_color(position, ss14_layer, layer_map, atoms_by_tile, survey.device_ports, groups)
+        if color_hex:
+            components.append(f"- type: AtmosPipeColor\n  color: '{color_hex}'")
+        if not components:
+            continue
         for entity in survey.device_entities.get(position, ()):
             if not entity.extra_components:
-                entity.extra_components = components
+                entity.extra_components = tuple(components)
 
 
 def place_gas_pipes(
@@ -559,8 +612,9 @@ def place_gas_pipes(
     unrelated pipe sprites on one cell instead of one correct one. The
     device still gets fitted *toward* correctly, via device_ports, exactly
     as any other neighbour. Also tags every device with its own declared
-    layer -- see _tag_device_layers(). Sets builder.gas_pipes_placed/
-    dropped/on_device.
+    layer, plus a colour borrowed from whichever fitted run (if any) is on
+    that same layer and actually touches it -- see _tag_devices(). Sets
+    builder.gas_pipes_placed/dropped/on_device.
     """
     groups: dict[tuple[str, str], set[tuple[int, int]]] = {}
     for tile_x, tile_y, color_name, tg_layer in survey.gas_pipe_atoms:
@@ -588,7 +642,7 @@ def place_gas_pipes(
             )
             builder.gas_pipes_placed += 1
 
-    _tag_device_layers(survey, layer_map)
+    _tag_devices(survey, layer_map, groups)
 
 
 def gas_pipe_layer_counts(dmm: dmmparser.DmmMap, z_level: int, allow_all_pipe_colors: bool = False) -> Counter:
