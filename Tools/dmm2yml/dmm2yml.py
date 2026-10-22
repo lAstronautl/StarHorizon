@@ -98,13 +98,19 @@ class Survey:
     # already rotated by its placement facing.
     device_ports: dict[tuple[int, int], set[str]] = field(default_factory=dict)
     # The placed Entity object(s) backing each device_ports position, kept so
-    # place_gas_pipes() can patch their AtmosPipeLayers/AtmosPipeColor once it
-    # knows which fitted network (if any) a device's own port actually
-    # touches -- a vent left at the engine's default Primary/uncoloured layer
-    # never actually joins its real, non-Primary/coloured network in-game,
-    # not just a cosmetic mismatch (AtmosPipeLayersComponent: "only pipes on
-    # the same layer can connect with each other").
+    # place_gas_pipes() can patch their AtmosPipeLayers once it has resolved
+    # layer_map -- a device left at the engine's default (Primary) when its
+    # own path says otherwise never actually connects to its real network in
+    # -game (PipeNode.GetReachableNodes: layer must match exactly; colour is
+    # never checked), not just a cosmetic mismatch.
     device_entities: dict[tuple[int, int], list["ss14map.Entity"]] = field(default_factory=dict)
+    # That same position's own declared tg piping_layer (1-5, gaspipes.
+    # device_piping_layer) -- the device's *own* path, never guessed from
+    # whichever pipe happens to be its nearest neighbour (tried that; see
+    # device_piping_layer()'s docstring for why it silently mis-wires a
+    # device onto the wrong network when a different-layer run is simply the
+    # closest thing physically nearby, which is common).
+    device_tg_layers: dict[tuple[int, int], int] = field(default_factory=dict)
 
     def note_unresolved(self, path: str, kind: str, x: int, y: int, variables, map_label: str = "") -> None:
         report = self.unresolved.get(path)
@@ -129,6 +135,7 @@ class Survey:
             self.device_ports.setdefault(position, set()).update(ports)
         for position, placed in other.device_entities.items():
             self.device_entities.setdefault(position, []).extend(placed)
+        self.device_tg_layers.update(other.device_tg_layers)
         for path, report in other.unresolved.items():
             existing = self.unresolved.get(path)
             if existing is None:
@@ -497,17 +504,15 @@ def walk(
                             }
                             survey.device_ports.setdefault((entity_x, entity_y), set()).update(ports)
                             survey.device_entities.setdefault((entity_x, entity_y), []).append(placed)
+                            survey.device_tg_layers[(entity_x, entity_y)] = gaspipes.device_piping_layer(atom.path)
 
     return survey
-
-
-_PORT_OFFSET = {"N": (0, 1), "S": (0, -1), "E": (1, 0), "W": (-1, 0)}
 
 
 def _pipe_color_component(color_hex: str | None) -> tuple[str, ...]:
     """For a fitted GasPipe* entity -- its layer is already the prototype
     chosen (GasPipeStraightAlt1 *is* the Secondary-layer straight pipe), so
-    unlike a device (see _device_pipe_components) it never needs its own
+    unlike a device (see _tag_device_layers) it never needs its own
     AtmosPipeLayers override, matching every pipe entity in this repo's own
     maps."""
     if not color_hex:
@@ -515,43 +520,24 @@ def _pipe_color_component(color_hex: str | None) -> tuple[str, ...]:
     return (f"- type: AtmosPipeColor\n  color: '{color_hex}'",)
 
 
-def _device_pipe_components(color_hex: str | None, ss14_layer: str) -> tuple[str, ...]:
-    """For a device (vent, scrubber, pump, ...) -- unlike a pipe, there is no
-    per-layer prototype variant to pick instead, so its layer can only be
-    expressed with an explicit AtmosPipeLayers override (confirmed against
-    Resources/Maps/exo.yml: GasOutletInjector/GasPassiveVent entities there
-    carry exactly this pair of components when not on the Primary/uncoloured
-    default)."""
-    parts = []
-    if ss14_layer != "Primary":
-        parts.append(f"- type: AtmosPipeLayers\n  pipeLayer: {ss14_layer}")
-    if color_hex:
-        parts.append(f"- type: AtmosPipeColor\n  color: '{color_hex}'")
-    return tuple(parts)
-
-
-def _tag_connected_devices(
-    survey: Survey,
-    tiles: set[tuple[int, int]],
-    color_hex: str | None,
-    ss14_layer: str,
-) -> None:
-    """A vent/scrubber/pump touching this fitted network must join it for
-    real, not just sit next to it looking right -- see AtmosPipeLayersComp-
-    onent's own doc comment: pipes (and anything else with a NodeContainer
-    Pipe node, devices included) only connect when they share both a layer
-    and, if either side has one, a colour. Left at the engine's defaults
-    (Primary, uncoloured) a device never joins a Secondary/Tertiary or
-    coloured run its own open port is physically touching.
+def _tag_device_layers(survey: Survey, layer_map: dict[int, str]) -> None:
+    """Give each device (vent, scrubber, pump, ...) its own AtmosPipeLayers
+    override, straight from its own tg path (survey.device_tg_layers --
+    see gaspipes.device_piping_layer()) -- never from which pipe colour
+    happens to be physically nearest it. No AtmosPipeColor: tg never records
+    one for a device (only for a pipe's own subtype name), and this engine's
+    connectivity check never looks at colour at all (PipeNode.
+    GetReachableNodes: NodeGroupID + CurrentPipeLayer match, direction --
+    that is the whole list), so there is nothing honest to guess it from.
     """
-    components = _device_pipe_components(color_hex, ss14_layer)
-    if not components:
-        return  # Primary, uncoloured -- already every device's own default
-    for (x, y), ports in survey.device_ports.items():
-        if any((x + _PORT_OFFSET[p][0], y + _PORT_OFFSET[p][1]) in tiles for p in ports):
-            for entity in survey.device_entities.get((x, y), ()):
-                if not entity.extra_components:
-                    entity.extra_components = components
+    for position, tg_layer in survey.device_tg_layers.items():
+        ss14_layer = layer_map.get(tg_layer)
+        if ss14_layer is None or ss14_layer == "Primary":
+            continue  # declined, or already every device's own default
+        components = (f"- type: AtmosPipeLayers\n  pipeLayer: {ss14_layer}",)
+        for entity in survey.device_entities.get(position, ()):
+            if not entity.extra_components:
+                entity.extra_components = components
 
 
 def place_gas_pipes(
@@ -572,10 +558,9 @@ def place_gas_pipes(
     in SS14; fitting a second GasPipe* entity on top of it stacked two
     unrelated pipe sprites on one cell instead of one correct one. The
     device still gets fitted *toward* correctly, via device_ports, exactly
-    as any other neighbour. Also patches any device (vent, scrubber, pump,
-    ...) whose own open port touches a fitted network onto that network's
-    layer/colour -- see _tag_connected_devices(). Sets builder.gas_pipes_
-    placed/dropped/on_device.
+    as any other neighbour. Also tags every device with its own declared
+    layer -- see _tag_device_layers(). Sets builder.gas_pipes_placed/
+    dropped/on_device.
     """
     groups: dict[tuple[str, str], set[tuple[int, int]]] = {}
     for tile_x, tile_y, color_name, tg_layer in survey.gas_pipe_atoms:
@@ -602,7 +587,8 @@ def place_gas_pipes(
                 extra_components=_pipe_color_component(pipe.color),
             )
             builder.gas_pipes_placed += 1
-        _tag_connected_devices(survey, tiles, color_hex, ss14_layer)
+
+    _tag_device_layers(survey, layer_map)
 
 
 def gas_pipe_layer_counts(dmm: dmmparser.DmmMap, z_level: int, allow_all_pipe_colors: bool = False) -> Counter:
@@ -820,7 +806,7 @@ def build_map(
         dmm, mapping_set, index, z_level, builder, variant_mode,
         pipenode_index=pipenode_index, allow_all_pipe_colors=allow_all_pipe_colors,
     )
-    if survey.gas_pipe_atoms:
+    if survey.gas_pipe_atoms or survey.device_tg_layers:
         place_gas_pipes(survey, builder, layer_map if layer_map is not None else gaspipes.DEFAULT_LAYER_MAP)
     return builder
 

@@ -41,6 +41,7 @@ FF appended to match AtmosPipeColor's #RRGGBBAA convention.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 
 PIPE_PREFIX = "/obj/machinery/atmospherics/pipe"
@@ -137,3 +138,32 @@ def parse_gas_pipe_path(path: str, allow_all_colors: bool = False) -> ParsedGasP
     if not allow_all_colors and color_name not in BASE_COLORS:
         return None
     return ParsedGasPipe(shape=shape, color_name=color_name, tg_layer=tg_layer)
+
+
+_DEVICE_LAYER_SUFFIX = re.compile(r"/layer([0-9]+)$")
+
+
+def device_piping_layer(path: str) -> int:
+    """An atmos device's own tg piping_layer, straight from its path.
+
+    Every atmos device class (code/modules/atmospherics/machinery/components/
+    {unary,binary,trinary}_devices/*.dm: vent_pump, vent_scrubber, filter,
+    mixer, pump, valve, outlet_injector, ...) declares its non-default layer
+    the same way as a pipe does -- a bare /layerN subtype path, e.g. /obj/
+    machinery/atmospherics/components/unary/vent_scrubber/layer2 -- and
+    otherwise leaves piping_layer at its class default, PIPING_LAYER_DEFAULT
+    = 3 (code/__DEFINES/atmospherics/atmos_piping.dm). This is the one
+    reliable, authored signal for which layer a device is actually on: most
+    real placements never use the /layerN suffix at all (confirmed against
+    two full tgstation checkouts), and are genuinely on layer 3, reaching a
+    coloured trunk line elsewhere through a layer_manifold rather than
+    sitting directly on that line's own layer -- so a device's own layer
+    must never be guessed from which coloured pipe happens to be its nearest
+    neighbour (that produced a real, reported bug: a scrubber whose only
+    physical neighbour was a supply run got tagged onto the supply network
+    outright, which this engine's connectivity check -- CurrentPipeLayer
+    match only, PipeNode.GetReachableNodes, no colour involved at all --
+    would have made literal, not just a cosmetic mismatch).
+    """
+    match = _DEVICE_LAYER_SUFFIX.search(path)
+    return int(match.group(1)) if match else 3
