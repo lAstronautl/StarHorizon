@@ -20,6 +20,9 @@ public sealed partial class ShuttleConsoleSystem
     private const float FtlProximityMassThreshold = 50f;
     private const float FtlProximityRange = 150f;
 
+    /// <summary>Shuttles with at most this many tiles can always jump, without the nearby-grid check.</summary>
+    private const int FtlProximityExemptTiles = 64;
+
     [Dependency] private readonly IMapManager _ftlMapManager = default!;
     [Dependency] private readonly IConfigurationManager _ftlCfg = default!;
 
@@ -125,6 +128,17 @@ public sealed partial class ShuttleConsoleSystem
     private bool HasMassiveGridNearby(EntityUid shuttleUid)
     {
         if (!TryComp<MapGridComponent>(shuttleUid, out var gridComp))
+            return false;
+
+        // Small shuttles are exempt from the check.
+        var tiles = 0;
+        foreach (var _ in _mapSystem.GetAllTiles(shuttleUid, gridComp))
+        {
+            if (++tiles > FtlProximityExemptTiles)
+                break;
+        }
+
+        if (tiles <= FtlProximityExemptTiles)
             return false;
 
         var xform = Transform(shuttleUid);
