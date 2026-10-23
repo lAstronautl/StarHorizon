@@ -60,10 +60,6 @@ public sealed class SalvageExpeditionConsoleBoundUserInterface : BoundUserInterf
         {
             var missionParams = current.Missions[i];
 
-            // Horizon: a planet only offers expeditions that fit its biome
-            if (current.PlanetBiome != null && !salvage.PlanetFitsDifficulty(current.PlanetBiome, missionParams.Difficulty))
-                continue;
-
             var offering = new OfferingWindowOption();
             offering.Title = Loc.GetString($"salvage-expedition-type-{missionParams.MissionType}");
 
