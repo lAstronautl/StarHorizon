@@ -1,3 +1,4 @@
+using Content.Shared.Salvage.Expeditions;
 using Robust.Shared.GameStates;
 
 namespace Content.Shared._Horizon.SpaceHazards;
@@ -30,4 +31,11 @@ public sealed partial class ExpeditionPlanetComponent : Component
     /// <summary>Distance from the planet center within which a console can start an expedition.</summary>
     [DataField, AutoNetworkedField]
     public float Range = 450f;
+
+    /// <summary>
+    /// The planet's own pool of expedition offers, identical for every console that comes near. Server-side only,
+    /// filled lazily and replaced once an offer is claimed.
+    /// </summary>
+    [ViewVariables]
+    public List<SalvageMissionParams> Missions = new();
 }

@@ -6,6 +6,7 @@ using Robust.Shared.Prototypes;
 using Content.Server.Salvage.Expeditions; // Frontier
 using Content.Server._NF.Salvage; // Frontier
 using Content.Server._Horizon.SpaceHazards; // Horizon
+using Content.Shared._Horizon.SpaceHazards; // Horizon
 using Content.Shared.Mind.Components; // Frontier
 using Content.Shared.Mobs.Components; // Frontier
 using Content.Shared.NPC.Components; // Frontier
@@ -21,6 +22,8 @@ namespace Content.Server.Salvage;
 
 public sealed partial class SalvageSystem
 {
+    private ushort _planetMissionIndex = 1; // Horizon: indices of planet offers
+
     public static readonly EntProtoId CoordinatesDisk = "CoordinatesDisk";
     public static readonly ProtoId<LocalizedDatasetPrototype> PlanetNames = "NamesBorer";
 
@@ -36,10 +39,9 @@ public sealed partial class SalvageSystem
         if (!TryComp<SalvageExpeditionDataComponent>(station, out var data) || data.Claimed)
             return;
 
-        if (!data.Missions.TryGetValue(args.Index, out var missionparams))
-            return;
-
-        // Horizon: expeditions can only be started next to a planet, and the planet decides the biome.
+        // Horizon: expeditions can only be started next to a planet; the planet has its own pool of offers and decides the biome.
+        SalvageMissionParams missionparams;
+        Entity<ExpeditionPlanetComponent>? claimedPlanet = null;
         if (!component.Debug)
         {
             if (!_expeditionPlanets.TryGetPlanetNear(uid, out var planet))
@@ -50,8 +52,17 @@ public sealed partial class SalvageSystem
                 return;
             }
 
-            missionparams = missionparams with { Biome = planet.Comp.BiomeId };
-            data.Missions[args.Index] = missionparams;
+            EnsurePlanetMissions(planet.Comp);
+            var found = planet.Comp.Missions.FindIndex(m => m.Index == args.Index);
+            if (found < 0)
+                return;
+
+            missionparams = planet.Comp.Missions[found] with { Biome = planet.Comp.BiomeId };
+            claimedPlanet = planet;
+        }
+        else if (!data.Missions.TryGetValue(args.Index, out missionparams!))
+        {
+            return;
         }
         // End Horizon
 
@@ -105,6 +116,16 @@ public sealed partial class SalvageSystem
         SpawnMission(missionparams, station.Value, null);
         #endregion Frontier FTL changes
         // End Frontier
+
+        // Horizon: the station's list now only holds the claimed mission; the planet rolls a fresh pool of offers
+        if (claimedPlanet is { } usedPlanet)
+        {
+            data.Missions.Clear();
+            data.Missions[args.Index] = missionparams;
+            usedPlanet.Comp.Missions.Clear();
+            RefreshAllConsoles();
+        }
+        // End Horizon
 
         data.ActiveMission = args.Index;
         var mission = GetMission(missionparams.MissionType, _prototypeManager.Index<SalvageDifficultyPrototype>(missionparams.Difficulty), missionparams.Seed, missionparams.Biome); // Frontier: add MissionType; Horizon: planet biome
@@ -252,11 +273,34 @@ public sealed partial class SalvageSystem
         if (_expeditionPlanets.TryGetPlanetNear(console, out var planet))
         {
             state.PlanetBiome = planet.Comp.BiomeId;
+            EnsurePlanetMissions(planet.Comp);
+            state.Missions = new List<SalvageMissionParams>(planet.Comp.Missions);
         }
         else
         {
             state.NoPlanet = true;
             state.Cooldown = true;
+        }
+    }
+
+    /// <summary>Rolls the planet's offers if it has none yet. Every console near the planet sees this same list.</summary>
+    private void EnsurePlanetMissions(ExpeditionPlanetComponent planet)
+    {
+        if (planet.Missions.Count > 0)
+            return;
+
+        var scratch = new SalvageExpeditionDataComponent { NextIndex = _planetMissionIndex };
+        GenerateMissions(scratch);
+        _planetMissionIndex = scratch.NextIndex;
+        planet.Missions.AddRange(scratch.Missions.Values);
+    }
+
+    private void RefreshAllConsoles()
+    {
+        var query = AllEntityQuery<SalvageExpeditionConsoleComponent>();
+        while (query.MoveNext(out var uid, out var comp))
+        {
+            UpdateConsole((uid, comp));
         }
     }
 
