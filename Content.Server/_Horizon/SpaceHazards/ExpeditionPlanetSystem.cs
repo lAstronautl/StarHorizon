@@ -2,7 +2,6 @@ using System.Diagnostics.CodeAnalysis;
 using Content.Server.Salvage;
 using Content.Shared._Horizon.SpaceHazards;
 using Content.Shared.Salvage.Expeditions;
-using Content.Shared.Salvage.Expeditions.Modifiers;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Map;
 using Robust.Shared.Timing;
@@ -25,18 +24,18 @@ public sealed class ExpeditionPlanetSystem : EntitySystem
     private readonly Dictionary<EntityUid, EntityUid?> _lastPlanet = new();
     private TimeSpan _nextCheck;
 
-    /// <summary>Sets the biome, seed and the beacon name shown on the shuttle console map.</summary>
+    /// <summary>
+    /// Sets the biome and seed, and gives the planet a generated name (same generator as expedition destinations) for
+    /// its beacon on the shuttle console map. The name does not reveal the biome.
+    /// </summary>
     public void SetupPlanet(EntityUid uid, ExpeditionPlanetComponent planet, string biome, float seed)
     {
         planet.BiomeId = biome;
         planet.Seed = seed;
         Dirty(uid, planet);
 
-        var biomeName = biome;
-        if (_protos.TryIndex<SalvageBiomeModPrototype>(biome, out var mod) && !string.IsNullOrWhiteSpace(mod.Description))
-            biomeName = Loc.GetString(mod.Description);
-
-        _meta.SetEntityName(uid, Loc.GetString("expedition-planet-name", ("biome", biomeName)));
+        var nameSeed = (int) (seed * 10000f);
+        _meta.SetEntityName(uid, _salvage.GetFTLName(_protos.Index(SalvageSystem.PlanetNames), nameSeed));
     }
 
     /// <summary>The closest expedition planet whose range covers <paramref name="uid"/> (usually a console), if any.</summary>
