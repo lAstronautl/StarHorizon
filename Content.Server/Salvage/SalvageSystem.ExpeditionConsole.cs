@@ -28,8 +28,6 @@ public sealed partial class SalvageSystem
     [Dependency] private readonly SalvageSystem _salvage = default!; // Frontier
     [Dependency] private readonly ExpeditionPlanetSystem _expeditionPlanets = default!; // Horizon
 
-    private const float ShuttleFTLMassThreshold = 50f; // Frontier
-    private const float ShuttleFTLRange = 150f; // Frontier
 
     private void OnSalvageClaimMessage(EntityUid uid, SalvageExpeditionConsoleComponent component, ClaimSalvageMessage args)
     {
@@ -102,26 +100,7 @@ public sealed partial class SalvageSystem
                 UpdateConsoles((station.Value, data));
                 return;
             }
-
-            var xform = Transform(ourGrid);
-            var bounds = _transform.GetWorldMatrix(ourGrid).TransformBox(gridComp.LocalAABB).Enlarged(ShuttleFTLRange);
-            var bodyQuery = GetEntityQuery<PhysicsComponent>();
-            var otherGrids = new List<Entity<MapGridComponent>>();
-            _mapManager.FindGridsIntersecting(xform.MapID, bounds, ref otherGrids);
-            foreach (var otherGrid in otherGrids)
-            {
-                if (ourGrid == otherGrid.Owner ||
-                    !bodyQuery.TryGetComponent(otherGrid.Owner, out var body) ||
-                    body.Mass < ShuttleFTLMassThreshold && body.BodyType == BodyType.Dynamic)
-                {
-                    continue;
-                }
-
-                PlayDenySound((uid, component));
-                _popupSystem.PopupEntity(Loc.GetString("shuttle-ftl-proximity"), uid, PopupType.MediumCaution);
-                UpdateConsoles((station.Value, data));
-                return;
-            }
+            // Horizon: the nearby-grid (FTL proximity) check moved to the regular FTL jump (ShuttleConsoleSystem.ConsoleFTL).
         }
         SpawnMission(missionparams, station.Value, null);
         #endregion Frontier FTL changes
