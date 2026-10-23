@@ -1,3 +1,4 @@
+using Content.Shared._Horizon.SpaceHazards; // Horizon
 using System.Linq;
 using System.Threading;
 using Content.Server.Salvage.Expeditions;
@@ -160,6 +161,19 @@ public sealed partial class SalvageSystem
                     break;
             }
         }
+
+        // Horizon: one timer, the same for everybody, re-rolls the offers of every expedition planet
+        if (currentTime >= _planetPoolNext)
+        {
+            _planetPoolNext = currentTime + TimeSpan.FromSeconds(_cooldown);
+            var planetQuery = EntityQueryEnumerator<ExpeditionPlanetComponent>();
+            while (planetQuery.MoveNext(out _, out var planetComp))
+            {
+                planetComp.Missions.Clear();
+            }
+            RefreshAllConsoles();
+        }
+        // End Horizon
 
         var query = EntityQueryEnumerator<SalvageExpeditionDataComponent>();
         while (query.MoveNext(out var uid, out var comp))

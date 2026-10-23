@@ -22,6 +22,7 @@ namespace Content.Server.Salvage;
 
 public sealed partial class SalvageSystem
 {
+    private TimeSpan _planetPoolNext; // Horizon: when all planet offer pools re-roll
     private ushort _planetMissionIndex = 1; // Horizon: indices of planet offers
 
     public static readonly EntProtoId CoordinatesDisk = "CoordinatesDisk";
@@ -117,13 +118,11 @@ public sealed partial class SalvageSystem
         #endregion Frontier FTL changes
         // End Frontier
 
-        // Horizon: the station's list now only holds the claimed mission; the planet rolls a fresh pool of offers
-        if (claimedPlanet is { } usedPlanet)
+        // Horizon: the station's list now only holds the claimed mission; the planet's pool only re-rolls on the global timer
+        if (claimedPlanet != null)
         {
             data.Missions.Clear();
             data.Missions[args.Index] = missionparams;
-            usedPlanet.Comp.Missions.Clear();
-            RefreshAllConsoles();
         }
         // End Horizon
 
@@ -275,6 +274,8 @@ public sealed partial class SalvageSystem
             state.PlanetBiome = planet.Comp.BiomeId;
             EnsurePlanetMissions(planet.Comp);
             state.Missions = new List<SalvageMissionParams>(planet.Comp.Missions);
+            state.NextOffer = _planetPoolNext;
+            state.CooldownTime = TimeSpan.FromSeconds(_cooldown);
         }
         else
         {
