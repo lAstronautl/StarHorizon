@@ -46,6 +46,7 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
 
     private readonly Font _font;
     private readonly PlanetMapCamera _planetCamera = new(); // Horizon: far-away camera instead of the parallax on planets
+    private readonly SectorMapIcons _sectorIcons = new(); // Horizon: planet and threat icons
 
     private readonly EntityQuery<PhysicsComponent> _physicsQuery;
 
@@ -502,6 +503,7 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
         DrawTacticalMapBackground(handle, matty, viewBox);
         // Horizon: border rings of stars (solar boost zone) and black holes (pull / hazard / event horizon)
         SectorBodyRings.Draw(handle, EntManager, _xformSystem, ViewingMap, worldPoint => MapToScreen(worldPoint, matty), MinimapScale, PixelRect);
+        _sectorIcons.Draw(handle, EntManager, _xformSystem, ViewingMap, worldPoint => MapToScreen(worldPoint, matty), MinimapScale, PixelRect);
         var viewportObjects = GetViewportMapObjects(matty, mapObjects);
         _viewportExclusions.Clear();
 
