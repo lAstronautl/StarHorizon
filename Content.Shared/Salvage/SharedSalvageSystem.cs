@@ -32,6 +32,27 @@ public abstract partial class SharedSalvageSystem : EntitySystem
         return $"{Loc.GetString(dataset.Values[random.Next(dataset.Values.Count)])}-{random.Next(10, 100)}-{(char) (65 + random.Next(26))}";
     }
 
+    /// <summary>
+    /// Horizon: whether an offer of the given difficulty can take place on a planet of the given biome.
+    /// Difficulties with a dedicated biome (e.g. Inferno) only fit that biome, every other biome takes the rest.
+    /// </summary>
+    public bool PlanetFitsDifficulty(string biomeId, string difficultyId)
+    {
+        if (!_proto.TryIndex<SalvageBiomeModPrototype>(biomeId, out var biome))
+            return true;
+
+        if (biome.Difficulties is { Count: > 0 })
+            return biome.Difficulties.Contains(difficultyId);
+
+        foreach (var other in _proto.EnumeratePrototypes<SalvageBiomeModPrototype>())
+        {
+            if (other.Difficulties != null && other.Difficulties.Contains(difficultyId))
+                return false;
+        }
+
+        return true;
+    }
+
     public SalvageMission GetMission(SalvageMissionType config, SalvageDifficultyPrototype difficulty, int seed, string? biomeOverride = null) // Frontier: add config; Horizon: biomeOverride
     {
         // This is on shared to ensure the client display for missions and what the server generates are consistent

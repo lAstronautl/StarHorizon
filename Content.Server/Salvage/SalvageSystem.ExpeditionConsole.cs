@@ -50,6 +50,13 @@ public sealed partial class SalvageSystem
                 return;
             }
 
+            if (!PlanetFitsDifficulty(planet.Comp.BiomeId, missionparams.Difficulty))
+            {
+                PlayDenySound((uid, component));
+                UpdateConsoles((station.Value, data));
+                return;
+            }
+
             missionparams = missionparams with { Biome = planet.Comp.BiomeId };
             data.Missions[args.Index] = missionparams;
         }
