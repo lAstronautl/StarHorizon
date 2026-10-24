@@ -18,7 +18,8 @@
     spriteRadius: 32
     pixels: 1024
     # Far from the star solar panels work 3x better; close to it (hazardRadius) hull and crew take damage.
-    hazardRadius: 300
+    # Same as the FTL exclusion below: the red circle on the shuttle console is both the FTL block and the damage zone.
+    hazardRadius: 350
     solarBoostRadius: 4000
     solarBoostMultiplier: 3
   - type: PointLight
@@ -35,7 +36,7 @@
     shape: Circle
     visibleFromOtherGrids: true
     requireNoGrid: true
-  # Nobody can FTL into the star's danger zone.
+  # Nobody can FTL into the star's danger zone (keep equal to hazardRadius).
   - type: FTLExclusion
     range: 350
 
