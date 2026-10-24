@@ -5,6 +5,7 @@ using Content.Shared.Maps;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Parallax.Biomes;
 using Robust.Client.GameObjects;
+using Robust.Client.ResourceManagement;
 using Robust.Client.Utility;
 using Robust.Client.Graphics;
 using Robust.Shared.ContentPack;
@@ -35,15 +36,19 @@ public sealed class PlanetMapCamera
     [Dependency] private readonly IEntityManager _entMan = default!;
     [Dependency] private readonly ITileDefinitionManager _tileDefs = default!;
     [Dependency] private readonly IResourceManager _resources = default!;
+    [Dependency] private readonly IResourceCache _cache = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
 
     private readonly BiomeSystem _biome;
     private readonly SharedMapSystem _maps;
     private readonly SharedTransformSystem _xform;
     private readonly EntityLookupSystem _lookup;
+    private readonly SpriteSystem _sprites;
 
     private readonly Dictionary<int, Color> _tileColors = new();
-    private readonly Dictionary<Vector2i, (int? Tile, Color? Relief)> _sampled = new();
+    private readonly Dictionary<Vector2i, (int? Tile, string? Relief)> _sampled = new();
+    private readonly Dictionary<int, Texture?> _tileTextures = new();
+    private readonly Dictionary<string, Texture?> _reliefTextures = new();
     private readonly Dictionary<string, Color> _reliefColors = new();
     private readonly HashSet<Entity<SpriteComponent>> _entityScratch = new();
     private readonly Dictionary<int, int> _tileCounts = new();
@@ -59,6 +64,7 @@ public sealed class PlanetMapCamera
         _maps = sys.GetEntitySystem<SharedMapSystem>();
         _xform = sys.GetEntitySystem<SharedTransformSystem>();
         _lookup = sys.GetEntitySystem<EntityLookupSystem>();
+        _sprites = sys.GetEntitySystem<SpriteSystem>();
     }
 
     /// <summary>True when <paramref name="mapId"/> is a planet the shuttle is on and the camera was drawn.</summary>
@@ -142,7 +148,19 @@ public sealed class PlanetMapCamera
                     MathF.Min(a.X, b.X), MathF.Min(a.Y, b.Y),
                     MathF.Max(a.X, b.X), MathF.Max(a.Y, b.Y));
 
-                handle.DrawRect(box, relief ?? GetTileColor(tileId));
+                // Real ground texture, with the biome's own rocks, crystals and plants drawn on top.
+                if (GetTileTexture(tileId) is { } groundTexture)
+                    handle.DrawTextureRect(groundTexture, box);
+                else
+                    handle.DrawRect(box, GetTileColor(tileId));
+
+                if (relief != null)
+                {
+                    if (GetReliefTexture(relief) is { } reliefTexture)
+                        handle.DrawTextureRect(reliefTexture, box);
+                    else
+                        handle.DrawRect(box, GetReliefColor(relief));
+                }
                 _tileCounts[tileId] = _tileCounts.GetValueOrDefault(tileId) + 1;
             }
         }
@@ -158,13 +176,13 @@ public sealed class PlanetMapCamera
             _dominantTile = best;
     }
 
-    private bool TryGetTileId(Vector2i indices, Entity<MapGridComponent> grid, BiomeComponent biome, out int tileId, out Color? relief)
+    private bool TryGetTileId(Vector2i indices, Entity<MapGridComponent> grid, BiomeComponent biome, out int tileId, out string? relief)
     {
         if (!_sampled.TryGetValue(indices, out var cached))
         {
             Entity<MapGridComponent>? gridArg = grid;
             int? tileType = null;
-            Color? reliefColor = null;
+            string? reliefId = null;
 
             if (_biome.TryGetBiomeTile(indices, biome.Layers, biome.Seed, gridArg, out var tile) && !tile.Value.IsEmpty)
             {
@@ -172,16 +190,61 @@ public sealed class PlanetMapCamera
 
                 // Rocks, crystals and plants of the biome are what gives the terrain its relief.
                 if (_biome.TryGetEntity(indices, biome.Layers, tile.Value, biome.Seed, gridArg, out var entityId))
-                    reliefColor = GetReliefColor(entityId);
+                    reliefId = entityId;
             }
 
-            cached = (tileType, reliefColor);
+            cached = (tileType, reliefId);
             _sampled[indices] = cached;
         }
 
         tileId = cached.Tile ?? 0;
         relief = cached.Relief;
         return cached.Tile != null;
+    }
+
+    private Texture? GetTileTexture(int tileId)
+    {
+        if (_tileTextures.TryGetValue(tileId, out var cached))
+            return cached;
+
+        Texture? texture = null;
+        try
+        {
+            if (_tileDefs[tileId] is ContentTileDefinition { Sprite: { } sprite })
+            {
+                texture = _cache.GetResource<TextureResource>(sprite).Texture;
+
+                // Tiles with variants keep them side by side in one strip: use the first one.
+                if (texture.Width > texture.Height)
+                    texture = new AtlasTexture(texture, UIBox2.FromDimensions(0f, 0f, texture.Height, texture.Height));
+            }
+        }
+        catch (Exception)
+        {
+            texture = null;
+        }
+
+        _tileTextures[tileId] = texture;
+        return texture;
+    }
+
+    private Texture? GetReliefTexture(string entityId)
+    {
+        if (_reliefTextures.TryGetValue(entityId, out var cached))
+            return cached;
+
+        Texture? texture = null;
+        try
+        {
+            texture = _sprites.GetPrototypeIcon(entityId).Default;
+        }
+        catch (Exception)
+        {
+            texture = null;
+        }
+
+        _reliefTextures[entityId] = texture;
+        return texture;
     }
 
     private Color GetReliefColor(string entityId)
