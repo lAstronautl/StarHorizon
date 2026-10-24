@@ -1,6 +1,7 @@
 using Content.Shared.Shuttles.Components;
 using Content.Shared.Procedural;
 using Content.Shared.Salvage.Expeditions;
+using Content.Shared.Salvage.Expeditions.Modifiers; // Horizon
 using Content.Shared.Dataset;
 using Robust.Shared.Prototypes;
 using Content.Server.Salvage.Expeditions; // Frontier
@@ -291,9 +292,24 @@ public sealed partial class SalvageSystem
             return;
 
         var scratch = new SalvageExpeditionDataComponent { NextIndex = _planetMissionIndex };
-        GenerateMissions(scratch);
+        GenerateMissions(scratch, difficulty => BiomeFitsDifficulty(planet.BiomeId, difficulty));
         _planetMissionIndex = scratch.NextIndex;
         planet.Missions.AddRange(scratch.Missions.Values);
+    }
+
+    /// <summary>A biome with dedicated difficulties (Ardonium wastes: Inferno) only offers those, every other biome offers the rest.</summary>
+    private bool BiomeFitsDifficulty(string biomeId, string difficultyId)
+    {
+        if (_prototypeManager.TryIndex<SalvageBiomeModPrototype>(biomeId, out var biome) && biome.Difficulties is { Count: > 0 })
+            return biome.Difficulties.Contains(difficultyId);
+
+        foreach (var other in _prototypeManager.EnumeratePrototypes<SalvageBiomeModPrototype>())
+        {
+            if (other.Difficulties != null && other.Difficulties.Contains(difficultyId))
+                return false;
+        }
+
+        return true;
     }
 
     private void RefreshAllConsoles()

@@ -122,6 +122,38 @@ public sealed class SectorMapIcons
         }
     }
 
+    /// <summary>Expedition planets as true-scale discs for the NAV tab.</summary>
+    public void DrawNavPlanets(
+        DrawingHandleScreen handle,
+        IEntityManager entMan,
+        SharedTransformSystem xformSys,
+        MapId mapId,
+        Func<Vector2, Vector2> toScreen,
+        float pixelsPerMeter,
+        UIBox2 bounds)
+    {
+        if (mapId == MapId.Nullspace)
+            return;
+
+        var time = (float) _timing.RealTime.TotalSeconds;
+        var query = entMan.AllEntityQueryEnumerator<ExpeditionPlanetComponent, TransformComponent>();
+        while (query.MoveNext(out var uid, out var planet, out var xform))
+        {
+            if (xform.MapID != mapId)
+                continue;
+
+            var center = toScreen(xformSys.GetWorldPosition(xform));
+            var size = Math.Max(planet.SpriteRadius * 2f * pixelsPerMeter, 6f);
+            if (!Visible(center, size, bounds))
+                continue;
+
+            var look = PixelPlanetBiomeLooks.Resolve(planet.BiomeId);
+            var shader = GetShader(uid, look.Kind);
+            PixelPlanetBiomeLooks.Apply(shader, look, time + planet.Seed, MapPixels, planet.Seed);
+            DrawShaderIcon(handle, shader, center, size);
+        }
+    }
+
     /// <summary>Called when the control is disposed, to free the per-planet shaders.</summary>
     public void Dispose()
     {

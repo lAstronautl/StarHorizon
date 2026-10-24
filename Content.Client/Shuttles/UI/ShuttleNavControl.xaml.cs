@@ -34,6 +34,7 @@ public partial class ShuttleNavControl : BaseShuttleControl // Mono
     protected override bool ScaleWithControlSize => true; // Lua
     private readonly SharedShuttleSystem _shuttles;
     private readonly SharedTransformSystem _transform;
+    private readonly SectorMapIcons _sectorIcons = new(); // Horizon: planet discs
 
     /// <summary>
     /// Used to transform all of the radar objects. Typically is a shuttle console parented to a grid.
@@ -411,6 +412,16 @@ public partial class ShuttleNavControl : BaseShuttleControl // Mono
 
         // Draw shields
         DrawShields(handle, xform, worldToShuttle);
+
+        // Horizon: expedition planets as discs
+        _sectorIcons.DrawNavPlanets(
+            handle,
+            EntManager,
+            _transform,
+            xform.MapID,
+            worldPoint => Vector2.Transform(Vector2.Transform(worldPoint, worldToShuttle), shuttleToView),
+            MinimapScale,
+            PixelRect);
 
         // Horizon: border rings of stars (solar boost zone) and black holes (pull / hazard / event horizon)
         SectorBodyRings.Draw(

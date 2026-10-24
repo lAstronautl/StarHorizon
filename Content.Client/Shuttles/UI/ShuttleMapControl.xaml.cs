@@ -2,6 +2,7 @@ using System.Buffers;
 using System.Numerics;
 using Content.Client.Shuttles.Systems;
 using Content.Client._Horizon.Shuttles; // Horizon
+using Content.Shared._Horizon.SpaceHazards; // Horizon
 using Content.Shared.Shuttles.BUIStates;
 using Content.Shared.Shuttles.Components;
 using Content.Shared.Shuttles.UI.MapObjects;
@@ -45,6 +46,8 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
     private EntityUid? _shuttleEntity;
 
     private readonly Font _font;
+    private bool _planetCameraActive;
+    private const float PlanetCameraMaxRange = 40f; // only about this much terrain around the shuttle is actually loaded
     private readonly PlanetMapCamera _planetCamera = new(); // Horizon: far-away camera instead of the parallax on planets
     private readonly SectorMapIcons _sectorIcons = new(); // Horizon: planet and threat icons
 
@@ -267,7 +270,8 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
         var bounds = UIBox2.FromDimensions(Vector2.Zero, PixelSize);
 
         // Horizon: on a planet show a far-away top-down camera (terrain + structures, no creatures) instead of the parallax.
-        if (!_planetCamera.TryDraw(handle, ViewingMap, _shuttleEntity, viewBox, p => MapToScreen(p, mapTransform), MinimapScale, bounds))
+        _planetCameraActive = _planetCamera.TryDraw(handle, ViewingMap, _shuttleEntity, viewBox, p => MapToScreen(p, mapTransform), MinimapScale, bounds);
+        if (!_planetCameraActive)
             DrawParallax(handle);
         // End Horizon
 
@@ -481,6 +485,10 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
 
     protected override void Draw(DrawingHandleScreen handle)
     {
+        // Horizon: on a planet don't zoom out past the area the game has loaded
+        if (_planetCameraActive && ActualRadarRange > PlanetCameraMaxRange)
+            ActualRadarRange = Math.Max(PlanetCameraMaxRange, WorldMinRange);
+
         base.Draw(handle);
 
         if (ViewingMap == MapId.Nullspace)
@@ -581,7 +589,9 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
 
                 AddMapObject(existingEdges, existingVerts, mapObject);
                 _beacons.Add(mapO);
-                _glyphs.Add((beaconUiPos, "◎", displayColor));
+                // Horizon: expedition planets already have a planet icon, and the beacon glyph is missing from the font
+                if (!(mapO is ShuttleBeaconObject beaconObject && EntManager.TryGetEntity(beaconObject.Entity, out var beaconEnt) && EntManager.HasComponent<ExpeditionPlanetComponent>(beaconEnt)))
+                    _glyphs.Add((beaconUiPos, "◎", displayColor));
             }
         }
 
