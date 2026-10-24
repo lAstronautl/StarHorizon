@@ -5,6 +5,7 @@ using Content.Shared.Maps;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Parallax.Biomes;
 using Content.Shared.Light.EntitySystems;
+using Content.Shared.Shuttles.Components;
 using Content.Shared.Light.Components;
 using Robust.Client.GameObjects;
 using Robust.Client.ResourceManagement;
@@ -165,6 +166,10 @@ public sealed class PlanetMapCamera
 
     private bool IsUnderRoof(TransformComponent xform)
     {
+        // Ships (grids with an IFF transponder) are always shown, roof or not.
+        if (xform.GridUid is { } shuttleGrid && _entMan.HasComponent<IFFComponent>(shuttleGrid))
+            return false;
+
         if ((xform.GridUid ?? xform.MapUid) is not { } gridUid
             || !_entMan.TryGetComponent(gridUid, out MapGridComponent? grid)
             || !_maps.TryGetTileRef(gridUid, grid, xform.Coordinates, out var tileRef))
