@@ -47,7 +47,6 @@ public static class SectorBodyRings
             {
                 Ring(handle, center, body.PullRadius, pixelsPerMeter, bounds, Pull);
                 Ring(handle, center, body.HazardRadius, pixelsPerMeter, bounds, Hazard);
-                Ring(handle, center, body.EventHorizonRadius, pixelsPerMeter, bounds, Horizon);
             }
             else
             {
