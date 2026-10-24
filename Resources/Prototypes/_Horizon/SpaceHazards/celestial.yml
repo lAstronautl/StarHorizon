@@ -17,11 +17,9 @@
     kind: Star
     spriteRadius: 32
     pixels: 1024
-    # Far from the star solar panels work 3x better; close to it (hazardRadius) hull and crew take damage.
-    # Same as the FTL exclusion below: the red circle on the shuttle console is both the FTL block and the damage zone.
     hazardRadius: 350
-    solarBoostRadius: 4000
-    solarBoostMultiplier: 3
+    solarBoostRadius: 2048
+    solarBoostMultiplier: 4
   - type: PointLight
     enabled: true
     color: "#77D6C1"
@@ -123,8 +121,9 @@
   # A beacon: the planet shows up as a labelled marker on the shuttle console MAP tab.
   - type: FTLBeacon
   - type: ExpeditionPlanet
-    spriteRadius: 40
-    range: 450
+    spriteRadius: 10
+    range: 250
+    pixels: 1024
   - type: RadarBlip
     radarColor: "#6BCB77"
     highlightedRadarColor: "#B8F2BD"
