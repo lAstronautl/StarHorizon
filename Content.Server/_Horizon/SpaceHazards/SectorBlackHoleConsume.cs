@@ -43,27 +43,7 @@ public static class SectorBlackHoleConsume
         if (horizonRadius <= 0f)
             return false;
 
-        var circle = new Circle(worldCenter, horizonRadius);
-        var r2 = horizonRadius * horizonRadius;
-
-        TileScratch.Clear();
-
-        foreach (var tileRef in maps.GetTilesIntersecting(gridUid, grid, circle))
-        {
-            if (tileRef.Tile.IsEmpty)
-                continue;
-
-            var center = maps.GridTileToWorldPos(gridUid, grid, tileRef.GridIndices);
-            if ((center - worldCenter).LengthSquared() > r2)
-                continue;
-
-            DeleteAnchoredOnTile(gridUid, grid, maps, entMan, tileRef.GridIndices);
-            TileScratch.Add((tileRef.GridIndices, Tile.Empty));
-        }
-
-        if (TileScratch.Count > 0)
-            maps.SetTiles(gridUid, grid, TileScratch);
-
+        // Horizon: touching the singularity no longer erases tiles; only grids that are almost entirely inside are swallowed.
         if (entMan.Deleted(gridUid) || entMan.IsQueuedForDeletion(gridUid))
             return true;
 

@@ -121,6 +121,10 @@ public sealed class SectorBlackHoleSystem : EntitySystem
                         _random);
                 }
 
+                // Horizon: shuttles are thrown through the singularity (or just damaged), never swallowed
+                if (HasComp<ShuttleComponent>(gridUid))
+                    continue;
+
                 SectorBlackHoleConsume.TryEraseAndMaybeSwallow(
                     uid,
                     gridUid,
