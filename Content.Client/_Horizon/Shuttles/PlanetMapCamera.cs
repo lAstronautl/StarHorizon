@@ -4,6 +4,8 @@ using Content.Shared.Ghost;
 using Content.Shared.Maps;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Parallax.Biomes;
+using Content.Shared.Light.EntitySystems;
+using Content.Shared.Light.Components;
 using Robust.Client.GameObjects;
 using Robust.Client.ResourceManagement;
 using Robust.Client.Utility;
@@ -37,6 +39,7 @@ public sealed class PlanetMapCamera
     private readonly SharedMapSystem _maps;
     private readonly SharedTransformSystem _xform;
     private readonly EntityLookupSystem _lookup;
+    private readonly SharedRoofSystem _roof;
 
     private readonly Dictionary<int, Color> _tileColors = new();
     private readonly Dictionary<int, Texture?> _tileTextures = new();
@@ -49,6 +52,7 @@ public sealed class PlanetMapCamera
         _maps = sys.GetEntitySystem<SharedMapSystem>();
         _xform = sys.GetEntitySystem<SharedTransformSystem>();
         _lookup = sys.GetEntitySystem<EntityLookupSystem>();
+        _roof = sys.GetEntitySystem<SharedRoofSystem>();
     }
 
     /// <summary>True when <paramref name="mapId"/> is a planet the shuttle is on and the camera was drawn.</summary>
@@ -149,10 +153,30 @@ public sealed class PlanetMapCamera
                 continue;
             }
 
+            // Anything under a roof (a tile that weather cannot reach, or a roofed one) is hidden: only the tile shows.
+            if (IsUnderRoof(xform))
+                continue;
+
             var pos = toScreen(_xform.GetWorldPosition(xform));
             handle.DrawEntity(uid, pos, scale, -_xform.GetWorldRotation(xform), Angle.Zero, Direction.South, sprite);
             drawn++;
         }
+    }
+
+    private bool IsUnderRoof(TransformComponent xform)
+    {
+        if ((xform.GridUid ?? xform.MapUid) is not { } gridUid
+            || !_entMan.TryGetComponent(gridUid, out MapGridComponent? grid)
+            || !_maps.TryGetTileRef(gridUid, grid, xform.Coordinates, out var tileRef))
+        {
+            return false;
+        }
+
+        // Only the tile and the roof marker count, not entities that happen to block weather (walls, rocks).
+        if (_entMan.TryGetComponent(gridUid, out RoofComponent? roof) && _roof.IsRooved((gridUid, grid, roof), tileRef.GridIndices))
+            return true;
+
+        return !tileRef.Tile.IsEmpty && _tileDefs[tileRef.Tile.TypeId] is ContentTileDefinition { Weather: false };
     }
 
     private Texture? GetTileTexture(int tileId)
