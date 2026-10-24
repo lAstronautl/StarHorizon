@@ -21,8 +21,8 @@ namespace Content.Client._Horizon.Shuttles;
 /// <summary>
 /// Draws a far-away top-down "camera" of the planet around the shuttle as the background of the shuttle console
 /// MAP tab, in place of the parallax. Terrain comes from the biome (computed on the client, so it also shows the
-/// parts that are not loaded yet) with real tiles taking priority; structures and items are drawn from the loaded
-/// entities. Living creatures are left out on purpose.
+/// parts that are not loaded yet). Only terrain is drawn: structures, items and creatures stay hidden so the
+/// expedition's complex is not given away.
 /// </summary>
 public sealed class PlanetMapCamera
 {
@@ -45,6 +45,8 @@ public sealed class PlanetMapCamera
     private readonly Dictionary<int, Color> _tileColors = new();
     private readonly Dictionary<Vector2i, int?> _sampled = new();
     private readonly HashSet<Entity<SpriteComponent>> _entityScratch = new();
+    private readonly Dictionary<int, int> _tileCounts = new();
+    private int? _dominantTile;
     private TimeSpan _cacheExpires;
     private MapId _cachedMap = MapId.Nullspace;
 
@@ -91,10 +93,10 @@ public sealed class PlanetMapCamera
             _cacheExpires = _timing.RealTime + CacheLifetime;
         }
 
-        handle.DrawRect(bounds, Backdrop);
+        // Cells without a tile (not generated / chasms) take the planet's dominant ground colour instead of black.
+        handle.DrawRect(bounds, _dominantTile is { } dominant ? GetTileColor(dominant) : Backdrop);
 
         DrawTerrain(handle, (mapUid, grid), biome, viewBox, toScreen, pixelsPerMeter);
-        DrawEntities(handle, mapId, viewBox, toScreen, pixelsPerMeter);
         return true;
     }
 
@@ -124,6 +126,7 @@ public sealed class PlanetMapCamera
             maxY = (int) MathF.Ceiling(viewBox.Top / cell) * cell;
         }
 
+        _tileCounts.Clear();
         for (var x = minX; x < maxX; x += cell)
         {
             for (var y = minY; y < maxY; y += cell)
@@ -139,8 +142,19 @@ public sealed class PlanetMapCamera
                     MathF.Max(a.X, b.X), MathF.Max(a.Y, b.Y));
 
                 handle.DrawRect(box, GetTileColor(tileId));
+                _tileCounts[tileId] = _tileCounts.GetValueOrDefault(tileId) + 1;
             }
         }
+
+        var best = -1;
+        foreach (var (id, count) in _tileCounts)
+        {
+            if (best < 0 || count > _tileCounts[best])
+                best = id;
+        }
+
+        if (best >= 0)
+            _dominantTile = best;
     }
 
     private bool TryGetTileId(Vector2i indices, Entity<MapGridComponent> grid, BiomeComponent biome, out int tileId)
@@ -200,40 +214,6 @@ public sealed class PlanetMapCamera
         catch (Exception)
         {
             return fallback;
-        }
-    }
-
-    private void DrawEntities(
-        DrawingHandleScreen handle,
-        MapId mapId,
-        Box2 viewBox,
-        Func<Vector2, Vector2> toScreen,
-        float pixelsPerMeter)
-    {
-        // Sprites are authored at 32 px per meter; scale them so that one meter is `pixelsPerMeter` map pixels.
-        var scale = new Vector2(pixelsPerMeter / 32f);
-
-        _entityScratch.Clear();
-        _lookup.GetEntitiesIntersecting(mapId, viewBox, _entityScratch, LookupFlags.Static | LookupFlags.Dynamic | LookupFlags.Sundries);
-
-        var drawn = 0;
-        foreach (var (uid, sprite) in _entityScratch)
-        {
-            if (drawn >= MaxEntities)
-                break;
-
-            if (!sprite.Visible
-                || _entMan.HasComponent<MobStateComponent>(uid)
-                || _entMan.HasComponent<GhostComponent>(uid)
-                || !_entMan.TryGetComponent(uid, out TransformComponent? xform)
-                || xform.ParentUid != xform.GridUid && xform.ParentUid != xform.MapUid)
-            {
-                continue;
-            }
-
-            var pos = toScreen(_xform.GetWorldPosition(xform));
-            handle.DrawEntity(uid, pos, scale, -_xform.GetWorldRotation(xform), Angle.Zero, Direction.South, sprite);
-            drawn++;
         }
     }
 }
