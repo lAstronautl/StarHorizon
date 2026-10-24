@@ -90,22 +90,7 @@ public sealed class SectorMapIcons
             {
                 // The same accretion-disk shader as in the world, big enough to see the disk around the hole.
                 var holeSize = Math.Clamp(size * BlackHoleIconScale, MinIconPixels, MaxIconPixels * BlackHoleIconScale);
-                var holeShader = GetBlackHoleShader(uid);
-                holeShader.SetParameter("time", time * 0.2f);
-                holeShader.SetParameter("pixels", MapPixels * 2f);
-                holeShader.SetParameter("pixels_ring", MapPixels * 2f);
-                holeShader.SetParameter("seed", body.Seed);
-                holeShader.SetParameter("rotation", 0.766f);
-                holeShader.SetParameter("time_speed", 0.2f);
-                holeShader.SetParameter("should_dither", 0f);
-                holeShader.SetParameter("disk_width", 0.065f);
-                holeShader.SetParameter("ring_perspective", 14f);
-                holeShader.SetParameter("disk_size", 6.598f);
-                holeShader.SetParameter("octaves", 3f);
-                holeShader.SetParameter("hole_radius", 0.247f);
-                holeShader.SetParameter("hole_light_width", 0.028f);
-                PixelPlanetPalettes.ApplyBlackHole(holeShader, body.Palette);
-                DrawShaderIcon(handle, holeShader, center, holeSize);
+                DrawBlackHole(handle, uid, body, center, holeSize, time);
                 DrawLabel(handle, Loc.GetString("sector-map-black-hole"), center, size, BlackHoleColor);
             }
             else
@@ -148,6 +133,39 @@ public sealed class SectorMapIcons
             var shader = GetShader(uid, look.Kind);
             PixelPlanetBiomeLooks.Apply(shader, look, time + planet.Seed, MapPixels, planet.Seed);
             DrawShaderIcon(handle, shader, center, size);
+        }
+    }
+
+    /// <summary>Stars and black holes at their true size for the NAV tab.</summary>
+    public void DrawNavBodies(
+        DrawingHandleScreen handle,
+        IEntityManager entMan,
+        SharedTransformSystem xformSys,
+        MapId mapId,
+        Func<Vector2, Vector2> toScreen,
+        float pixelsPerMeter,
+        UIBox2 bounds)
+    {
+        if (mapId == MapId.Nullspace)
+            return;
+
+        var time = (float) _timing.RealTime.TotalSeconds;
+        var bodies = entMan.AllEntityQueryEnumerator<SectorCelestialBodyComponent, TransformComponent>();
+        while (bodies.MoveNext(out var uid, out var body, out var xform))
+        {
+            if (xform.MapID != mapId)
+                continue;
+
+            var center = toScreen(xformSys.GetWorldPosition(xform));
+            var size = Math.Max(body.SpriteRadius * 2f * pixelsPerMeter, 6f);
+            var reach = body.Kind == CelestialKind.BlackHole ? size * BlackHoleIconScale : size * StarOuterScale;
+            if (!Visible(center, reach, bounds))
+                continue;
+
+            if (body.Kind == CelestialKind.BlackHole)
+                DrawBlackHole(handle, uid, body, center, size * BlackHoleIconScale, time + body.Seed);
+            else
+                DrawStar(handle, uid, body, center, size, time + body.Seed);
         }
     }
 
@@ -220,6 +238,26 @@ public sealed class SectorMapIcons
         flares.SetParameter("circle_scale", 1f);
         PixelPlanetPalettes.ApplyStarFlares(flares, body.Palette);
         DrawShaderIcon(handle, flares, center, outerSize);
+    }
+
+    private void DrawBlackHole(DrawingHandleScreen handle, EntityUid uid, SectorCelestialBodyComponent body, Vector2 center, float size, float time)
+    {
+        var holeShader = GetBlackHoleShader(uid);
+        holeShader.SetParameter("time", time * 0.2f);
+        holeShader.SetParameter("pixels", MapPixels * 2f);
+        holeShader.SetParameter("pixels_ring", MapPixels * 2f);
+        holeShader.SetParameter("seed", body.Seed);
+        holeShader.SetParameter("rotation", 0.766f);
+        holeShader.SetParameter("time_speed", 0.2f);
+        holeShader.SetParameter("should_dither", 0f);
+        holeShader.SetParameter("disk_width", 0.065f);
+        holeShader.SetParameter("ring_perspective", 14f);
+        holeShader.SetParameter("disk_size", 6.598f);
+        holeShader.SetParameter("octaves", 3f);
+        holeShader.SetParameter("hole_radius", 0.247f);
+        holeShader.SetParameter("hole_light_width", 0.028f);
+        PixelPlanetPalettes.ApplyBlackHole(holeShader, body.Palette);
+        DrawShaderIcon(handle, holeShader, center, size);
     }
 
     private ShaderInstance GetBlackHoleShader(EntityUid uid)
