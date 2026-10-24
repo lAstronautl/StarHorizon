@@ -591,10 +591,12 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
 
                 AddMapObject(existingEdges, existingVerts, mapObject);
                 _beacons.Add(mapO);
-                _beaconLabels.Add((beaconUiPos, beaconName, displayColor)); // Horizon
                 // Horizon: expedition planets already have a planet icon, and the beacon glyph is missing from the font
                 if (!(mapO is ShuttleBeaconObject beaconObject && EntManager.TryGetEntity(beaconObject.Entity, out var beaconEnt) && EntManager.HasComponent<ExpeditionPlanetComponent>(beaconEnt)))
+                {
                     _glyphs.Add((beaconUiPos, "◎", displayColor));
+                    _beaconLabels.Add((beaconUiPos, beaconName, displayColor)); // Horizon: planets draw their own name next to their icon
+                }
             }
         }
 

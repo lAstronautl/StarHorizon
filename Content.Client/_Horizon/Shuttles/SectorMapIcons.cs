@@ -67,27 +67,7 @@ public sealed class SectorMapIcons
             var shader = GetShader(uid, look.Kind);
             PixelPlanetBiomeLooks.Apply(shader, look, time + planet.Seed, MapPixels, planet.Seed);
             DrawShaderIcon(handle, shader, center, size);
-            // The name is drawn by the beacon marker of the planet, so no label here.
-        }
-
-        // Decorative far-away planets.
-        var background = entMan.AllEntityQueryEnumerator<SectorBackgroundPlanetComponent, TransformComponent>();
-        while (background.MoveNext(out var uid, out var planet, out var xform))
-        {
-            if (xform.MapID != mapId)
-                continue;
-
-            var center = toScreen(xformSys.GetWorldPosition(xform));
-            var size = IconSize(planet.SpriteRadius, pixelsPerMeter);
-            if (!Visible(center, size, bounds))
-                continue;
-
-            var shader = GetShader(uid, planet.PlanetKind);
-            PixelPlanetShaderSetup.Configure(shader, planet.PlanetKind, time + planet.Seed, MapPixels, planet.Seed,
-                planet.Rotation, new Vector2(planet.LightOriginX, planet.LightOriginY));
-            PixelPlanetPalettes.ApplyPlanet(shader, planet.PlanetKind, planet.PaletteIndex);
-            DrawShaderIcon(handle, shader, center, size);
-            DrawLabel(handle, Loc.GetString("sector-map-planet"), center, size, Color.FromHex("#C5CEDB"));
+            DrawLabel(handle, meta.EntityName, center, size, Color.FromHex("#B8F2BD"));
         }
 
         // Threats: black holes and stars.
