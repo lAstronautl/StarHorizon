@@ -43,7 +43,8 @@ public sealed class PlanetMapCamera
     private readonly EntityLookupSystem _lookup;
 
     private readonly Dictionary<int, Color> _tileColors = new();
-    private readonly Dictionary<Vector2i, int?> _sampled = new();
+    private readonly Dictionary<Vector2i, (int? Tile, Color? Relief)> _sampled = new();
+    private readonly Dictionary<string, Color> _reliefColors = new();
     private readonly HashSet<Entity<SpriteComponent>> _entityScratch = new();
     private readonly Dictionary<int, int> _tileCounts = new();
     private int? _dominantTile;
@@ -132,7 +133,7 @@ public sealed class PlanetMapCamera
             for (var y = minY; y < maxY; y += cell)
             {
                 var sample = new Vector2i(x + cell / 2, y + cell / 2);
-                if (!TryGetTileId(sample, grid, biome, out var tileId))
+                if (!TryGetTileId(sample, grid, biome, out var tileId, out var relief))
                     continue;
 
                 var a = toScreen(new Vector2(x, y));
@@ -141,7 +142,7 @@ public sealed class PlanetMapCamera
                     MathF.Min(a.X, b.X), MathF.Min(a.Y, b.Y),
                     MathF.Max(a.X, b.X), MathF.Max(a.Y, b.Y));
 
-                handle.DrawRect(box, GetTileColor(tileId));
+                handle.DrawRect(box, relief ?? GetTileColor(tileId));
                 _tileCounts[tileId] = _tileCounts.GetValueOrDefault(tileId) + 1;
             }
         }
@@ -157,19 +158,51 @@ public sealed class PlanetMapCamera
             _dominantTile = best;
     }
 
-    private bool TryGetTileId(Vector2i indices, Entity<MapGridComponent> grid, BiomeComponent biome, out int tileId)
+    private bool TryGetTileId(Vector2i indices, Entity<MapGridComponent> grid, BiomeComponent biome, out int tileId, out Color? relief)
     {
         if (!_sampled.TryGetValue(indices, out var cached))
         {
             Entity<MapGridComponent>? gridArg = grid;
-            cached = _biome.TryGetBiomeTile(indices, biome.Layers, biome.Seed, gridArg, out var tile) && !tile.Value.IsEmpty
-                ? tile.Value.TypeId
-                : null;
+            int? tileType = null;
+            Color? reliefColor = null;
+
+            if (_biome.TryGetBiomeTile(indices, biome.Layers, biome.Seed, gridArg, out var tile) && !tile.Value.IsEmpty)
+            {
+                tileType = tile.Value.TypeId;
+
+                // Rocks, crystals and plants of the biome are what gives the terrain its relief.
+                if (_biome.TryGetEntity(indices, biome.Layers, tile.Value, biome.Seed, gridArg, out var entityId))
+                    reliefColor = GetReliefColor(entityId);
+            }
+
+            cached = (tileType, reliefColor);
             _sampled[indices] = cached;
         }
 
-        tileId = cached ?? 0;
-        return cached != null;
+        tileId = cached.Tile ?? 0;
+        relief = cached.Relief;
+        return cached.Tile != null;
+    }
+
+    private Color GetReliefColor(string entityId)
+    {
+        if (_reliefColors.TryGetValue(entityId, out var color))
+            return color;
+
+        var id = entityId.ToLowerInvariant();
+        if (id.Contains("crystal") || id.Contains("ore") || id.Contains("gem"))
+            color = new Color(0.45f, 0.78f, 0.85f);
+        else if (id.Contains("flora") || id.Contains("tree") || id.Contains("grass") || id.Contains("bush") || id.Contains("plant"))
+            color = new Color(0.18f, 0.42f, 0.2f);
+        else if (id.Contains("snow") || id.Contains("ice"))
+            color = new Color(0.85f, 0.9f, 0.95f);
+        else if (id.Contains("wall") || id.Contains("rock") || id.Contains("stalag") || id.Contains("asteroid"))
+            color = new Color(0.22f, 0.2f, 0.19f);
+        else
+            color = Color.FromHsv(new Vector4((entityId.GetHashCode() & 0xFF) / 255f, 0.25f, 0.4f, 1f));
+
+        _reliefColors[entityId] = color;
+        return color;
     }
 
     private Color GetTileColor(int tileId)
