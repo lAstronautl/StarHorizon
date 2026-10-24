@@ -47,7 +47,10 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
 
     private readonly Font _font;
     private bool _planetCameraActive;
-    private const float PlanetCameraMaxRange = 40f; // only about this much terrain around the shuttle is actually loaded
+    private const float PlanetCameraMinRange = 16f;
+    private const float PlanetCameraMaxRange = 48f; // only about this much terrain around the shuttle is actually loaded
+    private float? _defaultMinRange;
+    private float? _defaultMaxRange;
     private readonly PlanetMapCamera _planetCamera = new(); // Horizon: far-away camera instead of the parallax on planets
     private readonly SectorMapIcons _sectorIcons = new(); // Horizon: planet and threat icons
 
@@ -487,8 +490,11 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
     protected override void Draw(DrawingHandleScreen handle)
     {
         // Horizon: on a planet don't zoom out past the area the game has loaded
-        if (_planetCameraActive && ActualRadarRange > PlanetCameraMaxRange)
-            ActualRadarRange = Math.Max(PlanetCameraMaxRange, WorldMinRange);
+        _defaultMinRange ??= WorldMinRange;
+        _defaultMaxRange ??= WorldMaxRange;
+        WorldMinRange = _planetCameraActive ? PlanetCameraMinRange : _defaultMinRange.Value;
+        WorldMaxRange = _planetCameraActive ? PlanetCameraMaxRange : _defaultMaxRange.Value;
+        ActualRadarRange = Math.Clamp(ActualRadarRange, WorldMinRange, WorldMaxRange);
 
         base.Draw(handle);
 

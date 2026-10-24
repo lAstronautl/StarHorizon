@@ -1,3 +1,5 @@
+using Content.Shared.Damage;
+using Content.Shared.Damage.Components;
 // LuaCorp - This file is licensed under AGPLv3
 // Copyright (c) 2026 LuaCorp Contributors
 // See AGPLv3.txt for details.
@@ -91,6 +93,8 @@ public static class SectorBlackHoleConsume
         float horizonRadius,
         float pullAcceleration,
         float dt,
+        DamageSpecifier horizonDamage,
+        DamageableSystem damageable,
         EntityLookupSystem lookup,
         SharedTransformSystem transform,
         SharedPhysicsSystem physics,
@@ -120,7 +124,9 @@ public static class SectorBlackHoleConsume
 
             if (distSq <= consumeR2)
             {
-                entMan.DeleteEntity(uid);
+                // Horizon: things touching the singularity are hurt, not deleted
+                if (!horizonDamage.Empty && entMan.HasComponent<DamageableComponent>(uid))
+                    damageable.TryChangeDamage(uid, horizonDamage, ignoreResistances: true, interruptsDoAfters: false);
                 continue;
             }
 
