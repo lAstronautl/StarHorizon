@@ -50,8 +50,7 @@ public static class SectorBodyRings
             }
             else
             {
-                if (!body.Harmless)
-                    Ring(handle, center, body.HazardRadius, pixelsPerMeter, bounds, StarHazard);
+                Ring(handle, center, body.HazardRadius, pixelsPerMeter, bounds, StarHazard);
 
                 Ring(handle, center, body.SolarBoostRadius, pixelsPerMeter, bounds, SolarBoost);
             }

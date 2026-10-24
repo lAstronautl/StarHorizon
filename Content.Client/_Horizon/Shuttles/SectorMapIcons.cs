@@ -18,6 +18,7 @@ public sealed class SectorMapIcons
     private const float MinIconPixels = 22f;
     private const float MaxIconPixels = 72f;
     private const float MapPixels = 48f;
+    private const float StarOuterScale = 3f; // blobs and flares extend beyond the surface
     private const float BlackHoleIconScale = 3f; // the disk reaches far beyond the hole itself
 
     private static readonly Color BlackHoleColor = Color.FromHex("#A040FF");
@@ -30,6 +31,7 @@ public sealed class SectorMapIcons
     [Dependency] private readonly IResourceCache _cache = default!;
 
     private readonly Dictionary<EntityUid, ShaderInstance> _shaders = new();
+    private readonly Dictionary<EntityUid, (ShaderInstance Blobs, ShaderInstance Star, ShaderInstance Flares)> _starShaders = new();
     private readonly Font _font;
 
     public SectorMapIcons()
@@ -108,10 +110,9 @@ public sealed class SectorMapIcons
             }
             else
             {
-                handle.DrawCircle(center, radius, StarColor.WithAlpha(0.9f));
-                handle.DrawCircle(center, radius, Color.White.WithAlpha(0.6f), filled: false);
+                DrawStar(handle, uid, body, center, size, time);
                 var label = body.SolarBoostMultiplier > 1f
-                    ? Loc.GetString(body.Harmless ? "sector-map-star-safe" : "sector-map-star-boost", ("multiplier", body.SolarBoostMultiplier.ToString("0.#")))
+                    ? Loc.GetString("sector-map-star-boost", ("multiplier", body.SolarBoostMultiplier.ToString("0.#")))
                     : Loc.GetString("sector-map-star");
                 DrawLabel(handle, label, center, size, StarColor);
             }
@@ -156,7 +157,69 @@ public sealed class SectorMapIcons
         foreach (var shader in _shaders.Values)
             shader.Dispose();
 
+        foreach (var (blobs, star, flares) in _starShaders.Values)
+        {
+            blobs.Dispose();
+            star.Dispose();
+            flares.Dispose();
+        }
+
+        _starShaders.Clear();
         _shaders.Clear();
+    }
+
+    /// <summary>The same three passes as the world star: outer blobs, the surface and the flares.</summary>
+    private void DrawStar(DrawingHandleScreen handle, EntityUid uid, SectorCelestialBodyComponent body, Vector2 center, float size, float time)
+    {
+        if (!_starShaders.TryGetValue(uid, out var set))
+        {
+            set = (_protos.Index<ShaderPrototype>("PixelStarBlobs").InstanceUnique(),
+                _protos.Index<ShaderPrototype>("PixelStar").InstanceUnique(),
+                _protos.Index<ShaderPrototype>("PixelStarFlares").InstanceUnique());
+            _starShaders[uid] = set;
+        }
+
+        var (blobs, star, flares) = set;
+        var speed = 0.05f * PixelPlanetShaderSetup.AnimSpeedScale;
+        var outerSize = size * StarOuterScale;
+        var outerPixels = MapPixels * StarOuterScale;
+
+        blobs.SetParameter("time", time);
+        blobs.SetParameter("pixels", outerPixels);
+        blobs.SetParameter("seed", body.Seed);
+        blobs.SetParameter("rotation", 0f);
+        blobs.SetParameter("time_speed", speed);
+        blobs.SetParameter("size", 4.93f);
+        blobs.SetParameter("circle_amount", 2f);
+        blobs.SetParameter("circle_size", 1f);
+        PixelPlanetPalettes.ApplyStarBlobs(blobs, body.Palette);
+        DrawShaderIcon(handle, blobs, center, outerSize);
+
+        star.SetParameter("time", time);
+        star.SetParameter("pixels", MapPixels);
+        star.SetParameter("seed", body.Seed);
+        star.SetParameter("rotation", 0f);
+        star.SetParameter("time_speed", speed);
+        star.SetParameter("should_dither", 0f);
+        star.SetParameter("tiles", 1f);
+        PixelPlanetPalettes.ApplyStar(star, body.Palette);
+        DrawShaderIcon(handle, star, center, size);
+
+        flares.SetParameter("time", time);
+        flares.SetParameter("pixels", outerPixels);
+        flares.SetParameter("seed", body.Seed);
+        flares.SetParameter("rotation", 0f);
+        flares.SetParameter("time_speed", speed);
+        flares.SetParameter("should_dither", 0f);
+        flares.SetParameter("size", 1.6f);
+        flares.SetParameter("octaves", 4f);
+        flares.SetParameter("storm_width", 0.3f);
+        flares.SetParameter("storm_dither_width", 0f);
+        flares.SetParameter("flare_scale", 1f);
+        flares.SetParameter("circle_amount", 2f);
+        flares.SetParameter("circle_scale", 1f);
+        PixelPlanetPalettes.ApplyStarFlares(flares, body.Palette);
+        DrawShaderIcon(handle, flares, center, outerSize);
     }
 
     private ShaderInstance GetBlackHoleShader(EntityUid uid)

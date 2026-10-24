@@ -18,7 +18,6 @@
     spriteRadius: 32
     pixels: 1024
     # Far from the star solar panels work 3x better; close to it (hazardRadius) hull and crew take damage.
-    harmless: false
     hazardRadius: 300
     solarBoostRadius: 4000
     solarBoostMultiplier: 3
