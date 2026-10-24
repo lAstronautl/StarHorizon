@@ -40,7 +40,6 @@ public sealed class SectorBlackHoleSystem : EntitySystem
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly SpaceHazardActivitySystem _activity = default!;
     [Dependency] private readonly TemperatureSystem _temperature = default!;
-    [Dependency] private readonly LinkedLifecycleGridSystem _linkedLifecycle = default!;
     [Dependency] private readonly ShuttleSystem _shuttle = default!;
     [Dependency] private readonly SingularityTransitSystem _transit = default!;
 
@@ -120,21 +119,6 @@ public sealed class SectorBlackHoleSystem : EntitySystem
                         EntityManager,
                         _random);
                 }
-
-                // Horizon: shuttles are thrown through the singularity (or just damaged), never swallowed
-                if (HasComp<ShuttleComponent>(gridUid))
-                    continue;
-
-                SectorBlackHoleConsume.TryEraseAndMaybeSwallow(
-                    uid,
-                    gridUid,
-                    grid.Comp,
-                    pos,
-                    horizonR,
-                    _maps,
-                    _transform,
-                    EntityManager,
-                    _linkedLifecycle);
             }
 
             SectorCelestialMobDamage.ApplyHazardToMobsInRadius(
