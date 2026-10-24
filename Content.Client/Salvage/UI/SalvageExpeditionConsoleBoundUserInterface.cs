@@ -52,8 +52,33 @@ public sealed class SalvageExpeditionConsoleBoundUserInterface : BoundUserInterf
         _window.NextOffer = current.NextOffer;
         _window.Claimed = current.Claimed;
         _window.SetFinishDisabled(!current.CanFinish); // Frontier
-        _window.Title = Loc.GetString(current.NoPlanet ? "salvage-expedition-window-title-no-planet" : "salvage-expedition-window-title"); // Horizon
+        _window.Title = Loc.GetString("salvage-expedition-window-title");
         _window.ClearOptions();
+
+        // Horizon: nothing to offer away from a planet, say so in the middle of the window
+        if (current.NoPlanet)
+        {
+            var message = new BoxContainer
+            {
+                Orientation = BoxContainer.LayoutOrientation.Vertical,
+                HorizontalExpand = true,
+                VerticalExpand = true,
+                HorizontalAlignment = Control.HAlignment.Center,
+                VerticalAlignment = Control.VAlignment.Center,
+            };
+            message.AddChild(new Label
+            {
+                Text = Loc.GetString("salvage-expedition-no-planet-title"),
+                HorizontalAlignment = Control.HAlignment.Center,
+            });
+            message.AddChild(new Label
+            {
+                Text = Loc.GetString("salvage-expedition-no-planet-hint"),
+                HorizontalAlignment = Control.HAlignment.Center,
+                Modulate = Color.Gray,
+            });
+            _window.AddMessage(message);
+        }
         var salvage = _entManager.System<SalvageSystem>();
 
         for (var i = 0; i < current.Missions.Count; i++)
