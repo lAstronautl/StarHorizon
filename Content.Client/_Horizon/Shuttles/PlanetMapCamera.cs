@@ -22,14 +22,15 @@ namespace Content.Client._Horizon.Shuttles;
 /// <summary>
 /// Draws a far-away top-down "camera" of the planet around the shuttle as the background of the shuttle console
 /// MAP tab, in place of the parallax. Terrain comes from the biome (computed on the client, so it also shows the
-/// parts that are not loaded yet). Only terrain is drawn: structures, items and creatures stay hidden so the
-/// expedition's complex is not given away.
+/// parts that are not loaded yet). Around the camera, whatever the game has really loaded is drawn on top: tiles and
+/// entities. Living creatures are left out on purpose.
 /// </summary>
 public sealed class PlanetMapCamera
 {
     private const float TargetCellPixels = 5f;
     private const int MaxCells = 12000;
     private const int MaxEntities = 1200;
+    private const float LoadedDetailRange = 48f;
     private static readonly TimeSpan CacheLifetime = TimeSpan.FromSeconds(5);
     private static readonly Color Backdrop = new(0.02f, 0.02f, 0.035f);
 
@@ -104,6 +105,8 @@ public sealed class PlanetMapCamera
         handle.DrawRect(bounds, _dominantTile is { } dominant ? GetTileColor(dominant) : Backdrop);
 
         DrawTerrain(handle, (mapUid, grid), biome, viewBox, toScreen, pixelsPerMeter);
+        DrawLoadedTiles(handle, (mapUid, grid), viewBox, toScreen, pixelsPerMeter);
+        DrawEntities(handle, mapId, viewBox, toScreen, pixelsPerMeter);
         return true;
     }
 
@@ -176,6 +179,80 @@ public sealed class PlanetMapCamera
             _dominantTile = best;
     }
 
+    /// <summary>The tiles the game has really loaded around the camera, one by one at full detail.</summary>
+    private void DrawLoadedTiles(
+        DrawingHandleScreen handle,
+        Entity<MapGridComponent> grid,
+        Box2 viewBox,
+        Func<Vector2, Vector2> toScreen,
+        float pixelsPerMeter)
+    {
+        // Loaded ground is a limited area around whoever is looking; at this scale a tile is only a few pixels.
+        var area = Box2.CenteredAround(viewBox.Center, new Vector2(LoadedDetailRange * 2f));
+        var visible = viewBox.Intersect(area);
+        if (visible.IsEmpty() || pixelsPerMeter < 0.5f)
+            return;
+
+        var minX = (int) MathF.Floor(visible.Left);
+        var maxX = (int) MathF.Ceiling(visible.Right);
+        var minY = (int) MathF.Floor(visible.Bottom);
+        var maxY = (int) MathF.Ceiling(visible.Top);
+
+        for (var x = minX; x < maxX; x++)
+        {
+            for (var y = minY; y < maxY; y++)
+            {
+                if (!_maps.TryGetTileRef(grid.Owner, grid.Comp, new Vector2i(x, y), out var tileRef) || tileRef.Tile.IsEmpty)
+                    continue;
+
+                var a = toScreen(new Vector2(x, y));
+                var b = toScreen(new Vector2(x + 1, y + 1));
+                var box = new UIBox2(
+                    MathF.Min(a.X, b.X), MathF.Min(a.Y, b.Y),
+                    MathF.Max(a.X, b.X), MathF.Max(a.Y, b.Y));
+
+                if (GetTileTexture(tileRef.Tile.TypeId) is { } texture)
+                    handle.DrawTextureRect(texture, box);
+                else
+                    handle.DrawRect(box, GetTileColor(tileRef.Tile.TypeId));
+            }
+        }
+    }
+
+    private void DrawEntities(
+        DrawingHandleScreen handle,
+        MapId mapId,
+        Box2 viewBox,
+        Func<Vector2, Vector2> toScreen,
+        float pixelsPerMeter)
+    {
+        // Sprites are authored at 32 px per meter; scale them so that one meter is `pixelsPerMeter` map pixels.
+        var scale = new Vector2(pixelsPerMeter / 32f);
+
+        _entityScratch.Clear();
+        _lookup.GetEntitiesIntersecting(mapId, viewBox, _entityScratch, LookupFlags.Static | LookupFlags.Dynamic | LookupFlags.Sundries);
+
+        var drawn = 0;
+        foreach (var (uid, sprite) in _entityScratch)
+        {
+            if (drawn >= MaxEntities)
+                break;
+
+            if (!sprite.Visible
+                || _entMan.HasComponent<MobStateComponent>(uid)
+                || _entMan.HasComponent<GhostComponent>(uid)
+                || !_entMan.TryGetComponent(uid, out TransformComponent? xform)
+                || xform.ParentUid != xform.GridUid && xform.ParentUid != xform.MapUid)
+            {
+                continue;
+            }
+
+            var pos = toScreen(_xform.GetWorldPosition(xform));
+            handle.DrawEntity(uid, pos, scale, -_xform.GetWorldRotation(xform), Angle.Zero, Direction.South, sprite);
+            drawn++;
+        }
+    }
+
     private bool TryGetTileId(Vector2i indices, Entity<MapGridComponent> grid, BiomeComponent biome, out int tileId, out string? relief)
     {
         if (!_sampled.TryGetValue(indices, out var cached))
@@ -189,7 +266,9 @@ public sealed class PlanetMapCamera
                 tileType = tile.Value.TypeId;
 
                 // Rocks, crystals and plants of the biome are what gives the terrain its relief.
-                if (_biome.TryGetEntity(indices, biome.Layers, tile.Value, biome.Seed, gridArg, out var entityId))
+                // Where the real tile is loaded the real entities are drawn instead.
+                var loaded = _maps.TryGetTileRef(grid.Owner, grid.Comp, indices, out var loadedTile) && !loadedTile.Tile.IsEmpty;
+                if (!loaded && _biome.TryGetEntity(indices, biome.Layers, tile.Value, biome.Seed, gridArg, out var entityId))
                     reliefId = entityId;
             }
 

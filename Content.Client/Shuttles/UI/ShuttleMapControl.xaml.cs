@@ -3,6 +3,7 @@ using System.Numerics;
 using Content.Client.Shuttles.Systems;
 using Content.Client._Horizon.Shuttles; // Horizon
 using Content.Shared._Horizon.SpaceHazards; // Horizon
+using Content.Shared._Horizon.Shuttles; // Horizon
 using Content.Shared.Shuttles.BUIStates;
 using Content.Shared.Shuttles.Components;
 using Content.Shared.Shuttles.UI.MapObjects;
@@ -47,6 +48,9 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
 
     private readonly Font _font;
     private bool _planetCameraActive;
+    private bool _planetCameraRequested;
+    private Vector2 _planetCameraSent;
+    private TimeSpan _planetCameraNextSend;
     private const float PlanetCameraMaxPan = 256f; // the camera never looks further than this from the shuttle
     private float? _defaultMinRange;
     private float? _defaultMaxRange;
@@ -486,11 +490,47 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
         return results;
     }
 
+    /// <summary>Asks the server to load the ground around the camera while the planet camera is shown.</summary>
+    private void UpdatePlanetCameraRequest()
+    {
+        var now = _timing.RealTime;
+        if (!_planetCameraActive)
+        {
+            if (_planetCameraRequested)
+            {
+                _planetCameraRequested = false;
+                EntManager.System<PlanetCameraClientSystem>().Send(null);
+            }
+
+            return;
+        }
+
+        if (now < _planetCameraNextSend && (Offset - _planetCameraSent).LengthSquared() < 64f)
+            return;
+
+        _planetCameraRequested = true;
+        _planetCameraSent = Offset;
+        _planetCameraNextSend = now + TimeSpan.FromSeconds(2);
+        EntManager.System<PlanetCameraClientSystem>().Send(Offset);
+    }
+
+    protected override void ExitedTree()
+    {
+        base.ExitedTree();
+
+        if (_planetCameraRequested)
+        {
+            _planetCameraRequested = false;
+            EntManager.System<PlanetCameraClientSystem>().Send(null);
+        }
+    }
+
     protected override void Draw(DrawingHandleScreen handle)
     {
         // Horizon: on a planet don't zoom out past the area the game has loaded
         _defaultMinRange ??= WorldMinRange;
         _defaultMaxRange ??= WorldMaxRange;
+        UpdatePlanetCameraRequest();
 
         if (_planetCameraActive)
         {
