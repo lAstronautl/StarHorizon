@@ -51,6 +51,7 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
     private bool _planetCameraRequested;
     private Vector2 _planetCameraSent;
     private TimeSpan _planetCameraNextSend;
+    private const float PlanetCameraRange = 15f; // the camera sees 30 x 30 tiles
     private const float PlanetCameraMaxPan = 256f; // the camera never looks further than this from the shuttle
     private float? _defaultMinRange;
     private float? _defaultMaxRange;
@@ -534,9 +535,9 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
 
         if (_planetCameraActive)
         {
-            // Zoom is locked to the closest scale the map has, and the view stays within reach of the shuttle.
-            WorldMinRange = _defaultMinRange.Value;
-            WorldMaxRange = _defaultMinRange.Value;
+            // Zoom is locked to a 30 x 30 tile view, and the view stays within reach of the shuttle.
+            WorldMinRange = PlanetCameraRange;
+            WorldMaxRange = PlanetCameraRange;
 
             if (_shuttleEntity is { } camShuttle && EntManager.TryGetComponent(camShuttle, out TransformComponent? camXform))
             {
