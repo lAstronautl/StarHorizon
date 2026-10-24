@@ -53,6 +53,12 @@ public sealed class PixelPlanetOverlay : Overlay
         _expeditionShaders.Clear();
     }
 
+    /// <summary>How much of the camera movement expedition planets follow (0 = glued to the screen, 1 = real world position).</summary>
+    private const float ExpeditionParallax = 0.1f;
+
+    /// <summary>Expedition planets are drawn smaller than their world size to feel distant.</summary>
+    private const float ExpeditionVisualScale = 0.5f;
+
     protected override void Draw(in OverlayDrawArgs args)
     {
         if (args.MapId == MapId.Nullspace)
@@ -110,8 +116,11 @@ public sealed class PixelPlanetOverlay : Overlay
             if (xform.MapID != args.MapId)
                 continue;
 
-            var pos = _transform.GetWorldPosition(xform);
-            var radius = MathF.Max(expedition.SpriteRadius, 1f);
+            // Parallax: expedition planets are a far-away backdrop, so they follow the camera and only slowly drift
+            // against the world instead of sitting at their real world position in front of the ships.
+            var cameraCenter = aabb.Center;
+            var pos = cameraCenter + (_transform.GetWorldPosition(xform) - cameraCenter) * ExpeditionParallax;
+            var radius = MathF.Max(expedition.SpriteRadius, 1f) * ExpeditionVisualScale;
             if (!Intersects(aabb, pos, radius))
                 continue;
 

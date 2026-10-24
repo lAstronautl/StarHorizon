@@ -36,6 +36,9 @@
     shape: Circle
     visibleFromOtherGrids: true
     requireNoGrid: true
+  # Nobody can FTL into the star's danger zone.
+  - type: FTLExclusion
+    range: 350
 
 - type: entity
   id: SectorCelestialBlackHole

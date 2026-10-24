@@ -281,6 +281,7 @@ public sealed partial class SalvageSystem
         else
         {
             state.NoPlanet = true;
+            state.Missions = new List<SalvageMissionParams>(); // no planet, no offers
             state.Cooldown = true;
         }
     }

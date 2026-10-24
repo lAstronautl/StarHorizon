@@ -155,6 +155,8 @@ public sealed class SectorBlackHoleSystem : EntitySystem
                 horizonR,
                 body.PullAcceleration,
                 dt,
+                body.HorizonDamage,
+                _damageable,
                 _lookup,
                 _transform,
                 _physics,

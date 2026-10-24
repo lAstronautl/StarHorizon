@@ -1,3 +1,4 @@
+using Content.Server.Salvage.Expeditions; // Horizon
 using Content.Server.Shuttles.Components;
 using Content.Server.Shuttles.Events;
 using Content.Shared._NF.CCVar;
@@ -191,6 +192,13 @@ public sealed partial class ShuttleConsoleSystem
         // Check shuttle can FTL to this target.
         if (!_shuttle.CanFTLTo(shuttleUid.Value, targetMap, ent))
         {
+            return;
+        }
+
+        // Horizon: expeditions are left through the expedition console, never by a regular jump.
+        if (_xformQuery.GetComponent(shuttleUid.Value).MapUid is { } currentMap && HasComp<SalvageExpeditionComponent>(currentMap))
+        {
+            _popup.PopupEntity(Loc.GetString("shuttle-ftl-on-expedition"), ent, PopupType.MediumCaution);
             return;
         }
 

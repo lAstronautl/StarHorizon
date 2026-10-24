@@ -18,6 +18,7 @@ public sealed class SectorMapIcons
     private const float MinIconPixels = 22f;
     private const float MaxIconPixels = 72f;
     private const float MapPixels = 48f;
+    private const float BlackHoleIconScale = 3f; // the disk reaches far beyond the hole itself
 
     private static readonly Color BlackHoleColor = Color.FromHex("#A040FF");
     private static readonly Color BlackHoleHorizon = Color.FromHex("#F5F540");
@@ -67,32 +68,12 @@ public sealed class SectorMapIcons
             var shader = GetShader(uid, look.Kind);
             PixelPlanetBiomeLooks.Apply(shader, look, time + planet.Seed, MapPixels, planet.Seed);
             DrawShaderIcon(handle, shader, center, size);
-            // The name is drawn by the beacon marker of the planet, so no label here.
-        }
-
-        // Decorative far-away planets.
-        var background = entMan.AllEntityQueryEnumerator<SectorBackgroundPlanetComponent, TransformComponent>();
-        while (background.MoveNext(out var uid, out var planet, out var xform))
-        {
-            if (xform.MapID != mapId)
-                continue;
-
-            var center = toScreen(xformSys.GetWorldPosition(xform));
-            var size = IconSize(planet.SpriteRadius, pixelsPerMeter);
-            if (!Visible(center, size, bounds))
-                continue;
-
-            var shader = GetShader(uid, planet.PlanetKind);
-            PixelPlanetShaderSetup.Configure(shader, planet.PlanetKind, time + planet.Seed, MapPixels, planet.Seed,
-                planet.Rotation, new Vector2(planet.LightOriginX, planet.LightOriginY));
-            PixelPlanetPalettes.ApplyPlanet(shader, planet.PlanetKind, planet.PaletteIndex);
-            DrawShaderIcon(handle, shader, center, size);
-            DrawLabel(handle, Loc.GetString("sector-map-planet"), center, size, Color.FromHex("#C5CEDB"));
+            DrawLabel(handle, meta.EntityName, center, size, Color.FromHex("#B8F2BD"));
         }
 
         // Threats: black holes and stars.
         var bodies = entMan.AllEntityQueryEnumerator<SectorCelestialBodyComponent, TransformComponent>();
-        while (bodies.MoveNext(out _, out var body, out var xform))
+        while (bodies.MoveNext(out var uid, out var body, out var xform))
         {
             if (xform.MapID != mapId)
                 continue;
@@ -105,9 +86,24 @@ public sealed class SectorMapIcons
             var radius = size / 2f;
             if (body.Kind == CelestialKind.BlackHole)
             {
-                handle.DrawCircle(center, radius, Color.Black);
-                handle.DrawCircle(center, radius, BlackHoleColor, filled: false);
-                handle.DrawCircle(center, radius * 0.55f, BlackHoleHorizon.WithAlpha(0.85f), filled: false);
+                // The same accretion-disk shader as in the world, big enough to see the disk around the hole.
+                var holeSize = Math.Clamp(size * BlackHoleIconScale, MinIconPixels, MaxIconPixels * BlackHoleIconScale);
+                var holeShader = GetBlackHoleShader(uid);
+                holeShader.SetParameter("time", time * 0.2f);
+                holeShader.SetParameter("pixels", MapPixels * 2f);
+                holeShader.SetParameter("pixels_ring", MapPixels * 2f);
+                holeShader.SetParameter("seed", body.Seed);
+                holeShader.SetParameter("rotation", 0.766f);
+                holeShader.SetParameter("time_speed", 0.2f);
+                holeShader.SetParameter("should_dither", 0f);
+                holeShader.SetParameter("disk_width", 0.065f);
+                holeShader.SetParameter("ring_perspective", 14f);
+                holeShader.SetParameter("disk_size", 6.598f);
+                holeShader.SetParameter("octaves", 3f);
+                holeShader.SetParameter("hole_radius", 0.247f);
+                holeShader.SetParameter("hole_light_width", 0.028f);
+                PixelPlanetPalettes.ApplyBlackHole(holeShader, body.Palette);
+                DrawShaderIcon(handle, holeShader, center, holeSize);
                 DrawLabel(handle, Loc.GetString("sector-map-black-hole"), center, size, BlackHoleColor);
             }
             else
@@ -161,6 +157,16 @@ public sealed class SectorMapIcons
             shader.Dispose();
 
         _shaders.Clear();
+    }
+
+    private ShaderInstance GetBlackHoleShader(EntityUid uid)
+    {
+        if (_shaders.TryGetValue(uid, out var shader))
+            return shader;
+
+        shader = _protos.Index<ShaderPrototype>("PixelBlackHole").InstanceUnique();
+        _shaders[uid] = shader;
+        return shader;
     }
 
     private ShaderInstance GetShader(EntityUid uid, PixelPlanetKind kind)

@@ -21,12 +21,6 @@
       maxDistance: 14000
       blackHoleSeparation: 18000
       bodySeparation: 8000
-    - type: SectorBackgroundPlanetPlacerController
-      minCount: 2
-      maxCount: 4
-      minDistance: 6000
-      maxDistance: 12000
-      planetPrototype: SectorBackgroundPlanet
 # Horizon end
 # Horizon start: expedition planets (one per biome) scattered around the sector
     - type: ExpeditionPlanetPlacerController

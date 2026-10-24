@@ -47,7 +47,10 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
 
     private readonly Font _font;
     private bool _planetCameraActive;
-    private const float PlanetCameraMaxRange = 40f; // only about this much terrain around the shuttle is actually loaded
+    private const float PlanetCameraMinRange = 16f;
+    private const float PlanetCameraMaxRange = 48f; // only about this much terrain around the shuttle is actually loaded
+    private float? _defaultMinRange;
+    private float? _defaultMaxRange;
     private readonly PlanetMapCamera _planetCamera = new(); // Horizon: far-away camera instead of the parallax on planets
     private readonly SectorMapIcons _sectorIcons = new(); // Horizon: planet and threat icons
 
@@ -102,6 +105,7 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
     private readonly Dictionary<Color, List<Vector2>> _edges = new();
     private readonly Dictionary<Color, List<(Vector2, string)>> _strings = new();
     private readonly List<(Vector2 Position, string Icon, Color Color)> _glyphs = new();
+    private readonly List<(Vector2 Position, string Name, Color Color)> _beaconLabels = new(); // Horizon: beacon names under their markers
     private readonly List<ShuttleExclusionObject> _viewportExclusions = new();
 
     public ShuttleMapControl() : base(256f, 6144f, 6144f) // Lua 512f, 512f<6144f, 6144f
@@ -486,8 +490,11 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
     protected override void Draw(DrawingHandleScreen handle)
     {
         // Horizon: on a planet don't zoom out past the area the game has loaded
-        if (_planetCameraActive && ActualRadarRange > PlanetCameraMaxRange)
-            ActualRadarRange = Math.Max(PlanetCameraMaxRange, WorldMinRange);
+        _defaultMinRange ??= WorldMinRange;
+        _defaultMaxRange ??= WorldMaxRange;
+        WorldMinRange = _planetCameraActive ? PlanetCameraMinRange : _defaultMinRange.Value;
+        WorldMaxRange = _planetCameraActive ? PlanetCameraMaxRange : _defaultMaxRange.Value;
+        ActualRadarRange = Math.Clamp(ActualRadarRange, WorldMinRange, WorldMaxRange);
 
         base.Draw(handle);
 
@@ -565,6 +572,7 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
         _edges.Clear();
         _strings.Clear();
         _glyphs.Clear();
+        _beaconLabels.Clear();
 
         // Add beacons if relevant.
         var beaconsOnly = _shuttles.IsBeaconMap(viewedMapUid);
@@ -591,7 +599,10 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
                 _beacons.Add(mapO);
                 // Horizon: expedition planets already have a planet icon, and the beacon glyph is missing from the font
                 if (!(mapO is ShuttleBeaconObject beaconObject && EntManager.TryGetEntity(beaconObject.Entity, out var beaconEnt) && EntManager.HasComponent<ExpeditionPlanetComponent>(beaconEnt)))
+                {
                     _glyphs.Add((beaconUiPos, "◎", displayColor));
+                    _beaconLabels.Add((beaconUiPos, beaconName, displayColor)); // Horizon: planets draw their own name next to their icon
+                }
             }
         }
 
@@ -649,6 +660,16 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
         foreach (var (color, sendEdges) in _edges)
         {
             handle.DrawPrimitives(DrawPrimitiveTopology.LineList, sendEdges, color.WithAlpha(0.78f));
+        }
+
+        foreach (var (position, name, color) in _beaconLabels)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                continue;
+
+            var nameSize = handle.GetDimensions(_font, name, 1f);
+            var labelPos = position + new Vector2(-nameSize.X / 2f, GetMapObjectRadius() * 2f * UIScale + 4f);
+            DrawSoftMapText(handle, name, labelPos, 1f, color.WithAlpha(0.92f), Color.Black.WithAlpha(0.55f));
         }
 
         foreach (var (position, icon, color) in _glyphs)

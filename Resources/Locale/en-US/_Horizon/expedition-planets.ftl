@@ -5,3 +5,4 @@ sector-map-black-hole = Black hole (danger)
 sector-map-star = Star (danger)
 sector-map-star-boost = Star: panels x{ $multiplier }, dangerous up close
 sector-map-star-safe = Star: solar panels x{ $multiplier }
+shuttle-ftl-on-expedition = You cannot FTL away from an expedition. Finish it from the expedition console.
