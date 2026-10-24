@@ -98,27 +98,7 @@ public sealed class SectorBlackHoleSystem : EntitySystem
                     if (TryComp<PhysicsComponent>(gridUid, out var physics))
                         ApplyGridPull(gridUid, grid.Comp, physics, pos, distClosest, pullR, horizonR, body.PullAcceleration, dt);
                 }
-
-                if (distClosest > horizonR)
-                    continue;
-
-                var factor = SectorCelestialProximity.Factor(distClosest, horizonR);
-                var hits = SectorCelestialProximity.ScaledHits(BaseMaxHits, factor);
-                if (hits > 0)
-                {
-                    SectorCelestialHullDamage.DamageInRadius(
-                        gridUid,
-                        grid.Comp,
-                        pos,
-                        horizonR,
-                        body.HorizonDamage * factor,
-                        hits,
-                        _maps,
-                        _turf,
-                        _damageable,
-                        EntityManager,
-                        _random);
-                }
+                // Horizon: the singularity no longer damages or removes structures, items or tiles; it only pulls.
             }
 
             SectorCelestialMobDamage.ApplyHazardToMobsInRadius(
@@ -139,8 +119,6 @@ public sealed class SectorBlackHoleSystem : EntitySystem
                 horizonR,
                 body.PullAcceleration,
                 dt,
-                body.HorizonDamage,
-                _damageable,
                 _lookup,
                 _transform,
                 _physics,

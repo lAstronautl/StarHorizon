@@ -32,8 +32,6 @@ public static class SectorBlackHoleConsume
         float horizonRadius,
         float pullAcceleration,
         float dt,
-        DamageSpecifier horizonDamage,
-        DamageableSystem damageable,
         EntityLookupSystem lookup,
         SharedTransformSystem transform,
         SharedPhysicsSystem physics,
@@ -63,9 +61,7 @@ public static class SectorBlackHoleConsume
 
             if (distSq <= consumeR2)
             {
-                // Horizon: things touching the singularity are hurt, not deleted
-                if (!horizonDamage.Empty && entMan.HasComponent<DamageableComponent>(uid))
-                    damageable.TryChangeDamage(uid, horizonDamage, ignoreResistances: true, interruptsDoAfters: false);
+                // Horizon: things touching the singularity are left alone, not deleted or damaged
                 continue;
             }
 
