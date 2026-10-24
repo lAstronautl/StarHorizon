@@ -102,6 +102,7 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
     private readonly Dictionary<Color, List<Vector2>> _edges = new();
     private readonly Dictionary<Color, List<(Vector2, string)>> _strings = new();
     private readonly List<(Vector2 Position, string Icon, Color Color)> _glyphs = new();
+    private readonly List<(Vector2 Position, string Name, Color Color)> _beaconLabels = new(); // Horizon: beacon names under their markers
     private readonly List<ShuttleExclusionObject> _viewportExclusions = new();
 
     public ShuttleMapControl() : base(256f, 6144f, 6144f) // Lua 512f, 512f<6144f, 6144f
@@ -565,6 +566,7 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
         _edges.Clear();
         _strings.Clear();
         _glyphs.Clear();
+        _beaconLabels.Clear();
 
         // Add beacons if relevant.
         var beaconsOnly = _shuttles.IsBeaconMap(viewedMapUid);
@@ -589,6 +591,7 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
 
                 AddMapObject(existingEdges, existingVerts, mapObject);
                 _beacons.Add(mapO);
+                _beaconLabels.Add((beaconUiPos, beaconName, displayColor)); // Horizon
                 // Horizon: expedition planets already have a planet icon, and the beacon glyph is missing from the font
                 if (!(mapO is ShuttleBeaconObject beaconObject && EntManager.TryGetEntity(beaconObject.Entity, out var beaconEnt) && EntManager.HasComponent<ExpeditionPlanetComponent>(beaconEnt)))
                     _glyphs.Add((beaconUiPos, "◎", displayColor));
@@ -649,6 +652,16 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
         foreach (var (color, sendEdges) in _edges)
         {
             handle.DrawPrimitives(DrawPrimitiveTopology.LineList, sendEdges, color.WithAlpha(0.78f));
+        }
+
+        foreach (var (position, name, color) in _beaconLabels)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                continue;
+
+            var nameSize = handle.GetDimensions(_font, name, 1f);
+            var labelPos = position + new Vector2(-nameSize.X / 2f, GetMapObjectRadius() * 2f * UIScale + 4f);
+            DrawSoftMapText(handle, name, labelPos, 1f, color.WithAlpha(0.92f), Color.Black.WithAlpha(0.55f));
         }
 
         foreach (var (position, icon, color) in _glyphs)
