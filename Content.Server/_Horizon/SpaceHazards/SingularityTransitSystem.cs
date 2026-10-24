@@ -1,6 +1,7 @@
 using System.Numerics;
 using Content.Server.Shuttles.Components;
 using Content.Server.Shuttles.Systems;
+using Content.Server.Temperature.Systems;
 using Content.Shared._Horizon.SpaceHazards;
 using Content.Shared.Damage;
 using Content.Shared.Maps;
@@ -34,6 +35,8 @@ public sealed class SingularityTransitSystem : EntitySystem
     [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly MetaDataSystem _meta = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly TemperatureSystem _temperature = default!;
 
     private readonly List<Entity<MapGridComponent>> _gridScratch = new();
 
@@ -129,7 +132,7 @@ public sealed class SingularityTransitSystem : EntitySystem
         }
 
         var mapUid = _maps.CreateMap(out _);
-        _meta.SetEntityName(mapUid, "Singularity transit");
+        _meta.SetEntityName(mapUid, "Danger FTL");
 
         // FTLMapComponent makes the shared shuttle logic treat it as hyperspace; EnsureFTLMap skips it because of the marker.
         var ftlMap = EnsureComp<FTLMapComponent>(mapUid);
@@ -140,7 +143,10 @@ public sealed class SingularityTransitSystem : EntitySystem
         Dirty(mapUid, parallax);
 
         var transit = EnsureComp<SingularityTransitMapComponent>(mapUid);
-        transit.Damage = body.HorizonDamage * body.TransitDamageFactor;
+        // Danger FTL hurts like a star: same hull and crew damage.
+        var star = new SectorCelestialBodyComponent();
+        transit.Damage = star.StarDamage;
+        transit.MobDamage = star.MobHazardDamage;
         return mapUid;
     }
 
@@ -181,6 +187,17 @@ public sealed class SingularityTransitSystem : EntitySystem
                     _damageable,
                     EntityManager,
                     _random);
+
+                SectorCelestialMobDamage.ApplyHazardToMobsInRadius(
+                    xform.MapID,
+                    center,
+                    radius,
+                    transit.MobDamage,
+                    _lookup,
+                    _transform,
+                    _damageable,
+                    _temperature,
+                    EntityManager);
             }
         }
     }

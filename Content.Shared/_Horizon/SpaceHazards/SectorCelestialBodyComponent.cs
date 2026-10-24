@@ -102,8 +102,4 @@ public sealed partial class SectorCelestialBodyComponent : Component
     /// <summary>Parallax prototype shown on the singularity transit map. Change this to restyle the jump.</summary>
     [DataField]
     public string TransitParallax = "SingularityTransit";
-
-    /// <summary>Fraction of the event horizon hull damage a shuttle keeps taking while in transit.</summary>
-    [DataField]
-    public float TransitDamageFactor = 0.5f;
 }

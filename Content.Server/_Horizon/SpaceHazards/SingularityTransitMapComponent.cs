@@ -9,16 +9,20 @@ namespace Content.Server._Horizon.SpaceHazards;
 [RegisterComponent]
 public sealed partial class SingularityTransitMapComponent : Component
 {
-    /// <summary>Hull damage applied to every shuttle in transit at each tick.</summary>
+    /// <summary>Hull damage applied to every shuttle in transit at each tick (the star's damage).</summary>
     [DataField]
     public DamageSpecifier Damage = new();
 
     /// <summary>Exterior tiles hit per shuttle per tick.</summary>
     [DataField]
-    public int Hits = 8;
+    public int Hits = 12;
 
     [DataField]
-    public TimeSpan Interval = TimeSpan.FromSeconds(0.5);
+    public TimeSpan Interval = TimeSpan.FromSeconds(1);
+
+    /// <summary>Damage dealt to creatures aboard each tick (the star's hazard damage).</summary>
+    [DataField]
+    public DamageSpecifier MobDamage = new();
 
     public TimeSpan NextDamage;
 }

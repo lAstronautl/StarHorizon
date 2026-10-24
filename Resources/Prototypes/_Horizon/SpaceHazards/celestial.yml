@@ -57,11 +57,10 @@
     pullRadius: 350
     eventHorizonRadius: 45
     # Shuttles reaching the center are FTLed to a random point within transitRange of the map origin (Frontier),
-    # through a separate transit map that has its own parallax and keeps damaging the hull.
+    # through a separate transit map ("Danger FTL") that has its own parallax and damages the hull and crew like a star.
     transitRange: 25000
     transitTime: 25
     transitParallax: SingularityTransit
-    transitDamageFactor: 0.5
     horizonDamage:
       types:
         Structural: 800
