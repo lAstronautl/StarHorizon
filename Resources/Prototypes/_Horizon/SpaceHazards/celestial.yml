@@ -110,13 +110,6 @@
   - type: SectorBackgroundPlanet
     spriteRadius: 9
     pixels: 1024
-  - type: PointLight
-    enabled: true
-    color: "#FFFFFF"
-    radius: 150
-    energy: 2.4
-    softness: 1.4
-    castShadows: false
 
 # Planets expeditions can be started from. Salvage consoles only work within `range` of one and the expedition
 # uses the planet's biome. The ExpeditionPlanetPlacerController in the worldgen config places one per biome.
@@ -132,13 +125,6 @@
   - type: ExpeditionPlanet
     spriteRadius: 40
     range: 450
-  - type: PointLight
-    enabled: true
-    color: "#FFFFFF"
-    radius: 160
-    energy: 2.4
-    softness: 1.4
-    castShadows: false
   - type: RadarBlip
     radarColor: "#6BCB77"
     highlightedRadarColor: "#B8F2BD"
