@@ -3,4 +3,5 @@ salvage-expedition-window-title-no-planet = Утилизаторские экс�
 sector-map-planet = Планета
 sector-map-black-hole = Чёрная дыра (опасно)
 sector-map-star = Звезда (опасно)
+sector-map-star-boost = Звезда: панели ×{ $multiplier }, вблизи опасно
 sector-map-star-safe = Звезда: солнечные панели ×{ $multiplier }

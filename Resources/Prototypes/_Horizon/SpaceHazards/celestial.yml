@@ -17,8 +17,9 @@
     kind: Star
     spriteRadius: 32
     pixels: 1024
-    # The star is harmless: ships and crew can stay next to it. Panels near it work 3x better.
-    harmless: true
+    # Far from the star solar panels work 3x better; close to it (hazardRadius) hull and crew take damage.
+    harmless: false
+    hazardRadius: 300
     solarBoostRadius: 4000
     solarBoostMultiplier: 3
   - type: PointLight

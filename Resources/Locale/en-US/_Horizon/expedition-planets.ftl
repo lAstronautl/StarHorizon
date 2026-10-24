@@ -3,4 +3,5 @@ salvage-expedition-window-title-no-planet = Salvage expeditions (no planet in ra
 sector-map-planet = Planet
 sector-map-black-hole = Black hole (danger)
 sector-map-star = Star (danger)
+sector-map-star-boost = Star: panels x{ $multiplier }, dangerous up close
 sector-map-star-safe = Star: solar panels x{ $multiplier }

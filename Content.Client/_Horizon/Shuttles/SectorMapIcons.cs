@@ -114,8 +114,8 @@ public sealed class SectorMapIcons
             {
                 handle.DrawCircle(center, radius, StarColor.WithAlpha(0.9f));
                 handle.DrawCircle(center, radius, Color.White.WithAlpha(0.6f), filled: false);
-                var label = body.Harmless
-                    ? Loc.GetString("sector-map-star-safe", ("multiplier", body.SolarBoostMultiplier.ToString("0.#")))
+                var label = body.SolarBoostMultiplier > 1f
+                    ? Loc.GetString(body.Harmless ? "sector-map-star-safe" : "sector-map-star-boost", ("multiplier", body.SolarBoostMultiplier.ToString("0.#")))
                     : Loc.GetString("sector-map-star");
                 DrawLabel(handle, label, center, size, StarColor);
             }
