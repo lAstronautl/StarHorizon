@@ -70,7 +70,7 @@ public sealed class SectorMapIcons
             var shader = GetShader(uid, look.Kind);
             PixelPlanetBiomeLooks.Apply(shader, look, time + planet.Seed, MapPixels, planet.Seed);
             DrawShaderIcon(handle, shader, center, size);
-            DrawLabel(handle, meta.EntityName, center, size, Color.FromHex("#B8F2BD"));
+            DrawLabel(handle, meta.EntityName, center, size, Color.AliceBlue.WithAlpha(0.92f)); // same colour as other beacon names
         }
 
         // Threats: black holes and stars.
