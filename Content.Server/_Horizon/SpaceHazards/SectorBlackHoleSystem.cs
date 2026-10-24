@@ -241,13 +241,14 @@ public sealed class SectorBlackHoleSystem : EntitySystem
 
         var dir = toHole / distCenter;
         var t = Math.Clamp(1f - distCenter / MathF.Max(pullR, 1f), 0f, 1f);
-        var speed = distClosest < horizonR
+        // Horizon: the pull is an acceleration on top of the shuttle's own velocity, so engines can fight it near the
+        // edge of the pull radius instead of the ship being frozen to the pull speed.
+        var accel = distClosest < horizonR
             ? pullAcceleration * (0.65f + 0.55f * t)
             : pullAcceleration * (0.15f + 0.55f * t * t);
 
-        speed = MathF.Min(speed, distCenter / MathF.Max(dt, 0.05f) * 0.5f);
-
-        _physics.SetLinearVelocity(gridUid, dir * speed, body: physics);
+        var velocity = physics.LinearVelocity + dir * accel * dt;
+        _physics.SetLinearVelocity(gridUid, velocity, body: physics);
 
         var ang = physics.AngularVelocity;
         if (ang != 0f)
