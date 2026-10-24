@@ -21,8 +21,8 @@ namespace Content.Client._Horizon.Shuttles;
 /// <summary>
 /// Draws a far-away top-down "camera" of the planet around the shuttle as the background of the shuttle console
 /// MAP tab, in place of the parallax. Terrain comes from the biome (computed on the client, so it also shows the
-/// parts that are not loaded yet) with real tiles taking priority; structures and items are drawn from the loaded
-/// entities. Living creatures are left out on purpose.
+/// parts that are not loaded yet). Only terrain is drawn: structures, items and creatures stay hidden so the
+/// expedition's complex is not given away.
 /// </summary>
 public sealed class PlanetMapCamera
 {
@@ -43,8 +43,11 @@ public sealed class PlanetMapCamera
     private readonly EntityLookupSystem _lookup;
 
     private readonly Dictionary<int, Color> _tileColors = new();
-    private readonly Dictionary<Vector2i, int?> _sampled = new();
+    private readonly Dictionary<Vector2i, (int? Tile, Color? Relief)> _sampled = new();
+    private readonly Dictionary<string, Color> _reliefColors = new();
     private readonly HashSet<Entity<SpriteComponent>> _entityScratch = new();
+    private readonly Dictionary<int, int> _tileCounts = new();
+    private int? _dominantTile;
     private TimeSpan _cacheExpires;
     private MapId _cachedMap = MapId.Nullspace;
 
@@ -91,10 +94,10 @@ public sealed class PlanetMapCamera
             _cacheExpires = _timing.RealTime + CacheLifetime;
         }
 
-        handle.DrawRect(bounds, Backdrop);
+        // Cells without a tile (not generated / chasms) take the planet's dominant ground colour instead of black.
+        handle.DrawRect(bounds, _dominantTile is { } dominant ? GetTileColor(dominant) : Backdrop);
 
         DrawTerrain(handle, (mapUid, grid), biome, viewBox, toScreen, pixelsPerMeter);
-        DrawEntities(handle, mapId, viewBox, toScreen, pixelsPerMeter);
         return true;
     }
 
@@ -124,12 +127,13 @@ public sealed class PlanetMapCamera
             maxY = (int) MathF.Ceiling(viewBox.Top / cell) * cell;
         }
 
+        _tileCounts.Clear();
         for (var x = minX; x < maxX; x += cell)
         {
             for (var y = minY; y < maxY; y += cell)
             {
                 var sample = new Vector2i(x + cell / 2, y + cell / 2);
-                if (!TryGetTileId(sample, grid, biome, out var tileId))
+                if (!TryGetTileId(sample, grid, biome, out var tileId, out var relief))
                     continue;
 
                 var a = toScreen(new Vector2(x, y));
@@ -138,24 +142,67 @@ public sealed class PlanetMapCamera
                     MathF.Min(a.X, b.X), MathF.Min(a.Y, b.Y),
                     MathF.Max(a.X, b.X), MathF.Max(a.Y, b.Y));
 
-                handle.DrawRect(box, GetTileColor(tileId));
+                handle.DrawRect(box, relief ?? GetTileColor(tileId));
+                _tileCounts[tileId] = _tileCounts.GetValueOrDefault(tileId) + 1;
             }
         }
+
+        var best = -1;
+        foreach (var (id, count) in _tileCounts)
+        {
+            if (best < 0 || count > _tileCounts[best])
+                best = id;
+        }
+
+        if (best >= 0)
+            _dominantTile = best;
     }
 
-    private bool TryGetTileId(Vector2i indices, Entity<MapGridComponent> grid, BiomeComponent biome, out int tileId)
+    private bool TryGetTileId(Vector2i indices, Entity<MapGridComponent> grid, BiomeComponent biome, out int tileId, out Color? relief)
     {
         if (!_sampled.TryGetValue(indices, out var cached))
         {
             Entity<MapGridComponent>? gridArg = grid;
-            cached = _biome.TryGetBiomeTile(indices, biome.Layers, biome.Seed, gridArg, out var tile) && !tile.Value.IsEmpty
-                ? tile.Value.TypeId
-                : null;
+            int? tileType = null;
+            Color? reliefColor = null;
+
+            if (_biome.TryGetBiomeTile(indices, biome.Layers, biome.Seed, gridArg, out var tile) && !tile.Value.IsEmpty)
+            {
+                tileType = tile.Value.TypeId;
+
+                // Rocks, crystals and plants of the biome are what gives the terrain its relief.
+                if (_biome.TryGetEntity(indices, biome.Layers, tile.Value, biome.Seed, gridArg, out var entityId))
+                    reliefColor = GetReliefColor(entityId);
+            }
+
+            cached = (tileType, reliefColor);
             _sampled[indices] = cached;
         }
 
-        tileId = cached ?? 0;
-        return cached != null;
+        tileId = cached.Tile ?? 0;
+        relief = cached.Relief;
+        return cached.Tile != null;
+    }
+
+    private Color GetReliefColor(string entityId)
+    {
+        if (_reliefColors.TryGetValue(entityId, out var color))
+            return color;
+
+        var id = entityId.ToLowerInvariant();
+        if (id.Contains("crystal") || id.Contains("ore") || id.Contains("gem"))
+            color = new Color(0.45f, 0.78f, 0.85f);
+        else if (id.Contains("flora") || id.Contains("tree") || id.Contains("grass") || id.Contains("bush") || id.Contains("plant"))
+            color = new Color(0.18f, 0.42f, 0.2f);
+        else if (id.Contains("snow") || id.Contains("ice"))
+            color = new Color(0.85f, 0.9f, 0.95f);
+        else if (id.Contains("wall") || id.Contains("rock") || id.Contains("stalag") || id.Contains("asteroid"))
+            color = new Color(0.22f, 0.2f, 0.19f);
+        else
+            color = Color.FromHsv(new Vector4((entityId.GetHashCode() & 0xFF) / 255f, 0.25f, 0.4f, 1f));
+
+        _reliefColors[entityId] = color;
+        return color;
     }
 
     private Color GetTileColor(int tileId)
@@ -200,40 +247,6 @@ public sealed class PlanetMapCamera
         catch (Exception)
         {
             return fallback;
-        }
-    }
-
-    private void DrawEntities(
-        DrawingHandleScreen handle,
-        MapId mapId,
-        Box2 viewBox,
-        Func<Vector2, Vector2> toScreen,
-        float pixelsPerMeter)
-    {
-        // Sprites are authored at 32 px per meter; scale them so that one meter is `pixelsPerMeter` map pixels.
-        var scale = new Vector2(pixelsPerMeter / 32f);
-
-        _entityScratch.Clear();
-        _lookup.GetEntitiesIntersecting(mapId, viewBox, _entityScratch, LookupFlags.Static | LookupFlags.Dynamic | LookupFlags.Sundries);
-
-        var drawn = 0;
-        foreach (var (uid, sprite) in _entityScratch)
-        {
-            if (drawn >= MaxEntities)
-                break;
-
-            if (!sprite.Visible
-                || _entMan.HasComponent<MobStateComponent>(uid)
-                || _entMan.HasComponent<GhostComponent>(uid)
-                || !_entMan.TryGetComponent(uid, out TransformComponent? xform)
-                || xform.ParentUid != xform.GridUid && xform.ParentUid != xform.MapUid)
-            {
-                continue;
-            }
-
-            var pos = toScreen(_xform.GetWorldPosition(xform));
-            handle.DrawEntity(uid, pos, scale, -_xform.GetWorldRotation(xform), Angle.Zero, Direction.South, sprite);
-            drawn++;
         }
     }
 }

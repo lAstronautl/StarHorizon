@@ -197,10 +197,7 @@ public sealed partial class ShuttleConsoleSystem
 
         // Horizon: expeditions are left through the expedition console, never by a regular jump.
         if (_xformQuery.GetComponent(shuttleUid.Value).MapUid is { } currentMap && HasComp<SalvageExpeditionComponent>(currentMap))
-        {
-            _popup.PopupEntity(Loc.GetString("shuttle-ftl-on-expedition"), ent, PopupType.MediumCaution);
             return;
-        }
 
         // Horizon: a normal FTL jump is refused while another big grid is right next to the shuttle.
         if (_ftlCfg.GetCVar(NFCCVars.SalvageExpeditionProximityCheck) && HasMassiveGridNearby(shuttleUid.Value))

@@ -13,9 +13,6 @@ public sealed class SectorPixelPlanetLightSystem : EntitySystem
     private const float StarEnergy = 9f;
     private const float BlackHoleRadiusMul = 7f;
     private const float BlackHoleEnergy = 5f;
-    private const float PlanetRadiusMul = 2.75f;
-    private const float PlanetEnergy = 2.4f;
-    private const float PlanetOffsetMul = 0.85f;
 
     [Dependency] private readonly SharedPointLightSystem _lights = default!;
 
@@ -44,20 +41,8 @@ public sealed class SectorPixelPlanetLightSystem : EntitySystem
         Dirty(uid, light);
     }
 
+    /// <summary>Horizon: planets do not emit light, so there is nothing to set up.</summary>
     public void ApplyPlanet(EntityUid uid, SectorBackgroundPlanetComponent planet)
     {
-        var light = _lights.EnsureLight(uid);
-        var radius = MathF.Max(planet.SpriteRadius, 1f);
-        _lights.SetCastShadows(uid, false, light);
-        _lights.SetEnabled(uid, true, light);
-        _lights.SetColor(uid, PixelPlanetLightColors.PlanetSunlight, light);
-        _lights.SetRadius(uid, radius * PlanetRadiusMul, light);
-        _lights.SetEnergy(uid, PlanetEnergy, light);
-        _lights.SetSoftness(uid, 1.4f, light);
-        var dir = new Vector2(planet.LightOriginX - 0.5f, planet.LightOriginY - 0.5f);
-        if (dir.LengthSquared() < 0.0001f) dir = new Vector2(0.25f, 0.25f);
-        else dir = Vector2.Normalize(dir);
-        light.Offset = dir * (radius * PlanetOffsetMul);
-        Dirty(uid, light);
     }
 }

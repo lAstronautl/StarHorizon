@@ -41,7 +41,7 @@ public sealed class SectorStarHazardSystem : EntitySystem
         _nextTick = now + TickInterval;
         foreach (var uid in _activity.ActiveHazards)
         {
-            if (!TryComp(uid, out SectorCelestialBodyComponent? body) || body.Kind != CelestialKind.Star || body.Harmless) continue; // Horizon: Harmless
+            if (!TryComp(uid, out SectorCelestialBodyComponent? body) || body.Kind != CelestialKind.Star) continue;
             if (!TryComp(uid, out TransformComponent? xform) || xform.MapID == MapId.Nullspace) continue;
             var pos = _transform.GetWorldPosition(xform);
             var hazardR = MathF.Max(body.HazardRadius, 1f);

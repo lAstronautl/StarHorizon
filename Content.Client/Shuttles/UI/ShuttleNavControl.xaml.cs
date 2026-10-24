@@ -413,7 +413,15 @@ public partial class ShuttleNavControl : BaseShuttleControl // Mono
         // Draw shields
         DrawShields(handle, xform, worldToShuttle);
 
-        // Horizon: expedition planets as discs
+        // Horizon: stars and black holes at their real size, and expedition planets as discs
+        _sectorIcons.DrawNavBodies(
+            handle,
+            EntManager,
+            _transform,
+            xform.MapID,
+            worldPoint => Vector2.Transform(Vector2.Transform(worldPoint, worldToShuttle), shuttleToView),
+            MinimapScale,
+            PixelRect);
         _sectorIcons.DrawNavPlanets(
             handle,
             EntManager,

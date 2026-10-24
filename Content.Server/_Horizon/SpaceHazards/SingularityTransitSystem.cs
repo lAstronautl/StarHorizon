@@ -1,10 +1,10 @@
 using System.Numerics;
 using Content.Server.Shuttles.Components;
 using Content.Server.Shuttles.Systems;
-using Content.Server.Temperature.Systems;
 using Content.Shared._Horizon.SpaceHazards;
 using Content.Shared.Damage;
 using Content.Shared.Maps;
+using Content.Shared.Mobs.Components;
 using Content.Shared.Parallax;
 using Content.Shared.Shuttles.Components;
 using Robust.Shared.Map;
@@ -30,6 +30,7 @@ public sealed class SingularityTransitSystem : EntitySystem
     private const float HullDamageScale = 0.25f;
     private const float MobDamageScale = 0.5f;
     private const int TransitHits = 5;
+    private const int TransitTileClears = 2;
 
     [Dependency] private readonly ShuttleSystem _shuttle = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
@@ -41,9 +42,9 @@ public sealed class SingularityTransitSystem : EntitySystem
     [Dependency] private readonly MetaDataSystem _meta = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly TemperatureSystem _temperature = default!;
 
     private readonly List<Entity<MapGridComponent>> _gridScratch = new();
+    private readonly HashSet<Entity<MobStateComponent>> _mobScratch = new();
 
     /// <summary>
     /// Starts the singularity jump for <paramref name="gridUid"/>. Returns false (nothing happened) when the grid is
@@ -156,6 +157,29 @@ public sealed class SingularityTransitSystem : EntitySystem
         return mapUid;
     }
 
+    /// <summary>Creatures standing on an intact tile are safe; those left without a floor (or in open space) are hurt.</summary>
+    private void DamageMobsOffTile(MapId mapId, Vector2 center, float radius, DamageSpecifier damage)
+    {
+        if (damage.Empty)
+            return;
+
+        _mobScratch.Clear();
+        _lookup.GetEntitiesInRange(mapId, center, radius, _mobScratch);
+
+        foreach (var (mob, _) in _mobScratch)
+        {
+            var xform = Transform(mob);
+            if (xform.GridUid is { } gridUid
+                && TryComp<MapGridComponent>(gridUid, out var grid)
+                && !_maps.GetTileRef(gridUid, grid, xform.Coordinates).Tile.IsEmpty)
+            {
+                continue;
+            }
+
+            _damageable.TryChangeDamage(mob, damage, ignoreResistances: false);
+        }
+    }
+
     public override void Update(float frameTime)
     {
         base.Update(frameTime);
@@ -194,16 +218,19 @@ public sealed class SingularityTransitSystem : EntitySystem
                     EntityManager,
                     _random);
 
-                SectorCelestialMobDamage.ApplyHazardToMobsInRadius(
-                    xform.MapID,
+                // Danger FTL also tears the hull plating apart.
+                SectorCelestialHullDamage.ClearBareTilesInRadius(
+                    gridUid,
+                    grid,
                     center,
                     radius,
-                    transit.MobDamage,
-                    _lookup,
-                    _transform,
-                    _damageable,
-                    _temperature,
-                    EntityManager);
+                    TransitTileClears,
+                    _maps,
+                    _turf,
+                    EntityManager,
+                    _random);
+
+                DamageMobsOffTile(xform.MapID, center, radius, transit.MobDamage);
             }
         }
     }

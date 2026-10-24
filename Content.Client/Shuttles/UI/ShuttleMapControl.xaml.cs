@@ -47,8 +47,7 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
 
     private readonly Font _font;
     private bool _planetCameraActive;
-    private const float PlanetCameraMinRange = 16f;
-    private const float PlanetCameraMaxRange = 48f; // only about this much terrain around the shuttle is actually loaded
+    private const float PlanetCameraMaxPan = 256f; // the camera never looks further than this from the shuttle
     private float? _defaultMinRange;
     private float? _defaultMaxRange;
     private readonly PlanetMapCamera _planetCamera = new(); // Horizon: far-away camera instead of the parallax on planets
@@ -492,8 +491,26 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
         // Horizon: on a planet don't zoom out past the area the game has loaded
         _defaultMinRange ??= WorldMinRange;
         _defaultMaxRange ??= WorldMaxRange;
-        WorldMinRange = _planetCameraActive ? PlanetCameraMinRange : _defaultMinRange.Value;
-        WorldMaxRange = _planetCameraActive ? PlanetCameraMaxRange : _defaultMaxRange.Value;
+
+        if (_planetCameraActive)
+        {
+            // Zoom is locked to the closest scale the map has, and the view stays within reach of the shuttle.
+            WorldMinRange = _defaultMinRange.Value;
+            WorldMaxRange = _defaultMinRange.Value;
+
+            if (_shuttleEntity is { } camShuttle && EntManager.TryGetComponent(camShuttle, out TransformComponent? camXform))
+            {
+                var fromShuttle = Offset - _xformSystem.GetWorldPosition(camXform);
+                if (fromShuttle.Length() > PlanetCameraMaxPan)
+                    Offset = _xformSystem.GetWorldPosition(camXform) + Vector2.Normalize(fromShuttle) * PlanetCameraMaxPan;
+            }
+        }
+        else
+        {
+            WorldMinRange = _defaultMinRange.Value;
+            WorldMaxRange = _defaultMaxRange.Value;
+        }
+
         ActualRadarRange = Math.Clamp(ActualRadarRange, WorldMinRange, WorldMaxRange);
 
         base.Draw(handle);
