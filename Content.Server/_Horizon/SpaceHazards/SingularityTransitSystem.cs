@@ -26,6 +26,11 @@ public sealed class SingularityTransitSystem : EntitySystem
     private const float BodyClearance = 600f;
     private const float StartupSeconds = 1f;
 
+    // The jump lasts ~25 s, so Danger FTL deals only a fraction of the star's damage per tick.
+    private const float HullDamageScale = 0.25f;
+    private const float MobDamageScale = 0.5f;
+    private const int TransitHits = 5;
+
     [Dependency] private readonly ShuttleSystem _shuttle = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly IMapManager _mapManager = default!;
@@ -143,10 +148,11 @@ public sealed class SingularityTransitSystem : EntitySystem
         Dirty(mapUid, parallax);
 
         var transit = EnsureComp<SingularityTransitMapComponent>(mapUid);
-        // Danger FTL hurts like a star: same hull and crew damage.
+        // Danger FTL hurts like a star, scaled down because the jump is long.
         var star = new SectorCelestialBodyComponent();
-        transit.Damage = star.StarDamage;
-        transit.MobDamage = star.MobHazardDamage;
+        transit.Damage = star.StarDamage * HullDamageScale;
+        transit.Hits = TransitHits;
+        transit.MobDamage = star.MobHazardDamage * MobDamageScale;
         return mapUid;
     }
 
