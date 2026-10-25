@@ -8,6 +8,11 @@
   - type: TetherGun
     massLimit: 5000
     maxForce: 3000
+  - type: Clothing
+    sprite: _Horizon/Objects/Tools/gravity_gun.rsi
+    quickEquip: false
+    slots:
+    - belt
   - type: Sprite
     sprite: _Horizon/Objects/Tools/gravity_gun.rsi
     layers:

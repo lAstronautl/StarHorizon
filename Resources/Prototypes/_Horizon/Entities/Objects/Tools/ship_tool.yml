@@ -5,7 +5,7 @@
 # Weld: pick an edge of one hull and an edge of another to join them, click a seam or a cut to weld it shut.
 # A ghost of the target is shown under the cursor while it is held.
 # The look follows the mode like on the omnitool: cutSprite / weldSprite change the icon, cutHeldPrefix / weldHeldPrefix
-# the in-hand states ({prefix}-inhand-left ...). The sprites are ship_tool.rsi: the flame layer follows the mode.
+# the in-hand states ({prefix}-inhand-left ...). The sprites are ship_tool.rsi: the flame on the icon and in the hands shows while the tool has charge and follows the mode.
 - type: entity
   id: ShipTool
   parent:
@@ -16,6 +16,11 @@
   components:
   - type: Item
     size: Normal
+  - type: Clothing
+    sprite: _Horizon/Objects/Tools/ship_tool.rsi
+    quickEquip: false
+    slots:
+    - belt
   - type: Sprite
     sprite: _Horizon/Objects/Tools/ship_tool.rsi
     layers:
@@ -24,6 +29,14 @@
     - state: cutter_flame
       map: ["flame"]
       shader: unshaded
+      visible: false
+  - type: Appearance
+  - type: GenericVisualizer
+    visuals:
+      enum.PowerCellSlotVisuals.Enabled:
+        flame:
+          True: { visible: true }
+          False: { visible: false }
   - type: ShipCutter
     # The look of the item is the same in both modes, only the flame under it (see the client ShipCutterSystem) changes.
     cutSprite:
