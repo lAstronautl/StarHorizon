@@ -58,6 +58,12 @@ public sealed partial class TileReclaimerComponent : Component
     public float Efficiency = 1f;
 
     /// <summary>
+    /// Whether reclaimed tiles are paid for. A furnace burns them for nothing.
+    /// </summary>
+    [DataField]
+    public bool Pay = true;
+
+    /// <summary>
     /// The bank account that receives the money for reclaimed tiles.
     /// </summary>
     [DataField]

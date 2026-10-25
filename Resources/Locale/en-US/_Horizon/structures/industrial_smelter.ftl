@@ -1,5 +1,5 @@
 ent-ShipbreakingFurnace = furnace
-    .desc = Burns loose floor tiles and pipes fed in by conveyors and pays the station for them.
+    .desc = Burns loose floor tiles and pipes fed in by conveyors and pays the station for them. Also burns the tiles of hulls pushed into it, for nothing.
 ent-ShipbreakingProcessor = shipbreaking processor
     .desc = Pulls in shuttle grids, shreds their tiles and buys loose walls and cable coils, paying the station.
 ent-ShipbreakingProcessorAdmeme = { ent-ShipbreakingProcessor }

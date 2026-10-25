@@ -23,7 +23,7 @@ public sealed class ServerTileReclaimerSystem : TileReclaimerSystem
         float efficiency,
         EntityUid sourceGrid)
     {
-        if (!TryComp<TileReclaimerComponent>(ent, out var reclaimer))
+        if (!TryComp<TileReclaimerComponent>(ent, out var reclaimer) || !reclaimer.Pay)
             return;
 
         var value = 0.0;
