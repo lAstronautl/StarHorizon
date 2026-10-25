@@ -190,11 +190,12 @@
   id: ShipbreakingBarge
   parent: BaseCargoPallet
   components:
+  # No layers on the sprite (the empty list drops the catwalk layer of the cargo pallet): IconSmooth adds the corner
+  # layers itself, a layer of its own would show under them.
   - type: Sprite
     drawdepth: FloorTiles
     sprite: _Horizon/Structures/Machines/shipbreaking/barge.rsi
-    layers:
-    - state: full
+    layers: []
   - type: Icon
     sprite: _Horizon/Structures/Machines/shipbreaking/barge.rsi
     state: full
