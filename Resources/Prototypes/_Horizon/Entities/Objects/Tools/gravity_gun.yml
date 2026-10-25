@@ -1,5 +1,4 @@
 # Shipbreaking gravity gun: the tether gun, strong enough for scrap and able to drag a whole grid (click its floor).
-# Sprite is the tether gun one.
 - type: entity
   id: WeaponGravityGun
   parent: WeaponTetherGun
@@ -9,3 +8,20 @@
   - type: TetherGun
     massLimit: 5000
     maxForce: 3000
+  - type: Sprite
+    sprite: _Horizon/Objects/Tools/gravity_gun.rsi
+    layers:
+    - state: icon
+    - state: grav_pull
+      map: [ "unshaded" ]
+      shader: unshaded
+      visible: false
+  - type: ToggleableVisuals
+    spriteLayer: unshaded
+    inhandVisuals:
+      left:
+      - state: inhand-left-flame
+        shader: unshaded
+      right:
+      - state: inhand-right-flame
+        shader: unshaded

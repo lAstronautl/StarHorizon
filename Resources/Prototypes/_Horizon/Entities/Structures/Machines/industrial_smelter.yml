@@ -6,6 +6,24 @@
   id: ShipbreakingFurnace
   parent: BaseScrapProcessor
   components:
+  - type: Sprite
+    drawdepth: Doors
+    sprite: _Horizon/Structures/Machines/shipbreaking/furnace.rsi
+    offset: 0,0.5
+    layers:
+    - state: base
+      map: ["base"]
+    - state: working
+      map: ["working"]
+      visible: false
+  - type: Appearance
+  - type: GenericVisualizer
+    visuals:
+      enum.ConveyorVisuals.State:
+        working:
+          Off: { visible: false }
+          Forward: { visible: true }
+          Reverse: { visible: true }
   - type: ScrapProcessor
     sound:
       path: /Audio/Effects/saw.ogg
@@ -21,6 +39,24 @@
   id: ShipbreakingProcessor
   parent: BaseScrapProcessor
   components:
+  - type: Sprite
+    drawdepth: Doors
+    sprite: _Horizon/Structures/Machines/shipbreaking/processor.rsi
+    offset: 0,0.5
+    layers:
+    - state: base
+      map: ["base"]
+    - state: working
+      map: ["working"]
+      visible: false
+  - type: Appearance
+  - type: GenericVisualizer
+    visuals:
+      enum.ConveyorVisuals.State:
+        working:
+          Off: { visible: false }
+          Forward: { visible: true }
+          Reverse: { visible: true }
   - type: TileReclaimer
     efficiency: 5 # tiles are paid for in money, see ServerTileReclaimerSystem
     whitelist:
@@ -46,6 +82,24 @@
   parent: BaseScrapProcessor
   suffix: Admeme
   components:
+  - type: Sprite
+    drawdepth: Doors
+    sprite: _Horizon/Structures/Machines/shipbreaking/processor.rsi
+    offset: 0,0.5
+    layers:
+    - state: base
+      map: ["base"]
+    - state: working
+      map: ["working"]
+      visible: false
+  - type: Appearance
+  - type: GenericVisualizer
+    visuals:
+      enum.ConveyorVisuals.State:
+        working:
+          Off: { visible: false }
+          Forward: { visible: true }
+          Reverse: { visible: true }
   - type: TileReclaimer
     efficiency: 5
     sound:
@@ -54,7 +108,7 @@
         volume: -3
 
 # Shipbreaking scrap processors: buy loose entities (fed in by conveyors) and pay the station bank account.
-# Sprites are placeholders (recycler).
+# Sprites: furnace.rsi (crusher), processor.rsi (shredder), barge.rsi; the base machine keeps the recycler as a fallback.
 - type: entity
   id: BaseScrapProcessor
   parent: BaseMachinePowered
@@ -125,6 +179,11 @@
   id: ShipbreakingBarge
   parent: BaseScrapProcessor
   components:
+  - type: Sprite
+    drawdepth: FloorObjects
+    sprite: _Horizon/Structures/Machines/shipbreaking/barge.rsi
+    layers:
+    - state: full
   - type: ScrapProcessor
     sound:
       path: /Audio/Effects/saw.ogg

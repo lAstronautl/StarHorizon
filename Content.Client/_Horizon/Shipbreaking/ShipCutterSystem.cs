@@ -32,8 +32,16 @@ public sealed class ShipCutterSystem : SharedShipCutterSystem
     // Also runs for the first state, so a tool picked up in either mode looks right.
     private void OnState(Entity<ShipCutterComponent> ent, ref AfterAutoHandleStateEvent args)
     {
-        var look = ent.Comp.Mode == ShipToolMode.Cut ? ent.Comp.CutSprite : ent.Comp.WeldSprite;
-        if (look != null && TryComp<SpriteComponent>(ent, out var sprite))
+        if (!TryComp<SpriteComponent>(ent, out var sprite))
+            return;
+
+        var cut = ent.Comp.Mode == ShipToolMode.Cut;
+        var look = cut ? ent.Comp.CutSprite : ent.Comp.WeldSprite;
+        if (look != null)
             _sprite.LayerSetSprite((ent, sprite), 0, look);
+
+        // The flame under the tool shows the mode.
+        if (_sprite.LayerMapTryGet((ent, sprite), "flame", out var flame, false))
+            _sprite.LayerSetRsiState((ent, sprite), flame, cut ? "cutter_flame" : "welder_flame");
     }
 }
