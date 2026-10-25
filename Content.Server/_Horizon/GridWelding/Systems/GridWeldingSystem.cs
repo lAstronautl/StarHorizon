@@ -2,6 +2,8 @@ using System.Numerics;
 using Content.Server._Horizon.Shipbreaking;
 using Content.Server.Administration.Logs;
 using Content.Server.PowerCell;
+using Content.Server.Shuttles.Components;
+using Content.Server.Shuttles.Systems;
 using Content.Shared._Horizon.GridWelding.Components;
 using Content.Shared._Horizon.GridWelding.Events;
 using Content.Shared._Horizon.GridWelding.Systems;
@@ -40,6 +42,7 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
     [Dependency] private readonly GridCutsSystem _cuts = default!;
     [Dependency] private readonly SharedShipCutterSystem _cutter = default!;
     [Dependency] private readonly GridGravitySystem _gridGravity = default!;
+    [Dependency] private readonly DockingSystem _docking = default!;
 
     public override void Initialize()
     {
@@ -234,6 +237,7 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
         }
 
         ReleaseStrays(gridBUid, gridB, xformB);
+        UndockBetween(gridAUid, gridBUid);
 
         gridA.CanSplit = false;
         _gridFixtures.Merge(gridAUid, gridBUid, offset, rotation, gridA, gridB, xformA, xformB);
@@ -244,6 +248,30 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
         _gridGravity.AfterMerge(gridAUid, bInherentGravity, bGravityEnabled);
 
         ApplyMergeSeams(gridAUid, gridA, gridAFootprint, gridBTiles, gridBCuts, offset, rotation, tileA, tileB);
+    }
+
+    /// <summary>
+    /// Two grids that are docked to each other (a bought wreck is docked to the station) have their dock ports on one grid
+    /// after the merge, and re-docking a port with the one it is docked with then joins a body to itself.
+    /// The ports between the two grids are undocked first.
+    /// </summary>
+    private void UndockBetween(EntityUid gridAUid, EntityUid gridBUid)
+    {
+        var toUndock = new List<Entity<DockingComponent>>();
+        var docks = EntityQueryEnumerator<DockingComponent, TransformComponent>();
+        while (docks.MoveNext(out var uid, out var dock, out var xform))
+        {
+            if (xform.GridUid != gridBUid || dock.DockedWith is not { } other)
+                continue;
+
+            if (Transform(other).GridUid == gridAUid)
+                toUndock.Add((uid, dock));
+        }
+
+        foreach (var dock in toUndock)
+        {
+            _docking.Undock(dock);
+        }
     }
 
     /// <summary>
