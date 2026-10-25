@@ -1,3 +1,4 @@
+using System.Numerics;
 using Content.Server._Horizon.Shipbreaking;
 using Content.Server.Administration.Logs;
 using Content.Server.PowerCell;
@@ -232,6 +233,8 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
             bGravityEnabled = bGravity.Enabled;
         }
 
+        ReleaseStrays(gridBUid, gridB, xformB);
+
         gridA.CanSplit = false;
         _gridFixtures.Merge(gridAUid, gridBUid, offset, rotation, gridA, gridB, xformA, xformB);
         gridA.CanSplit = true;
@@ -241,6 +244,39 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
         _gridGravity.AfterMerge(gridAUid, bInherentGravity, bGravityEnabled);
 
         ApplyMergeSeams(gridAUid, gridA, gridAFootprint, gridBTiles, gridBCuts, offset, rotation, tileA, tileB);
+    }
+
+    /// <summary>
+    /// The merge moves only what stands inside the tiles of grid B and deletes the grid, and the engine asserts that nothing
+    /// is left on it. Whatever hangs on the grid outside of its tiles (a thing that drifted off the edge, a cut loose
+    /// part) is put on the map where it is, so it is neither lost nor in the way.
+    /// </summary>
+    private void ReleaseStrays(EntityUid gridBUid, MapGridComponent gridB, TransformComponent xformB)
+    {
+        if (xformB.MapUid is not { } map)
+            return;
+
+        var strays = new List<EntityUid>();
+        var children = xformB.ChildEnumerator;
+        while (children.MoveNext(out var child))
+        {
+            var xform = Transform(child);
+            if (xform.Anchored)
+                continue;
+
+            var local = xform.LocalPosition;
+            var indices = _maps.LocalToTile(gridBUid, gridB, xform.Coordinates);
+            var bounds = Box2.FromDimensions(new Vector2(indices.X, indices.Y) * gridB.TileSize, new Vector2(gridB.TileSize));
+            if (!_maps.TryGetTile(gridB, indices, out var tile) || tile.IsEmpty || !bounds.Contains(local))
+                strays.Add(child);
+        }
+
+        foreach (var stray in strays)
+        {
+            var xform = Transform(stray);
+            _xform.SetCoordinates(stray, xform, new EntityCoordinates(map, _xform.GetWorldPosition(xform)),
+                _xform.GetWorldRotation(xform));
+        }
     }
 
     private void OnSealDoAfter(Entity<SeamWelderComponent> ent, ref GridWeldSealDoAfterEvent args)
