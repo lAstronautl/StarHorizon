@@ -174,26 +174,29 @@
         sound:
           collection: MetalBreak
 
-# Barge: furniture (chairs, beds, lockers, tables).
+# Barge: a pallet that buys everything left on it (furniture, crates, parts), except walls, floor tiles and the living.
+# Like the selling pallets of the cargo console, without the console. Sprite: barge.rsi, smoothed like the cargo pallets.
 - type: entity
   id: ShipbreakingBarge
-  parent: BaseScrapProcessor
+  parent: BaseCargoPallet
   components:
   - type: Sprite
-    drawdepth: FloorObjects
+    drawdepth: FloorTiles
     sprite: _Horizon/Structures/Machines/shipbreaking/barge.rsi
     layers:
     - state: full
-  - type: ScrapProcessor
+  - type: Icon
+    sprite: _Horizon/Structures/Machines/shipbreaking/barge.rsi
+    state: full
+  - type: IconSmooth
+    key: shipbreaking_barge
+    base: state_
+  - type: ScrapPallet
     sound:
-      path: /Audio/Effects/saw.ogg
-      params:
-        volume: -3
-    whitelist:
-      components:
-      - Strap
-      - EntityStorage
-      - Climbable
+      path: /Audio/Effects/Cargo/ping.ogg
     blacklist:
+      tags:
+      - Wall
       components:
+      - FloorTile
       - MobState

@@ -5,4 +5,4 @@ ent-ShipbreakingProcessor = shipbreaking processor
 ent-ShipbreakingProcessorAdmeme = { ent-ShipbreakingProcessor }
     .desc = { ent-ShipbreakingProcessor.desc }
 ent-ShipbreakingBarge = salvage barge
-    .desc = Takes furniture fed in by conveyors and pays the station for it.
+    .desc = A pallet that buys everything left on it (not walls, floor tiles or the living) and pays the station.

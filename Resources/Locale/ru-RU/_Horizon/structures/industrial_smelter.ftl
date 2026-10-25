@@ -5,4 +5,4 @@ ent-ShipbreakingProcessor = процессор лома
 ent-ShipbreakingProcessorAdmeme = { ent-ShipbreakingProcessor }
     .desc = { ent-ShipbreakingProcessor.desc }
 ent-ShipbreakingBarge = баржа
-    .desc = Принимает мебель, поданную конвейером, и платит станции деньги.
+    .desc = Поддон, который скупает всё оставленное на нём (кроме стен, плиток и живых) и платит станции.
