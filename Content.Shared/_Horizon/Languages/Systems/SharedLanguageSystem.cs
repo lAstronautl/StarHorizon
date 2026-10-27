@@ -119,7 +119,7 @@ public abstract partial class SharedLanguageSystem : EntitySystem
         SortLanguages(uid);
 
         component.CurrentLanguage = component.Languages.Where(x => (int)x.Value >= 1).ToDictionary().Keys.FirstOrDefault("Universal");
-        Dirty(uid, component); // Horizon: sync the chosen language to the client
+        Dirty(uid, component);
 
         GetLanguages(uid, out var langs, out var translator, out var current);
 

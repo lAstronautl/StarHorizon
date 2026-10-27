@@ -147,7 +147,7 @@ public sealed partial class HumanoidProfileEditor
 
                     SetDirty();
                     RefreshQuirks();
-                    RefreshLanguages(); // Horizon: traits can change the language slot limit
+                    RefreshLanguages();
                     UpdateSaveButton();
                 };
                 QuirksList.AddChild(quirkButton);

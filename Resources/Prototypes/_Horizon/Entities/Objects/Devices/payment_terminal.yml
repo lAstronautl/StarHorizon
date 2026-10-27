@@ -10,7 +10,7 @@
     sprite: _Horizon/Objects/Devices/payment_terminal.rsi
     state: icon
   - type: Item
-    size: Small
+    size: Normal
   - type: Anchorable
   - type: CollideOnAnchor
   - type: PaymentTerminal

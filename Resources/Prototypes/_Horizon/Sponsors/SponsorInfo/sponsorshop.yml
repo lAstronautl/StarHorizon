@@ -924,6 +924,21 @@
     - SponsorShopDisk13
     - SponsorShopDisk14
 
+- type: sponsorShopCategory
+  id: SponsorShopCategSeven
+  name: "ВАЛЮТЫ ФРАКЦИЙ"
+  priority: 26
+
+- type: sponsorShopCategory
+  id: SponsorShopFactionCurrency
+  name: валюты фракций
+  parent: SponsorShopCategSeven
+  priority: 27
+  items:
+    - SponsorShopCurrencyTelecrystal
+    - SponsorShopCurrencyDoubloon
+    - SponsorShopCurrencyFrontierCoin
+
 # region Очки
 - type: sponsorShopListing
   id: SponsorShopEyes1
@@ -7016,3 +7031,32 @@
 #   priority: 24
 #   state: rndmajordisk
 #   prototypeId: TechnologyDiscArsenalDome
+
+# region Валюты фракций
+
+- type: sponsorShopListing
+  id: SponsorShopCurrencyTelecrystal
+  name: телекристалл
+  description: Похоже, он переливается подозрительно манящей энергией.
+  cost: 1
+  priority: 27
+  state: telecrystal
+  prototypeId: Telecrystal1
+
+- type: sponsorShopListing
+  id: SponsorShopCurrencyDoubloon
+  name: дублон
+  description: Грязная золотая монета, которая используется для гнусных пиратских сделок.
+  cost: 1
+  priority: 27
+  state: doubloon
+  prototypeId: Doubloon1
+
+- type: sponsorShopListing
+  id: SponsorShopCurrencyFrontierCoin
+  name: таможенная монета
+  description: Таможенная монета, которые выдаются за представителям ДШНФ за успешный перехват контрабанды.
+  cost: 1
+  priority: 27
+  state: frontieruplinkcoin
+  prototypeId: FrontierUplinkCoin1

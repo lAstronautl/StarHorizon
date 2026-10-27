@@ -48,7 +48,6 @@ public sealed class MechDrillSystem : EntitySystem
         if (mech.Energy + component.DrillEnergyDelta < 0)
             return;
 
-        // Horizon: never drill the mech itself or anything inside it (like the pilot)
         if (IsInsideMech(target, args.User))
             return;
 
@@ -86,7 +85,6 @@ public sealed class MechDrillSystem : EntitySystem
 
         var owner = equipmentComponent.EquipmentOwner.Value;
 
-        // Horizon: stop if the target ended up being the mech or inside it
         if (IsInsideMech(target, owner))
             return;
 
@@ -105,9 +103,6 @@ public sealed class MechDrillSystem : EntitySystem
         args.Repeat = Comp<MechComponent>(owner).Energy > 0;
     }
 
-    /// <summary>
-    /// Horizon: whether the target is the mech itself or parented to it (pilot, equipment, stored items).
-    /// </summary>
     private bool IsInsideMech(EntityUid target, EntityUid mech)
     {
         var current = target;

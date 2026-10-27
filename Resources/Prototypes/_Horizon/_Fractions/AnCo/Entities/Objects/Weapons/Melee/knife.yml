@@ -1,6 +1,6 @@
 - type: entity
   name: Ардонивый нож АнКо
-  parent: BaseAnCoSharpWeapon
+  parent: [ManufacturerAnCo, BaseAnCoSharpWeapon]
   id: AnCoKnife
   description: Компактный боевой нож, идеальный для ближнего боя и метания.
   suffix: StarHorizon, AnCo, Weapon
@@ -45,11 +45,12 @@
     qualities:
     - Slicing
   - type: StaticPrice
-    price: 5000
+    price: 500
+    vendPrise: 5000
 
 - type: entity
   name: Продвинутый ардонивый нож АнКо
-  parent: AnCoKnife
+  parent: [BaseOperAnCoContraband, AnCoKnife]
   id: AnCoKnifeDash
   description: Компактный боевой нож, идеальный для ближнего боя и метания. Имеет втроеную технологию быстрой телепортации для быстрого отступления
   suffix: StarHorizon, AnCo, Weapon, Dash

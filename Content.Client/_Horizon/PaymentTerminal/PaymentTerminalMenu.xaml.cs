@@ -53,10 +53,6 @@ public sealed partial class PaymentTerminalMenu : DefaultWindow
             ? Loc.GetString("payment-terminal-ui-owner", ("name", owner))
             : Loc.GetString("payment-terminal-ui-no-owner");
 
-        ModeLabel.Text = Loc.GetString(state.Mode == PaymentTerminalMode.Fixed
-            ? "payment-terminal-ui-mode-fixed"
-            : "payment-terminal-ui-mode-free");
-
         PriceLabel.Text = Marker(state.Stage == PaymentTerminalStage.Price)
                           + Loc.GetString("payment-terminal-ui-price", ("amount", state.Price));
         TipLabel.Text = Marker(state.Stage == PaymentTerminalStage.Tip)

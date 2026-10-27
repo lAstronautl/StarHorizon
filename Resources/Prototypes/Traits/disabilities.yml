@@ -52,8 +52,8 @@
 
 - type: trait
   id: Monochromancy
-  name: trait-monochromacy-name # Horizon: fix locale key typo
-  description: trait-monochromacy-desc # Horizon: fix locale key typo
+  name: trait-monochromacy-name  # Horizon tweak
+  description: trait-monochromacy-desc  # Horizon tweak
   category: HorizonNeutral  # Horizon tweak
   group: TraitVision # Horizon: screen shaders don't stack
   components:

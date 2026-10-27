@@ -12,14 +12,14 @@ using Content.Shared.Movement.Components;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Popups;
 using Content.Shared.RCD;
-using Content.Shared.RCD.Components; // Horizon
+using Content.Shared.RCD.Components;
 using Content.Shared.RCD.Systems;
 using Content.Shared.Tools.Systems;
 using Robust.Shared.Containers;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Systems;
 using Robust.Shared.Timing;
-using System.Linq; // Horizon
+using System.Linq;
 
 namespace Content.Shared._Horizon.Mech.EntitySystems;
 
@@ -34,8 +34,8 @@ public abstract class SharedMechToolsSystem : EntitySystem
     [Dependency] private readonly SharedJetpackSystem _jet = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly MovementSpeedModifierSystem _movementSpeedModifier = default!;
-    [Dependency] private readonly RCDAmmoSystem _rcdAmmo = default!; // Horizon
-    [Dependency] private readonly SharedContainerSystem _container = default!; // Horizon
+    [Dependency] private readonly RCDAmmoSystem _rcdAmmo = default!;
+    [Dependency] private readonly SharedContainerSystem _container = default!;
 
     public override void Initialize()
     {
@@ -122,10 +122,6 @@ public abstract class SharedMechToolsSystem : EntitySystem
         _mech.TryChangeEnergy(ent, -ent.Comp.PlaceCost);
     }
 
-    /// <summary>
-    /// Horizon: the mech's RCD keeps its charges and grid access on the selected equipment item,
-    /// so they survive switching equipment and the ID card can be swiped on the item itself.
-    /// </summary>
     private void OnGetRCDResource(Entity<MechRCDComponent> ent, ref GetRCDResourceEntityEvent args)
     {
         if (TryComp<MechComponent>(ent, out var mech)
@@ -136,9 +132,6 @@ public abstract class SharedMechToolsSystem : EntitySystem
         }
     }
 
-    /// <summary>
-    /// Horizon: when the equipment runs low, pull RCD cartridges from the mech's storage, like mech guns do with magazines.
-    /// </summary>
     private void TryReloadFromStorage(Entity<MechRCDComponent> ent, MechComponent mech)
     {
         if (!TryComp<RCDComponent>(ent, out var rcd)

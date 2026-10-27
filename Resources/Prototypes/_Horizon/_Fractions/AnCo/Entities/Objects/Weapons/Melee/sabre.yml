@@ -1,6 +1,6 @@
 - type: entity
   name: сабля АнКо
-  parent: BaseAnCoSharpWeapon
+  parent: [ManufacturerAnCo, BaseAnCoSharpWeapon]
   id: AnCoSabre
   description: Элегантная и смертоносная сабля, символ офицерского состава AnCo.
   suffix: StarHorizon, AnCo, Weapon
@@ -30,7 +30,8 @@
     - Slicing
   - type: AnCoSabre
   - type: StaticPrice
-    price: 6000
+    price: 500
+    vendPrise: 6000
   - type: Tag
     tags:
       - AnCoSheathable

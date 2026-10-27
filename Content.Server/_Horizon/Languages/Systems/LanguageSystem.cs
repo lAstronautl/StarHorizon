@@ -39,7 +39,7 @@ public sealed partial class LanguageSystem : SharedLanguageSystem
         if (component.CurrentLanguage == null)
         {
             component.CurrentLanguage = component.Languages.Keys.Where(x => (int)component.Languages[x] > 0).FirstOrDefault("Universal");
-            Dirty(uid, component); // Horizon: sync the chosen language to the client
+            Dirty(uid, component);
         }
         UpdateUi(uid);
     }
@@ -52,7 +52,6 @@ public sealed partial class LanguageSystem : SharedLanguageSystem
     private void OnLanguageSwitch(LanguageChosenMessage args, EntitySessionEventArgs session)
     {
         var uid = GetEntity(args.Uid);
-        // Horizon: players may only change their own language
         if (session.SenderSession.AttachedEntity != uid)
             return;
         if (!TryComp<LanguageSpeakerComponent>(uid, out var component))
@@ -61,7 +60,7 @@ public sealed partial class LanguageSystem : SharedLanguageSystem
             return;
 
         component.CurrentLanguage = args.SelectedLanguage;
-        Dirty(uid, component); // Horizon: without this the client menu kept showing the old language
+        Dirty(uid, component);
 
         UpdateUi(uid);
     }

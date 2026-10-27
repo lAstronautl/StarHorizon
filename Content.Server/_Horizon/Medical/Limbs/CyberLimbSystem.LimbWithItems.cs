@@ -1,12 +1,12 @@
 using System.Linq;
 using Content.Shared._Horizon.Medical.Limbs;
 using Content.Shared.Armor;
-using Content.Server.Body.Systems; // Horizon
-using Content.Shared.Body.Components; // Horizon
+using Content.Server.Body.Systems;
+using Content.Shared.Body.Components;
 using Content.Shared.Body.Part;
-using Content.Shared.Cuffs; // Horizon
-using Content.Shared.Cuffs.Components; // Horizon
-using Content.Shared.Popups; // Horizon
+using Content.Shared.Cuffs;
+using Content.Shared.Cuffs.Components;
+using Content.Shared.Popups;
 using Content.Shared.Damage;
 using Content.Shared.Hands.Components;
 using Content.Shared.Humanoid;
@@ -24,8 +24,8 @@ public sealed partial class CyberLimbSystem
 {
     [Dependency] private readonly MovementSpeedModifierSystem _moveSystem = null!;
     [Dependency] private readonly SharedArmorSystem _armorSystem = null!;
-    [Dependency] private readonly BodySystem _body = null!; // Horizon
-    [Dependency] private readonly SharedPopupSystem _popup = null!; // Horizon
+    [Dependency] private readonly BodySystem _body = null!;
+    [Dependency] private readonly SharedPopupSystem _popup = null!;
 
     private readonly Dictionary<EntityUid, (BaseSpeed, List<float>)> _speedCoefficients = new();
     private readonly Dictionary<EntityUid, List<DamageModifierSet>> _armorCoefficients = new();
@@ -52,12 +52,11 @@ public sealed partial class CyberLimbSystem
         base.Initialize();
         SubscribeLocalEvent<LimbWithItemsComponent, ComponentInit>(OnLimbWithItemsInit);
         SubscribeLocalEvent<LimbWithItemsComponent, ToggleLimbEvent>(OnLimbToggle);
-        SubscribeLocalEvent<BodyComponent, TargetHandcuffedEvent>(OnBodyHandcuffed); // Horizon
+        SubscribeLocalEvent<BodyComponent, TargetHandcuffedEvent>(OnBodyHandcuffed);
     }
 
     private void OnLimbToggle(Entity<LimbWithItemsComponent> ent, ref ToggleLimbEvent args)
     {
-        // Horizon: limb tools add extra hands, which would let cuffed people keep fighting
         if (!ent.Comp.Toggled && TryComp<CuffableComponent>(args.Performer, out var cuffable) && cuffable.CuffedHandCount > 0)
         {
             _popup.PopupEntity(Loc.GetString("cuffable-component-cannot-interact-message"), args.Performer, args.Performer);
@@ -67,9 +66,6 @@ public sealed partial class CyberLimbSystem
         SetLimbToggled(ent, args.Performer, !ent.Comp.Toggled);
     }
 
-    /// <summary>
-    /// Horizon: retract limb tools when the owner gets cuffed, removing their extra hands before the cuffs apply.
-    /// </summary>
     private void OnBodyHandcuffed(Entity<BodyComponent> ent, ref TargetHandcuffedEvent args)
     {
         foreach (var part in _body.GetBodyChildren(ent, ent.Comp))

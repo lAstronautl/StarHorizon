@@ -1,7 +1,7 @@
 - type: entity
   id: AnCoAxe
   name: Ардонивый топор АнКо
-  parent: BaseAnCoSharpWeapon
+  parent: [ManufacturerAnCo, BaseAnCoSharpWeapon]
   description: Устали от обычных топоров? Покройте его ардонием и сделайте смертоноснее в 10 раз!
   suffix: StarHorizon, AnCo, Weapon
   components:
@@ -93,4 +93,5 @@
   - type: IgnitionSource
     temperature: 700
   - type: StaticPrice
-    price: 10000
+    price: 500
+    vendPrise: 10000
