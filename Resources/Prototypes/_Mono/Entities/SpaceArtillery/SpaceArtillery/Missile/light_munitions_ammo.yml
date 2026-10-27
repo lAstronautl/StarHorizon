@@ -127,7 +127,7 @@
     requireNoGrid: true
     shape: triangle
   - type: TimedDespawn
-    lifetime: 30 # Horizon: 10<30, light torpedoes vanished long before reaching anything
+    lifetime: 10
   - type: PointLight
     radius: 5
     color: orange
@@ -231,7 +231,7 @@
     requireNoGrid: true
     shape: triangle
   - type: TimedDespawn
-    lifetime: 30 # Horizon: 0.8<30, light torpedoes vanished long before reaching anything
+    lifetime: 0.8
   - type: PointLight
     radius: 5
     color: green
