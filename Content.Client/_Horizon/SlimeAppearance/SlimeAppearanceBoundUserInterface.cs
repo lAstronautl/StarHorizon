@@ -13,7 +13,7 @@ public sealed class SlimeAppearanceBoundUserInterface(EntityUid owner, Enum uiKe
         base.Open();
 
         _window = this.CreateWindow<SlimeAppearanceWindow>();
-        _window.OnApply += (markings, skin, eyes) => SendMessage(new SlimeAppearanceApplyMessage(markings, skin, eyes));
+        _window.OnApply += (markings, sex, skin, eyes) => SendMessage(new SlimeAppearanceApplyMessage(markings, sex, skin, eyes));
     }
 
     protected override void UpdateState(BoundUserInterfaceState state)

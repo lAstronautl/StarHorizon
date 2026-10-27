@@ -5,6 +5,10 @@
                       MinSize="700 600"
                       SetSize="760 680">
     <BoxContainer Orientation="Vertical" HorizontalExpand="True" VerticalExpand="True" Margin="8">
+        <BoxContainer Orientation="Horizontal" Margin="0 0 0 8">
+            <Label Text="{Loc 'slime-appearance-window-sex'}" Margin="0 0 8 0" />
+            <OptionButton Name="SexButton" MinWidth="150" />
+        </BoxContainer>
         <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
             <BoxContainer Orientation="Vertical" HorizontalExpand="True" Margin="0 0 8 0">
                 <Label Text="{Loc 'slime-appearance-window-skin'}" />

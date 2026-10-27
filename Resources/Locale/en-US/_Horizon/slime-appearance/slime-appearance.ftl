@@ -1,4 +1,5 @@
 slime-appearance-window-title = Reshape appearance
+slime-appearance-window-sex = Sex
 slime-appearance-window-skin = Body color
 slime-appearance-window-eyes = Eye color
 slime-appearance-window-apply = Apply

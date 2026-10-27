@@ -9,7 +9,7 @@ using Robust.Shared.Serialization;
 namespace Content.Shared._Horizon.SlimeAppearance;
 
 /// <summary>
-/// Lets a slime person reshape their appearance mid-round: markings (including hair), skin and eye color.
+/// Lets a slime person reshape their appearance mid-round: sex, markings (including hair), skin and eye color.
 /// The change applies after standing still for <see cref="DoAfterTime"/>, then goes on cooldown.
 /// </summary>
 [RegisterComponent, NetworkedComponent]
@@ -32,6 +32,9 @@ public sealed partial class SlimeAppearanceChangeComponent : Component
     /// </summary>
     [ViewVariables]
     public MarkingSet? PendingMarkings;
+
+    [ViewVariables]
+    public Sex PendingSex;
 
     [ViewVariables]
     public Color PendingSkinColor;
@@ -70,9 +73,10 @@ public sealed class SlimeAppearanceBoundUserInterfaceState(
 }
 
 [Serializable, NetSerializable]
-public sealed class SlimeAppearanceApplyMessage(MarkingSet markings, Color skinColor, Color eyeColor) : BoundUserInterfaceMessage
+public sealed class SlimeAppearanceApplyMessage(MarkingSet markings, Sex sex, Color skinColor, Color eyeColor) : BoundUserInterfaceMessage
 {
     public readonly MarkingSet Markings = markings;
+    public readonly Sex Sex = sex;
     public readonly Color SkinColor = skinColor;
     public readonly Color EyeColor = eyeColor;
 }

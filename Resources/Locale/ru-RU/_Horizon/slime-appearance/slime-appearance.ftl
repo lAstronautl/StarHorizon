@@ -1,4 +1,5 @@
 slime-appearance-window-title = Изменение облика
+slime-appearance-window-sex = Пол
 slime-appearance-window-skin = Цвет тела
 slime-appearance-window-eyes = Цвет глаз
 slime-appearance-window-apply = Применить

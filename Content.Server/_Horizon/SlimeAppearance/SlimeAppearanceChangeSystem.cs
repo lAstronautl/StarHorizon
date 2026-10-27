@@ -97,12 +97,16 @@ public sealed class SlimeAppearanceChangeSystem : EntitySystem
         if (!SkinColor.VerifySkinColor(species.SkinColoration, skinColor))
             skinColor = SkinColor.ValidSkinTone(species.SkinColoration, skinColor);
 
+        // Pronouns are the player's own choice, so only the sex changes
+        var sex = species.Sexes.Contains(args.Sex) ? args.Sex : humanoid.Sex;
+
         var markings = new MarkingSet(args.Markings.GetForwardEnumerator().ToList(), species.MarkingPoints, _markingManager, _proto);
         markings.EnsureValid(_markingManager);
         markings.EnsureSpecies(humanoid.Species, skinColor, _markingManager);
-        markings.EnsureSexes(humanoid.Sex, _markingManager);
+        markings.EnsureSexes(sex, _markingManager);
 
         ent.Comp.PendingMarkings = markings;
+        ent.Comp.PendingSex = sex;
         ent.Comp.PendingSkinColor = skinColor;
         ent.Comp.PendingEyeColor = new Color(args.EyeColor.R, args.EyeColor.G, args.EyeColor.B);
 
@@ -137,6 +141,8 @@ public sealed class SlimeAppearanceChangeSystem : EntitySystem
             return;
         }
 
+        // The sex goes first: changing it drops the markings that don't fit, and the new ones are already checked against it
+        _humanoid.SetSex(ent, ent.Comp.PendingSex, sync: false, humanoid: humanoid);
         humanoid.MarkingSet = markings;
         humanoid.EyeColor = ent.Comp.PendingEyeColor;
         _humanoid.SetSkinColor(ent, ent.Comp.PendingSkinColor, sync: false, humanoid: humanoid);
