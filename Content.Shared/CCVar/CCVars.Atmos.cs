@@ -57,7 +57,26 @@ public sealed partial class CCVars
     ///     Also looks weird on slow spacing for unrelated reasons. If you do want to enable this, you should probably turn on instaspacing.
     /// </summary>
     public static readonly CVarDef<bool> MonstermosRipTiles =
-        CVarDef.Create("atmos.monstermos_rip_tiles", false, CVar.SERVERONLY);
+        CVarDef.Create("atmos.monstermos_rip_tiles", true, CVar.SERVERONLY); // Horizon: false<true
+
+    /// <summary>
+    ///     Horizon: multiplier of the chance that explosive depressurization rips a tile, 1 is the original strength.
+    /// </summary>
+    public static readonly CVarDef<float> MonstermosRipStrength =
+        CVarDef.Create("atmos.monstermos_rip_strength", 0.5f, CVar.SERVERONLY);
+
+    /// <summary>
+    ///     Horizon: how much wind has to go through a tile before it starts breaking the structures around it
+    ///     (same units as the wind that rips tiles).
+    /// </summary>
+    public static readonly CVarDef<float> AtmosWindDamageThreshold =
+        CVarDef.Create("atmos.wind_damage_threshold", 150f, CVar.SERVERONLY);
+
+    /// <summary>
+    ///     Horizon: structural damage per unit of wind above <see cref="AtmosWindDamageThreshold"/>, per tile and atmos tick.
+    /// </summary>
+    public static readonly CVarDef<float> AtmosWindDamageScale =
+        CVarDef.Create("atmos.wind_damage_scale", 0.05f, CVar.SERVERONLY);
 
     /// <summary>
     ///     Whether explosive depressurization will cause the grid to gain an impulse.
