@@ -57,7 +57,7 @@ public sealed partial class CCVars
     ///     Also looks weird on slow spacing for unrelated reasons. If you do want to enable this, you should probably turn on instaspacing.
     /// </summary>
     public static readonly CVarDef<bool> MonstermosRipTiles =
-        CVarDef.Create("atmos.monstermos_rip_tiles", true, CVar.SERVERONLY); // Horizon: false<true
+        CVarDef.Create("atmos.monstermos_rip_tiles", false, CVar.SERVERONLY);
 
     /// <summary>
     ///     Horizon: multiplier of the chance that explosive depressurization rips a tile, 1 is the original strength.
