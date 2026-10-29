@@ -29,9 +29,6 @@ namespace Content.Server._Horizon.Shipbreaking.Derelict;
 public sealed class DerelictYardSystem : EntitySystem
 {
     private const string DerelictDockTag = "DerelictDock";
-    private const int MaxExtensions = 2;
-    private const float ExtendPriceShare = 0.15f;
-    private static readonly TimeSpan ExtendTime = TimeSpan.FromMinutes(10);
 
     private static readonly TimeSpan FirstWarning = TimeSpan.FromMinutes(5);
     private static readonly TimeSpan LastWarning = TimeSpan.FromMinutes(1);
@@ -63,7 +60,6 @@ public sealed class DerelictYardSystem : EntitySystem
         public int Price;
         public int Appraisal;
         public int Revenue;
-        public int Extensions;
         public TimeSpan Expires;
         public bool Warned5;
         public bool Warned1;
@@ -80,7 +76,7 @@ public sealed class DerelictYardSystem : EntitySystem
         SubscribeLocalEvent<DerelictYardConsoleComponent, BoundUIOpenedEvent>(OnOpened);
         SubscribeLocalEvent<DerelictYardConsoleComponent, DerelictPurchaseMessage>(OnPurchase);
         SubscribeLocalEvent<DerelictYardConsoleComponent, DerelictPreviewRequestMessage>(OnPreviewRequest);
-        SubscribeLocalEvent<DerelictYardConsoleComponent, DerelictExtendMessage>(OnExtend);
+        SubscribeLocalEvent<DerelictYardConsoleComponent, DerelictFinishMessage>(OnFinishEarly);
         SubscribeLocalEvent<DerelictLeaseComponent, PostGridSplitEvent>(OnSplit);
         SubscribeLocalEvent<RoundRestartCleanupEvent>(_ => _jobs.Clear());
     }
@@ -131,8 +127,6 @@ public sealed class DerelictYardSystem : EntitySystem
                 Name = job.Name,
                 Left = job.Expires - _timing.CurTime,
                 Share = job.Appraisal > 0 ? (float) job.Revenue / job.Appraisal : 0f,
-                CanExtend = job.Extensions < MaxExtensions,
-                ExtendPrice = ExtendPrice(job),
             });
         }
 
@@ -150,8 +144,6 @@ public sealed class DerelictYardSystem : EntitySystem
             UpdateUi((uid, console));
         }
     }
-
-    private static int ExtendPrice(Job job) => (int) (job.Price * ExtendPriceShare);
 
     private void OnPurchase(Entity<DerelictYardConsoleComponent> ent, ref DerelictPurchaseMessage args)
     {
@@ -240,24 +232,14 @@ public sealed class DerelictYardSystem : EntitySystem
             job.Revenue += amount;
     }
 
-    private void OnExtend(Entity<DerelictYardConsoleComponent> ent, ref DerelictExtendMessage args)
+    private void OnFinishEarly(Entity<DerelictYardConsoleComponent> ent, ref DerelictFinishMessage args)
     {
-        if (!_jobs.TryGetValue(GetEntity(args.Group), out var job) || job.Extensions >= MaxExtensions ||
-            job.Station != _station.GetOwningStation(ent))
+        var group = GetEntity(args.Group);
+        if (!_jobs.TryGetValue(group, out var job) || job.Station != _station.GetOwningStation(ent))
             return;
 
-        var price = ExtendPrice(job);
-        if (!_bank.TryGetBalance(SectorBankAccount.Frontier, out var balance) || balance < price ||
-            !_bank.TrySectorWithdraw(SectorBankAccount.Frontier, price, LedgerEntryType.StationWithdrawalSupplies))
-        {
-            _popup.PopupEntity(Loc.GetString("derelict-yard-no-funds"), ent, args.Actor);
-            return;
-        }
-
-        job.Extensions++;
-        job.Expires += ExtendTime;
-        job.Warned5 = false;
-        job.Warned1 = false;
+        Finish(group, job);
+        _jobs.Remove(group);
 
         UpdateAllUis();
     }

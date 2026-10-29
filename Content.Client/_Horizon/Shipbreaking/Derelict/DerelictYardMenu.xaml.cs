@@ -14,7 +14,7 @@ public sealed partial class DerelictYardMenu : FancyWindow
 {
     public event Action<string>? OnSelected;
     public event Action<string>? OnBuy;
-    public event Action<NetEntity>? OnExtend;
+    public event Action<NetEntity>? OnFinish;
 
     private DerelictYardState? _state;
     private string? _selected;
@@ -107,10 +107,9 @@ public sealed partial class DerelictYardMenu : FancyWindow
             var group = lease.Group;
             var button = new Button
             {
-                Text = Loc.GetString("derelict-yard-extend", ("price", lease.ExtendPrice)),
-                Disabled = !lease.CanExtend || state.Balance is not { } balance || balance < lease.ExtendPrice,
+                Text = Loc.GetString("derelict-yard-finish"),
             };
-            button.OnPressed += _ => OnExtend?.Invoke(group);
+            button.OnPressed += _ => OnFinish?.Invoke(group);
             row.AddChild(button);
 
             LeaseList.AddChild(row);

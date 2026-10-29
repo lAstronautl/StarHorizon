@@ -130,8 +130,6 @@ public sealed class DerelictLeaseEntry
     /// </summary>
     public float Share;
 
-    public bool CanExtend;
-    public int ExtendPrice;
 }
 
 [Serializable, NetSerializable]
@@ -156,14 +154,14 @@ public sealed class DerelictYardState : BoundUserInterfaceState
 }
 
 /// <summary>
-/// The client wants to extend a lease.
+/// The client hands the wreck in ahead of time: the job is settled and the wreck is deleted.
 /// </summary>
 [Serializable, NetSerializable]
-public sealed class DerelictExtendMessage : BoundUserInterfaceMessage
+public sealed class DerelictFinishMessage : BoundUserInterfaceMessage
 {
     public NetEntity Group;
 
-    public DerelictExtendMessage(NetEntity group)
+    public DerelictFinishMessage(NetEntity group)
     {
         Group = group;
     }
