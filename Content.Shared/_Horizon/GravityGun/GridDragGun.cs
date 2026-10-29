@@ -22,6 +22,43 @@ public sealed partial class GridDragGunComponent : Component
     /// </summary>
     [DataField]
     public int MaxTiles = 5;
+
+    /// <summary>
+    /// How hard the grid is pulled to the cursor, in metres per second per metre of distance.
+    /// </summary>
+    [DataField]
+    public float Gain = 4f;
+
+    /// <summary>
+    /// How much of the way from its speed to the wanted speed the grid goes with each request, 0 to 1. The smaller it
+    /// is, the more the grid lags behind the cursor and carries on after it.
+    /// </summary>
+    [DataField]
+    public float Blend = 0.08f;
+
+    [DataField]
+    public float MaxSpeed = 20f;
+
+    /// <summary>
+    /// The colour of the beam and of the grid while it is moved, the same as of the tether gun.
+    /// </summary>
+    [DataField]
+    public Color LineColor = Color.Orange;
+}
+
+/// <summary>
+/// On a grid while a <see cref="GridDragGunComponent"/> moves it, so everybody sees the beam and the grid coloured.
+/// </summary>
+[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true)]
+public sealed partial class GridDraggedComponent : Component
+{
+    [DataField, AutoNetworkedField]
+    public EntityUid Gun;
+
+    /// <summary>
+    /// When the gun last asked for the grid to be moved. Only the server needs it.
+    /// </summary>
+    public TimeSpan LastRequest;
 }
 
 /// <summary>

@@ -111,10 +111,7 @@ public sealed class GridDragGunSystem : SharedGridDragGunSystem
             return;
         }
 
-        var localToWorld = Vector2.Transform(_localPosition, _transformSystem.GetWorldMatrix(xform));
-
-        if (localToWorld.EqualsApprox(mousePos.Position, 0.01f)) return;
-
+        // Asked every frame, not only when the cursor moved: the pull has to hold the grid at the cursor.
         var requestedGridOrigin = mousePos.Position - _transformSystem.GetWorldRotation(xform).RotateVec(_localPosition);
         _lastMousePosition = new MapCoordinates(requestedGridOrigin, mousePos.MapId);
 
