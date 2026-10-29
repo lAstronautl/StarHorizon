@@ -17,7 +17,7 @@ namespace Content.Client._Horizon.GravityGun;
 /// A copy of the client side of the griddrag command: with the key held over a grid the grid follows the cursor, and
 /// keeps the speed of the hand when let go. It works while a <see cref="GridDragGunComponent"/> is held.
 /// </summary>
-public sealed class GridDragGunSystem : EntitySystem
+public sealed class GridDragGunSystem : SharedGridDragGunSystem
 {
     [Dependency] private readonly IEyeManager _eyeManager = default!;
     [Dependency] private readonly IGameTiming _gameTiming = default!;
@@ -75,8 +75,9 @@ public sealed class GridDragGunSystem : EntitySystem
 
         if (!_gameTiming.IsFirstTimePredicted) return;
 
+        GridDragGunComponent? gun = null;
         var holding = _player.LocalEntity is { } player && _hands.TryGetActiveItem(player, out var item) &&
-                      HasComp<GridDragGunComponent>(item);
+                      TryComp(item, out gun);
         var state = _inputSystem.CmdStates.GetState(EngineKeyFunctions.Use);
 
         if (!holding || state != BoundKeyState.Down)
@@ -90,7 +91,9 @@ public sealed class GridDragGunSystem : EntitySystem
 
         if (_dragging == null)
         {
-            if (!_mapManager.TryFindGridAt(mousePos, out var gridUid, out var grid))
+            // A grid that can not be taken is simply not taken.
+            if (!_mapManager.TryFindGridAt(mousePos, out var gridUid, out var grid) ||
+                !CanGrab(_player.LocalEntity!.Value, gun!, gridUid))
                 return;
 
             StartDragging(gridUid, Vector2.Transform(mousePos.Position, _transformSystem.GetInvWorldMatrix(gridUid)));

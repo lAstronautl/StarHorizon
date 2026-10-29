@@ -11,7 +11,7 @@ namespace Content.Server._Horizon.GravityGun;
 /// The griddrag command for whoever holds a <see cref="GridDragGunComponent"/>: same requests as
 /// <see cref="GridDraggingSystem"/>, but any holder may send them, and only for a grid near them.
 /// </summary>
-public sealed class GridDragGunSystem : EntitySystem
+public sealed class GridDragGunSystem : SharedGridDragGunSystem
 {
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
@@ -33,7 +33,7 @@ public sealed class GridDragGunSystem : EntitySystem
         if (args.SenderSession.AttachedEntity is not { } user ||
             !_hands.TryGetActiveItem(user, out var item) ||
             !TryComp<GridDragGunComponent>(item, out var gun) ||
-            TerminatingOrDeleted(grid) || !HasComp<PhysicsComponent>(grid))
+            !HasComp<PhysicsComponent>(grid) || !CanGrab(user, gun, grid))
             return false;
 
         var reach = gun.MaxDistance;
