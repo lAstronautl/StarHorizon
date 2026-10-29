@@ -1,95 +1,62 @@
 using System.Numerics;
-using Content.Server.PowerCell;
 using Content.Shared._Horizon.GravityGun;
 using Content.Shared.Hands.EntitySystems;
+using Content.Shared.Maps;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Systems;
-using Robust.Shared.Player;
 
 namespace Content.Server._Horizon.GravityGun;
 
 /// <summary>
-/// Server side of <see cref="GridDragGunComponent"/>, copied from the griddrag command: the grid is put where the client
-/// asks, as long as the user holds the gun, has charge, and the grabbed point is in reach.
+/// The griddrag command for whoever holds a <see cref="GridDragGunComponent"/>: same requests as
+/// <see cref="GridDraggingSystem"/>, but any holder may send them, and only for a grid near them.
 /// </summary>
 public sealed class GridDragGunSystem : EntitySystem
 {
-    [Dependency] private readonly PowerCellSystem _cell = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
 
-    private readonly Dictionary<ICommonSession, (EntityUid Grid, Vector2 Local)> _dragging = new();
-
     public override void Initialize()
     {
         base.Initialize();
-
-        SubscribeNetworkEvent<GridDragGunStartRequest>(OnStart);
-        SubscribeNetworkEvent<GridDragGunPositionRequest>(OnPosition);
-        SubscribeNetworkEvent<GridDragGunStopRequest>(OnStop);
+        SubscribeNetworkEvent<GridDragRequestPosition>(OnRequestDrag);
+        SubscribeNetworkEvent<GridDragVelocityRequest>(OnRequestVelocity);
     }
 
-    private bool TryGetGun(ICommonSession session, out Entity<GridDragGunComponent> gun, out EntityUid user)
+    /// <summary>
+    /// Whether the sender holds the gun and the grid is within reach of them (a grid far from the user is not theirs
+    /// to move, a client could otherwise take any grid anywhere).
+    /// </summary>
+    private bool CanDrag(EntitySessionEventArgs args, EntityUid grid, Vector2 point)
     {
-        gun = default;
-        user = default;
-
-        if (session.AttachedEntity is not { } attached ||
-            !_hands.TryGetActiveItem(attached, out var item) ||
-            !TryComp<GridDragGunComponent>(item, out var comp) ||
-            !_cell.HasDrawCharge(item.Value, user: attached))
+        if (args.SenderSession.AttachedEntity is not { } user ||
+            !_hands.TryGetActiveItem(user, out var item) ||
+            !TryComp<GridDragGunComponent>(item, out var gun) ||
+            TerminatingOrDeleted(grid) || !HasComp<PhysicsComponent>(grid))
             return false;
 
-        user = attached;
-        gun = (item.Value, comp);
-        return true;
+        var reach = gun.MaxDistance;
+        var userPos = _transform.GetWorldPosition(user);
+        return (point - userPos).Length() <= reach && (_transform.GetWorldPosition(grid) - userPos).Length() <= reach * 3f;
     }
 
-    private void OnStart(GridDragGunStartRequest msg, EntitySessionEventArgs args)
+    private void OnRequestVelocity(GridDragVelocityRequest ev, EntitySessionEventArgs args)
     {
-        var grid = GetEntity(msg.Grid);
-
-        if (!TryGetGun(args.SenderSession, out var gun, out var user) || !HasComp<PhysicsComponent>(grid) ||
-            Transform(user).GridUid == grid)
+        var grid = GetEntity(ev.Grid);
+        if (!CanDrag(args, grid, _transform.GetWorldPosition(grid)))
             return;
 
-        var point = Vector2.Transform(msg.LocalPoint, _transform.GetWorldMatrix(grid));
-        if ((point - _transform.GetWorldPosition(user)).Length() > gun.Comp.MaxDistance)
-            return;
-
-        _dragging[args.SenderSession] = (grid, msg.LocalPoint);
-        _physics.SetLinearVelocity(grid, Vector2.Zero);
+        _physics.SetLinearVelocity(grid, ev.LinearVelocity);
         _physics.SetAngularVelocity(grid, 0f);
     }
 
-    private void OnPosition(GridDragGunPositionRequest msg, EntitySessionEventArgs args)
+    private void OnRequestDrag(GridDragRequestPosition msg, EntitySessionEventArgs args)
     {
         var grid = GetEntity(msg.Grid);
-
-        if (!_dragging.TryGetValue(args.SenderSession, out var state) || state.Grid != grid || TerminatingOrDeleted(grid) ||
-            !TryGetGun(args.SenderSession, out var gun, out var user))
-        {
-            _dragging.Remove(args.SenderSession);
-            return;
-        }
-
-        // The point that is held has to stay in reach of the user.
-        var point = msg.WorldPosition + _transform.GetWorldRotation(grid).RotateVec(state.Local);
-        if ((point - _transform.GetWorldPosition(user)).Length() > gun.Comp.MaxDistance)
+        if (!CanDrag(args, grid, msg.WorldPosition))
             return;
 
         _transform.SetWorldPosition(grid, msg.WorldPosition);
-    }
-
-    private void OnStop(GridDragGunStopRequest msg, EntitySessionEventArgs args)
-    {
-        var grid = GetEntity(msg.Grid);
-
-        if (!_dragging.Remove(args.SenderSession, out var state) || state.Grid != grid || TerminatingOrDeleted(grid))
-            return;
-
-        _physics.SetLinearVelocity(grid, msg.LinearVelocity);
-        _physics.SetAngularVelocity(grid, 0f);
     }
 }
