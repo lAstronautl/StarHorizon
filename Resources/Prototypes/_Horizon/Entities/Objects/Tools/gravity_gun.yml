@@ -40,3 +40,11 @@
   description: A heavy gravity gun that takes whole hulls and drags them where you point.
   components:
   - type: GridDragGun
+
+# The grid gravity gun that takes only utilization shuttles (the wrecks of the derelict yard and their pieces).
+- type: entity
+  id: WeaponGridGravityGunUtilization
+  parent: WeaponGridGravityGun
+  components:
+  - type: GridDragGun
+    requireUtilization: true

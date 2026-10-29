@@ -33,6 +33,7 @@ public sealed class ShipCutterGhostOverlay : Overlay
 
     [Dependency] private readonly IEyeManager _eye = default!;
     [Dependency] private readonly IInputManager _input = default!;
+    [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
 
@@ -93,7 +94,7 @@ public sealed class ShipCutterGhostOverlay : Overlay
         }
         else if (_entManager.TryGetComponent(held, out SeamWelderComponent? welder))
         {
-            DrawWelding(handle, welder, mapPos);
+            DrawWelding(handle, cutter, welder, mapPos);
         }
 
         handle.SetTransform(Matrix3x2.Identity);
@@ -117,8 +118,12 @@ public sealed class ShipCutterGhostOverlay : Overlay
         }
     }
 
-    private void DrawWelding(DrawingHandleWorld handle, SeamWelderComponent welder, MapCoordinates mapPos)
+    private void DrawWelding(DrawingHandleWorld handle, ShipCutterComponent cutterTool, SeamWelderComponent welder, MapCoordinates mapPos)
     {
+        // A tool that is only for utilization grids shows nothing over the others.
+        if (_mapManager.TryFindGridAt(mapPos, out var gridUnder, out _) && !_cutter.AllowedGrid(cutterTool, gridUnder))
+            return;
+
         // A cut under the cursor is what a click would weld shut.
         if (_cutter.TryGetSeam(mapPos, welder.SeamTolerance, out var sealGrid, out var sealGridComp, out var sealTile, out var sealEdge) &&
             _cutter.HasCut(sealGrid, sealTile, sealEdge))

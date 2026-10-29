@@ -16,6 +16,20 @@ public abstract class SharedShipCutterSystem : EntitySystem
     [Dependency] protected readonly EntityWhitelistSystem Whitelist = default!;
 
     /// <summary>
+    /// Whether the tool may work with the grid: only the utilization tools are picky.
+    /// </summary>
+    public bool AllowedGrid(ShipCutterComponent cutter, EntityUid grid)
+    {
+        return !cutter.RequireUtilization || HasComp<Derelict.ShuttleUtilizationComponent>(grid);
+    }
+
+    /// <inheritdoc cref="AllowedGrid(ShipCutterComponent, EntityUid)"/>
+    public bool AllowedGrid(EntityUid tool, EntityUid grid)
+    {
+        return !TryComp<ShipCutterComponent>(tool, out var cutter) || AllowedGrid(cutter, grid);
+    }
+
+    /// <summary>
     /// Finds the tile edge a point is close to.
     /// </summary>
     /// <param name="tolerance">How close to the edge the point has to be, in tiles.</param>
@@ -73,7 +87,7 @@ public abstract class SharedShipCutterSystem : EntitySystem
     /// </summary>
     public ShipCutterPick Pick(MapCoordinates click, ShipCutterComponent cutter)
     {
-        if (!MapManager.TryFindGridAt(click, out var gridUid, out var grid))
+        if (!MapManager.TryFindGridAt(click, out var gridUid, out var grid) || !AllowedGrid(cutter, gridUid))
             return default;
 
         var local = Vector2.Transform(click.Position, TransformSystem.GetInvWorldMatrix(gridUid)) / grid.TileSize;

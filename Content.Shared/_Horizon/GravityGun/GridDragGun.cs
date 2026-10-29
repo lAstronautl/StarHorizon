@@ -24,6 +24,12 @@ public sealed partial class GridDragGunComponent : Component
     public int MaxTiles = 5;
 
     /// <summary>
+    /// The gun takes only grids that have a <see cref="Shipbreaking.Derelict.ShuttleUtilizationComponent"/>.
+    /// </summary>
+    [DataField]
+    public bool RequireUtilization;
+
+    /// <summary>
     /// How hard the grid is pulled to the cursor, in metres per second per metre of distance.
     /// </summary>
     [DataField]
@@ -74,7 +80,8 @@ public abstract class SharedGridDragGunSystem : EntitySystem
     /// </summary>
     public bool CanGrab(EntityUid user, GridDragGunComponent gun, EntityUid grid)
     {
-        if (TerminatingOrDeleted(grid) || !TryComp<MapGridComponent>(grid, out var comp) || Transform(user).GridUid == grid)
+        if (TerminatingOrDeleted(grid) || !TryComp<MapGridComponent>(grid, out var comp) || Transform(user).GridUid == grid ||
+            (gun.RequireUtilization && !HasComp<Shipbreaking.Derelict.ShuttleUtilizationComponent>(grid)))
             return false;
 
         var tiles = 0;

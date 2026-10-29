@@ -98,7 +98,7 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
         var comp = ent.Comp;
         var clickCoords = _xform.ToMapCoordinates(args.ClickLocation);
 
-        if (!_mapManager.TryFindGridAt(clickCoords, out var gridUid, out var grid))
+        if (!_mapManager.TryFindGridAt(clickCoords, out var gridUid, out var grid) || !_cutter.AllowedGrid(ent, gridUid))
             return;
 
         if (HasComp<MapComponent>(gridUid))

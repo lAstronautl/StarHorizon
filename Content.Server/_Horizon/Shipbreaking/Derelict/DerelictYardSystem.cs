@@ -185,6 +185,7 @@ public sealed class DerelictYardSystem : EntitySystem
         }
 
         EnsureComp<DerelictLeaseComponent>(shuttle.Value).Group = shuttle.Value;
+        EnsureComp<ShuttleUtilizationComponent>(shuttle.Value);
         MarkOrigin(shuttle.Value);
 
         _jobs[shuttle.Value] = new Job
@@ -266,6 +267,10 @@ public sealed class DerelictYardSystem : EntitySystem
     private void OnSplit(Entity<DerelictLeaseComponent> ent, ref PostGridSplitEvent args)
     {
         EnsureComp<DerelictLeaseComponent>(args.Grid).Group = ent.Comp.Group;
+
+        // Both halves are utilization grids.
+        EnsureComp<ShuttleUtilizationComponent>(ent);
+        EnsureComp<ShuttleUtilizationComponent>(args.Grid);
     }
 
     public override void Update(float frameTime)
@@ -324,8 +329,8 @@ public sealed class DerelictYardSystem : EntitySystem
         Settle(job);
 
         var grids = new HashSet<EntityUid>();
-        var leases = EntityQueryEnumerator<DerelictLeaseComponent>();
-        while (leases.MoveNext(out var uid, out var lease))
+        var leases = EntityQueryEnumerator<ShuttleUtilizationComponent, DerelictLeaseComponent>();
+        while (leases.MoveNext(out var uid, out _, out var lease))
         {
             if (lease.Group == group)
                 grids.Add(uid);

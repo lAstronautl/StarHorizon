@@ -51,3 +51,12 @@
       tags:
       - Wall
   - type: SeamWelder
+
+# The same tool, only for utilization shuttles (the wrecks of the derelict yard and their pieces): it neither cuts nor welds
+# any other grid.
+- type: entity
+  id: ShipToolUtilization
+  parent: ShipTool
+  components:
+  - type: ShipCutter
+    requireUtilization: true

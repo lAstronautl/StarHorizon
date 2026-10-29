@@ -100,6 +100,13 @@ public sealed partial class ShipCutterComponent : Component
     public float WallEdgeTolerance = 0.1f;
 
     /// <summary>
+    /// The tool works only with grids that have a <see cref="Derelict.ShuttleUtilizationComponent"/>: no cutting and no
+    /// welding anywhere else.
+    /// </summary>
+    [DataField]
+    public bool RequireUtilization;
+
+    /// <summary>
     /// Played when a cut starts.
     /// </summary>
     [DataField]
