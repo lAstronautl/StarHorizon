@@ -65,6 +65,11 @@ public sealed partial class GridDraggedComponent : Component
     /// When the gun last asked for the grid to be moved. Only the server needs it.
     /// </summary>
     public TimeSpan LastRequest;
+
+    /// <summary>
+    /// The humming of the gun while it holds the grid. Only the server needs it.
+    /// </summary>
+    public EntityUid? Stream;
 }
 
 /// <summary>

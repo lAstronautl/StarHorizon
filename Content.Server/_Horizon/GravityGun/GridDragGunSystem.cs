@@ -2,6 +2,8 @@ using System.Numerics;
 using Content.Shared._Horizon.GravityGun;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Maps;
+using Content.Shared.Weapons.Misc;
+using Robust.Shared.Audio.Systems;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Physics.Components;
@@ -19,6 +21,7 @@ public sealed class GridDragGunSystem : SharedGridDragGunSystem
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly SharedMapSystem _maps = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
@@ -28,6 +31,7 @@ public sealed class GridDragGunSystem : SharedGridDragGunSystem
         base.Initialize();
         SubscribeNetworkEvent<GridDragRequestPosition>(OnRequestDrag);
         SubscribeNetworkEvent<GridDragVelocityRequest>(OnRequestVelocity);
+        SubscribeLocalEvent<GridDraggedComponent, ComponentShutdown>(OnDraggedShutdown);
     }
 
     /// <summary>
@@ -51,7 +55,9 @@ public sealed class GridDragGunSystem : SharedGridDragGunSystem
     }
 
     /// <summary>
-    /// Whether the grid, going on with this speed for the lookahead time, would have a tile over a tile of another grid.
+    /// Whether the grid, going on with this speed for the lookahead time, would have a tile over a tile of another grid
+    /// anywhere on its way (not only at the end: a fast grid would jump over a thin one). A grid that is over another
+    /// one already is let go on, so it can get out.
     /// Grids do not push each other out of the way hard enough to count on it, so a grid is never let into another.
     /// </summary>
     private bool WouldOverlap(EntityUid gridUid, Vector2 speed, float lookahead)
@@ -62,37 +68,61 @@ public sealed class GridDragGunSystem : SharedGridDragGunSystem
         var xform = Transform(gridUid);
         var matrix = _transform.GetWorldMatrix(xform);
         var shift = speed * lookahead;
-        var half = grid.TileSize * 0.45f;
-        var others = new List<Entity<MapGridComponent>>();
+        var half = grid.TileSize * 0.48f;
 
+        // Points of every tile in the grid, once: the centre, the corners and the middles of the edges.
+        var points = new List<Vector2>();
         foreach (var tile in _maps.GetAllTiles(gridUid, grid))
         {
             var centre = new Vector2(tile.GridIndices.X + 0.5f, tile.GridIndices.Y + 0.5f) * grid.TileSize;
-            foreach (var corner in Corners)
+            foreach (var offset in Offsets)
             {
-                var point = Vector2.Transform(centre + corner * half, matrix) + shift;
+                points.Add(Vector2.Transform(centre + offset * half, matrix));
+            }
+        }
 
-                others.Clear();
-                _mapManager.FindGridsIntersecting(xform.MapID, Box2.CenteredAround(point, new Vector2(0.1f)), ref others);
+        if (OverlapsAt(gridUid, xform.MapID, points, Vector2.Zero))
+            return false;
 
-                foreach (var other in others)
-                {
-                    if (other.Owner == gridUid)
-                        continue;
+        // A step is shorter than a tile, so no tile of the other grid is skipped.
+        var steps = Math.Max(1, (int) MathF.Ceiling(shift.Length() / 0.4f));
+        for (var i = 1; i <= steps; i++)
+        {
+            if (OverlapsAt(gridUid, xform.MapID, points, shift * (i / (float) steps)))
+                return true;
+        }
 
-                    var indices = _maps.WorldToTile(other.Owner, other.Comp, point);
-                    if (_maps.TryGetTile(other.Comp, indices, out var otherTile) && !otherTile.IsEmpty)
-                        return true;
-                }
+        return false;
+    }
+
+    private bool OverlapsAt(EntityUid gridUid, MapId map, List<Vector2> points, Vector2 shift)
+    {
+        var others = new List<Entity<MapGridComponent>>();
+
+        foreach (var local in points)
+        {
+            var point = local + shift;
+
+            others.Clear();
+            _mapManager.FindGridsIntersecting(map, Box2.CenteredAround(point, new Vector2(0.1f)), ref others);
+
+            foreach (var other in others)
+            {
+                if (other.Owner == gridUid)
+                    continue;
+
+                var indices = _maps.WorldToTile(other.Owner, other.Comp, point);
+                if (_maps.TryGetTile(other.Comp, indices, out var otherTile) && !otherTile.IsEmpty)
+                    return true;
             }
         }
 
         return false;
     }
 
-    private static readonly Vector2[] Corners =
+    private static readonly Vector2[] Offsets =
     {
-        Vector2.Zero, new(1, 1), new(1, -1), new(-1, 1), new(-1, -1),
+        Vector2.Zero, new(1, 1), new(1, -1), new(-1, 1), new(-1, -1), new(1, 0), new(-1, 0), new(0, 1), new(0, -1),
     };
 
     /// <summary>
@@ -148,9 +178,19 @@ public sealed class GridDragGunSystem : SharedGridDragGunSystem
         {
             dragged.Gun = gun.Owner;
             Dirty(grid, dragged);
+
+            // The same humming as the tether of the gun makes, for as long as the grid is held.
+            _audio.Stop(dragged.Stream);
+            if (TryComp<BaseForceGunComponent>(gun.Owner, out var force))
+                dragged.Stream = _audio.PlayPvs(force.Sound, gun.Owner)?.Entity;
         }
 
         dragged.LastRequest = _timing.CurTime;
+    }
+
+    private void OnDraggedShutdown(Entity<GridDraggedComponent> ent, ref ComponentShutdown args)
+    {
+        _audio.Stop(ent.Comp.Stream);
     }
 
     private bool IsDragged(EntityUid grid) => HasComp<GridDraggedComponent>(grid);
@@ -190,6 +230,10 @@ public sealed class GridDragGunSystem : SharedGridDragGunSystem
             // Nobody asks for the grid any more (dropped, or the key let go).
             if (_timing.CurTime - dragged.LastRequest > TimeSpan.FromSeconds(0.5))
             {
+                // It goes on with its speed, so it is not let drift into another grid either.
+                if (WouldOverlap(uid, _physics.GetMapLinearVelocity(uid), 1f))
+                    _physics.SetLinearVelocity(uid, Vector2.Zero);
+
                 RemComp<GridDraggedComponent>(uid);
                 continue;
             }

@@ -2,12 +2,15 @@ using System.Numerics;
 using Content.Shared._Horizon.GravityGun;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Maps;
+using Content.Shared.Mobs.Systems;
 using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
 using Robust.Client.Input;
 using Robust.Client.Player;
 using Robust.Shared.Input;
+using Robust.Shared.Containers;
 using Robust.Shared.Map;
+using Robust.Shared.Physics;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Timing;
 
@@ -25,6 +28,9 @@ public sealed class GridDragGunSystem : SharedGridDragGunSystem
     [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly InputSystem _inputSystem = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
 
@@ -91,6 +97,10 @@ public sealed class GridDragGunSystem : SharedGridDragGunSystem
 
         if (_dragging == null)
         {
+            // A loose thing under the cursor is for the tether of the gun, not a reason to take the grid under it.
+            if (HasLooseThingAt(_player.LocalEntity!.Value, mousePos))
+                return;
+
             // A grid that can not be taken is simply not taken.
             if (!_mapManager.TryFindGridAt(mousePos, out var gridUid, out var grid) ||
                 !CanGrab(_player.LocalEntity!.Value, gun!, gridUid))
@@ -127,5 +137,28 @@ public sealed class GridDragGunSystem : SharedGridDragGunSystem
             Grid = GetNetEntity(_dragging.Value),
             WorldPosition = requestedGridOrigin,
         });
+    }
+
+    /// <summary>
+    /// Whether something that is not anchored, not alive and not in a container lies under the point: the tether of the
+    /// gun takes it.
+    /// </summary>
+    private bool HasLooseThingAt(EntityUid user, MapCoordinates point)
+    {
+        foreach (var uid in _lookup.GetEntitiesInRange(point, 0.3f, LookupFlags.Dynamic | LookupFlags.Sundries))
+        {
+            if (uid == user || _mapManager.IsGrid(uid) || Transform(uid).Anchored || _container.IsEntityInContainer(uid))
+                continue;
+
+            if (!TryComp<PhysicsComponent>(uid, out var physics) || physics.BodyType == BodyType.Static)
+                continue;
+
+            if (_mobState.IsAlive(uid))
+                continue;
+
+            return true;
+        }
+
+        return false;
     }
 }
