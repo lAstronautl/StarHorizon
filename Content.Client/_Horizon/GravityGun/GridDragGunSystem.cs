@@ -99,6 +99,13 @@ public sealed class GridDragGunSystem : SharedGridDragGunSystem
             StartDragging(gridUid, Vector2.Transform(mousePos.Position, _transformSystem.GetInvWorldMatrix(gridUid)));
         }
 
+        // Somebody got on the grid, the user included: let go of it, and it is not taken again.
+        if (_dragging != null && !CanGrab(_player.LocalEntity!.Value, gun!, _dragging.Value))
+        {
+            StopDragging();
+            return;
+        }
+
         if (!TryComp(_dragging, out TransformComponent? xform))
         {
             StopDragging();

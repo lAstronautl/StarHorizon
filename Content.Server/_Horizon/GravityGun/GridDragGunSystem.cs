@@ -118,6 +118,14 @@ public sealed class GridDragGunSystem : SharedGridDragGunSystem
     private void OnRequestDrag(GridDragRequestPosition msg, EntitySessionEventArgs args)
     {
         var grid = GetEntity(msg.Grid);
+
+        // Somebody got on the grid, the user included: the gun lets go of it.
+        if (IsHoldingGun(args, out var holder, out var held) && IsDragged(grid) && !CanGrab(holder, held.Comp, grid))
+        {
+            LetGo(grid);
+            return;
+        }
+
         if (!CanDrag(args, grid, msg.WorldPosition, out var gun))
             return;
 
@@ -145,16 +153,51 @@ public sealed class GridDragGunSystem : SharedGridDragGunSystem
         dragged.LastRequest = _timing.CurTime;
     }
 
+    private bool IsDragged(EntityUid grid) => HasComp<GridDraggedComponent>(grid);
+
+    private bool IsHoldingGun(EntitySessionEventArgs args, out EntityUid user, out Entity<GridDragGunComponent> gun)
+    {
+        user = default;
+        gun = default;
+
+        if (args.SenderSession.AttachedEntity is not { } attached ||
+            !_hands.TryGetActiveItem(attached, out var item) ||
+            !TryComp<GridDragGunComponent>(item, out var comp))
+            return false;
+
+        user = attached;
+        gun = (item.Value, comp);
+        return true;
+    }
+
+    /// <summary>
+    /// The gun lets go of the grid: it stops where it is and is not coloured any more.
+    /// </summary>
+    private void LetGo(EntityUid grid)
+    {
+        _physics.SetLinearVelocity(grid, Vector2.Zero);
+        _physics.SetAngularVelocity(grid, 0f);
+        RemComp<GridDraggedComponent>(grid);
+    }
+
     public override void Update(float frameTime)
     {
         base.Update(frameTime);
 
-        // The gun lets go when nobody asks for the grid any more (dropped, or the key let go).
         var query = EntityQueryEnumerator<GridDraggedComponent>();
         while (query.MoveNext(out var uid, out var dragged))
         {
+            // Nobody asks for the grid any more (dropped, or the key let go).
             if (_timing.CurTime - dragged.LastRequest > TimeSpan.FromSeconds(0.5))
+            {
                 RemComp<GridDraggedComponent>(uid);
+                continue;
+            }
+
+            // Whoever holds the gun, or anything alive, standing on the grid breaks the hold, even if no request comes.
+            if (TryComp<GridDragGunComponent>(dragged.Gun, out var gun) &&
+                !CanGrab(Transform(dragged.Gun).ParentUid, gun, uid))
+                LetGo(uid);
         }
     }
 }
