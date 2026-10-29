@@ -28,6 +28,7 @@ namespace Content.Server._Horizon.Shipbreaking.Derelict;
 /// </summary>
 public sealed class DerelictYardSystem : EntitySystem
 {
+    private const string DerelictDockTag = "DerelictDock";
     private const int MaxExtensions = 2;
     private const float ExtendPriceShare = 0.15f;
     private static readonly TimeSpan ExtendTime = TimeSpan.FromMinutes(10);
@@ -177,7 +178,7 @@ public sealed class DerelictYardSystem : EntitySystem
             return;
         }
 
-        if (!_shipyard.TryPurchaseShuttle(station, vessel.ShuttlePath, out var shuttle))
+        if (!_shipyard.TryPurchaseShuttle(station, vessel.ShuttlePath, out var shuttle, DerelictDockTag))
         {
             _bank.TrySectorDeposit(SectorBankAccount.Frontier, vessel.Price, LedgerEntryType.StationDepositOther);
             _popup.PopupEntity(Loc.GetString("derelict-yard-failed"), ent, args.Actor);
