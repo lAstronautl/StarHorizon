@@ -4,6 +4,10 @@ using Content.Shared._Horizon.Shipbreaking;
 using Content.Shared.Hands;
 using Content.Shared.Item;
 using Content.Shared.PowerCell;
+using Content.Shared.Hands.EntitySystems;
+using Robust.Client.Player;
+using Robust.Shared.Input;
+using Robust.Shared.Input.Binding;
 using Robust.Shared.Utility;
 using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
@@ -20,6 +24,8 @@ public sealed class ShipCutterSystem : SharedShipCutterSystem
     [Dependency] private readonly AppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedItemSystem _item = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
+    [Dependency] private readonly IPlayerManager _player = default!;
+    [Dependency] private readonly SharedHandsSystem _handsSystem = default!;
 
     public override void Initialize()
     {
@@ -30,12 +36,30 @@ public sealed class ShipCutterSystem : SharedShipCutterSystem
         SubscribeLocalEvent<ShipCutterComponent, AppearanceChangeEvent>(OnAppearance);
         SubscribeLocalEvent<ShipCutterComponent, GetInhandVisualsEvent>(OnGetHeldVisuals, after: [typeof(ItemSystem)]);
         Subs.ItemStatus<ShipCutterComponent>(ent => new ShipToolStatusControl(ent));
+
+        // The rotate key of the building ghost turns the edge of the cut.
+        CommandBinds.Builder
+            .Bind(EngineKeyFunctions.EditorRotateObject, new PointerInputCmdHandler(HandleRotate, outsidePrediction: true))
+            .Register<ShipCutterSystem>();
     }
 
     public override void Shutdown()
     {
         base.Shutdown();
         _overlay.RemoveOverlay<ShipCutterGhostOverlay>();
+        CommandBinds.Unregister<ShipCutterSystem>();
+    }
+
+    private bool HandleRotate(in PointerInputCmdHandler.PointerInputCmdArgs args)
+    {
+        if (_player.LocalEntity is not { } player ||
+            !_handsSystem.TryGetActiveItem(player, out var held) ||
+            !TryComp<ShipCutterComponent>(held, out var cutter) ||
+            cutter.Mode != ShipToolMode.Cut)
+            return false;
+
+        RaiseNetworkEvent(new ShipCutterRotateEdgeEvent());
+        return true;
     }
 
     // Also runs for the first state, so a tool picked up in either mode looks right.

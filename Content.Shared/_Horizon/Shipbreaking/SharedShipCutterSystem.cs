@@ -1,4 +1,5 @@
 using System.Numerics;
+using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Whitelist;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
@@ -14,6 +15,30 @@ public abstract class SharedShipCutterSystem : EntitySystem
     [Dependency] protected readonly SharedMapSystem MapSystem = default!;
     [Dependency] protected readonly SharedTransformSystem TransformSystem = default!;
     [Dependency] protected readonly EntityWhitelistSystem Whitelist = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
+
+    public override void Initialize()
+    {
+        base.Initialize();
+        SubscribeAllEvent<ShipCutterRotateEdgeEvent>(OnRotateEdge);
+    }
+
+    // Counter-clockwise like the building ghost, and one more step back to the edge nearest to the cursor.
+    private static readonly CutEdges[] RotateOrder =
+        { CutEdges.None, CutEdges.North, CutEdges.West, CutEdges.South, CutEdges.East };
+
+    private void OnRotateEdge(ShipCutterRotateEdgeEvent ev, EntitySessionEventArgs args)
+    {
+        if (args.SenderSession.AttachedEntity is not { } user ||
+            !_hands.TryGetActiveItem(user, out var tool) ||
+            !TryComp<ShipCutterComponent>(tool, out var cutter) ||
+            cutter.Mode != ShipToolMode.Cut)
+            return;
+
+        var index = Array.IndexOf(RotateOrder, cutter.SelectedEdge);
+        cutter.SelectedEdge = RotateOrder[(index + 1) % RotateOrder.Length];
+        Dirty(tool.Value, cutter);
+    }
 
     /// <summary>
     /// Whether the tool may work with the grid: only the utilization tools are picky.
@@ -106,6 +131,15 @@ public abstract class SharedShipCutterSystem : EntitySystem
 
         var tolerance = wall != null ? cutter.WallEdgeTolerance : cutter.EdgeTolerance;
         var hasSeam = TryGetSeam(click, tolerance, out _, out _, out var tile, out var edge);
+
+        // A turned edge is that edge of the tile under the cursor, wherever on the tile the cursor is.
+        if (cutter.SelectedEdge != CutEdges.None)
+        {
+            hasSeam = true;
+            tile = tilePos;
+            edge = cutter.SelectedEdge;
+        }
+
         var canCut = hasSeam && CanCut(gridUid, grid, tile, edge);
 
         if (canCut || (hasSeam && wall == null))

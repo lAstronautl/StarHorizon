@@ -25,6 +25,13 @@ public sealed partial class ShipCutterComponent : Component
     public ShipToolMode Mode = ShipToolMode.Cut;
 
     /// <summary>
+    /// The edge of the tile under the cursor that a cut goes along, turned with the rotate key like a building ghost.
+    /// None: the edge nearest to the cursor.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public CutEdges SelectedEdge = CutEdges.None;
+
+    /// <summary>
     /// Name of the item in each mode, localized.
     /// </summary>
     [DataField]
@@ -157,6 +164,14 @@ public enum ShipToolMode : byte
 {
     Cut,
     Weld,
+}
+
+/// <summary>
+/// The player pressed the rotate key with the tool in hand: the cut goes along the next edge of the tile.
+/// </summary>
+[Serializable, NetSerializable]
+public sealed class ShipCutterRotateEdgeEvent : EntityEventArgs
+{
 }
 
 /// <summary>
