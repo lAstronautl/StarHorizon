@@ -154,7 +154,7 @@ public sealed class GridDragGunSystem : SharedGridDragGunSystem
             Dirty(grid, dragged);
 
             _audio.Stop(dragged.Stream);
-            if (TryComp<BaseForceGunComponent>(gun.Owner, out var force))
+            if (TryComp<TetherGunComponent>(gun.Owner, out var force))
                 dragged.Stream = _audio.PlayPvs(force.Sound, gun.Owner)?.Entity;
         }
 
