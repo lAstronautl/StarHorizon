@@ -12,10 +12,6 @@ using Robust.Shared.Timing;
 
 namespace Content.Server._Horizon.GravityGun;
 
-/// <summary>
-/// The griddrag command for whoever holds a <see cref="GridDragGunComponent"/>: same requests as
-/// <see cref="GridDraggingSystem"/>, but any holder may send them, and only for a grid near them.
-/// </summary>
 public sealed class GridDragGunSystem : SharedGridDragGunSystem
 {
     [Dependency] private readonly IGameTiming _timing = default!;
@@ -34,10 +30,6 @@ public sealed class GridDragGunSystem : SharedGridDragGunSystem
         SubscribeLocalEvent<GridDraggedComponent, ComponentShutdown>(OnDraggedShutdown);
     }
 
-    /// <summary>
-    /// Whether the sender holds the gun and the grid is within reach of them (a grid far from the user is not theirs
-    /// to move, a client could otherwise take any grid anywhere).
-    /// </summary>
     private bool CanDrag(EntitySessionEventArgs args, EntityUid grid, Vector2 point, out Entity<GridDragGunComponent> gun)
     {
         gun = default;
@@ -54,12 +46,6 @@ public sealed class GridDragGunSystem : SharedGridDragGunSystem
         return (point - userPos).Length() <= reach && (_transform.GetWorldPosition(grid) - userPos).Length() <= reach * 3f;
     }
 
-    /// <summary>
-    /// Whether the grid, going on with this speed for the lookahead time, would have a tile over a tile of another grid
-    /// anywhere on its way (not only at the end: a fast grid would jump over a thin one). A grid that is over another
-    /// one already is let go on, so it can get out.
-    /// Grids do not push each other out of the way hard enough to count on it, so a grid is never let into another.
-    /// </summary>
     private bool WouldOverlap(EntityUid gridUid, Vector2 speed, float lookahead)
     {
         if (!TryComp<MapGridComponent>(gridUid, out var grid))
@@ -70,7 +56,6 @@ public sealed class GridDragGunSystem : SharedGridDragGunSystem
         var shift = speed * lookahead;
         var half = grid.TileSize * 0.48f;
 
-        // Points of every tile in the grid, once: the centre, the corners and the middles of the edges.
         var points = new List<Vector2>();
         foreach (var tile in _maps.GetAllTiles(gridUid, grid))
         {
@@ -84,7 +69,6 @@ public sealed class GridDragGunSystem : SharedGridDragGunSystem
         if (OverlapsAt(gridUid, xform.MapID, points, Vector2.Zero))
             return false;
 
-        // A step is shorter than a tile, so no tile of the other grid is skipped.
         var steps = Math.Max(1, (int) MathF.Ceiling(shift.Length() / 0.4f));
         for (var i = 1; i <= steps; i++)
         {
@@ -125,31 +109,22 @@ public sealed class GridDragGunSystem : SharedGridDragGunSystem
         Vector2.Zero, new(1, 1), new(1, -1), new(-1, 1), new(-1, -1), new(1, 0), new(-1, 0), new(0, 1), new(0, -1),
     };
 
-    /// <summary>
-    /// The end of a throw: the grid goes on with the speed of the hand, and is not coloured any more.
-    /// </summary>
     private void OnRequestVelocity(GridDragVelocityRequest ev, EntitySessionEventArgs args)
     {
         var grid = GetEntity(ev.Grid);
         if (!CanDrag(args, grid, _transform.GetWorldPosition(grid), out _))
             return;
 
-        // A throw into another grid is no throw at all.
         var thrown = WouldOverlap(grid, ev.LinearVelocity, 1f) ? Vector2.Zero : ev.LinearVelocity;
         _physics.SetLinearVelocity(grid, thrown);
         _physics.SetAngularVelocity(grid, 0f);
         RemComp<GridDraggedComponent>(grid);
     }
 
-    /// <summary>
-    /// The grid is pulled towards the requested place and does not jump to it: its speed moves a part of the way to
-    /// the wanted one with each request, so it lags behind the cursor and carries on after it.
-    /// </summary>
     private void OnRequestDrag(GridDragRequestPosition msg, EntitySessionEventArgs args)
     {
         var grid = GetEntity(msg.Grid);
 
-        // Somebody got on the grid, the user included: the gun lets go of it.
         if (IsHoldingGun(args, out var holder, out var held) && IsDragged(grid) && !CanGrab(holder, held.Comp, grid))
         {
             LetGo(grid);
@@ -166,7 +141,6 @@ public sealed class GridDragGunSystem : SharedGridDragGunSystem
         var speed = _physics.GetMapLinearVelocity(grid);
         var next = speed + (wanted - speed) * gun.Comp.Blend;
 
-        // Where the pull would take the grid into another grid it stops instead, like against a wall.
         if (WouldOverlap(grid, next, 0.25f))
             next = Vector2.Zero;
 
@@ -179,7 +153,6 @@ public sealed class GridDragGunSystem : SharedGridDragGunSystem
             dragged.Gun = gun.Owner;
             Dirty(grid, dragged);
 
-            // The same humming as the tether of the gun makes, for as long as the grid is held.
             _audio.Stop(dragged.Stream);
             if (TryComp<BaseForceGunComponent>(gun.Owner, out var force))
                 dragged.Stream = _audio.PlayPvs(force.Sound, gun.Owner)?.Entity;
@@ -210,9 +183,6 @@ public sealed class GridDragGunSystem : SharedGridDragGunSystem
         return true;
     }
 
-    /// <summary>
-    /// The gun lets go of the grid: it stops where it is and is not coloured any more.
-    /// </summary>
     private void LetGo(EntityUid grid)
     {
         _physics.SetLinearVelocity(grid, Vector2.Zero);
@@ -227,10 +197,8 @@ public sealed class GridDragGunSystem : SharedGridDragGunSystem
         var query = EntityQueryEnumerator<GridDraggedComponent>();
         while (query.MoveNext(out var uid, out var dragged))
         {
-            // Nobody asks for the grid any more (dropped, or the key let go).
             if (_timing.CurTime - dragged.LastRequest > TimeSpan.FromSeconds(0.5))
             {
-                // It goes on with its speed, so it is not let drift into another grid either.
                 if (WouldOverlap(uid, _physics.GetMapLinearVelocity(uid), 1f))
                     _physics.SetLinearVelocity(uid, Vector2.Zero);
 
@@ -238,7 +206,6 @@ public sealed class GridDragGunSystem : SharedGridDragGunSystem
                 continue;
             }
 
-            // Whoever holds the gun, or anything alive, standing on the grid breaks the hold, even if no request comes.
             if (TryComp<GridDragGunComponent>(dragged.Gun, out var gun) &&
                 !CanGrab(Transform(dragged.Gun).ParentUid, gun, uid))
                 LetGo(uid);

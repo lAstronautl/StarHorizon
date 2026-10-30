@@ -20,12 +20,6 @@ using Robust.Shared.Timing;
 
 namespace Content.Server._Horizon.Shipbreaking.Derelict;
 
-/// <summary>
-/// The derelict yard: sells wrecks for the price of the station account and deletes them, with every piece cut off
-/// them, when the lease is over. What the wreck is scrapped for pays into the account through the scrap machines and
-/// counts towards the job of that wreck; when the lease is over the share that came back pays a bonus or costs a fee,
-/// and the revenue raises the rank of the yard, which opens the bigger wrecks.
-/// </summary>
 public sealed class DerelictYardSystem : EntitySystem
 {
     private const string DerelictDockTag = "DerelictDock";
@@ -49,10 +43,6 @@ public sealed class DerelictYardSystem : EntitySystem
     [Dependency] private readonly ITileDefinitionManager _tileDefs = default!;
     [Dependency] private readonly UserInterfaceSystem _ui = default!;
 
-    /// <summary>
-    /// What the rental of a wreck is about: the time, what it was appraised at and what came back through the scrap
-    /// machines. Kept under the grid that was bought, for the round.
-    /// </summary>
     private sealed class Job
     {
         public EntityUid Station;
@@ -198,9 +188,6 @@ public sealed class DerelictYardSystem : EntitySystem
         UpdateAllUis();
     }
 
-    /// <summary>
-    /// Marks everything on the wreck, so what the scrap machines pay for it counts towards the job wherever it ends up.
-    /// </summary>
     private void MarkOrigin(EntityUid shuttle)
     {
         if (!TryComp<MapGridComponent>(shuttle, out var grid))
@@ -217,9 +204,6 @@ public sealed class DerelictYardSystem : EntitySystem
         }
     }
 
-    /// <summary>
-    /// Counts what a scrap machine paid for something towards the job of the wreck it came from.
-    /// </summary>
     public void CreditScrap(EntityUid source, int amount)
     {
         EntityUid? group = null;
@@ -244,14 +228,10 @@ public sealed class DerelictYardSystem : EntitySystem
         UpdateAllUis();
     }
 
-    /// <summary>
-    /// A piece cut off the wreck is part of the lease too.
-    /// </summary>
     private void OnSplit(Entity<DerelictLeaseComponent> ent, ref PostGridSplitEvent args)
     {
         EnsureComp<DerelictLeaseComponent>(args.Grid).Group = ent.Comp.Group;
 
-        // Both halves are utilization grids.
         EnsureComp<ShuttleUtilizationComponent>(ent);
         EnsureComp<ShuttleUtilizationComponent>(args.Grid);
     }
@@ -303,10 +283,6 @@ public sealed class DerelictYardSystem : EntitySystem
             playDefaultSound: false);
     }
 
-    /// <summary>
-    /// Ends a job: pays the bonus or takes the fee, raises the rank, then deletes the wreck with every piece of it.
-    /// Whoever is still aboard is put out into space first, only the wreck goes.
-    /// </summary>
     private void Finish(EntityUid group, Job job)
     {
         Settle(job);
@@ -332,7 +308,6 @@ public sealed class DerelictYardSystem : EntitySystem
             if (_container.TryGetContainingContainer((mob, null, null), out var container))
                 _container.Remove(mob, container, force: true);
 
-            // Straight onto the map, keeping the place: the grid under it is the one that goes.
             var xform = Transform(mob);
             if (xform.MapUid is { } map)
                 _transform.SetParent(mob, xform, map);
@@ -344,10 +319,6 @@ public sealed class DerelictYardSystem : EntitySystem
         }
     }
 
-    /// <summary>
-    /// The result of a job: the share of the appraisal that came back through the scrap machines pays a bonus
-    /// or costs a fee, and the revenue counts towards the rank.
-    /// </summary>
     private void Settle(Job job)
     {
         var share = job.Appraisal > 0 ? (float) job.Revenue / job.Appraisal : 0f;
@@ -411,9 +382,6 @@ public sealed class DerelictYardSystem : EntitySystem
             new DerelictPreviewMessage(vessel.ID, preview.Tiles, preview.Colors), args.Actor);
     }
 
-    /// <summary>
-    /// Loads the wreck on a map of its own, colours each tile by the minimap rules, and throws the map away.
-    /// </summary>
     private bool TryBuildPreview(DerelictVesselPrototype vessel, out (Vector2i[] Tiles, Color[] Colors) preview)
     {
         preview = default;
@@ -434,7 +402,6 @@ public sealed class DerelictYardSystem : EntitySystem
             {
                 var color = Color.Black;
 
-                // The rules are laid over each other, the last one that fits gives the colour.
                 var tileId = _tileDefs[tile.Tile.TypeId].ID;
                 foreach (var rule in minimap.Tiles)
                 {
@@ -442,7 +409,6 @@ public sealed class DerelictYardSystem : EntitySystem
                         color = rule.Color;
                 }
 
-                // The same for what stands on the tile, the rule that comes last among all of it wins.
                 var best = -1;
                 foreach (var anchored in _map.GetAnchoredEntities(grid.Value.Owner, grid.Value.Comp, tile.GridIndices))
                 {
@@ -469,10 +435,6 @@ public sealed class DerelictYardSystem : EntitySystem
 
     private EntityPrototype? Prototype(EntityUid uid) => MetaData(uid).EntityPrototype;
 
-    /// <summary>
-    /// The index of the last rule that fits the prototype or one of the prototypes it comes from, so a pattern for
-    /// a base prototype takes in everything made from it. -1 if none fits.
-    /// </summary>
     private int LastRule(List<ShuttleMinimapRule> rules, EntityPrototype? proto)
     {
         if (proto == null)
@@ -490,10 +452,6 @@ public sealed class DerelictYardSystem : EntitySystem
         return -1;
     }
 
-    /// <summary>
-    /// The id of the prototype and of what it comes from. Abstract bases can not be looked up any more, so for them
-    /// only the id is known, and what they come from is not.
-    /// </summary>
     private void CollectIds(EntityPrototype proto, HashSet<string> ids)
     {
         if (!ids.Add(proto.ID) || proto.Parents == null)

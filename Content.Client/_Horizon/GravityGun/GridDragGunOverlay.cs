@@ -5,10 +5,6 @@ using Robust.Shared.Map.Components;
 
 namespace Content.Client._Horizon.GravityGun;
 
-/// <summary>
-/// The beam from the gun to the grid it moves, drawn like the one of the tether gun, and the tiles of the grid in the
-/// colour of the beam (tiles have no sprites to colour).
-/// </summary>
 public sealed class GridDragGunOverlay : Overlay
 {
     public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowFOV;
@@ -38,7 +34,6 @@ public sealed class GridDragGunOverlay : Overlay
 
             var color = gun.LineColor;
 
-            // The tiles of the grid.
             handle.SetTransform(_transform.GetWorldMatrix(uid));
             foreach (var tile in _maps.GetAllTiles(uid, grid))
             {
@@ -48,7 +43,6 @@ public sealed class GridDragGunOverlay : Overlay
 
             handle.SetTransform(System.Numerics.Matrix3x2.Identity);
 
-            // The beam, from the gun to the middle of the grid.
             var gunPos = _transform.GetWorldPosition(gunXform);
             var gridPos = System.Numerics.Vector2.Transform(grid.LocalAABB.Center, _transform.GetWorldMatrix(uid));
             var diff = gridPos - gunPos;

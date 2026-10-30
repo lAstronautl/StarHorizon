@@ -4,10 +4,6 @@ using Robust.Client.Graphics;
 
 namespace Content.Client._Horizon.GravityGun;
 
-/// <summary>
-/// What the tether gun does with the thing it holds, for a grid the grid drag gun moves: the beam to it and its
-/// colour, for everybody to see.
-/// </summary>
 public sealed class GridDragGunVisualsSystem : EntitySystem
 {
     [Dependency] private readonly IOverlayManager _overlay = default!;
@@ -41,9 +37,6 @@ public sealed class GridDragGunVisualsSystem : EntitySystem
         Paint(ent.Owner, Color.White);
     }
 
-    /// <summary>
-    /// Everything with a sprite on the grid gets the colour, the way the tethered entity does.
-    /// </summary>
     private void Paint(EntityUid grid, Color color)
     {
         var children = Transform(grid).ChildEnumerator;

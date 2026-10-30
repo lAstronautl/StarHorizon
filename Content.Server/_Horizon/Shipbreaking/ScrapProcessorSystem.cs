@@ -12,10 +12,6 @@ using Robust.Shared.Physics.Events;
 
 namespace Content.Server._Horizon.Shipbreaking;
 
-/// <summary>
-/// Handles <see cref="ScrapProcessorComponent"/>: buys unanchored entities that touch the machine
-/// for their price and pays the station bank account.
-/// </summary>
 public sealed class ScrapProcessorSystem : EntitySystem
 {
     [Dependency] private readonly BankSystem _bank = default!;
@@ -38,16 +34,12 @@ public sealed class ScrapProcessorSystem : EntitySystem
         if (!this.IsPowered(ent, EntityManager))
             return;
 
-        // Never eat things that are still part of a grid (walls next to the machine), grids themselves (the tile
-        // reclaimer takes those) or living things.
         if (Transform(other).Anchored || HasComp<MobStateComponent>(other) || HasComp<MapGridComponent>(other))
             return;
 
-        // Protected entities are never touched.
         if (_whitelist.IsWhitelistPass(ent.Comp.Blacklist, other))
             return;
 
-        // Wrong kind of scrap for this machine: it is destroyed, but nothing is paid.
         if (!_whitelist.IsWhitelistPassOrNull(ent.Comp.Whitelist, other))
         {
             if (!ent.Comp.DestroyRejected)

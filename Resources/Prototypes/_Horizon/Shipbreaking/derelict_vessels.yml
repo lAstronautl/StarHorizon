@@ -1,5 +1,3 @@
-# Wrecks the derelict yard sells. The price is taken from the station account, what the wreck is scrapped for with the
-# shipbreaking machines pays into the same account. After the lifetime the wreck and everything cut off it is deleted.
 - type: derelictVessel
   id: DerelictSmallShip
   name: derelict-vessel-small-ship
@@ -58,7 +56,6 @@
   description: derelict-vessel-whiteship-desc
   price: 24000
   shuttlePath: /Maps/_Horizon/Lostvoid/Shuttle/whiteship-bluespacejumper.yml
-
 
 - type: derelictVessel
   id: DerelictKvazar

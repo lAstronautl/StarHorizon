@@ -14,10 +14,6 @@ using Robust.Client.Graphics;
 
 namespace Content.Client._Horizon.Shipbreaking;
 
-/// <summary>
-/// Client side of the ship tool: shows a ghost of the target under the cursor while the tool is held,
-/// and makes the mode visible: the sprite of the item and the line under the hand follow it.
-/// </summary>
 public sealed class ShipCutterSystem : SharedShipCutterSystem
 {
     [Dependency] private readonly IOverlayManager _overlay = default!;
@@ -37,7 +33,6 @@ public sealed class ShipCutterSystem : SharedShipCutterSystem
         SubscribeLocalEvent<ShipCutterComponent, GetInhandVisualsEvent>(OnGetHeldVisuals, after: [typeof(ItemSystem)]);
         Subs.ItemStatus<ShipCutterComponent>(ent => new ShipToolStatusControl(ent));
 
-        // The rotate key of the building ghost turns the edge of the cut.
         CommandBinds.Builder
             .Bind(EngineKeyFunctions.EditorRotateObject, new PointerInputCmdHandler(HandleRotate, outsidePrediction: true))
             .Register<ShipCutterSystem>();
@@ -62,7 +57,6 @@ public sealed class ShipCutterSystem : SharedShipCutterSystem
         return true;
     }
 
-    // Also runs for the first state, so a tool picked up in either mode looks right.
     private void OnState(Entity<ShipCutterComponent> ent, ref AfterAutoHandleStateEvent args)
     {
         if (!TryComp<SpriteComponent>(ent, out var sprite))
@@ -75,20 +69,15 @@ public sealed class ShipCutterSystem : SharedShipCutterSystem
 
         _item.VisualsChanged(ent);
 
-        // The flame under the tool shows the mode.
         if (_sprite.LayerMapTryGet((ent, sprite), "flame", out var flame, false))
             _sprite.LayerSetRsiState((ent, sprite), flame, cut ? "cutter_flame" : "welder_flame");
     }
 
     private void OnAppearance(Entity<ShipCutterComponent> ent, ref AppearanceChangeEvent args)
     {
-        // The flame in the hands comes and goes with the charge.
         _item.VisualsChanged(ent);
     }
 
-    /// <summary>
-    /// While the tool has charge, the flame in the hand shows the mode: the flame of the cutter or of the welder.
-    /// </summary>
     private void OnGetHeldVisuals(Entity<ShipCutterComponent> ent, ref GetInhandVisualsEvent args)
     {
         if (ent.Comp.CutSprite is not SpriteSpecifier.Rsi rsi ||

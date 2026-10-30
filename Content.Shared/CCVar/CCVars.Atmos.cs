@@ -59,24 +59,15 @@ public sealed partial class CCVars
     public static readonly CVarDef<bool> MonstermosRipTiles =
         CVarDef.Create("atmos.monstermos_rip_tiles", false, CVar.SERVERONLY);
 
-    /// <summary>
     ///     Horizon: multiplier of the chance that explosive depressurization rips a tile, 1 is the original strength
-    ///     (the default); the server configs lower it.
-    /// </summary>
     public static readonly CVarDef<float> MonstermosRipStrength =
         CVarDef.Create("atmos.monstermos_rip_strength", 1f, CVar.SERVERONLY);
 
-    /// <summary>
     ///     Horizon: how much wind has to go through a tile before it starts breaking the structures around it
-    ///     (same units as the wind that rips tiles).
-    /// </summary>
     public static readonly CVarDef<float> AtmosWindDamageThreshold =
         CVarDef.Create("atmos.wind_damage_threshold", 150f, CVar.SERVERONLY);
 
-    /// <summary>
     ///     Horizon: structural damage per unit of wind above <see cref="AtmosWindDamageThreshold"/>, per tile and atmos tick.
-    ///     0 (the default) means the wind breaks nothing; the server configs turn it on.
-    /// </summary>
     public static readonly CVarDef<float> AtmosWindDamageScale =
         CVarDef.Create("atmos.wind_damage_scale", 0f, CVar.SERVERONLY);
 

@@ -16,10 +16,6 @@ using Robust.Shared.Timing;
 
 namespace Content.Client._Horizon.GravityGun;
 
-/// <summary>
-/// A copy of the client side of the griddrag command: with the key held over a grid the grid follows the cursor, and
-/// keeps the speed of the hand when let go. It works while a <see cref="GridDragGunComponent"/> is held.
-/// </summary>
 public sealed class GridDragGunSystem : SharedGridDragGunSystem
 {
     [Dependency] private readonly IEyeManager _eyeManager = default!;
@@ -97,11 +93,9 @@ public sealed class GridDragGunSystem : SharedGridDragGunSystem
 
         if (_dragging == null)
         {
-            // A loose thing under the cursor is for the tether of the gun, not a reason to take the grid under it.
             if (HasLooseThingAt(_player.LocalEntity!.Value, mousePos))
                 return;
 
-            // A grid that can not be taken is simply not taken.
             if (!_mapManager.TryFindGridAt(mousePos, out var gridUid, out var grid) ||
                 !CanGrab(_player.LocalEntity!.Value, gun!, gridUid))
                 return;
@@ -109,7 +103,6 @@ public sealed class GridDragGunSystem : SharedGridDragGunSystem
             StartDragging(gridUid, Vector2.Transform(mousePos.Position, _transformSystem.GetInvWorldMatrix(gridUid)));
         }
 
-        // Somebody got on the grid, the user included: let go of it, and it is not taken again.
         if (_dragging != null && !CanGrab(_player.LocalEntity!.Value, gun!, _dragging.Value))
         {
             StopDragging();
@@ -128,7 +121,6 @@ public sealed class GridDragGunSystem : SharedGridDragGunSystem
             return;
         }
 
-        // Asked every frame, not only when the cursor moved: the pull has to hold the grid at the cursor.
         var requestedGridOrigin = mousePos.Position - _transformSystem.GetWorldRotation(xform).RotateVec(_localPosition);
         _lastMousePosition = new MapCoordinates(requestedGridOrigin, mousePos.MapId);
 
@@ -139,10 +131,6 @@ public sealed class GridDragGunSystem : SharedGridDragGunSystem
         });
     }
 
-    /// <summary>
-    /// Whether something that is not anchored, not alive and not in a container lies under the point: the tether of the
-    /// gun takes it.
-    /// </summary>
     private bool HasLooseThingAt(EntityUid user, MapCoordinates point)
     {
         foreach (var uid in _lookup.GetEntitiesInRange(point, 0.3f, LookupFlags.Dynamic | LookupFlags.Sundries))
