@@ -172,6 +172,7 @@
     layers:
     - state: grinder-o0
   - type: Conveyor
+    state: Forward # always on, like ConveyorBeltAlwaysOn: tiles are only reclaimed while the conveyor is not off
   - type: Rotatable
   - type: ApcPowerReceiver
     powerLoad: 500
