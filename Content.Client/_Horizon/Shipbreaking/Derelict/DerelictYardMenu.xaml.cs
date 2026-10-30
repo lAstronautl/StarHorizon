@@ -55,6 +55,7 @@ public sealed partial class DerelictYardMenu : FancyWindow
                     : Loc.GetString("derelict-yard-row", ("name", vessel.Name), ("price", vessel.Price)),
                 HorizontalExpand = true,
                 ToggleMode = true,
+                ClipText = true,
                 Pressed = id == _selected,
             };
             button.OnPressed += _ => Select(id);
