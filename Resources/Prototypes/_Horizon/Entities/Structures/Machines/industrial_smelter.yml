@@ -27,9 +27,16 @@
   # Burns the tiles of a grid pushed into it, for nothing.
   - type: TileReclaimer
     pay: false
+    recyclingBox: -0.35,-1,0.35,-0.5 # as in the upstream smelter, turned round: half a tile deep, so a hull is eaten tile by tile
     whitelist:
       components:
       - Shuttle
+    blacklist:
+      components:
+      - StationMember
+      - CargoShuttle
+      - ArrivalsShuttle
+      - EmergencyShuttle
     sound:
       path: /Audio/Effects/saw.ogg
       params:
@@ -68,10 +75,17 @@
           Forward: { visible: true }
           Reverse: { visible: true }
   - type: TileReclaimer
+    recyclingBox: -0.35,-1,0.35,-0.5 # as in the upstream smelter, turned round: half a tile deep, so a hull is eaten tile by tile
     efficiency: 5 # tiles are paid for in money, see ServerTileReclaimerSystem
     whitelist:
       components:
       - Shuttle
+    blacklist:
+      components:
+      - StationMember
+      - CargoShuttle
+      - ArrivalsShuttle
+      - EmergencyShuttle
     sound:
       path: /Audio/Effects/saw.ogg
       params:
@@ -111,6 +125,7 @@
           Forward: { visible: true }
           Reverse: { visible: true }
   - type: TileReclaimer
+    recyclingBox: -0.35,-1,0.35,-0.5 # as in the upstream smelter, turned round: half a tile deep, so a hull is eaten tile by tile
     efficiency: 5
     sound:
       path: /Audio/Effects/saw.ogg
@@ -126,11 +141,12 @@
   components:
   - type: Fixtures
     fixtures:
-      # The reach of the machine, as in the upstream smelter (space-station-14#43651): a tile and a half in front of it.
+      # The reach of the machine, as in the upstream smelter (space-station-14#43651) but turned round: its mouth looks
+      # south, away from the station.
       brrt:
         shape:
           !type:PhysShapeAabb
-          bounds: "-0.5, -0.15, 0.5, 1.5"
+          bounds: "-0.5, -1.5, 0.5, 0.15"
         hard: false
         layer:
         - FullTileLayer
@@ -174,6 +190,7 @@
     layers:
     - state: grinder-o0
   - type: Conveyor
+    angle: 90 # goes sideways, as in the upstream smelter
     state: Forward # always on, like ConveyorBeltAlwaysOn: tiles are only reclaimed while the conveyor is not off
   - type: Rotatable
   - type: ApcPowerReceiver

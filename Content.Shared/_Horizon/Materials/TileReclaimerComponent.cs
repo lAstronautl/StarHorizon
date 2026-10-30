@@ -77,6 +77,13 @@ public sealed partial class TileReclaimerComponent : Component
     public float SlurpStrength = 1600f;
 
     /// <summary>
+    /// Horizon: the speed the pull towards the machine never takes a grid above, in metres per second. The pull is an
+    /// impulse, so a light grid (a piece cut off a wreck) would be thrown through the machine at hundreds of metres.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public float SlurpMaxSpeed = 2f;
+
+    /// <summary>
     /// Next time a recycling attempt can be made.
     /// </summary>
     [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), ViewVariables(VVAccess.ReadOnly)]

@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Numerics;
 using Content.Shared.Conveyor;
 using Content.Shared.Maps;
 using Content.Shared.Materials;
@@ -132,8 +133,17 @@ public abstract class TileReclaimerSystem : EntitySystem
 
                 // We suck in the grid slurrrrp.
                 // TODO: This applies a stacking speed which could get out of hand if a grid is very long.
-                _physics.ApplyLinearImpulse(grid.Owner,
-                    reclaimer.SlurpStrength * _transform.GetWorldRotation(xform).ToWorldVec());
+                // Horizon: towards the machine from the middle of the box, so a box on either side of it pulls inwards.
+                // The pull is the impulse of the upstream version, but it stops once the grid goes fast enough.
+                var pull = -reclaimer.RecyclingBox.Center;
+                if (pull != Vector2.Zero && _physicsQuery.TryComp(grid.Owner, out var gridPhysics) && gridPhysics.Mass > 0f)
+                {
+                    var direction = _transform.GetWorldRotation(xform).RotateVec(Vector2.Normalize(pull));
+                    var speed = Vector2.Dot(gridPhysics.LinearVelocity, direction);
+                    var gain = MathF.Min(reclaimer.SlurpStrength / gridPhysics.Mass, reclaimer.SlurpMaxSpeed - speed);
+                    if (gain > 0f)
+                        _physics.ApplyLinearImpulse(grid.Owner, direction * gain * gridPhysics.Mass, body: gridPhysics);
+                }
             }
         }
 
