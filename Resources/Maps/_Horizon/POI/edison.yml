@@ -26086,6 +26086,13 @@ entities:
     - type: Transform
       pos: 0.5,-2.5
       parent: 2
+- proto: SpawnPointShipCutter
+  entities:
+  - uid: 4815
+    components:
+    - type: Transform
+      pos: 1.5,-2.5
+      parent: 2
 - proto: StationMap
   entities:
   - uid: 4044
