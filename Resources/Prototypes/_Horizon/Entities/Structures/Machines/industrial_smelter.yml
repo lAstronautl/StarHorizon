@@ -126,13 +126,18 @@
   components:
   - type: Fixtures
     fixtures:
+      # The reach of the machine, as in the upstream smelter (space-station-14#43651): a tile and a half in front of it.
       brrt:
         shape:
           !type:PhysShapeAabb
-          bounds: "-0.15,-0.15,0.15,0.15"
+          bounds: "-0.5, -0.15, 0.5, 1.5"
         hard: false
         layer:
         - FullTileLayer
+        - DoorPassable # Here to hit floor objects like carpets etc.
+        mask:
+        - FullTileMask # Necessary for grilles.
+        - TabletopMachineLayer # This is needed for lights.
       collision:
         shape:
           !type:PhysShapeAabb

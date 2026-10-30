@@ -7,6 +7,7 @@ using Content.Shared._NF.Bank.BUI;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Whitelist;
 using Robust.Shared.Audio.Systems;
+using Robust.Shared.Map.Components;
 using Robust.Shared.Physics.Events;
 
 namespace Content.Server._Horizon.Shipbreaking;
@@ -37,8 +38,9 @@ public sealed class ScrapProcessorSystem : EntitySystem
         if (!this.IsPowered(ent, EntityManager))
             return;
 
-        // Never eat things that are still part of a grid (walls next to the machine) or living things.
-        if (Transform(other).Anchored || HasComp<MobStateComponent>(other))
+        // Never eat things that are still part of a grid (walls next to the machine), grids themselves (the tile
+        // reclaimer takes those) or living things.
+        if (Transform(other).Anchored || HasComp<MobStateComponent>(other) || HasComp<MapGridComponent>(other))
             return;
 
         // Protected entities are never touched.
