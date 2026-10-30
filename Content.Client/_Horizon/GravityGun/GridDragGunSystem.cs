@@ -1,6 +1,7 @@
 using System.Numerics;
 using Content.Shared._Horizon.GravityGun;
 using Content.Shared.Hands.EntitySystems;
+using Content.Shared.Item;
 using Content.Shared.Maps;
 using Content.Shared.Mobs.Systems;
 using Robust.Client.GameObjects;
@@ -133,9 +134,10 @@ public sealed class GridDragGunSystem : SharedGridDragGunSystem
 
     private bool HasLooseThingAt(EntityUid user, MapCoordinates point)
     {
-        foreach (var uid in _lookup.GetEntitiesInRange(point, 0.3f, LookupFlags.Dynamic | LookupFlags.Sundries))
+        foreach (var uid in _lookup.GetEntitiesIntersecting(point, LookupFlags.Dynamic | LookupFlags.Sundries))
         {
-            if (uid == user || _mapManager.IsGrid(uid) || Transform(uid).Anchored || _container.IsEntityInContainer(uid))
+            if (uid == user || !HasComp<ItemComponent>(uid) || _mapManager.IsGrid(uid) || Transform(uid).Anchored ||
+                _container.IsEntityInContainer(uid))
                 continue;
 
             if (!TryComp<PhysicsComponent>(uid, out var physics) || physics.BodyType == BodyType.Static)
