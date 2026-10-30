@@ -6,7 +6,7 @@ namespace Content.Shared._Horizon.MusicRadio;
 
 /// <summary>
 /// A radio that plays the tracks of a sound collection in random order while it is switched on (see ItemToggle).
-/// When the end of the round is near it plays the tension collection instead.
+/// When the time of a leased wreck is running out it plays the tension collection instead.
 /// </summary>
 [RegisterComponent, NetworkedComponent]
 public sealed partial class MusicRadioComponent : Component
@@ -18,7 +18,7 @@ public sealed partial class MusicRadioComponent : Component
     public ProtoId<SoundCollectionPrototype> TensionCollection;
 
     /// <summary>
-    /// How long before the end of the round (the evacuation countdown or the scheduled restart) the tension tracks start.
+    /// How long before a wreck lease ends the tension tracks start.
     /// </summary>
     [DataField]
     public TimeSpan TensionTime = TimeSpan.FromMinutes(10);

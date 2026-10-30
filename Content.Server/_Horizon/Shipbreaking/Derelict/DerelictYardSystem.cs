@@ -231,6 +231,20 @@ public sealed class DerelictYardSystem : EntitySystem
             job.Revenue += amount;
     }
 
+    /// <summary>
+    /// Whether any lease runs out within the given time.
+    /// </summary>
+    public bool IsLeaseEnding(TimeSpan within)
+    {
+        foreach (var job in _jobs.Values)
+        {
+            if (job.Expires - _timing.CurTime <= within)
+                return true;
+        }
+
+        return false;
+    }
+
     private void OnFinishEarly(Entity<DerelictYardConsoleComponent> ent, ref DerelictFinishMessage args)
     {
         var group = GetEntity(args.Group);

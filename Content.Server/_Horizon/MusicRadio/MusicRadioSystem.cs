@@ -1,5 +1,4 @@
-using Content.Server._Horizon;
-using Content.Server.RoundEnd;
+using Content.Server._Horizon.Shipbreaking.Derelict;
 using Content.Shared._Horizon.MusicRadio;
 using Content.Shared.Item.ItemToggle;
 using Content.Shared.Item.ItemToggle.Components;
@@ -18,8 +17,7 @@ public sealed class MusicRadioSystem : EntitySystem
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly ItemToggleSystem _toggle = default!;
-    [Dependency] private readonly RoundEndSystem _roundEnd = default!;
-    [Dependency] private readonly GameShutdownController _shutdown = default!;
+    [Dependency] private readonly DerelictYardSystem _yard = default!;
 
     private static readonly TimeSpan CheckInterval = TimeSpan.FromSeconds(1);
 
@@ -73,16 +71,11 @@ public sealed class MusicRadioSystem : EntitySystem
     }
 
     /// <summary>
-    /// Whether the round ends within the tension time: the evacuation countdown or the scheduled restart, whichever is sooner.
+    /// Whether the time of a leased wreck is running out: the tension tracks play then.
     /// </summary>
     private bool IsEndNear(MusicRadioComponent radio)
     {
-        if (_roundEnd.ShuttleTimeLeft is { } left && left <= radio.TensionTime)
-            return true;
-
-        var status = _shutdown.GetStatus();
-        return status.Enabled && status.RestartTimeMsk is { } restart && status.CurrentTimeMsk is { } now &&
-               restart - now <= radio.TensionTime;
+        return _yard.IsLeaseEnding(radio.TensionTime);
     }
 
     public override void Update(float frameTime)
@@ -100,7 +93,7 @@ public sealed class MusicRadioSystem : EntitySystem
             if (!_toggle.IsActivated(uid))
                 continue;
 
-            // The end is near: the regular track is cut off and the tension ones begin.
+            // A lease is running out: the regular track is cut off and the tension ones begin.
             if (!radio.Tension && IsEndNear(radio))
             {
                 Stop((uid, radio));

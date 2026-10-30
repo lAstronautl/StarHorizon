@@ -7,21 +7,16 @@
   - type: Sprite
     sprite: Objects/Devices/communication.rsi
     layers:
-    - state: walkietalkie
-    - state: walkietalkie-on
-      map: [ "unshaded" ]
-      shader: unshaded
-      visible: false
+    - state: old-radio
   - type: Item
     sprite: Objects/Devices/communication.rsi
-    heldPrefix: walkietalkie
+    heldPrefix: old-radio
   - type: ItemToggle
+    activated: true
     soundActivate:
       path: /Audio/Machines/button.ogg
     soundDeactivate:
       path: /Audio/Machines/button.ogg
-  - type: ToggleableVisuals
-    spriteLayer: unshaded
   - type: MusicRadio
     collection: HorizonRadioMusic
     tensionCollection: HorizonRadioMusicTension
