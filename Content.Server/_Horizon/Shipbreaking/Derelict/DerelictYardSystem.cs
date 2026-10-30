@@ -1,5 +1,5 @@
 using Content.Server.Cargo.Systems;
-using Content.Server.Chat.Systems;
+using Content.Server.Radio.EntitySystems;
 using System.Linq;
 using Content.Server.Station.Systems;
 using Content.Server._NF.Bank;
@@ -9,6 +9,7 @@ using Content.Shared._NF.Bank.BUI;
 using Content.Shared._NF.Bank.Components;
 using Content.Shared.GameTicking;
 using Content.Shared.Mobs.Components;
+using Content.Shared.Cargo.Components;
 using Content.Shared.Popups;
 using Robust.Server.GameObjects;
 using Robust.Shared.Containers;
@@ -28,7 +29,7 @@ public sealed class DerelictYardSystem : EntitySystem
     private static readonly TimeSpan LastWarning = TimeSpan.FromMinutes(1);
 
     [Dependency] private readonly BankSystem _bank = default!;
-    [Dependency] private readonly ChatSystem _chat = default!;
+    [Dependency] private readonly RadioSystem _radio = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
@@ -180,12 +181,26 @@ public sealed class DerelictYardSystem : EntitySystem
             Expires = _timing.CurTime + vessel.Lifetime,
         };
 
-        _chat.DispatchStationAnnouncement(station,
-            Loc.GetString("derelict-yard-bought", ("name", Loc.GetString(vessel.Name)), ("minutes", (int) vessel.Lifetime.TotalMinutes)),
-            Loc.GetString("derelict-yard-sender"),
-            playDefaultSound: false);
+        Announce(station,
+            Loc.GetString("derelict-yard-bought", ("name", Loc.GetString(vessel.Name)), ("minutes", (int) vessel.Lifetime.TotalMinutes)));
 
         UpdateAllUis();
+    }
+
+    /// <summary>
+    /// The news of the yard goes to the supply radio channel, spoken by a yard console of the station.
+    /// </summary>
+    private void Announce(EntityUid station, string message)
+    {
+        var consoles = EntityQueryEnumerator<DerelictYardConsoleComponent>();
+        while (consoles.MoveNext(out var uid, out _))
+        {
+            if (_station.GetOwningStation(uid) != station)
+                continue;
+
+            _radio.SendRadioMessage(uid, message, CargoOrderConsoleComponent.BaseAnnouncementChannel, uid, escapeMarkup: false);
+            return;
+        }
     }
 
     private void MarkOrigin(EntityUid shuttle)
@@ -277,10 +292,8 @@ public sealed class DerelictYardSystem : EntitySystem
 
     private void Warn(Job job, int minutes)
     {
-        _chat.DispatchStationAnnouncement(job.Station,
-            Loc.GetString("derelict-yard-warning", ("minutes", minutes)),
-            Loc.GetString("derelict-yard-sender"),
-            playDefaultSound: false);
+        Announce(job.Station,
+            Loc.GetString("derelict-yard-warning", ("minutes", minutes)));
     }
 
     private void Finish(EntityUid group, Job job)
@@ -339,11 +352,9 @@ public sealed class DerelictYardSystem : EntitySystem
         if (fee > 0 && !_bank.TrySectorWithdraw(SectorBankAccount.Frontier, fee, LedgerEntryType.StationWithdrawalSupplies))
             fee = 0;
 
-        _chat.DispatchStationAnnouncement(job.Station,
+        Announce(job.Station,
             Loc.GetString("derelict-yard-result",
-                ("name", job.Name), ("percent", percent), ("revenue", job.Revenue), ("bonus", bonus), ("fee", fee)),
-            Loc.GetString("derelict-yard-sender"),
-            playDefaultSound: false);
+                ("name", job.Name), ("percent", percent), ("revenue", job.Revenue), ("bonus", bonus), ("fee", fee)));
 
         var rank = EnsureComp<DerelictYardRankComponent>(job.Station);
         rank.Experience += job.Revenue;
@@ -359,10 +370,8 @@ public sealed class DerelictYardSystem : EntitySystem
             return;
 
         rank.Rank = newRank;
-        _chat.DispatchStationAnnouncement(job.Station,
-            Loc.GetString("derelict-yard-rank-up", ("rank", newRank)),
-            Loc.GetString("derelict-yard-sender"),
-            playDefaultSound: false);
+        Announce(job.Station,
+            Loc.GetString("derelict-yard-rank-up", ("rank", newRank)));
     }
 
     private void OnPreviewRequest(Entity<DerelictYardConsoleComponent> ent, ref DerelictPreviewRequestMessage args)
