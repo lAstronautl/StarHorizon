@@ -1,12 +1,12 @@
 using System.Linq;
 using Content.Shared._Goobstation.CCVar;
 using Content.Shared._Goobstation.VoiceChat;
+using Content.Server.Radio.Components;
 using Content.Server.Radio.EntitySystems;
 using Content.Shared.Chat;
 using Content.Shared.Inventory;
 using Content.Shared.Radio;
 using Content.Shared.Radio.Components;
-using Content.Shared.Whitelist;
 using Robust.Server.Player;
 using Robust.Shared.Configuration;
 using Robust.Shared.Enums;
@@ -22,7 +22,6 @@ public sealed partial class VoiceRadioSystem : EntitySystem
     [Dependency] private IPlayerManager _player = default!;
     [Dependency] private IPrototypeManager _prototype = default!;
     [Dependency] private RadioSystem _radio = default!;
-    [Dependency] private EntityWhitelistSystem _whitelist = default!;
     [Dependency] private InventorySystem _inventory = default!;
 
     private static readonly TimeSpan RefreshInterval = TimeSpan.FromSeconds(1);
@@ -172,18 +171,16 @@ public sealed partial class VoiceRadioSystem : EntitySystem
         _channels.Sort((a, b) => string.CompareOrdinal(a.Id, b.Id));
     }
 
-    private void AddChannels(EntityUid uid, IEnumerable<ProtoId<RadioChannelPrototype>> channels)
+    private void AddChannels(EntityUid uid, IEnumerable<string> channels)
     {
-        foreach (var id in channels)
+        foreach (var raw in channels)
         {
+            var id = new ProtoId<RadioChannelPrototype>(raw);
             if (!_common && id == SharedChatSystem.CommonChannel)
                 continue;
 
-            if (!_prototype.TryIndex(id, out var channel) ||
-                !_whitelist.IsWhitelistPassOrNull(channel.SendWhitelist, uid))
-            {
+            if (!_prototype.HasIndex(id))
                 continue;
-            }
 
             if (!_channels.Contains(id))
                 _channels.Add(id);
@@ -220,22 +217,20 @@ public sealed partial class VoiceRadioSystem : EntitySystem
 
         foreach (var channel in _prototype.EnumeratePrototypes<RadioChannelPrototype>())
         {
-            AddReceive(uid, new[] { new ProtoId<RadioChannelPrototype>(channel.ID) });
+            AddReceive(uid, new[] { channel.ID });
         }
     }
 
-    private void AddReceive(EntityUid uid, IEnumerable<ProtoId<RadioChannelPrototype>> channels)
+    private void AddReceive(EntityUid uid, IEnumerable<string> channels)
     {
-        foreach (var id in channels)
+        foreach (var raw in channels)
         {
+            var id = new ProtoId<RadioChannelPrototype>(raw);
             if (!_common && id == SharedChatSystem.CommonChannel)
                 continue;
 
-            if (!_prototype.TryIndex(id, out var channel) ||
-                !_whitelist.IsWhitelistPassOrNull(channel.ReceiveWhitelist, uid))
-            {
+            if (!_prototype.HasIndex(id))
                 continue;
-            }
 
             if (!_receive.Contains(id))
                 _receive.Add(id);
@@ -245,9 +240,6 @@ public sealed partial class VoiceRadioSystem : EntitySystem
     private bool CanTransmit(EntityUid uid, RadioChannelPrototype channel, out EntityUid radioSource)
     {
         radioSource = default;
-        if (!_whitelist.IsWhitelistPassOrNull(channel.SendWhitelist, uid))
-            return false;
-
         if (TryComp<WearingHeadsetComponent>(uid, out var wearing) &&
             TryComp<HeadsetComponent>(wearing.Headset, out var headset) &&
             headset.Enabled &&

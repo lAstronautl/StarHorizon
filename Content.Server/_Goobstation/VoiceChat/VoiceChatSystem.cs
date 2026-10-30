@@ -5,6 +5,8 @@ using Content.Server.Atmos.Components;
 using Content.Server.GameTicking;
 using Content.Server.Power.EntitySystems;
 using Content.Server.Telephone;
+using Content.Server.Chat.Systems;
+using Content.Server.Radio.Components;
 using Content.Server.VoiceMask;
 using Content.Shared.ActionBlocker;
 using Content.Shared.Chat;
@@ -24,7 +26,7 @@ using Content.Shared.Speech;
 using Content.Shared.Speech.Components;
 using Content.Shared.Speech.Muting;
 using Content.Shared.StationAi;
-using Content.Server.SurveillanceCamera.Components;
+using Content.Server.SurveillanceCamera;
 using Content.Shared.Tag;
 using Content.Shared.Telephone;
 using Robust.Server.Player;
@@ -806,7 +808,7 @@ public sealed partial class VoiceChatSystem : EntitySystem
             {
                 var origin = _transform.GetMapCoordinates(receiver);
                 if (origin.MapId != MapId.Nullspace)
-                    transmission.Relays.Add(new Relay(receiver, origin, radioSpeaker.SpeakNormally ? _range : WhisperRange, VoiceRoute.RadioSpeaker));
+                    transmission.Relays.Add(new Relay(receiver, origin, radioSpeaker.OutputChatType == InGameICChatType.Speak ? _range : WhisperRange, VoiceRoute.RadioSpeaker));
             }
         }
 
@@ -935,7 +937,7 @@ public sealed partial class VoiceChatSystem : EntitySystem
 
     private bool IsActiveVoiceMask(EntityUid uid)
     {
-        return TryComp<VoiceMaskComponent>(uid, out var mask) && mask.Active;
+        return HasComp<VoiceMaskComponent>(uid);
     }
 
     private bool CanTransmit(Speaker speaker, EntityUid uid, TimeSpan now, bool recheck)
