@@ -1,5 +1,6 @@
 using Content.Client.Administration.Managers;
 using Content.Client.Audio;
+using Content.Shared._Goobstation.CCVar; // Goobstation - Voice chat
 using Content.Shared._Horizon.CCVar;
 using Content.Shared._NF.CCVar; // Frontier
 using Content.Shared.CCVar;
@@ -77,12 +78,18 @@ public sealed partial class AudioTab : Control
             SliderVolumeInterface,
             scale: ContentAudioSystem.InterfaceMultiplier);
 
+        Control.AddOptionPercentSlider(
+            GoobCVars.VoiceChatVolume,
+            SliderVolumeVoiceChat,
+            0, 2); // Goobstation - Voice chat
+
         Control.AddOptionSlider(
             CCVars.MaxAmbientSources,
             SliderMaxAmbienceSounds,
             _cfg.GetCVar(CCVars.MinMaxAmbientSourcesConfigured),
             _cfg.GetCVar(CCVars.MaxMaxAmbientSourcesConfigured));
 
+        Control.AddOptionCheckBox(GoobCVars.VoiceChatHearSelf, HearSelfCheckBox); // Goobstation - Voice chat
         Control.AddOptionCheckBox(CCVars.LobbyMusicEnabled, LobbyMusicCheckBox);
         Control.AddOptionCheckBox(CCVars.RestartSoundsEnabled, RestartSoundsCheckBox);
         Control.AddOptionCheckBox(CCVars.EventMusicEnabled, EventMusicCheckBox);

@@ -1,3 +1,6 @@
+using Content.Client._Goobstation.VoiceChat; // Goobstation - Voice chat
+using Content.Client._Goobstation.VoiceChat.UI; // Goobstation - Voice chat
+using Content.Client.UserInterface.Systems.Chat.Controls; // Goobstation - Voice chat
 using Content.Client._Horizon.Sponsors.Systems;
 using Content.Client._Horizon.Sponsors.UI;
 using Content.Client.Administration.Managers;
@@ -38,6 +41,8 @@ namespace Content.Client.IoC
             var collection = IoCManager.Instance!;
 
             collection.Register<SponsorConnectClientSystem>(); // _Horizon
+            collection.Register<VoiceChatManager>(); // Goobstation - Voice chat
+            collection.Register<IChatVoiceControls, ChatVoiceControls>(); // Goobstation - Voice chat
             collection.Register<SponsorShopUIController>(); // _Horizon
             collection.Register<IParallaxManager, ParallaxManager>();
             collection.Register<GeneratedParallaxCache>();

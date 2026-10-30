@@ -216,6 +216,8 @@ namespace Content.Client.Options.UI.Tabs
 
             AddHeader("ui-options-header-ui");
             AddButton(ContentKeyFunctions.FocusChat);
+            AddButton(ContentKeyFunctions.VoicePushToTalk); // Goobstation - Voice chat
+            AddButton(ContentKeyFunctions.VoicePushToTalkRadio); // Goobstation - Voice chat
             AddButton(ContentKeyFunctions.FocusLocalChat);
             AddButton(ContentKeyFunctions.FocusEmote);
             AddButton(ContentKeyFunctions.FocusWhisperChat);

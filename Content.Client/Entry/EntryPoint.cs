@@ -1,3 +1,4 @@
+using Content.Client._Goobstation.VoiceChat; // Goobstation - Voice chat
 using Content.Client._Harmony.JoinQueue; // Harmony Queue
 using Content.Client.Administration.Managers;
 using Content.Client.Changelog;
@@ -68,6 +69,7 @@ namespace Content.Client.Entry
         [Dependency] private readonly IVoteManager _voteManager = default!;
         [Dependency] private readonly DocumentParsingManager _documentParsingManager = default!;
         [Dependency] private readonly GhostKickManager _ghostKick = default!;
+        [Dependency] private readonly VoiceChatManager _voiceChat = default!; // Goobstation - Voice chat
         [Dependency] private readonly ExtendedDisconnectInformationManager _extendedDisconnectInformation = default!;
         [Dependency] private readonly JobRequirementsManager _jobRequirements = default!;
         [Dependency] private readonly ContentLocalizationManager _contentLoc = default!;
@@ -145,6 +147,7 @@ namespace Content.Client.Entry
             _changelogManager.Initialize();
             _viewportManager.Initialize();
             _ghostKick.Initialize();
+            _voiceChat.Initialize(); // Goobstation - Voice chat
             _extendedDisconnectInformation.Initialize();
             _jobRequirements.Initialize();
             _playbackMan.Initialize();
@@ -162,6 +165,7 @@ namespace Content.Client.Entry
         {
             base.Shutdown();
             _titleWindowManager.Shutdown();
+            _voiceChat.Shutdown(); // Goobstation - Voice chat
         }
 
         public override void PostInit()

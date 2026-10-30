@@ -3,6 +3,7 @@ using Content.Client.UserInterface.Controls;
 using Content.Client.UserInterface.Systems.Guidebook;
 using Content.Client.UserInterface.Systems.Info;
 using Content.Shared.CCVar;
+using Content.Shared._Goobstation.CCVar; // Goobstation - Voice chat
 using JetBrains.Annotations;
 using Robust.Client.Console;
 using Robust.Client.UserInterface;
@@ -103,8 +104,15 @@ public sealed class EscapeUIController : UIController, IOnStateEntered<GameplayS
             _guidebook.ToggleGuidebook();
         };
 
+        _escapeWindow.VoiceChatButton.OnPressed += _ => // Goobstation - Voice chat
+        {
+            CloseEscapeWindow();
+            _console.ExecuteCommand("voicechat");
+        };
+
         // Hide wiki button if we don't have a link for it.
         _escapeWindow.WikiButton.Visible = _cfg.GetCVar(CCVars.InfoLinksWiki) != "";
+        _cfg.OnValueChanged(GoobCVars.VoiceChatEnabled, OnVoiceChatEnabledChanged, true); // Goobstation - Voice chat
 
         CommandBinds.Builder
             .Bind(EngineKeyFunctions.EscapeMenu,
@@ -120,7 +128,15 @@ public sealed class EscapeUIController : UIController, IOnStateEntered<GameplayS
             _escapeWindow = null;
         }
 
+        _cfg.UnsubValueChanged(GoobCVars.VoiceChatEnabled, OnVoiceChatEnabledChanged); // Goobstation - Voice chat
+
         CommandBinds.Unregister<EscapeUIController>();
+    }
+
+    private void OnVoiceChatEnabledChanged(bool enabled) // Goobstation - Voice chat
+    {
+        if (_escapeWindow != null)
+            _escapeWindow.VoiceChatButton.Visible = enabled;
     }
 
     private void EscapeButtonOnOnPressed(ButtonEventArgs obj)

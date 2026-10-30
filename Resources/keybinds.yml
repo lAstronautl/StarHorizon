@@ -108,6 +108,12 @@ binds:
 - function: FocusChatInputWindow
   type: State
   key: T
+- function: VoicePushToTalk # Goobstation - Voice chat
+  type: State
+  key: N
+- function: VoicePushToTalkRadio # Goobstation - Voice chat
+  type: State
+  key: M
 - function: FocusLocalChatWindow
   type: State
   key: Period

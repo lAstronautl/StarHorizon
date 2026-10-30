@@ -16,6 +16,10 @@
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" PrivateAssets="All" />
     <PackageReference Include="NetCord" />
+    <PackageReference Include="NWaves" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="_Goobstation\VoiceChat\Web\**" LogicalName="VoiceChat.Web.%(Filename)%(Extension)" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Content.Packaging\Content.Packaging.csproj" />

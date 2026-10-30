@@ -14,6 +14,8 @@ namespace Content.Client.Input
         {
             var common = contexts.GetContext("common");
             common.AddFunction(ContentKeyFunctions.FocusChat);
+            common.AddFunction(ContentKeyFunctions.VoicePushToTalk); // Goobstation - Voice chat
+            common.AddFunction(ContentKeyFunctions.VoicePushToTalkRadio); // Goobstation - Voice chat
             common.AddFunction(ContentKeyFunctions.FocusLocalChat);
             common.AddFunction(ContentKeyFunctions.FocusEmote);
             common.AddFunction(ContentKeyFunctions.FocusWhisperChat);

@@ -1,3 +1,4 @@
+using Content.Server._Goobstation.VoiceChat; // Goobstation - Voice chat
 using Content.Server._Horizon;
 using Content.Server._Horizon.SponsorManager;
 using Content.Server._NF.Auth;
@@ -84,6 +85,8 @@ namespace Content.Server.IoC
             IoCManager.Register<CVarControlManager>();
             IoCManager.Register<MiniAuthManager>(); //Frontier
             IoCManager.Register<SponsorManager>(); // _Horizon
+            IoCManager.Register<VoiceChatManager>(); // Goobstation - Voice chat
+            IoCManager.Register<VoiceLogManager>(); // Goobstation - Voice chat
 
 
             IoCManager.Register<DiscordLink>();

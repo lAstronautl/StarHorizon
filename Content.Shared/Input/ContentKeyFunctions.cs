@@ -13,6 +13,8 @@ namespace Content.Shared.Input
         public static readonly BoundKeyFunction Drop = "Drop";
         public static readonly BoundKeyFunction ExamineEntity = "ExamineEntity";
         public static readonly BoundKeyFunction FocusChat = "FocusChatInputWindow";
+        public static readonly BoundKeyFunction VoicePushToTalk = "VoicePushToTalk"; // Goobstation - Voice chat
+        public static readonly BoundKeyFunction VoicePushToTalkRadio = "VoicePushToTalkRadio"; // Goobstation - Voice chat
         public static readonly BoundKeyFunction FocusLocalChat = "FocusLocalChatWindow";
         public static readonly BoundKeyFunction FocusEmote = "FocusEmote";
         public static readonly BoundKeyFunction FocusWhisperChat = "FocusWhisperChatWindow";

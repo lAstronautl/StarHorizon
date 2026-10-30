@@ -1,3 +1,4 @@
+using Content.Server._Goobstation.VoiceChat; // Goobstation - Voice chat
 using Content.Server._Horizon;
 using Content.Server._Horizon.SponsorManager;
 using Content.Server._NF.Auth;
@@ -118,6 +119,8 @@ namespace Content.Server.Entry
                 IoCManager.Resolve<GhostKickManager>().Initialize();
                 IoCManager.Resolve<ServerInfoManager>().Initialize();
                 IoCManager.Resolve<ServerApi>().Initialize();
+                IoCManager.Resolve<VoiceChatManager>().Initialize(); // Goobstation - Voice chat
+                IoCManager.Resolve<VoiceLogManager>().Initialize(); // Goobstation - Voice chat
                 var sponsorManager = IoCManager.Resolve<SponsorManager>();
                 sponsorManager.Initialize(); // _Horizon
                 sponsorManager.LoadSponsorsInfoFile(); // _Horizon
@@ -208,6 +211,8 @@ namespace Content.Server.Entry
             _playTimeTracking?.Shutdown();
             _dbManager?.Shutdown();
             IoCManager.Resolve<ServerApi>().Shutdown();
+            IoCManager.Resolve<VoiceChatManager>().Shutdown(); // Goobstation - Voice chat
+            IoCManager.Resolve<VoiceLogManager>().Shutdown(); // Goobstation - Voice chat
 
             IoCManager.Resolve<DiscordLink>().Shutdown();
             IoCManager.Resolve<DiscordChatLink>().Shutdown();
