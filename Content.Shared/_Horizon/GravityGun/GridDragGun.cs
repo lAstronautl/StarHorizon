@@ -12,7 +12,7 @@ public sealed partial class GridDragGunComponent : Component
     public float MaxDistance = 15f;
 
     [DataField]
-    public int MaxTiles = 5;
+    public int MaxTiles = 9;
 
     [DataField]
     public bool RequireUtilization;
