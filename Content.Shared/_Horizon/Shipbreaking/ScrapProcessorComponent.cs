@@ -1,4 +1,5 @@
 using Content.Shared._NF.Bank.Components;
+using Content.Shared.Damage;
 using Content.Shared.Whitelist;
 using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
@@ -25,4 +26,26 @@ public sealed partial class ScrapProcessorComponent : Component
 
     [DataField]
     public SoundSpecifier? Sound;
+
+    /// <summary>
+    /// Gibs whatever living thing with a body touches the machine, paying nothing.
+    /// </summary>
+    [DataField]
+    public bool GibLiving;
+
+    /// <summary>
+    /// Damage dealt to living things that touch the machine, once per <see cref="BurnInterval"/>, like the burn of a
+    /// shuttle thruster.
+    /// </summary>
+    [DataField]
+    public DamageSpecifier? BurnDamage;
+
+    [DataField]
+    public TimeSpan BurnInterval = TimeSpan.FromSeconds(2);
+
+    [ViewVariables]
+    public TimeSpan NextBurn;
+
+    [ViewVariables]
+    public HashSet<EntityUid> Burning = new();
 }

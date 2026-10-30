@@ -38,6 +38,9 @@
       params:
         volume: -3
   - type: ScrapProcessor
+    burnDamage:
+      types:
+        Heat: 5
     sound:
       path: /Audio/Effects/saw.ogg
       params:
@@ -86,6 +89,7 @@
       params:
         volume: -3
   - type: ScrapProcessor
+    gibLiving: true
     sound:
       path: /Audio/Effects/saw.ogg
       params:
