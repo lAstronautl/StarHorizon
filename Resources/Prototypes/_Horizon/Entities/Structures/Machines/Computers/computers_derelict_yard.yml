@@ -22,6 +22,7 @@
     - ScrapConstruct
     - ScrapDisciple
     - ScrapGeode
+    - ScrapMayflower
     - ScrapNugget
     - ScrapOrange
     - ScrapPoint
@@ -35,6 +36,15 @@
     - ScrapSparrow
     - ScrapSprinter
     - ScrapTide
+    - DerelictMiner
+    - DerelictSyndicate
+    - DerelictCargo
+    - DerelictCrashed
+    - DerelictHauler
+    - DerelictEmergency
+    - DerelictWhiteship
+    - DerelictDuranihp
+    - DerelictVelvet
   - type: ActivatableUI
     key: enum.DerelictYardUiKey.Key
   - type: UserInterface
