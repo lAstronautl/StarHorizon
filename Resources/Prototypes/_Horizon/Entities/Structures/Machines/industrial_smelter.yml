@@ -27,7 +27,6 @@
   # Burns the tiles of a grid pushed into it, for nothing.
   - type: TileReclaimer
     pay: false
-    recyclingBox: -0.5,0.5,0.5,2.5 # two tiles deep: the grid gun stops a hull short of the machine
     whitelist:
       components:
       - Shuttle
@@ -69,7 +68,6 @@
           Forward: { visible: true }
           Reverse: { visible: true }
   - type: TileReclaimer
-    recyclingBox: -0.5,0.5,0.5,2.5
     efficiency: 5 # tiles are paid for in money, see ServerTileReclaimerSystem
     whitelist:
       components:
@@ -113,7 +111,6 @@
           Forward: { visible: true }
           Reverse: { visible: true }
   - type: TileReclaimer
-    recyclingBox: -0.5,0.5,0.5,2.5
     efficiency: 5
     sound:
       path: /Audio/Effects/saw.ogg
