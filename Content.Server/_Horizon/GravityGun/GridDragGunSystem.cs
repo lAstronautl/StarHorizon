@@ -141,7 +141,7 @@ public sealed class GridDragGunSystem : SharedGridDragGunSystem
         var speed = _physics.GetMapLinearVelocity(grid);
         var next = speed + (wanted - speed) * gun.Comp.Blend;
 
-        if (WouldOverlap(grid, next, 0.25f))
+        if (WouldOverlap(grid, next, 0.15f))
             next = Vector2.Zero;
 
         _physics.SetLinearVelocity(grid, next);
