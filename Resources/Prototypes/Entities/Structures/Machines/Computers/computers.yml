@@ -695,6 +695,7 @@
       state: generic_panel_open
   - type: AccessReader
     access: [["HeadOfPersonnel"], ["HeadOfSecurity"]]
+  - type: VoiceBroadcastConsole # Goobstation
   - type: CommunicationsConsole
     title: comms-console-announcement-title-station
     global: true #SR WILL NOT BE IGNORED
@@ -739,6 +740,7 @@
       state: generic_panel_open
   - type: AccessReader
     access: [[ "NuclearOperative" ]]
+  - type: VoiceBroadcastConsole # Goobstation
   - type: CommunicationsConsole
     title: comms-console-announcement-title-nukie
     color: "#ff0000"
@@ -773,6 +775,7 @@
       state: generic_panel_open
   - type: AccessReader
     access: [[ "Wizard" ]]
+  - type: VoiceBroadcastConsole # Goobstation
   - type: CommunicationsConsole
     title: comms-console-announcement-title-wizard
     color: "#ff00ff"
@@ -807,6 +810,7 @@
       state: generic_panel_open
   - type: AccessReader
     access: [[ "CentralCommand" ]]
+  - type: VoiceBroadcastConsole # Goobstation
   - type: CommunicationsConsole
     title: comms-console-announcement-title-centcom
     color: "#1d8bad"

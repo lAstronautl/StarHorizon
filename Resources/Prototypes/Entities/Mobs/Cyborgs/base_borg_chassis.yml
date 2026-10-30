@@ -6,6 +6,8 @@
   save: false
   abstract: true
   components:
+- type: VoiceChatEffect # Goobstation - Voice chat
+  effect: Robot
 # Horizon start
   - type: LanguageSpeaker
     languages:
