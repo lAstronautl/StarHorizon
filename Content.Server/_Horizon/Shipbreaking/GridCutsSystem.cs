@@ -14,6 +14,7 @@ public sealed class GridCutsSystem : EntitySystem
         base.Initialize();
 
         SubscribeLocalEvent<GridCutsComponent, PostGridSplitEvent>(OnGridSplit);
+        SubscribeLocalEvent<GridCutsComponent, TileChangedEvent>(OnTileChanged);
     }
 
     public void AddCut(EntityUid gridUid, Vector2i tile, CutEdges edge)
@@ -47,6 +48,43 @@ public sealed class GridCutsSystem : EntitySystem
             Dirty(gridUid, cuts);
 
         return true;
+    }
+
+    /// <summary>
+    /// A tile that is gone takes its cuts with it, on both sides of every edge, so no cut is left hanging in space.
+    /// </summary>
+    private void OnTileChanged(Entity<GridCutsComponent> ent, ref TileChangedEvent args)
+    {
+        var changed = false;
+
+        foreach (var change in args.Changes)
+        {
+            if (!change.NewTile.IsEmpty)
+                continue;
+
+            var tile = change.GridIndices;
+            if (!ent.Comp.Cuts.Remove(tile, out var flags))
+                continue;
+
+            changed = true;
+            foreach (var edge in CutEdgesExtensions.All)
+            {
+                if (!flags.HasFlag(edge))
+                    continue;
+
+                var other = tile + edge.Offset();
+                ClearEdge(ent.Comp, other, edge.Opposite());
+                _atmos.InvalidateTile(ent.Owner, other);
+            }
+        }
+
+        if (!changed)
+            return;
+
+        if (ent.Comp.Cuts.Count == 0)
+            RemComp<GridCutsComponent>(ent);
+        else
+            Dirty(ent);
     }
 
     public bool HasCuts(EntityUid gridUid)

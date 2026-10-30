@@ -39,10 +39,14 @@ public sealed class GridCutOverlay : Overlay
 
             foreach (var (tile, edges) in cuts.Cuts)
             {
-                if (edges.HasFlag(CutEdges.North))
+                // A cut only shows between two floor tiles, whatever is stored for tiles that are gone.
+                if (!HasFloor(uid, grid, tile))
+                    continue;
+
+                if (edges.HasFlag(CutEdges.North) && HasFloor(uid, grid, tile + CutEdges.North.Offset()))
                     handle.DrawRect(CutEdges.North.GetRect(tile, size, half), GapColor);
 
-                if (edges.HasFlag(CutEdges.East))
+                if (edges.HasFlag(CutEdges.East) && HasFloor(uid, grid, tile + CutEdges.East.Offset()))
                     handle.DrawRect(CutEdges.East.GetRect(tile, size, half), GapColor);
             }
         }
@@ -70,5 +74,10 @@ public sealed class GridCutOverlay : Overlay
         }
 
         handle.SetTransform(Matrix3x2.Identity);
+    }
+
+    private bool HasFloor(EntityUid uid, MapGridComponent grid, Vector2i tile)
+    {
+        return _entManager.System<SharedMapSystem>().TryGetTile(grid, tile, out var found) && !found.IsEmpty;
     }
 }
