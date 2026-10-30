@@ -40,6 +40,12 @@ public sealed partial class ScrapProcessorComponent : Component
     [DataField]
     public DamageSpecifier? BurnDamage;
 
+    /// <summary>
+    /// Played at whoever is burned, so they know where the pain comes from.
+    /// </summary>
+    [DataField]
+    public SoundSpecifier? BurnSound;
+
     [DataField]
     public TimeSpan BurnInterval = TimeSpan.FromSeconds(2);
 

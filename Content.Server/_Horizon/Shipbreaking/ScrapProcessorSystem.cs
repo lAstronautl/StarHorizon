@@ -118,6 +118,7 @@ public sealed class ScrapProcessorSystem : EntitySystem
                 }
 
                 _damageable.TryChangeDamage(victim, processor.BurnDamage);
+                _audio.PlayPvs(processor.BurnSound, victim);
             }
         }
     }

@@ -41,6 +41,8 @@
     burnDamage:
       types:
         Heat: 5
+    burnSound:
+      path: /Audio/Effects/sizzle.ogg
     sound:
       path: /Audio/Effects/saw.ogg
       params:
