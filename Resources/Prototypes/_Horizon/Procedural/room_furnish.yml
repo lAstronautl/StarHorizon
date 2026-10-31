@@ -900,6 +900,88 @@
     - DirtMedium
     - DirtHeavy
     cleanable: true
+  stories:
+  - id: Evacuated
+    weight: 1.0
+    entries:
+    - group: HorizonFurnishClutterMaint
+      min: 1
+      max: 2
+      perTiles: 14
+    - group: HorizonFurnishLootPaper
+      min: 1
+      max: 1
+      perTiles: 18
+    - group: HorizonFurnishNoteEvacuation
+      min: 1
+      max: 1
+    - group: HorizonFurnishNoteMedical
+      min: 0
+      max: 1
+      chance: 0.6
+    decals:
+    - mode: Scatter
+      chance: 0.08
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+  - id: Abandoned
+    weight: 1.0
+    entries:
+    - group: HorizonFurnishCobweb
+      min: 2
+      max: 3
+      perTiles: 30
+    - group: HorizonFurnishNoteAbandoned
+      min: 0
+      max: 1
+      chance: 0.6
+    decals:
+    - mode: Scatter
+      chance: 0.35
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+      - DirtHeavy
+      - DirtHeavy
+  - id: Ransacked
+    weight: 0.8
+    entries:
+    - group: HorizonFurnishWreckedTable
+      min: 1
+      max: 1
+      perTiles: 36
+    - group: HorizonFurnishDroppedChair
+      min: 0
+      max: 1
+      perTiles: 40
+      chance: 0.7
+    - group: HorizonFurnishClutterScrap
+      min: 1
+      max: 2
+      perTiles: 22
+    - group: HorizonFurnishNoteRansacked
+      min: 1
+      max: 1
+    decals:
+    - mode: Scatter
+      chance: 0.22
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+  storyChance: 0.6
 
 - type: roomArchetype
   id: HorizonRoomArmory
@@ -914,20 +996,26 @@
   - group: HorizonFurnishDeskGuard
     min: 1
     max: 1
-  - group: HorizonFurnishRackArmory
+    bias: NearDoor
+  - group: HorizonFurnishArmoryRackNanoTrasen
     min: 1
     max: 2
     perTiles: 30
-  - group: HorizonFurnishRackArmorySec
+    alternative: Faction
+  - group: HorizonFurnishArmoryRackSyndicate
     min: 1
-    max: 1
+    max: 2
+    perTiles: 30
+    alternative: Faction
   - group: HorizonFurnishGunSafe
     min: 1
     max: 1
+    bias: FarFromDoor
   - group: HorizonFurnishLockerPpe
     min: 1
     max: 1
     perTiles: 35
+    bias: NearDoor
   - group: HorizonFurnishCrateRestock
     min: 0
     max: 1
@@ -949,11 +1037,6 @@
     max: 1
     perTiles: 70
     chance: 0.7
-  - group: HorizonFurnishArmoryIsland
-    min: 1
-    max: 1
-    perTiles: 45
-    chance: 1.0
   decals:
   - mode: Skirting
     cardinal:
@@ -982,6 +1065,88 @@
     - DirtMedium
     - DirtHeavy
     cleanable: true
+  stories:
+  - id: Evacuated
+    weight: 1.0
+    entries:
+    - group: HorizonFurnishClutterMaint
+      min: 1
+      max: 2
+      perTiles: 14
+    - group: HorizonFurnishLootPaper
+      min: 1
+      max: 1
+      perTiles: 18
+    - group: HorizonFurnishNoteEvacuation
+      min: 1
+      max: 1
+    - group: HorizonFurnishNoteArmory
+      min: 0
+      max: 1
+      chance: 0.6
+    decals:
+    - mode: Scatter
+      chance: 0.08
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+  - id: Abandoned
+    weight: 1.0
+    entries:
+    - group: HorizonFurnishCobweb
+      min: 2
+      max: 3
+      perTiles: 30
+    - group: HorizonFurnishNoteAbandoned
+      min: 0
+      max: 1
+      chance: 0.6
+    decals:
+    - mode: Scatter
+      chance: 0.35
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+      - DirtHeavy
+      - DirtHeavy
+  - id: Ransacked
+    weight: 0.8
+    entries:
+    - group: HorizonFurnishWreckedTable
+      min: 1
+      max: 1
+      perTiles: 36
+    - group: HorizonFurnishDroppedChair
+      min: 0
+      max: 1
+      perTiles: 40
+      chance: 0.7
+    - group: HorizonFurnishClutterScrap
+      min: 1
+      max: 2
+      perTiles: 22
+    - group: HorizonFurnishNoteRansacked
+      min: 1
+      max: 1
+    decals:
+    - mode: Scatter
+      chance: 0.22
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+  storyChance: 0.75
 
 - type: roomArchetype
   id: HorizonRoomVault
@@ -996,15 +1161,19 @@
     min: 0
     max: 1
     chance: 0.5
+    bias: NearDoor
   - group: HorizonFurnishRackVault
     min: 1
     max: 2
+    bias: FarFromDoor
   - group: HorizonFurnishGunSafe
     min: 1
     max: 1
+    bias: FarFromDoor
   - group: HorizonFurnishLootTreasure
     min: 2
     max: 2
+    bias: FarFromDoor
   - group: HorizonFurnishLootSpesos
     min: 1
     max: 2
@@ -1057,6 +1226,88 @@
     - DirtMedium
     - DirtHeavy
     cleanable: true
+  stories:
+  - id: Evacuated
+    weight: 1.0
+    entries:
+    - group: HorizonFurnishClutterMaint
+      min: 1
+      max: 2
+      perTiles: 14
+    - group: HorizonFurnishLootPaper
+      min: 1
+      max: 1
+      perTiles: 18
+    - group: HorizonFurnishNoteEvacuation
+      min: 1
+      max: 1
+    - group: HorizonFurnishNoteArmory
+      min: 0
+      max: 1
+      chance: 0.6
+    decals:
+    - mode: Scatter
+      chance: 0.08
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+  - id: Abandoned
+    weight: 1.0
+    entries:
+    - group: HorizonFurnishCobweb
+      min: 2
+      max: 3
+      perTiles: 30
+    - group: HorizonFurnishNoteAbandoned
+      min: 0
+      max: 1
+      chance: 0.6
+    decals:
+    - mode: Scatter
+      chance: 0.35
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+      - DirtHeavy
+      - DirtHeavy
+  - id: Ransacked
+    weight: 0.8
+    entries:
+    - group: HorizonFurnishWreckedTable
+      min: 1
+      max: 1
+      perTiles: 36
+    - group: HorizonFurnishDroppedChair
+      min: 0
+      max: 1
+      perTiles: 40
+      chance: 0.7
+    - group: HorizonFurnishClutterScrap
+      min: 1
+      max: 2
+      perTiles: 22
+    - group: HorizonFurnishNoteRansacked
+      min: 1
+      max: 1
+    decals:
+    - mode: Scatter
+      chance: 0.22
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+  storyChance: 0.75
 
 - type: roomArchetype
   id: HorizonRoomBarracks
@@ -1147,6 +1398,88 @@
     - DirtMedium
     - DirtHeavy
     cleanable: true
+  stories:
+  - id: Evacuated
+    weight: 1.0
+    entries:
+    - group: HorizonFurnishClutterMaint
+      min: 1
+      max: 2
+      perTiles: 14
+    - group: HorizonFurnishLootPaper
+      min: 1
+      max: 1
+      perTiles: 18
+    - group: HorizonFurnishNoteEvacuation
+      min: 1
+      max: 1
+    - group: HorizonFurnishNoteBarracks
+      min: 0
+      max: 1
+      chance: 0.6
+    decals:
+    - mode: Scatter
+      chance: 0.08
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+  - id: Abandoned
+    weight: 1.0
+    entries:
+    - group: HorizonFurnishCobweb
+      min: 2
+      max: 3
+      perTiles: 30
+    - group: HorizonFurnishNoteAbandoned
+      min: 0
+      max: 1
+      chance: 0.6
+    decals:
+    - mode: Scatter
+      chance: 0.35
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+      - DirtHeavy
+      - DirtHeavy
+  - id: Ransacked
+    weight: 0.8
+    entries:
+    - group: HorizonFurnishWreckedTable
+      min: 1
+      max: 1
+      perTiles: 36
+    - group: HorizonFurnishDroppedChair
+      min: 0
+      max: 1
+      perTiles: 40
+      chance: 0.7
+    - group: HorizonFurnishClutterScrap
+      min: 1
+      max: 2
+      perTiles: 22
+    - group: HorizonFurnishNoteRansacked
+      min: 1
+      max: 1
+    decals:
+    - mode: Scatter
+      chance: 0.22
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+  storyChance: 0.6
 
 - type: roomArchetype
   id: HorizonRoomStorage
@@ -1178,6 +1511,7 @@
     min: 0
     max: 1
     chance: 0.5
+    bias: FarFromDoor
   - group: HorizonFurnishPoster
     min: 1
     max: 1
@@ -1241,6 +1575,88 @@
     - DirtHeavy
     - DirtHeavy
     cleanable: true
+  stories:
+  - id: Evacuated
+    weight: 1.0
+    entries:
+    - group: HorizonFurnishClutterMaint
+      min: 1
+      max: 2
+      perTiles: 14
+    - group: HorizonFurnishLootPaper
+      min: 1
+      max: 1
+      perTiles: 18
+    - group: HorizonFurnishNoteEvacuation
+      min: 1
+      max: 1
+    - group: HorizonFurnishNoteStorage
+      min: 0
+      max: 1
+      chance: 0.6
+    decals:
+    - mode: Scatter
+      chance: 0.08
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+  - id: Abandoned
+    weight: 1.0
+    entries:
+    - group: HorizonFurnishCobweb
+      min: 2
+      max: 3
+      perTiles: 30
+    - group: HorizonFurnishNoteAbandoned
+      min: 0
+      max: 1
+      chance: 0.6
+    decals:
+    - mode: Scatter
+      chance: 0.35
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+      - DirtHeavy
+      - DirtHeavy
+  - id: Ransacked
+    weight: 0.8
+    entries:
+    - group: HorizonFurnishWreckedTable
+      min: 1
+      max: 1
+      perTiles: 36
+    - group: HorizonFurnishDroppedChair
+      min: 0
+      max: 1
+      perTiles: 40
+      chance: 0.7
+    - group: HorizonFurnishClutterScrap
+      min: 1
+      max: 2
+      perTiles: 22
+    - group: HorizonFurnishNoteRansacked
+      min: 1
+      max: 1
+    decals:
+    - mode: Scatter
+      chance: 0.22
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+  storyChance: 0.75
 
 - type: roomArchetype
   id: HorizonRoomEngineering
@@ -1335,6 +1751,88 @@
     - DirtHeavy
     - DirtHeavy
     cleanable: true
+  stories:
+  - id: Evacuated
+    weight: 1.0
+    entries:
+    - group: HorizonFurnishClutterMaint
+      min: 1
+      max: 2
+      perTiles: 14
+    - group: HorizonFurnishLootPaper
+      min: 1
+      max: 1
+      perTiles: 18
+    - group: HorizonFurnishNoteEvacuation
+      min: 1
+      max: 1
+    - group: HorizonFurnishNoteEngineering
+      min: 0
+      max: 1
+      chance: 0.6
+    decals:
+    - mode: Scatter
+      chance: 0.08
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+  - id: Abandoned
+    weight: 1.0
+    entries:
+    - group: HorizonFurnishCobweb
+      min: 2
+      max: 3
+      perTiles: 30
+    - group: HorizonFurnishNoteAbandoned
+      min: 0
+      max: 1
+      chance: 0.6
+    decals:
+    - mode: Scatter
+      chance: 0.35
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+      - DirtHeavy
+      - DirtHeavy
+  - id: Ransacked
+    weight: 0.8
+    entries:
+    - group: HorizonFurnishWreckedTable
+      min: 1
+      max: 1
+      perTiles: 36
+    - group: HorizonFurnishDroppedChair
+      min: 0
+      max: 1
+      perTiles: 40
+      chance: 0.7
+    - group: HorizonFurnishClutterScrap
+      min: 1
+      max: 2
+      perTiles: 22
+    - group: HorizonFurnishNoteRansacked
+      min: 1
+      max: 1
+    decals:
+    - mode: Scatter
+      chance: 0.22
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+  storyChance: 0.6
 
 - type: roomArchetype
   id: HorizonRoomLaboratory
@@ -1408,6 +1906,88 @@
     - DirtMedium
     - DirtHeavy
     cleanable: true
+  stories:
+  - id: Evacuated
+    weight: 1.0
+    entries:
+    - group: HorizonFurnishClutterMaint
+      min: 1
+      max: 2
+      perTiles: 14
+    - group: HorizonFurnishLootPaper
+      min: 1
+      max: 1
+      perTiles: 18
+    - group: HorizonFurnishNoteEvacuation
+      min: 1
+      max: 1
+    - group: HorizonFurnishNoteLaboratory
+      min: 0
+      max: 1
+      chance: 0.6
+    decals:
+    - mode: Scatter
+      chance: 0.08
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+  - id: Abandoned
+    weight: 1.0
+    entries:
+    - group: HorizonFurnishCobweb
+      min: 2
+      max: 3
+      perTiles: 30
+    - group: HorizonFurnishNoteAbandoned
+      min: 0
+      max: 1
+      chance: 0.6
+    decals:
+    - mode: Scatter
+      chance: 0.35
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+      - DirtHeavy
+      - DirtHeavy
+  - id: Ransacked
+    weight: 0.8
+    entries:
+    - group: HorizonFurnishWreckedTable
+      min: 1
+      max: 1
+      perTiles: 36
+    - group: HorizonFurnishDroppedChair
+      min: 0
+      max: 1
+      perTiles: 40
+      chance: 0.7
+    - group: HorizonFurnishClutterScrap
+      min: 1
+      max: 2
+      perTiles: 22
+    - group: HorizonFurnishNoteRansacked
+      min: 1
+      max: 1
+    decals:
+    - mode: Scatter
+      chance: 0.22
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+  storyChance: 0.6
 
 - type: roomArchetype
   id: HorizonRoomKitchen
@@ -1480,6 +2060,84 @@
     - DirtMedium
     - DirtHeavy
     cleanable: true
+  stories:
+  - id: Evacuated
+    weight: 1.0
+    entries:
+    - group: HorizonFurnishClutterMaint
+      min: 1
+      max: 2
+      perTiles: 14
+    - group: HorizonFurnishLootPaper
+      min: 1
+      max: 1
+      perTiles: 18
+    - group: HorizonFurnishNoteEvacuation
+      min: 1
+      max: 1
+    decals:
+    - mode: Scatter
+      chance: 0.08
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+  - id: Abandoned
+    weight: 1.0
+    entries:
+    - group: HorizonFurnishCobweb
+      min: 2
+      max: 3
+      perTiles: 30
+    - group: HorizonFurnishNoteAbandoned
+      min: 0
+      max: 1
+      chance: 0.6
+    decals:
+    - mode: Scatter
+      chance: 0.35
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+      - DirtHeavy
+      - DirtHeavy
+  - id: Ransacked
+    weight: 0.8
+    entries:
+    - group: HorizonFurnishWreckedTable
+      min: 1
+      max: 1
+      perTiles: 36
+    - group: HorizonFurnishDroppedChair
+      min: 0
+      max: 1
+      perTiles: 40
+      chance: 0.7
+    - group: HorizonFurnishClutterScrap
+      min: 1
+      max: 2
+      perTiles: 22
+    - group: HorizonFurnishNoteRansacked
+      min: 1
+      max: 1
+    decals:
+    - mode: Scatter
+      chance: 0.22
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+  storyChance: 0.6
 
 - type: roomArchetype
   id: HorizonRoomOffice
@@ -1549,6 +2207,84 @@
     - DirtMedium
     - DirtHeavy
     cleanable: true
+  stories:
+  - id: Evacuated
+    weight: 1.0
+    entries:
+    - group: HorizonFurnishClutterMaint
+      min: 1
+      max: 2
+      perTiles: 14
+    - group: HorizonFurnishLootPaper
+      min: 1
+      max: 1
+      perTiles: 18
+    - group: HorizonFurnishNoteEvacuation
+      min: 1
+      max: 1
+    decals:
+    - mode: Scatter
+      chance: 0.08
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+  - id: Abandoned
+    weight: 1.0
+    entries:
+    - group: HorizonFurnishCobweb
+      min: 2
+      max: 3
+      perTiles: 30
+    - group: HorizonFurnishNoteAbandoned
+      min: 0
+      max: 1
+      chance: 0.6
+    decals:
+    - mode: Scatter
+      chance: 0.35
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+      - DirtHeavy
+      - DirtHeavy
+  - id: Ransacked
+    weight: 0.8
+    entries:
+    - group: HorizonFurnishWreckedTable
+      min: 1
+      max: 1
+      perTiles: 36
+    - group: HorizonFurnishDroppedChair
+      min: 0
+      max: 1
+      perTiles: 40
+      chance: 0.7
+    - group: HorizonFurnishClutterScrap
+      min: 1
+      max: 2
+      perTiles: 22
+    - group: HorizonFurnishNoteRansacked
+      min: 1
+      max: 1
+    decals:
+    - mode: Scatter
+      chance: 0.22
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+  storyChance: 0.6
 
 - type: roomArchetype
   id: HorizonRoomHydroponics
@@ -1613,6 +2349,84 @@
     - DirtMedium
     - DirtHeavy
     cleanable: true
+  stories:
+  - id: Evacuated
+    weight: 1.0
+    entries:
+    - group: HorizonFurnishClutterMaint
+      min: 1
+      max: 2
+      perTiles: 14
+    - group: HorizonFurnishLootPaper
+      min: 1
+      max: 1
+      perTiles: 18
+    - group: HorizonFurnishNoteEvacuation
+      min: 1
+      max: 1
+    decals:
+    - mode: Scatter
+      chance: 0.08
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+  - id: Abandoned
+    weight: 1.0
+    entries:
+    - group: HorizonFurnishCobweb
+      min: 2
+      max: 3
+      perTiles: 30
+    - group: HorizonFurnishNoteAbandoned
+      min: 0
+      max: 1
+      chance: 0.6
+    decals:
+    - mode: Scatter
+      chance: 0.35
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+      - DirtHeavy
+      - DirtHeavy
+  - id: Ransacked
+    weight: 0.8
+    entries:
+    - group: HorizonFurnishWreckedTable
+      min: 1
+      max: 1
+      perTiles: 36
+    - group: HorizonFurnishDroppedChair
+      min: 0
+      max: 1
+      perTiles: 40
+      chance: 0.7
+    - group: HorizonFurnishClutterScrap
+      min: 1
+      max: 2
+      perTiles: 22
+    - group: HorizonFurnishNoteRansacked
+      min: 1
+      max: 1
+    decals:
+    - mode: Scatter
+      chance: 0.22
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+  storyChance: 0.6
 
 - type: roomArchetype
   id: HorizonRoomLounge
@@ -1678,6 +2492,84 @@
     - DirtMedium
     - DirtHeavy
     cleanable: true
+  stories:
+  - id: Evacuated
+    weight: 1.0
+    entries:
+    - group: HorizonFurnishClutterMaint
+      min: 1
+      max: 2
+      perTiles: 14
+    - group: HorizonFurnishLootPaper
+      min: 1
+      max: 1
+      perTiles: 18
+    - group: HorizonFurnishNoteEvacuation
+      min: 1
+      max: 1
+    decals:
+    - mode: Scatter
+      chance: 0.08
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+  - id: Abandoned
+    weight: 1.0
+    entries:
+    - group: HorizonFurnishCobweb
+      min: 2
+      max: 3
+      perTiles: 30
+    - group: HorizonFurnishNoteAbandoned
+      min: 0
+      max: 1
+      chance: 0.6
+    decals:
+    - mode: Scatter
+      chance: 0.35
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+      - DirtHeavy
+      - DirtHeavy
+  - id: Ransacked
+    weight: 0.8
+    entries:
+    - group: HorizonFurnishWreckedTable
+      min: 1
+      max: 1
+      perTiles: 36
+    - group: HorizonFurnishDroppedChair
+      min: 0
+      max: 1
+      perTiles: 40
+      chance: 0.7
+    - group: HorizonFurnishClutterScrap
+      min: 1
+      max: 2
+      perTiles: 22
+    - group: HorizonFurnishNoteRansacked
+      min: 1
+      max: 1
+    decals:
+    - mode: Scatter
+      chance: 0.22
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+  storyChance: 0.6
 
 - type: roomArchetype
   id: HorizonRoomSalvageBay
@@ -1769,6 +2661,88 @@
     - DirtHeavy
     - DirtHeavy
     cleanable: true
+  stories:
+  - id: Evacuated
+    weight: 1.0
+    entries:
+    - group: HorizonFurnishClutterMaint
+      min: 1
+      max: 2
+      perTiles: 14
+    - group: HorizonFurnishLootPaper
+      min: 1
+      max: 1
+      perTiles: 18
+    - group: HorizonFurnishNoteEvacuation
+      min: 1
+      max: 1
+    - group: HorizonFurnishNoteEngineering
+      min: 0
+      max: 1
+      chance: 0.6
+    decals:
+    - mode: Scatter
+      chance: 0.08
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+  - id: Abandoned
+    weight: 1.0
+    entries:
+    - group: HorizonFurnishCobweb
+      min: 2
+      max: 3
+      perTiles: 30
+    - group: HorizonFurnishNoteAbandoned
+      min: 0
+      max: 1
+      chance: 0.6
+    decals:
+    - mode: Scatter
+      chance: 0.35
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+      - DirtHeavy
+      - DirtHeavy
+  - id: Ransacked
+    weight: 0.8
+    entries:
+    - group: HorizonFurnishWreckedTable
+      min: 1
+      max: 1
+      perTiles: 36
+    - group: HorizonFurnishDroppedChair
+      min: 0
+      max: 1
+      perTiles: 40
+      chance: 0.7
+    - group: HorizonFurnishClutterScrap
+      min: 1
+      max: 2
+      perTiles: 22
+    - group: HorizonFurnishNoteRansacked
+      min: 1
+      max: 1
+    decals:
+    - mode: Scatter
+      chance: 0.22
+      randomRotation: true
+      cleanable: true
+      decals:
+      - Dirt
+      - DirtLight
+      - DirtMedium
+      - DirtHeavy
+  storyChance: 0.6
 
 # ---------------------------------------------------------------- Layer config
 

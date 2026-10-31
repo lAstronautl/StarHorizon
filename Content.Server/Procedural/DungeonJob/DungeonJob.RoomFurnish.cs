@@ -194,39 +194,99 @@ public sealed partial class DungeonJob
         ctx.Reserved.UnionWith(ctx.DoorSeeds);
         ctx.Reach = FurnishFlood(ctx, ctx.Blocked);
 
+        // Alternatives: of all entries sharing an id only one is built.
+        var chosenAlternatives = new Dictionary<string, FurnishEntry>();
+        var alternativeCount = new Dictionary<string, int>();
+
         foreach (var entry in arch.Entries)
         {
-            var count = random.Next(entry.Min, Math.Max(entry.Min, entry.Max) + 1);
-
-            if (entry.PerTiles > 0)
-                count += room.Tiles.Count / entry.PerTiles;
-
-            if (entry.Min <= 0 && !random.Prob(entry.Chance))
-                count = 0;
-
-            if (count <= 0)
+            if (entry.Alternative == null)
                 continue;
 
-            var group = _prototype.Index(entry.Group);
-            var placed = 0;
+            var seen = alternativeCount.GetValueOrDefault(entry.Alternative) + 1;
+            alternativeCount[entry.Alternative] = seen;
 
-            for (var i = 0; i < count; i++)
+            // Reservoir sampling keeps the pick uniform without a second pass.
+            if (random.Next(seen) == 0)
+                chosenAlternatives[entry.Alternative] = entry;
+        }
+
+        foreach (var entry in arch.Entries)
+        {
+            if (entry.Alternative != null && chosenAlternatives[entry.Alternative] != entry)
+                continue;
+
+            await FurnishEntryRun(ctx, arch.ID, entry, random);
+
+            if (!ValidateResume())
+                return;
+        }
+
+        // "What happened here" layer.
+        RoomStory? story = null;
+
+        if (arch.Stories.Count > 0 && random.Prob(arch.StoryChance))
+        {
+            var total = arch.Stories.Sum(x => x.Weight);
+            var roll = random.NextFloat() * total;
+            story = arch.Stories[^1];
+
+            foreach (var candidate in arch.Stories)
             {
-                if (!TryPlaceGroup(ctx, group, random))
-                    break;
+                roll -= candidate.Weight;
 
-                placed++;
-                await SuspendDungeon();
+                if (roll > 0f)
+                    continue;
+
+                story = candidate;
+                break;
+            }
+
+            foreach (var entry in story.Entries)
+            {
+                await FurnishEntryRun(ctx, $"{arch.ID}/{story.Id}", entry, random);
 
                 if (!ValidateResume())
                     return;
             }
-
-            if (placed < entry.Min)
-                _sawmill.Debug($"Room {arch.ID}: placed {placed}/{entry.Min} of {group.ID}");
         }
 
-        ApplyFurnishDecals(ctx, arch, random);
+        ApplyFurnishDecals(ctx, arch.Decals, random);
+
+        if (story != null)
+            ApplyFurnishDecals(ctx, story.Decals, random);
+    }
+
+    private async Task FurnishEntryRun(FurnishContext ctx, string owner, FurnishEntry entry, Random random)
+    {
+        var count = random.Next(entry.Min, Math.Max(entry.Min, entry.Max) + 1);
+
+        if (entry.PerTiles > 0)
+            count += ctx.Room.Tiles.Count / entry.PerTiles;
+
+        if (entry.Min <= 0 && !random.Prob(entry.Chance))
+            count = 0;
+
+        if (count <= 0)
+            return;
+
+        var group = _prototype.Index(entry.Group);
+        var placed = 0;
+
+        for (var i = 0; i < count; i++)
+        {
+            if (!TryPlaceGroup(ctx, group, entry.Bias, random))
+                break;
+
+            placed++;
+            await SuspendDungeon();
+
+            if (!ValidateResume())
+                return;
+        }
+
+        if (placed < entry.Min)
+            _sawmill.Debug($"Room {owner}: placed {placed}/{entry.Min} of {group.ID}");
     }
 
     private void AddFurnishDecal(string id, Vector2i tile, Color? tint, Angle rotation, bool cleanable = false)
@@ -242,9 +302,9 @@ public sealed partial class DungeonJob
         _decals.TryAddDecal(id, coords, out _, color: tint, rotation: rotation, cleanable: cleanable);
     }
 
-    private void ApplyFurnishDecals(FurnishContext ctx, RoomArchetypePrototype arch, Random random)
+    private void ApplyFurnishDecals(FurnishContext ctx, List<FurnishDecalRule> rules, Random random)
     {
-        foreach (var rule in arch.Decals)
+        foreach (var rule in rules)
         {
             switch (rule.Mode)
             {
@@ -440,7 +500,7 @@ public sealed partial class DungeonJob
         }
     }
 
-    private bool TryPlaceGroup(FurnishContext ctx, FurnitureGroupPrototype group, Random random)
+    private bool TryPlaceGroup(FurnishContext ctx, FurnitureGroupPrototype group, FurnishBias bias, Random random)
     {
         // Optional members are decided once, so every candidate spot is judged on the same shape.
         var members = group.Members.Where(m => m.Chance >= 1f || random.Prob(m.Chance)).ToList();
@@ -465,6 +525,27 @@ public sealed partial class DungeonJob
         }
 
         random.Shuffle(candidates);
+
+        // Brogue-style "near / far from origin": sort by distance to the nearest doorway. OrderBy is stable,
+        // so the shuffle above still breaks ties randomly.
+        if (bias != FurnishBias.None && ctx.DoorSeeds.Count > 0)
+        {
+            int DoorDistance(Vector2i tile)
+            {
+                var best = int.MaxValue;
+
+                foreach (var seed in ctx.DoorSeeds)
+                {
+                    best = Math.Min(best, Math.Abs(seed.X - tile.X) + Math.Abs(seed.Y - tile.Y));
+                }
+
+                return best;
+            }
+
+            candidates = bias == FurnishBias.NearDoor
+                ? candidates.OrderBy(c => DoorDistance(c.Tile)).ToList()
+                : candidates.OrderByDescending(c => DoorDistance(c.Tile)).ToList();
+        }
 
         const int maxAttempts = 200;
         var attempts = 0;

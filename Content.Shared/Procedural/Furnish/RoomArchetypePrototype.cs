@@ -3,6 +3,17 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared.Procedural.Furnish;
 
 /// <summary>
+/// Where an entry prefers to be placed relative to the doorways, like the "near / far from origin" flags
+/// of Brogue's machine blueprints. Rooms without doors ignore it.
+/// </summary>
+public enum FurnishBias : byte
+{
+    None,
+    NearDoor,
+    FarFromDoor,
+}
+
+/// <summary>
 /// Request for a number of <see cref="FurnitureGroupPrototype"/> instances inside a room.
 /// </summary>
 [DataDefinition]
@@ -31,6 +42,16 @@ public sealed partial class FurnishEntry
     /// </summary>
     [DataField]
     public float Chance = 1f;
+
+    [DataField]
+    public FurnishBias Bias;
+
+    /// <summary>
+    /// Entries of one room that share this id are alternatives: only one of them is built (random).
+    /// Used for e.g. "NanoTrasen weapons OR Syndicate weapons".
+    /// </summary>
+    [DataField]
+    public string? Alternative;
 }
 
 public enum FurnishDecalMode : byte
@@ -95,6 +116,26 @@ public sealed partial class FurnishDecalRule
 }
 
 /// <summary>
+/// "What happened here": an optional layer on top of an archetype that gives the room a visible event
+/// (evacuation, ransacking, long abandonment) through extra groups, decals and notes.
+/// </summary>
+[DataDefinition]
+public sealed partial class RoomStory
+{
+    [DataField(required: true)]
+    public string Id = string.Empty;
+
+    [DataField]
+    public float Weight = 1f;
+
+    [DataField]
+    public List<FurnishEntry> Entries = new();
+
+    [DataField]
+    public List<FurnishDecalRule> Decals = new();
+}
+
+/// <summary>
 /// What kind of room this is: when it may be used and what it must contain.
 /// </summary>
 [Prototype]
@@ -150,4 +191,16 @@ public sealed partial class RoomArchetypePrototype : IPrototype
     /// </summary>
     [DataField]
     public List<FurnishDecalRule> Decals = new();
+
+    /// <summary>
+    /// One of these is picked per room (by weight). Empty = no story layer.
+    /// </summary>
+    [DataField]
+    public List<RoomStory> Stories = new();
+
+    /// <summary>
+    /// Chance that a room gets a story at all.
+    /// </summary>
+    [DataField]
+    public float StoryChance = 0.6f;
 }

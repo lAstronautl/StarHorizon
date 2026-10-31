@@ -1,0 +1,297 @@
+# Storytelling layer for RoomFurnishDunGen ("what happened in this room"), notes, and faction armory tables.
+# Notes follow the mapping guide: tech and abandoned rooms tell a story through paper clues.
+
+# ---------------------------------------------------------------- Notes
+- type: entity
+  id: HorizonNoteEvacuation
+  parent: Paper
+  name: заметка
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: |
+      Всем сотрудникам: эвакуация по сигналу тревоги. Личные вещи и документы не брать,
+      уходить немедленно. Опечатайте помещение, если успеете.
+
+- type: entity
+  id: HorizonNoteAbandoned
+  parent: Paper
+  name: заметка
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: |
+      Объект законсервирован. Питание частично отключено, регулярный обход отменён.
+      Если читаете это - значит, никто не вернулся. Не включайте то, что выключено.
+
+- type: entity
+  id: HorizonNoteRansacked
+  parent: Paper
+  name: заметка
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: |
+      Здесь уже побывали до нас. Всё, что унесли, унесли быстро и не закрывая дверей.
+      Осторожнее: те, кто это сделал, могли остаться на объекте.
+
+- type: entity
+  id: HorizonNoteArmory
+  parent: Paper
+  name: заметка
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: |
+      Выдача оружия приостановлена до особого распоряжения. Ключи сдать дежурному.
+      Расхождение в описи: не хватает нескольких стволов, проверьте список на стеллажах.
+
+- type: entity
+  id: HorizonNoteMedical
+  parent: Paper
+  name: заметка
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: |
+      Пациентов перевели. Койки не стерилизованы, аптечки пополнить некому.
+      Кто дежурил следующим - просьба не оставлять препараты без присмотра.
+
+- type: entity
+  id: HorizonNoteEngineering
+  parent: Paper
+  name: заметка
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: |
+      Питание нестабильно: пока не заменим силовой кабель, держите резервные элементы
+      при себе. Инструменты не выносить из мастерской. Это касается и тех, кто думает, что я не вижу.
+
+- type: entity
+  id: HorizonNoteLaboratory
+  parent: Paper
+  name: заметка
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: |
+      Образцы вывезены. Оборудование оставлено по описи, расходники списаны.
+      Протокол испытаний сдать в архив до конца смены. Колбы пустые не оставлять.
+
+- type: entity
+  id: HorizonNoteBarracks
+  parent: Paper
+  name: заметка
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: |
+      Отбой в одиннадцать, подъём по сигналу. Шкафчики держать закрытыми.
+      Кто опять оставил еду на койке - наряд вне очереди.
+
+- type: entity
+  id: HorizonNoteStorage
+  parent: Paper
+  name: заметка
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: |
+      Опись склада не сходится: часть ящиков вскрыта, часть пропала. Новые поставки
+      принимать только по накладным. Ничего не складывать у дверей.
+
+# ---------------------------------------------------------------- Story groups
+- type: furnitureGroup
+  id: HorizonFurnishNoteEvacuation
+  placement: Free
+  clearance: 0
+  members:
+  - proto: HorizonNoteEvacuation
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishNoteAbandoned
+  placement: Free
+  clearance: 0
+  members:
+  - proto: HorizonNoteAbandoned
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishNoteRansacked
+  placement: Free
+  clearance: 0
+  members:
+  - proto: HorizonNoteRansacked
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishNoteArmory
+  placement: Free
+  clearance: 0
+  members:
+  - proto: HorizonNoteArmory
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishNoteMedical
+  placement: Free
+  clearance: 0
+  members:
+  - proto: HorizonNoteMedical
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishNoteEngineering
+  placement: Free
+  clearance: 0
+  members:
+  - proto: HorizonNoteEngineering
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishNoteLaboratory
+  placement: Free
+  clearance: 0
+  members:
+  - proto: HorizonNoteLaboratory
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishNoteBarracks
+  placement: Free
+  clearance: 0
+  members:
+  - proto: HorizonNoteBarracks
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishNoteStorage
+  placement: Free
+  clearance: 0
+  members:
+  - proto: HorizonNoteStorage
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishCobweb
+  placement: Corner
+  clearance: 0
+  members:
+  - proto: Cobweb1
+    blocking: false
+    rotate: false
+
+- type: furnitureGroup
+  id: HorizonFurnishWreckedTable
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: TableFrame
+
+- type: furnitureGroup
+  id: HorizonFurnishDroppedChair
+  placement: Free
+  clearance: 0
+  members:
+  - proto: ChairFolding
+    blocking: false
+
+# ---------------------------------------------------------------- Armory: one faction per room (guide: weapons by faction)
+- type: entityTable
+  id: HorizonArmoryNanoTrasen
+  table: !type:GroupSelector
+    children:
+    - id: WeaponRifleLecter
+      weight: 3
+    - id: WeaponRifleAk
+    - id: WeaponShotgunKammerer
+    - id: WeaponShotgunEnforcer
+    - id: WeaponSubMachineGunAtreides
+    - id: WeaponSubMachineGunDrozd
+    - id: WeaponSubMachineGunWt550
+    - id: WeaponPistolMk58
+      weight: 2
+    - id: WeaponRevolverInspector
+    - id: WeaponLaserCarbine
+    - id: WeaponDisabler
+      weight: 2
+
+- type: entityTable
+  id: HorizonArmorySyndicate
+  table: !type:GroupSelector
+    children:
+    - id: WeaponPistolCobra
+    - id: WeaponPistolViper
+    - id: WeaponRevolverPython
+    - id: WeaponSubMachineGunC20r
+    - id: WeaponShotgunBulldog
+    - id: WeaponLightMachineGunL6
+    - id: WeaponSniperMosin
+
+- type: entity
+  parent: MarkerBasePlaceFree
+  id: HorizonSpawnArmoryNanoTrasen
+  name: random NanoTrasen weapon
+  suffix: Horizon
+  components:
+  - type: Sprite
+    layers:
+    - state: green
+      scale: 0.7, 0.7
+    - sprite: Objects/Weapons/Guns/Pistols/mk58.rsi
+      state: icon
+  - type: EntityTableSpawner
+    offset: 0.1
+    deleteSpawnerAfterSpawn: false
+    table: !type:NestedSelector
+      tableId: HorizonArmoryNanoTrasen
+
+- type: entity
+  parent: MarkerBasePlaceFree
+  id: HorizonSpawnArmorySyndicate
+  name: random Syndicate weapon
+  suffix: Horizon
+  components:
+  - type: Sprite
+    layers:
+    - state: green
+      scale: 0.7, 0.7
+    - sprite: Objects/Weapons/Guns/Pistols/mk58.rsi
+      state: icon
+  - type: EntityTableSpawner
+    offset: 0.1
+    deleteSpawnerAfterSpawn: false
+    table: !type:NestedSelector
+      tableId: HorizonArmorySyndicate
+
+- type: furnitureGroup
+  id: HorizonFurnishArmoryRackNanoTrasen
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: Rack
+  - proto: Rack
+    offset: 1,0
+  - proto: HorizonSpawnArmoryNanoTrasen
+    blocking: false
+  - proto: HorizonSpawnArmoryNanoTrasen
+    offset: 1,0
+    blocking: false
+    chance: 0.6
+
+- type: furnitureGroup
+  id: HorizonFurnishArmoryRackSyndicate
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: Rack
+  - proto: Rack
+    offset: 1,0
+  - proto: HorizonSpawnArmorySyndicate
+    blocking: false
+  - proto: HorizonSpawnArmorySyndicate
+    offset: 1,0
+    blocking: false
+    chance: 0.6
