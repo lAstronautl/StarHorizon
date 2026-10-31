@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
+using Content.Shared.Decals;
 using Content.Shared.Procedural;
 using Content.Shared.Procedural.Furnish;
 using Content.Shared.Procedural.PostGeneration;
@@ -223,6 +224,94 @@ public sealed partial class DungeonJob
 
             if (placed < entry.Min)
                 _sawmill.Debug($"Room {arch.ID}: placed {placed}/{entry.Min} of {group.ID}");
+        }
+
+        ApplyFurnishDecals(ctx, arch, random);
+    }
+
+    private void AddFurnishDecal(string id, Vector2i tile, Color? tint, Angle rotation)
+    {
+        if (!_prototype.HasIndex<DecalPrototype>(id))
+        {
+            _sawmill.Error($"Unknown decal {id} in room archetype");
+            return;
+        }
+
+        // Decals are anchored at their corner, not the tile center.
+        var coords = _maps.GridTileToLocal(_gridUid, _grid, tile).Offset(-_grid.TileSizeHalfVector);
+        _decals.TryAddDecal(id, coords, out _, color: tint, rotation: rotation);
+    }
+
+    private void ApplyFurnishDecals(FurnishContext ctx, RoomArchetypePrototype arch, Random random)
+    {
+        foreach (var rule in arch.Decals)
+        {
+            switch (rule.Mode)
+            {
+                case FurnishDecalMode.Scatter:
+                case FurnishDecalMode.Fill:
+                    if (rule.Decals.Count == 0)
+                        break;
+
+                    foreach (var tile in ctx.TileList)
+                    {
+                        if (rule.Mode == FurnishDecalMode.Scatter && !random.Prob(rule.Chance))
+                            continue;
+
+                        var rotation = rule.RandomRotation ? new Angle(random.NextDouble() * Math.Tau) : Angle.Zero;
+                        AddFurnishDecal(rule.Decals[random.Next(rule.Decals.Count)], tile, rule.Tint, rotation);
+                    }
+
+                    break;
+
+                case FurnishDecalMode.Skirting:
+                    foreach (var tile in ctx.TileList)
+                    {
+                        DirectionFlag flags = DirectionFlag.None;
+                        var count = 0;
+
+                        for (var i = 0; i < 4; i++)
+                        {
+                            var dir = (DirectionFlag) Math.Pow(2, i);
+
+                            if (!FurnishIsWall(ctx, tile + dir.AsDir().ToIntVec()))
+                                continue;
+
+                            flags |= dir;
+                            count++;
+                        }
+
+                        if (count == 1 && rule.Cardinal.TryGetValue(flags, out var cardinal))
+                            AddFurnishDecal(cardinal, tile, rule.Tint, Angle.Zero);
+                        else if (count == 2 && rule.Corner.TryGetValue(flags, out var corner))
+                            AddFurnishDecal(corner, tile, rule.Tint, Angle.Zero);
+                    }
+
+                    break;
+
+                case FurnishDecalMode.DoorMarks:
+                    foreach (var door in ctx.Room.Entrances)
+                    {
+                        foreach (var seed in ctx.DoorSeeds)
+                        {
+                            var delta = door - seed;
+
+                            if (Math.Abs(delta.X) + Math.Abs(delta.Y) != 1)
+                                continue;
+
+                            // Side of the tile the door is on.
+                            var side = delta.Y < 0 ? DirectionFlag.South
+                                : delta.Y > 0 ? DirectionFlag.North
+                                : delta.X > 0 ? DirectionFlag.East
+                                : DirectionFlag.West;
+
+                            if (rule.Cardinal.TryGetValue(side, out var mark))
+                                AddFurnishDecal(mark, seed, rule.Tint, Angle.Zero);
+                        }
+                    }
+
+                    break;
+            }
         }
     }
 

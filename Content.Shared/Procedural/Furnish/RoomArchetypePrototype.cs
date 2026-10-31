@@ -33,6 +33,61 @@ public sealed partial class FurnishEntry
     public float Chance = 1f;
 }
 
+public enum FurnishDecalMode : byte
+{
+    /// <summary> Random decal from <see cref="FurnishDecalRule.Decals"/> on a fraction of the tiles (dirt, stains). </summary>
+    Scatter,
+
+    /// <summary> Every room tile gets a decal from <see cref="FurnishDecalRule.Decals"/> (floor patterns). </summary>
+    Fill,
+
+    /// <summary> Floor trim along the walls: <see cref="FurnishDecalRule.Cardinal"/> for one wall, <see cref="FurnishDecalRule.Corner"/> for two. </summary>
+    Skirting,
+
+    /// <summary> Marking in front of every doorway, picked by the side the door is on (<see cref="FurnishDecalRule.Cardinal"/>). </summary>
+    DoorMarks,
+}
+
+/// <summary>
+/// Floor decals applied to a whole room, so rooms get the dirt, trim and markings that atlas rooms had painted in.
+/// </summary>
+[DataDefinition]
+public sealed partial class FurnishDecalRule
+{
+    [DataField]
+    public FurnishDecalMode Mode = FurnishDecalMode.Scatter;
+
+    /// <summary>
+    /// Decal ids for Scatter / Fill. Repeat an id to make it more likely.
+    /// </summary>
+    [DataField]
+    public List<string> Decals = new();
+
+    /// <summary>
+    /// Chance per tile for Scatter.
+    /// </summary>
+    [DataField]
+    public float Chance = 0.3f;
+
+    [DataField]
+    public Color? Tint;
+
+    [DataField]
+    public bool RandomRotation;
+
+    /// <summary>
+    /// Skirting: decal for a wall on that side. DoorMarks: decal for a door on that side.
+    /// </summary>
+    [DataField]
+    public Dictionary<DirectionFlag, string> Cardinal = new();
+
+    /// <summary>
+    /// Skirting: decal for a tile with walls on two adjacent sides.
+    /// </summary>
+    [DataField]
+    public Dictionary<DirectionFlag, string> Corner = new();
+}
+
 /// <summary>
 /// What kind of room this is: when it may be used and what it must contain.
 /// </summary>
@@ -83,4 +138,10 @@ public sealed partial class RoomArchetypePrototype : IPrototype
 
     [DataField(required: true)]
     public List<FurnishEntry> Entries = new();
+
+    /// <summary>
+    /// Floor decals for the room.
+    /// </summary>
+    [DataField]
+    public List<FurnishDecalRule> Decals = new();
 }

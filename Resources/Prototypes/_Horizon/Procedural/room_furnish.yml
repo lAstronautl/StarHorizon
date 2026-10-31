@@ -740,6 +740,31 @@
     max: 1
     perTiles: 40
     chance: 0.5
+  decals:
+  - mode: Skirting
+    cardinal:
+      South: BrickTileWhiteLineS
+      East: BrickTileWhiteLineE
+      North: BrickTileWhiteLineN
+      West: BrickTileWhiteLineW
+    corner:
+      SouthEast: BrickTileWhiteCornerSe
+      SouthWest: BrickTileWhiteCornerSw
+      NorthEast: BrickTileWhiteCornerNe
+      NorthWest: BrickTileWhiteCornerNw
+  - mode: Fill
+    tint: "#9FD8FF30"
+    decals:
+    - MiniTileCheckerAOverlay
+  - mode: Scatter
+    chance: 0.05
+    randomRotation: true
+    decals:
+    - Dirt
+    - Dirt
+    - DirtLight
+    - DirtMedium
+    - DirtHeavy
 
 - type: roomArchetype
   id: HorizonRoomArmory
@@ -805,6 +830,33 @@
     max: 1
     perTiles: 40
     chance: 0.5
+  decals:
+  - mode: Skirting
+    cardinal:
+      South: BrickTileDarkLineS
+      East: BrickTileDarkLineE
+      North: BrickTileDarkLineN
+      West: BrickTileDarkLineW
+    corner:
+      SouthEast: BrickTileDarkCornerSe
+      SouthWest: BrickTileDarkCornerSw
+      NorthEast: BrickTileDarkCornerNe
+      NorthWest: BrickTileDarkCornerNw
+  - mode: DoorMarks
+    cardinal:
+      South: WarnLineS
+      East: WarnLineE
+      North: WarnLineN
+      West: WarnLineW
+  - mode: Scatter
+    chance: 0.14
+    randomRotation: true
+    decals:
+    - Dirt
+    - Dirt
+    - DirtLight
+    - DirtMedium
+    - DirtHeavy
 
 - type: roomArchetype
   id: HorizonRoomVault
@@ -865,6 +917,33 @@
     max: 1
     perTiles: 40
     chance: 0.5
+  decals:
+  - mode: Skirting
+    cardinal:
+      South: BrickTileDarkLineS
+      East: BrickTileDarkLineE
+      North: BrickTileDarkLineN
+      West: BrickTileDarkLineW
+    corner:
+      SouthEast: BrickTileDarkCornerSe
+      SouthWest: BrickTileDarkCornerSw
+      NorthEast: BrickTileDarkCornerNe
+      NorthWest: BrickTileDarkCornerNw
+  - mode: DoorMarks
+    cardinal:
+      South: WarnLineS
+      East: WarnLineE
+      North: WarnLineN
+      West: WarnLineW
+  - mode: Scatter
+    chance: 0.1
+    randomRotation: true
+    decals:
+    - Dirt
+    - Dirt
+    - DirtLight
+    - DirtMedium
+    - DirtHeavy
 
 - type: roomArchetype
   id: HorizonRoomBarracks
@@ -928,6 +1007,27 @@
     max: 1
     perTiles: 40
     chance: 0.5
+  decals:
+  - mode: Skirting
+    cardinal:
+      South: BrickTileDarkLineS
+      East: BrickTileDarkLineE
+      North: BrickTileDarkLineN
+      West: BrickTileDarkLineW
+    corner:
+      SouthEast: BrickTileDarkCornerSe
+      SouthWest: BrickTileDarkCornerSw
+      NorthEast: BrickTileDarkCornerNe
+      NorthWest: BrickTileDarkCornerNw
+  - mode: Scatter
+    chance: 0.16
+    randomRotation: true
+    decals:
+    - Dirt
+    - Dirt
+    - DirtLight
+    - DirtMedium
+    - DirtHeavy
 
 - type: roomArchetype
   id: HorizonRoomStorage
@@ -991,6 +1091,28 @@
     max: 1
     perTiles: 40
     chance: 0.5
+  decals:
+  - mode: Skirting
+    cardinal:
+      South: BrickTileSteelLineS
+      East: BrickTileSteelLineE
+      North: BrickTileSteelLineN
+      West: BrickTileSteelLineW
+    corner:
+      SouthEast: BrickTileSteelCornerSe
+      SouthWest: BrickTileSteelCornerSw
+      NorthEast: BrickTileSteelCornerNe
+      NorthWest: BrickTileSteelCornerNw
+  - mode: Scatter
+    chance: 0.28
+    randomRotation: true
+    decals:
+    - Dirt
+    - Dirt
+    - DirtLight
+    - DirtMedium
+    - DirtHeavy
+    - DirtHeavy
 
 - type: roomArchetype
   id: HorizonRoomEngineering
@@ -1057,6 +1179,34 @@
     max: 1
     perTiles: 40
     chance: 0.5
+  decals:
+  - mode: Skirting
+    cardinal:
+      South: BrickTileSteelLineS
+      East: BrickTileSteelLineE
+      North: BrickTileSteelLineN
+      West: BrickTileSteelLineW
+    corner:
+      SouthEast: BrickTileSteelCornerSe
+      SouthWest: BrickTileSteelCornerSw
+      NorthEast: BrickTileSteelCornerNe
+      NorthWest: BrickTileSteelCornerNw
+  - mode: DoorMarks
+    cardinal:
+      South: WarnLineS
+      East: WarnLineE
+      North: WarnLineN
+      West: WarnLineW
+  - mode: Scatter
+    chance: 0.3
+    randomRotation: true
+    decals:
+    - Dirt
+    - Dirt
+    - DirtLight
+    - DirtMedium
+    - DirtHeavy
+    - DirtHeavy
 
 - type: roomArchetype
   id: HorizonRoomLaboratory
@@ -1114,6 +1264,31 @@
     max: 1
     perTiles: 40
     chance: 0.5
+  decals:
+  - mode: Skirting
+    cardinal:
+      South: BrickTileWhiteLineS
+      East: BrickTileWhiteLineE
+      North: BrickTileWhiteLineN
+      West: BrickTileWhiteLineW
+    corner:
+      SouthEast: BrickTileWhiteCornerSe
+      SouthWest: BrickTileWhiteCornerSw
+      NorthEast: BrickTileWhiteCornerNe
+      NorthWest: BrickTileWhiteCornerNw
+  - mode: Fill
+    tint: "#9FD8FF30"
+    decals:
+    - MiniTileCheckerAOverlay
+  - mode: Scatter
+    chance: 0.08
+    randomRotation: true
+    decals:
+    - Dirt
+    - Dirt
+    - DirtLight
+    - DirtMedium
+    - DirtHeavy
 
 - type: roomArchetype
   id: HorizonRoomKitchen
@@ -1170,6 +1345,31 @@
     max: 1
     perTiles: 40
     chance: 0.5
+  decals:
+  - mode: Skirting
+    cardinal:
+      South: BrickTileWhiteLineS
+      East: BrickTileWhiteLineE
+      North: BrickTileWhiteLineN
+      West: BrickTileWhiteLineW
+    corner:
+      SouthEast: BrickTileWhiteCornerSe
+      SouthWest: BrickTileWhiteCornerSw
+      NorthEast: BrickTileWhiteCornerNe
+      NorthWest: BrickTileWhiteCornerNw
+  - mode: Fill
+    tint: "#FFFFFF22"
+    decals:
+    - CheckerNESW
+  - mode: Scatter
+    chance: 0.1
+    randomRotation: true
+    decals:
+    - Dirt
+    - Dirt
+    - DirtLight
+    - DirtMedium
+    - DirtHeavy
 
 - type: roomArchetype
   id: HorizonRoomOffice
@@ -1227,6 +1427,27 @@
     max: 1
     perTiles: 40
     chance: 0.5
+  decals:
+  - mode: Skirting
+    cardinal:
+      South: BrickTileWhiteLineS
+      East: BrickTileWhiteLineE
+      North: BrickTileWhiteLineN
+      West: BrickTileWhiteLineW
+    corner:
+      SouthEast: BrickTileWhiteCornerSe
+      SouthWest: BrickTileWhiteCornerSw
+      NorthEast: BrickTileWhiteCornerNe
+      NorthWest: BrickTileWhiteCornerNw
+  - mode: Scatter
+    chance: 0.1
+    randomRotation: true
+    decals:
+    - Dirt
+    - Dirt
+    - DirtLight
+    - DirtMedium
+    - DirtHeavy
 
 - type: roomArchetype
   id: HorizonRoomHydroponics
@@ -1284,6 +1505,27 @@
     max: 1
     perTiles: 40
     chance: 0.5
+  decals:
+  - mode: Skirting
+    cardinal:
+      South: BrickTileWhiteLineS
+      East: BrickTileWhiteLineE
+      North: BrickTileWhiteLineN
+      West: BrickTileWhiteLineW
+    corner:
+      SouthEast: BrickTileWhiteCornerSe
+      SouthWest: BrickTileWhiteCornerSw
+      NorthEast: BrickTileWhiteCornerNe
+      NorthWest: BrickTileWhiteCornerNw
+  - mode: Scatter
+    chance: 0.25
+    randomRotation: true
+    decals:
+    - Dirt
+    - Dirt
+    - DirtLight
+    - DirtMedium
+    - DirtHeavy
 
 - type: roomArchetype
   id: HorizonRoomLounge
@@ -1342,6 +1584,27 @@
     max: 1
     perTiles: 40
     chance: 0.5
+  decals:
+  - mode: Skirting
+    cardinal:
+      South: BrickTileDarkLineS
+      East: BrickTileDarkLineE
+      North: BrickTileDarkLineN
+      West: BrickTileDarkLineW
+    corner:
+      SouthEast: BrickTileDarkCornerSe
+      SouthWest: BrickTileDarkCornerSw
+      NorthEast: BrickTileDarkCornerNe
+      NorthWest: BrickTileDarkCornerNw
+  - mode: Scatter
+    chance: 0.12
+    randomRotation: true
+    decals:
+    - Dirt
+    - Dirt
+    - DirtLight
+    - DirtMedium
+    - DirtHeavy
 
 - type: roomArchetype
   id: HorizonRoomSalvageBay
@@ -1400,6 +1663,35 @@
     max: 1
     perTiles: 40
     chance: 0.5
+
+  decals:
+  - mode: Skirting
+    cardinal:
+      South: BrickTileSteelLineS
+      East: BrickTileSteelLineE
+      North: BrickTileSteelLineN
+      West: BrickTileSteelLineW
+    corner:
+      SouthEast: BrickTileSteelCornerSe
+      SouthWest: BrickTileSteelCornerSw
+      NorthEast: BrickTileSteelCornerNe
+      NorthWest: BrickTileSteelCornerNw
+  - mode: DoorMarks
+    cardinal:
+      South: WarnLineS
+      East: WarnLineE
+      North: WarnLineN
+      West: WarnLineW
+  - mode: Scatter
+    chance: 0.35
+    randomRotation: true
+    decals:
+    - Dirt
+    - Dirt
+    - DirtLight
+    - DirtMedium
+    - DirtHeavy
+    - DirtHeavy
 
 # ---------------------------------------------------------------- Layer config
 
