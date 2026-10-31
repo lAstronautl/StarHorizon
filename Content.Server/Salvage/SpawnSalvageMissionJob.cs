@@ -474,6 +474,22 @@ public sealed class SpawnSalvageMissionJob : Job<bool>
         }
     }
 
+    // Horizon: rooms assigned the Objective archetype tag by RoomFurnishDunGen are used for mission targets first.
+    private static bool IsObjectiveRoom(DungeonRoom room)
+    {
+        return room.Archetype?.Tags.Contains("Objective") == true;
+    }
+
+    private static DungeonRoom TakeRoom(List<DungeonRoom> preferred, List<DungeonRoom> others, Random random)
+    {
+        var list = preferred.Count > 0 ? preferred : others;
+        var index = random.Next(list.Count);
+        var room = list[index];
+        list[index] = list[^1];
+        list.RemoveAt(list.Count - 1);
+        return room;
+    }
+
     // Frontier: mission-specific setup functions
     private async Task SetupStructure(
         SalvageMission mission,
@@ -489,14 +505,14 @@ public sealed class SpawnSalvageMissionJob : Job<bool>
 
         var shaggy = faction.Configs["DefenseStructure"];
 
-        var availableRooms = new ValueList<DungeonRoom>(dungeon.Rooms);
+        var preferredRooms = dungeon.Rooms.Where(IsObjectiveRoom).ToList(); // Horizon: objective rooms first
+        var availableRooms = dungeon.Rooms.Where(r => !IsObjectiveRoom(r)).ToList();
         var availableTiles = new List<Vector2i>();
 
-        while (availableRooms.Count > 0 && structureComp.Structures.Count < difficulty.DestructionStructures)
+        while ((preferredRooms.Count > 0 || availableRooms.Count > 0) && structureComp.Structures.Count < difficulty.DestructionStructures)
         {
             availableTiles.Clear();
-            var roomIndex = random.Next(availableRooms.Count);
-            var room = availableRooms.RemoveSwap(roomIndex);
+            var room = TakeRoom(preferredRooms, availableRooms, random);
             availableTiles.AddRange(room.Tiles);
 
             while (availableTiles.Count > 0)
@@ -529,15 +545,15 @@ public sealed class SpawnSalvageMissionJob : Job<bool>
         var faction = _prototypeManager.Index<SalvageFactionPrototype>(mission.Faction);
         var prototype = faction.Configs["Megafauna"];
 
-        var availableRooms = new ValueList<DungeonRoom>(dungeon.Rooms);
+        var preferredRooms = dungeon.Rooms.Where(IsObjectiveRoom).ToList(); // Horizon: objective rooms first
+        var availableRooms = dungeon.Rooms.Where(r => !IsObjectiveRoom(r)).ToList();
         var availableTiles = new List<Vector2i>();
 
         var uid = EntityUid.Invalid;
-        while (availableRooms.Count > 0 && uid == EntityUid.Invalid)
+        while ((preferredRooms.Count > 0 || availableRooms.Count > 0) && uid == EntityUid.Invalid)
         {
             availableTiles.Clear();
-            var roomIndex = random.Next(availableRooms.Count);
-            var room = availableRooms.RemoveSwap(roomIndex);
+            var room = TakeRoom(preferredRooms, availableRooms, random);
             availableTiles.AddRange(room.Tiles);
 
             while (availableTiles.Count > 0)

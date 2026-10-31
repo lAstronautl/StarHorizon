@@ -59,3 +59,4 @@ salvage-dungeon-mod-snowy-labs = Snowy labs
 salvage-dungeon-mod-experiment = Experiment
 salvage-dungeon-mod-haunted = Haunted
 salvage-dungeon-mod-mineshaft = Mineshaft
+salvage-dungeon-mod-horizon-furnished-experiment = Furnished experiment

@@ -1,0 +1,88 @@
+# Experiment lab with rooms that are furnished by role (RoomFurnishDunGen) instead of only atlas contents.
+- type: dungeonConfig
+  id: HorizonFurnishedExperiment
+  layers:
+  - !type:PrefabDunGen
+    roomWhitelist:
+      tags:
+      - NFSalvageExperiment
+    presets:
+    - Bucket
+    - Wow
+    - SpaceShip
+    - Tall
+  - !type:CorridorDunGen
+    width: 3
+    tile: FloorSteel
+
+  - !type:DungeonEntranceDunGen
+    count: 2
+    tile: FloorSteel
+    contents: NFBaseAirlock
+
+  - !type:RoomEntranceDunGen
+    tile: FloorSteel
+    contents: NFBaseAirlock
+
+  - !type:EntranceFlankDunGen
+    tile: FloorSteel
+    contents: NFBaseWindow
+
+  - !type:ExternalWindowDunGen
+    tile: FloorSteel
+    contents: NFBaseWindow
+
+  - !type:WallMountDunGen
+    contents: NFScienceLabsWalls
+    tile: FloorSteel
+
+  - !type:BoundaryWallDunGen
+    wall: WallSolid
+    cornerWall: WallReinforced
+    tile: FloorSteel
+
+  - !type:JunctionDunGen
+    width: 1
+    tile: FloorSteel
+    contents: NFBaseAirlock
+
+  - !type:JunctionDunGen
+    width: 3
+    tile: FloorSteel
+    contents: NFBaseAirlock
+
+  - !type:PrototypeDunGen
+    proto: HorizonRoomFurnish
+    inheritDungeons: Last
+
+  - !type:AutoCablingDunGen
+    entity: CableApcExtension
+
+  - !type:CornerClutterDunGen
+    contents: NFBaseClutter
+
+  - !type:CorridorDecalSkirtingDunGen
+    cardinalDecals:
+      South: BrickTileWhiteLineS
+      East: BrickTileWhiteLineE
+      North: BrickTileWhiteLineN
+      West: BrickTileWhiteLineW
+    cornerDecals:
+      SouthEast: BrickTileWhiteCornerSe
+      SouthWest: BrickTileWhiteCornerSw
+      NorthEast: BrickTileWhiteCornerNe
+      NorthWest: BrickTileWhiteCornerNw
+    pocketDecals:
+      SouthWest: BrickTileWhiteInnerSw
+      SouthEast: BrickTileWhiteInnerSe
+      NorthWest: BrickTileWhiteInnerNw
+      NorthEast: BrickTileWhiteInnerNe
+    color: "#D381C996"
+
+
+- type: salvageDungeonMod
+  id: HorizonFurnishedExperiment
+  desc: salvage-dungeon-mod-horizon-furnished-experiment
+  proto: HorizonFurnishedExperiment
+  biomes:
+    - Grasslands
