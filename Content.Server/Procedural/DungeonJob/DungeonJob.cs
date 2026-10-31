@@ -228,6 +228,9 @@ public sealed partial class DungeonJob : Job<List<Dungeon>>
             case BiomeDunGen biome:
                 await PostGen(biome, dungeons[^1], reservedTiles, random);
                 break;
+            case BspRoomDunGen bsp:
+                dungeons.Add(await GenerateBspRoomDunGen(position, bsp, reservedTiles, random));
+                break;
             case BoundaryWallDunGen boundary:
                 await PostGen(boundary, dungeons[^1], reservedTiles, random);
                 break;

@@ -1,16 +1,16 @@
-# Experiment lab with rooms that are furnished by role (RoomFurnishDunGen) instead of only atlas contents.
+# Atlas-free dungeon: rooms come from BspRoomDunGen (BSP partition), corridors/doors/walls from the usual layers,
+# and everything inside the rooms from RoomFurnishDunGen (roles + furniture groups).
 - type: dungeonConfig
-  id: HorizonFurnishedExperiment
+  id: HorizonFurnishedBsp
   layers:
-  - !type:PrefabDunGen
-    roomWhitelist:
-      tags:
-      - NFSalvageExperiment
-    presets:
-    - Bucket
-    - Wow
-    - SpaceShip
-    - Tall
+  - !type:BspRoomDunGen
+    size: 64,64
+    minRoom: 5,5
+    maxRoom: 14,12
+    padding: 2
+    splitChance: 0.6
+    tile: FloorSteel
+
   - !type:CorridorDunGen
     width: 3
     tile: FloorSteel
@@ -32,10 +32,6 @@
     tile: FloorSteel
     contents: NFBaseWindow
 
-  - !type:WallMountDunGen
-    contents: NFScienceLabsWalls
-    tile: FloorSteel
-
   - !type:BoundaryWallDunGen
     wall: WallSolid
     cornerWall: WallReinforced
@@ -51,6 +47,7 @@
     tile: FloorSteel
     contents: NFBaseAirlock
 
+  # Roles + furniture groups (after walls and doors exist).
   - !type:PrototypeDunGen
     proto: HorizonRoomFurnish
     inheritDungeons: Last
@@ -58,31 +55,9 @@
   - !type:AutoCablingDunGen
     entity: CableApcExtension
 
-  - !type:CornerClutterDunGen
-    contents: NFBaseClutter
-
-  - !type:CorridorDecalSkirtingDunGen
-    cardinalDecals:
-      South: BrickTileWhiteLineS
-      East: BrickTileWhiteLineE
-      North: BrickTileWhiteLineN
-      West: BrickTileWhiteLineW
-    cornerDecals:
-      SouthEast: BrickTileWhiteCornerSe
-      SouthWest: BrickTileWhiteCornerSw
-      NorthEast: BrickTileWhiteCornerNe
-      NorthWest: BrickTileWhiteCornerNw
-    pocketDecals:
-      SouthWest: BrickTileWhiteInnerSw
-      SouthEast: BrickTileWhiteInnerSe
-      NorthWest: BrickTileWhiteInnerNw
-      NorthEast: BrickTileWhiteInnerNe
-    color: "#D381C996"
-
-
 - type: salvageDungeonMod
-  id: HorizonFurnishedExperiment
-  desc: salvage-dungeon-mod-horizon-furnished-experiment
-  proto: HorizonFurnishedExperiment
+  id: HorizonFurnishedBsp
+  desc: salvage-dungeon-mod-horizon-furnished-bsp
+  proto: HorizonFurnishedBsp
   biomes:
     - Grasslands

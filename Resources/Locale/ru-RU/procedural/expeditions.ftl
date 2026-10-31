@@ -56,4 +56,4 @@ salvage-dungeon-mod-snowy-labs = Снежные лаборатории
 salvage-dungeon-mod-experiment = Эксперимент
 salvage-dungeon-mod-haunted = Призрачный
 salvage-dungeon-mod-mineshaft = Шахта
-salvage-dungeon-mod-horizon-furnished-experiment = Экспедиция с обустроенными комнатами
+salvage-dungeon-mod-horizon-furnished-bsp = Обустроенный комплекс
