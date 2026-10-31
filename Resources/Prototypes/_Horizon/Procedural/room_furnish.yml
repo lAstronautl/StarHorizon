@@ -1,0 +1,198 @@
+# Meaningful room furnishing (RoomFurnishDunGen).
+#
+# Group frame: x runs along the wall (to the right when looking into the room), y runs away from the wall.
+# Anchor tile is 0,0. `onTop` is an entityTable spawned on the member, so loot belongs to the thing holding it.
+#
+# Usage: add this layer AFTER walls and doors exist in any dungeonConfig:
+#   - !type:PrototypeDunGen
+#     proto: HorizonRoomFurnish
+#     inheritDungeons: Last
+
+# ---------------------------------------------------------------- Groups
+
+- type: furnitureGroup
+  id: HorizonFurnishMedBay
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: MedicalBed
+    offset: 0,0
+  - proto: LockerMedical
+    offset: 1,0
+    chance: 0.7
+
+- type: furnitureGroup
+  id: HorizonFurnishMedTable
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: TableReinforced
+    offset: 0,0
+    onTop: HorizonFurnishMedkitTable
+  - proto: TableReinforced
+    offset: 1,0
+    chance: 0.6
+
+- type: furnitureGroup
+  id: HorizonFurnishMonitorDesk
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: ComputerCrewMonitoring
+    offset: 0,0
+  - proto: ChairOfficeDark
+    offset: 0,1
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishWeaponRack
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: Rack
+    offset: 0,0
+  - proto: Rack
+    offset: 1,0
+    chance: 0.7
+  - proto: CrateSecgear
+    offset: 2,0
+    chance: 0.5
+
+- type: furnitureGroup
+  id: HorizonFurnishGunSafe
+  placement: Corner
+  clearance: 1
+  members:
+  - proto: GunSafe
+    offset: 0,0
+
+- type: furnitureGroup
+  id: HorizonFurnishGuardPost
+  placement: DoorSide
+  clearance: 1
+  members:
+  - proto: TableReinforced
+    offset: 0,0
+  - proto: ChairOfficeDark
+    offset: 0,1
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishBunk
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: Bed
+    offset: 0,0
+  - proto: LockerSteel
+    offset: 1,0
+    chance: 0.8
+
+- type: furnitureGroup
+  id: HorizonFurnishMessTable
+  placement: Center
+  clearance: 1
+  members:
+  - proto: Table
+    offset: 0,0
+  - proto: Table
+    offset: 1,0
+  - proto: Stool
+    offset: 0,1
+    blocking: false
+  - proto: Stool
+    offset: 1,-1
+    blocking: false
+    chance: 0.6
+
+- type: furnitureGroup
+  id: HorizonFurnishSupplyStack
+  placement: Corner
+  clearance: 1
+  members:
+  - proto: CrateGenericSteel
+    offset: 0,0
+  - proto: CrateGenericSteel
+    offset: 1,0
+    chance: 0.6
+
+# ---------------------------------------------------------------- Archetypes
+
+- type: roomArchetype
+  id: HorizonRoomMedBay
+  weight: 1.0
+  minTiles: 20
+  entries:
+  - group: HorizonFurnishMedBay
+    min: 2
+    max: 3
+  - group: HorizonFurnishMedTable
+    min: 1
+    max: 2
+  - group: HorizonFurnishMonitorDesk
+    min: 0
+    max: 1
+    chance: 0.5
+
+- type: roomArchetype
+  id: HorizonRoomArmory
+  tags:
+  - Objective
+  weight: 0.6
+  minTiles: 20
+  minDepth: 0.5
+  minPerDungeon: 1
+  maxPerDungeon: 1
+  entries:
+  - group: HorizonFurnishGuardPost
+    min: 1
+    max: 1
+  - group: HorizonFurnishWeaponRack
+    min: 2
+    max: 3
+  - group: HorizonFurnishGunSafe
+    min: 1
+    max: 1
+
+- type: roomArchetype
+  id: HorizonRoomBarracks
+  weight: 1.0
+  minTiles: 24
+  entries:
+  - group: HorizonFurnishBunk
+    min: 3
+    max: 5
+  - group: HorizonFurnishMessTable
+    min: 0
+    max: 1
+    chance: 0.5
+
+- type: roomArchetype
+  id: HorizonRoomStorage
+  weight: 1.0
+  entries:
+  - group: HorizonFurnishSupplyStack
+    min: 2
+    max: 4
+
+# ---------------------------------------------------------------- Layer config
+
+- type: dungeonConfig
+  id: HorizonRoomFurnish
+  layers:
+  - !type:RoomFurnishDunGen
+    archetypes:
+    - HorizonRoomMedBay
+    - HorizonRoomArmory
+    - HorizonRoomBarracks
+    - HorizonRoomStorage
+    fallback: HorizonRoomStorage
+
+# Items on the med tables.
+- type: entityTable
+  id: HorizonFurnishMedkitTable
+  table: !type:GroupSelector
+    children:
+    - id: Medkit
+    - id: MedkitFilled
+      weight: 0.3

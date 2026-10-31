@@ -8,6 +8,11 @@ public sealed record DungeonRoom(HashSet<Vector2i> Tiles, Vector2 Center, Box2i 
     public readonly List<Vector2i> Entrances = new();
 
     /// <summary>
+    /// Role assigned by <see cref="Content.Shared.Procedural.PostGeneration.RoomFurnishDunGen"/>, if any.
+    /// </summary>
+    public Content.Shared.Procedural.Furnish.RoomArchetypePrototype? Archetype { get; set; }
+
+    /// <summary>
     /// Nodes adjacent to tiles, including the corners.
     /// </summary>
     public readonly HashSet<Vector2i> Exterior = Exterior;
