@@ -676,6 +676,150 @@
     offset: 1,0
     blocking: false
 
+- type: furnitureGroup
+  id: HorizonFurnishClutterMedical
+  placement: Free
+  clearance: 0
+  members:
+  - proto: SpawnDungeonClutterMedical
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishClutterKitchen
+  placement: Free
+  clearance: 0
+  members:
+  - proto: SpawnDungeonLootClutterKitchen
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishClutterScience
+  placement: Free
+  clearance: 0
+  members:
+  - proto: SpawnDungeonLootClutterScience
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishClutterHydro
+  placement: Free
+  clearance: 0
+  members:
+  - proto: SpawnDungeonLootClutterHydroponics
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishMedIsland
+  placement: Center
+  clearance: 1
+  members:
+  - proto: MedicalBed
+  - proto: MedicalBed
+    offset: 1,0
+  - proto: BedsheetMedical
+    blocking: false
+  - proto: BedsheetMedical
+    offset: 1,0
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishStorageIsland
+  placement: Center
+  clearance: 1
+  members:
+  - proto: Rack
+  - proto: Rack
+    offset: 1,0
+  - proto: Rack
+    offset: 2,0
+    chance: 0.6
+  - proto: SpawnDungeonLootMaterialsBasicFull
+    blocking: false
+  - proto: SpawnDungeonLootClutterSalvage
+    offset: 1,0
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishCrateIsland
+  placement: Center
+  clearance: 1
+  members:
+  - proto: SpawnDungeonLootCrateGeneral
+  - proto: SpawnDungeonLootCrateGeneral
+    offset: 1,0
+    chance: 0.6
+
+- type: furnitureGroup
+  id: HorizonFurnishDeskIsland
+  placement: Center
+  clearance: 1
+  members:
+  - proto: Table
+  - proto: Table
+    offset: 1,0
+  - proto: ChairOfficeLight
+    offset: 0,1
+    blocking: false
+  - proto: ChairOfficeLight
+    offset: 1,-1
+    blocking: false
+  - proto: SpawnDungeonLootBureaucracy
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishBunkIsland
+  placement: Center
+  clearance: 1
+  members:
+  - proto: Bed
+  - proto: Bed
+    offset: 1,0
+  - proto: BedsheetSpawner
+    blocking: false
+  - proto: BedsheetSpawner
+    offset: 1,0
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishHydroIsland
+  placement: Center
+  clearance: 1
+  members:
+  - proto: hydroponicsSoil
+  - proto: hydroponicsSoil
+    offset: 1,0
+  - proto: hydroponicsSoil
+    offset: 2,0
+    chance: 0.7
+
+- type: furnitureGroup
+  id: HorizonFurnishArmoryIsland
+  placement: Center
+  clearance: 1
+  members:
+  - proto: Rack
+  - proto: Rack
+    offset: 1,0
+  - proto: SpawnDungeonLootArmoryClutter
+    blocking: false
+  - proto: SpawnDungeonLootArmoryMelee
+    offset: 1,0
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishSalvageIsland
+  placement: Center
+  clearance: 1
+  members:
+  - proto: Table
+  - proto: Table
+    offset: 1,0
+  - proto: SpawnDungeonLootToolsSalvage
+    blocking: false
+  - proto: Stool
+    offset: 0,1
+    blocking: false
+
 # ---------------------------------------------------------------- Archetypes
 
 - type: roomArchetype
@@ -704,11 +848,6 @@
     min: 0
     max: 1
     chance: 0.4
-  - group: HorizonFurnishLootFood
-    min: 0
-    max: 1
-    perTiles: 60
-    chance: 0.4
   - group: HorizonFurnishPoster
     min: 1
     max: 1
@@ -726,20 +865,15 @@
     max: 1
     perTiles: 70
     chance: 0.7
-  - group: HorizonFurnishClutterMaint
+  - group: HorizonFurnishClutterMedical
     min: 1
     max: 2
-    perTiles: 9
-  - group: HorizonFurnishClutterScrap
-    min: 0
-    max: 1
-    perTiles: 25
-    chance: 0.6
-  - group: HorizonFurnishClutterSalvage
-    min: 0
+    perTiles: 10
+  - group: HorizonFurnishMedIsland
+    min: 1
     max: 1
     perTiles: 40
-    chance: 0.5
+    chance: 1.0
   decals:
   - mode: Skirting
     cardinal:
@@ -753,7 +887,7 @@
       NorthEast: BrickTileWhiteCornerNe
       NorthWest: BrickTileWhiteCornerNw
   - mode: Fill
-    tint: "#9FD8FF30"
+    tint: '#9FD8FF30'
     decals:
     - MiniTileCheckerAOverlay
   - mode: Scatter
@@ -765,6 +899,7 @@
     - DirtLight
     - DirtMedium
     - DirtHeavy
+    cleanable: true
 
 - type: roomArchetype
   id: HorizonRoomArmory
@@ -786,7 +921,6 @@
   - group: HorizonFurnishRackArmorySec
     min: 1
     max: 1
-    perTiles: 45
   - group: HorizonFurnishGunSafe
     min: 1
     max: 1
@@ -797,7 +931,6 @@
   - group: HorizonFurnishCrateRestock
     min: 0
     max: 1
-    perTiles: 60
     chance: 0.5
   - group: HorizonFurnishPoster
     min: 1
@@ -816,20 +949,11 @@
     max: 1
     perTiles: 70
     chance: 0.7
-  - group: HorizonFurnishClutterMaint
+  - group: HorizonFurnishArmoryIsland
     min: 1
-    max: 2
-    perTiles: 9
-  - group: HorizonFurnishClutterScrap
-    min: 0
     max: 1
-    perTiles: 25
-    chance: 0.6
-  - group: HorizonFurnishClutterSalvage
-    min: 0
-    max: 1
-    perTiles: 40
-    chance: 0.5
+    perTiles: 45
+    chance: 1.0
   decals:
   - mode: Skirting
     cardinal:
@@ -857,6 +981,7 @@
     - DirtLight
     - DirtMedium
     - DirtHeavy
+    cleanable: true
 
 - type: roomArchetype
   id: HorizonRoomVault
@@ -874,18 +999,15 @@
   - group: HorizonFurnishRackVault
     min: 1
     max: 2
-    perTiles: 40
   - group: HorizonFurnishGunSafe
     min: 1
     max: 1
   - group: HorizonFurnishLootTreasure
     min: 2
-    max: 3
-    perTiles: 14
+    max: 2
   - group: HorizonFurnishLootSpesos
     min: 1
     max: 2
-    perTiles: 22
   - group: HorizonFurnishPoster
     min: 1
     max: 1
@@ -903,20 +1025,10 @@
     max: 1
     perTiles: 70
     chance: 0.7
-  - group: HorizonFurnishClutterMaint
-    min: 1
-    max: 2
-    perTiles: 9
   - group: HorizonFurnishClutterScrap
-    min: 0
+    min: 1
     max: 1
     perTiles: 25
-    chance: 0.6
-  - group: HorizonFurnishClutterSalvage
-    min: 0
-    max: 1
-    perTiles: 40
-    chance: 0.5
   decals:
   - mode: Skirting
     cardinal:
@@ -944,6 +1056,7 @@
     - DirtLight
     - DirtMedium
     - DirtHeavy
+    cleanable: true
 
 - type: roomArchetype
   id: HorizonRoomBarracks
@@ -961,7 +1074,7 @@
   - group: HorizonFurnishLoungeTable
     min: 0
     max: 1
-    perTiles: 70
+    perTiles: 26
     chance: 0.6
   - group: HorizonFurnishVending
     min: 0
@@ -1007,6 +1120,11 @@
     max: 1
     perTiles: 40
     chance: 0.5
+  - group: HorizonFurnishBunkIsland
+    min: 1
+    max: 1
+    perTiles: 32
+    chance: 1.0
   decals:
   - mode: Skirting
     cardinal:
@@ -1028,6 +1146,7 @@
     - DirtLight
     - DirtMedium
     - DirtHeavy
+    cleanable: true
 
 - type: roomArchetype
   id: HorizonRoomStorage
@@ -1058,7 +1177,6 @@
   - group: HorizonFurnishLootTreasure
     min: 0
     max: 1
-    perTiles: 40
     chance: 0.5
   - group: HorizonFurnishPoster
     min: 1
@@ -1091,6 +1209,15 @@
     max: 1
     perTiles: 40
     chance: 0.5
+  - group: HorizonFurnishStorageIsland
+    min: 1
+    max: 1
+    perTiles: 32
+  - group: HorizonFurnishCrateIsland
+    min: 1
+    max: 1
+    perTiles: 45
+    chance: 1.0
   decals:
   - mode: Skirting
     cardinal:
@@ -1113,6 +1240,7 @@
     - DirtMedium
     - DirtHeavy
     - DirtHeavy
+    cleanable: true
 
 - type: roomArchetype
   id: HorizonRoomEngineering
@@ -1126,12 +1254,11 @@
   - group: HorizonFurnishRackCircuits
     min: 0
     max: 1
-    perTiles: 40
     chance: 0.7
   - group: HorizonFurnishWorkBench
     min: 1
     max: 1
-    perTiles: 45
+    perTiles: 32
   - group: HorizonFurnishLockerEngi
     min: 0
     max: 1
@@ -1207,6 +1334,7 @@
     - DirtMedium
     - DirtHeavy
     - DirtHeavy
+    cleanable: true
 
 - type: roomArchetype
   id: HorizonRoomLaboratory
@@ -1218,9 +1346,9 @@
     max: 1
     perTiles: 20
   - group: HorizonFurnishLabIsland
-    min: 0
+    min: 1
     max: 1
-    perTiles: 45
+    perTiles: 28
   - group: HorizonFurnishCrateScience
     min: 0
     max: 1
@@ -1250,20 +1378,10 @@
     max: 1
     perTiles: 70
     chance: 0.7
-  - group: HorizonFurnishClutterMaint
+  - group: HorizonFurnishClutterScience
     min: 1
     max: 2
-    perTiles: 9
-  - group: HorizonFurnishClutterScrap
-    min: 0
-    max: 1
-    perTiles: 25
-    chance: 0.6
-  - group: HorizonFurnishClutterSalvage
-    min: 0
-    max: 1
-    perTiles: 40
-    chance: 0.5
+    perTiles: 10
   decals:
   - mode: Skirting
     cardinal:
@@ -1277,7 +1395,7 @@
       NorthEast: BrickTileWhiteCornerNe
       NorthWest: BrickTileWhiteCornerNw
   - mode: Fill
-    tint: "#9FD8FF30"
+    tint: '#9FD8FF30'
     decals:
     - MiniTileCheckerAOverlay
   - mode: Scatter
@@ -1289,6 +1407,7 @@
     - DirtLight
     - DirtMedium
     - DirtHeavy
+    cleanable: true
 
 - type: roomArchetype
   id: HorizonRoomKitchen
@@ -1305,7 +1424,7 @@
   - group: HorizonFurnishMessTable
     min: 1
     max: 1
-    perTiles: 32
+    perTiles: 22
   - group: HorizonFurnishLootFood
     min: 1
     max: 2
@@ -1331,20 +1450,10 @@
     max: 1
     perTiles: 70
     chance: 0.7
-  - group: HorizonFurnishClutterMaint
+  - group: HorizonFurnishClutterKitchen
     min: 1
     max: 2
-    perTiles: 9
-  - group: HorizonFurnishClutterScrap
-    min: 0
-    max: 1
-    perTiles: 25
-    chance: 0.6
-  - group: HorizonFurnishClutterSalvage
-    min: 0
-    max: 1
-    perTiles: 40
-    chance: 0.5
+    perTiles: 10
   decals:
   - mode: Skirting
     cardinal:
@@ -1358,7 +1467,7 @@
       NorthEast: BrickTileWhiteCornerNe
       NorthWest: BrickTileWhiteCornerNw
   - mode: Fill
-    tint: "#FFFFFF22"
+    tint: '#FFFFFF22'
     decals:
     - CheckerNESW
   - mode: Scatter
@@ -1370,6 +1479,7 @@
     - DirtLight
     - DirtMedium
     - DirtHeavy
+    cleanable: true
 
 - type: roomArchetype
   id: HorizonRoomOffice
@@ -1413,20 +1523,10 @@
     max: 1
     perTiles: 70
     chance: 0.7
-  - group: HorizonFurnishClutterMaint
+  - group: HorizonFurnishDeskIsland
     min: 1
-    max: 2
-    perTiles: 9
-  - group: HorizonFurnishClutterScrap
-    min: 0
     max: 1
-    perTiles: 25
-    chance: 0.6
-  - group: HorizonFurnishClutterSalvage
-    min: 0
-    max: 1
-    perTiles: 40
-    chance: 0.5
+    perTiles: 32
   decals:
   - mode: Skirting
     cardinal:
@@ -1448,6 +1548,7 @@
     - DirtLight
     - DirtMedium
     - DirtHeavy
+    cleanable: true
 
 - type: roomArchetype
   id: HorizonRoomHydroponics
@@ -1464,15 +1565,6 @@
   - group: HorizonFurnishSink
     min: 0
     max: 1
-    chance: 0.5
-  - group: HorizonFurnishCrateService
-    min: 0
-    max: 1
-    chance: 0.4
-  - group: HorizonFurnishLootFood
-    min: 0
-    max: 1
-    perTiles: 50
     chance: 0.5
   - group: HorizonFurnishPoster
     min: 1
@@ -1491,20 +1583,14 @@
     max: 1
     perTiles: 70
     chance: 0.7
-  - group: HorizonFurnishClutterMaint
+  - group: HorizonFurnishClutterHydro
     min: 1
     max: 2
-    perTiles: 9
-  - group: HorizonFurnishClutterScrap
-    min: 0
+    perTiles: 10
+  - group: HorizonFurnishHydroIsland
+    min: 1
     max: 1
-    perTiles: 25
-    chance: 0.6
-  - group: HorizonFurnishClutterSalvage
-    min: 0
-    max: 1
-    perTiles: 40
-    chance: 0.5
+    perTiles: 28
   decals:
   - mode: Skirting
     cardinal:
@@ -1526,6 +1612,7 @@
     - DirtLight
     - DirtMedium
     - DirtHeavy
+    cleanable: true
 
 - type: roomArchetype
   id: HorizonRoomLounge
@@ -1539,7 +1626,7 @@
   - group: HorizonFurnishLoungeTable
     min: 1
     max: 1
-    perTiles: 40
+    perTiles: 26
   - group: HorizonFurnishVending
     min: 1
     max: 1
@@ -1547,11 +1634,6 @@
     min: 0
     max: 1
     perTiles: 60
-    chance: 0.5
-  - group: HorizonFurnishLootFood
-    min: 0
-    max: 1
-    perTiles: 50
     chance: 0.5
   - group: HorizonFurnishPoster
     min: 1
@@ -1573,17 +1655,7 @@
   - group: HorizonFurnishClutterMaint
     min: 1
     max: 2
-    perTiles: 9
-  - group: HorizonFurnishClutterScrap
-    min: 0
-    max: 1
-    perTiles: 25
-    chance: 0.6
-  - group: HorizonFurnishClutterSalvage
-    min: 0
-    max: 1
-    perTiles: 40
-    chance: 0.5
+    perTiles: 12
   decals:
   - mode: Skirting
     cardinal:
@@ -1605,6 +1677,7 @@
     - DirtLight
     - DirtMedium
     - DirtHeavy
+    cleanable: true
 
 - type: roomArchetype
   id: HorizonRoomSalvageBay
@@ -1663,7 +1736,10 @@
     max: 1
     perTiles: 40
     chance: 0.5
-
+  - group: HorizonFurnishSalvageIsland
+    min: 1
+    max: 1
+    perTiles: 32
   decals:
   - mode: Skirting
     cardinal:
@@ -1692,6 +1768,7 @@
     - DirtMedium
     - DirtHeavy
     - DirtHeavy
+    cleanable: true
 
 # ---------------------------------------------------------------- Layer config
 

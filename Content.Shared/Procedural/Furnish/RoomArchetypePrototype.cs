@@ -76,6 +76,12 @@ public sealed partial class FurnishDecalRule
     public bool RandomRotation;
 
     /// <summary>
+    /// Mapping rules require every dirt decal to be cleanable, so players can mop it away.
+    /// </summary>
+    [DataField]
+    public bool Cleanable;
+
+    /// <summary>
     /// Skirting: decal for a wall on that side. DoorMarks: decal for a door on that side.
     /// </summary>
     [DataField]

@@ -229,7 +229,7 @@ public sealed partial class DungeonJob
         ApplyFurnishDecals(ctx, arch, random);
     }
 
-    private void AddFurnishDecal(string id, Vector2i tile, Color? tint, Angle rotation)
+    private void AddFurnishDecal(string id, Vector2i tile, Color? tint, Angle rotation, bool cleanable = false)
     {
         if (!_prototype.HasIndex<DecalPrototype>(id))
         {
@@ -239,7 +239,7 @@ public sealed partial class DungeonJob
 
         // Decals are anchored at their corner, not the tile center.
         var coords = _maps.GridTileToLocal(_gridUid, _grid, tile).Offset(-_grid.TileSizeHalfVector);
-        _decals.TryAddDecal(id, coords, out _, color: tint, rotation: rotation);
+        _decals.TryAddDecal(id, coords, out _, color: tint, rotation: rotation, cleanable: cleanable);
     }
 
     private void ApplyFurnishDecals(FurnishContext ctx, RoomArchetypePrototype arch, Random random)
@@ -259,7 +259,7 @@ public sealed partial class DungeonJob
                             continue;
 
                         var rotation = rule.RandomRotation ? new Angle(random.NextDouble() * Math.Tau) : Angle.Zero;
-                        AddFurnishDecal(rule.Decals[random.Next(rule.Decals.Count)], tile, rule.Tint, rotation);
+                        AddFurnishDecal(rule.Decals[random.Next(rule.Decals.Count)], tile, rule.Tint, rotation, rule.Cleanable);
                     }
 
                     break;
