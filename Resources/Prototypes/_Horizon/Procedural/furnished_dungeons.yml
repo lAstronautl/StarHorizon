@@ -4,11 +4,11 @@
   id: HorizonFurnishedBsp
   layers:
   - !type:BspRoomDunGen
-    size: 64,64
-    minRoom: 5,5
+    size: 48,48
+    minRoom: 6,6
     maxRoom: 14,12
     padding: 2
-    splitChance: 0.6
+    splitChance: 0.3
     tile: FloorSteel
 
   - !type:CorridorDunGen

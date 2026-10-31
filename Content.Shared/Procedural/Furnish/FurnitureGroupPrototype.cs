@@ -75,6 +75,13 @@ public sealed partial class FurnitureMember
     /// </summary>
     [DataField]
     public ProtoId<EntityTablePrototype>? OnTop;
+
+    /// <summary>
+    /// Mount on the wall tile instead of the floor (posters, APCs, wall cabinets).
+    /// The position (usually offset 0,-1) must be an unused wall tile around the room.
+    /// </summary>
+    [DataField]
+    public bool OnWall;
 }
 
 /// <summary>

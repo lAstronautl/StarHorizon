@@ -1,7 +1,9 @@
 # Meaningful room furnishing (RoomFurnishDunGen).
 #
 # Group frame: x runs along the wall (to the right when looking into the room), y runs away from the wall.
-# Anchor tile is 0,0. `onTop` is an entityTable spawned on the member, so loot belongs to the thing holding it.
+# Anchor tile is 0,0. Spawners (SpawnDungeonLoot*, SalvageSpawner*, ...) are the same ones the old atlas rooms used,
+# so loot tables stay shared with the rest of the game. `onWall: true` mounts on the wall tile around the room.
+# Entries may use `perTiles` so bigger rooms get proportionally more content.
 #
 # Usage: add this layer AFTER walls and doors exist in any dungeonConfig:
 #   - !type:PrototypeDunGen
@@ -11,52 +13,369 @@
 # ---------------------------------------------------------------- Groups
 
 - type: furnitureGroup
-  id: HorizonFurnishMedBay
-  placement: Wall
+  id: HorizonFurnishPlant
+  placement: Corner
   clearance: 1
   members:
-  - proto: MedicalBed
-    offset: 0,0
-  - proto: LockerMedical
-    offset: 1,0
-    chance: 0.7
+  - proto: PottedPlantRandomPlastic
 
 - type: furnitureGroup
-  id: HorizonFurnishMedTable
+  id: HorizonFurnishPlantWall
   placement: Wall
   clearance: 1
   members:
-  - proto: TableReinforced
-    offset: 0,0
-    onTop: HorizonFurnishMedkitTable
-  - proto: TableReinforced
+  - proto: PottedPlantRandomPlastic
+
+- type: furnitureGroup
+  id: HorizonFurnishPoster
+  placement: Wall
+  clearance: 0
+  members:
+  - proto: RandomPosterContraband
+    offset: 0,-1
+    onWall: true
+    blocking: false
+    rotate: false
+
+- type: furnitureGroup
+  id: HorizonFurnishExtCabinet
+  placement: Wall
+  clearance: 0
+  members:
+  - proto: ExtinguisherCabinetFilled
+    offset: 0,-1
+    onWall: true
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishApc
+  placement: Wall
+  clearance: 0
+  members:
+  - proto: APCBasic
+    offset: 0,-1
+    onWall: true
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishClutterMaint
+  placement: Free
+  clearance: 0
+  members:
+  - proto: MaintenanceFluffSpawner
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishClutterScrap
+  placement: Free
+  clearance: 0
+  members:
+  - proto: SalvageSpawnerScrapCommon
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishClutterSalvage
+  placement: Free
+  clearance: 0
+  members:
+  - proto: SpawnDungeonLootClutterSalvage
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishClutterEngi
+  placement: Free
+  clearance: 0
+  members:
+  - proto: SpawnDungeonLootClutterEngiWithMines
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishLootTreasure
+  placement: Free
+  clearance: 0
+  members:
+  - proto: SalvageSpawnerTreasure
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishLootSpesos
+  placement: Free
+  clearance: 0
+  members:
+  - proto: SpawnDungeonLootSpesos
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishLootParts
+  placement: Free
+  clearance: 0
+  members:
+  - proto: SpawnDungeonLootPartsEngi
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishLootMaterials
+  placement: Free
+  clearance: 0
+  members:
+  - proto: SpawnDungeonLootMaterialsBasicFull
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishLootMaterialsRich
+  placement: Free
+  clearance: 0
+  members:
+  - proto: SpawnDungeonLootMaterialsValuableFull
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishLootFood
+  placement: Free
+  clearance: 0
+  members:
+  - proto: SpawnDungeonLootFood
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishLootPaper
+  placement: Free
+  clearance: 0
+  members:
+  - proto: SpawnDungeonLootBureaucracy
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishCrateGeneral
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: SpawnDungeonLootCrateGeneral
+  - proto: SpawnDungeonLootCrateGeneral
+    offset: 1,0
+    chance: 0.5
+
+- type: furnitureGroup
+  id: HorizonFurnishCrateEngi
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: SpawnDungeonLootCrateEngi
+  - proto: SpawnDungeonLootCrateEngi
+    offset: 1,0
+    chance: 0.5
+
+- type: furnitureGroup
+  id: HorizonFurnishCrateMaterials
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: SpawnDungeonLootCrateMaterials
+  - proto: SpawnDungeonLootCrateMaterials
+    offset: 1,0
+    chance: 0.5
+
+- type: furnitureGroup
+  id: HorizonFurnishCrateService
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: SpawnDungeonLootCrateService
+  - proto: SpawnDungeonLootCrateService
+    offset: 1,0
+    chance: 0.5
+
+- type: furnitureGroup
+  id: HorizonFurnishCrateMed
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: SpawnDungeonLootCrateMed
+  - proto: SpawnDungeonLootCrateMed
+    offset: 1,0
+    chance: 0.5
+
+- type: furnitureGroup
+  id: HorizonFurnishCrateScience
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: SpawnDungeonLootCrateScience
+  - proto: SpawnDungeonLootCrateScience
+    offset: 1,0
+    chance: 0.5
+
+- type: furnitureGroup
+  id: HorizonFurnishCrateRestock
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: SpawnDungeonLootCrateRestockGeneral
+  - proto: SpawnDungeonLootCrateRestockGeneral
+    offset: 1,0
+    chance: 0.5
+
+- type: furnitureGroup
+  id: HorizonFurnishLockerGeneral
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: SpawnDungeonLootLockersGeneral
+  - proto: SpawnDungeonLootLockersGeneral
     offset: 1,0
     chance: 0.6
 
 - type: furnitureGroup
-  id: HorizonFurnishMonitorDesk
+  id: HorizonFurnishLockerEngi
   placement: Wall
   clearance: 1
   members:
-  - proto: ComputerCrewMonitoring
-    offset: 0,0
-  - proto: ChairOfficeDark
+  - proto: SpawnDungeonLootLockersEngi
+  - proto: SpawnDungeonLootLockersEngi
+    offset: 1,0
+    chance: 0.6
+
+- type: furnitureGroup
+  id: HorizonFurnishLockerPpe
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: SpawnDungeonLootLockersProtectiveGear
+  - proto: SpawnDungeonLootLockersProtectiveGear
+    offset: 1,0
+    chance: 0.6
+
+- type: furnitureGroup
+  id: HorizonFurnishLockerSalvage
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: SpawnDungeonLootLockersSalvage
+  - proto: SpawnDungeonLootLockersSalvage
+    offset: 1,0
+    chance: 0.6
+
+- type: furnitureGroup
+  id: HorizonFurnishCrateStackCorner
+  placement: Corner
+  clearance: 1
+  members:
+  - proto: CrateGenericSteel
+  - proto: CrateGenericSteel
+    offset: 1,0
+    chance: 0.6
+  - proto: SpawnDungeonLootClutterSalvage
     offset: 0,1
+    blocking: false
+    chance: 0.5
+
+- type: furnitureGroup
+  id: HorizonFurnishRackEngi
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: Rack
+  - proto: Rack
+    offset: 1,0
+  - proto: SpawnDungeonLootPartsEngi
+    blocking: false
+  - proto: SpawnDungeonLootToolsBasicEngineering
+    offset: 1,0
     blocking: false
 
 - type: furnitureGroup
-  id: HorizonFurnishWeaponRack
+  id: HorizonFurnishRackMaterials
   placement: Wall
   clearance: 1
   members:
   - proto: Rack
-    offset: 0,0
+  - proto: Rack
+    offset: 1,0
+  - proto: SpawnDungeonLootMaterialsBasicFull
+    blocking: false
+  - proto: SpawnDungeonLootMaterialsValuableFull
+    offset: 1,0
+    blocking: false
+    chance: 0.5
+
+- type: furnitureGroup
+  id: HorizonFurnishRackCircuits
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: Rack
+  - proto: SpawnDungeonLootCircuitBoard
+    blocking: false
   - proto: Rack
     offset: 1,0
     chance: 0.7
-  - proto: CrateSecgear
-    offset: 2,0
+  - proto: SpawnDungeonLootLatheEngi
+    offset: 1,0
+    blocking: false
     chance: 0.5
+
+- type: furnitureGroup
+  id: HorizonFurnishRackSalvage
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: Rack
+  - proto: Rack
+    offset: 1,0
+  - proto: SpawnDungeonLootToolsSalvage
+    blocking: false
+  - proto: SalvageSpawnerEquipmentValuable
+    offset: 1,0
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishRackArmory
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: Rack
+  - proto: Rack
+    offset: 1,0
+  - proto: Rack
+    offset: 2,0
+    chance: 0.6
+  - proto: SpawnDungeonLootArmoryGuns
+    blocking: false
+  - proto: SpawnDungeonLootArmoryMelee
+    offset: 1,0
+    blocking: false
+  - proto: SpawnDungeonLootArmoryClutter
+    offset: 2,0
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishRackArmorySec
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: Rack
+  - proto: Rack
+    offset: 1,0
+  - proto: SpawnDungeonLootArmoryClutterSec
+    blocking: false
+  - proto: SpawnDungeonLootArmoryRare
+    offset: 1,0
+    blocking: false
+    chance: 0.4
+
+- type: furnitureGroup
+  id: HorizonFurnishRackVault
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: Rack
+  - proto: Rack
+    offset: 1,0
+  - proto: SpawnDungeonLootVaultGuns
+    blocking: false
+  - proto: SalvageSpawnerTreasureValuable
+    offset: 1,0
+    blocking: false
 
 - type: furnitureGroup
   id: HorizonFurnishGunSafe
@@ -64,15 +383,54 @@
   clearance: 1
   members:
   - proto: GunSafe
-    offset: 0,0
 
 - type: furnitureGroup
-  id: HorizonFurnishGuardPost
+  id: HorizonFurnishDeskBureau
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: Table
+  - proto: ChairOfficeLight
+    offset: 0,1
+    blocking: false
+  - proto: SpawnDungeonLootBureaucracy
+    blocking: false
+  - proto: Table
+    offset: 1,0
+    chance: 0.7
+  - proto: SpawnDungeonLootMugs
+    offset: 1,0
+    blocking: false
+    chance: 0.7
+
+- type: furnitureGroup
+  id: HorizonFurnishDeskGuard
   placement: DoorSide
   clearance: 1
   members:
   - proto: TableReinforced
-    offset: 0,0
+  - proto: ChairOfficeDark
+    offset: 0,1
+    blocking: false
+  - proto: SpawnDungeonLootArmoryClutterSec
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishBookshelf
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: BookshelfFilled
+  - proto: BookshelfFilled
+    offset: 1,0
+    chance: 0.7
+
+- type: furnitureGroup
+  id: HorizonFurnishMonitorDesk
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: ComputerCrewMonitoring
   - proto: ChairOfficeDark
     offset: 0,1
     blocking: false
@@ -83,10 +441,53 @@
   clearance: 1
   members:
   - proto: Bed
-    offset: 0,0
+  - proto: BedsheetSpawner
+    blocking: false
   - proto: LockerSteel
     offset: 1,0
     chance: 0.8
+
+- type: furnitureGroup
+  id: HorizonFurnishLoungeSofa
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: ComfyChair
+  - proto: ComfyChair
+    offset: 1,0
+  - proto: ComfyChair
+    offset: 2,0
+    chance: 0.5
+
+- type: furnitureGroup
+  id: HorizonFurnishLoungeTable
+  placement: Center
+  clearance: 1
+  members:
+  - proto: TableWood
+  - proto: TableWood
+    offset: 1,0
+    chance: 0.7
+  - proto: SpawnDungeonLootMugs
+    blocking: false
+  - proto: ComfyChair
+    offset: 0,1
+    blocking: false
+  - proto: ComfyChair
+    offset: 1,-1
+    blocking: false
+    chance: 0.5
+  - proto: RandomInstruments
+    offset: 1,0
+    blocking: false
+    chance: 0.3
+
+- type: furnitureGroup
+  id: HorizonFurnishVending
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: SpawnDungeonVendomatsRecreational
 
 - type: furnitureGroup
   id: HorizonFurnishMessTable
@@ -94,7 +495,6 @@
   clearance: 1
   members:
   - proto: Table
-    offset: 0,0
   - proto: Table
     offset: 1,0
   - proto: Stool
@@ -103,77 +503,903 @@
   - proto: Stool
     offset: 1,-1
     blocking: false
+  - proto: Stool
+    offset: 1,1
+    blocking: false
+    chance: 0.7
+  - proto: SpawnDungeonLootFood
+    blocking: false
+  - proto: SpawnDungeonLootMugs
+    offset: 1,0
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishKitchenCounter
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: TableCounterMetal
+  - proto: TableCounterMetal
+    offset: 1,0
+  - proto: TableCounterMetal
+    offset: 2,0
+    chance: 0.7
+  - proto: SpawnDungeonLootClutterKitchen
+    blocking: false
+  - proto: SpawnDungeonLootFood
+    offset: 1,0
+    blocking: false
+  - proto: SpawnDungeonLootMugs
+    offset: 2,0
+    blocking: false
+    chance: 0.5
+
+- type: furnitureGroup
+  id: HorizonFurnishSink
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: SinkWide
+
+- type: furnitureGroup
+  id: HorizonFurnishMedBed
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: MedicalBed
+  - proto: BedsheetMedical
+    blocking: false
+  - proto: MedicalBed
+    offset: 1,0
+    chance: 0.8
+  - proto: LockerMedical
+    offset: 2,0
     chance: 0.6
 
 - type: furnitureGroup
-  id: HorizonFurnishSupplyStack
-  placement: Corner
+  id: HorizonFurnishMedTable
+  placement: Wall
   clearance: 1
   members:
-  - proto: CrateGenericSteel
-    offset: 0,0
-  - proto: CrateGenericSteel
+  - proto: TableReinforced
+  - proto: SpawnDungeonClutterMedical
+    blocking: false
+  - proto: TableReinforced
     offset: 1,0
+  - proto: SpawnDungeonLootKitsFirstAid
+    offset: 1,0
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishMedVend
+  placement: Wall
+  clearance: 0
+  members:
+  - proto: VendingMachineWallMedical
+    offset: 0,-1
+    onWall: true
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishLabBench
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: TableGlass
+  - proto: TableGlass
+    offset: 1,0
+  - proto: SpawnDungeonLootClutterScience
+    blocking: false
+  - proto: SpawnDungeonClutterBeakerEmpty
+    offset: 1,0
+    blocking: false
+  - proto: Chair
+    offset: 0,1
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishLabIsland
+  placement: Center
+  clearance: 1
+  members:
+  - proto: TableGlass
+  - proto: TableGlass
+    offset: 1,0
+  - proto: SpawnDungeonClutterBeakerEmpty
+    blocking: false
+  - proto: SpawnDungeonLootClutterScience
+    offset: 1,0
+    blocking: false
+  - proto: Stool
+    offset: 0,1
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishHydroRow
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: hydroponicsSoil
+  - proto: hydroponicsSoil
+    offset: 1,0
+  - proto: hydroponicsSoil
+    offset: 2,0
+  - proto: hydroponicsSoil
+    offset: 3,0
     chance: 0.6
+  - proto: SpawnDungeonLootClutterHydroponics
+    blocking: false
+  - proto: SpawnDungeonLootSeed
+    offset: 2,0
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishHydroTools
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: Table
+  - proto: SpawnDungeonLootToolsHydroponics
+    blocking: false
+  - proto: SpawnDungeonLootSeed
+    blocking: false
+    chance: 0.5
+
+- type: furnitureGroup
+  id: HorizonFurnishWorkBench
+  placement: Center
+  clearance: 1
+  members:
+  - proto: Table
+  - proto: Table
+    offset: 1,0
+  - proto: SpawnDungeonLootToolsAdvancedEngineering
+    blocking: false
+  - proto: SpawnDungeonLootPartsEngi
+    offset: 1,0
+    blocking: false
+  - proto: Stool
+    offset: 0,1
+    blocking: false
+
+- type: furnitureGroup
+  id: HorizonFurnishWorkBenchWall
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: Table
+  - proto: Table
+    offset: 1,0
+  - proto: SpawnDungeonLootToolsBasicEngineering
+    blocking: false
+  - proto: SpawnDungeonLootClutterEngiWithMines
+    offset: 1,0
+    blocking: false
 
 # ---------------------------------------------------------------- Archetypes
 
 - type: roomArchetype
   id: HorizonRoomMedBay
   weight: 1.0
-  minTiles: 20
+  minTiles: 30
   entries:
-  - group: HorizonFurnishMedBay
-    min: 2
-    max: 3
-  - group: HorizonFurnishMedTable
+  - group: HorizonFurnishMedBed
     min: 1
     max: 2
+    perTiles: 22
+  - group: HorizonFurnishMedTable
+    min: 1
+    max: 1
+    perTiles: 36
+  - group: HorizonFurnishMedVend
+    min: 0
+    max: 1
+    chance: 0.6
+  - group: HorizonFurnishCrateMed
+    min: 0
+    max: 1
+    perTiles: 45
+    chance: 0.7
   - group: HorizonFurnishMonitorDesk
     min: 0
     max: 1
+    chance: 0.4
+  - group: HorizonFurnishLootFood
+    min: 0
+    max: 1
+    perTiles: 60
+    chance: 0.4
+  - group: HorizonFurnishPoster
+    min: 1
+    max: 1
+    perTiles: 22
+  - group: HorizonFurnishExtCabinet
+    min: 0
+    max: 1
+    chance: 0.5
+  - group: HorizonFurnishApc
+    min: 0
+    max: 1
+    chance: 0.4
+  - group: HorizonFurnishPlant
+    min: 0
+    max: 1
+    perTiles: 70
+    chance: 0.7
+  - group: HorizonFurnishClutterMaint
+    min: 1
+    max: 2
+    perTiles: 9
+  - group: HorizonFurnishClutterScrap
+    min: 0
+    max: 1
+    perTiles: 25
+    chance: 0.6
+  - group: HorizonFurnishClutterSalvage
+    min: 0
+    max: 1
+    perTiles: 40
     chance: 0.5
 
 - type: roomArchetype
   id: HorizonRoomArmory
+  weight: 0.6
+  minTiles: 36
   tags:
   - Objective
-  weight: 0.6
-  minTiles: 20
   minDepth: 0.5
   minPerDungeon: 1
   maxPerDungeon: 1
   entries:
-  - group: HorizonFurnishGuardPost
+  - group: HorizonFurnishDeskGuard
     min: 1
     max: 1
-  - group: HorizonFurnishWeaponRack
-    min: 2
-    max: 3
+  - group: HorizonFurnishRackArmory
+    min: 1
+    max: 2
+    perTiles: 30
+  - group: HorizonFurnishRackArmorySec
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishGunSafe
     min: 1
     max: 1
+  - group: HorizonFurnishLockerPpe
+    min: 1
+    max: 1
+    perTiles: 35
+  - group: HorizonFurnishCrateRestock
+    min: 0
+    max: 1
+    perTiles: 60
+    chance: 0.5
+  - group: HorizonFurnishPoster
+    min: 1
+    max: 1
+    perTiles: 22
+  - group: HorizonFurnishExtCabinet
+    min: 0
+    max: 1
+    chance: 0.5
+  - group: HorizonFurnishApc
+    min: 0
+    max: 1
+    chance: 0.4
+  - group: HorizonFurnishPlant
+    min: 0
+    max: 1
+    perTiles: 70
+    chance: 0.7
+  - group: HorizonFurnishClutterMaint
+    min: 1
+    max: 2
+    perTiles: 9
+  - group: HorizonFurnishClutterScrap
+    min: 0
+    max: 1
+    perTiles: 25
+    chance: 0.6
+  - group: HorizonFurnishClutterSalvage
+    min: 0
+    max: 1
+    perTiles: 40
+    chance: 0.5
+
+- type: roomArchetype
+  id: HorizonRoomVault
+  weight: 0.3
+  minTiles: 36
+  tags:
+  - Objective
+  minDepth: 0.65
+  maxPerDungeon: 1
+  entries:
+  - group: HorizonFurnishDeskGuard
+    min: 0
+    max: 1
+    chance: 0.5
+  - group: HorizonFurnishRackVault
+    min: 1
+    max: 2
+    perTiles: 40
+  - group: HorizonFurnishGunSafe
+    min: 1
+    max: 1
+  - group: HorizonFurnishLootTreasure
+    min: 2
+    max: 3
+    perTiles: 14
+  - group: HorizonFurnishLootSpesos
+    min: 1
+    max: 2
+    perTiles: 22
+  - group: HorizonFurnishPoster
+    min: 1
+    max: 1
+    perTiles: 22
+  - group: HorizonFurnishExtCabinet
+    min: 0
+    max: 1
+    chance: 0.5
+  - group: HorizonFurnishApc
+    min: 0
+    max: 1
+    chance: 0.4
+  - group: HorizonFurnishPlant
+    min: 0
+    max: 1
+    perTiles: 70
+    chance: 0.7
+  - group: HorizonFurnishClutterMaint
+    min: 1
+    max: 2
+    perTiles: 9
+  - group: HorizonFurnishClutterScrap
+    min: 0
+    max: 1
+    perTiles: 25
+    chance: 0.6
+  - group: HorizonFurnishClutterSalvage
+    min: 0
+    max: 1
+    perTiles: 40
+    chance: 0.5
 
 - type: roomArchetype
   id: HorizonRoomBarracks
   weight: 1.0
-  minTiles: 24
+  minTiles: 30
   entries:
   - group: HorizonFurnishBunk
-    min: 3
-    max: 5
-  - group: HorizonFurnishMessTable
+    min: 2
+    max: 2
+    perTiles: 11
+  - group: HorizonFurnishLockerGeneral
     min: 0
     max: 1
+    perTiles: 45
+  - group: HorizonFurnishLoungeTable
+    min: 0
+    max: 1
+    perTiles: 70
+    chance: 0.6
+  - group: HorizonFurnishVending
+    min: 0
+    max: 1
+    chance: 0.5
+  - group: HorizonFurnishBookshelf
+    min: 0
+    max: 1
+    chance: 0.3
+  - group: HorizonFurnishLootFood
+    min: 0
+    max: 1
+    perTiles: 40
+    chance: 0.6
+  - group: HorizonFurnishPoster
+    min: 1
+    max: 1
+    perTiles: 22
+  - group: HorizonFurnishExtCabinet
+    min: 0
+    max: 1
+    chance: 0.5
+  - group: HorizonFurnishApc
+    min: 0
+    max: 1
+    chance: 0.4
+  - group: HorizonFurnishPlant
+    min: 0
+    max: 1
+    perTiles: 70
+    chance: 0.7
+  - group: HorizonFurnishClutterMaint
+    min: 1
+    max: 2
+    perTiles: 9
+  - group: HorizonFurnishClutterScrap
+    min: 0
+    max: 1
+    perTiles: 25
+    chance: 0.6
+  - group: HorizonFurnishClutterSalvage
+    min: 0
+    max: 1
+    perTiles: 40
     chance: 0.5
 
 - type: roomArchetype
   id: HorizonRoomStorage
   weight: 1.0
+  minTiles: 0
   entries:
-  - group: HorizonFurnishSupplyStack
-    min: 2
-    max: 4
+  - group: HorizonFurnishCrateGeneral
+    min: 1
+    max: 2
+    perTiles: 14
+  - group: HorizonFurnishCrateMaterials
+    min: 0
+    max: 1
+    perTiles: 28
+  - group: HorizonFurnishCrateService
+    min: 0
+    max: 1
+    perTiles: 40
+    chance: 0.6
+  - group: HorizonFurnishRackMaterials
+    min: 1
+    max: 1
+    perTiles: 40
+  - group: HorizonFurnishCrateStackCorner
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishLootTreasure
+    min: 0
+    max: 1
+    perTiles: 40
+    chance: 0.5
+  - group: HorizonFurnishPoster
+    min: 1
+    max: 1
+    perTiles: 22
+  - group: HorizonFurnishExtCabinet
+    min: 0
+    max: 1
+    chance: 0.5
+  - group: HorizonFurnishApc
+    min: 0
+    max: 1
+    chance: 0.4
+  - group: HorizonFurnishPlant
+    min: 0
+    max: 1
+    perTiles: 70
+    chance: 0.7
+  - group: HorizonFurnishClutterMaint
+    min: 1
+    max: 2
+    perTiles: 9
+  - group: HorizonFurnishClutterScrap
+    min: 0
+    max: 1
+    perTiles: 25
+    chance: 0.6
+  - group: HorizonFurnishClutterSalvage
+    min: 0
+    max: 1
+    perTiles: 40
+    chance: 0.5
+
+- type: roomArchetype
+  id: HorizonRoomEngineering
+  weight: 1.0
+  minTiles: 36
+  entries:
+  - group: HorizonFurnishRackEngi
+    min: 1
+    max: 1
+    perTiles: 26
+  - group: HorizonFurnishRackCircuits
+    min: 0
+    max: 1
+    perTiles: 40
+    chance: 0.7
+  - group: HorizonFurnishWorkBench
+    min: 1
+    max: 1
+    perTiles: 45
+  - group: HorizonFurnishLockerEngi
+    min: 0
+    max: 1
+    perTiles: 30
+  - group: HorizonFurnishCrateEngi
+    min: 0
+    max: 1
+    perTiles: 30
+  - group: HorizonFurnishClutterEngi
+    min: 1
+    max: 2
+    perTiles: 14
+  - group: HorizonFurnishLootParts
+    min: 0
+    max: 1
+    perTiles: 22
+  - group: HorizonFurnishPoster
+    min: 1
+    max: 1
+    perTiles: 22
+  - group: HorizonFurnishExtCabinet
+    min: 0
+    max: 1
+    chance: 0.5
+  - group: HorizonFurnishApc
+    min: 0
+    max: 1
+    chance: 0.4
+  - group: HorizonFurnishPlant
+    min: 0
+    max: 1
+    perTiles: 70
+    chance: 0.7
+  - group: HorizonFurnishClutterMaint
+    min: 1
+    max: 2
+    perTiles: 9
+  - group: HorizonFurnishClutterScrap
+    min: 0
+    max: 1
+    perTiles: 25
+    chance: 0.6
+  - group: HorizonFurnishClutterSalvage
+    min: 0
+    max: 1
+    perTiles: 40
+    chance: 0.5
+
+- type: roomArchetype
+  id: HorizonRoomLaboratory
+  weight: 1.0
+  minTiles: 30
+  entries:
+  - group: HorizonFurnishLabBench
+    min: 1
+    max: 1
+    perTiles: 20
+  - group: HorizonFurnishLabIsland
+    min: 0
+    max: 1
+    perTiles: 45
+  - group: HorizonFurnishCrateScience
+    min: 0
+    max: 1
+    perTiles: 40
+  - group: HorizonFurnishBookshelf
+    min: 0
+    max: 1
+    chance: 0.4
+  - group: HorizonFurnishMonitorDesk
+    min: 0
+    max: 1
+    chance: 0.5
+  - group: HorizonFurnishPoster
+    min: 1
+    max: 1
+    perTiles: 22
+  - group: HorizonFurnishExtCabinet
+    min: 0
+    max: 1
+    chance: 0.5
+  - group: HorizonFurnishApc
+    min: 0
+    max: 1
+    chance: 0.4
+  - group: HorizonFurnishPlant
+    min: 0
+    max: 1
+    perTiles: 70
+    chance: 0.7
+  - group: HorizonFurnishClutterMaint
+    min: 1
+    max: 2
+    perTiles: 9
+  - group: HorizonFurnishClutterScrap
+    min: 0
+    max: 1
+    perTiles: 25
+    chance: 0.6
+  - group: HorizonFurnishClutterSalvage
+    min: 0
+    max: 1
+    perTiles: 40
+    chance: 0.5
+
+- type: roomArchetype
+  id: HorizonRoomKitchen
+  weight: 1.0
+  minTiles: 36
+  entries:
+  - group: HorizonFurnishKitchenCounter
+    min: 1
+    max: 1
+    perTiles: 24
+  - group: HorizonFurnishSink
+    min: 1
+    max: 1
+  - group: HorizonFurnishMessTable
+    min: 1
+    max: 1
+    perTiles: 32
+  - group: HorizonFurnishLootFood
+    min: 1
+    max: 2
+    perTiles: 20
+  - group: HorizonFurnishCrateService
+    min: 0
+    max: 1
+    chance: 0.5
+  - group: HorizonFurnishPoster
+    min: 1
+    max: 1
+    perTiles: 22
+  - group: HorizonFurnishExtCabinet
+    min: 0
+    max: 1
+    chance: 0.5
+  - group: HorizonFurnishApc
+    min: 0
+    max: 1
+    chance: 0.4
+  - group: HorizonFurnishPlant
+    min: 0
+    max: 1
+    perTiles: 70
+    chance: 0.7
+  - group: HorizonFurnishClutterMaint
+    min: 1
+    max: 2
+    perTiles: 9
+  - group: HorizonFurnishClutterScrap
+    min: 0
+    max: 1
+    perTiles: 25
+    chance: 0.6
+  - group: HorizonFurnishClutterSalvage
+    min: 0
+    max: 1
+    perTiles: 40
+    chance: 0.5
+
+- type: roomArchetype
+  id: HorizonRoomOffice
+  weight: 1.0
+  minTiles: 30
+  entries:
+  - group: HorizonFurnishDeskBureau
+    min: 1
+    max: 1
+    perTiles: 16
+  - group: HorizonFurnishBookshelf
+    min: 1
+    max: 1
+    perTiles: 40
+  - group: HorizonFurnishMonitorDesk
+    min: 0
+    max: 1
+    chance: 0.5
+  - group: HorizonFurnishLootPaper
+    min: 1
+    max: 2
+    perTiles: 14
+  - group: HorizonFurnishLoungeSofa
+    min: 0
+    max: 1
+    chance: 0.3
+  - group: HorizonFurnishPoster
+    min: 1
+    max: 1
+    perTiles: 22
+  - group: HorizonFurnishExtCabinet
+    min: 0
+    max: 1
+    chance: 0.5
+  - group: HorizonFurnishApc
+    min: 0
+    max: 1
+    chance: 0.4
+  - group: HorizonFurnishPlant
+    min: 0
+    max: 1
+    perTiles: 70
+    chance: 0.7
+  - group: HorizonFurnishClutterMaint
+    min: 1
+    max: 2
+    perTiles: 9
+  - group: HorizonFurnishClutterScrap
+    min: 0
+    max: 1
+    perTiles: 25
+    chance: 0.6
+  - group: HorizonFurnishClutterSalvage
+    min: 0
+    max: 1
+    perTiles: 40
+    chance: 0.5
+
+- type: roomArchetype
+  id: HorizonRoomHydroponics
+  weight: 1.0
+  minTiles: 36
+  entries:
+  - group: HorizonFurnishHydroRow
+    min: 1
+    max: 1
+    perTiles: 24
+  - group: HorizonFurnishHydroTools
+    min: 1
+    max: 1
+  - group: HorizonFurnishSink
+    min: 0
+    max: 1
+    chance: 0.5
+  - group: HorizonFurnishCrateService
+    min: 0
+    max: 1
+    chance: 0.4
+  - group: HorizonFurnishLootFood
+    min: 0
+    max: 1
+    perTiles: 50
+    chance: 0.5
+  - group: HorizonFurnishPoster
+    min: 1
+    max: 1
+    perTiles: 22
+  - group: HorizonFurnishExtCabinet
+    min: 0
+    max: 1
+    chance: 0.5
+  - group: HorizonFurnishApc
+    min: 0
+    max: 1
+    chance: 0.4
+  - group: HorizonFurnishPlant
+    min: 0
+    max: 1
+    perTiles: 70
+    chance: 0.7
+  - group: HorizonFurnishClutterMaint
+    min: 1
+    max: 2
+    perTiles: 9
+  - group: HorizonFurnishClutterScrap
+    min: 0
+    max: 1
+    perTiles: 25
+    chance: 0.6
+  - group: HorizonFurnishClutterSalvage
+    min: 0
+    max: 1
+    perTiles: 40
+    chance: 0.5
+
+- type: roomArchetype
+  id: HorizonRoomLounge
+  weight: 1.0
+  minTiles: 36
+  entries:
+  - group: HorizonFurnishLoungeSofa
+    min: 1
+    max: 1
+    perTiles: 30
+  - group: HorizonFurnishLoungeTable
+    min: 1
+    max: 1
+    perTiles: 40
+  - group: HorizonFurnishVending
+    min: 1
+    max: 1
+  - group: HorizonFurnishBookshelf
+    min: 0
+    max: 1
+    perTiles: 60
+    chance: 0.5
+  - group: HorizonFurnishLootFood
+    min: 0
+    max: 1
+    perTiles: 50
+    chance: 0.5
+  - group: HorizonFurnishPoster
+    min: 1
+    max: 1
+    perTiles: 22
+  - group: HorizonFurnishExtCabinet
+    min: 0
+    max: 1
+    chance: 0.5
+  - group: HorizonFurnishApc
+    min: 0
+    max: 1
+    chance: 0.4
+  - group: HorizonFurnishPlant
+    min: 0
+    max: 1
+    perTiles: 70
+    chance: 0.7
+  - group: HorizonFurnishClutterMaint
+    min: 1
+    max: 2
+    perTiles: 9
+  - group: HorizonFurnishClutterScrap
+    min: 0
+    max: 1
+    perTiles: 25
+    chance: 0.6
+  - group: HorizonFurnishClutterSalvage
+    min: 0
+    max: 1
+    perTiles: 40
+    chance: 0.5
+
+- type: roomArchetype
+  id: HorizonRoomSalvageBay
+  weight: 1.0
+  minTiles: 30
+  entries:
+  - group: HorizonFurnishRackSalvage
+    min: 1
+    max: 1
+    perTiles: 30
+  - group: HorizonFurnishLockerSalvage
+    min: 1
+    max: 1
+    perTiles: 40
+  - group: HorizonFurnishWorkBenchWall
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishLootMaterials
+    min: 1
+    max: 1
+    perTiles: 20
+  - group: HorizonFurnishCrateGeneral
+    min: 0
+    max: 1
+    perTiles: 40
+    chance: 0.6
+  - group: HorizonFurnishPoster
+    min: 1
+    max: 1
+    perTiles: 22
+  - group: HorizonFurnishExtCabinet
+    min: 0
+    max: 1
+    chance: 0.5
+  - group: HorizonFurnishApc
+    min: 0
+    max: 1
+    chance: 0.4
+  - group: HorizonFurnishPlant
+    min: 0
+    max: 1
+    perTiles: 70
+    chance: 0.7
+  - group: HorizonFurnishClutterMaint
+    min: 1
+    max: 2
+    perTiles: 9
+  - group: HorizonFurnishClutterScrap
+    min: 0
+    max: 1
+    perTiles: 25
+    chance: 0.6
+  - group: HorizonFurnishClutterSalvage
+    min: 0
+    max: 1
+    perTiles: 40
+    chance: 0.5
 
 # ---------------------------------------------------------------- Layer config
 
@@ -184,15 +1410,14 @@
     archetypes:
     - HorizonRoomMedBay
     - HorizonRoomArmory
+    - HorizonRoomVault
     - HorizonRoomBarracks
     - HorizonRoomStorage
+    - HorizonRoomEngineering
+    - HorizonRoomLaboratory
+    - HorizonRoomKitchen
+    - HorizonRoomOffice
+    - HorizonRoomHydroponics
+    - HorizonRoomLounge
+    - HorizonRoomSalvageBay
     fallback: HorizonRoomStorage
-
-# Items on the med tables.
-- type: entityTable
-  id: HorizonFurnishMedkitTable
-  table: !type:GroupSelector
-    children:
-    - id: Medkit
-    - id: MedkitFilled
-      weight: 0.3

@@ -21,6 +21,12 @@ public sealed partial class FurnishEntry
     public int Max = 1;
 
     /// <summary>
+    /// If above 0, adds room tiles / PerTiles more instances so bigger rooms get proportionally more content.
+    /// </summary>
+    [DataField]
+    public int PerTiles;
+
+    /// <summary>
     /// Chance to place the entry at all when <see cref="Min"/> is 0.
     /// </summary>
     [DataField]

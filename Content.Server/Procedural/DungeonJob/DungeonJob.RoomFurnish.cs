@@ -27,6 +27,8 @@ public sealed partial class DungeonJob
         public readonly HashSet<Vector2i> DoorSeeds = new();
         public readonly HashSet<Vector2i> Blocked = new();
         public readonly HashSet<Vector2i> Reserved = new();
+        /// <summary> Every tile already holding a member of some group (floor and wall tiles alike). </summary>
+        public readonly HashSet<Vector2i> Used = new();
         public readonly Dictionary<Vector2i, bool> WallCache = new();
         public HashSet<Vector2i> Reach = new();
     }
@@ -195,6 +197,9 @@ public sealed partial class DungeonJob
         {
             var count = random.Next(entry.Min, Math.Max(entry.Min, entry.Max) + 1);
 
+            if (entry.PerTiles > 0)
+                count += room.Tiles.Count / entry.PerTiles;
+
             if (entry.Min <= 0 && !random.Prob(entry.Chance))
                 count = 0;
 
@@ -340,8 +345,8 @@ public sealed partial class DungeonJob
                 break;
 
             default:
-                foreach (var dir in FurnishCardinals)
-                    yield return dir;
+                // Free: facing does not matter much, one candidate per tile keeps the search small.
+                yield return FurnishCardinals[0];
                 break;
         }
     }
@@ -359,6 +364,9 @@ public sealed partial class DungeonJob
         foreach (var tile in ctx.TileList)
         {
             if (ctx.Blocked.Contains(tile) || ctx.Reserved.Contains(tile))
+                continue;
+
+            if (group.Placement == FurnishPlacement.Free && ctx.Used.Contains(tile))
                 continue;
 
             foreach (var facing in FurnishFacings(ctx, group, tile))
@@ -388,24 +396,38 @@ public sealed partial class DungeonJob
             {
                 var pos = anchor + right * member.Offset.X + facing * member.Offset.Y;
                 positions.Add(pos);
+
+                if (member.OnWall)
+                {
+                    // Wall decor: must be an unused wall tile on the outline of this room.
+                    if (ctx.Room.Tiles.Contains(pos) || !ctx.Room.Exterior.Contains(pos) ||
+                        !FurnishIsWall(ctx, pos) || ctx.Used.Contains(pos))
+                    {
+                        ok = false;
+                        break;
+                    }
+
+                    continue;
+                }
+
                 footprint.Add(pos);
 
-                if (!ctx.Room.Tiles.Contains(pos))
+                if (!ctx.Room.Tiles.Contains(pos) || ctx.Used.Contains(pos))
                 {
                     ok = false;
                     break;
                 }
 
-                if (!member.Blocking)
-                    continue;
-
-                if (ctx.Blocked.Contains(pos) || ctx.Reserved.Contains(pos))
+                // Solid furniture respects reserved clearance, small items only keep doorways free.
+                if (ctx.Blocked.Contains(pos) ||
+                    (member.Blocking ? ctx.Reserved.Contains(pos) : ctx.DoorSeeds.Contains(pos)))
                 {
                     ok = false;
                     break;
                 }
 
-                newBlocked.Add(pos);
+                if (member.Blocking)
+                    newBlocked.Add(pos);
             }
 
             if (!ok)
@@ -416,7 +438,7 @@ public sealed partial class DungeonJob
 
             for (var i = 0; i < members.Count && ok; i++)
             {
-                if (!members[i].Blocking)
+                if (!members[i].Blocking || members[i].OnWall)
                     continue;
 
                 for (var k = 1; k <= group.Clearance; k++)
@@ -480,6 +502,7 @@ public sealed partial class DungeonJob
 
             ctx.Blocked.UnionWith(newBlocked);
             ctx.Reserved.UnionWith(clearance);
+            ctx.Used.UnionWith(positions);
 
             if (reach != null)
                 ctx.Reach = reach;
