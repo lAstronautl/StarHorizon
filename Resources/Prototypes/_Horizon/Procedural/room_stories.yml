@@ -199,36 +199,36 @@
     blocking: false
 
 # ---------------------------------------------------------------- Armory: one faction per room (guide: weapons by faction)
+# Weapons come as the same "weapon case" entities that the Frontier expedition loot tables use (weapon_tables.yml),
+# so every id here is already proven valid in this fork. Factions follow the mapping guide:
+# lasers / Lecter / Kammerer / Enforcer / Atreides / Drozd / WT-550 / Mk58 / Hristov = NanoTrasen,
+# Cobra / Viper / C20R / Bulldog / L6 SAW = Syndicate.
 - type: entityTable
   id: HorizonArmoryNanoTrasen
   table: !type:GroupSelector
     children:
-    - id: WeaponRifleLecter
+    - id: WeaponCaseLongLecterExpedition
       weight: 3
-    - id: WeaponRifleAk
-    - id: WeaponShotgunKammerer
-    - id: WeaponShotgunEnforcer
-    - id: WeaponSubMachineGunAtreides
-    - id: WeaponSubMachineGunDrozd
-    - id: WeaponSubMachineGunWt550
-    - id: WeaponPistolMk58
+    - id: WeaponCaseLongKammererExpedition
+    - id: WeaponCaseLongEnforcerExpedition
+    - id: WeaponCaseLongAtreidesExpedition
+    - id: WeaponCaseLongDrozdExpedition
+    - id: WeaponCaseLongWT550Expedition
+    - id: WeaponCaseShortMk58Expedition
       weight: 2
-    - id: WeaponRevolverInspector
-    - id: WeaponLaserCarbine
-    - id: WeaponDisabler
-      weight: 2
+    - id: WeaponCaseLongHristovExpedition
+    - id: WeaponCaseLongLaserCarbineExpedition
+    - id: WeaponCaseShortLaserGunExpedition
 
 - type: entityTable
   id: HorizonArmorySyndicate
   table: !type:GroupSelector
     children:
-    - id: WeaponPistolCobra
-    - id: WeaponPistolViper
-    - id: WeaponRevolverPython
-    - id: WeaponSubMachineGunC20r
-    - id: WeaponShotgunBulldog
-    - id: WeaponLightMachineGunL6
-    - id: WeaponSniperMosin
+    - id: WeaponCaseShortCobra
+    - id: WeaponCaseShortViper
+    - id: WeaponCaseLongC20r
+    - id: WeaponCaseLongBulldog
+    - id: WeaponCaseHeavyLightMachineGunL6
 
 - type: entity
   parent: MarkerBasePlaceFree

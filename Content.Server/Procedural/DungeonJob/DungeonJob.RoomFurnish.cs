@@ -5,6 +5,8 @@ using Content.Shared.Decals;
 using Content.Shared.Procedural;
 using Content.Shared.Procedural.Furnish;
 using Content.Shared.Procedural.PostGeneration;
+using Robust.Shared.Map;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
 namespace Content.Server.Procedural.DungeonJob;
@@ -55,11 +57,49 @@ public sealed partial class DungeonJob
             if (room.Archetype == null)
                 continue;
 
-            await FurnishRoom(room, room.Archetype, random);
+            // One broken room (bad prototype in a spawner table, etc.) must never abort the whole expedition:
+            // an uncaught exception here fails the generation job and leaves every later room empty.
+            try
+            {
+                await FurnishRoom(room, room.Archetype, random);
+            }
+            catch (Exception e)
+            {
+                _sawmill.Error($"Failed to furnish room {room.Archetype.ID}: {e}");
+            }
 
             await SuspendDungeon();
             if (!ValidateResume())
                 return;
+        }
+    }
+
+    private readonly HashSet<string> _furnishBadProtos = new();
+
+    /// <summary>
+    /// Spawns a furniture member. Unknown or abstract prototypes and spawners whose tables throw are logged once
+    /// and skipped, so a single bad id cannot take the dungeon down.
+    /// </summary>
+    private EntityUid? FurnishSpawn(string proto, EntityCoordinates coords)
+    {
+        if (!_prototype.TryIndex<EntityPrototype>(proto, out var prototype) || prototype.Abstract)
+        {
+            if (_furnishBadProtos.Add(proto))
+                _sawmill.Error($"Furnish: {proto} is missing or abstract, skipping it");
+
+            return null;
+        }
+
+        try
+        {
+            return _entManager.SpawnAtPosition(proto, coords);
+        }
+        catch (Exception e)
+        {
+            if (_furnishBadProtos.Add(proto))
+                _sawmill.Error($"Furnish: spawning {proto} failed, skipping it: {e}");
+
+            return null;
         }
     }
 
@@ -658,15 +698,25 @@ public sealed partial class DungeonJob
             {
                 var member = members[i];
                 var coords = _maps.GridTileToLocal(_gridUid, _grid, positions[i]);
-                var uid = _entManager.SpawnAtPosition(member.Proto, coords);
+                var uid = FurnishSpawn(member.Proto, coords);
+
+                if (uid == null)
+                    continue;
 
                 if (member.Rotate)
-                    _transform.SetLocalRotation(uid, new Vector2(facing.X, facing.Y).ToWorldAngle());
+                    _transform.SetLocalRotation(uid.Value, new Vector2(facing.X, facing.Y).ToWorldAngle());
 
                 if (member.OnTop != null)
                 {
-                    var items = _entTable.GetSpawns(_prototype.Index(member.OnTop.Value), random);
-                    _entManager.SpawnEntitiesAttachedTo(coords, items);
+                    try
+                    {
+                        var items = _entTable.GetSpawns(_prototype.Index(member.OnTop.Value), random);
+                        _entManager.SpawnEntitiesAttachedTo(coords, items);
+                    }
+                    catch (Exception e)
+                    {
+                        _sawmill.Error($"Failed to spawn items on {member.Proto}: {e}");
+                    }
                 }
             }
 
