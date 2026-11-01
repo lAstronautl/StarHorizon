@@ -1016,6 +1016,15 @@
     max: 1
     perTiles: 40
     chance: 1.0
+  - group: HorizonFurnishDgSolidMedical
+    min: 1
+    max: 1
+    perTiles: 36
+  - group: HorizonFurnishDgIslandMedical
+    min: 0
+    max: 1
+    perTiles: 60
+    chance: 0.8
   decals:
   - mode: Skirting
     cardinal:
@@ -1089,6 +1098,11 @@
       min: 0
       max: 1
       chance: 0.6
+    - group: HorizonFurnishDgSolidWreck
+      min: 0
+      max: 1
+      perTiles: 50
+      chance: 0.5
     decals:
     - mode: Scatter
       chance: 0.35
@@ -1101,6 +1115,13 @@
       - DirtHeavy
       - DirtHeavy
       - DirtHeavy
+    litter:
+    - table: HorizonDgFreeWreck
+      min: 0
+      max: 1
+      perTiles: 30
+      chance: 0.5
+      jitter: 0.45
   - id: Ransacked
     weight: 0.8
     entries:
@@ -1120,6 +1141,10 @@
     - group: HorizonFurnishNoteRansacked
       min: 1
       max: 1
+    - group: HorizonFurnishDgSolidWreck
+      min: 1
+      max: 1
+      perTiles: 40
     decals:
     - mode: Scatter
       chance: 0.22
@@ -1136,6 +1161,11 @@
       max: 3
       perTiles: 8
       jitter: 0.45
+    - table: HorizonDgFreeWreck
+      min: 1
+      max: 2
+      perTiles: 20
+      jitter: 0.45
   storyChance: 0.6
   litter:
   - table: TableDungeonLootMedicalClutter
@@ -1143,6 +1173,17 @@
     max: 3
     perTiles: 12
     jitter: 0.42
+  - table: HorizonDgFreeMedical
+    min: 2
+    max: 3
+    perTiles: 6
+    jitter: 0.45
+  - table: HorizonDgFreeCommon
+    min: 0
+    max: 2
+    perTiles: 22
+    chance: 0.8
+    jitter: 0.45
 
 - type: roomArchetype
   id: HorizonRoomArmory
@@ -1198,6 +1239,15 @@
     max: 1
     perTiles: 70
     chance: 0.7
+  - group: HorizonFurnishDgSolidArmory
+    min: 1
+    max: 1
+    perTiles: 36
+  - group: HorizonFurnishDgIslandArmory
+    min: 0
+    max: 1
+    perTiles: 60
+    chance: 0.8
   decals:
   - mode: Skirting
     cardinal:
@@ -1274,6 +1324,11 @@
       min: 0
       max: 1
       chance: 0.6
+    - group: HorizonFurnishDgSolidWreck
+      min: 0
+      max: 1
+      perTiles: 50
+      chance: 0.5
     decals:
     - mode: Scatter
       chance: 0.35
@@ -1286,6 +1341,13 @@
       - DirtHeavy
       - DirtHeavy
       - DirtHeavy
+    litter:
+    - table: HorizonDgFreeWreck
+      min: 0
+      max: 1
+      perTiles: 30
+      chance: 0.5
+      jitter: 0.45
   - id: Ransacked
     weight: 0.8
     entries:
@@ -1305,6 +1367,10 @@
     - group: HorizonFurnishNoteRansacked
       min: 1
       max: 1
+    - group: HorizonFurnishDgSolidWreck
+      min: 1
+      max: 1
+      perTiles: 40
     decals:
     - mode: Scatter
       chance: 0.22
@@ -1321,6 +1387,11 @@
       max: 3
       perTiles: 8
       jitter: 0.45
+    - table: HorizonDgFreeWreck
+      min: 1
+      max: 2
+      perTiles: 20
+      jitter: 0.45
   storyChance: 0.75
   litter:
   - table: TableDungeonLootMercenaryClutter
@@ -1328,6 +1399,17 @@
     max: 2
     perTiles: 18
     jitter: 0.42
+  - table: HorizonDgFreeArmory
+    min: 2
+    max: 3
+    perTiles: 6
+    jitter: 0.45
+  - table: HorizonDgFreeCommon
+    min: 0
+    max: 2
+    perTiles: 22
+    chance: 0.8
+    jitter: 0.45
 
 - type: roomArchetype
   id: HorizonRoomVault
@@ -1379,6 +1461,15 @@
     min: 1
     max: 1
     perTiles: 25
+  - group: HorizonFurnishDgSolidArmory
+    min: 1
+    max: 1
+    perTiles: 36
+  - group: HorizonFurnishDgIslandArmory
+    min: 0
+    max: 1
+    perTiles: 60
+    chance: 0.8
   decals:
   - mode: Skirting
     cardinal:
@@ -1455,6 +1546,11 @@
       min: 0
       max: 1
       chance: 0.6
+    - group: HorizonFurnishDgSolidWreck
+      min: 0
+      max: 1
+      perTiles: 50
+      chance: 0.5
     decals:
     - mode: Scatter
       chance: 0.35
@@ -1467,6 +1563,13 @@
       - DirtHeavy
       - DirtHeavy
       - DirtHeavy
+    litter:
+    - table: HorizonDgFreeWreck
+      min: 0
+      max: 1
+      perTiles: 30
+      chance: 0.5
+      jitter: 0.45
   - id: Ransacked
     weight: 0.8
     entries:
@@ -1486,6 +1589,10 @@
     - group: HorizonFurnishNoteRansacked
       min: 1
       max: 1
+    - group: HorizonFurnishDgSolidWreck
+      min: 1
+      max: 1
+      perTiles: 40
     decals:
     - mode: Scatter
       chance: 0.22
@@ -1502,6 +1609,11 @@
       max: 3
       perTiles: 8
       jitter: 0.45
+    - table: HorizonDgFreeWreck
+      min: 1
+      max: 2
+      perTiles: 20
+      jitter: 0.45
   storyChance: 0.75
   litter:
   - table: TableDungeonLootMercenaryClutter
@@ -1509,6 +1621,21 @@
     max: 1
     perTiles: 25
     jitter: 0.42
+  - table: HorizonDgFreeArmory
+    min: 2
+    max: 3
+    perTiles: 6
+    jitter: 0.45
+  - table: HorizonDgFreeCommon
+    min: 0
+    max: 2
+    perTiles: 22
+    chance: 0.8
+    jitter: 0.45
+  - table: HorizonDgFreeValuables
+    min: 1
+    max: 2
+    jitter: 0.4
 
 - type: roomArchetype
   id: HorizonRoomBarracks
@@ -1577,6 +1704,15 @@
     max: 1
     perTiles: 32
     chance: 1.0
+  - group: HorizonFurnishDgSolidGeneral
+    min: 1
+    max: 1
+    perTiles: 36
+  - group: HorizonFurnishDgIslandGeneral
+    min: 0
+    max: 1
+    perTiles: 60
+    chance: 0.8
   decals:
   - mode: Skirting
     cardinal:
@@ -1646,6 +1782,11 @@
       min: 0
       max: 1
       chance: 0.6
+    - group: HorizonFurnishDgSolidWreck
+      min: 0
+      max: 1
+      perTiles: 50
+      chance: 0.5
     decals:
     - mode: Scatter
       chance: 0.35
@@ -1658,6 +1799,13 @@
       - DirtHeavy
       - DirtHeavy
       - DirtHeavy
+    litter:
+    - table: HorizonDgFreeWreck
+      min: 0
+      max: 1
+      perTiles: 30
+      chance: 0.5
+      jitter: 0.45
   - id: Ransacked
     weight: 0.8
     entries:
@@ -1677,6 +1825,10 @@
     - group: HorizonFurnishNoteRansacked
       min: 1
       max: 1
+    - group: HorizonFurnishDgSolidWreck
+      min: 1
+      max: 1
+      perTiles: 40
     decals:
     - mode: Scatter
       chance: 0.22
@@ -1693,6 +1845,11 @@
       max: 3
       perTiles: 8
       jitter: 0.45
+    - table: HorizonDgFreeWreck
+      min: 1
+      max: 2
+      perTiles: 20
+      jitter: 0.45
   storyChance: 0.6
   litter:
   - table: TableDungeonLootServiceMugsFlasks
@@ -1705,6 +1862,22 @@
     max: 2
     perTiles: 22
     jitter: 0.42
+  - table: HorizonDgFreeGeneral
+    min: 2
+    max: 3
+    perTiles: 10
+    jitter: 0.45
+  - table: HorizonDgFreeService
+    min: 2
+    max: 3
+    perTiles: 10
+    jitter: 0.45
+  - table: HorizonDgFreeCommon
+    min: 0
+    max: 2
+    perTiles: 22
+    chance: 0.8
+    jitter: 0.45
 
 - type: roomArchetype
   id: HorizonRoomStorage
@@ -1777,6 +1950,24 @@
     max: 1
     perTiles: 45
     chance: 1.0
+  - group: HorizonFurnishDgSolidSalvage
+    min: 1
+    max: 1
+    perTiles: 60
+  - group: HorizonFurnishDgIslandSalvage
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.8
+  - group: HorizonFurnishDgSolidGeneral
+    min: 1
+    max: 1
+    perTiles: 60
+  - group: HorizonFurnishDgIslandGeneral
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.8
   decals:
   - mode: Skirting
     cardinal:
@@ -1847,6 +2038,11 @@
       min: 0
       max: 1
       chance: 0.6
+    - group: HorizonFurnishDgSolidWreck
+      min: 0
+      max: 1
+      perTiles: 50
+      chance: 0.5
     decals:
     - mode: Scatter
       chance: 0.35
@@ -1859,6 +2055,13 @@
       - DirtHeavy
       - DirtHeavy
       - DirtHeavy
+    litter:
+    - table: HorizonDgFreeWreck
+      min: 0
+      max: 1
+      perTiles: 30
+      chance: 0.5
+      jitter: 0.45
   - id: Ransacked
     weight: 0.8
     entries:
@@ -1878,6 +2081,10 @@
     - group: HorizonFurnishNoteRansacked
       min: 1
       max: 1
+    - group: HorizonFurnishDgSolidWreck
+      min: 1
+      max: 1
+      perTiles: 40
     decals:
     - mode: Scatter
       chance: 0.22
@@ -1894,6 +2101,11 @@
       max: 3
       perTiles: 8
       jitter: 0.45
+    - table: HorizonDgFreeWreck
+      min: 1
+      max: 2
+      perTiles: 20
+      jitter: 0.45
   storyChance: 0.75
   litter:
   - table: TableDungeonLootSupplyClutter
@@ -1901,6 +2113,27 @@
     max: 4
     perTiles: 10
     jitter: 0.42
+  - table: HorizonDgFreeSalvage
+    min: 2
+    max: 3
+    perTiles: 10
+    jitter: 0.45
+  - table: HorizonDgFreeGeneral
+    min: 2
+    max: 3
+    perTiles: 10
+    jitter: 0.45
+  - table: HorizonDgFreeCommon
+    min: 0
+    max: 2
+    perTiles: 22
+    chance: 0.8
+    jitter: 0.45
+  - table: HorizonDgFreeValuables
+    min: 0
+    max: 1
+    chance: 0.3
+    jitter: 0.4
 
 - type: roomArchetype
   id: HorizonRoomEngineering
@@ -1966,6 +2199,15 @@
     max: 1
     perTiles: 40
     chance: 0.5
+  - group: HorizonFurnishDgSolidEngineering
+    min: 1
+    max: 1
+    perTiles: 36
+  - group: HorizonFurnishDgIslandEngineering
+    min: 0
+    max: 1
+    perTiles: 60
+    chance: 0.8
   decals:
   - mode: Skirting
     cardinal:
@@ -2043,6 +2285,11 @@
       min: 0
       max: 1
       chance: 0.6
+    - group: HorizonFurnishDgSolidWreck
+      min: 0
+      max: 1
+      perTiles: 50
+      chance: 0.5
     decals:
     - mode: Scatter
       chance: 0.35
@@ -2055,6 +2302,13 @@
       - DirtHeavy
       - DirtHeavy
       - DirtHeavy
+    litter:
+    - table: HorizonDgFreeWreck
+      min: 0
+      max: 1
+      perTiles: 30
+      chance: 0.5
+      jitter: 0.45
   - id: Ransacked
     weight: 0.8
     entries:
@@ -2074,6 +2328,10 @@
     - group: HorizonFurnishNoteRansacked
       min: 1
       max: 1
+    - group: HorizonFurnishDgSolidWreck
+      min: 1
+      max: 1
+      perTiles: 40
     decals:
     - mode: Scatter
       chance: 0.22
@@ -2090,6 +2348,11 @@
       max: 3
       perTiles: 8
       jitter: 0.45
+    - table: HorizonDgFreeWreck
+      min: 1
+      max: 2
+      perTiles: 20
+      jitter: 0.45
   storyChance: 0.6
   litter:
   - table: TableDungeonLootEngineeringParts
@@ -2102,6 +2365,17 @@
     max: 2
     perTiles: 18
     jitter: 0.42
+  - table: HorizonDgFreeEngineering
+    min: 2
+    max: 3
+    perTiles: 6
+    jitter: 0.45
+  - table: HorizonDgFreeCommon
+    min: 0
+    max: 2
+    perTiles: 22
+    chance: 0.8
+    jitter: 0.45
 
 - type: roomArchetype
   id: HorizonRoomLaboratory
@@ -2149,6 +2423,15 @@
     min: 1
     max: 2
     perTiles: 10
+  - group: HorizonFurnishDgSolidScience
+    min: 1
+    max: 1
+    perTiles: 36
+  - group: HorizonFurnishDgIslandScience
+    min: 0
+    max: 1
+    perTiles: 60
+    chance: 0.8
   decals:
   - mode: Skirting
     cardinal:
@@ -2222,6 +2505,11 @@
       min: 0
       max: 1
       chance: 0.6
+    - group: HorizonFurnishDgSolidWreck
+      min: 0
+      max: 1
+      perTiles: 50
+      chance: 0.5
     decals:
     - mode: Scatter
       chance: 0.35
@@ -2234,6 +2522,13 @@
       - DirtHeavy
       - DirtHeavy
       - DirtHeavy
+    litter:
+    - table: HorizonDgFreeWreck
+      min: 0
+      max: 1
+      perTiles: 30
+      chance: 0.5
+      jitter: 0.45
   - id: Ransacked
     weight: 0.8
     entries:
@@ -2253,6 +2548,10 @@
     - group: HorizonFurnishNoteRansacked
       min: 1
       max: 1
+    - group: HorizonFurnishDgSolidWreck
+      min: 1
+      max: 1
+      perTiles: 40
     decals:
     - mode: Scatter
       chance: 0.22
@@ -2269,6 +2568,11 @@
       max: 3
       perTiles: 8
       jitter: 0.45
+    - table: HorizonDgFreeWreck
+      min: 1
+      max: 2
+      perTiles: 20
+      jitter: 0.45
   storyChance: 0.6
   litter:
   - table: TableDungeonLootScienceClutter
@@ -2276,6 +2580,17 @@
     max: 3
     perTiles: 12
     jitter: 0.42
+  - table: HorizonDgFreeScience
+    min: 2
+    max: 3
+    perTiles: 6
+    jitter: 0.45
+  - table: HorizonDgFreeCommon
+    min: 0
+    max: 2
+    perTiles: 22
+    chance: 0.8
+    jitter: 0.45
 
 - type: roomArchetype
   id: HorizonRoomKitchen
@@ -2322,6 +2637,15 @@
     min: 1
     max: 2
     perTiles: 10
+  - group: HorizonFurnishDgSolidService
+    min: 1
+    max: 1
+    perTiles: 36
+  - group: HorizonFurnishDgIslandService
+    min: 0
+    max: 1
+    perTiles: 60
+    chance: 0.8
   decals:
   - mode: Skirting
     cardinal:
@@ -2391,6 +2715,11 @@
       min: 0
       max: 1
       chance: 0.6
+    - group: HorizonFurnishDgSolidWreck
+      min: 0
+      max: 1
+      perTiles: 50
+      chance: 0.5
     decals:
     - mode: Scatter
       chance: 0.35
@@ -2403,6 +2732,13 @@
       - DirtHeavy
       - DirtHeavy
       - DirtHeavy
+    litter:
+    - table: HorizonDgFreeWreck
+      min: 0
+      max: 1
+      perTiles: 30
+      chance: 0.5
+      jitter: 0.45
   - id: Ransacked
     weight: 0.8
     entries:
@@ -2422,6 +2758,10 @@
     - group: HorizonFurnishNoteRansacked
       min: 1
       max: 1
+    - group: HorizonFurnishDgSolidWreck
+      min: 1
+      max: 1
+      perTiles: 40
     decals:
     - mode: Scatter
       chance: 0.22
@@ -2438,6 +2778,11 @@
       max: 3
       perTiles: 8
       jitter: 0.45
+    - table: HorizonDgFreeWreck
+      min: 1
+      max: 2
+      perTiles: 20
+      jitter: 0.45
   storyChance: 0.6
   litter:
   - table: TableDungeonLootServiceClutter
@@ -2450,6 +2795,17 @@
     max: 2
     perTiles: 20
     jitter: 0.42
+  - table: HorizonDgFreeService
+    min: 2
+    max: 3
+    perTiles: 6
+    jitter: 0.45
+  - table: HorizonDgFreeCommon
+    min: 0
+    max: 2
+    perTiles: 22
+    chance: 0.8
+    jitter: 0.45
 
 - type: roomArchetype
   id: HorizonRoomOffice
@@ -2497,6 +2853,15 @@
     min: 1
     max: 1
     perTiles: 32
+  - group: HorizonFurnishDgSolidGeneral
+    min: 1
+    max: 1
+    perTiles: 36
+  - group: HorizonFurnishDgIslandGeneral
+    min: 0
+    max: 1
+    perTiles: 60
+    chance: 0.8
   decals:
   - mode: Skirting
     cardinal:
@@ -2562,6 +2927,11 @@
       min: 0
       max: 1
       chance: 0.6
+    - group: HorizonFurnishDgSolidWreck
+      min: 0
+      max: 1
+      perTiles: 50
+      chance: 0.5
     decals:
     - mode: Scatter
       chance: 0.35
@@ -2574,6 +2944,13 @@
       - DirtHeavy
       - DirtHeavy
       - DirtHeavy
+    litter:
+    - table: HorizonDgFreeWreck
+      min: 0
+      max: 1
+      perTiles: 30
+      chance: 0.5
+      jitter: 0.45
   - id: Ransacked
     weight: 0.8
     entries:
@@ -2593,6 +2970,10 @@
     - group: HorizonFurnishNoteRansacked
       min: 1
       max: 1
+    - group: HorizonFurnishDgSolidWreck
+      min: 1
+      max: 1
+      perTiles: 40
     decals:
     - mode: Scatter
       chance: 0.22
@@ -2609,6 +2990,11 @@
       max: 3
       perTiles: 8
       jitter: 0.45
+    - table: HorizonDgFreeWreck
+      min: 1
+      max: 2
+      perTiles: 20
+      jitter: 0.45
   storyChance: 0.6
   litter:
   - table: TableDungeonLootGeneralBureaucracy
@@ -2616,6 +3002,17 @@
     max: 3
     perTiles: 12
     jitter: 0.42
+  - table: HorizonDgFreeGeneral
+    min: 2
+    max: 3
+    perTiles: 6
+    jitter: 0.45
+  - table: HorizonDgFreeCommon
+    min: 0
+    max: 2
+    perTiles: 22
+    chance: 0.8
+    jitter: 0.45
 
 - type: roomArchetype
   id: HorizonRoomHydroponics
@@ -2658,6 +3055,15 @@
     min: 1
     max: 1
     perTiles: 28
+  - group: HorizonFurnishDgSolidHydroponics
+    min: 1
+    max: 1
+    perTiles: 36
+  - group: HorizonFurnishDgIslandHydroponics
+    min: 0
+    max: 1
+    perTiles: 60
+    chance: 0.8
   decals:
   - mode: Skirting
     cardinal:
@@ -2723,6 +3129,11 @@
       min: 0
       max: 1
       chance: 0.6
+    - group: HorizonFurnishDgSolidWreck
+      min: 0
+      max: 1
+      perTiles: 50
+      chance: 0.5
     decals:
     - mode: Scatter
       chance: 0.35
@@ -2735,6 +3146,13 @@
       - DirtHeavy
       - DirtHeavy
       - DirtHeavy
+    litter:
+    - table: HorizonDgFreeWreck
+      min: 0
+      max: 1
+      perTiles: 30
+      chance: 0.5
+      jitter: 0.45
   - id: Ransacked
     weight: 0.8
     entries:
@@ -2754,6 +3172,10 @@
     - group: HorizonFurnishNoteRansacked
       min: 1
       max: 1
+    - group: HorizonFurnishDgSolidWreck
+      min: 1
+      max: 1
+      perTiles: 40
     decals:
     - mode: Scatter
       chance: 0.22
@@ -2770,6 +3192,11 @@
       max: 3
       perTiles: 8
       jitter: 0.45
+    - table: HorizonDgFreeWreck
+      min: 1
+      max: 2
+      perTiles: 20
+      jitter: 0.45
   storyChance: 0.6
   litter:
   - table: TableDungeonLootHydroponicsClutter
@@ -2782,6 +3209,17 @@
     max: 2
     perTiles: 20
     jitter: 0.42
+  - table: HorizonDgFreeHydroponics
+    min: 2
+    max: 3
+    perTiles: 6
+    jitter: 0.45
+  - table: HorizonDgFreeCommon
+    min: 0
+    max: 2
+    perTiles: 22
+    chance: 0.8
+    jitter: 0.45
 
 - type: roomArchetype
   id: HorizonRoomLounge
@@ -2825,6 +3263,15 @@
     min: 1
     max: 2
     perTiles: 12
+  - group: HorizonFurnishDgSolidService
+    min: 1
+    max: 1
+    perTiles: 36
+  - group: HorizonFurnishDgIslandService
+    min: 0
+    max: 1
+    perTiles: 60
+    chance: 0.8
   decals:
   - mode: Skirting
     cardinal:
@@ -2890,6 +3337,11 @@
       min: 0
       max: 1
       chance: 0.6
+    - group: HorizonFurnishDgSolidWreck
+      min: 0
+      max: 1
+      perTiles: 50
+      chance: 0.5
     decals:
     - mode: Scatter
       chance: 0.35
@@ -2902,6 +3354,13 @@
       - DirtHeavy
       - DirtHeavy
       - DirtHeavy
+    litter:
+    - table: HorizonDgFreeWreck
+      min: 0
+      max: 1
+      perTiles: 30
+      chance: 0.5
+      jitter: 0.45
   - id: Ransacked
     weight: 0.8
     entries:
@@ -2921,6 +3380,10 @@
     - group: HorizonFurnishNoteRansacked
       min: 1
       max: 1
+    - group: HorizonFurnishDgSolidWreck
+      min: 1
+      max: 1
+      perTiles: 40
     decals:
     - mode: Scatter
       chance: 0.22
@@ -2937,6 +3400,11 @@
       max: 3
       perTiles: 8
       jitter: 0.45
+    - table: HorizonDgFreeWreck
+      min: 1
+      max: 2
+      perTiles: 20
+      jitter: 0.45
   storyChance: 0.6
   litter:
   - table: TableDungeonLootServiceMugsFlasks
@@ -2944,6 +3412,22 @@
     max: 2
     perTiles: 14
     jitter: 0.42
+  - table: HorizonDgFreeService
+    min: 2
+    max: 3
+    perTiles: 10
+    jitter: 0.45
+  - table: HorizonDgFreeGeneral
+    min: 2
+    max: 3
+    perTiles: 10
+    jitter: 0.45
+  - table: HorizonDgFreeCommon
+    min: 0
+    max: 2
+    perTiles: 22
+    chance: 0.8
+    jitter: 0.45
 
 - type: roomArchetype
   id: HorizonRoomSalvageBay
@@ -3006,6 +3490,15 @@
     min: 1
     max: 1
     perTiles: 32
+  - group: HorizonFurnishDgSolidSalvage
+    min: 1
+    max: 1
+    perTiles: 36
+  - group: HorizonFurnishDgIslandSalvage
+    min: 0
+    max: 1
+    perTiles: 60
+    chance: 0.8
   decals:
   - mode: Skirting
     cardinal:
@@ -3083,6 +3576,11 @@
       min: 0
       max: 1
       chance: 0.6
+    - group: HorizonFurnishDgSolidWreck
+      min: 0
+      max: 1
+      perTiles: 50
+      chance: 0.5
     decals:
     - mode: Scatter
       chance: 0.35
@@ -3095,6 +3593,13 @@
       - DirtHeavy
       - DirtHeavy
       - DirtHeavy
+    litter:
+    - table: HorizonDgFreeWreck
+      min: 0
+      max: 1
+      perTiles: 30
+      chance: 0.5
+      jitter: 0.45
   - id: Ransacked
     weight: 0.8
     entries:
@@ -3114,6 +3619,10 @@
     - group: HorizonFurnishNoteRansacked
       min: 1
       max: 1
+    - group: HorizonFurnishDgSolidWreck
+      min: 1
+      max: 1
+      perTiles: 40
     decals:
     - mode: Scatter
       chance: 0.22
@@ -3130,6 +3639,11 @@
       max: 3
       perTiles: 8
       jitter: 0.45
+    - table: HorizonDgFreeWreck
+      min: 1
+      max: 2
+      perTiles: 20
+      jitter: 0.45
   storyChance: 0.6
   litter:
   - table: TableDungeonLootSupplyClutter
@@ -3142,6 +3656,17 @@
     max: 2
     perTiles: 20
     jitter: 0.42
+  - table: HorizonDgFreeSalvage
+    min: 2
+    max: 3
+    perTiles: 6
+    jitter: 0.45
+  - table: HorizonDgFreeCommon
+    min: 0
+    max: 2
+    perTiles: 22
+    chance: 0.8
+    jitter: 0.45
 
 - type: dungeonConfig
   id: HorizonRoomFurnish

@@ -763,13 +763,42 @@ public sealed partial class DungeonJob
             {
                 var member = members[i];
                 var coords = _maps.GridTileToLocal(_gridUid, _grid, positions[i]);
-                var uid = FurnishSpawn(member.Proto, coords);
+                // A member is either a fixed prototype or a roll of an entity table (random spawner per placement).
+                var spawnProtos = new List<EntProtoId>();
+
+                if (member.Table != null)
+                {
+                    try
+                    {
+                        spawnProtos.AddRange(_entTable.GetSpawns(_prototype.Index(member.Table.Value), random));
+                    }
+                    catch (Exception e)
+                    {
+                        _sawmill.Error($"Furnish: table {member.Table} failed: {e}");
+                    }
+                }
+                else
+                {
+                    spawnProtos.Add(member.Proto);
+                }
+
+                EntityUid? uid = null;
+
+                foreach (var spawnProto in spawnProtos)
+                {
+                    var spawned = FurnishSpawn(spawnProto, coords);
+
+                    if (spawned == null)
+                        continue;
+
+                    uid ??= spawned;
+
+                    if (member.Rotate)
+                        _transform.SetLocalRotation(spawned.Value, new Vector2(facing.X, facing.Y).ToWorldAngle());
+                }
 
                 if (uid == null)
                     continue;
-
-                if (member.Rotate)
-                    _transform.SetLocalRotation(uid.Value, new Vector2(facing.X, facing.Y).ToWorldAngle());
 
                 if (member.OnTop != null)
                 {

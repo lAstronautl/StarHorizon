@@ -1,0 +1,437 @@
+# Pools of the game's own "Dungeon" loot spawners (SpawnDungeon*), grouped by room function so a room only gets what fits it
+# (mapping guide: hydroponics holds botany items, not kitchen ones). Each placement rolls one random spawner.
+# Excluded on purpose: NPC loot (SpawnDungeonLootNpc*), vehicles, R&D disks, explosives T1-T5, gun/melee tier spawners
+# (weapons come only from the faction armory racks).
+- type: entityTable
+  id: HorizonDgFreeMedical
+  table: !type:GroupSelector
+    children:
+    - id: SpawnDungeonClutterBeakerEmpty
+    - id: SpawnDungeonClutterHypospray
+    - id: SpawnDungeonClutterImplanter
+    - id: SpawnDungeonClutterMedical
+    - id: SpawnDungeonClutterMedipens
+    - id: SpawnDungeonClutterMedsFull
+    - id: SpawnDungeonClutterMedsSingle
+    - id: SpawnDungeonClutterPatientTransport
+    - id: SpawnDungeonClutterSyringe
+    - id: SpawnDungeonLootChems
+    - id: SpawnDungeonLootCircuitBoardMed
+    - id: SpawnDungeonLootClothesMed
+    - id: SpawnDungeonLootFlatpacksMed
+    - id: SpawnDungeonLootKitSurgery
+    - id: SpawnDungeonLootKitsFirstAid
+    - id: SpawnDungeonLootToolsSurgery
+    - id: SpawnDungeonLootToolsSurgeryAdvanced
+    - id: SpawnDungeonLootToolsSurgeryCrude
+
+- type: entityTable
+  id: HorizonDgFreeEngineering
+  table: !type:GroupSelector
+    children:
+    - id: SpawnDungeonLootClutterEngi
+    - id: SpawnDungeonLootClutterEngiWithMines
+    - id: SpawnDungeonLootCircuitBoardEngi
+    - id: SpawnDungeonLootClothesEngi
+    - id: SpawnDungeonLootFlatpacksEngi
+    - id: SpawnDungeonLootPartsEngi
+    - id: SpawnDungeonLootPowerCell
+    - id: SpawnDungeonLootToolsBasicEngineering
+    - id: SpawnDungeonLootToolbox
+    - id: SpawnDungeonLootEngineeringRipleyDisassembled
+
+- type: entityTable
+  id: HorizonDgFreeScience
+  table: !type:GroupSelector
+    children:
+    - id: SpawnDungeonLootClutterScience
+    - id: SpawnDungeonLootCircuitBoardScience
+    - id: SpawnDungeonLootClothesScience
+    - id: SpawnDungeonLootFlatpacksScience
+    - id: SpawnDungeonClutterBeakerEmpty
+    - id: SpawnDungeonLootChems
+    - id: SpawnDungeonLootPowerCell
+
+- type: entityTable
+  id: HorizonDgFreeService
+  table: !type:GroupSelector
+    children:
+    - id: SpawnDungeonLootClutterKitchen
+    - id: SpawnDungeonLootClothesKitchen
+    - id: SpawnDungeonLootCutlery
+    - id: SpawnDungeonLootFood
+    - id: SpawnDungeonLootMugs
+    - id: SpawnDungeonLootFlatpacksService
+
+- type: entityTable
+  id: HorizonDgFreeHydroponics
+  table: !type:GroupSelector
+    children:
+    - id: SpawnDungeonLootClutterHydroponics
+    - id: SpawnDungeonLootChemsHydroponics
+    - id: SpawnDungeonLootClothesHydroponics
+    - id: SpawnDungeonLootSeed
+    - id: SpawnDungeonLootToolsHydroponics
+
+- type: entityTable
+  id: HorizonDgFreeSalvage
+  table: !type:GroupSelector
+    children:
+    - id: SpawnDungeonLootClutterSalvage
+    - id: SpawnDungeonLootCircuitBoardSalvage
+    - id: SpawnDungeonLootClothesSalvage
+    - id: SpawnDungeonLootFlatpacksSuppl
+    - id: SpawnDungeonLootHardsuitsSalvage
+    - id: SpawnDungeonLootToolsSalvage
+    - id: SpawnDungeonLootOresFull
+    - id: SpawnDungeonLootOresSingle
+    - id: SpawnDungeonLootMaterialsBasicFull
+    - id: SpawnDungeonLootMaterialsBasicSingle
+
+- type: entityTable
+  id: HorizonDgFreeGeneral
+  table: !type:GroupSelector
+    children:
+    - id: SpawnDungeonLootBureaucracy
+    - id: SpawnDungeonLootBureaucracyPen
+    - id: SpawnDungeonLootBriefcase
+    - id: SpawnDungeonLootCircuitBoard
+    - id: SpawnDungeonLootFlatpacks
+    - id: SpawnDungeonLootVendingRestocks
+    - id: SpawnDungeonLootToolbox
+    - id: SpawnDungeonLootPowerCell
+
+- type: entityTable
+  id: HorizonDgFreeArmory
+  table: !type:GroupSelector
+    children:
+    - id: SpawnDungeonLootArmoryClutter
+    - id: SpawnDungeonLootArmoryClutterSec
+    - id: SpawnDungeonLootArmorMercenary
+    - id: SpawnDungeonLootClothesMercenary
+    - id: SpawnDungeonLootHardsuitsMercenary
+    - id: SpawnDungeonLootShieldsMercenary
+    - id: SpawnDungeonLootAmmoIncendiary
+    - id: SpawnDungeonLootAmmoLethal
+    - id: SpawnDungeonLootAmmoPractice
+    - id: SpawnDungeonLootAmmoRandom
+    - id: SpawnDungeonLootAmmoRubber
+    - id: SpawnDungeonLootAmmoUranium
+
+- type: entityTable
+  id: HorizonDgFreeValuables
+  table: !type:GroupSelector
+    children:
+    - id: SpawnDungeonLootMaterialsValuableFull
+    - id: SpawnDungeonLootMaterialsValuableSingle
+    - id: SpawnDungeonLootSpesos
+    - id: SpawnDungeonLootStash10
+    - id: SpawnDungeonLootStash25
+    - id: SpawnDungeonLootStash50
+    - id: SpawnDungeonLootNpcCoins
+    - id: SpawnDungeonLootNpcJewelry
+    - id: SpawnDungeonLootArmoryRare
+
+- type: entityTable
+  id: HorizonDgFreeWreck
+  table: !type:GroupSelector
+    children:
+    - id: SpawnDungeonRandomHumanCorpse
+    - id: SpawnDungeonCanisterBroken
+    - id: SpawnDungeonLootClutterSalvage
+    - id: SpawnDungeonLootClutterEngi
+
+- type: entityTable
+  id: HorizonDgSolidMedical
+  table: !type:GroupSelector
+    children:
+    - id: SpawnDungeonLootCrateMed
+    - id: SpawnDungeonLootCrateEmptyMed
+    - id: SpawnDungeonLootCrateRestockMed
+    - id: SpawnDungeonLootLockersMed
+    - id: SpawnDungeonVendomatsMed
+
+- type: entityTable
+  id: HorizonDgSolidEngineering
+  table: !type:GroupSelector
+    children:
+    - id: SpawnDungeonLootCrateEngi
+    - id: SpawnDungeonLootCrateEmptyEngi
+    - id: SpawnDungeonLootCrateRestockEngi
+    - id: SpawnDungeonLootLockersEngi
+    - id: SpawnDungeonLootLatheEngi
+    - id: SpawnDungeonLootSuitStorageUnitsEngi
+    - id: SpawnDungeonVendomatsEngi
+    - id: SpawnDungeonComputerFrame
+    - id: SpawnDungeonMachineFrame
+    - id: RandomDungeonPortableGeneratorSpawner
+
+- type: entityTable
+  id: HorizonDgSolidScience
+  table: !type:GroupSelector
+    children:
+    - id: SpawnDungeonLootCrateScience
+    - id: SpawnDungeonFurnitureScience
+    - id: SpawnDungeonComputerFrame
+    - id: SpawnDungeonMachineFrame
+
+- type: entityTable
+  id: HorizonDgSolidService
+  table: !type:GroupSelector
+    children:
+    - id: SpawnDungeonLootCrateService
+    - id: SpawnDungeonLootCrateEmptyService
+    - id: SpawnDungeonLootCrateRestockService
+    - id: SpawnDungeonFurnitureKitchen
+    - id: SpawnDungeonLootKitchenTabletop
+    - id: SpawnDungeonVendomatsRecreational
+
+- type: entityTable
+  id: HorizonDgSolidHydroponics
+  table: !type:GroupSelector
+    children:
+    - id: SpawnDungeonLootCrateHydro
+    - id: SpawnDungeonLootCrateEmptyHydro
+    - id: SpawnDungeonLootCrateRestockHydro
+
+- type: entityTable
+  id: HorizonDgSolidSalvage
+  table: !type:GroupSelector
+    children:
+    - id: SpawnDungeonLootLockersSalvage
+    - id: SpawnDungeonLootLatheSalvage
+    - id: SpawnDungeonLootSuitStorageUnitsSalvage
+    - id: SpawnDungeonVendomatsSalvage
+    - id: SpawnDungeonVendomatsTools
+    - id: SpawnDungeonLootCrateMaterials
+    - id: SpawnDungeonLootCrateGeneral
+    - id: SpawnDungeonLootLathe
+
+- type: entityTable
+  id: HorizonDgSolidGeneral
+  table: !type:GroupSelector
+    children:
+    - id: SpawnDungeonLootCrateGeneral
+    - id: SpawnDungeonLootCrateRestockGeneral
+    - id: SpawnDungeonLootLockersGeneral
+    - id: SpawnDungeonLootSuitStorageUnitsGeneral
+    - id: SpawnDungeonLootCrateRestockClothes
+    - id: SpawnDungeonVendomatsClothes
+    - id: SpawnDungeonFurnitureBedroom
+    - id: SpawnDungeonLootLockersProtectiveGear
+
+- type: entityTable
+  id: HorizonDgSolidArmory
+  table: !type:GroupSelector
+    children:
+    - id: SpawnDungeonLootCrateArmoryArmor
+    - id: SpawnDungeonLootCrateRestockArmory
+    - id: SpawnDungeonLootLockersArmory
+    - id: SpawnDungeonLootLatheArmory
+    - id: SpawnDungeonLootSuitStorageUnitsMercenary
+    - id: SpawnDungeonVendomatsArmory
+    - id: SpawnDungeonLootLockersProtectiveGear
+
+- type: entityTable
+  id: HorizonDgSolidWreck
+  table: !type:GroupSelector
+    children:
+    - id: SpawnDungeonComputerFrame
+    - id: SpawnDungeonMachineFrame
+    - id: SpawnDungeonCanisterBroken
+
+- type: entityTable
+  id: HorizonDgFreeCommon
+  table: !type:GroupSelector
+    children:
+    - id: SpawnDungeonLootBureaucracy
+    - id: SpawnDungeonLootBureaucracyPen
+    - id: SpawnDungeonLootBriefcase
+    - id: SpawnDungeonLootToolbox
+    - id: SpawnDungeonLootPowerCell
+    - id: SpawnDungeonLootCircuitBoard
+    - id: SpawnDungeonLootFlatpacks
+    - id: SpawnDungeonLootMugs
+    - id: SpawnDungeonLootFood
+    - id: MaintenanceFluffSpawner
+
+- type: furnitureGroup
+  id: HorizonFurnishDgSolidMedical
+  placement: Wall
+  clearance: 1
+  members:
+  - table: HorizonDgSolidMedical
+  - table: HorizonDgSolidMedical
+    offset: 1,0
+    chance: 0.5
+
+- type: furnitureGroup
+  id: HorizonFurnishDgIslandMedical
+  placement: Center
+  clearance: 1
+  members:
+  - table: HorizonDgSolidMedical
+  - table: HorizonDgSolidMedical
+    offset: 1,0
+    chance: 0.6
+
+- type: furnitureGroup
+  id: HorizonFurnishDgSolidEngineering
+  placement: Wall
+  clearance: 1
+  members:
+  - table: HorizonDgSolidEngineering
+  - table: HorizonDgSolidEngineering
+    offset: 1,0
+    chance: 0.5
+
+- type: furnitureGroup
+  id: HorizonFurnishDgIslandEngineering
+  placement: Center
+  clearance: 1
+  members:
+  - table: HorizonDgSolidEngineering
+  - table: HorizonDgSolidEngineering
+    offset: 1,0
+    chance: 0.6
+
+- type: furnitureGroup
+  id: HorizonFurnishDgSolidScience
+  placement: Wall
+  clearance: 1
+  members:
+  - table: HorizonDgSolidScience
+  - table: HorizonDgSolidScience
+    offset: 1,0
+    chance: 0.5
+
+- type: furnitureGroup
+  id: HorizonFurnishDgIslandScience
+  placement: Center
+  clearance: 1
+  members:
+  - table: HorizonDgSolidScience
+  - table: HorizonDgSolidScience
+    offset: 1,0
+    chance: 0.6
+
+- type: furnitureGroup
+  id: HorizonFurnishDgSolidService
+  placement: Wall
+  clearance: 1
+  members:
+  - table: HorizonDgSolidService
+  - table: HorizonDgSolidService
+    offset: 1,0
+    chance: 0.5
+
+- type: furnitureGroup
+  id: HorizonFurnishDgIslandService
+  placement: Center
+  clearance: 1
+  members:
+  - table: HorizonDgSolidService
+  - table: HorizonDgSolidService
+    offset: 1,0
+    chance: 0.6
+
+- type: furnitureGroup
+  id: HorizonFurnishDgSolidHydroponics
+  placement: Wall
+  clearance: 1
+  members:
+  - table: HorizonDgSolidHydroponics
+  - table: HorizonDgSolidHydroponics
+    offset: 1,0
+    chance: 0.5
+
+- type: furnitureGroup
+  id: HorizonFurnishDgIslandHydroponics
+  placement: Center
+  clearance: 1
+  members:
+  - table: HorizonDgSolidHydroponics
+  - table: HorizonDgSolidHydroponics
+    offset: 1,0
+    chance: 0.6
+
+- type: furnitureGroup
+  id: HorizonFurnishDgSolidSalvage
+  placement: Wall
+  clearance: 1
+  members:
+  - table: HorizonDgSolidSalvage
+  - table: HorizonDgSolidSalvage
+    offset: 1,0
+    chance: 0.5
+
+- type: furnitureGroup
+  id: HorizonFurnishDgIslandSalvage
+  placement: Center
+  clearance: 1
+  members:
+  - table: HorizonDgSolidSalvage
+  - table: HorizonDgSolidSalvage
+    offset: 1,0
+    chance: 0.6
+
+- type: furnitureGroup
+  id: HorizonFurnishDgSolidGeneral
+  placement: Wall
+  clearance: 1
+  members:
+  - table: HorizonDgSolidGeneral
+  - table: HorizonDgSolidGeneral
+    offset: 1,0
+    chance: 0.5
+
+- type: furnitureGroup
+  id: HorizonFurnishDgIslandGeneral
+  placement: Center
+  clearance: 1
+  members:
+  - table: HorizonDgSolidGeneral
+  - table: HorizonDgSolidGeneral
+    offset: 1,0
+    chance: 0.6
+
+- type: furnitureGroup
+  id: HorizonFurnishDgSolidArmory
+  placement: Wall
+  clearance: 1
+  members:
+  - table: HorizonDgSolidArmory
+  - table: HorizonDgSolidArmory
+    offset: 1,0
+    chance: 0.5
+
+- type: furnitureGroup
+  id: HorizonFurnishDgIslandArmory
+  placement: Center
+  clearance: 1
+  members:
+  - table: HorizonDgSolidArmory
+  - table: HorizonDgSolidArmory
+    offset: 1,0
+    chance: 0.6
+
+- type: furnitureGroup
+  id: HorizonFurnishDgSolidWreck
+  placement: Wall
+  clearance: 1
+  members:
+  - table: HorizonDgSolidWreck
+  - table: HorizonDgSolidWreck
+    offset: 1,0
+    chance: 0.5
+
+- type: furnitureGroup
+  id: HorizonFurnishDgIslandWreck
+  placement: Center
+  clearance: 1
+  members:
+  - table: HorizonDgSolidWreck
+  - table: HorizonDgSolidWreck
+    offset: 1,0
+    chance: 0.6
+

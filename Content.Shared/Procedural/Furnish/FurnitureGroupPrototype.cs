@@ -40,8 +40,18 @@ public enum FurnishPlacement : byte
 [DataDefinition]
 public sealed partial class FurnitureMember
 {
-    [DataField(required: true)]
+    /// <summary>
+    /// Fixed prototype. Leave empty when <see cref="Table"/> is used.
+    /// </summary>
+    [DataField]
     public EntProtoId Proto;
+
+    /// <summary>
+    /// Instead of a fixed <see cref="Proto"/>, roll this entity table on every placement. Used with the pools of
+    /// Dungeon spawners so each placement is a different random spawner.
+    /// </summary>
+    [DataField]
+    public ProtoId<EntityTablePrototype>? Table;
 
     /// <summary>
     /// Offset relative to the group's anchor tile in the group's local frame:
