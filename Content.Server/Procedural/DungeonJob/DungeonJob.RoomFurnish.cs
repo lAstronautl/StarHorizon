@@ -291,10 +291,75 @@ public sealed partial class DungeonJob
             }
         }
 
+        ApplyFurnishLitter(ctx, arch.Litter, random);
         ApplyFurnishDecals(ctx, arch.Decals, random);
 
         if (story != null)
+        {
+            ApplyFurnishLitter(ctx, story.Litter, random);
             ApplyFurnishDecals(ctx, story.Decals, random);
+        }
+    }
+
+    /// <summary>
+    /// Drops random items on free floor with a random angle and a shift inside the tile.
+    /// </summary>
+    private void ApplyFurnishLitter(FurnishContext ctx, List<FurnishLitterRule> rules, Random random)
+    {
+        foreach (var rule in rules)
+        {
+            var count = random.Next(rule.Min, Math.Max(rule.Min, rule.Max) + 1);
+
+            if (rule.PerTiles > 0)
+                count += ctx.Room.Tiles.Count / rule.PerTiles;
+
+            if (rule.Min <= 0 && !random.Prob(rule.Chance))
+                count = 0;
+
+            for (var i = 0; i < count; i++)
+            {
+                // A few tries to find floor that is not under furniture or in a doorway.
+                Vector2i? tile = null;
+
+                for (var attempt = 0; attempt < 12; attempt++)
+                {
+                    var candidate = ctx.TileList[random.Next(ctx.TileList.Count)];
+
+                    if (ctx.Blocked.Contains(candidate) || ctx.DoorSeeds.Contains(candidate))
+                        continue;
+
+                    tile = candidate;
+                    break;
+                }
+
+                if (tile == null)
+                    continue;
+
+                List<EntProtoId> items;
+
+                try
+                {
+                    items = _entTable.GetSpawns(_prototype.Index(rule.Table), random).ToList();
+                }
+                catch (Exception e)
+                {
+                    _sawmill.Error($"Furnish: litter table {rule.Table} failed: {e}");
+                    continue;
+                }
+
+                foreach (var proto in items)
+                {
+                    var shift = new Vector2(
+                        (random.NextFloat() * 2f - 1f) * rule.Jitter,
+                        (random.NextFloat() * 2f - 1f) * rule.Jitter);
+                    var coords = _maps.GridTileToLocal(_gridUid, _grid, tile.Value).Offset(shift);
+                    var uid = FurnishSpawn(proto, coords);
+
+                    if (uid != null)
+                        _transform.SetLocalRotation(uid.Value, new Angle(random.NextDouble() * Math.Tau));
+                }
+            }
+        }
     }
 
     private async Task FurnishEntryRun(FurnishContext ctx, string owner, FurnishEntry entry, Random random)
@@ -718,6 +783,17 @@ public sealed partial class DungeonJob
                         _sawmill.Error($"Failed to spawn items on {member.Proto}: {e}");
                     }
                 }
+            }
+
+            foreach (var decal in group.Decals)
+            {
+                var decalTile = anchor + right * decal.Offset.X + facing * decal.Offset.Y;
+
+                if (!ctx.Room.Tiles.Contains(decalTile))
+                    continue;
+
+                var decalRotation = decal.Rotate ? new Vector2(facing.X, facing.Y).ToWorldAngle() : Angle.Zero;
+                AddFurnishDecal(decal.Id, decalTile, decal.Tint, decalRotation);
             }
 
             ctx.Blocked.UnionWith(newBlocked);

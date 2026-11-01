@@ -154,6 +154,10 @@
   - proto: SpawnDungeonLootCrateGeneral
     offset: 1,0
     chance: 0.5
+  decals:
+  - id: Bot
+  - id: Bot
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishCrateEngi
@@ -164,6 +168,10 @@
   - proto: SpawnDungeonLootCrateEngi
     offset: 1,0
     chance: 0.5
+  decals:
+  - id: Bot
+  - id: Bot
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishCrateMaterials
@@ -174,6 +182,10 @@
   - proto: SpawnDungeonLootCrateMaterials
     offset: 1,0
     chance: 0.5
+  decals:
+  - id: Bot
+  - id: Bot
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishCrateService
@@ -184,6 +196,10 @@
   - proto: SpawnDungeonLootCrateService
     offset: 1,0
     chance: 0.5
+  decals:
+  - id: Bot
+  - id: Bot
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishCrateMed
@@ -194,6 +210,10 @@
   - proto: SpawnDungeonLootCrateMed
     offset: 1,0
     chance: 0.5
+  decals:
+  - id: Bot
+  - id: Bot
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishCrateScience
@@ -204,6 +224,10 @@
   - proto: SpawnDungeonLootCrateScience
     offset: 1,0
     chance: 0.5
+  decals:
+  - id: Bot
+  - id: Bot
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishCrateRestock
@@ -214,6 +238,10 @@
   - proto: SpawnDungeonLootCrateRestockGeneral
     offset: 1,0
     chance: 0.5
+  decals:
+  - id: Bot
+  - id: Bot
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishLockerGeneral
@@ -224,6 +252,10 @@
   - proto: SpawnDungeonLootLockersGeneral
     offset: 1,0
     chance: 0.6
+  decals:
+  - id: Bot
+  - id: Bot
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishLockerEngi
@@ -234,6 +266,10 @@
   - proto: SpawnDungeonLootLockersEngi
     offset: 1,0
     chance: 0.6
+  decals:
+  - id: Bot
+  - id: Bot
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishLockerPpe
@@ -244,6 +280,10 @@
   - proto: SpawnDungeonLootLockersProtectiveGear
     offset: 1,0
     chance: 0.6
+  decals:
+  - id: Bot
+  - id: Bot
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishLockerSalvage
@@ -254,6 +294,10 @@
   - proto: SpawnDungeonLootLockersSalvage
     offset: 1,0
     chance: 0.6
+  decals:
+  - id: Bot
+  - id: Bot
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishCrateStackCorner
@@ -268,6 +312,10 @@
     offset: 0,1
     blocking: false
     chance: 0.5
+  decals:
+  - id: Bot
+  - id: Bot
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishRackEngi
@@ -282,6 +330,10 @@
   - proto: SpawnDungeonLootToolsBasicEngineering
     offset: 1,0
     blocking: false
+  decals:
+  - id: WarnBox
+  - id: WarnBox
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishRackMaterials
@@ -297,6 +349,10 @@
     offset: 1,0
     blocking: false
     chance: 0.5
+  decals:
+  - id: WarnBox
+  - id: WarnBox
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishRackCircuits
@@ -313,6 +369,10 @@
     offset: 1,0
     blocking: false
     chance: 0.5
+  decals:
+  - id: WarnBox
+  - id: WarnBox
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishRackSalvage
@@ -327,6 +387,10 @@
   - proto: SalvageSpawnerEquipmentValuable
     offset: 1,0
     blocking: false
+  decals:
+  - id: WarnBox
+  - id: WarnBox
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishRackArmory
@@ -347,6 +411,10 @@
   - proto: SpawnDungeonLootArmoryClutter
     offset: 2,0
     blocking: false
+  decals:
+  - id: WarnBox
+  - id: WarnBox
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishRackArmorySec
@@ -362,6 +430,10 @@
     offset: 1,0
     blocking: false
     chance: 0.4
+  decals:
+  - id: WarnBox
+  - id: WarnBox
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishRackVault
@@ -376,6 +448,10 @@
   - proto: SalvageSpawnerTreasureValuable
     offset: 1,0
     blocking: false
+  decals:
+  - id: WarnBox
+  - id: WarnBox
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishGunSafe
@@ -383,6 +459,8 @@
   clearance: 1
   members:
   - proto: GunSafe
+  decals:
+  - id: Caution
 
 - type: furnitureGroup
   id: HorizonFurnishDeskBureau
@@ -414,6 +492,8 @@
     blocking: false
   - proto: SpawnDungeonLootArmoryClutterSec
     blocking: false
+  decals:
+  - id: Caution
 
 - type: furnitureGroup
   id: HorizonFurnishBookshelf
@@ -481,6 +561,10 @@
     offset: 1,0
     blocking: false
     chance: 0.3
+  decals:
+  - id: BrickTileSteelBox
+  - id: BrickTileSteelBox
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishVending
@@ -488,6 +572,8 @@
   clearance: 1
   members:
   - proto: SpawnDungeonVendomatsRecreational
+  decals:
+  - id: Delivery
 
 - type: furnitureGroup
   id: HorizonFurnishMessTable
@@ -512,6 +598,10 @@
   - proto: SpawnDungeonLootMugs
     offset: 1,0
     blocking: false
+  decals:
+  - id: BrickTileSteelBox
+  - id: BrickTileSteelBox
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishKitchenCounter
@@ -533,6 +623,10 @@
     offset: 2,0
     blocking: false
     chance: 0.5
+  decals:
+  - id: BrickTileSteelBox
+  - id: BrickTileSteelBox
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishSink
@@ -579,6 +673,8 @@
     offset: 0,-1
     onWall: true
     blocking: false
+  decals:
+  - id: Delivery
 
 - type: furnitureGroup
   id: HorizonFurnishLabBench
@@ -613,6 +709,10 @@
   - proto: Stool
     offset: 0,1
     blocking: false
+  decals:
+  - id: BrickTileSteelBox
+  - id: BrickTileSteelBox
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishHydroRow
@@ -632,6 +732,10 @@
   - proto: SpawnDungeonLootSeed
     offset: 2,0
     blocking: false
+  decals:
+  - id: BrickTileSteelBox
+  - id: BrickTileSteelBox
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishHydroTools
@@ -661,6 +765,10 @@
   - proto: Stool
     offset: 0,1
     blocking: false
+  decals:
+  - id: BrickTileSteelBox
+  - id: BrickTileSteelBox
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishWorkBenchWall
@@ -675,6 +783,10 @@
   - proto: SpawnDungeonLootClutterEngiWithMines
     offset: 1,0
     blocking: false
+  decals:
+  - id: BrickTileSteelBox
+  - id: BrickTileSteelBox
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishClutterMedical
@@ -721,6 +833,10 @@
   - proto: BedsheetMedical
     offset: 1,0
     blocking: false
+  decals:
+  - id: BrickTileSteelBox
+  - id: BrickTileSteelBox
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishStorageIsland
@@ -738,6 +854,10 @@
   - proto: SpawnDungeonLootClutterSalvage
     offset: 1,0
     blocking: false
+  decals:
+  - id: BrickTileSteelBox
+  - id: BrickTileSteelBox
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishCrateIsland
@@ -748,6 +868,10 @@
   - proto: SpawnDungeonLootCrateGeneral
     offset: 1,0
     chance: 0.6
+  decals:
+  - id: Bot
+  - id: Bot
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishDeskIsland
@@ -765,6 +889,10 @@
     blocking: false
   - proto: SpawnDungeonLootBureaucracy
     blocking: false
+  decals:
+  - id: BrickTileSteelBox
+  - id: BrickTileSteelBox
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishBunkIsland
@@ -779,6 +907,10 @@
   - proto: BedsheetSpawner
     offset: 1,0
     blocking: false
+  decals:
+  - id: BrickTileSteelBox
+  - id: BrickTileSteelBox
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishHydroIsland
@@ -791,6 +923,10 @@
   - proto: hydroponicsSoil
     offset: 2,0
     chance: 0.7
+  decals:
+  - id: BrickTileSteelBox
+  - id: BrickTileSteelBox
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishArmoryIsland
@@ -805,6 +941,10 @@
   - proto: SpawnDungeonLootArmoryMelee
     offset: 1,0
     blocking: false
+  decals:
+  - id: BrickTileSteelBox
+  - id: BrickTileSteelBox
+    offset: 1,0
 
 - type: furnitureGroup
   id: HorizonFurnishSalvageIsland
@@ -819,8 +959,10 @@
   - proto: Stool
     offset: 0,1
     blocking: false
-
-# ---------------------------------------------------------------- Archetypes
+  decals:
+  - id: BrickTileSteelBox
+  - id: BrickTileSteelBox
+    offset: 1,0
 
 - type: roomArchetype
   id: HorizonRoomMedBay
@@ -886,6 +1028,7 @@
       SouthWest: BrickTileWhiteCornerSw
       NorthEast: BrickTileWhiteCornerNe
       NorthWest: BrickTileWhiteCornerNw
+    tint: '#52B4E9FF'
   - mode: Fill
     tint: '#9FD8FF30'
     decals:
@@ -929,6 +1072,12 @@
       - DirtLight
       - DirtMedium
       - DirtHeavy
+    litter:
+    - table: TableDungeonLootGeneralBureaucracy
+      min: 2
+      max: 3
+      perTiles: 10
+      jitter: 0.45
   - id: Abandoned
     weight: 1.0
     entries:
@@ -981,7 +1130,19 @@
       - DirtLight
       - DirtMedium
       - DirtHeavy
+    litter:
+    - table: TableDungeonLootMedicalClutter
+      min: 2
+      max: 3
+      perTiles: 8
+      jitter: 0.45
   storyChance: 0.6
+  litter:
+  - table: TableDungeonLootMedicalClutter
+    min: 1
+    max: 3
+    perTiles: 12
+    jitter: 0.42
 
 - type: roomArchetype
   id: HorizonRoomArmory
@@ -1040,21 +1201,23 @@
   decals:
   - mode: Skirting
     cardinal:
-      South: BrickTileDarkLineS
-      East: BrickTileDarkLineE
-      North: BrickTileDarkLineN
-      West: BrickTileDarkLineW
+      South: BrickTileWhiteLineS
+      East: BrickTileWhiteLineE
+      North: BrickTileWhiteLineN
+      West: BrickTileWhiteLineW
     corner:
-      SouthEast: BrickTileDarkCornerSe
-      SouthWest: BrickTileDarkCornerSw
-      NorthEast: BrickTileDarkCornerNe
-      NorthWest: BrickTileDarkCornerNw
+      SouthEast: BrickTileWhiteCornerSe
+      SouthWest: BrickTileWhiteCornerSw
+      NorthEast: BrickTileWhiteCornerNe
+      NorthWest: BrickTileWhiteCornerNw
+    tint: '#DE3A3AFF'
   - mode: DoorMarks
     cardinal:
       South: WarnLineS
       East: WarnLineE
       North: WarnLineN
       West: WarnLineW
+    tint: '#DE3A3AFF'
   - mode: Scatter
     chance: 0.14
     randomRotation: true
@@ -1094,6 +1257,12 @@
       - DirtLight
       - DirtMedium
       - DirtHeavy
+    litter:
+    - table: TableDungeonLootGeneralBureaucracy
+      min: 2
+      max: 3
+      perTiles: 10
+      jitter: 0.45
   - id: Abandoned
     weight: 1.0
     entries:
@@ -1146,7 +1315,19 @@
       - DirtLight
       - DirtMedium
       - DirtHeavy
+    litter:
+    - table: TableDungeonLootMercenaryClutter
+      min: 2
+      max: 3
+      perTiles: 8
+      jitter: 0.45
   storyChance: 0.75
+  litter:
+  - table: TableDungeonLootMercenaryClutter
+    min: 1
+    max: 2
+    perTiles: 18
+    jitter: 0.42
 
 - type: roomArchetype
   id: HorizonRoomVault
@@ -1201,21 +1382,23 @@
   decals:
   - mode: Skirting
     cardinal:
-      South: BrickTileDarkLineS
-      East: BrickTileDarkLineE
-      North: BrickTileDarkLineN
-      West: BrickTileDarkLineW
+      South: BrickTileWhiteLineS
+      East: BrickTileWhiteLineE
+      North: BrickTileWhiteLineN
+      West: BrickTileWhiteLineW
     corner:
-      SouthEast: BrickTileDarkCornerSe
-      SouthWest: BrickTileDarkCornerSw
-      NorthEast: BrickTileDarkCornerNe
-      NorthWest: BrickTileDarkCornerNw
+      SouthEast: BrickTileWhiteCornerSe
+      SouthWest: BrickTileWhiteCornerSw
+      NorthEast: BrickTileWhiteCornerNe
+      NorthWest: BrickTileWhiteCornerNw
+    tint: '#DE3A3AFF'
   - mode: DoorMarks
     cardinal:
       South: WarnLineS
       East: WarnLineE
       North: WarnLineN
       West: WarnLineW
+    tint: '#DE3A3AFF'
   - mode: Scatter
     chance: 0.1
     randomRotation: true
@@ -1255,6 +1438,12 @@
       - DirtLight
       - DirtMedium
       - DirtHeavy
+    litter:
+    - table: TableDungeonLootGeneralBureaucracy
+      min: 2
+      max: 3
+      perTiles: 10
+      jitter: 0.45
   - id: Abandoned
     weight: 1.0
     entries:
@@ -1307,7 +1496,19 @@
       - DirtLight
       - DirtMedium
       - DirtHeavy
+    litter:
+    - table: TableDungeonLootMercenaryClutter
+      min: 2
+      max: 3
+      perTiles: 8
+      jitter: 0.45
   storyChance: 0.75
+  litter:
+  - table: TableDungeonLootMercenaryClutter
+    min: 1
+    max: 1
+    perTiles: 25
+    jitter: 0.42
 
 - type: roomArchetype
   id: HorizonRoomBarracks
@@ -1379,15 +1580,16 @@
   decals:
   - mode: Skirting
     cardinal:
-      South: BrickTileDarkLineS
-      East: BrickTileDarkLineE
-      North: BrickTileDarkLineN
-      West: BrickTileDarkLineW
+      South: BrickTileWhiteLineS
+      East: BrickTileWhiteLineE
+      North: BrickTileWhiteLineN
+      West: BrickTileWhiteLineW
     corner:
-      SouthEast: BrickTileDarkCornerSe
-      SouthWest: BrickTileDarkCornerSw
-      NorthEast: BrickTileDarkCornerNe
-      NorthWest: BrickTileDarkCornerNw
+      SouthEast: BrickTileWhiteCornerSe
+      SouthWest: BrickTileWhiteCornerSw
+      NorthEast: BrickTileWhiteCornerNe
+      NorthWest: BrickTileWhiteCornerNw
+    tint: '#8E9AA8FF'
   - mode: Scatter
     chance: 0.16
     randomRotation: true
@@ -1427,6 +1629,12 @@
       - DirtLight
       - DirtMedium
       - DirtHeavy
+    litter:
+    - table: TableDungeonLootGeneralBureaucracy
+      min: 2
+      max: 3
+      perTiles: 10
+      jitter: 0.45
   - id: Abandoned
     weight: 1.0
     entries:
@@ -1479,7 +1687,24 @@
       - DirtLight
       - DirtMedium
       - DirtHeavy
+    litter:
+    - table: TableDungeonLootServiceMugsFlasks
+      min: 2
+      max: 3
+      perTiles: 8
+      jitter: 0.45
   storyChance: 0.6
+  litter:
+  - table: TableDungeonLootServiceMugsFlasks
+    min: 1
+    max: 2
+    perTiles: 16
+    jitter: 0.42
+  - table: TableDungeonLootServiceFoodSpoiled
+    min: 1
+    max: 2
+    perTiles: 22
+    jitter: 0.42
 
 - type: roomArchetype
   id: HorizonRoomStorage
@@ -1555,15 +1780,16 @@
   decals:
   - mode: Skirting
     cardinal:
-      South: BrickTileSteelLineS
-      East: BrickTileSteelLineE
-      North: BrickTileSteelLineN
-      West: BrickTileSteelLineW
+      South: BrickTileWhiteLineS
+      East: BrickTileWhiteLineE
+      North: BrickTileWhiteLineN
+      West: BrickTileWhiteLineW
     corner:
-      SouthEast: BrickTileSteelCornerSe
-      SouthWest: BrickTileSteelCornerSw
-      NorthEast: BrickTileSteelCornerNe
-      NorthWest: BrickTileSteelCornerNw
+      SouthEast: BrickTileWhiteCornerSe
+      SouthWest: BrickTileWhiteCornerSw
+      NorthEast: BrickTileWhiteCornerNe
+      NorthWest: BrickTileWhiteCornerNw
+    tint: '#B18644FF'
   - mode: Scatter
     chance: 0.28
     randomRotation: true
@@ -1604,6 +1830,12 @@
       - DirtLight
       - DirtMedium
       - DirtHeavy
+    litter:
+    - table: TableDungeonLootGeneralBureaucracy
+      min: 2
+      max: 3
+      perTiles: 10
+      jitter: 0.45
   - id: Abandoned
     weight: 1.0
     entries:
@@ -1656,7 +1888,19 @@
       - DirtLight
       - DirtMedium
       - DirtHeavy
+    litter:
+    - table: TableDungeonLootSupplyClutter
+      min: 2
+      max: 3
+      perTiles: 8
+      jitter: 0.45
   storyChance: 0.75
+  litter:
+  - table: TableDungeonLootSupplyClutter
+    min: 2
+    max: 4
+    perTiles: 10
+    jitter: 0.42
 
 - type: roomArchetype
   id: HorizonRoomEngineering
@@ -1725,21 +1969,23 @@
   decals:
   - mode: Skirting
     cardinal:
-      South: BrickTileSteelLineS
-      East: BrickTileSteelLineE
-      North: BrickTileSteelLineN
-      West: BrickTileSteelLineW
+      South: BrickTileWhiteLineS
+      East: BrickTileWhiteLineE
+      North: BrickTileWhiteLineN
+      West: BrickTileWhiteLineW
     corner:
-      SouthEast: BrickTileSteelCornerSe
-      SouthWest: BrickTileSteelCornerSw
-      NorthEast: BrickTileSteelCornerNe
-      NorthWest: BrickTileSteelCornerNw
+      SouthEast: BrickTileWhiteCornerSe
+      SouthWest: BrickTileWhiteCornerSw
+      NorthEast: BrickTileWhiteCornerNe
+      NorthWest: BrickTileWhiteCornerNw
+    tint: '#EFB341FF'
   - mode: DoorMarks
     cardinal:
       South: WarnLineS
       East: WarnLineE
       North: WarnLineN
       West: WarnLineW
+    tint: '#EFB341FF'
   - mode: Scatter
     chance: 0.3
     randomRotation: true
@@ -1780,6 +2026,12 @@
       - DirtLight
       - DirtMedium
       - DirtHeavy
+    litter:
+    - table: TableDungeonLootGeneralBureaucracy
+      min: 2
+      max: 3
+      perTiles: 10
+      jitter: 0.45
   - id: Abandoned
     weight: 1.0
     entries:
@@ -1832,7 +2084,24 @@
       - DirtLight
       - DirtMedium
       - DirtHeavy
+    litter:
+    - table: TableDungeonLootEngineeringParts
+      min: 2
+      max: 3
+      perTiles: 8
+      jitter: 0.45
   storyChance: 0.6
+  litter:
+  - table: TableDungeonLootEngineeringParts
+    min: 1
+    max: 3
+    perTiles: 12
+    jitter: 0.42
+  - table: TableDungeonLootEngineeringTools
+    min: 1
+    max: 2
+    perTiles: 18
+    jitter: 0.42
 
 - type: roomArchetype
   id: HorizonRoomLaboratory
@@ -1892,6 +2161,7 @@
       SouthWest: BrickTileWhiteCornerSw
       NorthEast: BrickTileWhiteCornerNe
       NorthWest: BrickTileWhiteCornerNw
+    tint: '#D381C9FF'
   - mode: Fill
     tint: '#9FD8FF30'
     decals:
@@ -1935,6 +2205,12 @@
       - DirtLight
       - DirtMedium
       - DirtHeavy
+    litter:
+    - table: TableDungeonLootGeneralBureaucracy
+      min: 2
+      max: 3
+      perTiles: 10
+      jitter: 0.45
   - id: Abandoned
     weight: 1.0
     entries:
@@ -1987,7 +2263,19 @@
       - DirtLight
       - DirtMedium
       - DirtHeavy
+    litter:
+    - table: TableDungeonLootScienceClutter
+      min: 2
+      max: 3
+      perTiles: 8
+      jitter: 0.45
   storyChance: 0.6
+  litter:
+  - table: TableDungeonLootScienceClutter
+    min: 1
+    max: 3
+    perTiles: 12
+    jitter: 0.42
 
 - type: roomArchetype
   id: HorizonRoomKitchen
@@ -2046,6 +2334,7 @@
       SouthWest: BrickTileWhiteCornerSw
       NorthEast: BrickTileWhiteCornerNe
       NorthWest: BrickTileWhiteCornerNw
+    tint: '#9FED58FF'
   - mode: Fill
     tint: '#FFFFFF22'
     decals:
@@ -2085,6 +2374,12 @@
       - DirtLight
       - DirtMedium
       - DirtHeavy
+    litter:
+    - table: TableDungeonLootGeneralBureaucracy
+      min: 2
+      max: 3
+      perTiles: 10
+      jitter: 0.45
   - id: Abandoned
     weight: 1.0
     entries:
@@ -2137,7 +2432,24 @@
       - DirtLight
       - DirtMedium
       - DirtHeavy
+    litter:
+    - table: TableDungeonLootServiceClutter
+      min: 2
+      max: 3
+      perTiles: 8
+      jitter: 0.45
   storyChance: 0.6
+  litter:
+  - table: TableDungeonLootServiceClutter
+    min: 1
+    max: 2
+    perTiles: 14
+    jitter: 0.42
+  - table: TableDungeonLootServiceMugsFlasks
+    min: 1
+    max: 2
+    perTiles: 20
+    jitter: 0.42
 
 - type: roomArchetype
   id: HorizonRoomOffice
@@ -2197,6 +2509,7 @@
       SouthWest: BrickTileWhiteCornerSw
       NorthEast: BrickTileWhiteCornerNe
       NorthWest: BrickTileWhiteCornerNw
+    tint: '#334E6DFF'
   - mode: Scatter
     chance: 0.1
     randomRotation: true
@@ -2232,6 +2545,12 @@
       - DirtLight
       - DirtMedium
       - DirtHeavy
+    litter:
+    - table: TableDungeonLootGeneralBureaucracy
+      min: 2
+      max: 3
+      perTiles: 10
+      jitter: 0.45
   - id: Abandoned
     weight: 1.0
     entries:
@@ -2284,7 +2603,19 @@
       - DirtLight
       - DirtMedium
       - DirtHeavy
+    litter:
+    - table: TableDungeonLootGeneralBureaucracy
+      min: 2
+      max: 3
+      perTiles: 8
+      jitter: 0.45
   storyChance: 0.6
+  litter:
+  - table: TableDungeonLootGeneralBureaucracy
+    min: 2
+    max: 3
+    perTiles: 12
+    jitter: 0.42
 
 - type: roomArchetype
   id: HorizonRoomHydroponics
@@ -2339,6 +2670,7 @@
       SouthWest: BrickTileWhiteCornerSw
       NorthEast: BrickTileWhiteCornerNe
       NorthWest: BrickTileWhiteCornerNw
+    tint: '#9FED58FF'
   - mode: Scatter
     chance: 0.25
     randomRotation: true
@@ -2374,6 +2706,12 @@
       - DirtLight
       - DirtMedium
       - DirtHeavy
+    litter:
+    - table: TableDungeonLootGeneralBureaucracy
+      min: 2
+      max: 3
+      perTiles: 10
+      jitter: 0.45
   - id: Abandoned
     weight: 1.0
     entries:
@@ -2426,7 +2764,24 @@
       - DirtLight
       - DirtMedium
       - DirtHeavy
+    litter:
+    - table: TableDungeonLootHydroponicsClutter
+      min: 2
+      max: 3
+      perTiles: 8
+      jitter: 0.45
   storyChance: 0.6
+  litter:
+  - table: TableDungeonLootHydroponicsClutter
+    min: 1
+    max: 2
+    perTiles: 14
+    jitter: 0.42
+  - table: TableDungeonLootHydroponicsSeeds
+    min: 1
+    max: 2
+    perTiles: 20
+    jitter: 0.42
 
 - type: roomArchetype
   id: HorizonRoomLounge
@@ -2473,15 +2828,16 @@
   decals:
   - mode: Skirting
     cardinal:
-      South: BrickTileDarkLineS
-      East: BrickTileDarkLineE
-      North: BrickTileDarkLineN
-      West: BrickTileDarkLineW
+      South: BrickTileWhiteLineS
+      East: BrickTileWhiteLineE
+      North: BrickTileWhiteLineN
+      West: BrickTileWhiteLineW
     corner:
-      SouthEast: BrickTileDarkCornerSe
-      SouthWest: BrickTileDarkCornerSw
-      NorthEast: BrickTileDarkCornerNe
-      NorthWest: BrickTileDarkCornerNw
+      SouthEast: BrickTileWhiteCornerSe
+      SouthWest: BrickTileWhiteCornerSw
+      NorthEast: BrickTileWhiteCornerNe
+      NorthWest: BrickTileWhiteCornerNw
+    tint: '#9FED58FF'
   - mode: Scatter
     chance: 0.12
     randomRotation: true
@@ -2517,6 +2873,12 @@
       - DirtLight
       - DirtMedium
       - DirtHeavy
+    litter:
+    - table: TableDungeonLootGeneralBureaucracy
+      min: 2
+      max: 3
+      perTiles: 10
+      jitter: 0.45
   - id: Abandoned
     weight: 1.0
     entries:
@@ -2569,7 +2931,19 @@
       - DirtLight
       - DirtMedium
       - DirtHeavy
+    litter:
+    - table: TableDungeonLootServiceMugsFlasks
+      min: 2
+      max: 3
+      perTiles: 8
+      jitter: 0.45
   storyChance: 0.6
+  litter:
+  - table: TableDungeonLootServiceMugsFlasks
+    min: 1
+    max: 2
+    perTiles: 14
+    jitter: 0.42
 
 - type: roomArchetype
   id: HorizonRoomSalvageBay
@@ -2635,21 +3009,23 @@
   decals:
   - mode: Skirting
     cardinal:
-      South: BrickTileSteelLineS
-      East: BrickTileSteelLineE
-      North: BrickTileSteelLineN
-      West: BrickTileSteelLineW
+      South: BrickTileWhiteLineS
+      East: BrickTileWhiteLineE
+      North: BrickTileWhiteLineN
+      West: BrickTileWhiteLineW
     corner:
-      SouthEast: BrickTileSteelCornerSe
-      SouthWest: BrickTileSteelCornerSw
-      NorthEast: BrickTileSteelCornerNe
-      NorthWest: BrickTileSteelCornerNw
+      SouthEast: BrickTileWhiteCornerSe
+      SouthWest: BrickTileWhiteCornerSw
+      NorthEast: BrickTileWhiteCornerNe
+      NorthWest: BrickTileWhiteCornerNw
+    tint: '#B18644FF'
   - mode: DoorMarks
     cardinal:
       South: WarnLineS
       East: WarnLineE
       North: WarnLineN
       West: WarnLineW
+    tint: '#B18644FF'
   - mode: Scatter
     chance: 0.35
     randomRotation: true
@@ -2690,6 +3066,12 @@
       - DirtLight
       - DirtMedium
       - DirtHeavy
+    litter:
+    - table: TableDungeonLootGeneralBureaucracy
+      min: 2
+      max: 3
+      perTiles: 10
+      jitter: 0.45
   - id: Abandoned
     weight: 1.0
     entries:
@@ -2742,9 +3124,24 @@
       - DirtLight
       - DirtMedium
       - DirtHeavy
+    litter:
+    - table: TableDungeonLootSupplyClutter
+      min: 2
+      max: 3
+      perTiles: 8
+      jitter: 0.45
   storyChance: 0.6
-
-# ---------------------------------------------------------------- Layer config
+  litter:
+  - table: TableDungeonLootSupplyClutter
+    min: 2
+    max: 3
+    perTiles: 10
+    jitter: 0.42
+  - table: TableDungeonLootSupplyTools
+    min: 1
+    max: 2
+    perTiles: 20
+    jitter: 0.42
 
 - type: dungeonConfig
   id: HorizonRoomFurnish

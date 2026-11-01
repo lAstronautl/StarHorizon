@@ -54,6 +54,41 @@ public sealed partial class FurnishEntry
     public string? Alternative;
 }
 
+/// <summary>
+/// Items dropped on the floor at random spots with a random angle and a random shift inside the tile, so rooms
+/// do not look like everything was placed on a grid. Draws from an entity table (the same ones loot spawners use).
+/// </summary>
+[DataDefinition]
+public sealed partial class FurnishLitterRule
+{
+    [DataField(required: true)]
+    public ProtoId<Content.Shared.EntityTable.EntityTablePrototype> Table;
+
+    [DataField]
+    public int Min = 0;
+
+    [DataField]
+    public int Max = 1;
+
+    /// <summary>
+    /// If above 0, adds room tiles / PerTiles more drops.
+    /// </summary>
+    [DataField]
+    public int PerTiles;
+
+    /// <summary>
+    /// Chance for the rule to run when <see cref="Min"/> is 0.
+    /// </summary>
+    [DataField]
+    public float Chance = 1f;
+
+    /// <summary>
+    /// Max random shift from the tile center, in tiles (0.5 = anywhere inside the tile).
+    /// </summary>
+    [DataField]
+    public float Jitter = 0.4f;
+}
+
 public enum FurnishDecalMode : byte
 {
     /// <summary> Random decal from <see cref="FurnishDecalRule.Decals"/> on a fraction of the tiles (dirt, stains). </summary>
@@ -133,6 +168,9 @@ public sealed partial class RoomStory
 
     [DataField]
     public List<FurnishDecalRule> Decals = new();
+
+    [DataField]
+    public List<FurnishLitterRule> Litter = new();
 }
 
 /// <summary>
@@ -191,6 +229,12 @@ public sealed partial class RoomArchetypePrototype : IPrototype
     /// </summary>
     [DataField]
     public List<FurnishDecalRule> Decals = new();
+
+    /// <summary>
+    /// Randomly scattered, randomly rotated items.
+    /// </summary>
+    [DataField]
+    public List<FurnishLitterRule> Litter = new();
 
     /// <summary>
     /// One of these is picked per room (by weight). Empty = no story layer.

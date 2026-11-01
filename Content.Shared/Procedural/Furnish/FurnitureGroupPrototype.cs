@@ -85,6 +85,29 @@ public sealed partial class FurnitureMember
 }
 
 /// <summary>
+/// A floor decal that belongs to a <see cref="FurnitureGroupPrototype"/> (hazard box around a bench,
+/// loading marks under crates, ...). Uses the same local frame as <see cref="FurnitureMember.Offset"/>.
+/// </summary>
+[DataDefinition]
+public sealed partial class FurnishGroupDecal
+{
+    [DataField(required: true)]
+    public string Id = string.Empty;
+
+    [DataField]
+    public Vector2i Offset;
+
+    [DataField]
+    public Color? Tint;
+
+    /// <summary>
+    /// Rotate the decal so it follows the group's facing.
+    /// </summary>
+    [DataField]
+    public bool Rotate = true;
+}
+
+/// <summary>
 /// A small meaningful composition of entities (a weapon rack with an ammo crate, a bed with a locker, ...)
 /// with a placement rule. The unit that <see cref="RoomArchetypePrototype"/> asks to be placed.
 /// </summary>
@@ -105,4 +128,10 @@ public sealed partial class FurnitureGroupPrototype : IPrototype
 
     [DataField(required: true)]
     public List<FurnitureMember> Members = new();
+
+    /// <summary>
+    /// Decals laid on the floor together with the group, outlining it.
+    /// </summary>
+    [DataField]
+    public List<FurnishGroupDecal> Decals = new();
 }
