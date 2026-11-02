@@ -136,7 +136,7 @@ public sealed class ShipBuilderSystem : EntitySystem
             return;
 
         var pos = Transform(camera).LocalPosition + delta;
-        var max = ShipBuilderPalette.MaxExtent;
+        var max = ShipBuilderPalette.MaxCameraExtent;
         pos = Vector2.Clamp(pos, new Vector2(-max), new Vector2(max));
         _transform.SetLocalPosition(camera, pos);
     }

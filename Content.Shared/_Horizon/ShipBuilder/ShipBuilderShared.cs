@@ -56,6 +56,9 @@ public static class ShipBuilderPalette
     /// <summary>Максимальное удаление от центра карты (в тайлах).</summary>
     public const int MaxExtent = 48;
 
+    /// <summary>Предел полёта камеры (в тайлах). Практически не ограничивает обзор.</summary>
+    public const int MaxCameraExtent = 512;
+
     /// <summary>Максимальное число тайлов в одном шаттле.</summary>
     public const int MaxTiles = 1500;
 }

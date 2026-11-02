@@ -17,6 +17,7 @@ public sealed class ShipBuilderView : Control
 
     private const float MinZoom = 0.25f;
     private const float MaxZoom = 2f;
+    private const float FlySpeed = 9f; // тайлов в секунду, как у глаза ИИ
 
     private readonly EyeLerpingSystem _eyeLerping;
     private readonly ScalingViewport _view;
@@ -28,6 +29,10 @@ public sealed class ShipBuilderView : Control
     private Vector2i? _lastCell;
     private Vector2 _pendingPan;
     private float _zoom = 1f;
+    private bool _up;
+    private bool _down;
+    private bool _left;
+    private bool _right;
 
     /// <summary>Клик/протяжка по карте: мировые координаты точки.</summary>
     public event Action<Vector2>? OnPaint;
@@ -41,6 +46,8 @@ public sealed class ShipBuilderView : Control
         _eyeLerping = _entManager.System<EyeLerpingSystem>();
 
         MouseFilter = MouseFilterMode.Stop;
+        CanKeyboardFocus = true;
+        KeyboardFocusOnClick = true;
         HorizontalExpand = true;
         VerticalExpand = true;
 
@@ -101,9 +108,38 @@ public sealed class ShipBuilderView : Control
         OnPaint?.Invoke(world);
     }
 
+    protected override void MouseEntered()
+    {
+        base.MouseEntered();
+        GrabKeyboardFocus();
+    }
+
+    protected override void KeyboardFocusExited()
+    {
+        base.KeyboardFocusExited();
+        _up = _down = _left = _right = false;
+    }
+
+    private bool SetMoveKey(BoundKeyFunction function, bool pressed)
+    {
+        if (function == EngineKeyFunctions.MoveUp) _up = pressed;
+        else if (function == EngineKeyFunctions.MoveDown) _down = pressed;
+        else if (function == EngineKeyFunctions.MoveLeft) _left = pressed;
+        else if (function == EngineKeyFunctions.MoveRight) _right = pressed;
+        else return false;
+
+        return true;
+    }
+
     protected override void KeyBindDown(GUIBoundKeyEventArgs args)
     {
         base.KeyBindDown(args);
+
+        if (SetMoveKey(args.Function, true))
+        {
+            args.Handle();
+            return;
+        }
 
         if (args.Function == EngineKeyFunctions.UIClick)
         {
@@ -122,6 +158,12 @@ public sealed class ShipBuilderView : Control
     protected override void KeyBindUp(GUIBoundKeyEventArgs args)
     {
         base.KeyBindUp(args);
+
+        if (SetMoveKey(args.Function, false))
+        {
+            args.Handle();
+            return;
+        }
 
         if (args.Function == EngineKeyFunctions.UIClick)
             _painting = false;
@@ -162,6 +204,12 @@ public sealed class ShipBuilderView : Control
         {
             SetCamera(cameraUid.Value);
         }
+
+        // Свободный полёт камеры, как у глаза ИИ. Клавиши движения перехватываются здесь,
+        // поэтому персонаж у консоли не двигается.
+        var dir = new Vector2((_right ? 1 : 0) - (_left ? 1 : 0), (_up ? 1 : 0) - (_down ? 1 : 0));
+        if (dir != Vector2.Zero)
+            _pendingPan += Vector2.Normalize(dir) * FlySpeed * Math.Max(_zoom, 0.5f) * args.DeltaSeconds;
 
         if (_pendingPan != Vector2.Zero)
         {
