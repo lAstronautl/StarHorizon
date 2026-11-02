@@ -2,7 +2,6 @@ using System.Numerics;
 using Content.Client.Eye;
 using Content.Client.Viewport;
 using Robust.Client.Graphics;
-using Robust.Client.Input;
 using Robust.Client.UserInterface;
 using Robust.Shared.Input;
 using Robust.Client.Timing;
@@ -16,7 +15,6 @@ namespace Content.Client._Horizon.ShipBuilder;
 public sealed class ShipBuilderView : Control
 {
     [Dependency] private readonly IEntityManager _entManager = default!;
-    [Dependency] private readonly IInputManager _input = default!;
     [Dependency] private readonly IClientGameTiming _timing = default!;
 
     private const float MinZoom = 0.25f;
@@ -96,14 +94,9 @@ public sealed class ShipBuilderView : Control
         _camera = null;
     }
 
-    private Vector2 MouseWorld()
+    private void Paint(Vector2 screenPosition)
     {
-        return _view.PixelToMap(_input.MouseScreenPosition.Position).Position;
-    }
-
-    private void Paint()
-    {
-        var world = MouseWorld();
+        var world = _view.PixelToMap(screenPosition).Position;
         var cell = new Vector2i((int) MathF.Floor(world.X), (int) MathF.Floor(world.Y));
         if (_lastCell == cell)
             return;
@@ -120,7 +113,7 @@ public sealed class ShipBuilderView : Control
         {
             _painting = true;
             _lastCell = null;
-            Paint();
+            Paint(args.PointerLocation.Position);
             args.Handle();
         }
         else if (args.Function == EngineKeyFunctions.UIRightClick)
@@ -145,11 +138,11 @@ public sealed class ShipBuilderView : Control
         base.MouseMove(args);
 
         if (_painting)
-            Paint();
+            Paint(args.GlobalPixelPosition.Position);
 
         if (_panning)
         {
-            var current = _input.MouseScreenPosition.Position;
+            var current = args.GlobalPixelPosition.Position;
             var previous = current - args.Relative * UIScale;
             _pendingPan += _view.PixelToMap(previous).Position - _view.PixelToMap(current).Position;
         }

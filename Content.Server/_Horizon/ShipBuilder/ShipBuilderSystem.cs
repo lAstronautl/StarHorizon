@@ -25,7 +25,7 @@ public sealed class ShipBuilderSystem : EntitySystem
     [Dependency] private readonly MapSystem _maps = default!;
     [Dependency] private readonly MetaDataSystem _meta = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly SharedEyeSystem _eye = default!;
 
     private static readonly EntProtoId CameraProto = "ShipBuilderCamera";
 
@@ -35,7 +35,7 @@ public sealed class ShipBuilderSystem : EntitySystem
         SubscribeLocalEvent<ShipBuilderConsoleComponent, ActivateInWorldEvent>(OnActivate);
     }
 
-    private void OnActivate(Entity<ShipBuilderConsoleComponent> ent, ActivateInWorldEvent args)
+    private void OnActivate(Entity<ShipBuilderConsoleComponent> ent, ref ActivateInWorldEvent args)
     {
         if (args.Handled || !args.Complex)
             return;
@@ -70,6 +70,9 @@ public sealed class ShipBuilderSystem : EntitySystem
         _maps.SetTile(grid.Owner, grid.Comp, Vector2i.Zero, new Tile(_tileDefs[ShipBuilderPalette.Tiles[0]].TileId));
 
         var camera = Spawn(CameraProto, new EntityCoordinates(mapUid, Vector2.Zero));
+
+        // Вид-чертёж без динамического освещения: иначе пол и стены почти не видны.
+        _eye.SetDrawLight((camera, null), false);
         return (mapUid, grid.Owner, camera);
     }
 

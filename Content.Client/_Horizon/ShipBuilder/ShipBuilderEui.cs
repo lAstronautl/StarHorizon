@@ -31,16 +31,16 @@ public sealed class ShipBuilderEui : BaseEui
         _window = new DefaultWindow
         {
             Title = Loc.GetString("ship-builder-title"),
-            MinSize = new Vector2(720, 520),
+            MinSize = new Vector2(760, 540),
         };
 
         var root = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Horizontal };
-        _window.ContentsContainer.AddChild(root);
+        _window.Contents.AddChild(root);
 
         var side = new BoxContainer
         {
             Orientation = BoxContainer.LayoutOrientation.Vertical,
-            MinWidth = 200,
+            SetWidth = 230,
             Margin = new Thickness(0, 0, 6, 0),
         };
         root.AddChild(side);
@@ -65,11 +65,10 @@ public sealed class ShipBuilderEui : BaseEui
         }
 
         side.AddChild(_stats);
-        side.AddChild(new Label
+        foreach (var line in Loc.GetString("ship-builder-hint").Split('|'))
         {
-            Text = Loc.GetString("ship-builder-hint"),
-            FontColorOverride = Color.Gray,
-        });
+            side.AddChild(new Label { Text = line, FontColorOverride = Color.Gray });
+        }
 
         _view = new ShipBuilderView();
         root.AddChild(_view);
