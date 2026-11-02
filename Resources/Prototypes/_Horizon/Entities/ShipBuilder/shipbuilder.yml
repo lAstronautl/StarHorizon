@@ -1,0 +1,29 @@
+- type: entity
+  id: ShipBuilderCamera
+  categories: [ HideSpawnMenu ]
+  name: shipbuilder camera
+  components:
+  - type: Eye
+    drawFov: false
+    pvsScale: 0.8
+
+- type: entity
+  parent: [BaseStructureDisableToolUse, BaseStructureIndestructible, BaseComputer]
+  id: ComputerShipBuilder
+  name: shipbuilder console
+  description: Позволяет спроектировать собственный шаттл на отдельной чертёжной карте.
+  components:
+  - type: Sprite
+    sprite: _NF/Structures/Machines/computers.rsi
+    layers:
+    - map: ["computerLayerBody"]
+      state: computer
+    - map: ["computerLayerKeyboard"]
+      state: generic_keyboard
+    - map: ["computerLayerScreen"]
+      state: shipyard
+    - map: ["computerLayerKeys"]
+      state: telesci_key
+  - type: ShipBuilderConsole
+  - type: Computer
+    board: Null
