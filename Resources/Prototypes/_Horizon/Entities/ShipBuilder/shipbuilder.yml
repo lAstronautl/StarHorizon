@@ -25,5 +25,12 @@
     - map: ["computerLayerKeys"]
       state: telesci_key
   - type: ShipBuilderConsole
+  - type: ActivatableUI
+    singleUser: true
+    key: enum.ShipBuilderUiKey.Key
+  - type: UserInterface
+    interfaces:
+      enum.ShipBuilderUiKey.Key:
+        type: ShipBuilderBoundUserInterface
   - type: Computer
     board: Null

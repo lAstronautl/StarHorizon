@@ -1,9 +1,6 @@
 using System.Numerics;
-using Content.Client.Eui;
 using Content.Shared._Horizon.ShipBuilder;
-using Content.Shared.Eui;
 using Content.Shared.Maps;
-using JetBrains.Annotations;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.CustomControls;
@@ -11,12 +8,11 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Client._Horizon.ShipBuilder;
 
-[UsedImplicitly]
-public sealed class ShipBuilderEui : BaseEui
+/// <summary>Окно консоли верфи: палитра слева, камера чертёжной карты справа.</summary>
+public sealed class ShipBuilderWindow : DefaultWindow
 {
     [Dependency] private readonly IPrototypeManager _proto = default!;
 
-    private readonly DefaultWindow _window;
     private readonly ShipBuilderView _view;
     private readonly Label _stats = new();
     private readonly List<(Button Button, string Label, ShipBuilderTool Tool, string Id)> _buttons = new();
@@ -24,18 +20,18 @@ public sealed class ShipBuilderEui : BaseEui
     private ShipBuilderTool _tool = ShipBuilderTool.Tile;
     private string _id = ShipBuilderPalette.Tiles[0];
 
-    public ShipBuilderEui()
+    public event Action<Vector2, ShipBuilderTool, string>? OnPlace;
+    public event Action<Vector2>? OnMoveCamera;
+
+    public ShipBuilderWindow()
     {
         IoCManager.InjectDependencies(this);
 
-        _window = new DefaultWindow
-        {
-            Title = Loc.GetString("ship-builder-title"),
-            MinSize = new Vector2(760, 540),
-        };
+        Title = Loc.GetString("ship-builder-title");
+        MinSize = new Vector2(760, 540);
 
         var root = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Horizontal };
-        _window.Contents.AddChild(root);
+        Contents.AddChild(root);
 
         var side = new BoxContainer
         {
@@ -73,10 +69,8 @@ public sealed class ShipBuilderEui : BaseEui
         _view = new ShipBuilderView();
         root.AddChild(_view);
 
-        _view.OnPaint += world => SendMessage(new ShipBuilderPlaceMessage(world, _tool, _id));
-        _view.OnPan += delta => SendMessage(new ShipBuilderMoveCameraMessage(delta));
-
-        _window.OnClose += () => SendMessage(new CloseEuiMessage());
+        _view.OnPaint += world => OnPlace?.Invoke(world, _tool, _id);
+        _view.OnPan += delta => OnMoveCamera?.Invoke(delta);
 
         UpdateSelection();
     }
@@ -102,25 +96,15 @@ public sealed class ShipBuilderEui : BaseEui
         }
     }
 
-    public override void Opened()
+    public void UpdateState(ShipBuilderBuiState state)
     {
-        base.Opened();
-        _window.OpenCentered();
+        _stats.Text = Loc.GetString("ship-builder-stats", ("tiles", state.Tiles), ("walls", state.Walls));
+        _view.SetCamera(state.Camera);
     }
 
-    public override void Closed()
+    public override void Close()
     {
-        base.Closed();
         _view.Release();
-        _window.Close();
-    }
-
-    public override void HandleState(EuiStateBase state)
-    {
-        if (state is not ShipBuilderEuiState s)
-            return;
-
-        _stats.Text = Loc.GetString("ship-builder-stats", ("tiles", s.Tiles), ("walls", s.Walls));
-        _view.SetState(s.Camera, s.Tick);
+        base.Close();
     }
 }

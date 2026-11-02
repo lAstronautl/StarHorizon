@@ -1,8 +1,5 @@
 using System.Numerics;
-using Content.Shared.Eui;
-using Robust.Shared.GameStates;
 using Robust.Shared.Serialization;
-using Robust.Shared.Timing;
 
 namespace Content.Shared._Horizon.ShipBuilder;
 
@@ -10,7 +7,27 @@ namespace Content.Shared._Horizon.ShipBuilder;
 /// Консоль верфи: при активации открывает окно строительства шаттла на отдельной карте.
 /// </summary>
 [RegisterComponent]
-public sealed partial class ShipBuilderConsoleComponent : Component;
+public sealed partial class ShipBuilderConsoleComponent : Component
+{
+    // Рабочая область текущего пользователя (только сервер, не сохраняется и не синхронизируется).
+    [ViewVariables]
+    public EntityUid Map;
+
+    [ViewVariables]
+    public EntityUid Grid;
+
+    [ViewVariables]
+    public EntityUid Camera;
+
+    [ViewVariables]
+    public EntityUid? User;
+}
+
+[Serializable, NetSerializable]
+public enum ShipBuilderUiKey : byte
+{
+    Key,
+}
 
 /// <summary>
 /// Наборы разрешённых для постройки тайлов и стен. Сервер проверяет выбор клиента по этим спискам.
@@ -51,20 +68,16 @@ public enum ShipBuilderTool : byte
 }
 
 [Serializable, NetSerializable]
-public sealed class ShipBuilderEuiState(NetEntity? camera, GameTick tick, int tiles, int walls) : EuiStateBase
+public sealed class ShipBuilderBuiState(NetEntity? camera, int tiles, int walls) : BoundUserInterfaceState
 {
     public readonly NetEntity? Camera = camera;
-
-    /// <summary>Нужен, чтобы клиент дождался применения игрового состояния перед поиском камеры.</summary>
-    public readonly GameTick Tick = tick;
-
     public readonly int Tiles = tiles;
     public readonly int Walls = walls;
 }
 
 /// <summary>Клик по карте. <see cref="World"/> - координаты на карте строительства.</summary>
 [Serializable, NetSerializable]
-public sealed class ShipBuilderPlaceMessage(Vector2 world, ShipBuilderTool tool, string id) : EuiMessageBase
+public sealed class ShipBuilderPlaceMessage(Vector2 world, ShipBuilderTool tool, string id) : BoundUserInterfaceMessage
 {
     public readonly Vector2 World = world;
     public readonly ShipBuilderTool Tool = tool;
@@ -73,7 +86,7 @@ public sealed class ShipBuilderPlaceMessage(Vector2 world, ShipBuilderTool tool,
 
 /// <summary>Сдвиг камеры (в мировых единицах).</summary>
 [Serializable, NetSerializable]
-public sealed class ShipBuilderMoveCameraMessage(Vector2 delta) : EuiMessageBase
+public sealed class ShipBuilderMoveCameraMessage(Vector2 delta) : BoundUserInterfaceMessage
 {
     public readonly Vector2 Delta = delta;
 }

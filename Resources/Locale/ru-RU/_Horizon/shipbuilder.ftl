@@ -1,5 +1,5 @@
-cmd-shipbuilder-desc = Открывает верфь для постройки собственного шаттла.
-cmd-shipbuilder-help = shipbuilder
+
+
 
 ship-builder-title = Верфь
 ship-builder-tool-tile = Тайл

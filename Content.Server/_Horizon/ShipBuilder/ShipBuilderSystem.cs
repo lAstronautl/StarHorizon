@@ -1,13 +1,11 @@
 using System.Numerics;
-using Content.Server.EUI;
+using Robust.Server.GameStates;
+using Robust.Shared.Player;
 using Content.Shared._Horizon.ShipBuilder;
-using Content.Shared.Interaction;
 using Robust.Server.GameObjects;
-using Robust.Server.Player;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
-using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 
 namespace Content.Server._Horizon.ShipBuilder;
@@ -18,7 +16,8 @@ namespace Content.Server._Horizon.ShipBuilder;
 /// </summary>
 public sealed class ShipBuilderSystem : EntitySystem
 {
-    [Dependency] private readonly EuiManager _eui = default!;
+    [Dependency] private readonly UserInterfaceSystem _ui = default!;
+    [Dependency] private readonly SharedViewSubscriberSystem _viewSubscriber = default!;
     [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly ITileDefinitionManager _tileDefs = default!;
@@ -32,24 +31,79 @@ public sealed class ShipBuilderSystem : EntitySystem
     public override void Initialize()
     {
         base.Initialize();
-        SubscribeLocalEvent<ShipBuilderConsoleComponent, ActivateInWorldEvent>(OnActivate);
+
+        SubscribeLocalEvent<ShipBuilderConsoleComponent, BoundUIOpenedEvent>(OnOpened);
+        SubscribeLocalEvent<ShipBuilderConsoleComponent, BoundUIClosedEvent>(OnClosed);
+        SubscribeLocalEvent<ShipBuilderConsoleComponent, ComponentShutdown>(OnShutdown);
+        SubscribeLocalEvent<ShipBuilderConsoleComponent, ShipBuilderPlaceMessage>(OnPlace);
+        SubscribeLocalEvent<ShipBuilderConsoleComponent, ShipBuilderMoveCameraMessage>(OnMoveCamera);
     }
 
-    private void OnActivate(Entity<ShipBuilderConsoleComponent> ent, ref ActivateInWorldEvent args)
+    private void OnOpened(Entity<ShipBuilderConsoleComponent> ent, ref BoundUIOpenedEvent args)
     {
-        if (args.Handled || !args.Complex)
+        if (!args.UiKey.Equals(ShipBuilderUiKey.Key) || !TryComp<ActorComponent>(args.Actor, out var actor))
             return;
 
-        if (!TryComp<ActorComponent>(args.User, out var actor))
-            return;
+        // Один пользователь на консоль: старая рабочая область заменяется новой.
+        DeleteWorkspace(ent.Comp);
 
-        args.Handled = true;
-        Open(actor.PlayerSession);
+        var (map, grid, camera) = CreateWorkspace(actor.PlayerSession.Name);
+        ent.Comp.Map = map;
+        ent.Comp.Grid = grid;
+        ent.Comp.Camera = camera;
+        ent.Comp.User = args.Actor;
+
+        // Игрок получает всё, что находится рядом с камерой.
+        _viewSubscriber.AddViewSubscriber(camera, actor.PlayerSession);
+        UpdateUi(ent);
     }
 
-    public void Open(ICommonSession session)
+    private void OnClosed(Entity<ShipBuilderConsoleComponent> ent, ref BoundUIClosedEvent args)
     {
-        _eui.OpenEui(new ShipBuilderEui(this), session);
+        if (!args.UiKey.Equals(ShipBuilderUiKey.Key) || ent.Comp.User != args.Actor)
+            return;
+
+        DeleteWorkspace(ent.Comp);
+    }
+
+    private void OnShutdown(Entity<ShipBuilderConsoleComponent> ent, ref ComponentShutdown args)
+    {
+        DeleteWorkspace(ent.Comp);
+    }
+
+    private void OnPlace(Entity<ShipBuilderConsoleComponent> ent, ref ShipBuilderPlaceMessage args)
+    {
+        if (ent.Comp.User != args.Actor)
+            return;
+
+        if (Interact(ent.Comp.Grid, args.World, args.Tool, args.Id))
+            UpdateUi(ent);
+    }
+
+    private void OnMoveCamera(Entity<ShipBuilderConsoleComponent> ent, ref ShipBuilderMoveCameraMessage args)
+    {
+        if (ent.Comp.User != args.Actor)
+            return;
+
+        if (float.IsFinite(args.Delta.X) && float.IsFinite(args.Delta.Y))
+            MoveCamera(ent.Comp.Camera, args.Delta);
+    }
+
+    private void UpdateUi(Entity<ShipBuilderConsoleComponent> ent)
+    {
+        var (tiles, walls) = Count(ent.Comp.Grid);
+        _ui.SetUiState(ent.Owner, ShipBuilderUiKey.Key, new ShipBuilderBuiState(GetNetEntity(ent.Comp.Camera), tiles, walls));
+    }
+
+    private void DeleteWorkspace(ShipBuilderConsoleComponent comp)
+    {
+        if (comp.Map.Valid)
+            DeleteWorkspace(comp.Map);
+
+        comp.Map = EntityUid.Invalid;
+        comp.Grid = EntityUid.Invalid;
+        comp.Camera = EntityUid.Invalid;
+        comp.User = null;
     }
 
     /// <summary>Создаёт карту строительства, грид и камеру.</summary>

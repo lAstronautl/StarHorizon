@@ -4,7 +4,6 @@ using Content.Client.Viewport;
 using Robust.Client.Graphics;
 using Robust.Client.UserInterface;
 using Robust.Shared.Input;
-using Robust.Client.Timing;
 using Robust.Shared.Timing;
 
 namespace Content.Client._Horizon.ShipBuilder;
@@ -15,7 +14,6 @@ namespace Content.Client._Horizon.ShipBuilder;
 public sealed class ShipBuilderView : Control
 {
     [Dependency] private readonly IEntityManager _entManager = default!;
-    [Dependency] private readonly IClientGameTiming _timing = default!;
 
     private const float MinZoom = 0.25f;
     private const float MaxZoom = 2f;
@@ -66,12 +64,10 @@ public sealed class ShipBuilderView : Control
     }
 
     private NetEntity? _pendingCamera;
-    private GameTick _pendingTick;
 
-    public void SetState(NetEntity? camera, GameTick tick)
+    public void SetCamera(NetEntity? camera)
     {
         _pendingCamera = camera;
-        _pendingTick = tick;
     }
 
     private void SetCamera(EntityUid camera)
@@ -160,9 +156,8 @@ public sealed class ShipBuilderView : Control
     {
         base.FrameUpdate(args);
 
-        // EUI обновляется раньше игрового состояния, поэтому ждём, пока камера появится на клиенте.
+        // BUI-состояние приходит раньше игрового, поэтому ждём, пока камера появится на клиенте.
         if (_pendingCamera is { } net
-            && _timing.LastRealTick >= _pendingTick
             && _entManager.TryGetEntity(net, out var cameraUid))
         {
             SetCamera(cameraUid.Value);
