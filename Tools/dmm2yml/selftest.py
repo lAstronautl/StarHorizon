@@ -1085,9 +1085,17 @@ def check_gas_pipe_autofit(mapping_set, index, prototypes_dir) -> Result:
 
     Fixture is an L-shaped supply-colour run on tg layer 1: one leg a bare
     pipe-to-pipe straight, the other ending one tile short of a vent pump (a
-    real NodeContainer device, dir=SOUTH) instead of another pipe -- so this
-    checks device_ports registration and rotation too, not just pipe-to-pipe
-    fitting (already covered on its own by pipefitting.py's own test suite).
+    real NodeContainer device, dir=SOUTH, also on layer 1) instead of another
+    pipe -- so this checks device_ports registration and rotation too, not
+    just pipe-to-pipe fitting (already covered on its own by pipefitting.
+    py's own test suite). A second case swaps that vent for a *bare* one
+    (tg's default layer 3, mismatched against the still-layer-1 pipe) and
+    checks the opposite: no bend, no borrowed colour -- device_ports itself
+    carries no layer information, so every fitting pass used to see every
+    device regardless of its real layer, letting two differently-layered
+    runs both bend into (and look fused at) the same device; see place_gas_
+    pipes()'s own docstring for the reported case this came from.
+
     Also checks that a vent gets its own AtmosPipeLayers override from its
     *own* tg path (gaspipes.device_piping_layer), never from whichever pipe
     colour happens to be its nearest neighbour -- and that AtmosPipeColor,
@@ -1121,7 +1129,7 @@ def check_gas_pipe_autofit(mapping_set, index, prototypes_dir) -> Result:
             problems.append(f"{path}: expected to stay unhandled (no SS14 destination), but it parsed")
 
     fixture = (
-        '"A" = (\n/obj/machinery/atmospherics/components/unary/vent_pump{dir = 2},\n'
+        '"A" = (\n/obj/machinery/atmospherics/components/unary/vent_pump/layer1{dir = 2},\n'
         '/turf/open/floor/iron,\n/area/station)\n'
         '"B" = (\n/turf/open/floor/iron,\n/area/station)\n'
         '"C" = (\n/obj/machinery/atmospherics/pipe/smart/simple/supply/layer1,\n'
@@ -1166,18 +1174,57 @@ def check_gas_pipe_autofit(mapping_set, index, prototypes_dir) -> Result:
     elif straight.rotation != ss14map.rotation_for_dir(mapping_rules.EAST):
         problems.append(f"straight rotation {straight.rotation!r}, expected facing east")
 
-    # The vent's own path has no /layerN suffix, so it is genuinely on tg's
-    # default layer 3 -> Tertiary, regardless of the adjacent pipe being a
-    # *different* layer (1 -> Primary here) -- and carries no colour at all,
-    # tg never records one for a device. A bare GasVentPump sitting right
-    # next to a Primary-layer run must NOT be mistaken for part of it.
+    # The vent's own path (layer1) matches the pipe network it physically
+    # touches (also layer1/supply), so it needs no AtmosPipeLayers override
+    # (Primary is the engine default already) but does pick up the colour.
     vent = next((e for e in builder.entities if e.proto == "GasVentPump"), None)
     if vent is None:
         problems.append("expected a GasVentPump entity in the fixture output")
-    elif not any("AtmosPipeLayers" in c and "Tertiary" in c for c in vent.extra_components):
-        problems.append(f"bare vent (tg layer 3 default) should get AtmosPipeLayers: Tertiary: {vent.extra_components}")
-    elif any("AtmosPipeColor" in c for c in vent.extra_components):
-        problems.append(f"a device must never get an AtmosPipeColor (tg records none for one): {vent.extra_components}")
+    elif any("AtmosPipeLayers" in c for c in vent.extra_components):
+        problems.append(f"vent_pump/layer1 is already Primary, should carry no AtmosPipeLayers override: {vent.extra_components}")
+    elif not any("AtmosPipeColor" in c and "#0055CCFF" in c for c in vent.extra_components):
+        problems.append(f"vent_pump/layer1 next to a same-layer supply run should borrow its colour: {vent.extra_components}")
+
+    # Now the mismatched case this bug was reported from: a *bare* vent
+    # (tg's default layer 3) sitting in the exact same spot next to the same
+    # layer-1 pipe run -- it must NOT pull that pipe into a bend (device_
+    # ports has to be filtered to the fitting pass's own layer), and must
+    # not borrow that pipe's colour either.
+    mismatched_fixture = (
+        '"A" = (\n/obj/machinery/atmospherics/components/unary/vent_pump{dir = 2},\n'
+        '/turf/open/floor/iron,\n/area/station)\n'
+        '"B" = (\n/turf/open/floor/iron,\n/area/station)\n'
+        '"C" = (\n/obj/machinery/atmospherics/pipe/smart/simple/supply/layer1,\n'
+        '/turf/open/floor/iron,\n/area/station)\n'
+        '"D" = (\n/turf/open/floor/iron,\n/area/station)\n\n'
+        '(1,1,1) = {"\nAB\nCD\n"}\n'
+    )
+    with tempfile.TemporaryDirectory() as directory:
+        path = os.path.join(directory, "fixture.dmm")
+        with open(path, "w", encoding="utf-8") as handle:
+            handle.write(mismatched_fixture)
+        dmm_mismatch = dmmparser.parse(path)
+    builder_mismatch = ss14map.MapBuilder(template["map_entity"], template["grid_entity"], "0.0.0")
+    survey_mismatch = dmm2yml.walk(
+        dmm_mismatch, mapping_set, index, 1, builder_mismatch, "deterministic", pipenode_index=pipenode_index
+    )
+    dmm2yml.place_gas_pipes(survey_mismatch, builder_mismatch, {1: "Primary", 2: "Secondary", 3: "Tertiary"})
+    mismatch_pipe = next((e for e in builder_mismatch.entities if e.proto.startswith("GasPipe")), None)
+    if mismatch_pipe is None:
+        problems.append("expected a GasPipe* entity in the mismatched-layer fixture output")
+    elif mismatch_pipe.proto != "GasPipeStraight":
+        problems.append(
+            f"a layer-3 (default) vent must not pull a layer-1 pipe into a bend toward it: "
+            f"{mismatch_pipe.proto} at ({mismatch_pipe.x},{mismatch_pipe.y})"
+        )
+    mismatch_vent = next((e for e in builder_mismatch.entities if e.proto == "GasVentPump"), None)
+    if mismatch_vent is None:
+        problems.append("expected a GasVentPump entity in the mismatched-layer fixture output")
+    else:
+        if not any("AtmosPipeLayers" in c and "Tertiary" in c for c in mismatch_vent.extra_components):
+            problems.append(f"bare vent (tg layer 3 default) should get AtmosPipeLayers: Tertiary: {mismatch_vent.extra_components}")
+        if any("AtmosPipeColor" in c for c in mismatch_vent.extra_components):
+            problems.append(f"a layer-3 vent next to an unrelated layer-1 pipe must stay uncoloured: {mismatch_vent.extra_components}")
 
     # Now the opposite case: a vent whose OWN path explicitly declares
     # layer2, sitting next to a pipe of a *different* colour and layer

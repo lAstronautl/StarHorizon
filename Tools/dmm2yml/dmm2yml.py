@@ -610,11 +610,19 @@ def place_gas_pipes(
     but the device's own NodeContainer already is that tile's pipe presence
     in SS14; fitting a second GasPipe* entity on top of it stacked two
     unrelated pipe sprites on one cell instead of one correct one. The
-    device still gets fitted *toward* correctly, via device_ports, exactly
-    as any other neighbour. Also tags every device with its own declared
-    layer, plus a colour borrowed from whichever fitted run (if any) is on
-    that same layer and actually touches it -- see _tag_devices(). Sets
-    builder.gas_pipes_placed/dropped/on_device.
+    device still gets fitted *toward* correctly, via device_ports -- but
+    only for the one group that is actually on the device's own layer (see
+    the local `ports_on` below): survey.device_ports itself carries no layer
+    information at all, so passing it unfiltered to every group's fit let a
+    single device (most often sitting right where two differently-layered
+    runs visually cross, exactly where this is most noticeable) pull pipes
+    from *every* colour/layer into a bend aimed at it, even layers it was
+    never actually on -- reported for real: two differently-coloured runs
+    both bending into the same vent looked like one fused junction. Also
+    tags every device with its own declared layer, plus a colour borrowed
+    from whichever fitted run (if any) is on that same layer and actually
+    touches it -- see _tag_devices(). Sets builder.gas_pipes_placed/
+    dropped/on_device.
     """
     groups: dict[tuple[str, str], set[tuple[int, int]]] = {}
     for tile_x, tile_y, color_name, tg_layer in survey.gas_pipe_atoms:
@@ -629,8 +637,12 @@ def place_gas_pipes(
 
     for (color_name, ss14_layer), tiles in groups.items():
         color_hex = gaspipes.PIPE_COLOR_HEX[color_name]
+        ports_on_this_layer = {
+            position: ports for position, ports in survey.device_ports.items()
+            if layer_map.get(survey.device_tg_layers.get(position, 3)) == ss14_layer
+        }
         fitted = pipefitting.fit_pipes(
-            tiles, family="gas", color=color_hex, layer=ss14_layer, device_ports=survey.device_ports
+            tiles, family="gas", color=color_hex, layer=ss14_layer, device_ports=ports_on_this_layer
         )
         for pipe in fitted:
             builder.add_entity(
