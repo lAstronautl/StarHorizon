@@ -1,4 +1,3 @@
-using Content.Shared._Horizon.Medical.Surgery.Components;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Systems;
 using Content.Shared.Camera;
