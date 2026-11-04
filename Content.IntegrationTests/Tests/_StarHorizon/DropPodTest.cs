@@ -3,6 +3,7 @@ using Content.Server.Shuttles.Components;
 using Content.Shared.Shuttles.Components;
 using Content.Server.Storage.EntitySystems;
 using Content.Shared._StarHorizon.DropPod;
+using Content.Shared.CCVar;
 using Content.Shared.Movement.Components;
 using Content.Shared.Storage.Components;
 using Robust.Shared.GameObjects;
@@ -53,6 +54,7 @@ public sealed class DropPodTest
     {
         await using var pair = await PoolManager.GetServerClient(new PoolSettings { FailureLogLevel = LogLevel.Error });
         var server = pair.Server;
+        server.CfgMan.SetCVar(CCVars.FTLArrivalTime, 1f);
         var map = await pair.CreateTestMap();
         var storage = server.System<EntityStorageSystem>();
 
@@ -106,8 +108,8 @@ public sealed class DropPodTest
         Assert.That(appearance.TryGetData<bool>(pod, DropPodVisuals.InFlight, out var hidden) && hidden);
         Assert.That(server.EntMan.Deleted(comp.Marker), Is.False, "метка остаётся до посадки");
 
-        // Конец БСС: телепорт, анимация падения, виньетка уходит в 0, камера возвращается.
-        await pair.RunSeconds(0.7f);
+        // Конец БСС (после фазы прибытия FTL): телепорт, анимация падения, виньетка уходит в 0, камера возвращается.
+        await pair.RunSeconds(1.7f);
         Assert.That(comp.State, Is.EqualTo(DropPodState.Landing));
         Assert.That(server.EntMan.HasComponent<FTLMapComponent>(server.EntMan.GetComponent<TransformComponent>(pod).MapUid), Is.False);
         Assert.That((xform.GetWorldPosition(pod) - target).Length(), Is.LessThan(0.5f), "капсула в точке метки");
@@ -129,6 +131,7 @@ public sealed class DropPodTest
     {
         await using var pair = await PoolManager.GetServerClient(new PoolSettings { FailureLogLevel = LogLevel.Error });
         var server = pair.Server;
+        server.CfgMan.SetCVar(CCVars.FTLArrivalTime, 1f);
         var map = await pair.CreateTestMap();
         var storage = server.System<EntityStorageSystem>();
         var xform = server.System<SharedTransformSystem>();
@@ -171,7 +174,7 @@ public sealed class DropPodTest
         // Шаттл улетает в произвольную точку, пока капсула в пути.
         await pair.RunSeconds(1.2f);
         await server.WaitPost(() => xform.SetWorldPosition(shuttle, new Vector2(900, -700)));
-        await pair.RunSeconds(2.2f);
+        await pair.RunSeconds(3.2f);
 
         var podComp = server.EntMan.GetComponent<DropPodComponent>(pod);
         Assert.That(podComp.State, Is.EqualTo(DropPodState.Landing));

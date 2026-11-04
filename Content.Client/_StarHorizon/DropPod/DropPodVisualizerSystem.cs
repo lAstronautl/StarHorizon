@@ -104,7 +104,7 @@ public sealed class DropPodVisualizerSystem : VisualizerSystem<DropPodComponent>
     /// <summary>Капсула падает сверху: большая и прозрачная, затем резко садится на место.</summary>
     private static Animation MakeLandingAnimation()
     {
-        const float fall = 0.5f;
+        const float fall = DropPodTrailSystem.FallTime;
         const float bounce = 0.15f;
         const float length = fall + bounce;
 
@@ -120,7 +120,7 @@ public sealed class DropPodVisualizerSystem : VisualizerSystem<DropPodComponent>
                     InterpolationMode = AnimationInterpolationMode.Linear,
                     KeyFrames =
                     {
-                        new AnimationTrackProperty.KeyFrame(new Vector2(0, 4f), 0),
+                        new AnimationTrackProperty.KeyFrame(new Vector2(0, DropPodTrailSystem.FallHeight), 0),
                         new AnimationTrackProperty.KeyFrame(new Vector2(0, 0), fall),
                         new AnimationTrackProperty.KeyFrame(new Vector2(0, 0.12f), bounce / 2),
                         new AnimationTrackProperty.KeyFrame(new Vector2(0, 0), bounce / 2),

@@ -136,7 +136,7 @@ public sealed partial class ShuttleSystem
     /// <summary>
     /// Ensures the FTL map exists and returns it.
     /// </summary>
-    public EntityUid EnsureFTLMap()
+    private EntityUid EnsureFTLMap()
     {
         var query = AllEntityQuery<FTLMapComponent>();
 
@@ -1053,6 +1053,10 @@ public sealed partial class ShuttleSystem
     /// </summary>
     private void Smimsh(EntityUid uid, FixturesComponent? manager = null, MapGridComponent? grid = null, TransformComponent? xform = null)
     {
+        // Не-гриды (персонажи, предметы, дроп-поды), отправленные в FTL, ничего не давят при прибытии.
+        if (!HasComp<MapGridComponent>(uid))
+            return;
+
         if (!Resolve(uid, ref manager, ref grid, ref xform) || xform.MapUid == null)
             return;
 

@@ -133,6 +133,30 @@
     - HideContextMenu
 
 - type: entity
+  id: StarHorizonDropPodTrail
+  name: drop pod trail
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Transform
+    noRot: true
+  - type: Sprite
+    # Длина, положение и прозрачность задаются клиентской анимацией (DropPodTrailSystem):
+    # полоса в 3 тайла постепенно вырастает за падающей капсулой.
+    drawdepth: HighFloorObjects
+    sprite: _StarHorizon/Effects/droppod_marker.rsi
+    noRot: true
+    color: "#ffffff00"
+    layers:
+    - state: smoke
+  - type: DropPodTrail
+    lifetime: 2.5
+  - type: TimedDespawn
+    lifetime: 2.5
+  - type: Tag
+    tags:
+    - HideContextMenu
+
+- type: entity
   parent: BaseComputerCircuitboard
   id: StarHorizonDropPodConsoleCircuitboard
   name: drop pod console board

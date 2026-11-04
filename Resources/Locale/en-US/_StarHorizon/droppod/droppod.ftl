@@ -3,6 +3,7 @@ ent-StarHorizonDropPod = drop pod
 ent-StarHorizonDropPodMarker = drop pod landing zone
     .desc = Something is about to fall from the sky here.
 ent-StarHorizonDropPodSmoke = debris
+ent-StarHorizonDropPodTrail = drop pod trail
 ent-StarHorizonDropPodConsole = drop pod console
     .desc = Sets the landing coordinates and launches the nearest drop pod.
 ent-StarHorizonDropPodConsoleCircuitboard = drop pod console board

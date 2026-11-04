@@ -42,11 +42,11 @@ public sealed partial class DropPodComponent : Component
     [DataField]
     public TimeSpan CountdownTime = TimeSpan.FromSeconds(8);
 
-    /// <summary>Время, за которое камера отдаляется перед уходом в блюспейс.</summary>
+    /// <summary>Стартовая фаза FTL: за это время камера отдаляется и нарастает виньетка.</summary>
     [DataField]
     public TimeSpan ZoomOutTime = TimeSpan.FromSeconds(3);
 
-    /// <summary>Время в блюспейсе.</summary>
+    /// <summary>Время в гиперпространстве (без фазы прибытия, её длину задаёт FTL).</summary>
     [DataField]
     public TimeSpan FlightTime = TimeSpan.FromSeconds(4);
 
@@ -75,8 +75,9 @@ public sealed partial class DropPodComponent : Component
     [DataField]
     public EntProtoId LandingEffect = "StarHorizonDropPodSmoke";
 
+    /// <summary>Длинный шлейф позади падающей капсулы.</summary>
     [DataField]
-    public SoundSpecifier LaunchSound = new SoundPathSpecifier("/Audio/_StarHorizon/Machines/droppod_woosh.ogg");
+    public EntProtoId TrailEffect = "StarHorizonDropPodTrail";
 
     [DataField]
     public SoundSpecifier LandingSound = new SoundPathSpecifier("/Audio/Effects/explosion1.ogg");

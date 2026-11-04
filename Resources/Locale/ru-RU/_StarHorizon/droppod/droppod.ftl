@@ -3,6 +3,7 @@ ent-StarHorizonDropPod = дроп-под
 ent-StarHorizonDropPodMarker = зона посадки дроп-пода
     .desc = Скоро здесь что-то упадёт с неба.
 ent-StarHorizonDropPodSmoke = обломки
+ent-StarHorizonDropPodTrail = шлейф дроп-пода
 ent-StarHorizonDropPodConsole = консоль дроп-подов
     .desc = Задаёт координаты посадки и запускает ближайший дроп-под.
 ent-StarHorizonDropPodConsoleCircuitboard = плата консоли дроп-подов

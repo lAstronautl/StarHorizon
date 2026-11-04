@@ -1,7 +1,9 @@
 using System.Linq;
 using System.Numerics;
 using Content.Server.Shuttles.Components;
+using Content.Server.Shuttles.Events;
 using Content.Server.Shuttles.Systems;
+using Content.Shared.Shuttles.Components;
 using Content.Shared._StarHorizon.DropPod;
 using Content.Shared.Damage;
 using Content.Shared.Mobs.Components;
@@ -46,6 +48,8 @@ public sealed class DropPodSystem : EntitySystem
 
         SubscribeLocalEvent<DropPodComponent, StorageOpenAttemptEvent>(OnStorageOpenAttempt);
         SubscribeLocalEvent<DropPodComponent, ComponentShutdown>(OnPodShutdown);
+        SubscribeLocalEvent<DropPodComponent, FTLStartedEvent>(OnFTLStarted);
+        SubscribeLocalEvent<DropPodComponent, FTLCompletedEvent>(OnFTLCompleted);
 
         SubscribeLocalEvent<DropPodConsoleComponent, BoundUIOpenedEvent>(OnConsoleOpened);
         SubscribeLocalEvent<DropPodConsoleComponent, DropPodLaunchMessage>(OnLaunchMessage);
@@ -304,15 +308,13 @@ public sealed class DropPodSystem : EntitySystem
                     break;
 
                 case DropPodState.ZoomingOut:
+                    // Это стартовая фаза настоящего FTL; в БСС капсулу переводит FTLStartedEvent.
                     SetZoom(ent, Lerp(1f, comp.PeakZoom, Smooth(t)));
-                    if (now >= comp.StateEnd)
-                        EnterBluespace(ent);
                     break;
 
                 case DropPodState.InBluespace:
+                    // Выход из БСС приходит событием FTLCompletedEvent.
                     SetZoom(ent, comp.PeakZoom);
-                    if (now >= comp.StateEnd)
-                        Land(ent);
                     break;
 
                 case DropPodState.Landing:
@@ -376,30 +378,66 @@ public sealed class DropPodSystem : EntitySystem
             return;
         }
 
+        // Остаток прошлого FTL (кулдаун) мешает запуску нового.
+        RemComp<FTLComponent>(ent);
+
+        // Настоящий БСС, как у команды ftlentity: старт, FTL-карта, фаза прибытия, телепорт.
+        // Летим на координаты метки; точное место (в т.ч. тайл захваченного шаттла) определяется при посадке.
+        var target = ent.Comp.Target;
+        if (ent.Comp.Marker is { } marker && !TerminatingOrDeleted(marker))
+            target = _xform.GetMapCoordinates(marker);
+
+        var mapUid = _map.GetMap(target.MapId);
+        if (mapUid == EntityUid.Invalid)
+        {
+            Abort(ent);
+            return;
+        }
+
+        _shuttle.FTLToCoordinates(
+            ent.Owner,
+            null,
+            new EntityCoordinates(mapUid, target.Position),
+            Angle.Zero,
+            (float) ent.Comp.ZoomOutTime.TotalSeconds,
+            (float) ent.Comp.FlightTime.TotalSeconds + _shuttle.DefaultArrivalTime);
+
+        if (!HasComp<FTLComponent>(ent))
+        {
+            Abort(ent);
+            return;
+        }
+
         SetState(ent, DropPodState.ZoomingOut, ent.Comp.ZoomOutTime);
         SetVignette(ent, 0f, 1f, ent.Comp.ZoomOutTime);
-        _audio.PlayPvs(ent.Comp.LaunchSound, ent);
     }
 
-    /// <summary>Капсула уходит на FTL-карту: пассажиры видят гиперпространство, виньетка остаётся.</summary>
-    private void EnterBluespace(Entity<DropPodComponent> ent)
+    /// <summary>Стартовая фаза FTL закончилась: капсула на FTL-карте, у пассажиров виньетка и отдалённая камера.</summary>
+    private void OnFTLStarted(Entity<DropPodComponent> ent, ref FTLStartedEvent args)
     {
-        SpawnAtPosition(ent.Comp.LaunchEffect, Transform(ent).Coordinates);
+        if (ent.Comp.State != DropPodState.ZoomingOut)
+            return;
+
+        SpawnAtPosition(ent.Comp.LaunchEffect, new EntityCoordinates(args.FromMapUid ?? EntityUid.Invalid, _xform.GetWorldPosition(ent.Owner)));
 
         _appearance.SetData(ent, DropPodVisuals.InFlight, true);
         if (TryComp(ent, out PhysicsComponent? physics))
             _physics.SetCanCollide(ent, false, body: physics);
 
-        // Как у FTL-сущности: на отдельной карте с гиперпространственным параллаксом.
-        // Шаттлы FTL летят вдоль y = 0, поэтому капсулы разводим по другой полосе.
-        var ftlMap = _shuttle.EnsureFTLMap();
-        _xform.SetCoordinates(ent.Owner, new EntityCoordinates(ftlMap, new Vector2(_random.NextFloat(-5000f, 5000f), 5000f)));
-        _xform.SetLocalRotation(ent.Owner, Angle.Zero);
-
-        SetState(ent, DropPodState.InBluespace, ent.Comp.FlightTime);
+        var total = TryComp(ent, out FTLComponent? ftl) ? ftl.TravelTime : (float) ent.Comp.FlightTime.TotalSeconds;
+        SetState(ent, DropPodState.InBluespace, TimeSpan.FromSeconds(total));
     }
 
-    /// <summary>Конец блюспейса: капсула телепортируется на место посадки, падает с анимацией, виньетка уходит в 0.</summary>
+    /// <summary>БСС закончился (FTL доставил капсулу): телепорт на место посадки, падение, виньетка уходит.</summary>
+    private void OnFTLCompleted(Entity<DropPodComponent> ent, ref FTLCompletedEvent args)
+    {
+        if (ent.Comp.State != DropPodState.InBluespace)
+            return;
+
+        Land(ent);
+    }
+
+    /// <summary>Конец БСС: капсула телепортируется на место посадки, падает с анимацией, виньетка уходит в 0.</summary>
     private void Land(Entity<DropPodComponent> ent)
     {
         EntityCoordinates coords;
@@ -438,6 +476,7 @@ public sealed class DropPodSystem : EntitySystem
         _appearance.SetData(ent, DropPodVisuals.InFlight, false);
 
         SpawnAtPosition(ent.Comp.LandingEffect, Transform(ent).Coordinates);
+        SpawnAtPosition(ent.Comp.TrailEffect, Transform(ent).Coordinates);
         SpawnAtPosition(ent.Comp.LaunchEffect, Transform(ent).Coordinates);
         _audio.PlayPvs(ent.Comp.LandingSound, ent);
 
@@ -462,6 +501,7 @@ public sealed class DropPodSystem : EntitySystem
         SetZoom(ent, 1f);
         ResetZoom(ent);
         ClearVignette(ent);
+        RemCompDeferred<FTLComponent>(ent);
         SetState(ent, DropPodState.Idle, TimeSpan.Zero);
     }
 
