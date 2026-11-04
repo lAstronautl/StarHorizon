@@ -1,10 +1,13 @@
-
-
-
 ship-builder-title = Верфь
-ship-builder-tool-tile = Тайл
-ship-builder-tool-wall = Стена
+ship-builder-tool-tile = Тайлы
+ship-builder-tool-entity = Детали
 ship-builder-tool-erase = Стереть
-ship-builder-stats = Тайлов: { $tiles }, стен: { $walls }
+ship-builder-search = Поиск
+ship-builder-rotation = Поворот: { $degrees }°
+ship-builder-stats = Тайлов: { $tiles }, объектов: { $objects }
+ship-builder-server-linked = Сервер верфи: подключён
+ship-builder-server-missing = Сервер верфи не найден
 ship-builder-hint = ЛКМ - строить|WASD или ПКМ - лететь камерой|Колесо - масштаб
-ship-builder-limit = Достигнут лимит тайлов.
+ship-builder-blueprint-no-server = Сервер верфи не найден.
+ship-builder-blueprint-known = Эти детали уже изучены.
+ship-builder-blueprint-unlocked = Изучено новых деталей: { $count }.

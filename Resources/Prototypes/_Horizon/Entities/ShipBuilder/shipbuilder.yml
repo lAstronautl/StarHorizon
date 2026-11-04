@@ -7,11 +7,14 @@
     drawFov: false
     pvsScale: 0.8
 
+# Консоль верфи.
+# tiles и entities - то, что доступно для постройки всегда (как записи спавн-меню).
+# Всё остальное открывается чертежами на сервере верфи (ShipBuilderServer).
 - type: entity
   parent: [BaseStructureDisableToolUse, BaseStructureIndestructible, BaseComputer]
   id: ComputerShipBuilder
   name: shipbuilder console
-  description: Позволяет спроектировать собственный шаттл на отдельной чертёжной карте.
+  description: Позволяет спроектировать собственный шаттл на отдельной чертёжной карте. Новые детали открываются чертежами, примененными к серверу верфи.
   components:
   - type: Sprite
     sprite: _NF/Structures/Machines/computers.rsi
@@ -25,6 +28,19 @@
     - map: ["computerLayerKeys"]
       state: telesci_key
   - type: ShipBuilderConsole
+    tiles:
+    - Plating
+    - FloorSteel
+    - FloorSteelDirty
+    - FloorDark
+    - FloorWhite
+    - FloorTechMaint
+    - FloorBlue
+    entities:
+    - WallSolid
+    - WallReinforced
+    - Window
+    - ReinforcedWindow
   - type: ActivatableUI
     singleUser: true
     key: enum.ShipBuilderUiKey.Key
@@ -34,3 +50,111 @@
         type: ShipBuilderBoundUserInterface
   - type: Computer
     board: Null
+
+# Сервер верфи - копия R&D-сервера. Хранит открытые чертежами детали.
+# Консоль использует сервер на том же гриде. Чертёж применяется кликом по серверу.
+- type: entity
+  parent: BaseMachinePowered
+  id: ShipBuilderServer
+  name: shipbuilder server
+  description: Хранит чертежи, по которым консоль верфи открывает новые детали. Приложите чертёж к серверу, чтобы изучить его.
+  components:
+  - type: Sprite
+    sprite: Structures/Machines/server.rsi
+    snapCardinals: true
+    layers:
+    - state: server-off
+    - state: server-on
+      visible: false
+      map: ["enum.PowerDeviceVisualLayers.Powered"]
+    - state: variant-gunnery
+    - state: server_o
+      map: ["enum.WiresVisualLayers.MaintenancePanel"]
+  - type: PointLight
+    enabled: false
+    castShadows: false
+    radius: 1.2
+    energy: 3.0
+    color: "#11b2b2"
+  - type: LitOnPowered
+  - type: ShipBuilderServer
+  - type: ApcPowerReceiver
+    powerLoad: 200
+  - type: ExtensionCableReceiver
+  - type: WiresPanel
+  - type: WiresVisuals
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 300
+      behaviors:
+      - !type:DoActsBehavior
+        acts: ["Destruction"]
+      - !type:PlaySoundBehavior
+        sound:
+          collection: MetalBreak
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          SheetSteel1:
+            min: 1
+            max: 2
+  - type: Appearance
+  - type: GenericVisualizer
+    visuals:
+      enum.PowerDeviceVisuals.Powered:
+        enum.PowerDeviceVisualLayers.Powered:
+          True: {visible: true}
+          False: {visible: false}
+  - type: AmbientOnPowered
+  - type: AmbientSound
+    volume: -9
+    range: 5
+    enabled: false
+    sound:
+      path: /Audio/Ambience/Objects/server_fans.ogg
+
+# Чертежи. В unlocks указываются id любых прототипов предметов/структур.
+- type: entity
+  parent: BaseItem
+  id: ShipBuilderBlueprintBase
+  abstract: true
+  name: чертёж верфи
+  description: Чертёж деталей шаттла. Приложите к серверу верфи, чтобы открыть их в консоли верфи.
+  components:
+  - type: Sprite
+    sprite: Objects/Tools/blueprint.rsi
+    state: icon
+  - type: ShipBuilderBlueprint
+
+- type: entity
+  parent: ShipBuilderBlueprintBase
+  id: ShipBuilderBlueprintThrusters
+  name: чертёж двигателей
+  components:
+  - type: ShipBuilderBlueprint
+    unlocks:
+    - Thruster
+    - Gyroscope
+
+- type: entity
+  parent: ShipBuilderBlueprintBase
+  id: ShipBuilderBlueprintControl
+  name: чертёж рубки
+  components:
+  - type: ShipBuilderBlueprint
+    unlocks:
+    - ComputerShuttle
+    - AirlockShuttle
+    - Catwalk
+
+- type: entity
+  parent: ShipBuilderBlueprintBase
+  id: ShipBuilderBlueprintPower
+  name: чертёж энергосистемы
+  components:
+  - type: ShipBuilderBlueprint
+    unlocks:
+    - GeneratorBasic
+    - APCBasic
+    - SubstationBasic

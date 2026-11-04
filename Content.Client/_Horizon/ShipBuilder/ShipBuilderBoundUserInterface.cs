@@ -18,7 +18,7 @@ public sealed class ShipBuilderBoundUserInterface : BoundUserInterface
         base.Open();
 
         _window = this.CreateWindow<ShipBuilderWindow>();
-        _window.OnPlace += (world, tool, id) => SendMessage(new ShipBuilderPlaceMessage(world, tool, id));
+        _window.OnPlace += (world, tool, id, rotation) => SendMessage(new ShipBuilderPlaceMessage(world, tool, id, rotation));
         _window.OnMoveCamera += delta => SendMessage(new ShipBuilderMoveCameraMessage(delta));
     }
 
