@@ -1,0 +1,29 @@
+ent-StarHorizonDropPod = дроп-под
+    .desc = Блюспейс-капсула. Загрузите в неё груз или залезьте сами, задайте координаты на консоли дроп-подов и запустите.
+ent-StarHorizonDropPodMarker = зона посадки дроп-пода
+    .desc = Скоро здесь что-то упадёт с неба.
+ent-StarHorizonDropPodSmoke = облако пыли
+ent-StarHorizonDropPodConsole = консоль дроп-подов
+    .desc = Задаёт координаты посадки и запускает ближайший дроп-под.
+ent-StarHorizonDropPodConsoleCircuitboard = плата консоли дроп-подов
+    .desc = Печатная плата для консоли дроп-подов.
+
+droppod-fail-open = Запуск отменён: дверь капсулы открыта!
+droppod-error-no-pod = Рядом нет дроп-пода.
+droppod-error-bad-target = Некорректные координаты цели.
+
+droppod-ui-title = Консоль дроп-подов
+droppod-ui-no-pod = Дроп-под не найден (радиус 6 тайлов).
+droppod-ui-state = Состояние: { $state }
+droppod-ui-occupants = Внутри объектов: { $count }
+droppod-ui-timer = Осталось: { $seconds } с
+droppod-ui-target = Координаты посадки (мировые):
+droppod-ui-here = Подставить координаты консоли
+droppod-ui-launch = Запуск
+droppod-ui-abort = Отмена
+
+droppod-state-Idle = ожидание
+droppod-state-Countdown = обратный отсчёт, закройте дверь капсулы
+droppod-state-ZoomingOut = старт
+droppod-state-InBluespace = в блюспейсе
+droppod-state-Landing = посадка

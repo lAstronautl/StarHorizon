@@ -1,0 +1,165 @@
+# Дроп-под. Спрайты и идея - tgstation (supply pods), CC-BY-SA 3.0.
+- type: entity
+  parent: BaseStructureDynamic
+  id: StarHorizonDropPod
+  name: drop pod
+  description: A bluespace drop pod. Load it with cargo or climb in yourself, set the destination at a drop pod console and launch.
+  components:
+  - type: Transform
+    noRot: true
+  - type: Icon
+    sprite: _StarHorizon/Structures/Misc/droppod.rsi
+    state: icon
+  - type: Sprite
+    noRot: true
+    sprite: _StarHorizon/Structures/Misc/droppod.rsi
+    scale: 0.75, 0.75
+    layers:
+    - state: base
+      map: ["enum.StorageVisualLayers.Base"]
+    - state: closed
+      map: ["enum.StorageVisualLayers.Door"]
+    - state: bluespace
+      map: ["droppodDecal"]
+  - type: InteractionOutline
+  - type: Physics
+    bodyType: Dynamic
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.4,-0.4,0.4,0.4"
+        density: 80
+        mask:
+        - MachineMask
+        layer:
+        - MachineLayer
+  - type: EntityStorage
+    openOnMove: false
+    isCollidableWhenOpen: true
+    capacity: 40
+  - type: ContainerContainer
+    containers:
+      entity_storage: !type:Container
+  - type: Appearance
+  - type: EntityStorageVisuals
+    stateDoorOpen: open
+    stateDoorClosed: closed
+  - type: GenericVisualizer
+    visuals:
+      enum.DropPodVisuals.InFlight:
+        enum.StorageVisualLayers.Base:
+          True: { visible: false }
+          False: { visible: true }
+        enum.StorageVisualLayers.Door:
+          True: { visible: false }
+          False: { visible: true }
+        droppodDecal:
+          True: { visible: false }
+          False: { visible: true }
+  - type: Damageable
+    damageContainer: StructuralInorganic
+    damageModifierSet: Metallic
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 300
+      behaviors:
+      - !type:DoActsBehavior
+        acts: ["Destruction"]
+      - !type:PlaySoundBehavior
+        sound:
+          collection: MetalBreak
+  - type: DropPod
+    landingDamage:
+      types:
+        Blunt: 25
+
+- type: entity
+  id: StarHorizonDropPodMarker
+  name: drop pod landing zone
+  description: Something is about to fall from the sky here.
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Transform
+    noRot: true
+  - type: Sprite
+    drawdepth: FloorObjects
+    sprite: _StarHorizon/Effects/droppod_marker.rsi
+    noRot: true
+    layers:
+    - state: lz
+      shader: unshaded
+    - state: ring
+      shader: unshaded
+  - type: PointLight
+    radius: 2.5
+    energy: 1.5
+    color: "#ff3030"
+  - type: Tag
+    tags:
+    - HideContextMenu
+
+- type: entity
+  id: StarHorizonDropPodSmoke
+  name: dust cloud
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Transform
+    noRot: true
+  - type: Sprite
+    drawdepth: Effects
+    sprite: _StarHorizon/Effects/droppod_marker.rsi
+    noRot: true
+    layers:
+    - state: smoke
+  - type: TimedDespawn
+    lifetime: 4
+  - type: Tag
+    tags:
+    - HideContextMenu
+
+- type: entity
+  parent: BaseComputerCircuitboard
+  id: StarHorizonDropPodConsoleCircuitboard
+  name: drop pod console board
+  description: A computer printed circuit board for a drop pod console.
+  components:
+  - type: Sprite
+    state: cpu_supply
+  - type: ComputerBoard
+    prototype: StarHorizonDropPodConsole
+
+- type: entity
+  parent: BaseComputer
+  id: StarHorizonDropPodConsole
+  name: drop pod console
+  description: Sets the landing coordinates and launches the nearest drop pod.
+  components:
+  - type: Sprite
+    layers:
+    - map: ["computerLayerBody"]
+      state: computer
+    - map: ["computerLayerKeyboard"]
+      state: generic_keyboard
+    - map: ["computerLayerScreen"]
+      state: teleport
+    - map: ["computerLayerKeys"]
+      state: generic_keys
+    - map: [ "enum.WiresVisualLayers.MaintenancePanel" ]
+      state: generic_panel_open
+  - type: Computer
+    board: StarHorizonDropPodConsoleCircuitboard
+  - type: DropPodConsole
+  - type: ActivatableUI
+    key: enum.DropPodUiKey.Key
+  - type: UserInterface
+    interfaces:
+      enum.DropPodUiKey.Key:
+        type: DropPodConsoleBoundUserInterface
+  - type: PointLight
+    radius: 1.5
+    energy: 1.6
+    color: "#ff9a30"

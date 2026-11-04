@@ -1,0 +1,101 @@
+using Content.Shared.Damage;
+using Robust.Shared.Audio;
+using Robust.Shared.GameStates;
+using Robust.Shared.Map;
+using Robust.Shared.Prototypes;
+using Robust.Shared.Serialization;
+
+namespace Content.Shared._StarHorizon.DropPod;
+
+/// <summary>
+/// Дроп-под: закрытая капсула, в которую можно загрузить груз или залезть самому.
+/// После запуска камера пассажиров плавно отдаляется, капсула уходит в блюспейс
+/// и приземляется в точке, заданной на <see cref="DropPodConsoleComponent"/>.
+/// </summary>
+[RegisterComponent, NetworkedComponent]
+public sealed partial class DropPodComponent : Component
+{
+    [ViewVariables]
+    public DropPodState State = DropPodState.Idle;
+
+    /// <summary>Когда текущая стадия началась (<see cref="Robust.Shared.Timing.IGameTiming.CurTime"/>).</summary>
+    [ViewVariables]
+    public TimeSpan StateStart;
+
+    /// <summary>Когда текущая стадия закончится.</summary>
+    [ViewVariables]
+    public TimeSpan StateEnd;
+
+    /// <summary>Запасная точка приземления, если метка пропала.</summary>
+    [ViewVariables]
+    public MapCoordinates Target;
+
+    /// <summary>Метка приземления. Следует за гридом, над которым стоит.</summary>
+    [ViewVariables]
+    public EntityUid? Marker;
+
+    /// <summary>Время обратного отсчёта перед стартом - успеть залезть и закрыть дверь.</summary>
+    [DataField]
+    public TimeSpan CountdownTime = TimeSpan.FromSeconds(8);
+
+    /// <summary>Время, за которое камера отдаляется перед уходом в блюспейс.</summary>
+    [DataField]
+    public TimeSpan ZoomOutTime = TimeSpan.FromSeconds(3);
+
+    /// <summary>Время в блюспейсе.</summary>
+    [DataField]
+    public TimeSpan FlightTime = TimeSpan.FromSeconds(4);
+
+    /// <summary>Время, за которое камера возвращается после приземления.</summary>
+    [DataField]
+    public TimeSpan ZoomInTime = TimeSpan.FromSeconds(2);
+
+    /// <summary>Максимальное отдаление камеры.</summary>
+    [DataField]
+    public float PeakZoom = 3f;
+
+    /// <summary>Радиус удара при приземлении.</summary>
+    [DataField]
+    public float LandingRadius = 1.2f;
+
+    /// <summary>Урон всем, кто оказался под капсулой.</summary>
+    [DataField]
+    public DamageSpecifier LandingDamage = new();
+
+    [DataField]
+    public EntProtoId MarkerPrototype = "StarHorizonDropPodMarker";
+
+    [DataField]
+    public EntProtoId LaunchEffect = "EffectFlashBluespace";
+
+    [DataField]
+    public EntProtoId LandingEffect = "StarHorizonDropPodSmoke";
+
+    [DataField]
+    public SoundSpecifier LaunchSound = new SoundPathSpecifier("/Audio/_StarHorizon/Machines/droppod_woosh.ogg");
+
+    [DataField]
+    public SoundSpecifier LandingSound = new SoundPathSpecifier("/Audio/Effects/explosion1.ogg");
+}
+
+[Serializable, NetSerializable]
+public enum DropPodState : byte
+{
+    /// <summary>Стоит и ждёт команды.</summary>
+    Idle,
+    /// <summary>Обратный отсчёт, дверь ещё можно открывать.</summary>
+    Countdown,
+    /// <summary>Камера отдаляется, дверь заблокирована.</summary>
+    ZoomingOut,
+    /// <summary>Капсула в блюспейсе.</summary>
+    InBluespace,
+    /// <summary>Приземлилась, камера возвращается.</summary>
+    Landing,
+}
+
+[Serializable, NetSerializable]
+public enum DropPodVisuals : byte
+{
+    /// <summary>true - капсулы нет на карте (она в блюспейсе).</summary>
+    InFlight,
+}
