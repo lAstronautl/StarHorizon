@@ -40,6 +40,7 @@ public sealed class DropPodSystem : EntitySystem
     [Dependency] private readonly SharedMapSystem _map = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly ShuttleSystem _shuttle = default!;
+    [Dependency] private readonly SharedPointLightSystem _light = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
 
     public override void Initialize()
@@ -420,7 +421,9 @@ public sealed class DropPodSystem : EntitySystem
 
         SpawnAtPosition(ent.Comp.LaunchEffect, new EntityCoordinates(args.FromMapUid ?? EntityUid.Invalid, _xform.GetWorldPosition(ent.Owner)));
 
-        _appearance.SetData(ent, DropPodVisuals.InFlight, true);
+        // В БСС капсула остаётся видимой, как шаттл в FTL: на FTL-карте нет освещения,
+        // поэтому подсвечиваем её собственным светом, а на корпусе горит синий индикатор.
+        _light.SetEnabled(ent, true);
         if (TryComp(ent, out PhysicsComponent? physics))
             _physics.SetCanCollide(ent, false, body: physics);
 
@@ -474,6 +477,7 @@ public sealed class DropPodSystem : EntitySystem
         if (TryComp(ent, out PhysicsComponent? physics))
             _physics.SetCanCollide(ent, true, body: physics);
         _appearance.SetData(ent, DropPodVisuals.InFlight, false);
+        _light.SetEnabled(ent, false);
 
         SpawnAtPosition(ent.Comp.LandingEffect, Transform(ent).Coordinates);
         SpawnAtPosition(ent.Comp.TrailEffect, Transform(ent).Coordinates);

@@ -105,7 +105,8 @@ public sealed class DropPodTest
         Assert.That(eye.TargetZoom.X, Is.EqualTo(comp.PeakZoom).Within(0.01f));
         Assert.That(vignette.To, Is.EqualTo(1f), "виньетка достигла максимума и держится");
         Assert.That(vignette.End, Is.LessThanOrEqualTo(server.Resolve<Robust.Shared.Timing.IGameTiming>().CurTime));
-        Assert.That(appearance.TryGetData<bool>(pod, DropPodVisuals.InFlight, out var hidden) && hidden);
+        Assert.That(appearance.TryGetData<bool>(pod, DropPodVisuals.InFlight, out var hidden) && hidden, Is.False, "капсула в БСС остаётся видимой");
+        Assert.That(server.EntMan.GetComponent<Robust.Server.GameObjects.PointLightComponent>(pod).Enabled, "и подсвечена");
         Assert.That(server.EntMan.Deleted(comp.Marker), Is.False, "метка остаётся до посадки");
 
         // Конец БСС (после фазы прибытия FTL): телепорт, анимация падения, виньетка уходит в 0, камера возвращается.

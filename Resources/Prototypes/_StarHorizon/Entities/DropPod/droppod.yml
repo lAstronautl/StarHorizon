@@ -65,7 +65,7 @@
           Idle: { visible: false }
           Countdown: { visible: true, state: glow_yellow }
           ZoomingOut: { visible: true, state: glow_blue }
-          InBluespace: { visible: false }
+          InBluespace: { visible: true, state: glow_blue }
           Landing: { visible: true, state: glow_red }
   - type: Damageable
     damageContainer: StructuralInorganic
@@ -81,6 +81,11 @@
       - !type:PlaySoundBehavior
         sound:
           collection: MetalBreak
+  - type: PointLight
+    enabled: false
+    radius: 3.5
+    energy: 3
+    color: "#4aa8ff"
   - type: DropPod
     landingDamage:
       types:
