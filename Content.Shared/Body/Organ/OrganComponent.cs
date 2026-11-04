@@ -1,16 +1,146 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 using Content.Shared.Body.Systems;
-using Robust.Shared.Containers;
 using Robust.Shared.GameStates;
+
+// Shitmed Change
+using Content.Shared.FixedPoint;
+using Robust.Shared.Prototypes;
+using Content.Shared._Shitmed.Medical.Surgery.Tools;
+using Content.Shared._Shitmed.Medical.Surgery.Traumas;
+using Robust.Shared.Audio;
 
 namespace Content.Shared.Body.Organ;
 
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
-[Access(typeof(SharedBodySystem))]
-public sealed partial class OrganComponent : Component
+// [Access(typeof(SharedBodySystem))] // Shitmed Change - no explicit access
+public sealed partial class OrganComponent : Component, ISurgeryToolComponent // Shitmed Change
 {
     /// <summary>
     /// Relevant body this organ is attached to.
     /// </summary>
     [DataField, AutoNetworkedField]
     public EntityUid? Body;
+
+    // Shitmed Change Start
+    /// <summary>
+    ///     Shitmed Change:Relevant body this organ originally belonged to.
+    ///     FOR WHATEVER FUCKING REASON AUTONETWORKING THIS CRASHES GIBTEST AAAAAAAAAAAAAAA
+    /// </summary>
+    [DataField]
+    public EntityUid? OriginalBody;
+
+    // goida component registry bs fix
+    [ViewVariables, AutoNetworkedField]
+    public HashSet<string> AddedKeys = [];
+
+    /// <summary>
+    ///     Maximum organ integrity.
+    /// </summary>
+    [DataField("intCap"), AutoNetworkedField]
+    public FixedPoint2 IntegrityCap = 120;
+
+    /// <summary>
+    ///     Current organ HP, or integrity, whatever you prefer to say
+    /// </summary>
+    [DataField("integrity"), AutoNetworkedField]
+    public FixedPoint2 OrganIntegrity = 120;
+
+    /// <summary>
+    ///     If true, this organ is never removed/deleted when it reaches Destroyed severity.
+    [DataField, AutoNetworkedField]
+    public bool Indestructible;
+
+    /// <summary>
+    ///     Current Organ severity, dynamically updated based on organ integrity
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public OrganSeverity OrganSeverity = OrganSeverity.Normal;
+
+    /// <summary>
+    ///     Sound played when this organ gets turned into a blood mush.
+    /// </summary>
+    [DataField]
+    public SoundSpecifier OrganDestroyedSound = new SoundCollectionSpecifier("OrganDestroyed");
+
+    /// <summary>
+    ///     All the modifiers that are currently modifying the OrganIntegrity
+    /// </summary>
+    public Dictionary<(string, EntityUid), FixedPoint2> IntegrityModifiers = new();
+
+    /// <summary>
+    ///     The name's self-explanatory, thresholds. for states. of integrity. of this god fucking damn organ.
+    /// </summary>
+    [DataField] //TEMPORARY: MAKE REQUIRED WHEN EVERY YML HAS THESE.
+    public Dictionary<OrganSeverity, FixedPoint2> IntegrityThresholds = new()
+    {
+        { OrganSeverity.Normal, 120 },
+        { OrganSeverity.Damaged, 60 },
+        { OrganSeverity.Destroyed, 0 },
+    };
+
+    /// <summary>
+    ///     Pre-sorted version of <see cref="IntegrityThresholds"/> in ascending order by value.
+    /// </summary>
+    public KeyValuePair<OrganSeverity, FixedPoint2>[]? SortedIntegrityThresholds;
+
+    [DataField]
+    public Dictionary<OrganSeverity, FixedPoint2> HealSeverityFloor = new()
+    {
+        { OrganSeverity.Normal, 0 },
+        { OrganSeverity.Damaged, 10 },
+        { OrganSeverity.Destroyed, 30 },
+    };
+
+    /// <summary>
+    ///     Shitmed Change: Shitcodey solution to not being able to know what name corresponds to each organ's slot ID
+    ///     without referencing the prototype or hardcoding.
+    /// </summary>
+
+    [DataField]
+    public string SlotId = string.Empty;
+
+    [DataField]
+    public string ToolName { get; set; } = "An organ";
+
+    [DataField]
+    public float Speed { get; set; } = 1f;
+
+    /// <summary>
+    ///     Shitmed Change: If true, the organ will not heal an entity when transplanted into them.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public bool? Used { get; set; }
+
+
+    /// <summary>
+    ///     When attached, the organ will ensure these components on the entity, and delete them on removal.
+    /// </summary>
+    [DataField]
+    public ComponentRegistry? OnAdd;
+
+    /// <summary>
+    ///     When removed, the organ will ensure these components on the entity, and delete them on insertion.
+    /// </summary>
+    [DataField]
+    public ComponentRegistry? OnRemove;
+
+    /// <summary>
+    ///     Is this organ working or not?
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public bool Enabled = true;
+
+    /// <summary>
+    ///     Can this organ be enabled or disabled? Used mostly for prop, damaged or useless organs.
+    /// </summary>
+    [DataField]
+    public bool CanEnable = true;
+
+    /// <summary>
+    ///     DeltaV - Can this organ be removed? Used to be able to make organs unremovable by setting it to false.
+    /// </summary>
+    [DataField]
+    public bool Removable = true;
+    // Shitmed Change End
 }

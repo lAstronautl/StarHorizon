@@ -5,35 +5,66 @@ using Content.Shared.Body.Organ;
 using Content.Shared.Body.Part;
 using Robust.Shared.Containers;
 
+// Shitmed Change
+
+using Content.Shared.Damage;
+using Content.Shared._Shitmed.BodyEffects;
+using Content.Shared._Shitmed.Body.Organ;
+
 namespace Content.Shared.Body.Systems;
 
 public partial class SharedBodySystem
 {
+    // Shitmed Change Start
+
+    private void InitializeOrgans()
+    {
+        SubscribeLocalEvent<OrganComponent, MapInitEvent>(OnMapInit);
+        SubscribeLocalEvent<OrganComponent, OrganEnableChangedEvent>(OnOrganEnableChanged);
+    }
+
+    private void OnMapInit(Entity<OrganComponent> ent, ref MapInitEvent args)
+    {
+        if (ent.Comp.OnAdd is not null || ent.Comp.OnRemove is not null)
+            EnsureComp<OrganEffectComponent>(ent);
+    }
+
+    // Shitmed Change End
+
     private void AddOrgan(
         Entity<OrganComponent> organEnt,
         EntityUid bodyUid,
         EntityUid parentPartUid)
     {
         organEnt.Comp.Body = bodyUid;
-        var addedEv = new OrganAddedEvent(parentPartUid);
+        var addedEv = new OrganAddedEvent(parentPartUid, bodyUid); // Shitmed - add body
         RaiseLocalEvent(organEnt, ref addedEv);
 
         if (organEnt.Comp.Body is not null)
         {
+        // Shitmed Change Start
             var addedInBodyEv = new OrganAddedToBodyEvent(bodyUid, parentPartUid);
             RaiseLocalEvent(organEnt, ref addedInBodyEv);
+            var organEnabledEv = new OrganEnableChangedEvent(true);
+            RaiseLocalEvent(organEnt, ref organEnabledEv);
         }
+        // Shitmed Change End
 
         Dirty(organEnt, organEnt.Comp);
     }
 
     private void RemoveOrgan(Entity<OrganComponent> organEnt, EntityUid parentPartUid)
     {
-        var removedEv = new OrganRemovedEvent(parentPartUid);
+        var removedEv = new OrganRemovedEvent(parentPartUid, organEnt.Comp.Body); // Shitmed - add body
         RaiseLocalEvent(organEnt, ref removedEv);
 
         if (organEnt.Comp.Body is { Valid: true } bodyUid)
         {
+            // Shitmed Change Start
+            organEnt.Comp.OriginalBody = organEnt.Comp.Body;
+            var organDisabledEv = new OrganEnableChangedEvent(false);
+            RaiseLocalEvent(organEnt, ref organDisabledEv);
+            // Shitmed Change End
             var removedInBodyEv = new OrganRemovedFromBodyEvent(bodyUid, parentPartUid);
             RaiseLocalEvent(organEnt, ref removedInBodyEv);
         }
@@ -51,6 +82,10 @@ public partial class SharedBodySystem
             return null;
 
         Containers.EnsureContainer<ContainerSlot>(parentEnt, GetOrganContainerId(slotId));
+        // Shitmed Change: Don't throw when a slot already exists
+        if (parentEnt.Comp.Organs.TryGetValue(slotId, out var existing))
+            return existing;
+
         var slot = new OrganSlot(slotId);
         parentEnt.Comp.Organs.Add(slotId, slot);
         return slot;
@@ -74,8 +109,7 @@ public partial class SharedBodySystem
 
         Containers.EnsureContainer<ContainerSlot>(parent.Value, GetOrganContainerId(slotId));
         slot = new OrganSlot(slotId);
-        return part.Organs.TryAdd(slotId, slot.Value);
-		/*
+
         // Shitmed Change Start
         if (!part.Organs.ContainsKey(slotId)
             && !part.Organs.TryAdd(slotId, slot.Value))
@@ -84,7 +118,6 @@ public partial class SharedBodySystem
 
         return true;
         // Shitmed Change End
-		*/
     }
 
     /// <summary>
@@ -160,8 +193,8 @@ public partial class SharedBodySystem
 
         foreach (var slotId in part.Organs.Keys)
         {
-            InsertOrgan(partId, organId, slotId, part, organ);
-            return true;
+            if (InsertOrgan(partId, organId, slotId, part, organ))
+                return true;
         }
 
         return false;
@@ -177,8 +210,16 @@ public partial class SharedBodySystem
         Entity<BodyComponent?> entity)
         where T : IComponent
     {
-        if (!Resolve(entity, ref entity.Comp))
+        if (!Resolve(entity, ref entity.Comp, false)) // Goobstation - added false
             return new List<Entity<T, OrganComponent>>();
+
+        // Goobstation start
+        var ev = new GetBodyOrganOverrideEvent<T>();
+        RaiseLocalEvent(entity, ref ev);
+        var result = ev.Organ;
+        if (result != null)
+            return new List<Entity<T, OrganComponent>> {result.Value};
+        // Goobstation end
 
         var query = GetEntityQuery<T>();
         var list = new List<Entity<T, OrganComponent>>(3);
@@ -219,4 +260,69 @@ public partial class SharedBodySystem
         comps = null;
         return false;
     }
+
+    // Shitmed Change Start
+
+    private void OnOrganEnableChanged(Entity<OrganComponent> organEnt, ref OrganEnableChangedEvent args)
+    {
+        if (!organEnt.Comp.CanEnable && args.Enabled)
+            return;
+
+        organEnt.Comp.Enabled = args.Enabled;
+
+        if (args.Enabled)
+            EnableOrgan(organEnt);
+        else
+            DisableOrgan(organEnt);
+
+        if (organEnt.Comp.Body is { Valid: true } bodyEnt)
+            RaiseLocalEvent(organEnt, new OrganComponentsModifyEvent(bodyEnt, args.Enabled));
+
+        Dirty(organEnt, organEnt.Comp);
+    }
+
+    private void EnableOrgan(Entity<OrganComponent> organEnt)
+    {
+        if (!TryComp(organEnt.Comp.Body, out BodyComponent? body))
+            return;
+
+        // I hate having to hardcode these checks so much.
+        if (HasComp<EyesComponent>(organEnt))
+        {
+            var ev = new OrganEnabledEvent(organEnt);
+            RaiseLocalEvent(organEnt, ref ev);
+        }
+    }
+
+    private void DisableOrgan(Entity<OrganComponent> organEnt)
+    {
+        if (!TryComp(organEnt.Comp.Body, out BodyComponent? body))
+            return;
+
+        // I hate having to hardcode these checks so much.
+        if (HasComp<EyesComponent>(organEnt))
+        {
+            var ev = new OrganDisabledEvent(organEnt);
+            RaiseLocalEvent(organEnt, ref ev);
+        }
+    }
+
+    /// <summary>
+    /// Tries to remove the organ if it is inside of a body part.
+    /// </summary>
+    public bool TryRemoveOrgan(EntityUid organId, OrganComponent? organ = null)
+    {
+        if (!Resolve(organId, ref organ))
+            return false;
+
+        var ev = new TryRemoveOrganEvent(organId, organ);
+        RaiseLocalEvent(organId, ref ev);
+
+        if (ev.Cancelled)
+            return false;
+
+        return RemoveOrgan(organId, organ);
+    }
+
+    // Shitmed Change End
 }
