@@ -8,6 +8,118 @@
 # The sheet is used as an item source, not as a checklist: each placement rolls a random item of the room's pools.
 # Generated from the sheet + prototype data; every id is a real, non-abstract entity.
 
+- type: furnitureGroup
+  id: HorizonFurnishDgBenchMedical
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: TableGlass
+  - table: HorizonDgFreeMedical
+    blocking: false
+  - proto: TableGlass
+    offset: 1,0
+    chance: 0.7
+  - table: HorizonDgFreeMedical
+    offset: 1,0
+    blocking: false
+    chance: 0.7
+
+- type: furnitureGroup
+  id: HorizonFurnishDgBenchScience
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: TableGlass
+  - table: HorizonDgFreeScience
+    blocking: false
+  - proto: TableGlass
+    offset: 1,0
+    chance: 0.7
+  - table: HorizonDgFreeScience
+    offset: 1,0
+    blocking: false
+    chance: 0.7
+
+- type: furnitureGroup
+  id: HorizonFurnishDgBenchEngineering
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: Table
+  - table: HorizonDgFreeEngineering
+    blocking: false
+  - proto: Table
+    offset: 1,0
+    chance: 0.7
+  - table: HorizonDgFreeEngineering
+    offset: 1,0
+    blocking: false
+    chance: 0.7
+
+- type: furnitureGroup
+  id: HorizonFurnishDgBenchArmory
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: TableReinforced
+  - table: HorizonDgFreeArmory
+    blocking: false
+  - proto: TableReinforced
+    offset: 1,0
+    chance: 0.7
+  - table: HorizonDgFreeArmory
+    offset: 1,0
+    blocking: false
+    chance: 0.7
+
+- type: furnitureGroup
+  id: HorizonFurnishDgBenchService
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: Table
+  - table: HorizonDgFreeService
+    blocking: false
+  - proto: Table
+    offset: 1,0
+    chance: 0.7
+  - table: HorizonDgFreeService
+    offset: 1,0
+    blocking: false
+    chance: 0.7
+
+- type: furnitureGroup
+  id: HorizonFurnishDgBenchGeneral
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: Table
+  - table: HorizonDgFreeGeneral
+    blocking: false
+  - proto: Table
+    offset: 1,0
+    chance: 0.7
+  - table: HorizonDgFreeGeneral
+    offset: 1,0
+    blocking: false
+    chance: 0.7
+
+- type: furnitureGroup
+  id: HorizonFurnishDgBenchSalvage
+  placement: Wall
+  clearance: 1
+  members:
+  - proto: Table
+  - table: HorizonDgFreeSalvage
+    blocking: false
+  - proto: Table
+    offset: 1,0
+    chance: 0.7
+  - table: HorizonDgFreeSalvage
+    offset: 1,0
+    blocking: false
+    chance: 0.7
+
 - type: entityTable
   id: HorizonSheetChemistrySolid
   table: !type:GroupSelector
@@ -26,6 +138,9 @@
     - id: BaseGasCondenser
     - id: WeldingFuelTankFull
     - id: SmartFridge
+    - !type:NestedSelector
+      tableId: HorizonDgSolidMedical
+      weight: 10
 
 - type: furnitureGroup
   id: HorizonFurnishChemistryWall
@@ -54,6 +169,9 @@
     - id: BoxBeaker
     - id: SheetPlasma
     - id: HandLabeler
+    - !type:NestedSelector
+      tableId: HorizonDgFreeMedical
+      weight: 12
 
 - type: entityTable
   id: HorizonSheetChemistrySeats
@@ -86,6 +204,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchMedical
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -113,7 +235,7 @@
   - table: HorizonDgFreeMedical
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -271,6 +393,9 @@
     - id: Holopad
     - id: WardrobeMedicalDoctor
     - id: CrateMedical
+    - !type:NestedSelector
+      tableId: HorizonDgSolidMedical
+      weight: 2
 
 - type: furnitureGroup
   id: HorizonFurnishMedbay2Wall
@@ -307,6 +432,9 @@
     - id: Medkit
     - id: ClothingHandsGlovesColorWhite
     - id: Beaker
+    - !type:NestedSelector
+      tableId: HorizonDgFreeMedical
+      weight: 18
 
 - type: roomArchetype
   id: HorizonRoomMedbay2
@@ -332,6 +460,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchMedical
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -354,7 +486,7 @@
   - table: HorizonDgFreeMedical
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -513,6 +645,9 @@
     - id: Holopad
     - id: StasisBed
     - id: CurtainSpawner
+    - !type:NestedSelector
+      tableId: HorizonDgSolidMedical
+      weight: 3
 
 - type: furnitureGroup
   id: HorizonFurnishWardsWall
@@ -559,6 +694,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchMedical
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -576,7 +715,7 @@
   - table: HorizonDgFreeMedical
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -739,6 +878,9 @@
     - id: CrateMedical
     - id: SmartFridge
     - id: OperatingTable
+    - !type:NestedSelector
+      tableId: HorizonDgSolidMedical
+      weight: 6
 
 - type: furnitureGroup
   id: HorizonFurnishMorgueWall
@@ -765,6 +907,9 @@
   table: !type:GroupSelector
     children:
     - id: BoxBodyBag
+    - !type:NestedSelector
+      tableId: HorizonDgFreeMedical
+      weight: 6
 
 - type: roomArchetype
   id: HorizonRoomMorgue
@@ -791,6 +936,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchMedical
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -813,7 +962,7 @@
   - table: HorizonDgFreeMedical
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -975,6 +1124,9 @@
     - id: ComputerCrewMonitoring
     - id: Bed
     - id: PowerCellRecharger
+    - !type:NestedSelector
+      tableId: HorizonDgSolidMedical
+      weight: 5
 
 - type: furnitureGroup
   id: HorizonFurnishCmoOfficeWall
@@ -1001,6 +1153,9 @@
   table: !type:GroupSelector
     children:
     - id: ScrapFaxMachine
+    - !type:NestedSelector
+      tableId: HorizonDgFreeMedical
+      weight: 6
 
 - type: roomArchetype
   id: HorizonRoomCmoOffice
@@ -1027,6 +1182,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchMedical
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -1049,7 +1208,7 @@
   - table: HorizonDgFreeMedical
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -1213,6 +1372,9 @@
     - id: Sink
     - id: SinkEmpty
     - id: CrateSurgery
+    - !type:NestedSelector
+      tableId: HorizonDgSolidMedical
+      weight: 6
 
 - type: furnitureGroup
   id: HorizonFurnishOperatingRoomWall
@@ -1259,6 +1421,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchMedical
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -1276,7 +1442,7 @@
   - table: HorizonDgFreeMedical
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -1438,6 +1604,9 @@
     - id: VendingMachineViroDrobe
     - id: WardrobeVirology
     - id: SmartFridge
+    - !type:NestedSelector
+      tableId: HorizonDgSolidMedical
+      weight: 5
 
 - type: furnitureGroup
   id: HorizonFurnishVirologyWall
@@ -1469,6 +1638,9 @@
     - id: Dropper
     - id: Beaker
     - id: HandLabeler
+    - !type:NestedSelector
+      tableId: HorizonDgFreeMedical
+      weight: 21
 
 - type: roomArchetype
   id: HorizonRoomVirology
@@ -1495,6 +1667,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchMedical
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -1517,7 +1693,7 @@
   - table: HorizonDgFreeMedical
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -1676,6 +1852,9 @@
     - id: Table
     - id: Holopad
     - id: Bookshelf
+    - !type:NestedSelector
+      tableId: HorizonDgSolidMedical
+      weight: 3
 
 - type: furnitureGroup
   id: HorizonFurnishPsychologistWall
@@ -1748,6 +1927,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchMedical
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -1770,7 +1953,7 @@
   - table: HorizonDgFreeMedical
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -1928,6 +2111,9 @@
     - id: CryoPod
     - id: GasThermoMachineFreezer
     - id: AirCanister
+    - !type:NestedSelector
+      tableId: HorizonDgSolidMedical
+      weight: 2
 
 - type: furnitureGroup
   id: HorizonFurnishCryogenicsWall
@@ -1946,6 +2132,9 @@
     - id: Wrench
     - id: GasAnalyzer
     - id: ClothingOuterWinterCoat
+    - !type:NestedSelector
+      tableId: HorizonDgFreeMedical
+      weight: 12
 
 - type: roomArchetype
   id: HorizonRoomCryogenics
@@ -1967,6 +2156,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchMedical
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -1989,7 +2182,7 @@
   - table: HorizonDgFreeMedical
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -2146,6 +2339,9 @@
     children:
     - id: MedicalTechFab
     - id: LockerMedical
+    - !type:NestedSelector
+      tableId: HorizonDgSolidMedical
+      weight: 1
 
 - type: furnitureGroup
   id: HorizonFurnishMedStorageWall
@@ -2198,6 +2394,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchMedical
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -2215,7 +2415,7 @@
   - table: HorizonDgFreeMedical
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -2372,6 +2572,9 @@
     children:
     - id: LockerParamedic
     - id: ComputerCrewMonitoring
+    - !type:NestedSelector
+      tableId: HorizonDgSolidMedical
+      weight: 1
 
 - type: furnitureGroup
   id: HorizonFurnishParamedicWall
@@ -2423,6 +2626,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchMedical
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -2440,7 +2647,7 @@
   - table: HorizonDgFreeMedical
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -2600,6 +2807,9 @@
     - id: KitchenMicrowave
     - id: VendingMachineCigs
     - id: WaterCooler
+    - !type:NestedSelector
+      tableId: HorizonDgSolidMedical
+      weight: 4
 
 - type: furnitureGroup
   id: HorizonFurnishMedBreakWall
@@ -2627,6 +2837,9 @@
     children:
     - id: FoodDonkpocket
     - id: Ashtray
+    - !type:NestedSelector
+      tableId: HorizonDgFreeMedical
+      weight: 9
 
 - type: entityTable
   id: HorizonSheetMedBreakSeats
@@ -2660,6 +2873,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchMedical
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -2687,7 +2904,7 @@
   - table: HorizonDgFreeMedical
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -2845,6 +3062,9 @@
     - id: MachineCryoSleepPod
     - id: Holopad
     - id: CrateMedicalSecure
+    - !type:NestedSelector
+      tableId: HorizonDgSolidMedical
+      weight: 2
 
 - type: furnitureGroup
   id: HorizonFurnishCryoSleepWall
@@ -2876,6 +3096,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchMedical
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -2893,7 +3117,7 @@
   - table: HorizonDgFreeMedical
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -3052,6 +3276,9 @@
     - id: MachineAnomalyVessel
     - id: Holopad
     - id: ComputerResearchAndDevelopment
+    - !type:NestedSelector
+      tableId: HorizonDgSolidScience
+      weight: 3
 
 - type: furnitureGroup
   id: HorizonFurnishAnomalyWall
@@ -3079,6 +3306,9 @@
     children:
     - id: AnomalyScanner
     - id: Wrench
+    - !type:NestedSelector
+      tableId: HorizonDgFreeScience
+      weight: 9
 
 - type: roomArchetype
   id: HorizonRoomAnomaly
@@ -3105,6 +3335,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchScience
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -3127,7 +3361,7 @@
   - table: HorizonDgFreeScience
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -3290,6 +3524,9 @@
     - id: computerBodyScanner
     - id: PowerCellRecharger
     - id: ExosuitFabricator
+    - !type:NestedSelector
+      tableId: HorizonDgSolidScience
+      weight: 6
 
 - type: furnitureGroup
   id: HorizonFurnishRoboticsWall
@@ -3336,6 +3573,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchScience
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -3353,7 +3594,7 @@
   - table: HorizonDgFreeScience
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -3513,6 +3754,9 @@
     - id: ClosetRadiationSuit
     - id: ClosetBomb
     - id: ClosetL3
+    - !type:NestedSelector
+      tableId: HorizonDgSolidScience
+      weight: 4
 
 - type: furnitureGroup
   id: HorizonFurnishXenoarchWall
@@ -3540,6 +3784,9 @@
     children:
     - id: HandLabeler
     - id: WeaponLaserCarbinePractice
+    - !type:NestedSelector
+      tableId: HorizonDgFreeScience
+      weight: 9
 
 - type: roomArchetype
   id: HorizonRoomXenoarch
@@ -3566,6 +3813,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchScience
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -3588,7 +3839,7 @@
   - table: HorizonDgFreeScience
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -3750,6 +4001,9 @@
     - id: ComputerRoboticsControl
     - id: Bed
     - id: ComputerResearchAndDevelopment
+    - !type:NestedSelector
+      tableId: HorizonDgSolidScience
+      weight: 5
 
 - type: furnitureGroup
   id: HorizonFurnishRdOfficeWall
@@ -3777,6 +4031,9 @@
     children:
     - id: ScrapFaxMachine
     - id: PottedPlantRD
+    - !type:NestedSelector
+      tableId: HorizonDgFreeScience
+      weight: 9
 
 - type: roomArchetype
   id: HorizonRoomRdOffice
@@ -3803,6 +4060,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchScience
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -3825,7 +4086,7 @@
   - table: HorizonDgFreeScience
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -3982,6 +4243,9 @@
     children:
     - id: GasThermoMachineFreezer
     - id: ComputerResearchAndDevelopment
+    - !type:NestedSelector
+      tableId: HorizonDgSolidScience
+      weight: 1
 
 - type: furnitureGroup
   id: HorizonFurnishRndServerWall
@@ -4013,6 +4277,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchScience
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -4030,7 +4298,7 @@
   - table: HorizonDgFreeScience
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -4194,6 +4462,9 @@
     - id: LockerScientist
     - id: VendingMachineSciDrobe
     - id: PowerCellRecharger
+    - !type:NestedSelector
+      tableId: HorizonDgSolidScience
+      weight: 6
 
 - type: furnitureGroup
   id: HorizonFurnishRndLabWall
@@ -4221,6 +4492,9 @@
     children:
     - id: ClothingHandsGlovesColorWhite
     - id: ClothingBeltUtility
+    - !type:NestedSelector
+      tableId: HorizonDgFreeScience
+      weight: 9
 
 - type: roomArchetype
   id: HorizonRoomRndLab
@@ -4247,6 +4521,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchScience
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -4269,7 +4547,7 @@
   - table: HorizonDgFreeScience
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -4426,6 +4704,9 @@
     children:
     - id: GasThermoMachineFreezer
     - id: GasThermoMachineHeater
+    - !type:NestedSelector
+      tableId: HorizonDgSolidScience
+      weight: 1
 
 - type: furnitureGroup
   id: HorizonFurnishToxinsWall
@@ -4446,6 +4727,9 @@
     - id: GasPressurePump
     - id: ClothingMaskGas
     - id: MedkitToxin
+    - !type:NestedSelector
+      tableId: HorizonDgFreeScience
+      weight: 18
 
 - type: roomArchetype
   id: HorizonRoomToxins
@@ -4467,6 +4751,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchScience
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -4489,7 +4777,7 @@
   - table: HorizonDgFreeScience
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -4647,6 +4935,9 @@
     - id: NitrogenCanister
     - id: PlasmaCanister
     - id: NitrousOxideCanister
+    - !type:NestedSelector
+      tableId: HorizonDgSolidScience
+      weight: 2
 
 - type: furnitureGroup
   id: HorizonFurnishCanisterStoreWall
@@ -4678,6 +4969,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchScience
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -4695,7 +4990,7 @@
   - table: HorizonDgFreeScience
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -4855,6 +5150,9 @@
     - id: KitchenMicrowave
     - id: VendingMachineCigs
     - id: WaterCooler
+    - !type:NestedSelector
+      tableId: HorizonDgSolidScience
+      weight: 4
 
 - type: furnitureGroup
   id: HorizonFurnishSciBreakWall
@@ -4882,6 +5180,9 @@
     children:
     - id: FoodDonkpocket
     - id: Ashtray
+    - !type:NestedSelector
+      tableId: HorizonDgFreeScience
+      weight: 9
 
 - type: entityTable
   id: HorizonSheetSciBreakSeats
@@ -4914,6 +5215,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchScience
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -4941,7 +5246,7 @@
   - table: HorizonDgFreeScience
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -5098,6 +5403,9 @@
     children:
     - id: GravityGenerator
     - id: ComputerPowerMonitoring
+    - !type:NestedSelector
+      tableId: HorizonDgSolidEngineering
+      weight: 1
 
 - type: furnitureGroup
   id: HorizonFurnishGravityRoomWall
@@ -5149,6 +5457,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchEngineering
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -5166,7 +5478,7 @@
   - table: HorizonDgFreeEngineering
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -5330,6 +5642,9 @@
     - id: filingCabinetDrawer
     - id: Bed
     - id: SuitStorageBase
+    - !type:NestedSelector
+      tableId: HorizonDgSolidEngineering
+      weight: 4
 
 - type: furnitureGroup
   id: HorizonFurnishCeOfficeWall
@@ -5356,6 +5671,9 @@
   table: !type:GroupSelector
     children:
     - id: RCDAmmo
+    - !type:NestedSelector
+      tableId: HorizonDgFreeEngineering
+      weight: 6
 
 - type: roomArchetype
   id: HorizonRoomCeOffice
@@ -5382,6 +5700,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchEngineering
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -5404,7 +5726,7 @@
   - table: HorizonDgFreeEngineering
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -5573,6 +5895,9 @@
     - id: VendingMachineTankDispenserEngineering
     - id: WaterTank
     - id: WeldingFuelTank
+    - !type:NestedSelector
+      tableId: HorizonDgSolidEngineering
+      weight: 7
 
 - type: furnitureGroup
   id: HorizonFurnishAtmosWall
@@ -5617,6 +5942,9 @@
     children:
     - id: GasOutletInjector
     - id: GasPassiveVent
+    - !type:NestedSelector
+      tableId: HorizonDgFreeEngineering
+      weight: 9
 
 - type: roomArchetype
   id: HorizonRoomAtmos
@@ -5647,6 +5975,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchEngineering
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -5669,7 +6001,7 @@
   - table: HorizonDgFreeEngineering
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -5840,6 +6172,9 @@
     - id: ClosetTool
     - id: LockerWeldingSupplies
     - id: ClosetRadiationSuit
+    - !type:NestedSelector
+      tableId: HorizonDgSolidEngineering
+      weight: 8
 
 - type: furnitureGroup
   id: HorizonFurnishMainEngineeringWall
@@ -5878,6 +6213,9 @@
     - id: SprayPainter
     - id: ClothingEyesHudDiagnostic
     - id: ClothingHeadHatBeretEngineering
+    - !type:NestedSelector
+      tableId: HorizonDgFreeEngineering
+      weight: 42
 
 - type: roomArchetype
   id: HorizonRoomMainEngineering
@@ -5904,6 +6242,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchEngineering
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -5926,7 +6268,7 @@
   - table: HorizonDgFreeEngineering
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -6104,6 +6446,9 @@
     - id: ClothingHandsGlovesColorYellow
     - id: ToolboxMechanicalFilled
     - id: ToolboxElectricalFilled
+    - !type:NestedSelector
+      tableId: HorizonDgFreeEngineering
+      weight: 12
 
 - type: roomArchetype
   id: HorizonRoomBoardStore
@@ -6125,6 +6470,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchEngineering
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -6147,7 +6496,7 @@
   - table: HorizonDgFreeEngineering
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -6311,6 +6660,9 @@
     - id: VendingMachineAtmosDrobe
     - id: VendingMachineTankDispenserEVA
     - id: VendingMachineTankDispenserEngineering
+    - !type:NestedSelector
+      tableId: HorizonDgSolidEngineering
+      weight: 4
 
 - type: furnitureGroup
   id: HorizonFurnishAtmosLockerWall
@@ -6357,6 +6709,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchEngineering
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -6374,7 +6730,7 @@
   - table: HorizonDgFreeEngineering
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -6538,6 +6894,9 @@
     - id: KitchenMicrowave
     - id: VendingMachineCigs
     - id: WaterCooler
+    - !type:NestedSelector
+      tableId: HorizonDgSolidEngineering
+      weight: 4
 
 - type: furnitureGroup
   id: HorizonFurnishEngBreakWall
@@ -6565,6 +6924,9 @@
     children:
     - id: FoodDonkpocket
     - id: Ashtray
+    - !type:NestedSelector
+      tableId: HorizonDgFreeEngineering
+      weight: 9
 
 - type: entityTable
   id: HorizonSheetEngBreakSeats
@@ -6598,6 +6960,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchEngineering
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -6625,7 +6991,7 @@
   - table: HorizonDgFreeEngineering
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -6789,6 +7155,9 @@
     - id: Dresser
     - id: filingCabinetDrawer
     - id: Bed
+    - !type:NestedSelector
+      tableId: HorizonDgSolidArmory
+      weight: 4
 
 - type: furnitureGroup
   id: HorizonFurnishHosOfficeWall
@@ -6815,6 +7184,9 @@
   table: !type:GroupSelector
     children:
     - id: ScrapFaxMachine
+    - !type:NestedSelector
+      tableId: HorizonDgFreeArmory
+      weight: 6
 
 - type: roomArchetype
   id: HorizonRoomHosOffice
@@ -6841,6 +7213,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchArmory
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -6863,7 +7239,7 @@
   - table: HorizonDgFreeArmory
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -7016,6 +7392,9 @@
     children:
     - id: Holopad
     - id: LockerEvidence
+    - !type:NestedSelector
+      tableId: HorizonDgSolidArmory
+      weight: 1
 
 - type: furnitureGroup
   id: HorizonFurnishBrigWall
@@ -7034,6 +7413,9 @@
     - id: Handcuffs
     - id: FoodSnackNutribrick
     - id: ClothingHandsGlovesColorBlack
+    - !type:NestedSelector
+      tableId: HorizonDgFreeArmory
+      weight: 12
 
 - type: roomArchetype
   id: HorizonRoomBrig
@@ -7055,6 +7437,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchArmory
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -7077,7 +7463,7 @@
   - table: HorizonDgFreeArmory
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -7232,6 +7618,9 @@
     - id: WardrobePrison
     - id: CrateFunBoardGames
     - id: RandomArcade
+    - !type:NestedSelector
+      tableId: HorizonDgSolidArmory
+      weight: 3
 
 - type: furnitureGroup
   id: HorizonFurnishCellsWall
@@ -7275,6 +7664,9 @@
     children:
     - id: AcousticGuitarInstrument
     - id: ViolinInstrument
+    - !type:NestedSelector
+      tableId: HorizonDgFreeArmory
+      weight: 9
 
 - type: roomArchetype
   id: HorizonRoomCells
@@ -7305,6 +7697,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchArmory
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -7327,7 +7723,7 @@
   - table: HorizonDgFreeArmory
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -7482,6 +7878,9 @@
     - id: SuitStorageBase
     - id: SecurityTechFab
     - id: Holopad
+    - !type:NestedSelector
+      tableId: HorizonDgSolidArmory
+      weight: 3
 
 - type: furnitureGroup
   id: HorizonFurnishWardenOfficeWall
@@ -7525,6 +7924,9 @@
   table: !type:GroupSelector
     children:
     - id: ScrapFaxMachine
+    - !type:NestedSelector
+      tableId: HorizonDgFreeArmory
+      weight: 6
 
 - type: roomArchetype
   id: HorizonRoomWardenOffice
@@ -7555,6 +7957,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchArmory
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -7577,7 +7983,7 @@
   - table: HorizonDgFreeArmory
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -7730,6 +8136,9 @@
     children:
     - id: Table
     - id: Holopad
+    - !type:NestedSelector
+      tableId: HorizonDgSolidArmory
+      weight: 1
 
 - type: furnitureGroup
   id: HorizonFurnishInterrogationWall
@@ -7763,6 +8172,9 @@
   table: !type:GroupSelector
     children:
     - id: LampInterrogator
+    - !type:NestedSelector
+      tableId: HorizonDgFreeArmory
+      weight: 6
 
 - type: entityTable
   id: HorizonSheetInterrogationSeats
@@ -7794,6 +8206,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchArmory
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -7821,7 +8237,7 @@
   - table: HorizonDgFreeArmory
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -7983,6 +8399,9 @@
     - id: RandomVendingDrinks
     - id: RandomArcade
     - id: VendingMachineSustenance
+    - !type:NestedSelector
+      tableId: HorizonDgSolidArmory
+      weight: 8
 
 - type: furnitureGroup
   id: HorizonFurnishPermabrigWall
@@ -8009,6 +8428,9 @@
   table: !type:GroupSelector
     children:
     - id: Beaker
+    - !type:NestedSelector
+      tableId: HorizonDgFreeArmory
+      weight: 6
 
 - type: roomArchetype
   id: HorizonRoomPermabrig
@@ -8035,6 +8457,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchArmory
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -8057,7 +8483,7 @@
   - table: HorizonDgFreeArmory
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -8211,6 +8637,9 @@
     - id: VendingMachineDetDrobe
     - id: LockerDetective
     - id: Morgue
+    - !type:NestedSelector
+      tableId: HorizonDgSolidArmory
+      weight: 2
 
 - type: furnitureGroup
   id: HorizonFurnishDetectiveOfficeWall
@@ -8244,6 +8673,9 @@
     children:
     - id: BoxForensicPad
     - id: ScrapFaxMachine
+    - !type:NestedSelector
+      tableId: HorizonDgFreeArmory
+      weight: 9
 
 - type: roomArchetype
   id: HorizonRoomDetectiveOffice
@@ -8269,6 +8701,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchArmory
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -8291,7 +8727,7 @@
   - table: HorizonDgFreeArmory
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -8446,6 +8882,9 @@
     - id: VendingMachineSec
     - id: VendingMachineSecDrobe
     - id: WeaponCapacitorRecharger
+    - !type:NestedSelector
+      tableId: HorizonDgSolidArmory
+      weight: 3
 
 - type: furnitureGroup
   id: HorizonFurnishSecLockerWall
@@ -8474,6 +8913,9 @@
     - id: WeaponDisabler
     - id: Stunbaton
     - id: ClothingEyesHudSecurity
+    - !type:NestedSelector
+      tableId: HorizonDgFreeArmory
+      weight: 12
 
 - type: roomArchetype
   id: HorizonRoomSecLocker
@@ -8500,6 +8942,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchArmory
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -8522,7 +8968,7 @@
   - table: HorizonDgFreeArmory
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -8675,6 +9121,9 @@
     children:
     - id: GasOutletInjector
     - id: Handcuffs
+    - !type:NestedSelector
+      tableId: HorizonDgFreeArmory
+      weight: 9
 
 - type: roomArchetype
   id: HorizonRoomExecutionRoom
@@ -8692,6 +9141,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchArmory
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -8714,7 +9167,7 @@
   - table: HorizonDgFreeArmory
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -8870,6 +9323,9 @@
     - id: VendingMachineSecDrobe
     - id: PowerCellRecharger
     - id: WeaponCapacitorRecharger
+    - !type:NestedSelector
+      tableId: HorizonDgSolidArmory
+      weight: 4
 
 - type: furnitureGroup
   id: HorizonFurnishCheckpointWall
@@ -8898,6 +9354,9 @@
     - id: WeaponDisabler
     - id: Stunbaton
     - id: Handcuffs
+    - !type:NestedSelector
+      tableId: HorizonDgFreeArmory
+      weight: 12
 
 - type: entityTable
   id: HorizonSheetCheckpointSeats
@@ -8930,6 +9389,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchArmory
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -8957,7 +9420,7 @@
   - table: HorizonDgFreeArmory
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -9112,6 +9575,9 @@
     - id: TargetSyndicate
     - id: TargetClown
     - id: WeaponCapacitorRecharger
+    - !type:NestedSelector
+      tableId: HorizonDgSolidArmory
+      weight: 3
 
 - type: furnitureGroup
   id: HorizonFurnishFiringRangeWall
@@ -9158,6 +9624,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchArmory
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -9175,7 +9645,7 @@
   - table: HorizonDgFreeArmory
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -9328,6 +9798,9 @@
     children:
     - id: MedicalBed
     - id: StasisBed
+    - !type:NestedSelector
+      tableId: HorizonDgSolidArmory
+      weight: 1
 
 - type: furnitureGroup
   id: HorizonFurnishSecMedicalWall
@@ -9362,6 +9835,9 @@
     children:
     - id: HandheldHealthAnalyzerUnpowered
     - id: ClothingHandsGlovesColorWhite
+    - !type:NestedSelector
+      tableId: HorizonDgFreeArmory
+      weight: 9
 
 - type: roomArchetype
   id: HorizonRoomSecMedical
@@ -9387,6 +9863,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchArmory
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -9409,7 +9889,7 @@
   - table: HorizonDgFreeArmory
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -9568,6 +10048,9 @@
     - id: Sink
     - id: SinkEmpty
     - id: Jukebox
+    - !type:NestedSelector
+      tableId: HorizonDgSolidService
+      weight: 6
 
 - type: furnitureGroup
   id: HorizonFurnishBarWall
@@ -9620,6 +10103,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -9642,7 +10129,7 @@
   - table: HorizonDgFreeService
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -9801,6 +10288,9 @@
     - id: Holopad
     - id: VendingMachineChefvend
     - id: VendingMachineChefDrobe
+    - !type:NestedSelector
+      tableId: HorizonDgSolidService
+      weight: 6
 
 - type: furnitureGroup
   id: HorizonFurnishKitchen2Wall
@@ -9828,6 +10318,9 @@
     children:
     - id: KitchenKnife
     - id: ButchCleaver
+    - !type:NestedSelector
+      tableId: HorizonDgFreeService
+      weight: 9
 
 - type: roomArchetype
   id: HorizonRoomKitchen2
@@ -9854,6 +10347,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -9876,7 +10373,7 @@
   - table: HorizonDgFreeService
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -10032,6 +10529,9 @@
     - id: GasThermoMachineFreezer
     - id: CrateFreezer
     - id: LockerFreezer
+    - !type:NestedSelector
+      tableId: HorizonDgSolidService
+      weight: 4
 
 - type: furnitureGroup
   id: HorizonFurnishFridgeWall
@@ -10078,6 +10578,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -10095,7 +10599,7 @@
   - table: HorizonDgFreeService
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -10257,6 +10761,9 @@
     - id: Biogenerator
     - id: Sink
     - id: SinkEmpty
+    - !type:NestedSelector
+      tableId: HorizonDgSolidService
+      weight: 8
 
 - type: furnitureGroup
   id: HorizonFurnishHydro2Wall
@@ -10284,6 +10791,9 @@
     children:
     - id: Wrench
     - id: BoxMouthSwab
+    - !type:NestedSelector
+      tableId: HorizonDgFreeService
+      weight: 9
 
 - type: roomArchetype
   id: HorizonRoomHydro2
@@ -10310,6 +10820,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -10332,7 +10846,7 @@
   - table: HorizonDgFreeService
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -10491,6 +11005,9 @@
     - id: FloorDrain
     - id: WaterTank
     - id: CrateServiceJanitorialSupplies
+    - !type:NestedSelector
+      tableId: HorizonDgSolidService
+      weight: 6
 
 - type: furnitureGroup
   id: HorizonFurnishJanitorWall
@@ -10518,6 +11035,9 @@
     children:
     - id: Bucket
     - id: MopItem
+    - !type:NestedSelector
+      tableId: HorizonDgFreeService
+      weight: 9
 
 - type: roomArchetype
   id: HorizonRoomJanitor
@@ -10544,6 +11064,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -10566,7 +11090,7 @@
   - table: HorizonDgFreeService
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -10720,6 +11244,9 @@
     - id: AltarConvertWhite
     - id: Holopad
     - id: ChurchBell
+    - !type:NestedSelector
+      tableId: HorizonDgSolidService
+      weight: 2
 
 - type: furnitureGroup
   id: HorizonFurnishChapelWall
@@ -10736,6 +11263,9 @@
   table: !type:GroupSelector
     children:
     - id: BoxCandle
+    - !type:NestedSelector
+      tableId: HorizonDgFreeService
+      weight: 6
 
 - type: roomArchetype
   id: HorizonRoomChapel
@@ -10757,6 +11287,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -10779,7 +11313,7 @@
   - table: HorizonDgFreeService
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -10934,6 +11468,9 @@
     - id: Bed
     - id: Crematorium
     - id: WardrobeChapel
+    - !type:NestedSelector
+      tableId: HorizonDgSolidService
+      weight: 3
 
 - type: furnitureGroup
   id: HorizonFurnishChaplainRoomWall
@@ -10980,6 +11517,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -10997,7 +11538,7 @@
   - table: HorizonDgFreeService
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -11150,6 +11691,9 @@
     children:
     - id: VendingBarDrobe
     - id: Bed
+    - !type:NestedSelector
+      tableId: HorizonDgSolidService
+      weight: 1
 
 - type: furnitureGroup
   id: HorizonFurnishBartenderRoomWall
@@ -11181,6 +11725,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -11198,7 +11746,7 @@
   - table: HorizonDgFreeService
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -11351,6 +11899,9 @@
     children:
     - id: VendingMachineTheater
     - id: VendingMachineClothing
+    - !type:NestedSelector
+      tableId: HorizonDgSolidService
+      weight: 1
 
 - type: furnitureGroup
   id: HorizonFurnishTheatreWall
@@ -11368,6 +11919,9 @@
     children:
     - id: AcousticGuitarInstrument
     - id: ViolinInstrument
+    - !type:NestedSelector
+      tableId: HorizonDgFreeService
+      weight: 9
 
 - type: entityTable
   id: HorizonSheetTheatreSeats
@@ -11396,6 +11950,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -11423,7 +11981,7 @@
   - table: HorizonDgFreeService
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -11576,6 +12134,9 @@
     children:
     - id: ComputerMassMedia
     - id: Holopad
+    - !type:NestedSelector
+      tableId: HorizonDgSolidService
+      weight: 1
 
 - type: furnitureGroup
   id: HorizonFurnishReporterOfficeWall
@@ -11607,6 +12168,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -11624,7 +12189,7 @@
   - table: HorizonDgFreeService
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -11778,6 +12343,9 @@
     - id: Crematorium
     - id: Morgue
     - id: CrateCoffin
+    - !type:NestedSelector
+      tableId: HorizonDgSolidService
+      weight: 2
 
 - type: furnitureGroup
   id: HorizonFurnishChapelMorgueWall
@@ -11794,6 +12362,9 @@
   table: !type:GroupSelector
     children:
     - id: BoxBodyBag
+    - !type:NestedSelector
+      tableId: HorizonDgFreeService
+      weight: 6
 
 - type: roomArchetype
   id: HorizonRoomChapelMorgue
@@ -11815,6 +12386,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -11837,7 +12412,7 @@
   - table: HorizonDgFreeService
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -11989,6 +12564,9 @@
   table: !type:GroupSelector
     children:
     - id: LockerClown
+    - !type:NestedSelector
+      tableId: HorizonDgSolidService
+      weight: 1
 
 - type: furnitureGroup
   id: HorizonFurnishClownRoomWall
@@ -12008,6 +12586,9 @@
     - id: FoodBanana
     - id: PlasticBanana
     - id: LauncherCreamPie
+    - !type:NestedSelector
+      tableId: HorizonDgFreeService
+      weight: 15
 
 - type: roomArchetype
   id: HorizonRoomClownRoom
@@ -12029,6 +12610,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -12051,7 +12636,7 @@
   - table: HorizonDgFreeService
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -12203,6 +12788,9 @@
   table: !type:GroupSelector
     children:
     - id: LockerMime
+    - !type:NestedSelector
+      tableId: HorizonDgSolidService
+      weight: 1
 
 - type: furnitureGroup
   id: HorizonFurnishMimeRoomWall
@@ -12220,6 +12808,9 @@
     children:
     - id: DrinkBottleOfNothingFull
     - id: FoodTartMime
+    - !type:NestedSelector
+      tableId: HorizonDgFreeService
+      weight: 9
 
 - type: roomArchetype
   id: HorizonRoomMimeRoom
@@ -12241,6 +12832,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -12263,7 +12858,7 @@
   - table: HorizonDgFreeService
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -12416,6 +13011,9 @@
     children:
     - id: AcousticGuitarInstrument
     - id: ViolinInstrument
+    - !type:NestedSelector
+      tableId: HorizonDgFreeService
+      weight: 9
 
 - type: roomArchetype
   id: HorizonRoomMusicianRoom
@@ -12433,6 +13031,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -12455,7 +13057,7 @@
   - table: HorizonDgFreeService
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -12609,6 +13211,9 @@
     - id: DogBed
     - id: OperatingTable
     - id: computerBodyScanner
+    - !type:NestedSelector
+      tableId: HorizonDgSolidService
+      weight: 2
 
 - type: furnitureGroup
   id: HorizonFurnishZooRoomWall
@@ -12625,6 +13230,9 @@
   table: !type:GroupSelector
     children:
     - id: PetCarrier
+    - !type:NestedSelector
+      tableId: HorizonDgFreeService
+      weight: 6
 
 - type: roomArchetype
   id: HorizonRoomZooRoom
@@ -12646,6 +13254,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -12668,7 +13280,7 @@
   - table: HorizonDgFreeService
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -12824,6 +13436,9 @@
     - id: Dresser
     - id: filingCabinetDrawer
     - id: Table
+    - !type:NestedSelector
+      tableId: HorizonDgSolidGeneral
+      weight: 4
 
 - type: furnitureGroup
   id: HorizonFurnishDormWall
@@ -12851,6 +13466,9 @@
     children:
     - id: BedsheetNT
     - id: BedsheetMedical
+    - !type:NestedSelector
+      tableId: HorizonDgFreeGeneral
+      weight: 9
 
 - type: entityTable
   id: HorizonSheetDormSeats
@@ -12883,6 +13501,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -12910,7 +13532,7 @@
   - table: HorizonDgFreeGeneral
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -13061,6 +13683,9 @@
     - id: Sink
     - id: SinkEmpty
     - id: FloorDrain
+    - !type:NestedSelector
+      tableId: HorizonDgSolidGeneral
+      weight: 3
 
 - type: furnitureGroup
   id: HorizonFurnishToiletsWall
@@ -13106,6 +13731,9 @@
     - id: ToyRubberDuck
     - id: Soap
     - id: SoapNT
+    - !type:NestedSelector
+      tableId: HorizonDgFreeGeneral
+      weight: 12
 
 - type: roomArchetype
   id: HorizonRoomToilets
@@ -13136,6 +13764,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -13158,7 +13790,7 @@
   - table: HorizonDgFreeGeneral
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -13308,6 +13940,9 @@
     - id: Holopad
     - id: PowerCellRecharger
     - id: Autolathe
+    - !type:NestedSelector
+      tableId: HorizonDgSolidGeneral
+      weight: 2
 
 - type: furnitureGroup
   id: HorizonFurnishToolStoreWall
@@ -13329,6 +13964,9 @@
     - id: ClothingBeltUtility
     - id: SprayPainter
     - id: HandLabeler
+    - !type:NestedSelector
+      tableId: HorizonDgFreeGeneral
+      weight: 21
 
 - type: roomArchetype
   id: HorizonRoomToolStore
@@ -13350,6 +13988,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -13372,7 +14014,7 @@
   - table: HorizonDgFreeGeneral
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -13524,6 +14166,9 @@
     - id: NFRandomBook
     - id: Table
     - id: FigureSpawner
+    - !type:NestedSelector
+      tableId: HorizonDgSolidGeneral
+      weight: 4
 
 - type: furnitureGroup
   id: HorizonFurnishLibraryWall
@@ -13551,6 +14196,9 @@
     children:
     - id: DiceBag
     - id: ScrapFaxMachine
+    - !type:NestedSelector
+      tableId: HorizonDgFreeGeneral
+      weight: 9
 
 - type: roomArchetype
   id: HorizonRoomLibrary
@@ -13577,6 +14225,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -13599,7 +14251,7 @@
   - table: HorizonDgFreeGeneral
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -13752,6 +14404,9 @@
     - id: ClosetFire
     - id: RandomVendingSnacks
     - id: RandomVendingDrinks
+    - !type:NestedSelector
+      tableId: HorizonDgSolidGeneral
+      weight: 4
 
 - type: furnitureGroup
   id: HorizonFurnishArrivalsWall
@@ -13798,6 +14453,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -13815,7 +14474,7 @@
   - table: HorizonDgFreeGeneral
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -13963,6 +14622,9 @@
   table: !type:GroupSelector
     children:
     - id: Holopad
+    - !type:NestedSelector
+      tableId: HorizonDgSolidGeneral
+      weight: 1
 
 - type: furnitureGroup
   id: HorizonFurnishGymWall
@@ -13999,6 +14661,9 @@
     - id: UniformShortsRed
     - id: Medkit
     - id: DrinkWaterBottleFull
+    - !type:NestedSelector
+      tableId: HorizonDgFreeGeneral
+      weight: 18
 
 - type: roomArchetype
   id: HorizonRoomGym
@@ -14024,6 +14689,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -14046,7 +14715,7 @@
   - table: HorizonDgFreeGeneral
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -14197,6 +14866,9 @@
     - id: SpawnDungeonLootSeed
     - id: Sink
     - id: SinkEmpty
+    - !type:NestedSelector
+      tableId: HorizonDgSolidGeneral
+      weight: 3
 
 - type: furnitureGroup
   id: HorizonFurnishPublicGardenWall
@@ -14243,6 +14915,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -14260,7 +14936,7 @@
   - table: HorizonDgFreeGeneral
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -14411,6 +15087,9 @@
     - id: RandomVendingSnacks
     - id: RandomVendingDrinks
     - id: Holopad
+    - !type:NestedSelector
+      tableId: HorizonDgSolidGeneral
+      weight: 3
 
 - type: furnitureGroup
   id: HorizonFurnishCourtroomWall
@@ -14441,6 +15120,9 @@
     - id: Paper
     - id: SheetPaper
     - id: BriefcaseBrown
+    - !type:NestedSelector
+      tableId: HorizonDgFreeGeneral
+      weight: 18
 
 - type: entityTable
   id: HorizonSheetCourtroomSeats
@@ -14474,6 +15156,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -14501,7 +15187,7 @@
   - table: HorizonDgFreeGeneral
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -14651,6 +15337,9 @@
     - id: VendingMachineClothing
     - id: VendingMachineTheater
     - id: Holopad
+    - !type:NestedSelector
+      tableId: HorizonDgSolidGeneral
+      weight: 2
 
 - type: furnitureGroup
   id: HorizonFurnishLockerWall
@@ -14682,6 +15371,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -14699,7 +15392,7 @@
   - table: HorizonDgFreeGeneral
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -14865,6 +15558,9 @@
     - id: ComputerMassMedia
     - id: ComputerSurveillanceWirelessCameraMonitor
     - id: Holopad
+    - !type:NestedSelector
+      tableId: HorizonDgSolidGeneral
+      weight: 13
 
 - type: furnitureGroup
   id: HorizonFurnishBridgeWall
@@ -14908,6 +15604,9 @@
   table: !type:GroupSelector
     children:
     - id: Medkit
+    - !type:NestedSelector
+      tableId: HorizonDgFreeGeneral
+      weight: 6
 
 - type: roomArchetype
   id: HorizonRoomBridge
@@ -14938,6 +15637,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -14960,7 +15663,7 @@
   - table: HorizonDgFreeGeneral
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -15113,6 +15816,9 @@
     - id: SuitStorageBase
     - id: Holopad
     - id: WeaponCapacitorRecharger
+    - !type:NestedSelector
+      tableId: HorizonDgSolidGeneral
+      weight: 4
 
 - type: furnitureGroup
   id: HorizonFurnishCaptainQuartersWall
@@ -15140,6 +15846,9 @@
     children:
     - id: ScrapFaxMachine
     - id: PinpointerDeadDrop
+    - !type:NestedSelector
+      tableId: HorizonDgFreeGeneral
+      weight: 9
 
 - type: roomArchetype
   id: HorizonRoomCaptainQuarters
@@ -15166,6 +15875,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -15188,7 +15901,7 @@
   - table: HorizonDgFreeGeneral
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -15343,6 +16056,9 @@
     - id: CrateServicePersonnel
     - id: Holopad
     - id: DogBed
+    - !type:NestedSelector
+      tableId: HorizonDgSolidGeneral
+      weight: 6
 
 - type: furnitureGroup
   id: HorizonFurnishHopOfficeWall
@@ -15373,6 +16089,9 @@
     - id: BoxPDA
     - id: BoxFolderBase
     - id: BoxFolderBaseEmpty
+    - !type:NestedSelector
+      tableId: HorizonDgFreeGeneral
+      weight: 18
 
 - type: roomArchetype
   id: HorizonRoomHopOffice
@@ -15399,6 +16118,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -15421,7 +16144,7 @@
   - table: HorizonDgFreeGeneral
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -15570,6 +16293,9 @@
     children:
     - id: VendingMachineLawDrobe
     - id: Holopad
+    - !type:NestedSelector
+      tableId: HorizonDgSolidGeneral
+      weight: 1
 
 - type: furnitureGroup
   id: HorizonFurnishLawyerOfficeWall
@@ -15586,6 +16312,9 @@
   table: !type:GroupSelector
     children:
     - id: ScrapFaxMachine
+    - !type:NestedSelector
+      tableId: HorizonDgFreeGeneral
+      weight: 6
 
 - type: roomArchetype
   id: HorizonRoomLawyerOffice
@@ -15607,6 +16336,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -15629,7 +16362,7 @@
   - table: HorizonDgFreeGeneral
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -15778,6 +16511,9 @@
     children:
     - id: CrateMaterialGold
     - id: CrateMaterialSilver
+    - !type:NestedSelector
+      tableId: HorizonDgSolidGeneral
+      weight: 1
 
 - type: furnitureGroup
   id: HorizonFurnishVault2Wall
@@ -15812,6 +16548,9 @@
     - id: GoldOre
     - id: SilverOre
     - id: MedalCase
+    - !type:NestedSelector
+      tableId: HorizonDgFreeGeneral
+      weight: 12
 
 - type: roomArchetype
   id: HorizonRoomVault2
@@ -15837,6 +16576,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -15859,7 +16602,7 @@
   - table: HorizonDgFreeGeneral
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -16009,6 +16752,9 @@
     - id: SuitStorageBase
     - id: VendingMachineTankDispenserEVA
     - id: VendingMachineTankDispenserEngineering
+    - !type:NestedSelector
+      tableId: HorizonDgSolidGeneral
+      weight: 2
 
 - type: furnitureGroup
   id: HorizonFurnishEvaStorageWall
@@ -16027,6 +16773,9 @@
     - id: JetpackBlue
     - id: JetpackBlack
     - id: ClothingBeltUtility
+    - !type:NestedSelector
+      tableId: HorizonDgFreeGeneral
+      weight: 12
 
 - type: roomArchetype
   id: HorizonRoomEvaStorage
@@ -16048,6 +16797,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -16070,7 +16823,7 @@
   - table: HorizonDgFreeGeneral
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -16221,6 +16974,9 @@
     - id: RandomVendingDrinks
     - id: Holopad
     - id: Bookshelf
+    - !type:NestedSelector
+      tableId: HorizonDgSolidGeneral
+      weight: 3
 
 - type: furnitureGroup
   id: HorizonFurnishConferenceWall
@@ -16249,6 +17005,9 @@
     - id: BoxFolderBase
     - id: BoxFolderBaseEmpty
     - id: BriefcaseBrown
+    - !type:NestedSelector
+      tableId: HorizonDgFreeGeneral
+      weight: 12
 
 - type: roomArchetype
   id: HorizonRoomConference
@@ -16275,6 +17034,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -16297,7 +17060,7 @@
   - table: HorizonDgFreeGeneral
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -16447,6 +17210,9 @@
     - id: CableHV
     - id: CableMV
     - id: CableApcExtension
+    - !type:NestedSelector
+      tableId: HorizonDgSolidGeneral
+      weight: 2
 
 - type: furnitureGroup
   id: HorizonFurnishWorkshopWall
@@ -16478,6 +17244,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -16495,7 +17265,7 @@
   - table: HorizonDgFreeGeneral
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -16644,6 +17414,9 @@
     children:
     - id: CargoTechFabNF
     - id: Rack
+    - !type:NestedSelector
+      tableId: HorizonDgSolidSalvage
+      weight: 1
 
 - type: furnitureGroup
   id: HorizonFurnishCargoReceptionWall
@@ -16661,6 +17434,9 @@
     children:
     - id: BoxFolderBase
     - id: BoxFolderBaseEmpty
+    - !type:NestedSelector
+      tableId: HorizonDgFreeSalvage
+      weight: 9
 
 - type: roomArchetype
   id: HorizonRoomCargoReception
@@ -16682,6 +17458,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchSalvage
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -16704,7 +17484,7 @@
   - table: HorizonDgFreeSalvage
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -16861,6 +17641,9 @@
     - id: CrateGenericSteel
     - id: WaterTank
     - id: WeldingFuelTank
+    - !type:NestedSelector
+      tableId: HorizonDgSolidSalvage
+      weight: 4
 
 - type: furnitureGroup
   id: HorizonFurnishCargoStorageWall
@@ -16888,6 +17671,9 @@
     children:
     - id: ClothingBeltUtility
     - id: ClothingHandsGlovesColorBlack
+    - !type:NestedSelector
+      tableId: HorizonDgFreeSalvage
+      weight: 9
 
 - type: roomArchetype
   id: HorizonRoomCargoStorage
@@ -16914,6 +17700,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchSalvage
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -16936,7 +17726,7 @@
   - table: HorizonDgFreeSalvage
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -17092,6 +17882,9 @@
     - id: Dresser
     - id: filingCabinetDrawer
     - id: Bed
+    - !type:NestedSelector
+      tableId: HorizonDgSolidSalvage
+      weight: 3
 
 - type: furnitureGroup
   id: HorizonFurnishQmOfficeWall
@@ -17118,6 +17911,9 @@
   table: !type:GroupSelector
     children:
     - id: ScrapFaxMachine
+    - !type:NestedSelector
+      tableId: HorizonDgFreeSalvage
+      weight: 6
 
 - type: roomArchetype
   id: HorizonRoomQmOffice
@@ -17144,6 +17940,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchSalvage
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -17166,7 +17966,7 @@
   - table: HorizonDgFreeSalvage
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -17326,6 +18126,9 @@
     - id: VendingMachineTankDispenserEVA
     - id: VendingMachineTankDispenserEngineering
     - id: WardrobeSalvage
+    - !type:NestedSelector
+      tableId: HorizonDgSolidSalvage
+      weight: 6
 
 - type: furnitureGroup
   id: HorizonFurnishSalvageRoomWall
@@ -17372,6 +18175,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchSalvage
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -17389,7 +18196,7 @@
   - table: HorizonDgFreeSalvage
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
@@ -17542,6 +18349,9 @@
   table: !type:GroupSelector
     children:
     - id: MailingUnit
+    - !type:NestedSelector
+      tableId: HorizonDgSolidSalvage
+      weight: 1
 
 - type: furnitureGroup
   id: HorizonFurnishMailRoomWall
@@ -17558,6 +18368,9 @@
   table: !type:GroupSelector
     children:
     - id: ScrapFaxMachine
+    - !type:NestedSelector
+      tableId: HorizonDgFreeSalvage
+      weight: 6
 
 - type: roomArchetype
   id: HorizonRoomMailRoom
@@ -17579,6 +18392,10 @@
     max: 1
     perTiles: 80
     chance: 0.6
+  - group: HorizonFurnishDgBenchSalvage
+    min: 1
+    max: 1
+    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -17601,7 +18418,7 @@
   - table: HorizonDgFreeSalvage
     min: 2
     max: 3
-    perTiles: 9
+    perTiles: 6
     jitter: 0.45
   - table: HorizonDgFreeCommon
     min: 0
