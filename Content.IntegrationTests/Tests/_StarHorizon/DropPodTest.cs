@@ -45,6 +45,7 @@ public sealed class DropPodTest
     {
         pod.CountdownTime = Fast;
         pod.ZoomOutTime = Fast;
+        pod.VignetteDelay = TimeSpan.FromSeconds(0.3);
         pod.FlightTime = Fast;
         pod.LandingTime = Fast;
     }

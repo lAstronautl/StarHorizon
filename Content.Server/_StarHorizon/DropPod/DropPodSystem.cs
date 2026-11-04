@@ -310,7 +310,7 @@ public sealed class DropPodSystem : EntitySystem
 
                 case DropPodState.ZoomingOut:
                     // Это стартовая фаза настоящего FTL; в БСС капсулу переводит FTLStartedEvent.
-                    SetZoom(ent, Lerp(1f, comp.PeakZoom, Smooth(t)));
+                    SetZoom(ent, Lerp(1f, comp.PeakZoom, EaseOut(t)));
                     break;
 
                 case DropPodState.InBluespace:
@@ -410,7 +410,9 @@ public sealed class DropPodSystem : EntitySystem
         }
 
         SetState(ent, DropPodState.ZoomingOut, ent.Comp.ZoomOutTime);
-        SetVignette(ent, 0f, 1f, ent.Comp.ZoomOutTime);
+        // Камера отдаляется сразу, а виньетка начинает расти с задержкой и успевает дорасти к концу взлёта.
+        var delay = TimeSpan.FromTicks(Math.Min(ent.Comp.VignetteDelay.Ticks, ent.Comp.ZoomOutTime.Ticks / 2));
+        SetVignette(ent, 0f, 1f, ent.Comp.ZoomOutTime - delay, delay);
     }
 
     /// <summary>Стартовая фаза FTL закончилась: капсула на FTL-карте, у пассажиров виньетка и отдалённая камера.</summary>
@@ -583,7 +585,7 @@ public sealed class DropPodSystem : EntitySystem
     }
 
     /// <summary>Затемняет экран всем пассажирам: альфа от <paramref name="from"/> к <paramref name="to"/> за <paramref name="duration"/>.</summary>
-    private void SetVignette(Entity<DropPodComponent> ent, float from, float to, TimeSpan duration)
+    private void SetVignette(Entity<DropPodComponent> ent, float from, float to, TimeSpan duration, TimeSpan delay = default)
     {
         if (!TryComp(ent, out EntityStorageComponent? storage))
             return;
@@ -594,8 +596,8 @@ public sealed class DropPodSystem : EntitySystem
             fade.Pod = ent;
             fade.From = from;
             fade.To = to;
-            fade.Start = _timing.CurTime;
-            fade.End = _timing.CurTime + duration;
+            fade.Start = _timing.CurTime + delay;
+            fade.End = fade.Start + duration;
             Dirty(occupant, fade);
         }
     }
@@ -612,6 +614,9 @@ public sealed class DropPodSystem : EntitySystem
     }
 
     private static float Lerp(float a, float b, float t) => a + (b - a) * t;
+
+    /// <summary>Быстрый старт и плавное замедление: отдаление начинается сразу.</summary>
+    private static float EaseOut(float t) => 1f - (1f - t) * (1f - t);
 
     private static float Smooth(float t) => t * t * (3f - 2f * t);
 

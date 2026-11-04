@@ -44,7 +44,11 @@ public sealed partial class DropPodComponent : Component
 
     /// <summary>Стартовая фаза FTL: за это время камера отдаляется и нарастает виньетка.</summary>
     [DataField]
-    public TimeSpan ZoomOutTime = TimeSpan.FromSeconds(3);
+    public TimeSpan ZoomOutTime = TimeSpan.FromSeconds(5);
+
+    /// <summary>Через сколько после начала взлёта начинает расти виньетка (камера отдаляется сразу).</summary>
+    [DataField]
+    public TimeSpan VignetteDelay = TimeSpan.FromSeconds(2);
 
     /// <summary>Время в гиперпространстве (без фазы прибытия, её длину задаёт FTL).</summary>
     [DataField]
