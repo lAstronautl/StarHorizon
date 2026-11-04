@@ -31,11 +31,14 @@ public sealed partial class DungeonJob
 
         _maps.SetTiles(_gridUid, _grid, setTiles);
 
+        // A door in a wall shared by two rooms is listed by both: spawn it only once.
+        var spawned = new HashSet<Vector2i>();
+
         foreach (var room in dungeon.Rooms)
         {
             foreach (var entrance in room.Entrances)
             {
-                if (reservedTiles.Contains(entrance))
+                if (reservedTiles.Contains(entrance) || !spawned.Add(entrance))
                     continue;
 
                 _entManager.SpawnEntitiesAttachedTo(

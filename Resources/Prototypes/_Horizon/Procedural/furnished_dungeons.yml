@@ -1,18 +1,15 @@
-# Atlas-free dungeon: rooms come from BspRoomDunGen (BSP partition), corridors/doors/walls from the usual layers,
+# Atlas-free dungeon: rooms come from BspRoomDunGen (BSP partition: rooms fill their cells, neighbours share one wall tile and
+# are joined by doors straight through it, so there are no corridors and no wasted space), doors/walls from the usual layers,
 # and everything inside the rooms from RoomFurnishDunGen (roles + furniture groups).
 - type: dungeonConfig
   id: HorizonFurnishedBsp
   layers:
   - !type:BspRoomDunGen
-    size: 48,48
-    minRoom: 6,6
+    size: 40,40
+    minRoom: 7,7
     maxRoom: 14,12
-    padding: 2
-    splitChance: 0.3
-    tile: FloorSteel
-
-  - !type:CorridorDunGen
-    width: 3
+    splitChance: 0.2
+    loopChance: 0.25
     tile: FloorSteel
 
   - !type:DungeonEntranceDunGen
@@ -36,16 +33,6 @@
     wall: WallSolid
     cornerWall: WallReinforced
     tile: FloorSteel
-
-  - !type:JunctionDunGen
-    width: 1
-    tile: FloorSteel
-    contents: NFBaseAirlock
-
-  - !type:JunctionDunGen
-    width: 3
-    tile: FloorSteel
-    contents: NFBaseAirlock
 
   # Roles + furniture groups (after walls and doors exist).
   - !type:PrototypeDunGen

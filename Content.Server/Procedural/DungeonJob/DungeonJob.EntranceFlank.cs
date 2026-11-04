@@ -20,10 +20,15 @@ public sealed partial class DungeonJob
         var spawnPositions = new ValueList<Vector2i>(dungeon.Rooms.Count);
         var contents = _prototype.Index(gen.Contents);
 
+        var handled = new HashSet<Vector2i>(); // doors shared by two rooms are listed twice
+
         foreach (var room in dungeon.Rooms)
         {
             foreach (var entrance in room.Entrances)
             {
+                if (!handled.Add(entrance))
+                    continue;
+
                 for (var i = 0; i < 8; i++)
                 {
                     var dir = (Direction) i;
