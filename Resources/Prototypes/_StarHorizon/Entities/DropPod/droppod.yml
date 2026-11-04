@@ -28,21 +28,19 @@
   - type: InteractionOutline
   - type: Physics
     bodyType: Dynamic
+  # Фикстура и хранилище - как у CrateGeneric / CrateGenericSteel.
   - type: Fixtures
     fixtures:
       fix1:
         shape:
           !type:PhysShapeAabb
-          bounds: "-0.4,-0.4,0.4,0.4"
-        density: 80
+          bounds: "-0.4,-0.4,0.4,0.29"
+        density: 50
         mask:
-        - MachineMask
+        - CrateMask
         layer:
         - MachineLayer
   - type: EntityStorage
-    openOnMove: false
-    isCollidableWhenOpen: true
-    capacity: 40
   - type: ContainerContainer
     containers:
       entity_storage: !type:Container
@@ -68,7 +66,6 @@
           Countdown: { visible: true, state: glow_yellow }
           ZoomingOut: { visible: true, state: glow_blue }
           InBluespace: { visible: false }
-          Arriving: { visible: false }
           Landing: { visible: true, state: glow_red }
   - type: Damageable
     damageContainer: StructuralInorganic

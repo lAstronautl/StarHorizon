@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Numerics;
 using Content.Server.Shuttles.Components;
+using Content.Server.Shuttles.Systems;
 using Content.Shared._StarHorizon.DropPod;
 using Content.Shared.Damage;
 using Content.Shared.Mobs.Components;
@@ -36,6 +37,7 @@ public sealed class DropPodSystem : EntitySystem
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly ShuttleSystem _shuttle = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
 
     public override void Initialize()
@@ -282,7 +284,7 @@ public sealed class DropPodSystem : EntitySystem
             UpdateCapture((consoleUid, console), now);
         }
 
-        CleanupFades();
+        CleanupVignettes();
 
         var query = EntityQueryEnumerator<DropPodComponent>();
         while (query.MoveNext(out var uid, out var comp))
@@ -308,37 +310,34 @@ public sealed class DropPodSystem : EntitySystem
                     break;
 
                 case DropPodState.InBluespace:
-                    if (now >= comp.StateEnd)
-                        Arrive(ent);
-                    break;
-
-                case DropPodState.Arriving:
+                    SetZoom(ent, comp.PeakZoom);
                     if (now >= comp.StateEnd)
                         Land(ent);
                     break;
 
                 case DropPodState.Landing:
+                    SetZoom(ent, Lerp(comp.PeakZoom, 1f, Smooth(t)));
                     if (now >= comp.StateEnd)
-                        SetState(ent, DropPodState.Idle, TimeSpan.Zero);
+                        FinishLanding(ent);
                     break;
             }
         }
     }
 
     /// <summary>Снимает затемнение с тех, кто больше не в капсуле, или если капсула уничтожена / не летит.</summary>
-    private void CleanupFades()
+    private void CleanupVignettes()
     {
-        var fades = EntityQueryEnumerator<DropPodFadeComponent>();
+        var fades = EntityQueryEnumerator<DropPodVignetteComponent>();
         while (fades.MoveNext(out var uid, out var fade))
         {
             var valid = TryComp(fade.Pod, out DropPodComponent? pod) &&
                         !TerminatingOrDeleted(fade.Pod) &&
-                        pod.State is DropPodState.ZoomingOut or DropPodState.InBluespace or DropPodState.Arriving &&
+                        pod.State is DropPodState.ZoomingOut or DropPodState.InBluespace or DropPodState.Landing &&
                         TryComp(fade.Pod, out EntityStorageComponent? storage) &&
                         storage.Contents.Contains(uid);
 
             if (!valid)
-                RemCompDeferred<DropPodFadeComponent>(uid);
+                RemCompDeferred<DropPodVignetteComponent>(uid);
         }
     }
 
@@ -378,10 +377,11 @@ public sealed class DropPodSystem : EntitySystem
         }
 
         SetState(ent, DropPodState.ZoomingOut, ent.Comp.ZoomOutTime);
-        SetFade(ent, 0f, 1f, ent.Comp.ZoomOutTime);
+        SetVignette(ent, 0f, 1f, ent.Comp.ZoomOutTime);
         _audio.PlayPvs(ent.Comp.LaunchSound, ent);
     }
 
+    /// <summary>Капсула уходит на FTL-карту: пассажиры видят гиперпространство, виньетка остаётся.</summary>
     private void EnterBluespace(Entity<DropPodComponent> ent)
     {
         SpawnAtPosition(ent.Comp.LaunchEffect, Transform(ent).Coordinates);
@@ -390,15 +390,17 @@ public sealed class DropPodSystem : EntitySystem
         if (TryComp(ent, out PhysicsComponent? physics))
             _physics.SetCanCollide(ent, false, body: physics);
 
-        // Под полной темнотой снимаем все эффекты: зум возвращается к обычному.
-        ResetZoom(ent);
-        SetFade(ent, 1f, 1f, TimeSpan.Zero);
+        // Как у FTL-сущности: на отдельной карте с гиперпространственным параллаксом.
+        // Шаттлы FTL летят вдоль y = 0, поэтому капсулы разводим по другой полосе.
+        var ftlMap = _shuttle.EnsureFTLMap();
+        _xform.SetCoordinates(ent.Owner, new EntityCoordinates(ftlMap, new Vector2(_random.NextFloat(-5000f, 5000f), 5000f)));
+        _xform.SetLocalRotation(ent.Owner, Angle.Zero);
 
         SetState(ent, DropPodState.InBluespace, ent.Comp.FlightTime);
     }
 
-    /// <summary>Камера (вместе с невидимой капсулой) перебрасывается на место посадки, экран светлеет.</summary>
-    private void Arrive(Entity<DropPodComponent> ent)
+    /// <summary>Конец блюспейса: капсула телепортируется на место посадки, падает с анимацией, виньетка уходит в 0.</summary>
+    private void Land(Entity<DropPodComponent> ent)
     {
         EntityCoordinates coords;
         if (ent.Comp.TargetGrid is { } grid && !TerminatingOrDeleted(grid) && HasComp<MapGridComponent>(grid))
@@ -424,22 +426,12 @@ public sealed class DropPodSystem : EntitySystem
             coords = _xform.ToCoordinates(landingPos);
         }
 
-        // Капсула остаётся скрытой и без коллизий, пока экран не посветлеет.
-        _xform.SetCoordinates(ent.Owner, coords);
-        _xform.AttachToGridOrMap(ent.Owner);
-
-        SetFade(ent, 1f, 0f, ent.Comp.FadeInTime);
-        SetState(ent, DropPodState.Arriving, ent.Comp.FadeInTime);
-    }
-
-    /// <summary>Экран посветлел: капсула падает и появляется вместе с пассажирами.</summary>
-    private void Land(Entity<DropPodComponent> ent)
-    {
         QueueDel(ent.Comp.Marker);
         ent.Comp.Marker = null;
         ent.Comp.TargetGrid = null;
 
-        ClearFade(ent);
+        _xform.SetCoordinates(ent.Owner, coords);
+        _xform.AttachToGridOrMap(ent.Owner);
 
         if (TryComp(ent, out PhysicsComponent? physics))
             _physics.SetCanCollide(ent, true, body: physics);
@@ -461,7 +453,16 @@ public sealed class DropPodSystem : EntitySystem
             }
         }
 
+        SetVignette(ent, 1f, 0f, ent.Comp.LandingTime);
         SetState(ent, DropPodState.Landing, ent.Comp.LandingTime);
+    }
+
+    private void FinishLanding(Entity<DropPodComponent> ent)
+    {
+        SetZoom(ent, 1f);
+        ResetZoom(ent);
+        ClearVignette(ent);
+        SetState(ent, DropPodState.Idle, TimeSpan.Zero);
     }
 
     #endregion
@@ -538,14 +539,14 @@ public sealed class DropPodSystem : EntitySystem
     }
 
     /// <summary>Затемняет экран всем пассажирам: альфа от <paramref name="from"/> к <paramref name="to"/> за <paramref name="duration"/>.</summary>
-    private void SetFade(Entity<DropPodComponent> ent, float from, float to, TimeSpan duration)
+    private void SetVignette(Entity<DropPodComponent> ent, float from, float to, TimeSpan duration)
     {
         if (!TryComp(ent, out EntityStorageComponent? storage))
             return;
 
         foreach (var occupant in storage.Contents.ContainedEntities)
         {
-            var fade = EnsureComp<DropPodFadeComponent>(occupant);
+            var fade = EnsureComp<DropPodVignetteComponent>(occupant);
             fade.Pod = ent;
             fade.From = from;
             fade.To = to;
@@ -555,14 +556,14 @@ public sealed class DropPodSystem : EntitySystem
         }
     }
 
-    private void ClearFade(Entity<DropPodComponent> ent)
+    private void ClearVignette(Entity<DropPodComponent> ent)
     {
         if (!TryComp(ent, out EntityStorageComponent? storage))
             return;
 
         foreach (var occupant in storage.Contents.ContainedEntities)
         {
-            RemCompDeferred<DropPodFadeComponent>(occupant);
+            RemCompDeferred<DropPodVignetteComponent>(occupant);
         }
     }
 
