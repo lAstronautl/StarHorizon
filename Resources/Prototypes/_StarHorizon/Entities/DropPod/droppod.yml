@@ -115,19 +115,19 @@
 
 - type: entity
   id: StarHorizonDropPodSmoke
-  name: dust cloud
+  name: debris
   categories: [ HideSpawnMenu ]
   components:
   - type: Transform
     noRot: true
   - type: Sprite
-    drawdepth: Effects
+    drawdepth: FloorObjects
     sprite: _StarHorizon/Effects/droppod_marker.rsi
     noRot: true
     layers:
-    - state: smoke
+    - state: rubble
   - type: TimedDespawn
-    lifetime: 4
+    lifetime: 12
   - type: Tag
     tags:
     - HideContextMenu
