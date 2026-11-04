@@ -58,7 +58,7 @@ public sealed class DropPodSystem : EntitySystem
     private void OnStorageOpenAttempt(Entity<DropPodComponent> ent, ref StorageOpenAttemptEvent args)
     {
         // Во время полёта дверь заблокирована.
-        if (ent.Comp.State is DropPodState.ZoomingOut or DropPodState.InBluespace)
+        if (ent.Comp.State is not (DropPodState.Idle or DropPodState.Countdown))
             args.Cancelled = true;
     }
 
@@ -282,6 +282,8 @@ public sealed class DropPodSystem : EntitySystem
             UpdateCapture((consoleUid, console), now);
         }
 
+        CleanupFades();
+
         var query = EntityQueryEnumerator<DropPodComponent>();
         while (query.MoveNext(out var uid, out var comp))
         {
@@ -306,17 +308,37 @@ public sealed class DropPodSystem : EntitySystem
                     break;
 
                 case DropPodState.InBluespace:
-                    SetZoom(ent, comp.PeakZoom);
+                    if (now >= comp.StateEnd)
+                        Arrive(ent);
+                    break;
+
+                case DropPodState.Arriving:
                     if (now >= comp.StateEnd)
                         Land(ent);
                     break;
 
                 case DropPodState.Landing:
-                    SetZoom(ent, Lerp(comp.PeakZoom, 1f, Smooth(t)));
                     if (now >= comp.StateEnd)
-                        FinishLanding(ent);
+                        SetState(ent, DropPodState.Idle, TimeSpan.Zero);
                     break;
             }
+        }
+    }
+
+    /// <summary>Снимает затемнение с тех, кто больше не в капсуле, или если капсула уничтожена / не летит.</summary>
+    private void CleanupFades()
+    {
+        var fades = EntityQueryEnumerator<DropPodFadeComponent>();
+        while (fades.MoveNext(out var uid, out var fade))
+        {
+            var valid = TryComp(fade.Pod, out DropPodComponent? pod) &&
+                        !TerminatingOrDeleted(fade.Pod) &&
+                        pod.State is DropPodState.ZoomingOut or DropPodState.InBluespace or DropPodState.Arriving &&
+                        TryComp(fade.Pod, out EntityStorageComponent? storage) &&
+                        storage.Contents.Contains(uid);
+
+            if (!valid)
+                RemCompDeferred<DropPodFadeComponent>(uid);
         }
     }
 
@@ -356,6 +378,7 @@ public sealed class DropPodSystem : EntitySystem
         }
 
         SetState(ent, DropPodState.ZoomingOut, ent.Comp.ZoomOutTime);
+        SetFade(ent, 0f, 1f, ent.Comp.ZoomOutTime);
         _audio.PlayPvs(ent.Comp.LaunchSound, ent);
     }
 
@@ -367,10 +390,15 @@ public sealed class DropPodSystem : EntitySystem
         if (TryComp(ent, out PhysicsComponent? physics))
             _physics.SetCanCollide(ent, false, body: physics);
 
+        // Под полной темнотой снимаем все эффекты: зум возвращается к обычному.
+        ResetZoom(ent);
+        SetFade(ent, 1f, 1f, TimeSpan.Zero);
+
         SetState(ent, DropPodState.InBluespace, ent.Comp.FlightTime);
     }
 
-    private void Land(Entity<DropPodComponent> ent)
+    /// <summary>Камера (вместе с невидимой капсулой) перебрасывается на место посадки, экран светлеет.</summary>
+    private void Arrive(Entity<DropPodComponent> ent)
     {
         EntityCoordinates coords;
         if (ent.Comp.TargetGrid is { } grid && !TerminatingOrDeleted(grid) && HasComp<MapGridComponent>(grid))
@@ -396,12 +424,22 @@ public sealed class DropPodSystem : EntitySystem
             coords = _xform.ToCoordinates(landingPos);
         }
 
+        // Капсула остаётся скрытой и без коллизий, пока экран не посветлеет.
+        _xform.SetCoordinates(ent.Owner, coords);
+        _xform.AttachToGridOrMap(ent.Owner);
+
+        SetFade(ent, 1f, 0f, ent.Comp.FadeInTime);
+        SetState(ent, DropPodState.Arriving, ent.Comp.FadeInTime);
+    }
+
+    /// <summary>Экран посветлел: капсула падает и появляется вместе с пассажирами.</summary>
+    private void Land(Entity<DropPodComponent> ent)
+    {
         QueueDel(ent.Comp.Marker);
         ent.Comp.Marker = null;
         ent.Comp.TargetGrid = null;
 
-        _xform.SetCoordinates(ent.Owner, coords);
-        _xform.AttachToGridOrMap(ent.Owner);
+        ClearFade(ent);
 
         if (TryComp(ent, out PhysicsComponent? physics))
             _physics.SetCanCollide(ent, true, body: physics);
@@ -423,13 +461,7 @@ public sealed class DropPodSystem : EntitySystem
             }
         }
 
-        SetState(ent, DropPodState.Landing, ent.Comp.ZoomInTime);
-    }
-
-    private void FinishLanding(Entity<DropPodComponent> ent)
-    {
-        SetZoom(ent, 1f);
-        SetState(ent, DropPodState.Idle, TimeSpan.Zero);
+        SetState(ent, DropPodState.Landing, ent.Comp.LandingTime);
     }
 
     #endregion
@@ -492,6 +524,46 @@ public sealed class DropPodSystem : EntitySystem
         }
 
         return true;
+    }
+
+    private void ResetZoom(Entity<DropPodComponent> ent)
+    {
+        if (!TryComp(ent, out EntityStorageComponent? storage))
+            return;
+
+        foreach (var occupant in storage.Contents.ContainedEntities)
+        {
+            _eye.ResetZoom(occupant);
+        }
+    }
+
+    /// <summary>Затемняет экран всем пассажирам: альфа от <paramref name="from"/> к <paramref name="to"/> за <paramref name="duration"/>.</summary>
+    private void SetFade(Entity<DropPodComponent> ent, float from, float to, TimeSpan duration)
+    {
+        if (!TryComp(ent, out EntityStorageComponent? storage))
+            return;
+
+        foreach (var occupant in storage.Contents.ContainedEntities)
+        {
+            var fade = EnsureComp<DropPodFadeComponent>(occupant);
+            fade.Pod = ent;
+            fade.From = from;
+            fade.To = to;
+            fade.Start = _timing.CurTime;
+            fade.End = _timing.CurTime + duration;
+            Dirty(occupant, fade);
+        }
+    }
+
+    private void ClearFade(Entity<DropPodComponent> ent)
+    {
+        if (!TryComp(ent, out EntityStorageComponent? storage))
+            return;
+
+        foreach (var occupant in storage.Contents.ContainedEntities)
+        {
+            RemCompDeferred<DropPodFadeComponent>(occupant);
+        }
     }
 
     private static float Lerp(float a, float b, float t) => a + (b - a) * t;

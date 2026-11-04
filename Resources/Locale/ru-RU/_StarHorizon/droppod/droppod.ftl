@@ -28,6 +28,7 @@ droppod-state-Idle = ожидание
 droppod-state-Countdown = обратный отсчёт, закройте дверь капсулы
 droppod-state-ZoomingOut = старт
 droppod-state-InBluespace = в блюспейсе
+droppod-state-Arriving = прибытие
 droppod-state-Landing = посадка
 droppod-ui-section-pod = Капсула
 droppod-ui-section-capture = Захват шаттла

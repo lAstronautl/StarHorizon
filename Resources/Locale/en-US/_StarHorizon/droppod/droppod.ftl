@@ -28,6 +28,7 @@ droppod-state-Idle = idle
 droppod-state-Countdown = countdown, close the pod door
 droppod-state-ZoomingOut = launching
 droppod-state-InBluespace = in bluespace
+droppod-state-Arriving = arriving
 droppod-state-Landing = landing
 droppod-ui-section-pod = Pod
 droppod-ui-section-capture = Shuttle capture
