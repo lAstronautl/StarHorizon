@@ -1,4 +1,6 @@
+using System.Linq;
 using System.Numerics;
+using Content.Server.Shuttles.Components;
 using Content.Shared._StarHorizon.DropPod;
 using Content.Shared.Damage;
 using Content.Shared.Mobs.Components;
@@ -8,7 +10,9 @@ using Content.Shared.Storage.Components;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
+using Robust.Shared.Map.Components;
 using Robust.Shared.Physics.Components;
+using Robust.Shared.Random;
 using Robust.Shared.Physics.Systems;
 using Robust.Shared.Timing;
 
@@ -30,6 +34,8 @@ public sealed class DropPodSystem : EntitySystem
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly SharedMapSystem _map = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
 
     public override void Initialize()
@@ -42,6 +48,9 @@ public sealed class DropPodSystem : EntitySystem
         SubscribeLocalEvent<DropPodConsoleComponent, BoundUIOpenedEvent>(OnConsoleOpened);
         SubscribeLocalEvent<DropPodConsoleComponent, DropPodLaunchMessage>(OnLaunchMessage);
         SubscribeLocalEvent<DropPodConsoleComponent, DropPodAbortMessage>(OnAbortMessage);
+        SubscribeLocalEvent<DropPodConsoleComponent, DropPodLaunchToCapturedMessage>(OnLaunchToCapturedMessage);
+        SubscribeLocalEvent<DropPodConsoleComponent, DropPodCaptureMessage>(OnCaptureMessage);
+        SubscribeLocalEvent<DropPodConsoleComponent, DropPodReleaseMessage>(OnReleaseMessage);
     }
 
     #region Pod events
@@ -101,6 +110,53 @@ public sealed class DropPodSystem : EntitySystem
         Abort(pod.Value);
     }
 
+    private void OnLaunchToCapturedMessage(Entity<DropPodConsoleComponent> ent, ref DropPodLaunchToCapturedMessage args)
+    {
+        var pod = FindPod(ent);
+        if (pod == null || pod.Value.Comp.State != DropPodState.Idle)
+        {
+            UpdateConsole(ent, "droppod-error-no-pod");
+            return;
+        }
+
+        if (ent.Comp.CapturedGrid is not { } grid || TerminatingOrDeleted(grid))
+        {
+            ent.Comp.CapturedGrid = null;
+            UpdateConsole(ent, "droppod-error-not-captured");
+            return;
+        }
+
+        if (PickLandingTile(grid) is not { } coords)
+        {
+            UpdateConsole(ent, "droppod-error-bad-target");
+            return;
+        }
+
+        pod.Value.Comp.TargetGrid = grid;
+        StartCountdown(pod.Value, _xform.ToMapCoordinates(coords), coords);
+    }
+
+    private void OnCaptureMessage(Entity<DropPodConsoleComponent> ent, ref DropPodCaptureMessage args)
+    {
+        if (!TryGetEntity(args.Grid, out var grid) || !HasComp<ShuttleComponent>(grid) || TerminatingOrDeleted(grid))
+        {
+            UpdateConsole(ent, "droppod-error-bad-grid");
+            return;
+        }
+
+        ent.Comp.CapturedGrid = null;
+        ent.Comp.CapturingGrid = grid;
+        ent.Comp.CaptureEnd = _timing.CurTime + ent.Comp.CaptureTime;
+        UpdateConsole(ent);
+    }
+
+    private void OnReleaseMessage(Entity<DropPodConsoleComponent> ent, ref DropPodReleaseMessage args)
+    {
+        ent.Comp.CapturingGrid = null;
+        ent.Comp.CapturedGrid = null;
+        UpdateConsole(ent);
+    }
+
     private Entity<DropPodComponent>? FindPod(Entity<DropPodConsoleComponent> console)
     {
         // Капсула в процессе запуска остаётся привязанной, даже если улетела далеко.
@@ -142,24 +198,32 @@ public sealed class DropPodSystem : EntitySystem
     {
         var pod = FindPod(console);
         var origin = _xform.GetWorldPosition(console);
+        var err = error == null ? null : Loc.GetString(error);
 
-        DropPodConsoleState state;
-        if (pod == null)
+        var grids = new List<DropPodGridInfo>();
+        var gridQuery = EntityQueryEnumerator<ShuttleComponent, TransformComponent, MetaDataComponent>();
+        while (gridQuery.MoveNext(out var gridUid, out _, out var gridXform, out var meta))
         {
-            state = new DropPodConsoleState(false, DropPodState.Idle, TimeSpan.Zero, 0, origin, null,
-                error == null ? null : Loc.GetString(error));
-        }
-        else
-        {
-            var comp = pod.Value.Comp;
-            var occupants = TryComp(pod.Value, out EntityStorageComponent? storage)
-                ? storage.Contents.ContainedEntities.Count
-                : 0;
-            Vector2? target = comp.State == DropPodState.Idle ? null : comp.Target.Position;
+            if (grids.Count >= 64)
+                break;
 
-            state = new DropPodConsoleState(true, comp.State, comp.StateEnd, occupants, origin, target,
-                error == null ? null : Loc.GetString(error));
+            grids.Add(new DropPodGridInfo(GetNetEntity(gridUid), meta.EntityName, _xform.GetWorldPosition(gridXform)));
         }
+
+        var state = new DropPodConsoleState(
+            pod != null,
+            pod?.Comp.State ?? DropPodState.Idle,
+            pod?.Comp.StateEnd ?? TimeSpan.Zero,
+            pod?.Comp.StateStart ?? TimeSpan.Zero,
+            pod != null && TryComp(pod.Value, out EntityStorageComponent? storage) ? storage.Contents.ContainedEntities.Count : 0,
+            origin,
+            pod != null && pod.Value.Comp.State != DropPodState.Idle ? pod.Value.Comp.Target.Position : null,
+            err,
+            grids,
+            console.Comp.CapturingGrid == null ? null : GetNetEntity(console.Comp.CapturingGrid.Value),
+            console.Comp.CapturedGrid == null ? null : GetNetEntity(console.Comp.CapturedGrid.Value),
+            console.Comp.CaptureEnd,
+            console.Comp.CaptureTime);
 
         _ui.SetUiState(console.Owner, DropPodUiKey.Key, state);
     }
@@ -183,15 +247,18 @@ public sealed class DropPodSystem : EntitySystem
         ent.Comp.State = state;
         ent.Comp.StateStart = _timing.CurTime;
         ent.Comp.StateEnd = _timing.CurTime + duration;
+        _appearance.SetData(ent, DropPodVisuals.State, state);
         UpdateConsolesFor(ent);
     }
 
-    private void StartCountdown(Entity<DropPodComponent> ent, MapCoordinates target)
+    private void StartCountdown(Entity<DropPodComponent> ent, MapCoordinates target, EntityCoordinates? coords = null)
     {
         ent.Comp.Target = target;
+        if (coords == null)
+            ent.Comp.TargetGrid = null;
 
         QueueDel(ent.Comp.Marker);
-        ent.Comp.Marker = Spawn(ent.Comp.MarkerPrototype, _xform.ToCoordinates(target));
+        ent.Comp.Marker = Spawn(ent.Comp.MarkerPrototype, coords ?? _xform.ToCoordinates(target));
 
         SetState(ent, DropPodState.Countdown, ent.Comp.CountdownTime);
     }
@@ -208,6 +275,13 @@ public sealed class DropPodSystem : EntitySystem
         base.Update(frameTime);
 
         var now = _timing.CurTime;
+
+        var consoles = EntityQueryEnumerator<DropPodConsoleComponent>();
+        while (consoles.MoveNext(out var consoleUid, out var console))
+        {
+            UpdateCapture((consoleUid, console), now);
+        }
+
         var query = EntityQueryEnumerator<DropPodComponent>();
         while (query.MoveNext(out var uid, out var comp))
         {
@@ -246,6 +320,32 @@ public sealed class DropPodSystem : EntitySystem
         }
     }
 
+    private void UpdateCapture(Entity<DropPodConsoleComponent> console, TimeSpan now)
+    {
+        if (console.Comp.CapturedGrid is { } captured && TerminatingOrDeleted(captured))
+        {
+            console.Comp.CapturedGrid = null;
+            UpdateConsole(console);
+        }
+
+        if (console.Comp.CapturingGrid is not { } grid)
+            return;
+
+        if (TerminatingOrDeleted(grid))
+        {
+            console.Comp.CapturingGrid = null;
+            UpdateConsole(console, "droppod-error-bad-grid");
+            return;
+        }
+
+        if (now < console.Comp.CaptureEnd)
+            return;
+
+        console.Comp.CapturedGrid = grid;
+        console.Comp.CapturingGrid = null;
+        UpdateConsole(console);
+    }
+
     private void FinishCountdown(Entity<DropPodComponent> ent)
     {
         if (!TryComp(ent, out EntityStorageComponent? storage) || storage.Open)
@@ -272,15 +372,36 @@ public sealed class DropPodSystem : EntitySystem
 
     private void Land(Entity<DropPodComponent> ent)
     {
-        // Метка могла уехать вместе с гридом - приземляемся туда, где она сейчас.
-        var landing = ent.Comp.Target;
-        if (ent.Comp.Marker is { } marker && !TerminatingOrDeleted(marker))
-            landing = _xform.GetMapCoordinates(marker);
+        EntityCoordinates coords;
+        if (ent.Comp.TargetGrid is { } grid && !TerminatingOrDeleted(grid) && HasComp<MapGridComponent>(grid))
+        {
+            // Шаттл мог улететь куда угодно - приземляемся на него. Метка едет вместе с гридом,
+            // но если под ней успели что-то построить или поставить, выбираем новый свободный тайл.
+            var markerCoords = ent.Comp.Marker is { } m && !TerminatingOrDeleted(m)
+                ? (EntityCoordinates?) Transform(m).Coordinates
+                : null;
+
+            if (markerCoords is { } mc && mc.EntityId == grid && IsTileFree(grid, mc))
+                coords = mc;
+            else
+                coords = PickLandingTile(grid) ?? new EntityCoordinates(grid, Vector2.Zero);
+        }
+        else
+        {
+            // Метка могла уехать вместе с гридом - приземляемся туда, где она сейчас.
+            var landingPos = ent.Comp.Target;
+            if (ent.Comp.Marker is { } marker && !TerminatingOrDeleted(marker))
+                landingPos = _xform.GetMapCoordinates(marker);
+
+            coords = _xform.ToCoordinates(landingPos);
+        }
 
         QueueDel(ent.Comp.Marker);
         ent.Comp.Marker = null;
+        ent.Comp.TargetGrid = null;
 
-        _xform.SetMapCoordinates(ent.Owner, landing);
+        _xform.SetCoordinates(ent.Owner, coords);
+        _xform.AttachToGridOrMap(ent.Owner);
 
         if (TryComp(ent, out PhysicsComponent? physics))
             _physics.SetCanCollide(ent, true, body: physics);
@@ -292,6 +413,7 @@ public sealed class DropPodSystem : EntitySystem
 
         if (!ent.Comp.LandingDamage.Empty)
         {
+            var landing = _xform.GetMapCoordinates(ent.Owner);
             foreach (var mob in _lookup.GetEntitiesInRange<MobStateComponent>(landing, ent.Comp.LandingRadius))
             {
                 if (mob.Owner == ent.Owner)
@@ -325,6 +447,51 @@ public sealed class DropPodSystem : EntitySystem
         {
             _eye.SetZoom(occupant, vec, ignoreLimits: true);
         }
+    }
+
+    /// <summary>
+    /// Случайный тайл грида без закреплённых твёрдых структур (стен, машин, столов...).
+    /// Если таких нет - любой тайл, если и тайлов нет - начало координат грида.
+    /// </summary>
+    private EntityCoordinates? PickLandingTile(EntityUid gridUid)
+    {
+        if (!TryComp(gridUid, out MapGridComponent? grid))
+            return null;
+
+        var free = new List<Vector2i>();
+        var any = new List<Vector2i>();
+        foreach (var tile in _map.GetAllTiles(gridUid, grid))
+        {
+            any.Add(tile.GridIndices);
+            if (IsTileFree((gridUid, grid), tile.GridIndices))
+                free.Add(tile.GridIndices);
+        }
+
+        var pool = free.Count > 0 ? free : any;
+        if (pool.Count == 0)
+            return new EntityCoordinates(gridUid, Vector2.Zero);
+
+        return _map.GridTileToLocal(gridUid, grid, _random.Pick(pool));
+    }
+
+    private bool IsTileFree(EntityUid gridUid, EntityCoordinates coords)
+    {
+        if (!TryComp(gridUid, out MapGridComponent? grid))
+            return false;
+
+        var indices = _map.TileIndicesFor(gridUid, grid, coords);
+        return !_map.GetTileRef(gridUid, grid, indices).Tile.IsEmpty && IsTileFree((gridUid, grid), indices);
+    }
+
+    private bool IsTileFree(Entity<MapGridComponent> grid, Vector2i indices)
+    {
+        foreach (var anchored in _map.GetAnchoredEntities(grid, indices))
+        {
+            if (TryComp(anchored, out PhysicsComponent? body) && body.CanCollide && body.Hard)
+                return false;
+        }
+
+        return true;
     }
 
     private static float Lerp(float a, float b, float t) => a + (b - a) * t;

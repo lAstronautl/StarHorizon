@@ -30,6 +30,10 @@ public sealed partial class DropPodComponent : Component
     [ViewVariables]
     public MapCoordinates Target;
 
+    /// <summary>Если задан - капсула приземляется на этот грид (на случайный свободный тайл), где бы он ни находился.</summary>
+    [ViewVariables]
+    public EntityUid? TargetGrid;
+
     /// <summary>Метка приземления. Следует за гридом, над которым стоит.</summary>
     [ViewVariables]
     public EntityUid? Marker;
@@ -98,4 +102,6 @@ public enum DropPodVisuals : byte
 {
     /// <summary>true - капсулы нет на карте (она в блюспейсе).</summary>
     InFlight,
+    /// <summary>Текущая <see cref="DropPodState"/>, для подсветки и анимаций.</summary>
+    State,
 }

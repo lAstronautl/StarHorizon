@@ -21,6 +21,18 @@
     },
     {
       "name": "bluespace"
+    },
+    {
+      "name": "glow_yellow"
+    },
+    {
+      "name": "glow_blue"
+    },
+    {
+      "name": "glow_red"
+    },
+    {
+      "name": "glow_green"
     }
   ]
 }

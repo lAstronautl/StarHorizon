@@ -21,6 +21,10 @@
       map: ["enum.StorageVisualLayers.Door"]
     - state: bluespace
       map: ["droppodDecal"]
+    - state: glow_yellow
+      map: ["droppodGlow"]
+      visible: false
+      shader: unshaded
   - type: InteractionOutline
   - type: Physics
     bodyType: Dynamic
@@ -58,6 +62,13 @@
         droppodDecal:
           True: { visible: false }
           False: { visible: true }
+      enum.DropPodVisuals.State:
+        droppodGlow:
+          Idle: { visible: false }
+          Countdown: { visible: true, state: glow_yellow }
+          ZoomingOut: { visible: true, state: glow_blue }
+          InBluespace: { visible: false }
+          Landing: { visible: true, state: glow_red }
   - type: Damageable
     damageContainer: StructuralInorganic
     damageModifierSet: Metallic
@@ -93,6 +104,8 @@
     - state: lz
       shader: unshaded
     - state: ring
+      shader: unshaded
+    - state: ring_pulse
       shader: unshaded
   - type: PointLight
     radius: 2.5
