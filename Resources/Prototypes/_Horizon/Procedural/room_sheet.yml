@@ -184,6 +184,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidMedical
   entries:
   - group: HorizonFurnishChemistryWall
     min: 6
@@ -441,6 +442,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidMedical
   entries:
   - group: HorizonFurnishMedbay2Wall
     min: 1
@@ -674,6 +676,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidMedical
   entries:
   - group: HorizonFurnishWardsWall
     min: 2
@@ -916,6 +919,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidMedical
   entries:
   - group: HorizonFurnishMorgueWall
     min: 4
@@ -1162,6 +1166,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidMedical
   entries:
   - group: HorizonFurnishCmoOfficeWall
     min: 3
@@ -1401,6 +1406,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidMedical
   entries:
   - group: HorizonFurnishOperatingRoomWall
     min: 4
@@ -1647,6 +1653,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidMedical
   entries:
   - group: HorizonFurnishVirologyWall
     min: 3
@@ -1903,6 +1910,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidMedical
   entries:
   - group: HorizonFurnishPsychologistWall
     min: 2
@@ -2141,6 +2149,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidMedical
   entries:
   - group: HorizonFurnishCryogenicsWall
     min: 1
@@ -2375,6 +2384,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidMedical
   entries:
   - group: HorizonFurnishMedStorageWall
     min: 1
@@ -2607,6 +2617,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidMedical
   entries:
   - group: HorizonFurnishParamedicWall
     min: 1
@@ -2853,6 +2864,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidMedical
   entries:
   - group: HorizonFurnishMedBreakWall
     min: 2
@@ -3081,6 +3093,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidMedical
   entries:
   - group: HorizonFurnishCryoSleepWall
     min: 1
@@ -3315,6 +3328,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidScience
   entries:
   - group: HorizonFurnishAnomalyWall
     min: 2
@@ -3553,6 +3567,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidScience
   entries:
   - group: HorizonFurnishRoboticsWall
     min: 4
@@ -3793,6 +3808,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidScience
   entries:
   - group: HorizonFurnishXenoarchWall
     min: 2
@@ -4040,6 +4056,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidScience
   entries:
   - group: HorizonFurnishRdOfficeWall
     min: 3
@@ -4262,6 +4279,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidScience
   entries:
   - group: HorizonFurnishRndServerWall
     min: 1
@@ -4501,6 +4519,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidScience
   entries:
   - group: HorizonFurnishRndLabWall
     min: 4
@@ -4736,6 +4755,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidScience
   entries:
   - group: HorizonFurnishToxinsWall
     min: 1
@@ -4954,6 +4974,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidScience
   entries:
   - group: HorizonFurnishCanisterStoreWall
     min: 1
@@ -5195,6 +5216,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidScience
   entries:
   - group: HorizonFurnishSciBreakWall
     min: 2
@@ -5438,6 +5460,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidEngineering
   entries:
   - group: HorizonFurnishGravityRoomWall
     min: 1
@@ -5680,6 +5703,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidEngineering
   entries:
   - group: HorizonFurnishCeOfficeWall
     min: 2
@@ -5951,6 +5975,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidEngineering
   entries:
   - group: HorizonFurnishAtmosWall
     min: 4
@@ -6222,6 +6247,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidEngineering
   entries:
   - group: HorizonFurnishMainEngineeringWall
     min: 5
@@ -6455,6 +6481,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidEngineering
   entries:
   - group: HorizonFurnishBoardStoreOnWall
     min: 1
@@ -6689,6 +6716,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidEngineering
   entries:
   - group: HorizonFurnishAtmosLockerWall
     min: 2
@@ -6940,6 +6968,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidEngineering
   entries:
   - group: HorizonFurnishEngBreakWall
     min: 2
@@ -7193,6 +7222,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidArmory
   entries:
   - group: HorizonFurnishHosOfficeWall
     min: 2
@@ -7422,6 +7452,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidArmory
   entries:
   - group: HorizonFurnishBrigWall
     min: 1
@@ -7673,6 +7704,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidArmory
   entries:
   - group: HorizonFurnishCellsWall
     min: 2
@@ -7933,6 +7965,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidArmory
   entries:
   - group: HorizonFurnishWardenOfficeWall
     min: 2
@@ -8187,6 +8220,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidArmory
   entries:
   - group: HorizonFurnishInterrogationWall
     min: 1
@@ -8437,6 +8471,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidArmory
   entries:
   - group: HorizonFurnishPermabrigWall
     min: 5
@@ -8682,6 +8717,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidArmory
   entries:
   - group: HorizonFurnishDetectiveOfficeWall
     min: 1
@@ -8922,6 +8958,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidArmory
   entries:
   - group: HorizonFurnishSecLockerWall
     min: 2
@@ -9130,6 +9167,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidArmory
   entries:
   - group: HorizonFurnishDgSolidArmory
     min: 0
@@ -9369,6 +9407,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidArmory
   entries:
   - group: HorizonFurnishCheckpointWall
     min: 2
@@ -9604,6 +9643,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidArmory
   entries:
   - group: HorizonFurnishFiringRangeWall
     min: 2
@@ -9844,6 +9884,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidArmory
   entries:
   - group: HorizonFurnishSecMedicalWall
     min: 1
@@ -10083,6 +10124,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidService
   entries:
   - group: HorizonFurnishBarWall
     min: 4
@@ -10327,6 +10369,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidService
   entries:
   - group: HorizonFurnishKitchen2Wall
     min: 4
@@ -10558,6 +10601,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidService
   entries:
   - group: HorizonFurnishFridgeWall
     min: 2
@@ -10800,6 +10844,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidService
   entries:
   - group: HorizonFurnishHydro2Wall
     min: 5
@@ -11044,6 +11089,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidService
   entries:
   - group: HorizonFurnishJanitorWall
     min: 4
@@ -11272,6 +11318,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidService
   entries:
   - group: HorizonFurnishChapelWall
     min: 1
@@ -11497,6 +11544,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidService
   entries:
   - group: HorizonFurnishChaplainRoomWall
     min: 2
@@ -11710,6 +11758,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidService
   entries:
   - group: HorizonFurnishBartenderRoomWall
     min: 1
@@ -11935,6 +11984,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidService
   entries:
   - group: HorizonFurnishTheatreWall
     min: 1
@@ -12153,6 +12203,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidService
   entries:
   - group: HorizonFurnishReporterOfficeWall
     min: 1
@@ -12371,6 +12422,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidService
   entries:
   - group: HorizonFurnishChapelMorgueWall
     min: 1
@@ -12595,6 +12647,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidService
   entries:
   - group: HorizonFurnishClownRoomWall
     min: 1
@@ -12817,6 +12870,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidService
   entries:
   - group: HorizonFurnishMimeRoomWall
     min: 1
@@ -13020,6 +13074,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidService
   entries:
   - group: HorizonFurnishDgSolidService
     min: 0
@@ -13239,6 +13294,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidService
   entries:
   - group: HorizonFurnishZooRoomWall
     min: 1
@@ -13481,6 +13537,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidGeneral
   entries:
   - group: HorizonFurnishDormWall
     min: 2
@@ -13740,6 +13797,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidGeneral
   entries:
   - group: HorizonFurnishToiletsWall
     min: 2
@@ -13973,6 +14031,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidGeneral
   entries:
   - group: HorizonFurnishToolStoreWall
     min: 1
@@ -14205,6 +14264,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidGeneral
   entries:
   - group: HorizonFurnishLibraryWall
     min: 2
@@ -14433,6 +14493,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidGeneral
   entries:
   - group: HorizonFurnishArrivalsWall
     min: 3
@@ -14670,6 +14731,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidGeneral
   entries:
   - group: HorizonFurnishGymWall
     min: 1
@@ -14895,6 +14957,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidGeneral
   entries:
   - group: HorizonFurnishPublicGardenWall
     min: 2
@@ -15136,6 +15199,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidGeneral
   entries:
   - group: HorizonFurnishCourtroomWall
     min: 2
@@ -15356,6 +15420,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidGeneral
   entries:
   - group: HorizonFurnishLockerWall
     min: 1
@@ -15613,6 +15678,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidGeneral
   entries:
   - group: HorizonFurnishBridgeWall
     min: 9
@@ -15855,6 +15921,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidGeneral
   entries:
   - group: HorizonFurnishCaptainQuartersWall
     min: 3
@@ -16098,6 +16165,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidGeneral
   entries:
   - group: HorizonFurnishHopOfficeWall
     min: 4
@@ -16321,6 +16389,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidGeneral
   entries:
   - group: HorizonFurnishLawyerOfficeWall
     min: 1
@@ -16557,6 +16626,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidGeneral
   entries:
   - group: HorizonFurnishVault2Wall
     min: 1
@@ -16782,6 +16852,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidGeneral
   entries:
   - group: HorizonFurnishEvaStorageWall
     min: 1
@@ -17014,6 +17085,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidGeneral
   entries:
   - group: HorizonFurnishConferenceWall
     min: 2
@@ -17229,6 +17301,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidGeneral
   entries:
   - group: HorizonFurnishWorkshopWall
     min: 1
@@ -17443,6 +17516,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidSalvage
   entries:
   - group: HorizonFurnishCargoReceptionWall
     min: 1
@@ -17680,6 +17754,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidSalvage
   entries:
   - group: HorizonFurnishCargoStorageWall
     min: 2
@@ -17920,6 +17995,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidSalvage
   entries:
   - group: HorizonFurnishQmOfficeWall
     min: 2
@@ -18155,6 +18231,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidSalvage
   entries:
   - group: HorizonFurnishSalvageRoomWall
     min: 4
@@ -18377,6 +18454,7 @@
   weight: 0.7
   minTiles: 30
   maxPerDungeon: 1
+  gapFiller: HorizonDgSolidSalvage
   entries:
   - group: HorizonFurnishMailRoomWall
     min: 1

@@ -1184,6 +1184,7 @@
     perTiles: 22
     chance: 0.8
     jitter: 0.45
+  gapFiller: HorizonDgSolidMedical
 
 - type: roomArchetype
   id: HorizonRoomArmory
@@ -1410,6 +1411,7 @@
     perTiles: 22
     chance: 0.8
     jitter: 0.45
+  gapFiller: HorizonDgSolidArmory
 
 - type: roomArchetype
   id: HorizonRoomVault
@@ -1636,6 +1638,7 @@
     min: 1
     max: 2
     jitter: 0.4
+  gapFiller: HorizonDgSolidArmory
 
 - type: roomArchetype
   id: HorizonRoomBarracks
@@ -1878,6 +1881,7 @@
     perTiles: 22
     chance: 0.8
     jitter: 0.45
+  gapFiller: HorizonDgSolidGeneral
 
 - type: roomArchetype
   id: HorizonRoomStorage
@@ -2134,6 +2138,7 @@
     max: 1
     chance: 0.3
     jitter: 0.4
+  gapFiller: HorizonDgSolidSalvage
 
 - type: roomArchetype
   id: HorizonRoomEngineering
@@ -2376,6 +2381,7 @@
     perTiles: 22
     chance: 0.8
     jitter: 0.45
+  gapFiller: HorizonDgSolidEngineering
 
 - type: roomArchetype
   id: HorizonRoomLaboratory
@@ -2591,6 +2597,7 @@
     perTiles: 22
     chance: 0.8
     jitter: 0.45
+  gapFiller: HorizonDgSolidScience
 
 - type: roomArchetype
   id: HorizonRoomKitchen
@@ -2806,6 +2813,7 @@
     perTiles: 22
     chance: 0.8
     jitter: 0.45
+  gapFiller: HorizonDgSolidService
 
 - type: roomArchetype
   id: HorizonRoomOffice
@@ -3013,6 +3021,7 @@
     perTiles: 22
     chance: 0.8
     jitter: 0.45
+  gapFiller: HorizonDgSolidGeneral
 
 - type: roomArchetype
   id: HorizonRoomHydroponics
@@ -3220,6 +3229,7 @@
     perTiles: 22
     chance: 0.8
     jitter: 0.45
+  gapFiller: HorizonDgSolidHydroponics
 
 - type: roomArchetype
   id: HorizonRoomLounge
@@ -3428,6 +3438,7 @@
     perTiles: 22
     chance: 0.8
     jitter: 0.45
+  gapFiller: HorizonDgSolidService
 
 - type: roomArchetype
   id: HorizonRoomSalvageBay
@@ -3667,6 +3678,7 @@
     perTiles: 22
     chance: 0.8
     jitter: 0.45
+  gapFiller: HorizonDgSolidSalvage
 
 - type: dungeonConfig
   id: HorizonRoomFurnish

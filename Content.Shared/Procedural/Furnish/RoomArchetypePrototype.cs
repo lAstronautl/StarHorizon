@@ -231,6 +231,13 @@ public sealed partial class RoomArchetypePrototype : IPrototype
     public List<FurnishDecalRule> Decals = new();
 
     /// <summary>
+    /// Solid one-tile items (crate/locker spawners, plants) that plug dead-end pockets nothing else fits into.
+    /// Null disables gap filling for the room.
+    /// </summary>
+    [DataField]
+    public ProtoId<Content.Shared.EntityTable.EntityTablePrototype>? GapFiller;
+
+    /// <summary>
     /// Randomly scattered, randomly rotated items.
     /// </summary>
     [DataField]

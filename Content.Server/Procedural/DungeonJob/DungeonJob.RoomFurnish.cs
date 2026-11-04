@@ -74,6 +74,22 @@ public sealed partial class DungeonJob
         }
     }
 
+    /// <summary>
+    /// How many valid spots a group is compared on before it is committed to the best one (packing).
+    /// </summary>
+    private const int FurnishPackCandidates = 8;
+
+    private sealed record FurnishCandidate(
+        Vector2i Anchor,
+        Vector2i Facing,
+        Vector2i Right,
+        List<Vector2i> Positions,
+        HashSet<Vector2i> NewBlocked,
+        HashSet<Vector2i> Clearance,
+        HashSet<Vector2i>? Reach,
+        int NewPockets,
+        int Contact);
+
     private readonly HashSet<string> _furnishBadProtos = new();
 
     /// <summary>
@@ -291,6 +307,7 @@ public sealed partial class DungeonJob
             }
         }
 
+        FillFurnishGaps(ctx, arch.GapFiller, random);
         ApplyFurnishLitter(ctx, arch.Litter, random);
         ApplyFurnishDecals(ctx, arch.Decals, random);
 
@@ -298,6 +315,91 @@ public sealed partial class DungeonJob
         {
             ApplyFurnishLitter(ctx, story.Litter, random);
             ApplyFurnishDecals(ctx, story.Decals, random);
+        }
+    }
+
+    /// <summary>
+    /// Plugs dead-end pockets (a free tile with at most one free neighbour, not in front of furniture and not at a doorway)
+    /// with one solid item from the room's filler table, so no unusable gaps are left. Never cuts off any part of the room.
+    /// </summary>
+    private void FillFurnishGaps(FurnishContext ctx, ProtoId<Content.Shared.EntityTable.EntityTablePrototype>? filler, Random random)
+    {
+        if (filler == null)
+            return;
+
+        for (var pass = 0; pass < 40; pass++)
+        {
+            Vector2i? hit = null;
+            HashSet<Vector2i>? reach = null;
+
+            foreach (var tile in ctx.TileList)
+            {
+                if (ctx.Blocked.Contains(tile) || ctx.DoorSeeds.Contains(tile) || ctx.Reserved.Contains(tile) ||
+                    ctx.Used.Contains(tile))
+                {
+                    continue;
+                }
+
+                var freeNeighbors = 0;
+
+                foreach (var dir in FurnishCardinals)
+                {
+                    var next = tile + dir;
+
+                    if (ctx.Room.Tiles.Contains(next) && !ctx.Blocked.Contains(next))
+                        freeNeighbors++;
+                }
+
+                if (freeNeighbors > 1)
+                    continue;
+
+                if (ctx.DoorSeeds.Count > 0)
+                {
+                    var blockedWithTile = new HashSet<Vector2i>(ctx.Blocked) { tile };
+                    var after = FurnishFlood(ctx, blockedWithTile);
+                    var cuts = false;
+
+                    foreach (var reachable in ctx.Reach)
+                    {
+                        if (reachable != tile && !after.Contains(reachable))
+                        {
+                            cuts = true;
+                            break;
+                        }
+                    }
+
+                    if (cuts)
+                        continue;
+
+                    reach = after;
+                }
+
+                hit = tile;
+                break;
+            }
+
+            if (hit == null)
+                return;
+
+            var coords = _maps.GridTileToLocal(_gridUid, _grid, hit.Value);
+
+            try
+            {
+                foreach (var proto in _entTable.GetSpawns(_prototype.Index(filler.Value), random).ToList())
+                {
+                    FurnishSpawn(proto, coords);
+                }
+            }
+            catch (Exception e)
+            {
+                _sawmill.Error($"Furnish: gap filler table {filler} failed: {e}");
+            }
+
+            ctx.Blocked.Add(hit.Value);
+            ctx.Used.Add(hit.Value);
+
+            if (reach != null)
+                ctx.Reach = reach;
         }
     }
 
@@ -654,6 +756,40 @@ public sealed partial class DungeonJob
 
         const int maxAttempts = 200;
         var attempts = 0;
+        FurnishCandidate? best = null;
+        var valid = 0;
+
+        // Dead-end tiles (at most one free neighbour) next to the given tiles: space nothing can use.
+        int PocketsNear(IEnumerable<Vector2i> tiles, HashSet<Vector2i> blocked)
+        {
+            var count = 0;
+
+            foreach (var origin in tiles)
+            {
+                foreach (var dir in FurnishCardinals)
+                {
+                    var tile = origin + dir;
+
+                    if (!ctx.Room.Tiles.Contains(tile) || blocked.Contains(tile) || ctx.DoorSeeds.Contains(tile))
+                        continue;
+
+                    var freeNeighbors = 0;
+
+                    foreach (var around in FurnishCardinals)
+                    {
+                        var neighbor = tile + around;
+
+                        if (ctx.Room.Tiles.Contains(neighbor) && !blocked.Contains(neighbor))
+                            freeNeighbors++;
+                    }
+
+                    if (freeNeighbors <= 1)
+                        count++;
+                }
+            }
+
+            return count;
+        }
 
         foreach (var (anchor, facing) in candidates)
         {
@@ -758,6 +894,55 @@ public sealed partial class DungeonJob
             if (!ok)
                 continue;
 
+            // Packing score: the spot that leaves the fewest new dead-end pockets wins, ties go to the one hugging
+            // walls and other furniture the most. Compared over a handful of random valid spots, so rooms stay varied.
+            var contact = 0;
+
+            foreach (var tile in newBlocked)
+            {
+                foreach (var dir in FurnishCardinals)
+                {
+                    var next = tile + dir;
+
+                    if (!ctx.Room.Tiles.Contains(next) || (allBlocked.Contains(next) && !newBlocked.Contains(next)))
+                        contact++;
+                }
+            }
+
+            var candidate = new FurnishCandidate(
+                anchor,
+                facing,
+                right,
+                positions,
+                newBlocked,
+                clearance,
+                reach,
+                PocketsNear(newBlocked, allBlocked) - PocketsNear(newBlocked, ctx.Blocked),
+                contact);
+
+            if (best == null ||
+                candidate.NewPockets < best.NewPockets ||
+                (candidate.NewPockets == best.NewPockets && candidate.Contact > best.Contact))
+            {
+                best = candidate;
+            }
+
+            if (++valid >= FurnishPackCandidates)
+                break;
+        }
+
+        if (best == null)
+            return false;
+
+        {
+            var anchor = best.Anchor;
+            var facing = best.Facing;
+            var right = best.Right;
+            var positions = best.Positions;
+            var newBlocked = best.NewBlocked;
+            var clearance = best.Clearance;
+            var reach = best.Reach;
+
             // Commit.
             for (var i = 0; i < members.Count; i++)
             {
@@ -834,8 +1019,6 @@ public sealed partial class DungeonJob
 
             return true;
         }
-
-        return false;
     }
 
     #endregion
