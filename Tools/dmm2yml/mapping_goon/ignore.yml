@@ -1,0 +1,19 @@
+# Goonstation -> SS14 (this fork). Prefixes, matched down the path tree.
+#
+# SS14 has no areas at all: rooms are defined by their walls and the station
+# map prototype, not by an area object covering the tiles. Same reasoning as
+# the tgstation mapping set's own /area line.
+- /area
+
+# code/obj/landmark.dm -- invisible round-start/game-logic markers (spawn
+# points, gamemode anchors, ...), never rendered in play.
+- /obj/landmark
+
+# code/modules/mapping/helpers/* access-setting variants -- self-deleting
+# init-time helpers (deleted_on_start = TRUE, code/modules/mapping/
+# _helper_parent.dm) with no visible effect, same reasoning as tgstation's
+# own mapping_helpers. NOT a blanket /obj/mapping_helper: wingrille_spawn
+# under that same prefix spawns real, visible structure and is mapped in
+# entities.yml instead -- see check_ignore_does_not_swallow_mappings.
+- /obj/mapping_helper/access
+- /obj/cable

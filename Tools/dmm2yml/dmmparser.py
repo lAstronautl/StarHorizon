@@ -48,7 +48,7 @@ class Atom:
             return "turf"
         if self.path.startswith("/area"):
             return "area"
-        if self.path.startswith(("/obj/effect/turf_decal", "/obj/effect/decal")):
+        if self.path.startswith(("/obj/effect/turf_decal", "/obj/effect/decal", "/obj/decal")):
             return "decal"
         if self.path.startswith("/mob"):
             return "mob"

@@ -1,0 +1,97 @@
+# Goonstation -> SS14 (this fork) turf rules.
+#
+# First pass, built against maps/pod_wars.dmm's own catalog (ranked by use
+# count) rather than a full inventory of goonstation's turf tree -- a /side
+# or /corner subtype (a colour-trim variant baked into the turf itself,
+# confirmed in code/turf/floors.dm's color_coded_hall comments) inherits its
+# parent's plain colour rule here rather than getting its own tile, which
+# loses the trim detail but keeps the right floor colour. Two-tone combos
+# (redwhite, blueblack, ...) likewise fold onto their first-named colour.
+
+# Space and its variants (dense debris, ocean/fluid "space") -- see
+# code/turf/turf.dm. Plain Space for all of them; fluid specifically means
+# underwater terrain (oshan/sealab/trench maps), not relevant to the first
+# three target maps.
+/turf/space: Space
+
+# code/turf/turf.dm: an INVIS_ALWAYS, impassable, map-editor-only boundary
+# marker -- never actually rendered in play. Space is the closest honest
+# equivalent (empty, off the playable area); it carries no wall entity since
+# cordon blocks movement by preBYOND-engine special-casing, not a real wall.
+/turf/cordon: Space
+
+# code/turf/walls.dm -- asteroid rock, same pattern as tgstation's own
+# mineral-wall rule (tile underneath + WallRock entity).
+/turf/simulated/wall/auto/asteroid:
+  tile: FloorAsteroidSand
+  entity: WallRock
+
+# code/turf/turf_autoalign.dm -- the standard reinforced hull/station wall
+# family (supernorn/plain). Plating underneath, same stopgap tgstation's own
+# WallSolid/WallReinforced rules use.
+/turf/simulated/wall/auto/reinforced:
+  tile: Plating
+  entity: WallReinforced
+/turf/unsimulated/wall/auto/reinforced:
+  tile: Plating
+  entity: WallReinforced
+
+# code/datums/gamemodes/pod_wars.dm, code/obj/sealab_objects.dm -- shuttle
+# hull walls; WallShuttle is this fork's closest matching prototype.
+/turf/unsimulated/wall/auto/adventure/shuttle:
+  tile: Plating
+  entity: WallShuttle
+
+# code/turf/floors.dm -- plating (exposed floor substrate, no finish).
+/turf/simulated/floor/plating: Plating
+/turf/unsimulated/floor/plating: Plating
+
+# code/turf/floors.dm: icon_state "floor" -- the bare default station floor.
+/turf/simulated/floor: FloorSteel
+/turf/unsimulated/floor: FloorSteel
+
+# Solid colour floor families (code/turf/floors.dm -- white/black/red/blue/
+# yellow/green/purple), each with /side and /corner trim subtypes folded on
+# as noted above.
+/turf/simulated/floor/white: FloorWhite
+/turf/unsimulated/floor/white: FloorWhite
+/turf/unsimulated/floor/sanitary: FloorWhite
+/turf/simulated/floor/black: FloorDark
+/turf/unsimulated/floor/black: FloorDark
+/turf/simulated/floor/red: FloorRedMono
+/turf/unsimulated/floor/red: FloorRedMono
+/turf/simulated/floor/blue: FloorBlue
+/turf/unsimulated/floor/blue: FloorBlue
+/turf/simulated/floor/yellow: FloorLightYellowMono
+/turf/unsimulated/floor/yellow: FloorLightYellowMono
+/turf/simulated/floor/green: FloorGreenMono
+/turf/simulated/floor/purple: FloorShuttlePurple
+
+# Two-tone combo floors -- folded onto their first-named colour (see module
+# comment above); loses the second colour's accent but keeps a plausible one.
+/turf/unsimulated/floor/redwhite: FloorRedMono
+/turf/unsimulated/floor/blackwhite: FloorDark
+/turf/unsimulated/floor/bluewhite: FloorBlue
+/turf/unsimulated/floor/redblack: FloorRedMono
+/turf/simulated/floor/blueblack: FloorBlue
+/turf/unsimulated/floor/blueblack: FloorBlue
+
+# code/turf/floors.dm line ~1223: name "reinforced floor", icon_state
+# "engine" -- the engineering-room floor. code/turf/floors_unsimulated.dm's
+# shuttlebay plating uses the exact same icon_state, same tile.
+/turf/simulated/floor/engine: FloorReinforced
+/turf/unsimulated/floor/shuttlebay: FloorReinforced
+
+# code/turf/floors_unsimulated.dm ~683: icon_state "bar".
+/turf/unsimulated/floor/specialroom/bar: FloorBar
+
+# code/turf/floors_unsimulated.dm -- a plain wood floor variant.
+/turf/unsimulated/floor/wood: FloorWood
+
+# code/turf/floors.dm -- a circuit-patterned floor; colour-neutral "off"
+# variant folded onto the green circuit tile (closest plain option).
+/turf/simulated/floor/circuit: FloorGreenCircuit
+
+# code/turf/floors.dm -- a carpeted floor; the plain (non-clown, non-fancy)
+# variant maps to this fork's office carpet.
+/turf/simulated/floor/carpet: FloorCarpetOffice

@@ -1,0 +1,38 @@
+# Goonstation -> SS14 (this fork) decal rules.
+#
+# code/obj/decal/tile_edge.dm: /obj/decal/tile_edge/stripe draws one base
+# "stripe-edge" icon rotated by its own `dir` (image(..., dir=src.dir) in
+# initialize()), rather than switching between pre-drawn directional sprite
+# states the way tgstation's own turf_decal/stripes/line does -- but SS14's
+# decal set is itself pre-drawn per direction (no per-instance decal
+# rotation), so the same dir->id table tgstation's own stripes/line rule
+# already uses (BYOND's shared N/S/E/W + diagonal-corner dir convention) is
+# reused here as a first-pass approximation. NOT pixel-verified against this
+# icon set the way the original was against tgstation's.
+# The bare, un-styled base class (code/obj/decal/tile_edge.dm: icon_state
+# "tile_edge", no colour) needs its own rule too, even though it's rarely
+# placed directly -- otherwise it is itself unresolved, and an auto-skip
+# convert run appends it to ignore.yml as a *prefix*, which then shadows
+# every one of its own subtypes below (including the stripe rule right
+# after it) the same way a static ignore.yml entry would (see check_ignore_
+# does_not_swallow_mappings) -- caught for real converting pod_wars.dmm.
+/obj/decal/tile_edge:
+  dirs:
+    1: WarnLineW
+    2: WarnLineN
+    4: WarnLineE
+    8: WarnLineS
+    5: WarnCornerNE
+    6: WarnCornerSE
+    9: WarnCornerNW
+    10: WarnCornerSW
+/obj/decal/tile_edge/stripe:
+  dirs:
+    1: WarnLineW
+    2: WarnLineN
+    4: WarnLineE
+    8: WarnLineS
+    5: WarnCornerNE
+    6: WarnCornerSE
+    9: WarnCornerNW
+    10: WarnCornerSW

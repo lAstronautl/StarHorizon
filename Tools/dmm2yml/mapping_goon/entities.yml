@@ -1,0 +1,107 @@
+# Goonstation -> SS14 (this fork) entity rules.
+#
+# First pass, built against maps/pod_wars.dmm's own catalog (ranked by use
+# count), same approach and same caveats as turfs.yml.
+
+# code/obj/mesh.dm, code/obj/lattice.dm -- same pattern tgstation's own
+# lattice/catwalk already use: Lattice is a *tile* (a lattice is a surface
+# you stand on, not a freestanding object), with Catwalk as an entity on top
+# of it for the walkable mesh specifically.
+/obj/lattice: {tile: Lattice}
+/obj/mesh/catwalk: {tile: Lattice, entity: Catwalk}
+
+# code/modules/disposals/disposal.dm -- straight/bent pipe segments are real
+# distinct subtypes here (not engine-computed shape like tgstation's smart
+# pipes), so a direct id per subtype is correct, no auto-fit needed.
+/obj/disposalpipe/segment: DisposalPipe
+/obj/disposalpipe/segment/bent: DisposalBend
+/obj/disposalpipe/trunk: DisposalTrunk
+
+# code/modules/power/lighting.dm -- wall-mounted strip light; "netural" is
+# goonstation's own typo for "neutral" (a plain uncoloured bulb), not ours.
+/obj/machinery/light/incandescent: PoweredSmallLight
+/obj/machinery/light/small/floor: PoweredSmallLight
+
+# code/modules/mapping/helpers/wingrille_spawner.dm -- a self-deleting
+# mapping helper (deleted_on_start = TRUE, code/modules/mapping/
+# _helper_parent.dm) that spawns a grille + a *full* window on its own tile
+# (full_win = TRUE, no_dirs = TRUE for every /auto/* variant) -- unlike
+# tgstation's own mapping_helpers, this one's effect is real, visible
+# structure, so it is mapped to what it spawns rather than ignored.
+/obj/mapping_helper/wingrille_spawn/auto:
+  entities: [Window, Grille]
+/obj/mapping_helper/wingrille_spawn/auto/reinforced:
+  entities: [ReinforcedWindow, Grille]
+/obj/mapping_helper/wingrille_spawn/auto/reinforced/crystal:
+  entities: [ReinforcedPlasmaWindow, Grille]
+/obj/mapping_helper/wingrille_spawn/auto/crystal:
+  entities: [PlasmaWindow, Grille]
+
+# code/modules/power/solar.dm -- solar panel (directional subtypes inherit).
+/obj/machinery/power/solar: SolarPanel
+
+# code/obj/table.dm -- plain/reinforced tables.
+/obj/table/auto: Table
+/obj/table/reinforced/auto: TableReinforced
+
+# code/modules/transport/shuttle/shuttle_misc.dm -- shuttle engine thruster;
+# "heater" (a separate warm-up stage object in goonstation's own shuttle
+# model) has no direct SS14 equivalent and is left unmapped rather than
+# guessed at.
+/obj/machinery/shuttle/engine/propulsion: Thruster
+
+# code/datums/gamemodes/pod_wars/pw_misc_objects.dm -- a permanent, map-
+# placed energy barrier.
+/obj/forcefield/energyshield/perma: EnergyShield
+
+/obj/stool/chair: Chair
+/obj/stool/bed: Bed
+/obj/storage/crate: CrateGenericSteel
+
+# code/obj/item/mops_cleaners.dm
+/obj/item/mop: MopItem
+/obj/item/spraybottle/cleaner: SprayBottleSpaceCleaner
+
+# code/obj/item/storage/backpack_belt_etc.dm
+/obj/item/storage/belt/utility: ClothingBeltUtility
+/obj/item/storage/belt/medical: ClothingBeltMedical
+
+# code/modules/fluids/sink.dm -- both the kitchen (base) and hand-washing
+# (slim) variants are close enough in appearance to use the same tile; the
+# base rule also keeps an unresolved /obj/machinery/sink from being auto-
+# skip-appended to ignore.yml and shadowing the /slim rule below it (same
+# failure shape as /obj/decal/tile_edge, see decals.yml's comment on it).
+/obj/machinery/sink: Sink
+
+# code/modules/power/terminal.dm
+/obj/machinery/power/terminal: CableTerminal
+
+# code/obj/item/device/gps.dm
+/obj/item/device/gps: HandheldGPSBasic
+
+# code/obj/mining.dm -- handheld ore-gathering tool; satchel/mining is the
+# matching ore storage bag.
+/obj/item/ore_scoop: OreBag
+/obj/item/satchel/mining: OreBag
+
+# code/modules/disposals/disposal_chute.dm
+/obj/machinery/disposal/small: DisposalUnit
+
+# code/obj/item/reagent_containers/food/... -- plain cheese wheel.
+/obj/item/reagent_containers/food/snacks/ingredient/cheese: FoodCheese
+
+# code/obj/window.dm -- directional cubicle divider window.
+/obj/window/cubicle: WindowDirectional
+
+# code/datums/gamemodes/pod_wars.dm, code/obj/sealab_objects.dm, code/obj/
+# machinery/door/airlock_pyro.dm -- same family tgstation's own airlocks
+# already map to, reused directly since both source codebases target this
+# same fork.
+/obj/machinery/door/airlock/pyro: Airlock
+/obj/machinery/door/airlock/pyro/external: AirlockExternal
+/obj/machinery/door/airlock/pyro/glass: AirlockGlass
+/obj/machinery/door/airlock/pyro/engineering: AirlockEngineeringLocked
+
+# code/obj/landmark.dm, code/modules/mapping/helpers/* -- invisible round-
+# start/game-logic markers (spawn points, access setters, ...), never
+# rendered; same reasoning as tgstation's own mapping_helpers/landmarks.
