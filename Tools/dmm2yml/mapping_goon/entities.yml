@@ -166,8 +166,495 @@
 /obj/machinery/vending/medical: VendingMachineMedical
 /obj/machinery/vending/kitchen: VendingMachineChefvend
 
+# code/modules/vending/vending.dm -- "GardenGear", a hydroponics tool/
+# supply vendor; SS14 has no matching tool vendor, closest department-
+# appropriate vending machine is the seed vendor (documented approximation).
+/obj/machinery/vending/hydroponics: VendingMachineSeeds
+
+# code/obj/submachine/seed.dm -- "Fabricates basic plant seeds"; direct
+# SS14 match.
+/obj/submachine/seed_vendor: VendingMachineSeeds
+
+# code/modules/vending/vending.dm -- "gaming machine" selling cards/dice/
+# board games; direct SS14 match.
+/obj/machinery/vending/cards: VendingMachineGames
+
+# code/modules/vending/vending.dm -- pizza vendor and this fork's
+# pod_wars-specific oxygen-tank-filling vendor have no matching SS14
+# vending machine prototype; left unmapped.
+
+# code/modules/vending/vending.dm -- "Public MiniMed", a cheaper public-
+# access medical vendor; same closest SS14 match as the professional
+# /obj/machinery/vending/medical above.
+/obj/machinery/vending/medical_public: VendingMachineMedical
+
+# code/obj/submachine/chem_extractor.dm -- extracts reagents from food/
+# plant matter; same closest SS14 role match as the mixer/foodprocessor
+# above (no distinct SS14 "extractor" machine).
+/obj/submachine/chem_extractor: KitchenReagentGrinder
+
+# code/obj/item/toilets.dm -- plain toilet, no bowl contents; closest SS14
+# match is the empty (dry) toilet.
+/obj/item/storage/toilet: ToiletEmpty
+
+# code/obj/fakeobject.dm -- an invisible, no-fixed-appearance base class
+# for one-off admin/flavour decorations (its icon_state is set per-
+# instance in map data, not by this type); no generic SS14 equivalent,
+# left unmapped. Covers /cpucontroller and /operatorconsole.
+
+# code/obj/mining.dm -- cargo-transporter receiving pad; code/modules/
+# cooking/kitchen_submachines.dm's ice cream dispenser; code/modules/
+# telescience/radiostation.dm's whole radio-DJ-booth flavour set (mixing
+# desk, record player, tape deck); code/obj/machinery/shower.dm's shower
+# head (SS14 has no shower fixture at all); and code/obj/machinery/
+# sleeper.dm's compact sleeper and code/modules/medical/surgery_tools.dm's
+# rolling tray (no SS14 "sleeper" or generic "tray" prototype exists) --
+# none of these have a matching SS14 prototype; left unmapped.
+
 # code/datums/gamemodes/pod_wars/pw_misc_objects.dm -- a map-deployed,
 # already-anchored combat turret; this fork's closest matching "already
 # deployed, ready to fire" turret entity, same for both pod_wars factions
 # (no faction-specific reskin exists on this fork).
 /obj/deployable_turret/pod_wars: WeaponTurretAsmgtNtDeployed
+
+# --- third pass: "100% port" push -- researching and mapping every path
+# still left in pod_wars.dmm's unresolved list, not just common/high-value
+# ones. Items genuinely without an SS14 equivalent are documented and left
+# unmapped (picked up by the usual auto-skip-to-ignore.yml flow) rather than
+# forced into a wrong guess -- same policy as the shuttle heater above. ---
+
+# code/obj/machinery/recharger.dm -- small hand-item recharger (batons,
+# mining tools, defibrillators, ...); /wall is a cosmetic wall-mount variant.
+/obj/machinery/recharger: WeaponCapacitorRecharger
+
+# code/modules/fluids/fluid_objects.dm -- floor drain; /big is a wider
+# drain, same closest SS14 prototype either way.
+/obj/machinery/drainage: FloorDrain
+
+# code/obj/item/clothing/suits.dm -- plain cloth bedsheet, colour variants;
+# /random is this fork's round-start random-colour spawner, folded onto
+# plain white as its representative colour. No SS14 "pink" bedsheet exists,
+# so /pink is left unmapped rather than guessed at.
+/obj/item/clothing/suit/bedsheet/random: BedsheetWhite
+/obj/item/clothing/suit/bedsheet/orange: BedsheetOrange
+/obj/item/clothing/suit/bedsheet/red: BedsheetRed
+/obj/item/clothing/suit/bedsheet/blue: BedsheetBlue
+/obj/item/clothing/suit/bedsheet/green: BedsheetGreen
+
+# code/obj/item/clothing/glasses.dm -- health-scanning HUD glasses; /upgraded
+# is the same item with a scan-upgrade already installed, no distinct SS14
+# "upgraded" prototype exists so it folds onto the base rule.
+/obj/item/clothing/glasses/healthgoggles: ClothingEyesHudMedical
+
+# code/modules/cooking/kitchen_items.dm -- plain plate.
+/obj/item/plate: FoodPlate
+
+# code/modules/transport/shuttle/shuttle_turfobjs.dm -- a corner-sprite
+# variant of the same indestructible shuttle hull wall as /turf/unsimulated/
+# wall/auto/adventure/shuttle above; reuses the same WallShuttle prototype.
+/obj/indestructible/shuttle_corner: WallShuttle
+
+# code/modules/cooking/mixer.dm, code/modules/cooking/kitchen_submachines.dm
+# -- food mixer and food processor; both are kitchen-prep appliances with no
+# distinct SS14 counterpart, closest is the reagent grinder.
+/obj/machinery/mixer: KitchenReagentGrinder
+/obj/submachine/foodprocessor: KitchenReagentGrinder
+
+# code/modules/cooking/deep_fryer.dm
+/obj/machinery/deep_fryer: KitchenDeepFryer
+
+# code/obj/railing.dm -- plain railing; base rule covers every colour/
+# reinforced subtype by inheritance.
+/obj/railing: Railing
+
+# code/obj/table.dm -- glass table; the round wood "champagne table" loses
+# its autonomous champagne-bottle-spawning behaviour, folded onto the plain
+# wood table as the closest structural match.
+/obj/table/glass/auto: TableGlass
+/obj/table/wood/round/champagne: TableWood
+
+# code/obj/item/storage/med_chem.dm, code/obj/item/storage/food.dm -- boxes
+# of small glass labware; SS14 has no distinct "box of drinking glasses"
+# prototype, so glassbox folds onto the beaker box as the closest "box of
+# glass containers" approximation.
+/obj/item/storage/box/beakerbox: BoxBeaker
+/obj/item/storage/box/glassbox: BoxBeaker
+
+# code/obj/mopbucket.dm, code/modules/chemistry/tools/droppers.dm,
+# code/modules/chemistry/Chemistry-Tools.dm, code/modules/chemistry/tools/
+# hyposprays.dm, code/obj/mining.dm -- plain reagent-handling tools/
+# containers with direct SS14 matches.
+/obj/mopbucket: MopBucket
+/obj/item/reagent_containers/dropper: Dropper
+/obj/item/reagent_containers/glass/bucket: Bucket
+/obj/item/reagent_containers/hypospray: Hypospray
+/obj/item/mining_tool/powered/pickaxe: Pickaxe
+
+# code/obj/item/reagent_containers/... -- large pre-filled chemical
+# beakers (antitox/brute/burn/epinephrine); SS14 has no distinct "large"
+# beaker line, folded onto the plain beaker.
+/obj/item/reagent_containers/glass/beaker/large: Beaker
+
+# code/obj/item/organs/eye.dm -- direct SS14 match.
+/obj/item/organ/eye: OrganHumanEyes
+
+# code/obj/item/storage/misc.dm's light-tube box and code/obj/item/
+# storage/food.dm's Donk-Pockets box -- direct SS14 matches.
+/obj/item/storage/box/lightbox/tubes: BoxLighttube
+/obj/item/storage/box/donkpocket_kit: FoodBoxDonkpocket
+
+# code/obj/item/clothing/hats.dm, code/obj/item/clothing/suits.dm -- a
+# virology hazmat hood/suit pair; code/obj/item/playing_cards.dm's card
+# deck box (SS14's card decks have no separate storage-box prototype);
+# code/obj/item/storage/electronics.dm's cable-coil box; code/obj/item/
+# storage/food.dm's ice-cream-cone box; code/obj/item/storage/misc.dm's
+# crayon box -- none have a matching SS14 prototype; left unmapped.
+
+# code/obj/item/mops_cleaners.dm, code/obj/item/cigarette.dm -- direct
+# SS14 matches.
+/obj/item/caution: WetFloorSign
+/obj/item/matchbook: Matchbox
+
+# code/obj/storage/secure_closets.dm -- a card-locked contraband safe, a
+# locker pre-stocked with the full set of first-aid kits, and a plain
+# empty personal locker; closest SS14 structural matches.
+/obj/storage/secure/closet/brig: LockerEvidence
+/obj/storage/secure/closet/medical/medkit: ClosetEmergencyFilledRandom
+/obj/storage/secure/closet/personal/empty: ClosetSteelBase
+
+# code/obj/item/storage/electronics.dm -- direct SS14 match.
+/obj/item/storage/toolbox/electrical: ToolboxElectrical
+
+# code/obj/item/organs/eye.dm already covered above. code/obj/item/
+# device/mic_amp_etc.dm's handheld radio/intercom device; direct SS14
+# match (plain handheld radio).
+/obj/item/device/radio/intercom/radiostation: RadioHandheld
+
+# code/modules/cooking/soup.dm -- this fork's bespoke soup-cooking item
+# pair (ladle, soup pot); no matching SS14 items, left unmapped.
+
+# code/datums/gamemodes/pod_wars/pw_misc_objects.dm's flavour radio tapes
+# (advertisement/captain_psa, advertisement/danitos_burritos,
+# advertisement/grones, advertisement/quik_noodles, audio_book/heisenbee)
+# and code/obj/decorations.dm's drink_rack/mug are pure lore flavour items
+# with no SS14 equivalent of this fork's radio-tape system; left unmapped,
+# except drink_rack/mug which does have a direct structural match:
+/obj/drink_rack/mug: DrinkMug
+
+# code/modules/cooking/kitchen_items.dm -- plain burger, generic fallback
+# for every flavour subtype without its own closer match below.
+/obj/item/reagent_containers/food/snacks/burger: FoodBurgerPlain
+/obj/item/reagent_containers/food/snacks/burger/baconburger: FoodBurgerBacon
+/obj/item/reagent_containers/food/snacks/burger/bigburger: FoodBurgerBig
+/obj/item/reagent_containers/food/snacks/burger/cheeseburger: FoodBurgerCheese
+/obj/item/reagent_containers/food/snacks/burger/chicken: FoodBurgerChicken
+/obj/item/reagent_containers/food/snacks/omelette: FoodMealOmelette
+
+# code/obj/item/reagent_containers/food/snacks/... -- a cold-sandwich-style
+# cheese toastie; no matching SS14 prototype (FoodBakedGrilledCheeseSandwich
+# above is the hot grilled version, used for the distinct /sandwich/cheese
+# item), left unmapped.
+
+# code/obj/item/reagent_containers/food/snacks/... -- cheese sandwich closest
+# matches the grilled cheese sandwich (no separate SS14 "sandwich" family).
+/obj/item/reagent_containers/food/snacks/sandwich/cheese: FoodBakedGrilledCheeseSandwich
+
+# code/modules/power/furnace.dm -- anchored, map-placed 20kW fuel-burning
+# power generator; closest scale/anchoring match is the 15kW anchored
+# generator (SS14 has no exact 20kW prototype).
+/obj/machinery/power/furnace: GeneratorBasic15kW
+
+# code/obj/mining.dm -- this fork's asteroid-mining "mineral magnet" minigame
+# (magnetizer gun, magnet chassis/parts, construction magnet, its control
+# computer) has no equivalent mechanic or prototype in SS14 at all, so the
+# whole family is left unmapped rather than guessed at:
+# /obj/item/magnet_parts/construction, /obj/item/magnetizer,
+# /obj/machinery/magnet_chassis, /obj/machinery/mining_magnet,
+# /obj/machinery/computer/magnet.
+
+# code/obj/item/mops_cleaners.dm -- plain cleaning sponge; no SS14 prototype
+# for a bare sponge exists (only themed Syndicate sponges), left unmapped.
+
+# code/datums/gamemodes/pod_wars/pw_misc_objects.dm -- bandage dispenser
+# machine; no SS14 "dispenses bandages" machine prototype exists, left
+# unmapped.
+
+# code/obj/machinery/glass_recycler.dm -- recycles glass shards into
+# drinking glasses/beakers; no SS14 glass-recycling machine prototype
+# exists (GasRecycler is an unrelated atmos device), left unmapped. Covers
+# both the base machine and its /chemistry subtype.
+
+# code/obj/machinery/secscanner.dm -- walk-through contraband/weapon body
+# scanner (a security checkpoint fixture); no matching SS14 machine
+# prototype exists, left unmapped.
+
+# code/modules/transport/pods/secondary_system.dm -- an internal pod/ship
+# upgrade module (auto-collects ore into the vehicle's own cargo hold), not
+# a placeable map structure in its own right; left unmapped.
+
+# code/datums/gamemodes/pod_wars/pw_misc_objects.dm -- gamemode-specific
+# capture-point computer; its only real behaviour is the point-capture
+# mechanic (team ownership, capture timer), which has no SS14 equivalent at
+# all, so forcing a generic computer sprite on it would misrepresent its
+# function. Left unmapped.
+
+# code/obj/machinery/door/poddoor.dm -- same blast-door family tgstation's
+# own /obj/machinery/door/poddoor already maps to BlastDoor, reused
+# directly; covers every podbay_autoclose/t#d#_horizontal variant and the
+# plain /pyro subtype by inheritance (same icon family, "bdoor*" states).
+/obj/machinery/door/poddoor: BlastDoor
+
+# code/obj/machinery/door/door_control.dm -- wall-mounted remote door
+# buttons (plain, bolt-toggle, and the receiver variant); SS14's closest
+# structural match for all three is the generic directional signal button
+# used to remote-trigger doors, reused across every new_walls/<dir> and
+# podbay/<door> subtype by inheritance.
+/obj/machinery/door_control: SignalButtonDirectional
+/obj/machinery/r_door_control: SignalButtonDirectional
+
+# code/obj/machinery/door/window.dm -- plain (non-directional) windoor.
+/obj/machinery/door/window: Windoor
+
+# code/datums/gamemodes/pod_wars/pw_misc_objects.dm -- "cloning pod deluxe",
+# a reskinned/boosted version of the standard cloning pod; SS14's own
+# CloningPod is the direct structural match.
+/obj/machinery/clonepod/pod_wars: CloningPod
+
+# code/obj/submachine/weapon_vendor.dm -- automated quartermaster vendor
+# that issues weapons/gear for team tokens; closest SS14 structural match is
+# the security-gear vending machine. Same id reused for both factions, no
+# faction-specific reskin exists on this fork (same reasoning as the
+# deployable turret above).
+/obj/submachine/weapon_vendor/podwars/NT: VendingMachineSec
+/obj/submachine/weapon_vendor/podwars/SY: VendingMachineSec
+
+# code/datums/gamemodes/pod_wars.dm, code/modules/transport/pods/ships.dm --
+# the pod_wars gamemode's pilotable combat/mining pods (both factions'
+# "dingy" and "pod_smooth" variants) are small craft with their own
+# installed-component/weapon/cargo system; nothing in SS14 represents a
+# small pilotable pod placed directly on the map this way (mechs are a
+# fundamentally different walker-type vehicle), so the whole vehicle family
+# is left unmapped rather than forced onto an unrelated prototype:
+# /obj/machinery/vehicle/pod_wars_dingy/*, /obj/machinery/vehicle/pod_smooth/*.
+
+# code/datums/gamemodes/pod_wars/pw_manufacturing_.dm,
+# code/datums/gamemodes/pod_wars.dm -- the gamemode's recipe-browser ship-
+# component fabricators (manufacturer/pod_wars, manufacturer/general/
+# pod_wars, manufacturer/medical/pod_wars, manufacturer/mining/pod_wars/*,
+# manufacturer/qm) and emergency pod macrofabs (macrofab/pod_wars/*) are
+# tied to this gamemode's own crafting-datum and vehicle-spawning systems,
+# which have no SS14 equivalent; left unmapped.
+
+# code/datums/gamemodes/pod_wars/pw_misc_objects.dm -- warp_beacon/pod_wars
+# (a capture-point navigation marker, same "no SS14 equivalent" mechanic as
+# the control-point computer above) and pod_base_critical_system (a 64x64
+# per-team win-condition MacGuffin structure) are both pure gamemode-logic
+# objects with no structural SS14 counterpart; left unmapped.
+
+# code/modules/atmospherics/portable/canister.dm -- this mapping set has no
+# shared canister table of its own yet (unlike the tgstation one), so the
+# two gases pod_wars.dmm actually uses get their own rules here; Goonstation
+# "toxins" is the same gas as tgstation/SS14's "plasma". Both /pod_wars/
+# anchored subtypes (just a tougher, always-anchored variant, see
+# pw_misc_objects.dm) inherit from these.
+/obj/machinery/portable_atmospherics/canister/oxygen: OxygenCanister
+/obj/machinery/portable_atmospherics/canister/toxins: PlasmaCanister
+
+# code/modules/chemistry/tools/dispensers.dm -- a tank dispensing welding
+# fuel; direct SS14 match. Covers the tougher /pod_wars/anchored subtype.
+/obj/reagent_dispensers/fueltank: WeldingFuelTank
+
+# code/modules/medical/defibrillator.dm -- wall-mounted defibrillator unit
+# that holds a removable handheld defib; closest SS14 structural match is
+# the defibrillator wall cabinet.
+/obj/machinery/defib_mount: DefibrillatorCabinet
+
+# code/obj/item/material.dm -- processes scrap/sheets into material bars;
+# direct SS14 match.
+/obj/machinery/portable_reclaimer: MaterialReclaimer
+
+# code/modules/materials/Mat_Processing.dm -- turns material bars into
+# sheets; direct SS14 match (Sheetifier does the same job).
+/obj/machinery/sheet_extruder: Sheetifier
+
+# code/modules/materials/Mat_Fabrication.dm -- a general-purpose, material-
+# aware item fabricator (the same role as the pod_wars ship-component
+# manufacturers above, but for everyday items rather than gamemode-specific
+# parts); closest SS14 structural/role match is the general fabrication
+# lathe. Covers /mining and /refining subtypes by inheritance.
+/obj/machinery/nanofab: Autolathe
+
+# code/obj/machinery/computer/buildandrepair.dm -- an unfinished computer
+# under construction; direct SS14 match.
+/obj/computerframe: ComputerFrame
+
+# code/modules/networks/computer3/comm_dish.dm -- a station-to-station
+# messaging/networking dish tied to this fork's own data_terminal network,
+# code/modules/disposals/crusher.dm -- a trap-door ore/trash crusher, and
+# code/modules/materials/Mat_Processing.dm's neosmelter ("Nano-crucible", a
+# 2-slot material combiner) all have no matching SS14 machine; left
+# unmapped. Likewise code/modules/power/terminal.dm's data_terminal is a
+# normally-hidden, underfloor cable-network connection point (distinct from
+# the already-mapped /obj/machinery/power/terminal above) with no visible
+# presence either way; left unmapped.
+
+# code/modules/minimap/minimap_objects/objects/map_computer.dm -- a tactical
+# map/radar display computer; closest SS14 structural match is the radar
+# console. Covers the nanotrasen/syndicate/neutral/both_teams variants by
+# inheritance (no faction-specific reskin exists on this fork).
+/obj/minimap/map_computer/pod_wars: ComputerRadar
+
+# code/obj/machinery/computer/announcement.dm -- sends a station-wide
+# announcement; same role as tgstation's own /obj/machinery/announcement_
+# system, reusing its ComputerComms id directly.
+/obj/machinery/computer/announcement: ComputerComms
+
+# code/modules/power/monitor.dm -- direct SS14 match.
+/obj/machinery/computer/power_monitor: ComputerPowerMonitoring
+
+# code/modules/power/solar.dm -- same role as tgstation's own
+# /obj/machinery/power/solar_control, reusing its ComputerSolarControl id
+# directly. Covers every solar_id direction/array subtype by inheritance.
+/obj/machinery/computer/solar_control: ComputerSolarControl
+
+# code/modules/disposals/disposal.dm, code/obj/machinery/pipe/
+# pipe_dispenser.dm, code/modules/cooking/gibber.dm, code/obj/machinery/
+# launcherloader.dm, code/obj/machinery/mass_driver.dm -- a disposal-pipe-
+# network termination point, a mobile pipe-laying cart, a corpse/meat
+# grinder, and a pneumatic object launcher/loader pair all have no matching
+# SS14 machine (SS14's own disposal network has no distinct "outlet"
+# prototype separate from DisposalUnit); left unmapped.
+
+# code/obj/machinery/plantpot.dm -- hydroponics tray; direct SS14 match
+# (note the lowercase-leading prototype id, as SS14 itself spells it).
+/obj/machinery/plantpot: hydroponicsTray
+
+# code/obj/decorations.dm -- plain decorative potted/standing plants
+# (numbered icon-state variants only, no distinct species); folded onto the
+# same generic potted-plant prototype already used for /obj/shrub above.
+/obj/potted_plant: PottedPlant1
+/obj/decoration/decorativeplant: PottedPlant1
+
+# code/datums/gamemodes/pod_wars.dm -- generic memorial prop; direct SS14
+# match. Covers memorial_left/right and the per-team pod_war_stats variants
+# by inheritance.
+/obj/decoration/memorial: Memorial
+
+# code/modules/chemistry/Chemistry-Dispenser.dm -- "soda fountain-like"
+# chemical dispenser; direct SS14 match. Covers every alcohol/medical/soda/
+# bar/fortuna flavour subtype by inheritance.
+/obj/machinery/chem_dispenser: ChemDispenser
+
+# code/modules/medical/cloning/grinder.dm -- "enzymatic reclaimer", recovers
+# biomatter from corpses for cloning; closest SS14 structural/role match is
+# the biomass reclaimer.
+/obj/machinery/clonegrinder/podwars: BiomassReclaimer
+
+# code/obj/item/device/mic_amp_etc.dm -- a wall-mounted speaker that plays
+# back nearby microphone pickup; closest SS14 structural match is the wall
+# intercom (not a perfect behavioural match -- SS14's intercom is two-way
+# departmental comms -- but it is the closest "wall audio device" SS14 has).
+/obj/machinery/loudspeaker: Intercom
+
+# code/obj/item/device/mic_amp_etc.dm -- decorative microphone stand with a
+# removable handheld mic; no matching SS14 prototype, left unmapped.
+
+# code/obj/random_spawners.dm -- a self-deleting spawner for the already-
+# unmapped pod-vehicle family (see the pod_wars vehicle note above); same
+# reasoning, left unmapped. Covers random_putt_spawner too.
+
+# code/obj/random_spawners.dm -- self-deleting, invisible round-start
+# spawners that pick a random count of items from a category-specific
+# list (snacks, tableware, tools, junk, medicine, ...), then delete
+# themselves; the amount/chance subtypes (one, two, maybe_few, ...) are
+# all cosmetic spawn-count variants of the same category. SS14 has no
+# equivalent "random loot spawner" mechanic, so each category is folded
+# onto one representative, commonly-stocked item from its own items2spawn
+# list instead of left fully unmapped -- a documented simplification, same
+# reasoning as the bedsheet/random fold above.
+/obj/random_item_spawner/snacks: FoodCookieFortune
+/obj/random_item_spawner/tableware: FoodPlate
+/obj/random_item_spawner/tools: Wrench
+/obj/random_item_spawner/junk: Paper
+/obj/random_item_spawner/desk_stuff: Paper
+/obj/random_item_spawner/medicine: PillCanister
+/obj/random_item_spawner/med_kit: MedkitAdvancedFilled
+/obj/random_item_spawner/med_tool: Scalpel
+/obj/random_item_spawner/shoe: ClothingShoesBootsWork
+/obj/random_item_spawner/hat: ClothingHeadHatPaper
+/obj/random_item_spawner/organs: OrganHumanEyes
+
+# code/modules/chemistry/tools/bottles.dm -- a bottle of cleaning fluid; no
+# SS14 "bottle" container of cleaner exists, folded onto the spray bottle
+# already used for /obj/item/spraybottle/cleaner above (closest "container
+# of cleaning solution" SS14 has).
+/obj/item/reagent_containers/glass/bottle/cleaner: SprayBottleSpaceCleaner
+
+# code/obj/storage/secure_closets.dm -- "refrigerator"; same closest SS14
+# match as the pass-one chef's fridge rule.
+/obj/storage/secure/closet/fridge: ClosetChefFilled
+
+# code/modules/vending/vending.dm -- direct SS14 match.
+/obj/machinery/vending/coffee: VendingMachineCoffee
+
+# code/obj/machinery/espresso.dm -- plain and security-break-room coffee
+# maker; reuses tgstation's own coffeemaker/impressa mapping (ImpCoffeeMachine
+# is this fork's only coffee-machine prototype).
+/obj/machinery/coffeemaker: ImpCoffeeMachine
+
+# code/modules/mapping/helpers/beaker_spawn.dm -- a self-deleting helper
+# that only ensures a dispenser already on the same tile has glassware in
+# it (per its own doc comment, map a specific glass item on the tile for
+# anything other than the default); it has no freestanding visible effect
+# of its own, unlike wingrille_spawn above, so it is left unmapped.
+
+# code/obj/item/cloning_modules.dm -- a cloning-pod speed-upgrade module
+# (an installable part, not a freestanding structure); no matching SS14
+# item, left unmapped.
+
+# code/modules/power/solar.dm -- "Houyi stellar tracker", the panel-facing
+# half of the solar array; same role as tgstation's own /obj/machinery/
+# power/tracker, reusing its SolarTracker id directly. Covers every
+# solar_id subtype (diner, west, ...) by inheritance.
+/obj/machinery/power/tracker: SolarTracker
+
+# code/obj/item/kitchen/food_box/... -- a box of lollipops; no distinct
+# SS14 "box" prototype exists for this, folded onto the candy itself.
+/obj/item/kitchen/food_box/lollipop: FoodLollipop
+
+# code/modules/chemistry/tools/fuel_tanks.dm -- a small handheld fuel
+# container (distinct from the big anchored /obj/reagent_dispensers/
+# fueltank above); closest SS14 match is the handheld fuel jug.
+/obj/item/reagent_containers/food/drinks/fueltank: JugWeldingFuel
+
+# code/modules/minimap/minimap_objects/controllers/pod_wars_minimap_
+# controller.dm -- the behind-the-scenes team-ownership controller for the
+# minimap gamemode mechanic (distinct from the player-facing /obj/minimap/
+# map_computer radar display already mapped above); pure gamemode-logic
+# object, same reasoning as the control-point computer, left unmapped.
+
+# code/modules/cooking/soup.dm -- stove, part of this fork's bespoke soup-
+# cooking item set (ladle/soup_pot above); no matching SS14 prototype,
+# left unmapped.
+
+# code/obj/decal/cleanable.dm -- a motor-oil floor spill; SS14 has no oil-
+# specific puddle, folded onto the plain generic liquid puddle (this is a
+# "decal"-kind path with no decals.yml rule, so it falls through to this
+# table per mappings.py's own decal->entity fallback, same as cobwebs).
+/obj/decal/cleanable/oil: Puddle
+
+# code/obj/decal/poster.dm -- "Miner's almanac", a specific informational
+# poster with its own in-game readable image; no SS14 poster prototype
+# carries matching content, and unlike a purely decorative pick, the wrong
+# poster image would misrepresent what's actually on it, so this is left
+# unmapped rather than forced onto an unrelated poster.
+
+# mob/living/carbon/human/monkeys.dm -- a pod_wars-aware pet monkey NPC
+# (team-targeting logic only, same base appearance); direct SS14 match.
+/mob/living/carbon/human/npc/monkey/oppenheimer/pod_wars: MobMonkey
+
+# mob/living/critter/turtle.dm -- a named pet turtle NPC wearing a beret;
+# SS14 has no turtle mob/critter prototype at all, left unmapped.
+
+# code/obj/item/reagent_containers/food/snacks/... -- plain tomato.
+/obj/item/reagent_containers/food/snacks/plant/tomato: FoodTomato

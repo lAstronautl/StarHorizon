@@ -95,3 +95,10 @@
 # code/turf/floors.dm -- a carpeted floor; the plain (non-clown, non-fancy)
 # variant maps to this fork's office carpet.
 /turf/simulated/floor/carpet: FloorCarpetOffice
+
+# code/obj/false_wall.dm -- a wall that looks and gas-seals like a normal
+# wall but is actually a concealed, remotely-openable secret door; SS14's
+# closest structural/functional match is its own secret-door family.
+/turf/simulated/wall/false_wall:
+  tile: Plating
+  entity: SolidSecretDoor
