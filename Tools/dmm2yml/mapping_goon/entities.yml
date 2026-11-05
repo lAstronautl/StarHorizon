@@ -105,3 +105,69 @@
 # code/obj/landmark.dm, code/modules/mapping/helpers/* -- invisible round-
 # start/game-logic markers (spawn points, access setters, ...), never
 # rendered; same reasoning as tgstation's own mapping_helpers/landmarks.
+
+# --- second pass: room furniture/content, reported too sparse on a first
+# look at the converted map -- these are what was mostly missing. ---
+
+# code/obj/table.dm, code/modules/barber/barber_shop.dm -- table/seating
+# family; the bar/nanotrasen/syndicate/wood auto-tables are all cosmetic
+# reskins of the plain reinforced table, same base appearance.
+/obj/table/reinforced/bar/auto: TableReinforced
+/obj/table/nanotrasen/auto: TableReinforced
+/obj/table/syndicate/auto: TableReinforced
+/obj/table/wood/auto: TableWood
+/obj/stool/bar: Stool
+/obj/stool/bench: BenchSteelMiddle
+/obj/rack: Rack
+/obj/storage/closet: ClosetSteelBase
+
+# code/obj/mining.dm family decorative plant -- code didn't name a specific
+# species, PottedPlant1 is a plain generic one.
+/obj/shrub: PottedPlant1
+
+# code/modules/power/* -- area power controller, power cell storage, belt
+# conveyor. autoname_* are just the 4 wall-facing directions of the same APC.
+/obj/machinery/power/apc: APCBasic
+/obj/machinery/power/smes: SMESBasic
+/obj/machinery/conveyor: ConveyorBelt
+
+# code/modules/food_and_drinks/machinery/* -- kitchen appliances.
+/obj/machinery/microwave: KitchenMicrowave
+/obj/submachine/chef_oven: KitchenMicrowave
+
+# code/modules/medical/* -- surgery/medical machines and tools.
+/obj/machinery/optable: OperatingTable
+/obj/item/robodefibrillator: Defibrillator
+/obj/item/scalpel: Scalpel
+/obj/item/circular_saw: Saw
+/obj/item/scissors/surgical_scissors: Hemostat
+/obj/item/surgical_spoon: Retractor
+/obj/item/suture: MedicatedSuture
+
+# code/modules/power/machinery/chem_master.dm
+/obj/machinery/chem_master: ChemMaster
+
+# code/modules/disposals/disposal.dm -- 3-way junction; losing the exact
+# left/right/middle + facing precision for this first pass (approximated as
+# one orientation), same simplification as the colour-trim turfs.
+/obj/disposalpipe/junction: DisposalJunction
+
+# code/obj/item/device/*, code/obj/item/storage/* -- common handheld tools.
+/obj/item/device/multitool: Multitool
+/obj/item/storage/toolbox/mechanical: ToolboxMechanicalFilled
+/obj/item/sheet/steel: SheetSteel1
+/obj/item/sheet/glass/reinforced: SheetRGlass1
+/obj/item/currency/spacecash: SpaceCash1000
+/obj/item/reagent_containers/food/drinks/drinkingglass: FoodPlate
+
+# code/modules/vending/* -- vending machine family.
+/obj/machinery/vending/snack: VendingMachineSnack
+/obj/machinery/vending/cola: VendingMachineCola
+/obj/machinery/vending/medical: VendingMachineMedical
+/obj/machinery/vending/kitchen: VendingMachineChefvend
+
+# code/datums/gamemodes/pod_wars/pw_misc_objects.dm -- a map-deployed,
+# already-anchored combat turret; this fork's closest matching "already
+# deployed, ready to fire" turret entity, same for both pod_wars factions
+# (no faction-specific reskin exists on this fork).
+/obj/deployable_turret/pod_wars: WeaponTurretAsmgtNtDeployed
