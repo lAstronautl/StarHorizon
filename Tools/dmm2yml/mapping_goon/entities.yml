@@ -1579,3 +1579,99 @@
 # code/modules/atmospherics/portable/canister.dm -- "Canister [Air]";
 # same match already used for the /large child.
 /obj/machinery/portable_atmospherics/canister/air: AirCanister
+
+# --- neon.dmm: final mop-up (food/kitchen, remaining machines, misc
+# toys) -- the items six earlier parallel research forks either didn't
+# cover or explicitly flagged as "not researched" rather than guessed
+# at. ---
+
+# code/obj/item/kitchen/*.dm, modules/cooking/food_and_drink/*.dm --
+# direct SS14 matches.
+/obj/item/kitchen/food_box/donut_box: FoodBoxDonut
+/obj/item/reagent_containers/food/snacks/donut: FoodDonut
+/obj/item/kitchen/utensil/fork: Fork
+/obj/item/kitchen/utensil/knife: KitchenKnife
+/obj/item/kitchen/utensil/spoon: Spoon
+/obj/item/reagent_containers/food/fish/bass: FishBass
+/obj/item/reagent_containers/food/drinks/bowl: FoodBowlBig
+/obj/item/reagent_containers/food/snacks/ingredient/egg: FoodEgg
+/obj/item/reagent_containers/food/snacks/breakfast: FoodBreakfastAmerican
+/obj/item/reagent_containers/food/snacks/plant/corn: FoodCorn
+/obj/item/reagent_containers/food/snacks/plant/banana: FoodBanana
+/obj/item/reagent_containers/food/snacks/donkpocket: FoodDonkpocket
+/obj/kitchenspike: KitchenSpike
+/obj/surgery_tray/kitchen_island: TableWood
+
+# code/modules/chemistry/tools/food_and_drink.dm -- bottled drinks;
+# direct matches (fancy_beer/hobo_wine fold onto their closest plain
+# bottle, documented simplification -- loses the flavour-text
+# distinction).
+/obj/item/reagent_containers/food/drinks/bottle/champagne: DrinkChampagneBottleFull
+/obj/item/reagent_containers/food/drinks/bottle/fancy_beer: DrinkBeerBottleFull
+/obj/item/reagent_containers/food/drinks/bottle/hobo_wine: DrinkWineBottleFull
+/obj/item/reagent_containers/food/drinks/bottle/wine: DrinkWineBottleFull
+/obj/item/reagent_containers/food/drinks/bottle/vodka: DrinkVodkaBottleFull
+/obj/item/reagent_containers/food/drinks/bottle/soda: DrinkColaBottleFull
+/obj/item/reagent_containers/food/drinks/cola: DrinkColaBottleFull
+/obj/item/reagent_containers/food/drinks/rum_spaced: DrinkRumBottleFull
+/obj/item/reagent_containers/food/drinks/tea: DrinkTeaGlass
+/obj/item/reagent_containers/food/drinks/mug/HoS: DrinkMug
+/obj/drink_rack/cup: DrinkMug
+
+# code/obj/item/reagent_containers/food/fish/salmon.dm, code/obj/item/
+# kitchen/food_box/sugar_box.dm, and the remaining food/snack/drink one-
+# offs below (creamer, fillet, carp, ice cream cone/dispenser, "the good
+# stuff", pet food, cornbread, sugar cube, choc chips, corndog, random
+# ice cream, sheep egg, plain/mystery meat, cream pie, meat sandwich,
+# spicy spaghetti, steak/synth steak, uranium cake, yoghurt) -- checked
+# directly, no matching SS14 food/drink prototype exists for any of
+# them (confirmed no "Salmon" food item at all in this fork, despite
+# FishBass existing). code/obj/item/reagent_containers/glass/
+# water_pipe.dm is actually a bong (drug paraphernalia), no SS14
+# equivalent. /obj/machinery/vending/monkey/kitchen -- no monkey-staffed
+# vending concept exists. None of these have a matching SS14 prototype;
+# left unmapped.
+
+# code/obj/machinery/turret.dm -- "Turret deactivation control"; closest
+# SS14 structural match is the energy-turret control panel frame.
+# Covers /ai_chamber, /armory, /computer_core by inheritance.
+/obj/machinery/turretid: WeaponEnergyTurretControlPanelFrame
+
+# code/modules/minimap/minimap_objects/objects/info_map.dm --
+# "Information Map... You are here"; direct SS14 match.
+/obj/machinery/info_map: StationMap
+
+# code/obj/item/toy.dm family -- direct SS14 matches.
+/obj/item/bananapeel: TrashBananaPeel
+/obj/item/basketball: Basketball
+/obj/item/beach_ball: BeachBall
+/obj/item/bell: DeskBell
+/obj/item/bell/hop: DeskBell
+
+# code/obj/machinery/status_display.dm (+/ai, +/market), code/obj/
+# machinery/teleport.dm family (+portal_generator/portal_ring/the
+# teleporter computer and circuitboard -- SS14's only "Portal*"
+# prototypes are visual effects, not a placeable teleporter machine),
+# the whole guardbot/gunbot patrol-bot and combat-drone family (no
+# patrol-bot or combat-drone mob/structure exists in this SS14 fork at
+# all, confirmed by a second, independent search), code/obj/machinery/
+# networked/*.dm (Goonstation's own bespoke networked-peripheral/lab-
+# equipment framework -- printer, radio, mainframe, tape drive, bomb
+# tester, scanner, teleconsole, telepad, artifact console, and the
+# physics-lab test apparatus set -- no matching SS14 prototype for any
+# of it), the computer3 family's remaining /radio, /bank_data,
+# /personnel_management, /luggable programs and its boot floppy,
+# /obj/machinery/vending/air_vendor(+/plasma), /obj/machinery/
+# interdictor/ranch, /obj/machinery/portableowl/judgementowl, and
+# /obj/machinery/telejam/active -- none have a matching SS14 prototype;
+# left unmapped. /obj/item/bee_egg_carton -- no matching SS14 item.
+
+# base-class fixes, same auto-skip-shadow reason as every other such
+# rule in this file.
+# code/modules/chemistry/tools/food_and_drink.dm -- plain mug; same
+# match already used for the /HoS child.
+/obj/item/reagent_containers/food/drinks/mug: DrinkMug
+# code/modules/medical/surgery_tools.dm -- the base rolling tray still
+# has no SS14 equivalent (see the earlier note on /obj/surgery_tray),
+# unlike its /kitchen_island child above; explicit skip.
+/obj/surgery_tray: skip
