@@ -67,6 +67,7 @@
           Countdown: { visible: true, state: glow_yellow }
           ZoomingOut: { visible: true, state: glow_blue }
           InBluespace: { visible: true, state: glow_blue }
+          Arriving: { visible: false }
           Landing: { visible: true, state: glow_red }
   - type: Damageable
     damageContainer: StructuralInorganic

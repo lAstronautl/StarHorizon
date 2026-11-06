@@ -61,6 +61,7 @@ public sealed class DropPodTest
         pod.ZoomOutTime = Fast;
         pod.VignetteDelay = TimeSpan.FromSeconds(0.3);
         pod.FlightTime = Fast;
+        pod.ArrivalViewTime = Fast;
         pod.LandingTime = Fast;
     }
 
@@ -135,15 +136,25 @@ public sealed class DropPodTest
         Assert.That(server.EntMan.GetComponent<Robust.Server.GameObjects.PointLightComponent>(pod).Enabled, "и подсвечена");
         Assert.That(server.EntMan.Deleted(comp.Marker), Is.False, "метка остаётся до посадки");
 
-        // Конец БСС (после фазы прибытия FTL): телепорт, анимация падения, виньетка уходит в 0, камера возвращается.
+        // Конец БСС: камера (с невидимой капсулой) уже на месте посадки, виньетка снимается, зум возвращается.
         await pair.RunSeconds(1.7f);
-        Assert.That(comp.State, Is.EqualTo(DropPodState.Landing));
+        Assert.That(comp.State, Is.EqualTo(DropPodState.Arriving));
         Assert.That(server.EntMan.HasComponent<FTLMapComponent>(server.EntMan.GetComponent<TransformComponent>(pod).MapUid), Is.False);
+        Assert.That((xform.GetWorldPosition(mob) - target).Length(), Is.LessThan(0.5f), "камера уже на месте посадки");
+        Assert.That((vignette.From, vignette.To), Is.EqualTo((1f, 0f)), "виньетка снимается");
+        Assert.That(appearance.TryGetData<bool>(pod, DropPodVisuals.InFlight, out hidden) && hidden, "капсулы ещё не видно");
+        Assert.That(server.EntMan.Deleted(comp.Marker), Is.False, "метка остаётся до приземления");
+        Assert.That(eye.TargetZoom.X, Is.GreaterThan(1.0f).And.LessThan(comp.PeakZoom));
+        Assert.That(comp.Used, Is.False, "физически ещё не приземлилась");
+
+        // Виньетка снята: капсула физически приземляется.
+        await pair.RunSeconds(1.0f);
+        Assert.That(comp.State, Is.EqualTo(DropPodState.Landing));
         Assert.That((xform.GetWorldPosition(pod) - target).Length(), Is.LessThan(0.5f), "капсула в точке метки");
         Assert.That(appearance.TryGetData<bool>(pod, DropPodVisuals.InFlight, out hidden) && hidden, Is.False, "капсула появилась");
         Assert.That(server.EntMan.Deleted(comp.Marker), "метка исчезла");
-        Assert.That((vignette.From, vignette.To), Is.EqualTo((1f, 0f)), "виньетка уменьшается до 0");
-        Assert.That(eye.TargetZoom.X, Is.GreaterThan(1.0f).And.LessThan(comp.PeakZoom));
+        Assert.That(server.EntMan.HasComponent<DropPodVignetteComponent>(mob), Is.False, "виньетка снята");
+        Assert.That(comp.Used, "приземлилась");
 
         await pair.RunSeconds(1.5f);
         Assert.That(comp.State, Is.EqualTo(DropPodState.Idle));
@@ -209,7 +220,7 @@ public sealed class DropPodTest
         // Шаттл улетает в произвольную точку, пока капсула в пути.
         await pair.RunSeconds(1.2f);
         await server.WaitPost(() => xform.SetWorldPosition(shuttle, new Vector2(900, -700)));
-        await pair.RunSeconds(3.2f);
+        await pair.RunSeconds(4.2f);
 
         var podComp = server.EntMan.GetComponent<DropPodComponent>(pod);
         Assert.That(podComp.State, Is.EqualTo(DropPodState.Landing));

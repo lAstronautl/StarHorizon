@@ -373,8 +373,14 @@ public sealed class DropPodSystem : EntitySystem
                     SetZoom(ent, comp.PeakZoom);
                     break;
 
-                case DropPodState.Landing:
+                case DropPodState.Arriving:
+                    // Камера на месте посадки: зум возвращается, виньетка (отдельный компонент) снимается.
                     SetZoom(ent, Lerp(comp.PeakZoom, 1f, Smooth(t)));
+                    if (now >= comp.StateEnd)
+                        Land(ent);
+                    break;
+
+                case DropPodState.Landing:
                     if (now >= comp.StateEnd)
                         FinishLanding(ent);
                     break;
@@ -390,7 +396,7 @@ public sealed class DropPodSystem : EntitySystem
         {
             var valid = TryComp(fade.Pod, out DropPodComponent? pod) &&
                         !TerminatingOrDeleted(fade.Pod) &&
-                        pod.State is DropPodState.ZoomingOut or DropPodState.InBluespace or DropPodState.Landing &&
+                        pod.State is DropPodState.ZoomingOut or DropPodState.InBluespace or DropPodState.Arriving &&
                         TryComp(fade.Pod, out EntityStorageComponent? storage) &&
                         storage.Contents.Contains(uid);
 
@@ -488,17 +494,20 @@ public sealed class DropPodSystem : EntitySystem
         SetState(ent, DropPodState.InBluespace, TimeSpan.FromSeconds(total));
     }
 
-    /// <summary>БСС закончился (FTL доставил капсулу): телепорт на место посадки, падение, виньетка уходит.</summary>
+    /// <summary>БСС закончился (FTL доставил капсулу): камера переезжает на место посадки.</summary>
     private void OnFTLCompleted(Entity<DropPodComponent> ent, ref FTLCompletedEvent args)
     {
         if (ent.Comp.State != DropPodState.InBluespace)
             return;
 
-        Land(ent);
+        Arrive(ent);
     }
 
-    /// <summary>Конец БСС: капсула телепортируется на место посадки, падает с анимацией, виньетка уходит в 0.</summary>
-    private void Land(Entity<DropPodComponent> ent)
+    /// <summary>
+    /// Камера (вместе со скрытой капсулой) переносится на место посадки, виньетка плавно снимается.
+    /// Игрок видит, куда падает; физически капсула приземлится, когда виньетка снята (<see cref="Land"/>).
+    /// </summary>
+    private void Arrive(Entity<DropPodComponent> ent)
     {
         EntityCoordinates coords;
         if (ent.Comp.TargetGrid is { } grid && !TerminatingOrDeleted(grid) && HasComp<MapGridComponent>(grid))
@@ -524,17 +533,31 @@ public sealed class DropPodSystem : EntitySystem
             coords = _xform.ToCoordinates(landingPos);
         }
 
+        // Капсула ещё не приземлилась: скрыта и без коллизий, метка остаётся на месте.
+        _xform.SetCoordinates(ent.Owner, coords);
+        _xform.AttachToGridOrMap(ent.Owner);
+
+        _appearance.SetData(ent, DropPodVisuals.InFlight, true);
+        _light.SetEnabled(ent, false);
+        if (TryComp(ent, out PhysicsComponent? hidden))
+            _physics.SetCanCollide(ent, false, body: hidden);
+
+        SetVignette(ent, 1f, 0f, ent.Comp.ArrivalViewTime);
+        SetState(ent, DropPodState.Arriving, ent.Comp.ArrivalViewTime);
+    }
+
+    /// <summary>Виньетка снята: капсула физически приземляется с анимацией падения.</summary>
+    private void Land(Entity<DropPodComponent> ent)
+    {
         QueueDel(ent.Comp.Marker);
         ent.Comp.Marker = null;
         ent.Comp.TargetGrid = null;
 
-        _xform.SetCoordinates(ent.Owner, coords);
-        _xform.AttachToGridOrMap(ent.Owner);
+        ClearVignette(ent);
 
         if (TryComp(ent, out PhysicsComponent? physics))
             _physics.SetCanCollide(ent, true, body: physics);
         _appearance.SetData(ent, DropPodVisuals.InFlight, false);
-        _light.SetEnabled(ent, false);
 
         // Одноразовая: больше не запускается. В прототипе капсула прикручена, при взлёте движок её
         // откручивает (перемещение снимает крепление), а после посадки прикручиваем обратно.
@@ -562,15 +585,12 @@ public sealed class DropPodSystem : EntitySystem
             }
         }
 
-        SetVignette(ent, 1f, 0f, ent.Comp.LandingTime);
         SetState(ent, DropPodState.Landing, ent.Comp.LandingTime);
     }
 
     private void FinishLanding(Entity<DropPodComponent> ent)
     {
-        SetZoom(ent, 1f);
         ResetZoom(ent);
-        ClearVignette(ent);
         RemCompDeferred<FTLComponent>(ent);
         SetState(ent, DropPodState.Idle, TimeSpan.Zero);
     }

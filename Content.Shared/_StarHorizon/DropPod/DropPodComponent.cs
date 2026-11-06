@@ -58,9 +58,16 @@ public sealed partial class DropPodComponent : Component
     [DataField]
     public TimeSpan FlightTime = TimeSpan.FromSeconds(4);
 
-    /// <summary>Падение капсулы: за это время виньетка уходит в 0, камера возвращается, дверь заблокирована.</summary>
+    /// <summary>
+    /// Камера уже на месте посадки (капсулы ещё нет): за это время виньетка снимается и зум возвращается,
+    /// чтобы игрок увидел, куда падает. Когда виньетка снята, капсула физически приземляется.
+    /// </summary>
     [DataField]
-    public TimeSpan LandingTime = TimeSpan.FromSeconds(2);
+    public TimeSpan ArrivalViewTime = TimeSpan.FromSeconds(3);
+
+    /// <summary>Падение капсулы и блокировка двери после касания.</summary>
+    [DataField]
+    public TimeSpan LandingTime = TimeSpan.FromSeconds(1);
 
     /// <summary>Максимальное отдаление камеры перед уходом в блюспейс.</summary>
     [DataField]
@@ -102,7 +109,9 @@ public enum DropPodState : byte
     ZoomingOut,
     /// <summary>Капсула летит по блюспейсу (FTL-карта), у пассажиров виньетка как в крите.</summary>
     InBluespace,
-    /// <summary>Капсула телепортирована, падает с анимацией; виньетка уходит в 0, камера возвращается.</summary>
+    /// <summary>Камера переброшена на место посадки, виньетка снимается, капсулы ещё не видно.</summary>
+    Arriving,
+    /// <summary>Виньетка снята: капсула физически приземляется с анимацией падения.</summary>
     Landing,
 }
 
