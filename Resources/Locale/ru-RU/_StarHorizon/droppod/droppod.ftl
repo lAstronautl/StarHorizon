@@ -1,5 +1,5 @@
 ent-StarHorizonDropPod = дроп-под
-    .desc = Блюспейс-капсула. Загрузите в неё груз или залезьте сами, задайте координаты на консоли дроп-подов и запустите.
+    .desc = Блюспейс-капсула. Загрузите в неё груз или залезьте сами, привяжите её к консоли дроп-подов мультитулом и запустите.
 ent-StarHorizonDropPodMarker = зона посадки дроп-пода
     .desc = Скоро здесь что-то упадёт с неба.
 ent-StarHorizonDropPodSmoke = обломки
@@ -10,14 +10,14 @@ ent-StarHorizonDropPodConsoleCircuitboard = плата консоли дроп-�
     .desc = Печатная плата для консоли дроп-подов.
 
 droppod-fail-open = Запуск отменён: дверь капсулы открыта!
-droppod-error-no-pod = Рядом нет дроп-пода.
+droppod-error-no-pod = Капсула не привязана. Свяжите её с консолью мультитулом.
 droppod-error-used = Капсула уже использована и прикручена к полу.
 droppod-error-bad-target = Некорректные координаты цели.
 droppod-error-not-captured = Шаттл не захвачен.
 droppod-error-bad-grid = Шаттл недоступен для захвата.
 
 droppod-ui-title = Консоль дроп-подов
-droppod-ui-no-pod = Дроп-под не найден (радиус 6 тайлов).
+droppod-ui-no-pod = Капсула не привязана. Нажмите мультитулом на капсулу, затем на консоль.
 droppod-ui-state = Состояние: { $state }
 droppod-ui-occupants = Внутри объектов: { $count }
 droppod-ui-timer = Осталось: { $seconds } с
@@ -41,3 +41,6 @@ droppod-ui-captured = Захвачен: { $name }. Капсула приземл
 droppod-ui-capturing = Идёт захват: { $name }...
 droppod-ui-not-captured = Шаттл не захвачен. Захват длится 15 секунд.
 droppod-ui-used = Капсула использована и прикручена. Запуск невозможен.
+droppod-link-pod-saved = Капсула выбрана. Теперь нажмите мультитулом на консоль.
+droppod-link-console-saved = Консоль выбрана. Теперь нажмите мультитулом на капсулу.
+droppod-link-done = Капсула привязана к консоли.

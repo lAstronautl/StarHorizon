@@ -3,15 +3,12 @@ using Robust.Shared.GameStates;
 namespace Content.Shared._StarHorizon.DropPod;
 
 /// <summary>
-/// Консоль управления дроп-подами. Привязывается к ближайшей капсуле.
+/// Консоль управления дроп-подами. Капсула привязывается мультитулом.
 /// </summary>
 [RegisterComponent, NetworkedComponent]
 public sealed partial class DropPodConsoleComponent : Component
 {
-    /// <summary>Радиус поиска капсулы.</summary>
-    [DataField]
-    public float LinkRange = 6f;
-
+    /// <summary>Привязанная капсула. Привязывается мультитулом (по очереди нажать на капсулу и консоль).</summary>
     [ViewVariables]
     public EntityUid? LinkedPod;
 

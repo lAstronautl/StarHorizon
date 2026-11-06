@@ -4,6 +4,7 @@ using Content.Shared.Shuttles.Components;
 using Content.Server.Storage.EntitySystems;
 using Content.Shared._StarHorizon.DropPod;
 using Content.Shared.CCVar;
+using Content.Shared.Interaction;
 using Content.Shared.Movement.Components;
 using Content.Shared.Storage.Components;
 using Robust.Shared.GameObjects;
@@ -41,6 +42,19 @@ public sealed class DropPodTest
 
     private static readonly TimeSpan Fast = TimeSpan.FromSeconds(1);
 
+    /// <summary>Привязка капсулы к консоли мультитулом: сначала капсула, потом консоль.</summary>
+    private static async Task LinkWithMultitool(Pair.TestPair pair, EntityUid user, EntityUid pod, EntityUid console)
+    {
+        var server = pair.Server;
+        await server.WaitPost(() =>
+        {
+            var tool = server.EntMan.SpawnEntity("Multitool", server.EntMan.GetComponent<TransformComponent>(user).Coordinates);
+            var coords = server.EntMan.GetComponent<TransformComponent>(user).Coordinates;
+            server.EntMan.EventBus.RaiseLocalEvent(pod, new InteractUsingEvent(user, tool, pod, coords));
+            server.EntMan.EventBus.RaiseLocalEvent(console, new InteractUsingEvent(user, tool, console, coords));
+        });
+    }
+
     private static void MakeFast(DropPodComponent pod)
     {
         pod.CountdownTime = Fast;
@@ -63,7 +77,7 @@ public sealed class DropPodTest
         await server.WaitPost(() =>
         {
             console = server.EntMan.SpawnEntity("StarHorizonDropPodConsole", map.GridCoords);
-            pod = server.EntMan.SpawnEntity("StarHorizonDropPod", map.GridCoords.Offset(new Vector2(2, 0)));
+            pod = server.EntMan.SpawnEntity("StarHorizonDropPod", map.GridCoords);
             mob = server.EntMan.SpawnEntity("DropPodTestPassenger", map.GridCoords.Offset(new Vector2(2, 0)));
             MakeFast(server.EntMan.GetComponent<DropPodComponent>(pod));
             storage.OpenStorage(pod);
@@ -73,7 +87,18 @@ public sealed class DropPodTest
 
         Assert.That(server.EntMan.GetComponent<EntityStorageComponent>(pod).Contents.Contains(mob), "пассажир должен быть внутри капсулы");
 
+        Assert.That(server.EntMan.GetComponent<TransformComponent>(pod).Anchored, "капсула прикручена прототипом");
+
         var target = new Vector2(80, 80);
+
+        // Без привязки мультитулом консоль капсулу не видит.
+        await server.WaitPost(() => server.EntMan.EventBus.RaiseLocalEvent(console, (object) new DropPodLaunchMessage(target)));
+        await pair.RunSeconds(0.2f);
+        Assert.That(server.EntMan.GetComponent<DropPodComponent>(pod).State, Is.EqualTo(DropPodState.Idle), "без привязки запуск невозможен");
+
+        await LinkWithMultitool(pair, mob, pod, console);
+        Assert.That(server.EntMan.GetComponent<DropPodConsoleComponent>(console).LinkedPod, Is.EqualTo(pod), "мультитул привязал капсулу");
+
         await server.WaitPost(() =>
         {
             var msg = new DropPodLaunchMessage(target);
@@ -127,7 +152,7 @@ public sealed class DropPodTest
 
         // Одноразовая: помечена использованной, на месте, повторный запуск отклоняется.
         Assert.That(comp.Used, "капсула одноразовая");
-        Assert.That(server.EntMan.GetComponent<Robust.Shared.Physics.Components.PhysicsComponent>(pod).BodyType, Is.EqualTo(Robust.Shared.Physics.BodyType.Static), "и неподвижна");
+        Assert.That(server.EntMan.GetComponent<Robust.Shared.Physics.Components.PhysicsComponent>(pod).BodyType, Is.EqualTo(Robust.Shared.Physics.BodyType.Static), "в космосе капсула неподвижна");
         await server.WaitPost(() => server.EntMan.EventBus.RaiseLocalEvent(console, (object) new DropPodLaunchMessage(new Vector2(10, 10))));
         await pair.RunSeconds(0.3f);
         Assert.That(comp.State, Is.EqualTo(DropPodState.Idle), "использованную капсулу запустить нельзя");
@@ -153,12 +178,13 @@ public sealed class DropPodTest
             server.EntMan.EnsureComponent<ShuttleComponent>(shuttle);
 
             console = server.EntMan.SpawnEntity("StarHorizonDropPodConsole", map.GridCoords);
-            pod = server.EntMan.SpawnEntity("StarHorizonDropPod", map.GridCoords.Offset(new Vector2(2, 0)));
+            pod = server.EntMan.SpawnEntity("StarHorizonDropPod", map.GridCoords);
             MakeFast(server.EntMan.GetComponent<DropPodComponent>(pod));
             server.EntMan.GetComponent<DropPodConsoleComponent>(console).CaptureTime = TimeSpan.FromSeconds(1);
             wall = server.EntMan.SpawnEntity("WallSolid", map.GridCoords.Offset(new Vector2(1, 1)));
         });
 
+        await LinkWithMultitool(pair, console, pod, console);
         Assert.That(new DropPodConsoleComponent().CaptureTime, Is.EqualTo(TimeSpan.FromSeconds(15)));
 
         await server.WaitPost(() =>
@@ -195,10 +221,10 @@ public sealed class DropPodTest
         var wallPos = xform.GetWorldPosition(wall);
         Assert.That((world - wallPos).Length(), Is.GreaterThan(0.4f));
 
-        // После посадки капсула на гриде прикручена и одноразовая.
+        // После посадки на грид капсула одноразовая и снова прикручена (на время полёта движок её открепил).
         await pair.RunSeconds(1.5f);
         Assert.That(podComp.Used);
-        Assert.That(server.EntMan.GetComponent<TransformComponent>(pod).Anchored, "капсула прикручена к полу");
+        Assert.That(server.EntMan.GetComponent<TransformComponent>(pod).Anchored, "капсула прикручена к полу после посадки");
 
         await pair.CleanReturnAsync();
     }

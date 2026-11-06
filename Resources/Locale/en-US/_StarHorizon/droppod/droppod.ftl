@@ -1,5 +1,5 @@
 ent-StarHorizonDropPod = drop pod
-    .desc = A bluespace drop pod. Load it with cargo or climb in yourself, set the destination at a drop pod console and launch.
+    .desc = A bluespace drop pod. Load it with cargo or climb in yourself, link it to a drop pod console with a multitool and launch.
 ent-StarHorizonDropPodMarker = drop pod landing zone
     .desc = Something is about to fall from the sky here.
 ent-StarHorizonDropPodSmoke = debris
@@ -10,14 +10,14 @@ ent-StarHorizonDropPodConsoleCircuitboard = drop pod console board
     .desc = A computer printed circuit board for a drop pod console.
 
 droppod-fail-open = Launch aborted: the pod door is open!
-droppod-error-no-pod = No drop pod nearby.
+droppod-error-no-pod = No pod linked. Link one to the console with a multitool.
 droppod-error-used = The pod has already been used and is bolted down.
 droppod-error-bad-target = Invalid target coordinates.
 droppod-error-not-captured = No shuttle is captured.
 droppod-error-bad-grid = That shuttle cannot be captured.
 
 droppod-ui-title = Drop pod console
-droppod-ui-no-pod = No drop pod found (6 tile range).
+droppod-ui-no-pod = No pod linked. Use a multitool on the pod, then on the console.
 droppod-ui-state = State: { $state }
 droppod-ui-occupants = Objects inside: { $count }
 droppod-ui-timer = Remaining: { $seconds } s
@@ -41,3 +41,6 @@ droppod-ui-captured = Captured: { $name }. The pod will land on it wherever it i
 droppod-ui-capturing = Capturing: { $name }...
 droppod-ui-not-captured = No shuttle captured. Capture takes 15 seconds.
 droppod-ui-used = Pod used and bolted down. Cannot launch.
+droppod-link-pod-saved = Pod selected. Now use the multitool on the console.
+droppod-link-console-saved = Console selected. Now use the multitool on the pod.
+droppod-link-done = Pod linked to the console.

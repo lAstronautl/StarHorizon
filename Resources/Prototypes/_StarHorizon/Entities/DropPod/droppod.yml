@@ -3,9 +3,10 @@
   parent: BaseStructureDynamic
   id: StarHorizonDropPod
   name: drop pod
-  description: A bluespace drop pod. Load it with cargo or climb in yourself, set the destination at a drop pod console and launch.
+  description: A bluespace drop pod. Load it with cargo or climb in yourself, link it to a drop pod console with a multitool and launch.
   components:
   - type: Transform
+    anchored: true
     noRot: true
   - type: Icon
     sprite: _StarHorizon/Structures/Misc/droppod.rsi

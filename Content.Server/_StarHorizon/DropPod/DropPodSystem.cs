@@ -8,14 +8,19 @@ using Content.Shared._StarHorizon.DropPod;
 using Content.Shared.Damage;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Movement.Systems;
+using Content.Shared.Interaction;
 using Content.Shared.Popups;
+using Content.Shared.Storage.EntitySystems;
+using Content.Shared.Tools.Systems;
 using Content.Shared.Storage.Components;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
-using Robust.Shared.Physics.Components;
+using Content.Shared.Tools;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Physics;
+using Robust.Shared.Physics.Components;
 using Robust.Shared.Random;
 using Robust.Shared.Physics.Systems;
 using Robust.Shared.Timing;
@@ -42,6 +47,9 @@ public sealed class DropPodSystem : EntitySystem
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly ShuttleSystem _shuttle = default!;
     [Dependency] private readonly SharedPointLightSystem _light = default!;
+    [Dependency] private readonly SharedToolSystem _tool = default!;
+
+    private static readonly ProtoId<ToolQualityPrototype> LinkQuality = "Pulsing";
     [Dependency] private readonly DamageableSystem _damageable = default!;
 
     public override void Initialize()
@@ -50,6 +58,10 @@ public sealed class DropPodSystem : EntitySystem
 
         SubscribeLocalEvent<DropPodComponent, StorageOpenAttemptEvent>(OnStorageOpenAttempt);
         SubscribeLocalEvent<DropPodComponent, ComponentShutdown>(OnPodShutdown);
+        SubscribeLocalEvent<DropPodComponent, InteractUsingEvent>(OnPodInteractUsing,
+            before: new[] { typeof(SharedEntityStorageSystem) });
+        SubscribeLocalEvent<DropPodConsoleComponent, InteractUsingEvent>(OnConsoleInteractUsing,
+            before: new[] { typeof(SharedEntityStorageSystem) });
         SubscribeLocalEvent<DropPodComponent, FTLStartedEvent>(OnFTLStarted);
         SubscribeLocalEvent<DropPodComponent, FTLCompletedEvent>(OnFTLCompleted);
 
@@ -177,42 +189,71 @@ public sealed class DropPodSystem : EntitySystem
         UpdateConsole(ent);
     }
 
+    /// <summary>Капсула, привязанная к консоли мультитулом. Без привязки капсулы нет.</summary>
     private Entity<DropPodComponent>? FindPod(Entity<DropPodConsoleComponent> console)
     {
-        // Капсула в процессе запуска остаётся привязанной, даже если улетела далеко.
         if (console.Comp.LinkedPod is { } linked &&
-            TryComp(linked, out DropPodComponent? linkedComp) &&
-            !TerminatingOrDeleted(linked))
+            !TerminatingOrDeleted(linked) &&
+            TryComp(linked, out DropPodComponent? pod))
         {
-            if (linkedComp.State != DropPodState.Idle)
-                return (linked, linkedComp);
-
-            var consolePos = _xform.GetMapCoordinates(console);
-            var podPos = _xform.GetMapCoordinates(linked);
-            if (consolePos.MapId == podPos.MapId &&
-                (consolePos.Position - podPos.Position).Length() <= console.Comp.LinkRange)
-                return (linked, linkedComp);
+            return (linked, pod);
         }
 
         console.Comp.LinkedPod = null;
+        return null;
+    }
 
-        Entity<DropPodComponent>? best = null;
-        var bestDist = float.MaxValue;
-        var origin = _xform.GetMapCoordinates(console);
+    #region Multitool linking
 
-        foreach (var pod in _lookup.GetEntitiesInRange<DropPodComponent>(origin, console.Comp.LinkRange))
+    private void OnPodInteractUsing(EntityUid uid, DropPodComponent comp, InteractUsingEvent args)
+    {
+        if (args.Handled || !_tool.HasQuality(args.Used, LinkQuality))
+            return;
+
+        args.Handled = true;
+
+        var buffer = EnsureComp<DropPodLinkBufferComponent>(args.Used);
+        if (buffer.Console is { } console && !TerminatingOrDeleted(console) &&
+            TryComp(console, out DropPodConsoleComponent? consoleComp))
         {
-            var dist = (_xform.GetWorldPosition(pod) - origin.Position).LengthSquared();
-            if (dist >= bestDist)
-                continue;
-
-            bestDist = dist;
-            best = pod;
+            Link((console, consoleComp), uid, args.User);
+            buffer.Console = null;
+            return;
         }
 
-        console.Comp.LinkedPod = best?.Owner;
-        return best;
+        buffer.Pod = uid;
+        buffer.Console = null;
+        _popup.PopupEntity(Loc.GetString("droppod-link-pod-saved"), uid, args.User);
     }
+
+    private void OnConsoleInteractUsing(EntityUid uid, DropPodConsoleComponent comp, InteractUsingEvent args)
+    {
+        if (args.Handled || !_tool.HasQuality(args.Used, LinkQuality))
+            return;
+
+        args.Handled = true;
+
+        var buffer = EnsureComp<DropPodLinkBufferComponent>(args.Used);
+        if (buffer.Pod is { } pod && !TerminatingOrDeleted(pod) && HasComp<DropPodComponent>(pod))
+        {
+            Link((uid, comp), pod, args.User);
+            buffer.Pod = null;
+            return;
+        }
+
+        buffer.Console = uid;
+        buffer.Pod = null;
+        _popup.PopupEntity(Loc.GetString("droppod-link-console-saved"), uid, args.User);
+    }
+
+    private void Link(Entity<DropPodConsoleComponent> console, EntityUid pod, EntityUid user)
+    {
+        console.Comp.LinkedPod = pod;
+        _popup.PopupEntity(Loc.GetString("droppod-link-done"), console, user);
+        UpdateConsole(console);
+    }
+
+    #endregion
 
     private void UpdateConsole(Entity<DropPodConsoleComponent> console, string? error = null)
     {
@@ -495,11 +536,12 @@ public sealed class DropPodSystem : EntitySystem
         _appearance.SetData(ent, DropPodVisuals.InFlight, false);
         _light.SetEnabled(ent, false);
 
-        // Одноразовая: после посадки прикручивается к полу и больше не запускается.
+        // Одноразовая: больше не запускается. В прототипе капсула прикручена, при взлёте движок её
+        // откручивает (перемещение снимает крепление), а после посадки прикручиваем обратно.
         ent.Comp.Used = true;
         if (!_xform.AnchorEntity(ent.Owner) && TryComp(ent, out PhysicsComponent? body))
         {
-            // Посадка не на грид (в космос): остаётся на месте.
+            // Посадка не на грид (в космос): прикрутить не к чему, капсула остаётся неподвижной.
             _physics.SetBodyType(ent, BodyType.Static, body: body);
         }
 
