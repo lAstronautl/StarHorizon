@@ -45,7 +45,7 @@ public sealed class DropPodVisualizerSystem : VisualizerSystem<DropPodComponent>
         }
     }
 
-    /// <summary>Нарастающая тряска, затем рывок вверх с увеличением и исчезновением.</summary>
+    /// <summary>Нарастающая тряска, затем капсула уходит вниз (как в люк корабля): уменьшается и исчезает.</summary>
     private static Animation MakeLaunchAnimation(DropPodComponent comp)
     {
         var length = (float) Math.Max(0.5, comp.ZoomOutTime.TotalSeconds);
@@ -66,8 +66,8 @@ public sealed class DropPodVisualizerSystem : VisualizerSystem<DropPodComponent>
             offset.KeyFrames.Add(new AnimationTrackProperty.KeyFrame(new Vector2(i % 2 == 0 ? amp : -amp, 0), i == 0 ? 0 : shakeEnd / shakes));
         }
 
-        // Взлёт.
-        offset.KeyFrames.Add(new AnimationTrackProperty.KeyFrame(new Vector2(0, 1.5f), length - shakeEnd));
+        // Уход вниз.
+        offset.KeyFrames.Add(new AnimationTrackProperty.KeyFrame(new Vector2(0, -1.5f), length - shakeEnd));
 
         var scale = new AnimationTrackComponentProperty
         {
@@ -78,7 +78,7 @@ public sealed class DropPodVisualizerSystem : VisualizerSystem<DropPodComponent>
             {
                 new AnimationTrackProperty.KeyFrame(BaseScale, 0),
                 new AnimationTrackProperty.KeyFrame(BaseScale, shakeEnd),
-                new AnimationTrackProperty.KeyFrame(BaseScale * 1.5f, length - shakeEnd),
+                new AnimationTrackProperty.KeyFrame(BaseScale * 0.35f, length - shakeEnd),
             },
         };
 
