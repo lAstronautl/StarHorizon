@@ -1167,10 +1167,41 @@
 # object tree (a distinct base path from tgstation's /obj/structure/
 # disposalpipe, so matched fresh to the same target ids tgstation uses
 # for the equivalent shapes).
+#
+# switch_junction/left and /right (code/modules/disposals/disposal.dm,
+# ~line 900) each have /north, /east, /south, /west sub-subtypes that set
+# `dir` at DM class-definition time, not as a per-instance map variable --
+# confirmed by grepping maps/neon.dmm: every placed instance (e.g.
+# switch_junction/right/south) is a bare, comma-terminated atom with no
+# {dir=...} block at all. The plain base rules below would therefore read
+# dmm2yml's DEFAULT_DIR (south) for every single one, rotating them all
+# the same wrong way -- fixed with explicit per-subtype {entity, dir}
+# rules, same pattern as camera/directional/* elsewhere in this file. The
+# base rules are kept too as a fallback for any bare, un-suffixed
+# instance.
 /obj/disposalpipe/switch_junction/left: DisposalRouter
+/obj/disposalpipe/switch_junction/left/north: { entity: DisposalRouter, dir: 1 }
+/obj/disposalpipe/switch_junction/left/south: { entity: DisposalRouter, dir: 2 }
+/obj/disposalpipe/switch_junction/left/east: { entity: DisposalRouter, dir: 4 }
+/obj/disposalpipe/switch_junction/left/west: { entity: DisposalRouter, dir: 8 }
 /obj/disposalpipe/switch_junction/right: DisposalRouterFlipped
+/obj/disposalpipe/switch_junction/right/north: { entity: DisposalRouterFlipped, dir: 1 }
+/obj/disposalpipe/switch_junction/right/south: { entity: DisposalRouterFlipped, dir: 2 }
+/obj/disposalpipe/switch_junction/right/east: { entity: DisposalRouterFlipped, dir: 4 }
+/obj/disposalpipe/switch_junction/right/west: { entity: DisposalRouterFlipped, dir: 8 }
 /obj/disposalpipe/block_sensing_outlet: DisposalSignaller
-/obj/disposalpipe/chicken_disposal_pipe/horizontal: DisposalPipe
+# /horizontal and /vertical (same file, ~line 1120) are the same
+# fixed-orientation-via-subtype-name shape: /horizontal sets dir = EAST,
+# /vertical sets dir = NORTH, both at class-definition time. The straight
+# DisposalPipe sprite (conpipe-s, Resources/Textures/Structures/Piping/
+# disposal.rsi) renders vertical at facing north/south and horizontal at
+# facing east/west, so /horizontal needs an explicit east facing --
+# without it dmm2yml's default-south read would draw it vertical. Only
+# /horizontal appears in neon.dmm (1 instance, no {dir=...} block,
+# confirmed by grep); /vertical isn't placed anywhere in this map, so it's
+# left to the (already-correct-by-default) base rule.
+/obj/disposalpipe/chicken_disposal_pipe/horizontal: { entity: DisposalPipe, dir: 4 }
+/obj/disposalpipe/chicken_disposal_pipe: DisposalPipe
 /obj/disposalpipe/type_sensing_outlet/drone_factory: DisposalSignaller
 /obj/disposaloutlet: DisposalUnit
 
