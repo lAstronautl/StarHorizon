@@ -994,3 +994,65 @@
 # /auto child.
 /obj/mapping_helper/wingrille_spawn:
   entities: [Window, Grille]
+
+# --- neon.dmm (full playable station): bulk reuse of exact-path matches
+# already resolved in tgstation's own dictionary (Tools/dmm2yml/mapping/
+# entities.yml) -- standard SS13 items both codebases name identically,
+# reused directly since both target this same SS14 fork. ---
+/obj/item/clothing/mask/breath: ClothingMaskBreath
+/obj/item/storage/toolbox/emergency: ToolboxEmergency
+/obj/item/crowbar: Crowbar
+/obj/item/hand_labeler: HandLabeler
+/obj/item/paper_bin: PaperBin
+/obj/machinery/cell_charger: PowerCellRecharger
+/obj/machinery/portable_atmospherics/scrubber: PortableScrubber
+/obj/item/extinguisher: FireExtinguisher
+/obj/machinery/recharge_station: BorgCharger
+/obj/item/wrench: Wrench
+/obj/machinery/space_heater: SpaceHeater
+/obj/item/cigbutt: CigaretteSpent
+/obj/item/clothing/gloves/latex: ClothingHandsGlovesLatex
+/obj/item/light/tube: LightTube
+/obj/machinery/portable_atmospherics/pump: PortablePump
+/obj/item/light/bulb: LightBulb
+/obj/item/pen: Pen
+/obj/item/reagent_containers/syringe: Syringe
+/obj/item/screwdriver: Screwdriver
+/obj/item/weldingtool: Welder
+/obj/machinery/portable_atmospherics/canister/carbon_dioxide: CarbonDioxideCanister
+/obj/item/clothing/glasses/sunglasses: ClothingEyesGlassesSunglasses
+/obj/item/stamp: RubberStampApproved
+/obj/item/wirecutters: Wirecutter
+/obj/machinery/meter: GasAnalyzer
+/obj/machinery/vending/cigarette: VendingMachineCigs
+/obj/machinery/vending/security: VendingMachineSec
+/obj/item/clipboard: BoxFolderClipboardEmpty
+/obj/item/clothing/gloves/fingerless: ClothingHandsGlovesFingerless
+/obj/item/hand_tele: HandTeleporter
+/obj/item/hemostat: Hemostat
+/obj/item/instrument/bikehorn: GoldenBikeHorn
+/obj/item/kitchen/rollingpin: RollingPin
+/obj/item/stamp/law: RubberStampLawyer
+/obj/item/storage/briefcase: BriefcaseBrown
+/obj/machinery/portable_atmospherics/canister/nitrogen: NitrogenCanister
+/obj/item/clothing/glasses/blindfold: ClothingEyesBlindfold
+/obj/item/clothing/head/cowboy: ClothingHeadHatCowboyBrown
+/obj/item/clothing/mask/balaclava: ClothingMaskBalaclava
+/obj/item/clothing/mask/gas: ClothingMaskGas
+/obj/item/clothing/mask/surgical: ClothingMaskSterile
+/obj/item/folder: BoxFolderBase
+/obj/item/implanter: Implanter
+/obj/item/instrument/harmonica: HarmonicaInstrument
+/obj/item/stamp/chap: RubberStampChaplain
+/obj/item/stamp/clown: RubberStampClown
+/obj/item/tank/jetpack: JetpackBlackFilled
+/obj/machinery/computer/robotics: ComputerRoboticsControl
+
+# base-class fixes for the same auto-skip-shadow reason as the debris-
+# field batch above: /obj/machinery/clonegrinder and /obj/machinery/
+# clonepod are the bare forms of the already-mapped /podwars and
+# /pod_wars children (same matches); /obj/item/tile is the material-less
+# base of the already-mapped /steel child (same visual).
+/obj/machinery/clonegrinder: BiomassReclaimer
+/obj/machinery/clonepod: CloningPod
+/obj/item/tile: FloorTileItemSteel

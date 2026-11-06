@@ -37,3 +37,26 @@
 # restricting gate; sets INVIS_ALWAYS_ISH in New(), never actually seen
 # in play.
 - /obj/channel
+
+# --- neon.dmm (full playable station): bulk invisible/no-visible-effect
+# marker families, confirmed by reading each base class directly. ---
+
+# code/obj/machinery/navbeacon.dm -- an underfloor (level=1) bot-
+# navigation radio beacon; calls hide(T.intact) in New(), so it's never
+# visible once the floor above it is intact. Covers every /mule, /tour,
+# and /guardbotsecbot_circularpatrol routing variant.
+- /obj/machinery/navbeacon
+
+# code/modules/mapping/helpers/mailtag_spawn.dm -- "Configures a mail
+# chute or junction with its mail tag, then destroys itself"; purely
+# configures an already-placed object, no structure of its own, same
+# reasoning as /obj/mapping_helper/access above.
+- /obj/mapping_helper/mailtag
+
+# code/modules/mapping/helpers/button_helpers.dm -- "door button helper";
+# configures an already-placed door/door_control, no structure of its own.
+- /obj/mapping_helper/button
+
+# code/modules/economy/supply_misc.dm -- a cargo-drop-zone marker;
+# INVIS_ALWAYS, confirmed non-rendered.
+- /obj/marker/supplymarker
