@@ -71,3 +71,28 @@
 # mapping_helper entries above.
 - /obj/mapping_helper/airlock/cycler/manual
 - /obj/mapping_helper/glassware_spawn
+
+# code/obj/decal.dm -- department wayfinding floor guides and arrows
+# (icon 'icons/obj/decals/floorguides.dmi', a completely different sprite
+# set from tile_edge's own hazard-stripe icon). None of its subtypes
+# (security/science/mining/medbay/evac/engineering/command/botany/qm/hop/
+# ai/catering, arrow_e/w/n/s) have their own rule, so without this they
+# fall through decals.yml's prefix-walk to the unrelated parent
+# /obj/decal/tile_edge rule and render as hazard-stripe/corner lines --
+# wrong shape and wrong icon entirely. Confirmed via neon.dmm grep: 38
+# instances (floorguide/evac x15, arrow_e x11, arrow_n x7, arrow_s x2,
+# ai x2, arrow_w x1) were rendering this way before this entry existed.
+# No equivalent SS14 department-floor-guide decal exists to map to
+# instead, so these are left invisible rather than guessed at.
+- /obj/decal/tile_edge/floorguide
+
+# code/obj/decal/tile_edge.dm -- a plain solid-color line decoration
+# (icon 'icons/obj/line.dmi', icon_state "linefull" -- not the hazard-
+# stripe "stripe-edge" icon tile_edge/stripe uses). Its only subtypes are
+# flat colour variants (white/grey/black/red/orange/yellow/green/blue/
+# purple/darkpurple/darkblue), none separately mapped, so without this
+# entry it falls through to the unrelated tile_edge hazard-stripe rule
+# the same way floorguide did above (4 /line/blue instances confirmed in
+# neon.dmm). No matching plain-colour-line SS14 decal exists; left
+# invisible rather than guessed at.
+- /obj/decal/tile_edge/line
