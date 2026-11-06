@@ -15,6 +15,7 @@ using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Physics.Components;
+using Robust.Shared.Physics;
 using Robust.Shared.Random;
 using Robust.Shared.Physics.Systems;
 using Robust.Shared.Timing;
@@ -93,6 +94,12 @@ public sealed class DropPodSystem : EntitySystem
             return;
         }
 
+        if (pod.Value.Comp.Used)
+        {
+            UpdateConsole(ent, "droppod-error-used");
+            return;
+        }
+
         var target = args.Target;
         if (!float.IsFinite(target.X) || !float.IsFinite(target.Y) ||
             MathF.Abs(target.X) > ent.Comp.MaxCoordinate || MathF.Abs(target.Y) > ent.Comp.MaxCoordinate)
@@ -123,6 +130,12 @@ public sealed class DropPodSystem : EntitySystem
         if (pod == null || pod.Value.Comp.State != DropPodState.Idle)
         {
             UpdateConsole(ent, "droppod-error-no-pod");
+            return;
+        }
+
+        if (pod.Value.Comp.Used)
+        {
+            UpdateConsole(ent, "droppod-error-used");
             return;
         }
 
@@ -219,6 +232,7 @@ public sealed class DropPodSystem : EntitySystem
 
         var state = new DropPodConsoleState(
             pod != null,
+            pod?.Comp.Used ?? false,
             pod?.Comp.State ?? DropPodState.Idle,
             pod?.Comp.StateEnd ?? TimeSpan.Zero,
             pod?.Comp.StateStart ?? TimeSpan.Zero,
@@ -480,6 +494,14 @@ public sealed class DropPodSystem : EntitySystem
             _physics.SetCanCollide(ent, true, body: physics);
         _appearance.SetData(ent, DropPodVisuals.InFlight, false);
         _light.SetEnabled(ent, false);
+
+        // Одноразовая: после посадки прикручивается к полу и больше не запускается.
+        ent.Comp.Used = true;
+        if (!_xform.AnchorEntity(ent.Owner) && TryComp(ent, out PhysicsComponent? body))
+        {
+            // Посадка не на грид (в космос): остаётся на месте.
+            _physics.SetBodyType(ent, BodyType.Static, body: body);
+        }
 
         SpawnAtPosition(ent.Comp.LandingEffect, Transform(ent).Coordinates);
         SpawnAtPosition(ent.Comp.TrailEffect, Transform(ent).Coordinates);

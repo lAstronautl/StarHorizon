@@ -125,6 +125,13 @@ public sealed class DropPodTest
         Assert.That(eye.TargetZoom.X, Is.EqualTo(1f).Within(0.01f));
         Assert.That(server.EntMan.HasComponent<DropPodVignetteComponent>(mob), Is.False);
 
+        // Одноразовая: помечена использованной, на месте, повторный запуск отклоняется.
+        Assert.That(comp.Used, "капсула одноразовая");
+        Assert.That(server.EntMan.GetComponent<Robust.Shared.Physics.Components.PhysicsComponent>(pod).BodyType, Is.EqualTo(Robust.Shared.Physics.BodyType.Static), "и неподвижна");
+        await server.WaitPost(() => server.EntMan.EventBus.RaiseLocalEvent(console, (object) new DropPodLaunchMessage(new Vector2(10, 10))));
+        await pair.RunSeconds(0.3f);
+        Assert.That(comp.State, Is.EqualTo(DropPodState.Idle), "использованную капсулу запустить нельзя");
+
         await pair.CleanReturnAsync();
     }
 
@@ -187,6 +194,11 @@ public sealed class DropPodTest
         // Не поверх закреплённой структуры.
         var wallPos = xform.GetWorldPosition(wall);
         Assert.That((world - wallPos).Length(), Is.GreaterThan(0.4f));
+
+        // После посадки капсула на гриде прикручена и одноразовая.
+        await pair.RunSeconds(1.5f);
+        Assert.That(podComp.Used);
+        Assert.That(server.EntMan.GetComponent<TransformComponent>(pod).Anchored, "капсула прикручена к полу");
 
         await pair.CleanReturnAsync();
     }

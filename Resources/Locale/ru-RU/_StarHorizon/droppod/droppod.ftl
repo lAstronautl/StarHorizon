@@ -11,6 +11,7 @@ ent-StarHorizonDropPodConsoleCircuitboard = плата консоли дроп-�
 
 droppod-fail-open = Запуск отменён: дверь капсулы открыта!
 droppod-error-no-pod = Рядом нет дроп-пода.
+droppod-error-used = Капсула уже использована и прикручена к полу.
 droppod-error-bad-target = Некорректные координаты цели.
 droppod-error-not-captured = Шаттл не захвачен.
 droppod-error-bad-grid = Шаттл недоступен для захвата.
@@ -39,3 +40,4 @@ droppod-ui-launch-captured = Запуск на захваченный шаттл
 droppod-ui-captured = Захвачен: { $name }. Капсула приземлится на нём в любой точке.
 droppod-ui-capturing = Идёт захват: { $name }...
 droppod-ui-not-captured = Шаттл не захвачен. Захват длится 15 секунд.
+droppod-ui-used = Капсула использована и прикручена. Запуск невозможен.

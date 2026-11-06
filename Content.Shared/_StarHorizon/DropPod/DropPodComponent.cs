@@ -18,6 +18,10 @@ public sealed partial class DropPodComponent : Component
     [ViewVariables]
     public DropPodState State = DropPodState.Idle;
 
+    /// <summary>Капсула одноразовая: после посадки она прикручивается к полу и больше не запускается.</summary>
+    [ViewVariables]
+    public bool Used;
+
     /// <summary>Когда текущая стадия началась (<see cref="Robust.Shared.Timing.IGameTiming.CurTime"/>).</summary>
     [ViewVariables]
     public TimeSpan StateStart;

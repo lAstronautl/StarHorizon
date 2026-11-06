@@ -11,6 +11,7 @@ ent-StarHorizonDropPodConsoleCircuitboard = drop pod console board
 
 droppod-fail-open = Launch aborted: the pod door is open!
 droppod-error-no-pod = No drop pod nearby.
+droppod-error-used = The pod has already been used and is bolted down.
 droppod-error-bad-target = Invalid target coordinates.
 droppod-error-not-captured = No shuttle is captured.
 droppod-error-bad-grid = That shuttle cannot be captured.
@@ -39,3 +40,4 @@ droppod-ui-launch-captured = Launch to captured shuttle
 droppod-ui-captured = Captured: { $name }. The pod will land on it wherever it is.
 droppod-ui-capturing = Capturing: { $name }...
 droppod-ui-not-captured = No shuttle captured. Capture takes 15 seconds.
+droppod-ui-used = Pod used and bolted down. Cannot launch.

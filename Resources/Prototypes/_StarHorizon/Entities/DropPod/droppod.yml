@@ -150,6 +150,8 @@
     drawdepth: HighFloorObjects
     sprite: _StarHorizon/Effects/droppod_marker.rsi
     noRot: true
+    # Шлейф лежит вдоль траектории падения (45° по часовой стрелке).
+    rotation: -45
     color: "#ffffff00"
     layers:
     - state: smoke

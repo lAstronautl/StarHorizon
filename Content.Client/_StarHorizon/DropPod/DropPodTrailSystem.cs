@@ -7,7 +7,7 @@ using Robust.Shared.Animations;
 namespace Content.Client._StarHorizon.DropPod;
 
 /// <summary>
-/// Шлейф за падающей капсулой. Нижний край следует за капсулой (она падает сверху на место посадки),
+/// Шлейф за падающей капсулой. Нижний край следует за капсулой (она падает под углом 45° на место посадки),
 /// а полоса постепенно вырастает до <see cref="TrailLength"/> тайлов позади неё. Потом плавно гаснет.
 /// </summary>
 public sealed class DropPodTrailSystem : EntitySystem
@@ -17,6 +17,12 @@ public sealed class DropPodTrailSystem : EntitySystem
     /// <summary>Должно совпадать с падением в <see cref="DropPodVisualizerSystem"/>.</summary>
     public const float FallTime = 0.5f;
     public const float FallHeight = 4f;
+
+    /// <summary>Капсула падает под углом: летит справа-сверху налево-вниз.</summary>
+    public static readonly Vector2 FallDirection = Vector2.Normalize(new Vector2(1f, 1f));
+
+    /// <summary>Наклон капсулы и шлейфа вдоль траектории (по часовой стрелке на 45°).</summary>
+    public static readonly Angle Tilt = Angle.FromDegrees(-45);
 
     /// <summary>Длина шлейфа в тайлах.</summary>
     public const float TrailLength = 3f;
@@ -50,9 +56,9 @@ public sealed class DropPodTrailSystem : EntitySystem
                     InterpolationMode = AnimationInterpolationMode.Linear,
                     KeyFrames =
                     {
-                        new AnimationTrackProperty.KeyFrame(new Vector2(0, FallHeight + start / 2), 0),
-                        new AnimationTrackProperty.KeyFrame(new Vector2(0, TrailLength / 2), FallTime),
-                        new AnimationTrackProperty.KeyFrame(new Vector2(0, TrailLength / 2), length - FallTime),
+                        new AnimationTrackProperty.KeyFrame(FallDirection * (FallHeight + start / 2), 0),
+                        new AnimationTrackProperty.KeyFrame(FallDirection * (TrailLength / 2), FallTime),
+                        new AnimationTrackProperty.KeyFrame(FallDirection * (TrailLength / 2), length - FallTime),
                     },
                 },
                 new AnimationTrackComponentProperty

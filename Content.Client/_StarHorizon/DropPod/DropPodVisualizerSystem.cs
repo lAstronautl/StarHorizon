@@ -39,6 +39,7 @@ public sealed class DropPodVisualizerSystem : VisualizerSystem<DropPodComponent>
             default:
                 SpriteSystem.SetScale((uid, args.Sprite), BaseScale);
                 SpriteSystem.SetOffset((uid, args.Sprite), Vector2.Zero);
+                SpriteSystem.SetRotation((uid, args.Sprite), Angle.Zero);
                 SpriteSystem.SetColor((uid, args.Sprite), Color.White);
                 break;
         }
@@ -101,7 +102,7 @@ public sealed class DropPodVisualizerSystem : VisualizerSystem<DropPodComponent>
         };
     }
 
-    /// <summary>Капсула падает сверху: большая и прозрачная, затем резко садится на место.</summary>
+    /// <summary>Капсула падает под углом 45°: большая и прозрачная, затем садится на место и выпрямляется.</summary>
     private static Animation MakeLandingAnimation()
     {
         const float fall = DropPodTrailSystem.FallTime;
@@ -120,10 +121,23 @@ public sealed class DropPodVisualizerSystem : VisualizerSystem<DropPodComponent>
                     InterpolationMode = AnimationInterpolationMode.Linear,
                     KeyFrames =
                     {
-                        new AnimationTrackProperty.KeyFrame(new Vector2(0, DropPodTrailSystem.FallHeight), 0),
+                        new AnimationTrackProperty.KeyFrame(DropPodTrailSystem.FallDirection * DropPodTrailSystem.FallHeight, 0),
                         new AnimationTrackProperty.KeyFrame(new Vector2(0, 0), fall),
                         new AnimationTrackProperty.KeyFrame(new Vector2(0, 0.12f), bounce / 2),
                         new AnimationTrackProperty.KeyFrame(new Vector2(0, 0), bounce / 2),
+                    },
+                },
+                // Летит под углом 45° и выпрямляется при касании.
+                new AnimationTrackComponentProperty
+                {
+                    ComponentType = typeof(SpriteComponent),
+                    Property = nameof(SpriteComponent.Rotation),
+                    InterpolationMode = AnimationInterpolationMode.Linear,
+                    KeyFrames =
+                    {
+                        new AnimationTrackProperty.KeyFrame(DropPodTrailSystem.Tilt, 0),
+                        new AnimationTrackProperty.KeyFrame(DropPodTrailSystem.Tilt, fall),
+                        new AnimationTrackProperty.KeyFrame(Angle.Zero, bounce),
                     },
                 },
                 new AnimationTrackComponentProperty
