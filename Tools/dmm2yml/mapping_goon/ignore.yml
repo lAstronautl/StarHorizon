@@ -60,3 +60,14 @@
 # code/modules/economy/supply_misc.dm -- a cargo-drop-zone marker;
 # INVIS_ALWAYS, confirmed non-rendered.
 - /obj/marker/supplymarker
+
+# code/modules/fluids/fluid_objects.dm -- a periodic fluid spawner;
+# invisibility = INVIS_ADVENTURE, confirmed non-rendered.
+- /obj/fluid_spawner
+
+# code/modules/mapping/helpers/airlock_helpers.dm, beaker_spawn.dm --
+# self-configuring linkage/content helpers for an already-placed airlock
+# or dispenser; no structure of their own, same reasoning as the other
+# mapping_helper entries above.
+- /obj/mapping_helper/airlock/cycler/manual
+- /obj/mapping_helper/glassware_spawn

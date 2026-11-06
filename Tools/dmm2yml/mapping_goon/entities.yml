@@ -1056,3 +1056,526 @@
 /obj/machinery/clonegrinder: BiomassReclaimer
 /obj/machinery/clonepod: CloningPod
 /obj/item/tile: FloorTileItemSteel
+
+# --- neon.dmm: trench/water environment fork results. ---
+
+# code/obj/sealab_objects.dm -- bioluminescent coral decorations; no SS14
+# coral/plant prop matches the sea-floor theme, folded onto the generic
+# decorative plant already used for /obj/shrub above.
+/obj/plasma_coral/coralfingers: PottedPlant1
+/obj/plasma_coral/branching: PottedPlant1
+/obj/plasma_coral/bulbous: PottedPlant1
+
+# code/obj/structure.dm -- "barricade... thrown up in a hurry"; direct
+# SS14 match despite the "woodwall" path name.
+/obj/structure/woodwall: Barricade
+
+# code/modules/currents/turbine.dm -- a tidal current turbine and its
+# connecting shaft; SS14's plain Turbine is the closest match for both.
+/obj/turbine_shaft: Turbine
+/obj/turbine_shaft/turbine: Turbine
+
+# code/obj/item/pinpointer.dm -- a trench-specific pinpointer variant;
+# closest SS14 match is the universal pinpointer (loses the "only finds
+# trench stuff" restriction, keeps the "handheld locator" role).
+/obj/item/pinpointer/trench: PinpointerUniversal
+
+# mob/living/critter/aquatic/shark.dm, small_animal/{cat,mouse,bee,
+# cockroach}.dm -- named pet/wildlife critters; direct SS14 species
+# matches, same "reuse the generic species mob" precedent as oppenheimer/
+# MobMonkey and fermid/MobGoliath above.
+/mob/living/critter/aquatic/shark: MobShark
+/mob/living/critter/small_animal/cat/jones: MobCat
+/mob/living/critter/small_animal/cat/jons: MobCat
+/mob/living/critter/small_animal/mouse: MobMouse
+/mob/living/critter/small_animal/mouse/remy: MobMouse
+/mob/living/critter/small_animal/bee/bubs: MobBee
+/mob/living/critter/small_animal/cockroach: MobCockroach
+
+# mob/living/carbon/human/monkeys.dm -- named pet monkey NPCs; same
+# MobMonkey match as oppenheimer above.
+/mob/living/carbon/human/npc/monkey/albert: MobMonkey
+/mob/living/carbon/human/npc/monkey/horse: MobMonkey
+/mob/living/carbon/human/npc/monkey/krimpus: MobMonkey
+/mob/living/carbon/human/npc/monkey/mr_muggles: MobMonkey
+/mob/living/carbon/human/npc/monkey/mr_rathen: MobMonkey
+/mob/living/carbon/human/npc/monkey/mrs_muggles: MobMonkey
+/mob/living/carbon/human/npc/monkey/stirstir: MobMonkey
+/mob/living/carbon/human/npc/monkey/tanhony: MobMonkey
+
+# code/obj/mapping_helper/algae.dm, code/obj/window_blinds.dm (+ their
+# wall switch, same icons/obj/power.dmi family as the already-unmapped
+# light_switch), code/modules/fishing/, code/obj/flock/* (no equivalent
+# Flock content, established elsewhere), named unique human NPCs (no
+# generic "static human NPC" SS14 prototype to represent an arbitrary
+# named character), and this fork's own sea-ladder/trench-map/gym-
+# equipment/bubble-vent props -- none have a matching SS14 prototype;
+# left unmapped. /obj/warp_beacon (bare) already considered elsewhere,
+# still no teleport-beacon decoration exists.
+
+# --- neon.dmm: atmospherics/disposal/computer3/vending/bots fork results. ---
+
+# code/modules/atmospherics/machinery/pipe.dm -- the flexible "wanders
+# around" pipe segment: its own New() turns a diagonal dir into a bend
+# (initialize_directions = dir for anything that isn't a cardinal pair),
+# exactly like tgstation's own disposalpipe/segment bend convention (see
+# that rule in Tools/dmm2yml/mapping/entities.yml). byDir rotations below
+# are derived from pipefitting.py's own _bend_facing() (SS14's
+# GasPipeBend at its default "south" facing connects S+W), not guessed:
+# dir 5 (connects N+E) -> facing north, 6 (S+E) -> east, 9 (N+W) -> west,
+# 10 (S+W) -> south. Every /heat_exchanging, /insulated, and /insulated/
+# cold subtype inherits this same rule (and its byDir) by not overriding
+# it, since none of them override New() either. This loses the dynamic
+# gas-pipe auto-fitter's bend/colour logic (gaspipes.py only parses
+# tgstation's own "smart/<shape>/<color>" path shape) -- a fixed-shape
+# placement instead, with only the per-instance dir driving the bend.
+/obj/machinery/atmospherics/pipe/simple:
+  entity: GasPipeStraight
+  byDir:
+    5: { entity: GasPipeBend, dir: 1 }
+    6: { entity: GasPipeBend, dir: 4 }
+    9: { entity: GasPipeBend, dir: 8 }
+    10: { entity: GasPipeBend, dir: 2 }
+
+# code/modules/atmospherics/machinery/pipe.dm -- a fixed T-shaped
+# junction (unlike plain /simple above, its own name and shape don't
+# bend via dir); direct SS14 match.
+/obj/machinery/atmospherics/pipe/simple/junction: GasPipeTJunction
+
+# code/modules/atmospherics/machinery/*.dm -- fixed-shape manifold
+# fittings and devices; direct SS14 matches by shape/role.
+/obj/machinery/atmospherics/pipe/manifold: GasPipeManifold
+/obj/machinery/atmospherics/binary/valve: GasValve
+/obj/machinery/atmospherics/binary/pump: GasPressurePump
+/obj/machinery/atmospherics/binary/volume_pump: GasVolumePump
+/obj/machinery/atmospherics/binary/passive_gate: GasPassiveGate
+/obj/machinery/atmospherics/unary/portables_connector: GasPort
+/obj/machinery/atmospherics/unary/furnace_connector: GasPort
+/obj/machinery/atmospherics/unary/vent: GasPort
+/obj/machinery/atmospherics/unary/vent_pump/overfloor: GasVentPump
+/obj/machinery/atmospherics/unary/vent_pump/overfloor/siphoning: GasVentScrubber
+/obj/machinery/atmospherics/unary/outlet_injector/overfloor/active: GasVentPump
+/obj/machinery/atmospherics/unary/tank: GasPort
+
+# code/obj/machinery/portable_atmospherics/canister.dm -- plain air
+# canister variants; reuse the already-mapped AirCanister pattern.
+/obj/machinery/portable_atmospherics/canister/air/large: AirCanister
+/obj/machinery/portable_atmospherics/canister/empty: AirCanister
+/obj/machinery/portable_atmospherics/canister/sleeping_agent: NitrousOxideCanister
+
+# code/obj/disposalpipe.dm family -- Goonstation's own disposal-pipe
+# object tree (a distinct base path from tgstation's /obj/structure/
+# disposalpipe, so matched fresh to the same target ids tgstation uses
+# for the equivalent shapes).
+/obj/disposalpipe/switch_junction/left: DisposalRouter
+/obj/disposalpipe/switch_junction/right: DisposalRouterFlipped
+/obj/disposalpipe/block_sensing_outlet: DisposalSignaller
+/obj/disposalpipe/chicken_disposal_pipe/horizontal: DisposalPipe
+/obj/disposalpipe/type_sensing_outlet/drone_factory: DisposalSignaller
+/obj/disposaloutlet: DisposalUnit
+
+# code/modules/networks/computer3/* -- Goonstation's hardware-agnostic
+# "generic terminal" framework; matched by what each program actually
+# displays.
+/obj/machinery/computer3/generic/secure_data: ComputerCriminalRecords
+/obj/machinery/computer3/generic/med_data: ComputerMedicalRecords
+/obj/machinery/computer3/generic/communications: ComputerComms
+/obj/machinery/computer3/generic/personal: ComputerCrewMonitoring
+/obj/machinery/computer3/terminal/zeta/os_loaded: ComputerCrewMonitoring
+/obj/computer3frame: ComputerFrame
+
+# code/modules/vending/vending.dm -- direct/close SS14 matches.
+/obj/machinery/vending/standard: VendingMachineSnack
+/obj/machinery/vending/alcohol: VendingMachineBooze
+/obj/machinery/vending/alcohol/with_ammo: VendingMachineBooze
+/obj/machinery/vending/chapel: VendingMachineChapel
+/obj/machinery/vending/jobclothing/catering: VendingMachineClothing
+/obj/machinery/vending/jobclothing/engineering: VendingMachineClothing
+/obj/machinery/vending/jobclothing/medical: VendingMachineClothing
+/obj/machinery/vending/jobclothing/research: VendingMachineClothing
+/obj/machinery/vending/jobclothing/security: VendingMachineClothing
+/obj/machinery/vending/standard/toxins: VendingMachineChemicals
+
+# code/modules/robotics/bot/firebot.dm -- direct match.
+/obj/machinery/bot/firebot: MobFireBot
+
+# code/obj/machinery/shieldgenerator.dm -- direct match.
+/obj/machinery/shieldgenerator/energy_shield: ShieldGeneratorMedium
+
+# code/obj/machinery/power/data_terminal.dm, code/obj/machinery/
+# lightswitch.dm -- same "underfloor hidden" / "no SS14 LightSwitch
+# prototype exists at all" verdicts already established on other maps;
+# left unmapped. code/obj/machinery/disposal_pipedispenser.dm -- same
+# already-unmapped mobile pipe-laying cart reasoning. code/modules/
+# robotics/bot/{guardbot,secbot}.dm and /obj/machinery/checkpointbot,
+# /obj/machinery/turretid/* -- no patrol-bot/turret-AI mob or structure
+# exists in this SS14 fork at all. code/modules/power/manufacturing.dm
+# family (/obj/machinery/manufacturer/*, every department) -- same "no
+# recipe-browser fabricator concept" verdict already established for the
+# pod_wars manufacturer family. code/obj/item/aiModule.dm -- abstract AI-
+# law cartridges with no matching SS14 item (all 7 variants). None of
+# these have a matching SS14 prototype; left unmapped.
+
+# --- neon.dmm: clothing/personal items, both fork batches combined. ---
+
+# code/obj/item/clothing/shoes.dm, uniforms.dm -- direct matches.
+/obj/item/clothing/shoes/flippers: ClothingShoesFlippers
+/obj/item/clothing/under/towel: TowelColorWhite
+
+# code/modules/fluids -- a drinking-water fountain; direct match.
+/obj/reagent_dispensers/watertank/fountain: WaterCooler
+
+# code/obj/item/clothing/helmets.dm, suits.dm -- this fork's underwater
+# pressure-diving suit/helmet family (civilian/security/command/
+# engineering reskins, same base diving_suit/diving0 icons, cosmetic
+# only); SS14 has no diving suit at all, folded onto its closest full-
+# body environmental-protection gear by department (documented
+# simplification, loses the underwater theming). The bare/plain and
+# /old variants fold onto the basic EVA suit; /civilian is explicit for
+# clarity. Base rules keep this from being auto-skip-shadowed the same
+# way every other base-class rule in this file is.
+/obj/item/clothing/suit/space/diving: ClothingOuterHardsuitEVA
+/obj/item/clothing/suit/space/diving/civilian: ClothingOuterHardsuitEVA
+/obj/item/clothing/suit/space/diving/engineering: ClothingOuterHardsuitEngineering
+/obj/item/clothing/suit/space/diving/security: ClothingOuterHardsuitSecurity
+/obj/item/clothing/suit/space/diving/command: ClothingOuterHardsuitCap
+/obj/item/clothing/suit/space/old: ClothingOuterHardsuitEVA
+/obj/item/clothing/head/helmet/space/engineer/diving: ClothingHeadHelmetEVA
+/obj/item/clothing/head/helmet/space/engineer/diving/civilian: ClothingHeadHelmetEVA
+/obj/item/clothing/head/helmet/space/engineer/diving/engineering: ClothingHeadHelmetHardsuitEngineering
+/obj/item/clothing/head/helmet/space/engineer/diving/security: ClothingHeadHelmetHardsuitSecurity
+/obj/item/clothing/head/helmet/space/engineer/diving/command: ClothingHeadHelmetHardsuitCap
+/obj/item/clothing/head/helmet/space/old: ClothingHeadHelmetEVA
+
+# code/obj/item/clothing/helmets.dm -- plain engineering hardhat
+# (distinct from the full hardsuit above); direct match.
+/obj/item/clothing/head/helmet/hardhat: ClothingHeadHatHardhatYellow
+
+# code/obj/item/clothing/*.dm -- direct matches.
+/obj/item/clothing/shoes/black: ClothingShoesColorBlack
+/obj/item/clothing/shoes/swat: ClothingShoesSwat
+/obj/item/clothing/suit/hazard/rad: ClothingOuterSuitRad
+/obj/item/clothing/under/misc/atmospheric_technician: ClothingUniformJumpsuitAtmos
+/obj/item/clothing/under/misc/lawyer: ClothingUniformJumpsuitLawyerBlack
+/obj/item/clothing/under/misc/lawyer/red: ClothingUniformJumpsuitLawyerRed
+/obj/item/clothing/head/helmet/space/santahat: ClothingHeadHatSantahat
+/obj/item/clothing/head/NTberet: ClothingHeadHatBeret
+/obj/item/clothing/suit/space/santa: ClothingOuterSanta
+/obj/item/clothing/head/wig: ClothingHeadPerformerWig
+/obj/item/clothing/suit/judgerobe: ClothingOuterRobesJudge
+/obj/item/clothing/head/bandana/red: ClothingHeadBandRed
+/obj/item/clothing/under/gimmick/sweater: ClothingOuterClothingSweaterGrey
+/obj/item/clothing/head/souschefhat: ClothingHeadHatChef
+/obj/item/clothing/mask/clown_nose: ClothingMaskClown
+/obj/item/clothing/mask/cigarette/random: Cigarette
+/obj/item/clothing/glasses/toggleable/meson: ClothingEyesGlassesMeson
+
+# code/obj/item/tank.dm -- standard breathable-mix gas tank; direct
+# match. The pocket/mini oxygen variants are small supplemental tanks
+# with no distinct SS14 size tiers, folded onto the compact emergency
+# tank.
+/obj/item/tank/air: AirTankFilled
+/obj/item/tank/pocket/oxygen: EmergencyOxygenTankFilled
+/obj/item/tank/mini/oxygen: EmergencyOxygenTankFilled
+
+# code/modules/chemistry/tools/grenades.dm -- direct matches for metal-
+# foam and flashbang; firefighting foam has no dedicated SS14 grenade,
+# folded onto the metal-foam grenade as the closest "foam deployment"
+# analog (documented approximation).
+/obj/item/chem_grenade/metalfoam: MetalFoamGrenade
+/obj/item/chem_grenade/flashbang: GrenadeFlashBang
+/obj/item/chem_grenade/firefighting: MetalFoamGrenade
+
+# code/obj/item/clothing/suits.dm, helmets.dm -- firesuit + firefighter
+# helm; direct matches.
+/obj/item/clothing/suit/hazard/fire: ClothingOuterSuitFire
+/obj/item/clothing/head/helmet/firefighter: ClothingHeadHelmetFire
+
+# code/obj/item/device/*.dm -- direct matches for standard handheld
+# tools.
+/obj/item/device/prox_sensor: ProximitySensor
+/obj/item/device/analyzer/healthanalyzer: HandheldHealthAnalyzer
+/obj/item/device/igniter: Igniter
+/obj/item/device/light/floodlight/starts_on: Floodlight
+/obj/item/device/flash: Flash
+/obj/item/device/detective_scanner: ForensicScanner
+/obj/item/device/light/zippo: Lighter
+/obj/item/device/light/candle/small: CandleBlackSmall
+/obj/item/device/key/generic/radio: EncryptionKeyCommon
+
+# code/obj/item/instrument.dm -- direct matches for these large
+# furniture-style instruments.
+/obj/item/instrument/large/jukebox: Jukebox
+/obj/item/instrument/large/piano: PianoInstrument
+/obj/item/instrument/large/organ: ChurchOrganInstrument
+
+# code/obj/item/gun/implanter.dm, handcuffs.dm, pinpointer.dm, mine.dm,
+# card.dm -- direct matches.
+/obj/item/gun/implanter: Implanter
+/obj/item/handcuffs: Handcuffs
+/obj/item/card/id/security: SecurityIDCard
+/obj/item/mine/stun/armed: Claymore
+
+# code/obj/item/clothing/*.dm -- long tail of joke/costume items this
+# fork has that SS14 doesn't: XComHair, mario costume (head+under),
+# princess costume (gloves+under), bald cap, horse mask, surgical mask-
+# shield, genki dress, cardboard-box captain costume, robuddy suit,
+# syndicate space suit, barber/tourist/vice under-uniforms, water-wings
+# gloves, magnetic shoes (no SS14 magboots *clothing* item), earmuffs,
+# random swimsuit (no SS14 swimwear category), VR goggles (bomb/arcade),
+# emergency suit/hood. Also no SS14 match found for: oxygen-burst hazard
+# grenade, the pod/ship vehicle component family (same already-
+# established "not a freestanding structure" reasoning: communications/
+# mining, mainweapon/taser, secondary_system/gps, sensor/ecto/mining,
+# pod_lights/police_siren, mainweapon/bad_mining), this fork's radio-
+# tape flavour items, its own computer3 disk/peripheral/electronics
+# component subsystem (no item prototypes for any of it), a riot-grade
+# kinetic launcher, a health implant case, a non-sports bat, a skull key,
+# a trained attack-bat critter, a rock-storage bag, a bathtub fixture, a
+# static water tank, and the whole small-pilotable-submarine vehicle
+# family (/obj/machinery/vehicle/tank/minisub, same install_part/ship-
+# component system as the already-unmapped pod_wars pods).
+
+# --- neon.dmm: machines/furniture/closets/crates, both fork batches
+# combined. ---
+
+# code/obj/random_spawners.dm -- more random round-start loot
+# categories, same representative-item-per-category fold already used
+# above.
+/obj/random_item_spawner/gross_with_junk: Paper
+/obj/random_item_spawner/mask: ClothingMaskBalaclava
+/obj/random_item_spawner/gross: PuddleVomit
+
+# code/obj/random_spawners.dm -- NOT actually random despite the path:
+# each has its own fixed spawn_items() set (a rack + gear, one even
+# explicitly commented "random" despite a fixed loadout); mapped to
+# what each one actually spawns, one entity per real item in its list
+# (loses exact duplicate counts, documented simplification).
+/obj/random_item_spawner/armory_armor_supplies:
+  entities: [Rack, ClothingHeadHelmetBombSuit, ClothingHeadHelmetRiot, ClothingOuterArmorRiot]
+/obj/random_item_spawner/armory_goggle_supplies:
+  entities: [Rack, ClothingMaskGas, ClothingEyesGlassesThermal]
+/obj/random_item_spawner/armory_breaching_supplies:
+  entities: [Rack, BreachingCharge, BreachingCharge, BreachingCharge]
+
+# code/obj/random_spawners.dm -- one of two phaser weapon racks; no SS14
+# energy-weapon rack exists, folded onto the closest "wall rack holding
+# weapons" structure (loses the phaser-specific skin).
+/obj/random_item_spawner/armory_phasers: StructureMeleeWeaponRackWallmounted
+
+# code/obj/machinery/traymachines.dm -- direct match.
+/obj/machinery/traymachine/morgue: Morgue
+
+# code/obj/item/storage/secure_safe.dm -- "an extremely tough secure
+# safe"; closest structural match. Covers /loot and /diner_arcade by
+# inheritance.
+/obj/item/storage/secure/ssafe: GunSafeBaseSecure
+
+# code/modules/chemistry/tools/pills.dm -- anti-radiation pill bottle;
+# potassium iodide is the real-world anti-rad treatment, direct match.
+/obj/item/storage/pill_bottle/antirad: PillCanisterPotassiumIodide
+
+# code/obj/item/boardgame.dm, toy.dm -- direct matches.
+/obj/item/boardgame/chess: ChessBoard
+/obj/item/toy/plush/small/bee: PlushieBee
+
+# code/obj/filing_cabinet.dm -- direct match (lowercase-leading id, same
+# pattern as hydroponicsTray above).
+/obj/filing_cabinet: filingCabinet
+
+# code/obj/player_piano.dm, submachine/seed.dm, decorations.dm -- a self-
+# playing piano (loses the "plays itself" behaviour), a seed-gene
+# manipulator, and a plain bookcase; direct/closest structural matches.
+/obj/player_piano: UprightPianoInstrument
+/obj/submachine/seed_manipulator: SeedExtractor
+/obj/decoration/bookcase: Bookshelf
+
+# code/obj/storage/secure_closets.dm -- department lockers; SS14's own
+# naming convention here is "Locker<Dept>Filled". Department variants
+# with no close SS14 equivalent fold onto the plain generic locker
+# instead of a mismatched department skin.
+/obj/storage/secure/closet/engineering/mechanic: LockerEngineerFilled
+/obj/storage/secure/closet/engineering/engineer: LockerAtmospherics
+/obj/storage/secure/closet/engineering/mining: LockerSalvageSpecialist
+/obj/storage/secure/closet/engineering/cargo: LockerQuarterMasterFilled
+/obj/storage/secure/closet/engineering/electrical: LockerElectricalSuppliesFilled
+/obj/storage/secure/closet/command/captain: LockerCaptainFilled
+/obj/storage/secure/closet/command/hop: LockerHeadOfPersonnelFilled
+/obj/storage/secure/closet/command/medical_director: LockerChiefMedicalOfficerFilled
+/obj/storage/secure/closet/command/chief_engineer: ClosetSteelBase
+/obj/storage/secure/closet/command/hos: ClosetSteelBase
+/obj/storage/secure/closet/command/research_director: ClosetSteelBase
+/obj/storage/secure/closet/research/chemical: LockerChemistryFilled
+/obj/storage/secure/closet/research/chemical/pharmacy: ClosetSteelBase
+/obj/storage/secure/closet/security/forensics: LockerDetectiveFilled
+/obj/storage/secure/closet/security/equipment: LockerSecurity
+/obj/storage/secure/closet/civilian/bartender: LockerBoozeFilled
+/obj/storage/secure/closet/civilian/kitchen: ClosetChefFilled
+/obj/storage/secure/closet/civilian/hydro: ClosetSteelBase
+/obj/storage/secure/closet/civilian/janitor: ClosetSteelBase
+/obj/storage/secure/closet/civilian/ranch: ClosetSteelBase
+/obj/storage/secure/closet/kitchen: ClosetSteelBase
+/obj/storage/secure/closet/animal: ClosetSteelBase
+/obj/storage/secure/closet/brig_automatic/solitary: ClosetSteelBase
+/obj/storage/secure/closet/brig_automatic/genpop: ClosetSteelBase
+/obj/storage/secure/closet/brig_automatic/solitary2: ClosetSteelBase
+
+# code/obj/storage/crate.dm family -- armory/security/engineering
+# delivery crates; direct or closest-category matches, folding onto the
+# plain generic crate where no specific-contents SS14 crate exists.
+/obj/storage/secure/crate/gear/armory/equipment: CrateSecuritySupplies
+/obj/storage/secure/crate/plasma/armory/anti_biological: CrateSecurityBiosuit
+/obj/storage/secure/crate/weapon/armory/shotgun: CrateArmoryShotgun
+/obj/storage/secure/crate/weapon/confiscated_items: CrateSecuritySupplies
+/obj/storage/secure/crate/eng/explosives: CrateGenericSteel
+/obj/storage/secure/crate/gear/armory/grenades: CrateGenericSteel
+/obj/storage/secure/crate/weapon/armory/pod_weapons: CrateGenericSteel
+/obj/storage/secure/crate/weapon/armory/tranquilizer: CrateGenericSteel
+/obj/storage/secure/crate/weapon/sec_weapons: CrateGenericSteel
+
+# code/obj/submachine/weapon_vendor.dm -- same "Weapons Vendor" sprite as
+# the already-mapped /podwars subtype, same match (no faction skin here
+# either).
+/obj/submachine/weapon_vendor/security: VendingMachineSec
+
+# code/obj/stool.dm, vehicle.dm, item/decoration.dm -- a foldable chair
+# item (distinct from the placed furniture entities), a rideable fun
+# vehicle, and a plain ashtray; direct matches.
+/obj/item/chair/folded: ChairFolding
+/obj/vehicle/segway: VehicleSyndicateSegway
+/obj/item/decoration/ashtray: Ashtray
+
+# code/modules/economy/cargo -- a cargo order/requisition computer;
+# direct match.
+/obj/machinery/computer/ordercomp: ComputerCargoOrders
+
+# code/obj/machinery/computer/card.dm -- an ID-card programming
+# computer; direct match (same id control_point_computer-style reuse
+# elsewhere).
+/obj/machinery/computer/card: ComputerId
+
+# code/item/bible.dm -- direct match.
+/obj/item/bible: Bible
+
+# code/obj/item/reagent_containers/applicator -- condiment bottles/
+# packets (no dedicated "shaker" SS14 prototype, folded onto the packet
+# form).
+/obj/item/reagent_containers/applicator/condiment/bottle/mustard: FoodCondimentSqueezeBottleMustard
+/obj/item/reagent_containers/applicator/condiment/bottle/ketchup: FoodCondimentSqueezeBottleKetchup
+/obj/item/reagent_containers/applicator/condiment/shaker/salt: FoodCondimentPacketSalt
+/obj/item/reagent_containers/applicator/condiment/shaker/pepper: FoodCondimentPacketPepper
+
+# code/modules/medical/firstaid -- first-aid kits; no exact per-damage-
+# type SS14 kit lines up with these specific subtypes, folded onto the
+# general-purpose filled medkit (same simplification as the med_kit
+# random-spawner fold established above).
+/obj/item/storage/firstaid: MedkitAdvancedFilled
+/obj/item/storage/firstaid/toxin: MedkitAdvancedFilled
+/obj/item/storage/firstaid/brain: MedkitAdvancedFilled
+/obj/item/storage/firstaid/mental: MedkitAdvancedFilled
+/obj/item/storage/firstaid/fire: MedkitBurnFilled
+
+# code/obj/item/reagent_containers/applicator/stick/glue.dm,
+# code/obj/item/device/pinpointer.dm -- direct/closest matches (no
+# "disk" pinpointer variant exists, folds onto the plain scanner).
+/obj/item/reagent_containers/applicator/stick/glue: CrazyGlue
+/obj/item/pinpointer/disk: PinpointerScanner
+
+# code/obj/structure/noticeboard.dm -- reused directly from tgstation's
+# own noticeboard rule (same {entity, wall} combo pattern); covers every
+# department/persistent variant by inheritance.
+/obj/noticeboard/directional/north: {entity: NoticeBoard, wall: north, onWall: true}
+/obj/noticeboard/persistent/detectives_office/directional/west: {entity: NoticeBoard, wall: west, onWall: true}
+/obj/noticeboard/persistent/medbay/directional/north: {entity: NoticeBoard, wall: north, onWall: true}
+
+# code/obj/machinery/flasher.dm -- reused directly from tgstation's own
+# flasher rule; covers every genpop/solitary/solitary2 new_walls
+# directional variant by inheritance.
+/obj/machinery/flasher/genpop/new_walls/east: {entity: PortableFlasher, wall: east, onWall: true}
+/obj/machinery/flasher/solitary2/new_walls/west: {entity: PortableFlasher, wall: west, onWall: true}
+
+# code/obj/storage/cart.dm, item/*.dm, machinery/*.dm, npc/trader/*.dm --
+# no SS14 equivalent found for the long remaining tail: a gift box, the
+# already-established "no SS14 box for cards" card_box family,
+# cigarette packets, a robot oil can, wall-mounted supply cabinets (no
+# generic "wall cabinet" structure exists), a fluid-mechanics prop, the
+# plain utility cart, genetics-minigame machines, assorted department
+# computers with no SS14 console match (television, tour_console,
+# stockexchange, riotgear, elevator/sea, barcode/qm, card/department/
+# medical, card/department/security), the bespoke "ruckingenur"
+# fabrication device, a landline phone, a gas-tank storage rack, this
+# fork's unique NPC traders (chad/flock/martian/skeleton/exclown/hand/
+# robot/medical), its own incompatible cyborg-part items, and a long
+# list of one-off flavour props (dye bottle, laser-sink mirror,
+# chemistry/psychiatry cabinets, toilet holder, captain's display case,
+# wall health scanner, flower vase, emeter, flock table parts, inner
+# tube, beepsky photo/photo album, atlas record, fanny pack, goodybag,
+# mannitol pill bottle, diner-arcade safe, gooncode toy, spooky prop,
+# driver/ignition buttons, electroplater, chemicompiler, clothing booth,
+# crematorium switch, door timers, industrial/solitary2 floorflushers,
+# ghost catcher, ghostdrone factory parts, hydro growlamp, port-a-brig,
+# ship alert, VR bed, sparker, rifle rack recharger, pool springboard,
+# clone rack spawner, forensic/hotdog/medcart crash carts, GTM, claw
+# machine, ranch feed grinder, forklift, voting box, and the cargopad
+# family's remaining department variants, same already-unmapped
+# mechanic).
+
+# --- base-class fixes for the same auto-skip-shadow reason as every
+# other such rule in this file; several more real, literal atoms at the
+# shallower end of a deep clothing/storage path tree turned up only once
+# neon.dmm's own instances of them were actually scanned. ---
+
+# code/obj/item/clothing/helmets.dm -- plain "space helmet... protect
+# against vacuum"; closest match is the plain EVA helmet.
+/obj/item/clothing/head/helmet/space: ClothingHeadHelmetEVA
+
+# code/obj/item/clothing/helmets.dm -- "engineering space helmet...
+# built-in flashlight" (distinct from the /diving engineering variant
+# above); same hardsuit-helmet match.
+/obj/item/clothing/head/helmet/space/engineer: ClothingHeadHelmetHardsuitEngineering
+
+# code/obj/item/clothing/suits.dm -- plain "space suit... protects
+# against low pressure"; same plain EVA suit match as the helmet above.
+/obj/item/clothing/suit/space: ClothingOuterHardsuitEVA
+
+# code/modules/networks/computer3/* -- the bare hardware-agnostic
+# terminal frame, with no "program" loaded; same match already used for
+# /obj/computer3frame above. Covers /zeta by inheritance.
+/obj/machinery/computer3/terminal: ComputerFrame
+
+# code/obj/item/card.dm -- the base NanoTrasen ID card class; SS14 has
+# no equivalent "generic civilian ID" prototype (only role-specific
+# ones), left unresolved via skip rather than guessed at.
+/obj/item/card/id: skip
+
+# code/modules/items/gimmick/plushies.dm -- the base/undifferentiated
+# plush toy classes (no species set at this level, unlike the mapped
+# /small/bee child); no generic "plush toy" SS14 prototype exists
+# either, left unresolved via skip.
+/obj/item/toy/plush: skip
+/obj/item/toy/plush/small: skip
+
+# mob/living/critter/small_animal/small_animal.dm -- "space cat"; same
+# MobCat match as the named cat pets above.
+/mob/living/critter/small_animal/cat: MobCat
+
+# code/modules/chemistry/tools/dispensers.dm -- a large static water
+# tank; no SS14 "water tank" structure exists, folded onto the closest
+# "dispenses water" fixture already used for the /fountain child.
+/obj/reagent_dispensers/watertank: WaterCooler
+
+# code/obj/storage/secure_closets.dm -- "Security locker"; same match
+# already used for the /equipment child.
+/obj/storage/secure/closet/security: LockerSecurity
+
+# code/obj/item/cigarette.dm -- a cigarette worn as a mask while lit;
+# same match already used for the /random child.
+/obj/item/clothing/mask/cigarette: Cigarette
+
+# code/obj/storage/secure_crates.dm -- the base "Secure crate" class;
+# direct SS14 match.
+/obj/storage/secure/crate: CrateBaseSecure
+
+# code/modules/atmospherics/portable/canister.dm -- "Canister [Air]";
+# same match already used for the /large child.
+/obj/machinery/portable_atmospherics/canister/air: AirCanister

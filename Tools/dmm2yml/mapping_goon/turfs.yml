@@ -351,3 +351,16 @@
 /turf/simulated/shuttle/wall:
   tile: Plating
   entity: WallShuttle
+
+# --- neon.dmm (full playable station): underwater/trench environment. ---
+
+# code/obj/sealab_objects.dm -- the trench's ocean-boundary wall (plain
+# and /side variants of the same thing); no ocean/trench-themed SS14
+# wall or tile exists, same "environmental boundary, no thematic match"
+# stopgap as the debris field's void/abyss walls above.
+/turf/unsimulated/wall/trench:
+  tile: Plating
+  entity: WallSolid
+/turf/unsimulated/wall/trench/side:
+  tile: Plating
+  entity: WallSolid
