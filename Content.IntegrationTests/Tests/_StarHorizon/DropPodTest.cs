@@ -98,7 +98,7 @@ public sealed class DropPodTest
         Assert.That(server.EntMan.GetComponent<DropPodComponent>(pod).State, Is.EqualTo(DropPodState.Idle), "без привязки запуск невозможен");
 
         await LinkWithMultitool(pair, mob, pod, console);
-        Assert.That(server.EntMan.GetComponent<DropPodConsoleComponent>(console).LinkedPod, Is.EqualTo(pod), "мультитул привязал капсулу");
+        Assert.That(server.EntMan.GetComponent<DropPodConsoleComponent>(console).LinkedPods, Does.Contain(pod), "мультитул привязал капсулу");
 
         await server.WaitPost(() =>
         {
@@ -236,6 +236,57 @@ public sealed class DropPodTest
         await pair.RunSeconds(1.5f);
         Assert.That(podComp.Used);
         Assert.That(server.EntMan.GetComponent<TransformComponent>(pod).Anchored, "капсула прикручена к полу после посадки");
+
+        await pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task PodsLaunchOneByOne()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { FailureLogLevel = LogLevel.Error });
+        var server = pair.Server;
+        server.CfgMan.SetCVar(CCVars.FTLArrivalTime, 1f);
+        var map = await pair.CreateTestMap();
+        var storage = server.System<EntityStorageSystem>();
+        var xform = server.System<SharedTransformSystem>();
+
+        EntityUid console = default, pod1 = default, pod2 = default, user = default;
+        await server.WaitPost(() =>
+        {
+            console = server.EntMan.SpawnEntity("StarHorizonDropPodConsole", map.GridCoords);
+            pod1 = server.EntMan.SpawnEntity("StarHorizonDropPod", map.GridCoords);
+            pod2 = server.EntMan.SpawnEntity("StarHorizonDropPod", map.GridCoords);
+            user = server.EntMan.SpawnEntity("DropPodTestPassenger", map.GridCoords);
+            MakeFast(server.EntMan.GetComponent<DropPodComponent>(pod1));
+            MakeFast(server.EntMan.GetComponent<DropPodComponent>(pod2));
+            storage.CloseStorage(pod1);
+            storage.CloseStorage(pod2);
+        });
+
+        // Обе капсулы привязаны к одной консоли.
+        await LinkWithMultitool(pair, user, pod1, console);
+        await LinkWithMultitool(pair, user, pod2, console);
+        var consoleComp = server.EntMan.GetComponent<DropPodConsoleComponent>(console);
+        Assert.That(consoleComp.LinkedPods, Is.EqualTo(new[] { pod1, pod2 }));
+
+        var target = new Vector2(80, 80);
+        await server.WaitPost(() => server.EntMan.EventBus.RaiseLocalEvent(console, (object) new DropPodLaunchMessage(target)));
+        var comp1 = server.EntMan.GetComponent<DropPodComponent>(pod1);
+        var comp2 = server.EntMan.GetComponent<DropPodComponent>(pod2);
+
+        // Первая уже взлетает, вторая ещё ждёт своей очереди (интервал - секунда).
+        await pair.RunSeconds(1.5f);
+        Assert.That(comp1.State, Is.EqualTo(DropPodState.ZoomingOut), "первая стартовала");
+        Assert.That(comp2.State, Is.EqualTo(DropPodState.Countdown), "вторая ждёт очереди");
+
+        await pair.RunSeconds(1.0f);
+        Assert.That(comp2.State, Is.EqualTo(DropPodState.ZoomingOut), "вторая стартовала секундой позже");
+
+        // Обе приземляются, в разных точках и не друг на друге; обе одноразовые.
+        await pair.RunSeconds(5.0f);
+        Assert.That(comp1.Used && comp2.Used, "обе приземлились");
+        var d = (xform.GetWorldPosition(pod1) - xform.GetWorldPosition(pod2)).Length();
+        Assert.That(d, Is.GreaterThan(1.0f), "капсулы разведены в разные точки");
 
         await pair.CleanReturnAsync();
     }

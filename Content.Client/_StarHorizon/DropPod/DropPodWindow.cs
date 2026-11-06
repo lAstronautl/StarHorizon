@@ -169,15 +169,16 @@ public sealed class DropPodWindow : DefaultWindow
         }
         else
         {
-            _status.Text = state.PodUsed
+            _status.Text = state.ReadyCount == 0 && state.PodState == DropPodState.Idle
                 ? Loc.GetString("droppod-ui-used")
-                : Loc.GetString("droppod-ui-state", ("state", Loc.GetString($"droppod-state-{state.PodState}")));
+                : Loc.GetString("droppod-ui-state", ("state", Loc.GetString($"droppod-state-{state.PodState}")))
+                  + "\n" + Loc.GetString("droppod-ui-pods", ("count", state.PodCount), ("ready", state.ReadyCount));
             _occupants.Text = Loc.GetString("droppod-ui-occupants", ("count", state.Occupants));
         }
 
         RebuildGrids(state);
 
-        var idle = state.Linked && !state.PodUsed && state.PodState == DropPodState.Idle;
+        var idle = state.Linked && state.ReadyCount > 0 && state.PodState == DropPodState.Idle;
         var captured = state.CapturedGrid != null;
         var capturing = state.CapturingGrid != null;
 

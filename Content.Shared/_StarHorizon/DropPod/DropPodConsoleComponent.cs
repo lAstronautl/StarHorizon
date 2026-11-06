@@ -3,14 +3,21 @@ using Robust.Shared.GameStates;
 namespace Content.Shared._StarHorizon.DropPod;
 
 /// <summary>
-/// Консоль управления дроп-подами. Капсула привязывается мультитулом.
+/// Консоль управления дроп-подами. Капсулы привязываются мультитулом.
 /// </summary>
 [RegisterComponent, NetworkedComponent]
 public sealed partial class DropPodConsoleComponent : Component
 {
-    /// <summary>Привязанная капсула. Привязывается мультитулом (по очереди нажать на капсулу и консоль).</summary>
+    /// <summary>
+    /// Привязанные капсулы (мультитулом: нажать на капсулу и на консоль, повторная привязка отвязывает).
+    /// Запускаются по очереди с интервалом <see cref="LaunchInterval"/>.
+    /// </summary>
     [ViewVariables]
-    public EntityUid? LinkedPod;
+    public List<EntityUid> LinkedPods = new();
+
+    /// <summary>Интервал между стартами соседних капсул.</summary>
+    [DataField]
+    public TimeSpan LaunchInterval = TimeSpan.FromSeconds(1);
 
     /// <summary>Сколько нужно удерживать захват шаттла консолью.</summary>
     [DataField]

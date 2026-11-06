@@ -16,7 +16,8 @@ public readonly record struct DropPodGridInfo(NetEntity Grid, string Name, Vecto
 [Serializable, NetSerializable]
 public sealed class DropPodConsoleState(
     bool linked,
-    bool podUsed,
+    int podCount,
+    int readyCount,
     DropPodState podState,
     TimeSpan stateEnd,
     TimeSpan stateStart,
@@ -31,8 +32,10 @@ public sealed class DropPodConsoleState(
     TimeSpan captureTime) : BoundUserInterfaceState
 {
     public bool Linked = linked;
-    /// <summary>Капсула уже отработала и прикручена: запустить её нельзя.</summary>
-    public bool PodUsed = podUsed;
+    /// <summary>Сколько капсул привязано.</summary>
+    public int PodCount = podCount;
+    /// <summary>Сколько из них готово к запуску (не использованы).</summary>
+    public int ReadyCount = readyCount;
     public DropPodState PodState = podState;
     public TimeSpan StateEnd = stateEnd;
     public TimeSpan StateStart = stateStart;

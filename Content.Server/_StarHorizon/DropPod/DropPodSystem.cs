@@ -99,16 +99,10 @@ public sealed class DropPodSystem : EntitySystem
 
     private void OnLaunchMessage(Entity<DropPodConsoleComponent> ent, ref DropPodLaunchMessage args)
     {
-        var pod = FindPod(ent);
-        if (pod == null || pod.Value.Comp.State != DropPodState.Idle)
+        var pods = ReadyPods(ent, out var error);
+        if (pods.Count == 0)
         {
-            UpdateConsole(ent, "droppod-error-no-pod");
-            return;
-        }
-
-        if (pod.Value.Comp.Used)
-        {
-            UpdateConsole(ent, "droppod-error-used");
+            UpdateConsole(ent, error);
             return;
         }
 
@@ -124,30 +118,29 @@ public sealed class DropPodSystem : EntitySystem
         if (mapId == MapId.Nullspace)
             return;
 
-        StartCountdown(pod.Value, new MapCoordinates(target, mapId));
+        // Капсулы стартуют по очереди; на месте посадки их разводим в ряд, чтобы не падали друг на друга.
+        for (var i = 0; i < pods.Count; i++)
+        {
+            var offset = new Vector2((i - (pods.Count - 1) / 2f) * 1.5f, 0f);
+            StartCountdown(pods[i], new MapCoordinates(target + offset, mapId), null, ent.Comp.LaunchInterval * i);
+        }
     }
 
     private void OnAbortMessage(Entity<DropPodConsoleComponent> ent, ref DropPodAbortMessage args)
     {
-        var pod = FindPod(ent);
-        if (pod == null || pod.Value.Comp.State != DropPodState.Countdown)
-            return;
-
-        Abort(pod.Value);
+        foreach (var pod in LinkedPods(ent))
+        {
+            if (pod.Comp.State == DropPodState.Countdown)
+                Abort(pod);
+        }
     }
 
     private void OnLaunchToCapturedMessage(Entity<DropPodConsoleComponent> ent, ref DropPodLaunchToCapturedMessage args)
     {
-        var pod = FindPod(ent);
-        if (pod == null || pod.Value.Comp.State != DropPodState.Idle)
+        var pods = ReadyPods(ent, out var error);
+        if (pods.Count == 0)
         {
-            UpdateConsole(ent, "droppod-error-no-pod");
-            return;
-        }
-
-        if (pod.Value.Comp.Used)
-        {
-            UpdateConsole(ent, "droppod-error-used");
+            UpdateConsole(ent, error);
             return;
         }
 
@@ -158,14 +151,19 @@ public sealed class DropPodSystem : EntitySystem
             return;
         }
 
-        if (PickLandingTile(grid) is not { } coords)
+        // Каждой капсуле - свой свободный тайл, по очереди с интервалом.
+        var taken = new HashSet<Vector2i>();
+        for (var i = 0; i < pods.Count; i++)
         {
-            UpdateConsole(ent, "droppod-error-bad-target");
-            return;
-        }
+            if (PickLandingTile(grid, taken) is not { } coords)
+            {
+                UpdateConsole(ent, "droppod-error-bad-target");
+                return;
+            }
 
-        pod.Value.Comp.TargetGrid = grid;
-        StartCountdown(pod.Value, _xform.ToMapCoordinates(coords), coords);
+            pods[i].Comp.TargetGrid = grid;
+            StartCountdown(pods[i], _xform.ToMapCoordinates(coords), coords, ent.Comp.LaunchInterval * i);
+        }
     }
 
     private void OnCaptureMessage(Entity<DropPodConsoleComponent> ent, ref DropPodCaptureMessage args)
@@ -189,18 +187,30 @@ public sealed class DropPodSystem : EntitySystem
         UpdateConsole(ent);
     }
 
-    /// <summary>Капсула, привязанная к консоли мультитулом. Без привязки капсулы нет.</summary>
-    private Entity<DropPodComponent>? FindPod(Entity<DropPodConsoleComponent> console)
+    /// <summary>Капсулы, привязанные к консоли мультитулом (мёртвые отвязываются).</summary>
+    private List<Entity<DropPodComponent>> LinkedPods(Entity<DropPodConsoleComponent> console)
     {
-        if (console.Comp.LinkedPod is { } linked &&
-            !TerminatingOrDeleted(linked) &&
-            TryComp(linked, out DropPodComponent? pod))
+        var result = new List<Entity<DropPodComponent>>();
+        console.Comp.LinkedPods.RemoveAll(p => TerminatingOrDeleted(p) || !HasComp<DropPodComponent>(p));
+
+        foreach (var uid in console.Comp.LinkedPods)
         {
-            return (linked, pod);
+            result.Add((uid, Comp<DropPodComponent>(uid)));
         }
 
-        console.Comp.LinkedPod = null;
-        return null;
+        return result;
+    }
+
+    /// <summary>Капсулы, которые можно запускать прямо сейчас: простаивают и ещё не использованы.</summary>
+    private List<Entity<DropPodComponent>> ReadyPods(Entity<DropPodConsoleComponent> console, out string error)
+    {
+        var all = LinkedPods(console);
+        var ready = all.FindAll(p => p.Comp.State == DropPodState.Idle && !p.Comp.Used);
+
+        error = all.Count == 0 ? "droppod-error-no-pod"
+            : all.TrueForAll(p => p.Comp.Used) ? "droppod-error-used"
+            : "droppod-error-busy";
+        return ready;
     }
 
     #region Multitool linking
@@ -246,10 +256,19 @@ public sealed class DropPodSystem : EntitySystem
         _popup.PopupEntity(Loc.GetString("droppod-link-console-saved"), uid, args.User);
     }
 
+    /// <summary>Привязывает капсулу к консоли; если уже привязана - отвязывает.</summary>
     private void Link(Entity<DropPodConsoleComponent> console, EntityUid pod, EntityUid user)
     {
-        console.Comp.LinkedPod = pod;
-        _popup.PopupEntity(Loc.GetString("droppod-link-done"), console, user);
+        if (console.Comp.LinkedPods.Remove(pod))
+        {
+            _popup.PopupEntity(Loc.GetString("droppod-link-removed"), console, user);
+        }
+        else
+        {
+            console.Comp.LinkedPods.Add(pod);
+            _popup.PopupEntity(Loc.GetString("droppod-link-done", ("count", console.Comp.LinkedPods.Count)), console, user);
+        }
+
         UpdateConsole(console);
     }
 
@@ -257,7 +276,7 @@ public sealed class DropPodSystem : EntitySystem
 
     private void UpdateConsole(Entity<DropPodConsoleComponent> console, string? error = null)
     {
-        var pod = FindPod(console);
+        var pods = LinkedPods(console);
         var origin = _xform.GetWorldPosition(console);
         var err = error == null ? null : Loc.GetString(error);
 
@@ -271,15 +290,49 @@ public sealed class DropPodSystem : EntitySystem
             grids.Add(new DropPodGridInfo(GetNetEntity(gridUid), meta.EntityName, _xform.GetWorldPosition(gridXform)));
         }
 
+        // Показываем самую «продвинутую» капсулу: активную, иначе первую готовую, иначе первую.
+        Entity<DropPodComponent>? rep = null;
+        foreach (var p in pods)
+        {
+            if (p.Comp.State != DropPodState.Idle)
+            {
+                rep = p;
+                break;
+            }
+        }
+
+        if (rep == null)
+        {
+            foreach (var p in pods)
+            {
+                if (!p.Comp.Used)
+                {
+                    rep = p;
+                    break;
+                }
+            }
+        }
+
+        if (rep == null && pods.Count > 0)
+            rep = pods[0];
+
+        var occupants = 0;
+        foreach (var pod in pods)
+        {
+            if (TryComp(pod, out EntityStorageComponent? storage))
+                occupants += storage.Contents.ContainedEntities.Count;
+        }
+
         var state = new DropPodConsoleState(
-            pod != null,
-            pod?.Comp.Used ?? false,
-            pod?.Comp.State ?? DropPodState.Idle,
-            pod?.Comp.StateEnd ?? TimeSpan.Zero,
-            pod?.Comp.StateStart ?? TimeSpan.Zero,
-            pod != null && TryComp(pod.Value, out EntityStorageComponent? storage) ? storage.Contents.ContainedEntities.Count : 0,
+            pods.Count > 0,
+            pods.Count,
+            pods.Count(p => !p.Comp.Used),
+            rep?.Comp.State ?? DropPodState.Idle,
+            rep?.Comp.StateEnd ?? TimeSpan.Zero,
+            rep?.Comp.StateStart ?? TimeSpan.Zero,
+            occupants,
             origin,
-            pod != null && pod.Value.Comp.State != DropPodState.Idle ? pod.Value.Comp.Target.Position : null,
+            rep != null && rep.Value.Comp.State != DropPodState.Idle ? rep.Value.Comp.Target.Position : null,
             err,
             grids,
             console.Comp.CapturingGrid == null ? null : GetNetEntity(console.Comp.CapturingGrid.Value),
@@ -295,7 +348,7 @@ public sealed class DropPodSystem : EntitySystem
         var query = EntityQueryEnumerator<DropPodConsoleComponent>();
         while (query.MoveNext(out var uid, out var console))
         {
-            if (console.LinkedPod == pod)
+            if (console.LinkedPods.Contains(pod))
                 UpdateConsole((uid, console));
         }
     }
@@ -313,7 +366,7 @@ public sealed class DropPodSystem : EntitySystem
         UpdateConsolesFor(ent);
     }
 
-    private void StartCountdown(Entity<DropPodComponent> ent, MapCoordinates target, EntityCoordinates? coords = null)
+    private void StartCountdown(Entity<DropPodComponent> ent, MapCoordinates target, EntityCoordinates? coords = null, TimeSpan delay = default)
     {
         ent.Comp.Target = target;
         if (coords == null)
@@ -322,7 +375,8 @@ public sealed class DropPodSystem : EntitySystem
         QueueDel(ent.Comp.Marker);
         ent.Comp.Marker = Spawn(ent.Comp.MarkerPrototype, coords ?? _xform.ToCoordinates(target));
 
-        SetState(ent, DropPodState.Countdown, ent.Comp.CountdownTime);
+        // delay - очередь запуска: капсула стартует через i * интервал после предыдущей.
+        SetState(ent, DropPodState.Countdown, ent.Comp.CountdownTime + delay);
     }
 
     private void Abort(Entity<DropPodComponent> ent)
@@ -616,7 +670,7 @@ public sealed class DropPodSystem : EntitySystem
     /// Случайный тайл грида без закреплённых твёрдых структур (стен, машин, столов...).
     /// Если таких нет - любой тайл, если и тайлов нет - начало координат грида.
     /// </summary>
-    private EntityCoordinates? PickLandingTile(EntityUid gridUid)
+    private EntityCoordinates? PickLandingTile(EntityUid gridUid, HashSet<Vector2i>? taken = null)
     {
         if (!TryComp(gridUid, out MapGridComponent? grid))
             return null;
@@ -625,6 +679,9 @@ public sealed class DropPodSystem : EntitySystem
         var any = new List<Vector2i>();
         foreach (var tile in _map.GetAllTiles(gridUid, grid))
         {
+            if (taken != null && taken.Contains(tile.GridIndices))
+                continue;
+
             any.Add(tile.GridIndices);
             if (IsTileFree((gridUid, grid), tile.GridIndices))
                 free.Add(tile.GridIndices);
@@ -634,7 +691,9 @@ public sealed class DropPodSystem : EntitySystem
         if (pool.Count == 0)
             return new EntityCoordinates(gridUid, Vector2.Zero);
 
-        return _map.GridTileToLocal(gridUid, grid, _random.Pick(pool));
+        var picked = _random.Pick(pool);
+        taken?.Add(picked);
+        return _map.GridTileToLocal(gridUid, grid, picked);
     }
 
     private bool IsTileFree(EntityUid gridUid, EntityCoordinates coords)
