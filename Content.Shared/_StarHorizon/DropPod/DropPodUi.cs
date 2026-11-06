@@ -11,7 +11,7 @@ public enum DropPodUiKey : byte
 
 /// <summary>Шаттл, доступный для захвата.</summary>
 [Serializable, NetSerializable]
-public readonly record struct DropPodGridInfo(NetEntity Grid, string Name, Vector2 Position);
+public readonly record struct DropPodGridInfo(NetEntity Grid, string Name, Vector2 Position, float Radius);
 
 [Serializable, NetSerializable]
 public sealed class DropPodConsoleState(
@@ -29,7 +29,9 @@ public sealed class DropPodConsoleState(
     NetEntity? capturingGrid,
     NetEntity? capturedGrid,
     TimeSpan captureEnd,
-    TimeSpan captureTime) : BoundUserInterfaceState
+    TimeSpan captureTime,
+    int mapId,
+    float captureRange) : BoundUserInterfaceState
 {
     public bool Linked = linked;
     /// <summary>Сколько капсул привязано.</summary>
@@ -49,6 +51,10 @@ public sealed class DropPodConsoleState(
     public NetEntity? CapturedGrid = capturedGrid;
     public TimeSpan CaptureEnd = captureEnd;
     public TimeSpan CaptureTime = captureTime;
+    /// <summary>Карта, на которой стоит консоль (её показывает карта в окне).</summary>
+    public int MapId = mapId;
+    /// <summary>Дальность удержания захвата, метры.</summary>
+    public float CaptureRange = captureRange;
 }
 
 /// <summary>Запустить капсулу в указанные мировые координаты.</summary>

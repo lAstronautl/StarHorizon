@@ -1,43 +1,70 @@
 using System.Globalization;
 using System.Numerics;
+using Content.Client.Shuttles.UI;
 using Content.Shared._StarHorizon.DropPod;
+using Content.Shared.Shuttles.UI.MapObjects;
+using Robust.Client.Graphics;
+using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.CustomControls;
+using Robust.Shared.Map;
 using Robust.Shared.Timing;
 
 namespace Content.Client._StarHorizon.DropPod;
 
-/// <summary>Окно консоли дроп-пода: захват шаттла, координаты цели, запуск и отмена.</summary>
+/// <summary>
+/// Окно консоли дроп-пода. Слева карта, как в консоли управления шаттлом: клик задаёт точку посадки
+/// или захватывает шаттл (в зависимости от режима). Справа состояние капсул, прогресс и кнопки.
+/// </summary>
 public sealed class DropPodWindow : DefaultWindow
 {
     [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly IMapManager _mapManager = default!;
+    [Dependency] private readonly IEntityManager _ent = default!;
 
     private static readonly Color Accent = Color.FromHex("#ff9a30");
     private static readonly Color Good = Color.FromHex("#5fd35f");
+    private static readonly Color Target = Color.FromHex("#ff4040");
+    private static readonly Color Capturing = Color.FromHex("#f0c674");
+
+    private enum ClickMode
+    {
+        Target,
+        Capture,
+    }
+
+    private readonly ShuttleMapControl _map = new()
+    {
+        HorizontalExpand = true,
+        VerticalExpand = true,
+        MinSize = new Vector2(480, 480),
+    };
+
+    private readonly Font _font;
 
     private readonly Label _status = new() { HorizontalExpand = true, FontColorOverride = Accent };
     private readonly Label _occupants = new();
     private readonly ProgressBar _podProgress = new() { MinHeight = 14, MaxValue = 1f, HorizontalExpand = true };
     private readonly Label _timer = new();
-    private readonly Label _error = new() { FontColorOverride = Color.OrangeRed };
+    private readonly Label _error = new() { FontColorOverride = Color.OrangeRed, HorizontalExpand = true };
 
-    private readonly OptionButton _grids = new() { HorizontalExpand = true };
-    private readonly Button _capture = new();
-    private readonly Button _release = new();
-    private readonly ProgressBar _captureProgress = new() { MinHeight = 14, MaxValue = 1f, HorizontalExpand = true };
-    private readonly Label _captureStatus = new();
-
-    private readonly LineEdit _x = new() { HorizontalExpand = true, PlaceHolder = "X" };
-    private readonly LineEdit _y = new() { HorizontalExpand = true, PlaceHolder = "Y" };
-    private readonly Button _here = new();
+    private readonly Button _modeTarget = new() { ToggleMode = true, HorizontalExpand = true };
+    private readonly Button _modeCapture = new() { ToggleMode = true, HorizontalExpand = true };
+    private readonly Label _targetLabel = new();
     private readonly Button _launch = new();
-    private readonly Button _launchCaptured = new();
     private readonly Button _abort = new();
 
-    private readonly List<NetEntity> _gridIds = new();
+    private readonly Button _release = new();
+    private readonly ProgressBar _captureProgress = new() { MinHeight = 14, MaxValue = 1f, HorizontalExpand = true };
+    private readonly Label _captureStatus = new() { HorizontalExpand = true };
+    private readonly Button _launchCaptured = new();
+
     private DropPodConsoleState? _state;
-    private bool _filled;
+    private ClickMode _mode = ClickMode.Target;
+    private Vector2? _target;
+    private bool _mapReady;
+    private TimeSpan _nextMapObjects;
 
     public event Action<Vector2>? OnLaunch;
     public event Action? OnLaunchToCaptured;
@@ -49,115 +76,247 @@ public sealed class DropPodWindow : DefaultWindow
     {
         IoCManager.InjectDependencies(this);
 
-        Title = Loc.GetString("droppod-ui-title");
-        MinSize = new Vector2(420, 400);
+        _font = new VectorFont(IoCManager.Resolve<IResourceCache>().GetResource<FontResource>("/Fonts/NotoSans/NotoSans-Regular.ttf"), 10);
 
-        _here.Text = Loc.GetString("droppod-ui-here");
+        Title = Loc.GetString("droppod-ui-title");
+        MinSize = new Vector2(820, 560);
+
+        _modeTarget.Text = Loc.GetString("droppod-ui-mode-target");
+        _modeCapture.Text = Loc.GetString("droppod-ui-mode-capture");
         _launch.Text = Loc.GetString("droppod-ui-launch");
         _launchCaptured.Text = Loc.GetString("droppod-ui-launch-captured");
         _abort.Text = Loc.GetString("droppod-ui-abort");
-        _capture.Text = Loc.GetString("droppod-ui-capture");
         _release.Text = Loc.GetString("droppod-ui-release");
 
-        var root = new BoxContainer
+        var group = new ButtonGroup(false);
+        _modeTarget.Group = group;
+        _modeCapture.Group = group;
+        _modeTarget.Pressed = true;
+
+        // Карта как в консоли шаттла: клик по ней выбирает точку или шаттл.
+        _map.ShowFTLRange = false;
+        _map.NoFTLRange = true;
+        _map.ShowBeacons = false;
+        _map.MarkMode = true;
+        _map.MarkPlaced += OnMapClicked;
+        _map.DrawOverlay += DrawOverlay;
+
+        var side = new BoxContainer
         {
             Orientation = BoxContainer.LayoutOrientation.Vertical,
             SeparationOverride = 6,
-            Margin = new Thickness(8),
+            Margin = new Thickness(8, 0, 0, 0),
+            MinWidth = 280,
         };
 
-        root.AddChild(Header(Loc.GetString("droppod-ui-section-pod")));
-        root.AddChild(_status);
-        root.AddChild(_occupants);
-        root.AddChild(_podProgress);
-        root.AddChild(_timer);
+        side.AddChild(Header(Loc.GetString("droppod-ui-section-pod")));
+        side.AddChild(_status);
+        side.AddChild(_occupants);
+        side.AddChild(_podProgress);
+        side.AddChild(_timer);
 
-        root.AddChild(Header(Loc.GetString("droppod-ui-section-capture")));
-        root.AddChild(_grids);
-        var captureButtons = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Horizontal, SeparationOverride = 4 };
-        _capture.HorizontalExpand = true;
-        _release.HorizontalExpand = true;
-        captureButtons.AddChild(_capture);
-        captureButtons.AddChild(_release);
-        root.AddChild(captureButtons);
-        root.AddChild(_captureProgress);
-        root.AddChild(_captureStatus);
-        _launchCaptured.ModulateSelfOverride = Good;
-        root.AddChild(_launchCaptured);
+        side.AddChild(Header(Loc.GetString("droppod-ui-section-click")));
+        var modes = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Horizontal, SeparationOverride = 4 };
+        modes.AddChild(_modeTarget);
+        modes.AddChild(_modeCapture);
+        side.AddChild(modes);
 
-        root.AddChild(Header(Loc.GetString("droppod-ui-section-coords")));
-        var coords = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Horizontal, SeparationOverride = 4 };
-        coords.AddChild(new Label { Text = "X" });
-        coords.AddChild(_x);
-        coords.AddChild(new Label { Text = "Y" });
-        coords.AddChild(_y);
-        root.AddChild(coords);
-        root.AddChild(_here);
-
+        side.AddChild(Header(Loc.GetString("droppod-ui-section-coords")));
+        side.AddChild(_targetLabel);
         var buttons = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Horizontal, SeparationOverride = 4 };
         _launch.HorizontalExpand = true;
         _abort.HorizontalExpand = true;
         buttons.AddChild(_launch);
         buttons.AddChild(_abort);
-        root.AddChild(buttons);
-        root.AddChild(_error);
+        side.AddChild(buttons);
 
-        Contents.AddChild(new ScrollContainer { HScrollEnabled = false, VerticalExpand = true, Children = { root } });
+        side.AddChild(Header(Loc.GetString("droppod-ui-section-capture")));
+        side.AddChild(_captureStatus);
+        side.AddChild(_captureProgress);
+        _release.HorizontalExpand = true;
+        side.AddChild(_release);
+        _launchCaptured.ModulateSelfOverride = Good;
+        side.AddChild(_launchCaptured);
+        side.AddChild(_error);
 
-        _here.OnPressed += _ =>
-        {
-            if (_state != null)
-                SetCoordinates(_state.ConsolePosition);
-        };
+        var root = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Horizontal };
+        root.AddChild(_map);
+        root.AddChild(new ScrollContainer { HScrollEnabled = false, VerticalExpand = true, Children = { side } });
+        Contents.AddChild(root);
+
+        _modeTarget.OnPressed += _ => _mode = ClickMode.Target;
+        _modeCapture.OnPressed += _ => _mode = ClickMode.Capture;
 
         _launch.OnPressed += _ =>
         {
-            if (TryParse(_x.Text, out var x) && TryParse(_y.Text, out var y))
-                OnLaunch?.Invoke(new Vector2(x, y));
-            else
-                _error.Text = Loc.GetString("droppod-error-bad-target");
+            if (_target is { } t)
+                OnLaunch?.Invoke(t);
         };
-
         _launchCaptured.OnPressed += _ => OnLaunchToCaptured?.Invoke();
         _abort.OnPressed += _ => OnAbort?.Invoke();
         _release.OnPressed += _ => OnRelease?.Invoke();
-        _capture.OnPressed += _ =>
-        {
-            var idx = _grids.SelectedId;
-            if (idx >= 0 && idx < _gridIds.Count)
-                OnCapture?.Invoke(_gridIds[idx]);
-        };
-        _grids.OnItemSelected += args => _grids.SelectId(args.Id);
     }
 
     private static Control Header(string text)
     {
         var box = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Vertical, Margin = new Thickness(0, 6, 0, 0) };
         box.AddChild(new Label { Text = text, FontColorOverride = Accent });
-        box.AddChild(new PanelContainer { MinHeight = 2, PanelOverride = new Robust.Client.Graphics.StyleBoxFlat { BackgroundColor = Accent } });
+        box.AddChild(new PanelContainer { MinHeight = 2, PanelOverride = new StyleBoxFlat { BackgroundColor = Accent } });
         return box;
     }
 
-    private static bool TryParse(string text, out float value)
+    #region Map
+
+    private void OnMapClicked(MapCoordinates coords)
     {
-        return float.TryParse(text.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out value)
-               && float.IsFinite(value);
+        if (_state == null)
+            return;
+
+        if (_mode == ClickMode.Target)
+        {
+            _target = coords.Position;
+            UpdateTargetLabel();
+            UpdateButtons();
+            return;
+        }
+
+        // Режим захвата: ближайший шаттл под курсором (в радиусе корпуса + небольшой запас).
+        DropPodGridInfo? best = null;
+        var bestDist = float.MaxValue;
+        foreach (var info in _state.Grids)
+        {
+            var dist = (info.Position - coords.Position).Length();
+            if (dist > info.Radius + 15f || dist >= bestDist)
+                continue;
+
+            best = info;
+            bestDist = dist;
+        }
+
+        if (best is { } picked)
+            OnCapture?.Invoke(picked.Grid);
+        else
+            _error.Text = Loc.GetString("droppod-ui-no-shuttle-there");
     }
 
-    private void SetCoordinates(Vector2 pos)
+    private void DrawOverlay(DrawingHandleScreen handle, Func<Vector2, Vector2> toControl)
     {
-        _x.Text = MathF.Round(pos.X).ToString(CultureInfo.InvariantCulture);
-        _y.Text = MathF.Round(pos.Y).ToString(CultureInfo.InvariantCulture);
+        if (_state is not { } state)
+            return;
+
+        // Дальность захвата вокруг консоли.
+        var console = toControl(state.ConsolePosition);
+        var edge = toControl(state.ConsolePosition + new Vector2(state.CaptureRange, 0f));
+        var rangePx = (edge - console).Length();
+        handle.DrawCircle(console, rangePx, Capturing.WithAlpha(0.04f), true);
+        handle.DrawCircle(console, rangePx, Capturing.WithAlpha(0.55f), false);
+        DrawLabel(handle, Loc.GetString("droppod-ui-range", ("range", (int) state.CaptureRange)), console + new Vector2(6f, -rangePx - 14f), Capturing);
+
+        // Консоль.
+        handle.DrawCircle(console, 4f, Color.Cyan, true);
+        DrawLabel(handle, Loc.GetString("droppod-ui-console"), console + new Vector2(8f, 2f), Color.Cyan);
+
+        // Захват / идущий захват.
+        foreach (var info in state.Grids)
+        {
+            Color? color = null;
+            if (state.CapturedGrid == info.Grid)
+                color = Good;
+            else if (state.CapturingGrid == info.Grid)
+                color = Capturing;
+
+            if (color is not { } c)
+                continue;
+
+            var pos = toControl(info.Position);
+            var radius = MathF.Max(12f, (toControl(info.Position + new Vector2(info.Radius, 0f)) - pos).Length() + 6f);
+            handle.DrawCircle(pos, radius, c.WithAlpha(0.1f), true);
+            handle.DrawCircle(pos, radius, c, false);
+            handle.DrawLine(console, pos, c.WithAlpha(0.6f));
+        }
+
+        // Выбранная точка посадки.
+        if (_target is { } target)
+            DrawTargetMarker(handle, toControl(target), Target, $"{target.X:0}, {target.Y:0}");
+
+        // Куда уже летит капсула.
+        if (state.Target is { } flying)
+            DrawTargetMarker(handle, toControl(flying), Accent, Loc.GetString("droppod-ui-in-flight"));
+    }
+
+    private void DrawTargetMarker(DrawingHandleScreen handle, Vector2 pos, Color color, string label)
+    {
+        handle.DrawCircle(pos, 9f, color.WithAlpha(0.12f), true);
+        handle.DrawCircle(pos, 9f, color, false);
+        handle.DrawLine(pos + new Vector2(-14f, 0f), pos + new Vector2(-4f, 0f), color);
+        handle.DrawLine(pos + new Vector2(4f, 0f), pos + new Vector2(14f, 0f), color);
+        handle.DrawLine(pos + new Vector2(0f, -14f), pos + new Vector2(0f, -4f), color);
+        handle.DrawLine(pos + new Vector2(0f, 4f), pos + new Vector2(0f, 14f), color);
+        DrawLabel(handle, label, pos + new Vector2(12f, 8f), color);
+    }
+
+    private void DrawLabel(DrawingHandleScreen handle, string text, Vector2 pos, Color color)
+    {
+        handle.DrawString(_font, pos + new Vector2(1f, 1f), text, Color.Black.WithAlpha(0.7f));
+        handle.DrawString(_font, pos, text, color);
+    }
+
+    /// <summary>Передаём карте сетки (шаттлы и станции), известные клиенту на карте консоли.</summary>
+    private void RefreshMapObjects(MapId mapId)
+    {
+        var objects = new List<IMapObject>();
+        foreach (var grid in _mapManager.GetAllGrids(mapId))
+        {
+            if (!_ent.TryGetComponent(grid.Owner, out MetaDataComponent? meta))
+                continue;
+
+            objects.Add(new GridMapObject
+            {
+                Name = meta.EntityName,
+                Entity = grid.Owner,
+            });
+        }
+
+        _map.SetMapObjects(new Dictionary<MapId, List<IMapObject>> { [mapId] = objects });
+    }
+
+    #endregion
+
+    private void UpdateTargetLabel()
+    {
+        _targetLabel.Text = _target is { } t
+            ? Loc.GetString("droppod-ui-target-selected", ("x", t.X.ToString("0", CultureInfo.InvariantCulture)), ("y", t.Y.ToString("0", CultureInfo.InvariantCulture)))
+            : Loc.GetString("droppod-ui-target-none");
+    }
+
+    private void UpdateButtons()
+    {
+        if (_state is not { } state)
+            return;
+
+        var idle = state.Linked && state.ReadyCount > 0 && state.PodState == DropPodState.Idle;
+        var captured = state.CapturedGrid != null;
+        var capturing = state.CapturingGrid != null;
+
+        _launch.Disabled = !idle || _target == null;
+        _launchCaptured.Disabled = !idle || !captured;
+        _abort.Disabled = !(state.Linked && state.PodState == DropPodState.Countdown);
+        _release.Disabled = !captured && !capturing;
     }
 
     public void UpdateState(DropPodConsoleState state)
     {
         _state = state;
 
-        if (!_filled)
+        var mapId = new MapId(state.MapId);
+        if (!_mapReady)
         {
-            _filled = true;
-            SetCoordinates(state.ConsolePosition);
+            _mapReady = true;
+            _map.SetMap(mapId, state.ConsolePosition);
+            _map.Offset = state.ConsolePosition;
+            _map.SetRadarZoom(0.08f);
+            UpdateTargetLabel();
+            RefreshMapObjects(mapId);
         }
 
         _error.Text = state.Error ?? string.Empty;
@@ -176,34 +335,23 @@ public sealed class DropPodWindow : DefaultWindow
             _occupants.Text = Loc.GetString("droppod-ui-occupants", ("count", state.Occupants));
         }
 
-        RebuildGrids(state);
-
-        var idle = state.Linked && state.ReadyCount > 0 && state.PodState == DropPodState.Idle;
-        var captured = state.CapturedGrid != null;
-        var capturing = state.CapturingGrid != null;
-
-        _launch.Disabled = !idle;
-        _launchCaptured.Disabled = !idle || !captured;
-        _abort.Disabled = !(state.Linked && state.PodState == DropPodState.Countdown);
-        _x.Editable = idle;
-        _y.Editable = idle;
-        _here.Disabled = !idle;
-        _capture.Disabled = capturing || _gridIds.Count == 0;
-        _release.Disabled = !captured && !capturing;
-        _grids.Disabled = capturing;
-
-        if (captured)
+        if (state.CapturedGrid is { } held)
         {
             _captureStatus.FontColorOverride = Good;
-            _captureStatus.Text = Loc.GetString("droppod-ui-captured", ("name", GridName(state, state.CapturedGrid!.Value)));
+            _captureStatus.Text = Loc.GetString("droppod-ui-captured", ("name", GridName(state, held)));
+        }
+        else if (state.CapturingGrid is { } capturing)
+        {
+            _captureStatus.FontColorOverride = Capturing;
+            _captureStatus.Text = Loc.GetString("droppod-ui-capturing", ("name", GridName(state, capturing)));
         }
         else
         {
             _captureStatus.FontColorOverride = null;
-            _captureStatus.Text = capturing
-                ? Loc.GetString("droppod-ui-capturing", ("name", GridName(state, state.CapturingGrid!.Value)))
-                : Loc.GetString("droppod-ui-not-captured");
+            _captureStatus.Text = Loc.GetString("droppod-ui-not-captured", ("range", (int) state.CaptureRange));
         }
+
+        UpdateButtons();
     }
 
     private static string GridName(DropPodConsoleState state, NetEntity grid)
@@ -217,35 +365,18 @@ public sealed class DropPodWindow : DefaultWindow
         return "?";
     }
 
-    private void RebuildGrids(DropPodConsoleState state)
-    {
-        var selected = _grids.SelectedId >= 0 && _grids.SelectedId < _gridIds.Count
-            ? _gridIds[_grids.SelectedId]
-            : (NetEntity?) null;
-
-        _gridIds.Clear();
-        _grids.Clear();
-
-        var index = 0;
-        foreach (var info in state.Grids)
-        {
-            _gridIds.Add(info.Grid);
-            _grids.AddItem($"{info.Name} ({MathF.Round(info.Position.X)}, {MathF.Round(info.Position.Y)})", index);
-            if (info.Grid == selected || info.Grid == state.CapturingGrid || info.Grid == state.CapturedGrid)
-                _grids.SelectId(index);
-            index++;
-        }
-
-        if (selected == null && index > 0 && state.CapturingGrid == null && state.CapturedGrid == null)
-            _grids.SelectId(0);
-    }
-
     protected override void FrameUpdate(FrameEventArgs args)
     {
         base.FrameUpdate(args);
 
         if (_state is not { } state)
             return;
+
+        if (_mapReady && _timing.RealTime >= _nextMapObjects)
+        {
+            _nextMapObjects = _timing.RealTime + TimeSpan.FromSeconds(0.5);
+            RefreshMapObjects(new MapId(state.MapId));
+        }
 
         // Прогресс капсулы.
         if (state.Linked && state.PodState != DropPodState.Idle)

@@ -185,7 +185,12 @@ public sealed class DropPodTest
         EntityUid shuttle = default, console = default, pod = default, wall = default;
         await server.WaitPost(() =>
         {
-            shuttle = map.Grid.Owner;
+            // Захватываемый шаттл - отдельный грид в 50 м от консоли (в пределах дальности захвата).
+            var mapSys = server.System<SharedMapSystem>();
+            var shuttleGrid = server.MapMan.CreateGridEntity(map.MapId);
+            mapSys.SetTile(shuttleGrid.Owner, shuttleGrid.Comp, Robust.Shared.Maths.Vector2i.Zero, map.Tile.Tile);
+            xform.SetWorldPosition(shuttleGrid.Owner, new Vector2(50, 0));
+            shuttle = shuttleGrid.Owner;
             server.EntMan.EnsureComponent<ShuttleComponent>(shuttle);
 
             console = server.EntMan.SpawnEntity("StarHorizonDropPodConsole", map.GridCoords);
@@ -197,6 +202,17 @@ public sealed class DropPodTest
 
         await LinkWithMultitool(pair, console, pod, console);
         Assert.That(new DropPodConsoleComponent().CaptureTime, Is.EqualTo(TimeSpan.FromSeconds(15)));
+
+        // Шаттл на другой карте (дальше любой дальности) захватить нельзя.
+        var farMap = await pair.CreateTestMap();
+        await server.WaitPost(() =>
+        {
+            server.EntMan.EnsureComponent<ShuttleComponent>(farMap.Grid.Owner);
+            var msg = new DropPodCaptureMessage(server.EntMan.GetNetEntity(farMap.Grid.Owner));
+            server.EntMan.EventBus.RaiseLocalEvent(console, (object) msg);
+        });
+        await pair.RunSeconds(0.2f);
+        Assert.That(server.EntMan.GetComponent<DropPodConsoleComponent>(console).CapturingGrid, Is.Null, "шаттл вне дальности захватить нельзя");
 
         await server.WaitPost(() =>
         {
@@ -236,6 +252,9 @@ public sealed class DropPodTest
         await pair.RunSeconds(1.5f);
         Assert.That(podComp.Used);
         Assert.That(server.EntMan.GetComponent<TransformComponent>(pod).Anchored, "капсула прикручена к полу после посадки");
+
+        // Шаттл ушёл дальше 256 м от консоли: захват спал (капсулы в полёте на это не влияют).
+        Assert.That(consoleComp.CapturedGrid, Is.Null, "захват спал: шаттл дальше 256 м");
 
         await pair.CleanReturnAsync();
     }

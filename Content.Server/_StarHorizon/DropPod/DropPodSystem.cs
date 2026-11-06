@@ -174,6 +174,12 @@ public sealed class DropPodSystem : EntitySystem
             return;
         }
 
+        if (!InCaptureRange(ent, grid.Value))
+        {
+            UpdateConsole(ent, "droppod-error-out-of-range");
+            return;
+        }
+
         ent.Comp.CapturedGrid = null;
         ent.Comp.CapturingGrid = grid;
         ent.Comp.CaptureEnd = _timing.CurTime + ent.Comp.CaptureTime;
@@ -211,6 +217,32 @@ public sealed class DropPodSystem : EntitySystem
             : all.TrueForAll(p => p.Comp.Used) ? "droppod-error-used"
             : "droppod-error-busy";
         return ready;
+    }
+
+    /// <summary>Центр грида в мировых координатах.</summary>
+    private Vector2 GridCenter(EntityUid grid)
+    {
+        if (!TryComp(grid, out MapGridComponent? comp))
+            return _xform.GetWorldPosition(grid);
+
+        return Vector2.Transform(comp.LocalAABB.Center, _xform.GetWorldMatrix(grid));
+    }
+
+    private float GridRadius(EntityUid grid)
+    {
+        return TryComp(grid, out MapGridComponent? comp)
+            ? MathF.Max(comp.LocalAABB.Width, comp.LocalAABB.Height) / 2f
+            : 1f;
+    }
+
+    /// <summary>Шаттл в пределах дальности захвата от консоли (и на той же карте).</summary>
+    private bool InCaptureRange(Entity<DropPodConsoleComponent> console, EntityUid grid)
+    {
+        if (Transform(console).MapID != Transform(grid).MapID)
+            return false;
+
+        var distance = (GridCenter(grid) - _xform.GetWorldPosition(console)).Length();
+        return distance <= console.Comp.CaptureRange;
     }
 
     #region Multitool linking
@@ -281,13 +313,18 @@ public sealed class DropPodSystem : EntitySystem
         var err = error == null ? null : Loc.GetString(error);
 
         var grids = new List<DropPodGridInfo>();
+        var consoleMap = Transform(console).MapID;
         var gridQuery = EntityQueryEnumerator<ShuttleComponent, TransformComponent, MetaDataComponent>();
         while (gridQuery.MoveNext(out var gridUid, out _, out var gridXform, out var meta))
         {
             if (grids.Count >= 64)
                 break;
 
-            grids.Add(new DropPodGridInfo(GetNetEntity(gridUid), meta.EntityName, _xform.GetWorldPosition(gridXform)));
+            // На карте в окне показывается только карта консоли.
+            if (gridXform.MapID != consoleMap)
+                continue;
+
+            grids.Add(new DropPodGridInfo(GetNetEntity(gridUid), meta.EntityName, GridCenter(gridUid), GridRadius(gridUid)));
         }
 
         // Показываем самую «продвинутую» капсулу: активную, иначе первую готовую, иначе первую.
@@ -338,7 +375,9 @@ public sealed class DropPodSystem : EntitySystem
             console.Comp.CapturingGrid == null ? null : GetNetEntity(console.Comp.CapturingGrid.Value),
             console.Comp.CapturedGrid == null ? null : GetNetEntity(console.Comp.CapturedGrid.Value),
             console.Comp.CaptureEnd,
-            console.Comp.CaptureTime);
+            console.Comp.CaptureTime,
+            consoleMap.GetHashCode(),
+            console.Comp.CaptureRange);
 
         _ui.SetUiState(console.Owner, DropPodUiKey.Key, state);
     }
@@ -467,22 +506,39 @@ public sealed class DropPodSystem : EntitySystem
             UpdateConsole(console);
         }
 
-        if (console.Comp.CapturingGrid is not { } grid)
-            return;
-
-        if (TerminatingOrDeleted(grid))
+        // Захват спадает, если шаттл ушёл дальше CaptureRange. Уже запущенные капсулы летят к своей цели как летели.
+        if (console.Comp.CapturedGrid is { } held && !InCaptureRange(console, held))
         {
-            console.Comp.CapturingGrid = null;
-            UpdateConsole(console, "droppod-error-bad-grid");
-            return;
+            console.Comp.CapturedGrid = null;
+            UpdateConsole(console, "droppod-error-capture-lost");
         }
 
-        if (now < console.Comp.CaptureEnd)
-            return;
+        if (console.Comp.CapturingGrid is { } grid)
+        {
+            if (TerminatingOrDeleted(grid))
+            {
+                console.Comp.CapturingGrid = null;
+                UpdateConsole(console, "droppod-error-bad-grid");
+            }
+            else if (!InCaptureRange(console, grid))
+            {
+                console.Comp.CapturingGrid = null;
+                UpdateConsole(console, "droppod-error-capture-lost");
+            }
+            else if (now >= console.Comp.CaptureEnd)
+            {
+                console.Comp.CapturedGrid = grid;
+                console.Comp.CapturingGrid = null;
+                UpdateConsole(console);
+            }
+        }
 
-        console.Comp.CapturedGrid = grid;
-        console.Comp.CapturingGrid = null;
-        UpdateConsole(console);
+        // Пока окно открыто, шлём свежие позиции шаттлов на карту.
+        if (now >= console.Comp.NextUiUpdate && _ui.IsUiOpen(console.Owner, DropPodUiKey.Key))
+        {
+            console.Comp.NextUiUpdate = now + TimeSpan.FromSeconds(1);
+            UpdateConsole(console);
+        }
     }
 
     private void FinishCountdown(Entity<DropPodComponent> ent)

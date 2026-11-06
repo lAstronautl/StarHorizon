@@ -23,6 +23,14 @@ public sealed partial class DropPodConsoleComponent : Component
     [DataField]
     public TimeSpan CaptureTime = TimeSpan.FromSeconds(15);
 
+    /// <summary>Захват спадает, если шаттл дальше этого расстояния (в метрах) от консоли.</summary>
+    [DataField]
+    public float CaptureRange = 256f;
+
+    /// <summary>Когда в открытое окно снова отправить позиции шаттлов.</summary>
+    [ViewVariables]
+    public TimeSpan NextUiUpdate;
+
     /// <summary>Грид, захват которого идёт сейчас.</summary>
     [ViewVariables]
     public EntityUid? CapturingGrid;

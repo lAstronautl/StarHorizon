@@ -86,6 +86,12 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
     public event Action<MapCoordinates>? MarkPlaced;
 
     /// <summary>
+    /// StarHorizon: hook for overlays drawn on top of the map (drop pod console: target marker, capture range).
+    /// The second argument converts a map position (in the viewed map) to a position on this control.
+    /// </summary>
+    public event Action<DrawingHandleScreen, Func<Vector2, Vector2>>? DrawOverlay;
+
+    /// <summary>
     /// Set every draw to determine the beacons that are clickable for mouse events
     /// </summary>
     private List<IMapObject> _beacons = new();
@@ -727,6 +733,8 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
                 }
             }
         }
+
+        DrawOverlay?.Invoke(handle, pos => MapToScreen(pos, matty)); // StarHorizon
 
         // Draw the coordinates
         var mapOffset = MidPointVector;
