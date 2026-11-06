@@ -17,3 +17,23 @@
 # entities.yml instead -- see check_ignore_does_not_swallow_mappings.
 - /obj/mapping_helper/access
 - /obj/cable
+
+# code/obj/decal.dm, code/obj/map/light.dm -- pure invisible point-light
+# emitters with no icon/sprite of their own (map/light.dm's own comment:
+# "meant to replace those fucking instanced glow decals" -- same class of
+# thing as /obj/decal/glow, just the newer version), confirmed by reading
+# both classes directly: neither sets an icon file, only a /datum/light
+# attached in New(). Never rendered in play, same reasoning as /obj/
+# landmark above.
+- /obj/decal/glow
+- /obj/map/light
+
+# WorkInProgress/actuallyKeelinsStuff.dm -- literally "nothing": blank
+# icon_state, opacity/density both FALSE, PLANE_ABOVE_LIGHTING. Confirmed
+# non-rendered by its own name/icon, same reasoning as /obj/landmark.
+- /obj/decal/nothing
+
+# code/modules/fluids/fluid_objects.dm -- a fluid-mechanics flow-
+# restricting gate; sets INVIS_ALWAYS_ISH in New(), never actually seen
+# in play.
+- /obj/channel

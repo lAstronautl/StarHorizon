@@ -102,3 +102,252 @@
 /turf/simulated/wall/false_wall:
   tile: Plating
   entity: SolidSecretDoor
+
+# --- atlas debris field (z2/z3/z5): biome wall/floor families. ---
+
+# code/z_adventurezones/void.dm, code/z_adventurezones/icemoon.dm -- a
+# dense, opaque wall bounding the "void" pocket dimension and the
+# matching bottomless-abyss boundary wall; plain solid wall.
+/turf/unsimulated/wall/void:
+  tile: Plating
+  entity: WallSolid
+/turf/unsimulated/wall/arctic/abyss:
+  tile: Plating
+  entity: WallSolid
+
+# code/turf/turf_autoalign.dm -- radiation-shielding lead walls, three
+# colour variants (blue/gray/white) with no functional difference; no
+# SS14 lead-wall prototype exists, closest is the standard reinforced
+# wall.
+/turf/unsimulated/wall/auto/lead:
+  tile: Plating
+  entity: WallReinforced
+
+# code/turf/turf_autoalign.dm -- rock/stone biome walls (cave, martian
+# rock, moon rock, iomoon crust, and the oddly-named hospital-zone
+# exterior which is also a rock wall); same pattern as the existing
+# /turf/simulated/wall/auto/asteroid rule above.
+/turf/unsimulated/wall/auto/adventure/cave:
+  tile: FloorAsteroidSand
+  entity: WallRock
+/turf/unsimulated/wall/auto/adventure/mars:
+  tile: FloorAsteroidSand
+  entity: WallRock
+/turf/unsimulated/wall/auto/adventure/moon:
+  tile: FloorAsteroidSand
+  entity: WallRock
+/turf/unsimulated/wall/auto/adventure/iomoon:
+  tile: FloorAsteroidSand
+  entity: WallRock
+/turf/unsimulated/wall/auto/adventure/hospital:
+  tile: FloorAsteroidSand
+  entity: WallRock
+
+# code/turf/turf_autoalign.dm -- plain interior station-style paneling
+# reused across several adventure zones (mars outpost interior, hospital
+# interior); no exterior-biome theming to preserve, same reinforced-wall
+# stopgap as the base reinforced rule above.
+/turf/unsimulated/wall/auto/adventure/mars/interior:
+  tile: Plating
+  entity: WallReinforced
+/turf/unsimulated/wall/auto/adventure/hospital/interior:
+  tile: Plating
+  entity: WallReinforced
+
+# code/turf/turf_autoalign.dm -- "strange"/ancient precursor-tech walls
+# (jet black metal, glassy ancient iomoon interior, glowing icemoon
+# precursor interior); no SS14 "ancient alien tech" wall exists, folded
+# onto a plain solid wall.
+/turf/unsimulated/wall/auto/adventure/ancient:
+  tile: Plating
+  entity: WallSolid
+/turf/unsimulated/wall/auto/adventure/iomoon/interior:
+  tile: Plating
+  entity: WallSolid
+/turf/unsimulated/wall/auto/adventure/icemooninterior:
+  tile: Plating
+  entity: WallSolid
+
+# code/z_adventurezones/icemoon.dm -- icy wall biome.
+/turf/unsimulated/wall/auto/adventure/icemoon:
+  tile: Plating
+  entity: WallSolid
+
+# code/turf/turf.dm -- the plain generic/"other" station wall skins; same
+# reinforced-wall stopgap.
+/turf/unsimulated/wall/generic:
+  tile: Plating
+  entity: WallReinforced
+/turf/unsimulated/wall/other:
+  tile: Plating
+  entity: WallReinforced
+
+# code/turf/turf_autoalign.dm, code/z_adventurezones/debris.dm -- organic/
+# biological walls: the plain and "meatier" body-horror wall variants, the
+# bee faction's hive wall (+exterior), and the martian ruins' organic wall
+# on z5; SS14's chitin wall is the closest "organic-looking wall" for all.
+# The plain /meat rule also prevents it from being auto-skipped and
+# shadowing its own /meatier child -- see check_ignore_does_not_swallow_
+# mappings in dmm2yml's selftest for this failure shape.
+/turf/unsimulated/wall/auto/adventure/meat:
+  tile: Plating
+  entity: WallSolidChitin
+/turf/unsimulated/wall/auto/adventure/meat/meatier:
+  tile: Plating
+  entity: WallSolidChitin
+/turf/unsimulated/wall/auto/adventure/bee:
+  tile: Plating
+  entity: WallSolidChitin
+/turf/unsimulated/wall/auto/adventure/bee/exterior:
+  tile: Plating
+  entity: WallSolidChitin
+/turf/simulated/wall/auto/martian:
+  tile: Plating
+  entity: WallSolidChitin
+
+# code/turf/turf_autoalign.dm -- a joke "virtual wall" in a simulation
+# zone (desc: "that sure is a wall, yep"); plain solid wall.
+/turf/unsimulated/wall/auto/virtual:
+  tile: Plating
+  entity: WallSolid
+
+# code/turf/turf_autoalign.dm -- NOT actually a solid wall despite the
+# "wall" path: opacity = FALSE, name "strong window". Closest SS14 match
+# is the reinforced window, not a wall entity.
+/turf/unsimulated/wall/auto/adventure/fake_window:
+  tile: Plating
+  entity: ReinforcedWindow
+
+# code/turf/turf_autoalign.dm -- derelict/abandoned wall skin; direct
+# thematic match to SS14's own rusted reinforced-wall variant.
+/turf/simulated/wall/auto/old:
+  tile: Plating
+  entity: WallSolidRust
+
+# code/turf/turf_autoalign.dm -- "supernorn" is this fork's own default/
+# plain station wall (icon_state "mapwall", used everywhere a plain wall
+# is needed); same reinforced-wall stopgap as the existing /turf/
+# simulated/wall/auto/reinforced rule.
+/turf/simulated/wall/auto/supernorn:
+  tile: Plating
+  entity: WallReinforced
+
+# code/turf/turf.dm -- the bare /turf/simulated/wall base class itself
+# (every station-wall subtype above, including false_wall, inherits from
+# it); needs its own real rule too, or an auto-skip conversion run would
+# add this unresolved parent to ignore.yml and shadow every one of those
+# more specific, already-mapped children (same failure shape as /obj/
+# decal/tile_edge in entities.yml -- see check_ignore_does_not_swallow_
+# mappings). Same reinforced-wall stopgap.
+/turf/simulated/wall:
+  tile: Plating
+  entity: WallReinforced
+
+# code/obj/flock/trader.dm -- the flock faction's own reskinned shuttle
+# hull wall; reuses the same WallShuttle prototype as the plain shuttle
+# wall rule above (purely cosmetic reskin, same structural role).
+/turf/simulated/shuttle/wall/flock:
+  tile: Plating
+  entity: WallShuttle
+
+# code/z_adventurezones/lavamoon.dm -- "silicate crust", the lava moon's
+# hot volcanic-rock floor (plain and arena variants); SS14's basalt floor
+# is the closest volcanic-rock match.
+/turf/unsimulated/iomoon/floor: FloorBasalt
+/turf/unsimulated/iomoon/floor/arena: FloorBasalt
+
+# code/z_adventurezones/lavamoon.dm -- "Ancient Metal Floor", a cold dark
+# worn metal floor; closest SS14 match is the grimy steel floor.
+/turf/unsimulated/iomoon/ancient_floor: FloorSteelDirty
+
+# code/turf/turf.dm -- plain grass/dirt terrain turfs; grasstodirt keeps
+# the "grass" name/desc in its own source (just a patchier icon), folded
+# onto plain grass rather than dirt.
+/turf/unsimulated/outdoors/grass: FloorGrass
+/turf/unsimulated/outdoors/grass/dense: FloorGrassDark
+/turf/unsimulated/grass: FloorGrass
+/turf/unsimulated/grasstodirt: FloorGrass
+/turf/unsimulated/dirt: FloorDirt
+
+# code/turf/turf.dm -- "Virtual Floor" in a VR/simulation training room;
+# just a plain floor, no special theming needed.
+/turf/unsimulated/bombvr: FloorSteel
+
+# code/turf/turf_autoalign.dm -- a derelict station wall skin, same
+# rusted match as the already-mapped /turf/simulated/wall/auto/old.
+/turf/unsimulated/wall/auto/adventure/old:
+  tile: Plating
+  entity: WallSolidRust
+
+# code/z_adventurezones/gannets_dojozone.dm -- the dojo adventure zone's
+# wood/paper wall skins; SS14's wood wall is the closest match for both.
+/turf/unsimulated/wall/auto/sengoku:
+  tile: Plating
+  entity: WallWood
+/turf/unsimulated/wall/auto/paper:
+  tile: Plating
+  entity: WallWood
+
+# code/turf/floors.dm, code/turf/turf_autoalign.dm -- vine-covered walls
+# (the setpieces version and its adventure-zone twin share the exact same
+# "covered in vines" description); no SS14 vine/overgrown wall exists,
+# folded onto a plain solid wall.
+/turf/unsimulated/wall/setpieces/rootwall:
+  tile: Plating
+  entity: WallSolid
+/turf/unsimulated/wall/auto/adventure/overgrown1:
+  tile: Plating
+  entity: WallSolid
+
+# code/turf/turf_autoalign.dm -- "Rock Wall... made of damp stone"; direct
+# match to the existing rock-wall rule.
+/turf/unsimulated/wall/auto/adventure/overgrown2:
+  tile: FloorAsteroidSand
+  entity: WallRock
+
+# code/turf/turf_autoalign.dm -- "organic wall"; same chitin-wall match as
+# the already-mapped /turf/simulated/wall/auto/martian. Covers /exterior
+# by inheritance.
+/turf/unsimulated/wall/auto/adventure/martian:
+  tile: Plating
+  entity: WallSolidChitin
+
+# code/turf/turf.dm -- "Virtual Wall" in the same VR/simulation zone as
+# the bombvr floor above; plain solid wall, same joke theming.
+/turf/unsimulated/wall/bombvr:
+  tile: Plating
+  entity: WallSolid
+
+# code/turf/floors.dm -- "shielded window" (lead-glass observation
+# window, opacity=0 despite the "wall" path); closest SS14 match is the
+# reinforced window, same reasoning as the fake_window rule above. Covers
+# /gray and /white by inheritance.
+/turf/unsimulated/wall/setpieces/leadwindow:
+  tile: Plating
+  entity: ReinforcedWindow
+
+# code/turf/turf.dm -- "invisible solid turf... a solid nothing?", a
+# background-scenery boundary wall (mouse_opacity=0, so it can't be
+# examined, but it does render); plain solid wall. Covers /white by
+# inheritance.
+/turf/unsimulated/wall/solidcolor:
+  tile: Plating
+  entity: WallSolid
+
+# code/z_adventurezones/lavamoon.dm -- "charred plating", exposed floor
+# substrate with its protective coating burned away; direct match to the
+# plain Plating tile.
+/turf/unsimulated/iomoon/plating: Plating
+
+# code/turf/turf.dm -- plain grass turf (icons/turf/outdoors.dmi); same
+# grass tile as the outdoors/grass family above. /random only randomizes
+# which cardinal direction the sprite faces, no visual difference SS14
+# can represent per-tile.
+/turf/unsimulated/nicegrass: FloorGrass
+
+# code/modules/transport/shuttle/shuttle_turfobjs.dm -- the bare shuttle
+# hull wall (distinct DM class from /turf/unsimulated/wall/auto/adventure/
+# shuttle above, same "shuttle wall" name/role); same WallShuttle match.
+/turf/simulated/shuttle/wall:
+  tile: Plating
+  entity: WallShuttle

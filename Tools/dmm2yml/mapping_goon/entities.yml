@@ -658,3 +658,339 @@
 
 # code/obj/item/reagent_containers/food/snacks/... -- plain tomato.
 /obj/item/reagent_containers/food/snacks/plant/tomato: FoodTomato
+
+# --- atlas debris field (z2/z3/z5): fakeobject subtypes, mapping helpers,
+# spawners, mobs. ---
+
+# code/obj/fakeobject.dm -- decorative, non-functional shuttle engine/
+# thruster wreckage props (anchored, no real function, fixed icon_state
+# unlike the per-instance base class); SS14's own "unrepairable, only
+# good for scrapping" thruster is a direct thematic match for both.
+/obj/fakeobject/shuttlethruster: RustedThruster
+/obj/fakeobject/shuttleengine: RustedThruster
+
+# code/obj/fakedoor.dm -- a decorative, rusted-through, non-functional
+# firelock; no placeable "broken firelock" structure exists in SS14, so
+# this folds onto the closest available prototype, the scrap-tier broken
+# firelock item (pickupable, unlike the original's untouchable intent --
+# a documented simplification).
+/obj/fakeobject/airlock_broken/firelock: ScrapFirelock1
+
+# code/obj/fakeobject.dm -- a decorative human-skeleton-remains prop;
+# SS14's non-playable dummy skeleton decoration is the closest "inert
+# skeleton corpse" prop available.
+/obj/fakeobject/skeleton: MobSkeletonPersonDummy
+
+# code/obj/fakeobject.dm -- decorative shattered light fixtures; direct
+# SS14 matches (pickupable items rather than wall fixtures, same
+# simplification as the firelock above).
+/obj/fakeobject/lighttube_broken: LightTubeBroken
+/obj/fakeobject/lightbulb_broken: LightBulbBroken
+
+# code/obj/fakeobject.dm -- a decorative "rusted pipe" prop; despite its
+# fixed (non-per-instance) icon, no SS14 "loose decorative pipe" prop or
+# structure exists, left unmapped like the base class.
+
+# code/modules/mapping/helpers/wingrille_spawner.dm -- the Flock-faction
+# skin of the already-mapped wingrille_spawn/auto family (spawns a window+
+# barricade pair themed for this fork's "Flock" antagonist, which has no
+# equivalent content on this SS14 fork at all); folded onto the same
+# [Window, Grille] pair the plain /auto rule uses, for consistency with
+# that family's "always real structure here" rule -- keeps the real
+# window+grille, loses the Flock-specific skin/lore.
+/obj/mapping_helper/wingrille_spawn/flock:
+  entities: [Window, Grille]
+
+# code/obj/critter/drone.dm, code/mob/living/critter/martian.dm -- a self-
+# deleting hostile-drone round-start spawner (same mechanic shape as
+# /obj/random_item_spawner, but for a mob) and this fork's Mars-themed
+# hostile "martian" critters/corpse-spawner; SS14 has no matching drone
+# pool or "martian" species/mob at all, left unmapped.
+
+# --- atlas debris field (z2/z3/z5): decal->entity fallback, lighting,
+# structures, misc items. ---
+
+# code/obj/decal/cleanable.dm -- a "decal"-kind path with no decals.yml
+# rule (blood puddle/smear variants, and robot-debris shrapnel that reuses
+# the exact same gib icon tgstation's own robot_debris rule already maps
+# to PuddleSmear), falling through to this table per mappings.py's own
+# decal->entity fallback, same as the oil puddle in pod_wars.
+/obj/decal/cleanable/blood/splatter: PuddleBlood
+/obj/decal/cleanable/blood/tracks: PuddleBloodSmall
+/obj/decal/cleanable/machine_debris: PuddleSmear
+/obj/decal/cleanable/cobweb2: Cobweb2
+
+# code/obj/wallsigns.dm -- direct SS14 match.
+/obj/securearea: SignSecurearea
+
+# code/modules/mapping/helpers/firedoor_spawn.dm -- unlike /obj/mapping_
+# helper/access, this one spawns a real firelock at its own tile before
+# deleting itself, same precedent as wingrille_spawn above.
+/obj/mapping_helper/firedoor_spawn: Firelock
+
+# code/obj/machinery/light*.dm, code/modules/power/light.dm -- powered
+# ceiling/wall light fixtures; direct SS14 matches reused from the same
+# role as tgstation's own light mapping. /flock and /worn are reskins
+# with no distinct SS14 counterpart, /emergency likewise has no separate
+# SS14 "emergency light" prototype -- all fold onto the plain fixture.
+/obj/machinery/light: Poweredlight
+/obj/machinery/light/small: PoweredSmallLight
+/obj/machinery/light/small/sticky: PoweredSmallLight
+/obj/machinery/light/worn: Poweredlight
+/obj/machinery/light/flock: Poweredlight
+/obj/machinery/light/emergency: Poweredlight
+
+# code/obj/structure/girder.dm, code/obj/window.dm, code/obj/decoration.dm
+# (or wherever /obj/tree lives), code/obj/mesh.dm -- direct SS14 matches;
+# base girder rule covers /displaced and /reinforced by inheritance.
+/obj/structure/girder: Girder
+/obj/window: Window
+/obj/tree: FloraTree
+/obj/mesh/grille/steel: Grille
+
+# code/obj/item/stack_item.dm family -- plain steel rods/floor tiles,
+# cut cable coil, and a glass shard; direct SS14 matches.
+/obj/item/rods/steel: PartRodMetal
+/obj/item/tile/steel: FloorTileItemSteel
+/obj/item/cable_coil/cut: CableApcStack
+/obj/item/raw_material/shard/glass: ShardGlass
+
+# code/obj/item/cell.dm -- a charged high-capacity power cell; direct
+# SS14 match.
+/obj/item/cell/supercell/charged: PowerCellHyper
+
+# code/obj/item/clothing/suits.dm -- the bare/base bedsheet path (no
+# colour); same representative-colour fold as /random in the pod_wars
+# pass.
+/obj/item/clothing/suit/bedsheet: BedsheetWhite
+
+# code/datums/gamemodes/pod_wars/pw_misc_objects.dm-style honey end table
+# (code/obj/table.dm) -- loses its honey-themed cosmetic skin, folded
+# onto the plain wood table.
+/obj/table/endtable_honey: TableWood
+
+# code/obj/machinery/door/door_parent.dm -- an unpowered (no wire network)
+# shuttle-hull door; reuses tgstation's own airlock/shuttle id as the
+# closest "shuttle door" structural match. The /martian "Orifice" organic
+# door variant has no SS14 equivalent at all and is left unmapped.
+/obj/machinery/door/unpowered/shuttle: AirlockShuttle
+
+# code/obj/item/paper.dm -- a pre-bloodied paper; same closest SS14 match
+# as tgstation's own plain /obj/item/paper rule.
+/obj/item/paper/empty_bloody: Paper
+
+# code/obj/machinery/lightswitch.dm, code/obj/item/material.dm's bohrum/
+# pharosium/rock raw ore (this fork's own named-metal mining materials,
+# with no tgstation-side or SS14-side concept to reuse), code/obj/item/
+# cigarette.dm's cigarette butt, code/modules/chemistry/tools/pills.dm's
+# morphine pill (named "stox" internally, a leftover variable name), and
+# code/obj/item/seeds.dm's artifact-rock alien seed -- none have a
+# matching SS14 prototype; left unmapped.
+
+# code/obj/mobile_ai.dm-style industrial cargo rail track (/obj/rail, NOT
+# the already-mapped /obj/railing) and code/obj/crevice.dm's martian-
+# biome ground crevice -- no matching SS14 prototype; left unmapped.
+
+# code/obj/decal/cleanable.dm -- the base blood decal and the base cobweb
+# decal (decal-kind paths with no decals.yml rule, falling through to this
+# table) and robot debris (same gib icon file/states already mapped for
+# machine_debris above, so the same PuddleSmear match applies).
+/obj/decal/cleanable/blood: PuddleBlood
+/obj/decal/cleanable/cobweb: Cobweb1
+/obj/decal/cleanable/robot_debris: PuddleSmear
+
+# code/obj/decal.dm's icy floor hazard and theatre-curtain stage edge
+# (a directional-collision prop, not a flat decal), code/obj/decal/
+# cleanable.dm's spraypainted gang tag and molten-goo blob -- none have a
+# matching SS14 decal/prop; left unmapped.
+
+# code/modules/events/gimmick/kudzu.dm -- "space kudzu", a spreading
+# invasive vine; direct SS14 match.
+/obj/spacevine: Kudzu
+
+# code/obj/decorations.dm -- a decorative flowing-water prop; no SS14
+# "river" structure exists, folded onto the generic liquid puddle (loses
+# the "flowing" distinction, closest available).
+/obj/river: Puddle
+
+# code/obj/table.dm -- round wood table, same closest match as the
+# champagne table above.
+/obj/table/wood/round/auto: TableWood
+
+# code/modules/writing/paper.dm -- plain paper; same closest SS14 match
+# as the pre-bloodied paper above.
+/obj/item/paper: Paper
+
+# code/obj/machinery/door/door_parent.dm -- a wooden door; reuses
+# tgstation's own WoodDoor id (used there for /obj/structure/mineral_door/
+# wood) as the closest "wooden door" structural match. Covers /pyro by
+# inheritance.
+/obj/machinery/door/unpowered/wood: WoodDoor
+
+# code/z_adventurezones/meatland.dm -- a hazardous acid pool; closest
+# SS14 match is the corrosive-acid puddle.
+/obj/stomachacid: PuddleFluorosulfuricAcid
+
+# code/modules/fluids/fluid_objects.dm -- a fluid-mechanics flow-
+# restricting gate; sets INVIS_ALWAYS_ISH in New(), confirmed non-
+# rendered by its own code, same reasoning as the landmark-style entries
+# in ignore.yml (added there instead of here).
+
+# code/obj/decorations.dm's minable decorative rock/stone (breaks into
+# the already-unmapped raw_material/rock, no SS14 decorative boulder
+# exists either) and WorkInProgress/racing.dm's unused racing-minigame
+# booster strip -- no matching SS14 prototype; left unmapped.
+
+# code/obj/flock/furniture.dm -- the Flock faction's own reskinned table
+# (no equivalent faction content on this SS14 fork, see the wingrille_
+# spawn/flock note above); folded onto the plain generic table.
+/obj/table/flock/auto: Table
+
+# mob/living/critter/mining_critter.dm -- "fermid", a hostile asteroid-
+# dwelling mining-hazard bug; SS14's own asteroid mining-hazard mob
+# (Goliath) is the closest structural/role match.
+/mob/living/critter/fermid: MobGoliath
+
+# code/modules/chemistry/Chemistry-Tools.dm -- a petri dish for pathogen
+# cultures; direct SS14 match.
+/obj/item/reagent_containers/glass/petridish: CytologyPetriDish
+
+# code/obj/pool.dm's swimming-pool edge decoration and code/modules/
+# chemistry/Chemistry-Tools.dm's forensics blood-sample slide, plus this
+# fork's own named-metal raw ores (syreline/uqill/claretine, same "no
+# tgstation/SS14 concept to reuse" reasoning as bohrum/pharosium/rock
+# above) -- no matching SS14 prototype; left unmapped.
+
+# code/obj/machinery/firealarm.dm, code/obj/machinery/camera.dm -- wall-
+# mounted fire alarms and directional cameras; reused directly from
+# tgstation's own mapping (same role, same {entity, wall/dir} combo
+# pattern already established there).
+/obj/machinery/firealarm/directional/north: {entity: FireAlarm, wall: north, onWall: true}
+/obj/machinery/firealarm/directional/south: {entity: FireAlarm, wall: south, onWall: true}
+/obj/machinery/firealarm/directional/east: {entity: FireAlarm, wall: east, onWall: true}
+/obj/machinery/firealarm/directional/west: {entity: FireAlarm, wall: west, onWall: true}
+/obj/machinery/camera/mining/directional/north: {entity: SurveillanceCameraGeneral, dir: 1}
+/obj/machinery/camera/mining/directional/south: {entity: SurveillanceCameraGeneral, dir: 2}
+/obj/machinery/camera/mining/directional/east: {entity: SurveillanceCameraGeneral, dir: 4}
+/obj/machinery/camera/mining/directional/west: {entity: SurveillanceCameraGeneral, dir: 8}
+
+# code/obj/item/device/radios/_radio.dm -- the base handheld radio; same
+# closest SS14 match already used for the radiostation's handheld radio
+# device above.
+/obj/item/device/radio: RadioHandheld
+
+# code/obj/item/clothing/gloves.dm -- insulated work gloves; direct SS14
+# match.
+/obj/item/clothing/gloves/yellow: ClothingHandsGlovesColorYellow
+
+# code/obj/flock/flockdrone.dm's Flock-faction drone mob (same "no
+# equivalent faction content" reasoning as the other flock entries above),
+# code/obj/flock/trader.dm's Flock antenna prop (fixed appearance, but no
+# generic "antenna/pole" SS14 structure exists either), code/obj/item/
+# hydroponics.dm's compost bag, and code/modules/fishing/fish.dm's salmon
+# -- none have a matching SS14 prototype; left unmapped. code/obj.dm's
+# /obj/overlay base class sets no icon/icon_state of its own (per-instance
+# visual dressing, same shape as the /obj/fakeobject base class), also
+# left unmapped for the same reason. (The businesscard paper variant needs
+# no separate rule -- it inherits the base /obj/item/paper: Paper rule
+# above.)
+
+# --- bare base-class rules, added purely so none of these ever get
+# auto-skip-appended to ignore.yml and shadow the more specific child
+# rules already above (same failure shape as /obj/decal/tile_edge; see
+# check_ignore_does_not_swallow_mappings) -- caught for real converting
+# the atlas debris field z-levels, where several of these appear on the
+# map directly as their own bare, undecorated class. ---
+
+# code/obj/fakeobject.dm -- the bare class has no fixed appearance at all
+# (icon_state is set per-instance in map data), so unlike its specific
+# subtypes above it genuinely has nothing to map to; explicit "skip"
+# instead of leaving it unresolved (which would shadow those subtypes).
+/obj/fakeobject: skip
+# code/obj/fakedoor.dm -- "rusted airlock" (distinct from its mapped
+# /firelock child); no SS14 equivalent, same explicit-skip treatment.
+/obj/fakeobject/airlock_broken: skip
+
+# code/obj/decal.dm -- the bare /obj/decal base class itself (every decal
+# rule in decals.yml inherits from it). decals.yml itself has no "skip"
+# sentinel (_parse_decal always treats a bare string as a literal decal
+# id, unlike _parse_turf/_parse_entity), so this relies on mappings.py's
+# own decal->entity fallback: decals.yml has no rule for this exact path,
+# so resolve() falls through to this table, finds this "skip" entry, and
+# treats the bare path as resolved-to-nothing without ever touching
+# ignore.yml -- same shadow-avoidance reasoning as every other base-class
+# rule in this section.
+/obj/decal: skip
+
+# code/obj/stool.dm -- "a four-legged padded stool", same closest match
+# as the already-mapped /obj/stool/chair child.
+/obj/stool: Chair
+
+# code/modules/disposals/disposal_chute.dm -- "disposal unit... pressurized
+# trashcan"; same match as the already-mapped /small child.
+/obj/machinery/disposal: DisposalUnit
+
+# code/modules/power/cell.dm -- generic rechargeable power cell (distinct
+# from the charged high-capacity /supercell/charged child above).
+/obj/item/cell: PowerCellMedium
+
+# code/modules/barber/barber_shop.dm -- "Used to cut hair"; SS14's own
+# barber scissors are a direct, exact match (distinct from the surgical
+# scissors already mapped to Hemostat above).
+/obj/item/scissors: BarberScissors
+
+# code/obj/mining.dm -- the base pickaxe class itself ("a thing to bash
+# rocks with"); same match as the already-mapped /powered/pickaxe child.
+/obj/item/mining_tool: Pickaxe
+
+# code/modules/camera/camera.dm -- the base camera class; same match
+# already reused from tgstation's own directional camera rules above.
+/obj/machinery/camera: SurveillanceCameraGeneral
+
+# code/obj/table.dm -- base classes for the whole table family tree (every
+# /auto variant above inherits from one of these); same matches already
+# used for their respective decorated children.
+/obj/table: Table
+/obj/table/reinforced: TableReinforced
+/obj/table/wood/round: TableWood
+
+# code/obj/item/storage/*.dm -- base classes for the box family (every
+# specific box above inherits from one of these); direct SS14 matches for
+# a plain cardboard box and a plain lightbulb box (distinct from the
+# /tubes child already mapped to BoxLighttube).
+/obj/item/storage/box: BoxCardboard
+/obj/item/storage/box/lightbox: BoxLightbulb
+
+# code/obj/storage/secure_closets.dm -- base classes; same matches already
+# used for their more specific children (/empty, /medkit).
+/obj/storage/secure/closet/personal: ClosetSteelBase
+/obj/storage/secure/closet/medical: ClosetEmergencyFilledRandom
+
+# code/obj/item/building_materials.dm family -- base classes for plain
+# rod/cable/shard/glass-sheet stacks (every specific material variant
+# above inherits from one of these); same matches already used for their
+# steel/cut/glass children.
+/obj/item/rods: PartRodMetal
+/obj/item/cable_coil: CableApcStack
+/obj/item/raw_material/shard: ShardGlass
+/obj/item/sheet/glass: SheetGlass1
+
+# code/modules/chemistry/tools/*.dm -- base reagent-container classes; no
+# SS14 "bottle" item exists at all (the /bottle/cleaner child above
+# already folds onto the spray bottle as an approximation), so the plain
+# bottle folds onto the closest generic glass reagent container instead.
+# The plain beaker needs its own rule for the same auto-skip-shadow
+# reason, even though it's the obvious match for its own /large child.
+/obj/item/reagent_containers/glass/bottle: Beaker
+/obj/item/reagent_containers/glass/beaker: Beaker
+
+# mob/living/carbon/human/monkeys.dm -- the base oppenheimer NPC monkey
+# (without the pod_wars-specific team-targeting twist); same match as its
+# /pod_wars child.
+/mob/living/carbon/human/npc/monkey/oppenheimer: MobMonkey
+
+# code/modules/mapping/helpers/wingrille_spawner.dm -- the undecorated
+# base of the wingrille_spawn family; same [Window, Grille] pair as its
+# /auto child.
+/obj/mapping_helper/wingrille_spawn:
+  entities: [Window, Grille]

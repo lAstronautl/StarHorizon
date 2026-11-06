@@ -36,3 +36,22 @@
     6: WarnCornerSE
     9: WarnCornerNW
     10: WarnCornerSW
+
+# --- atlas debris field (z2/z3/z5). ---
+
+# code/obj/decal/cleanable.dm -- common cleanable floor dirt/rust and a
+# random-state gib pile; direct SS14 matches.
+/obj/decal/cleanable/dirt: Dirt
+/obj/decal/cleanable/rust: Rust
+/obj/decal/cleanable/blood/gibs: Gib
+
+# code/obj/decal/misc.dm -- floor hazard stripes (icon_states "hazard_
+# caution"/"hazard_delivery"); direct SS14 matches.
+/obj/decal/stripe_caution: WarnFull
+/obj/decal/stripe_delivery: Delivery
+
+# code/obj/decal.dm -- a navigational hazard marker that reuses the exact
+# same "hazard_delivery" icon_state as stripe_delivery above (just a
+# different in-fiction label on the identical sprite); same decal.
+/obj/decal/nav_danger: Delivery
+
