@@ -1,0 +1,52 @@
+<controls:FancyWindow xmlns="https://spacestation14.io"
+                      xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
+                      xmlns:hack="clr-namespace:Content.Client._Horizon._Fractions.AnCo.WeaponCaseHack"
+                      Title="{Loc 'anco-weapon-case-hack-window-title'}"
+                      MinSize="360 520"
+                      SetSize="360 520">
+    <BoxContainer Orientation="Vertical" Margin="10">
+        <!-- Попытки -->
+        <PanelContainer StyleClasses="AngleRect" HorizontalExpand="True">
+            <BoxContainer Orientation="Horizontal" Margin="10 5">
+                <Label Text="{Loc 'anco-weapon-case-hack-attempts-title'}" StyleClasses="LabelSubText" />
+                <Control HorizontalExpand="True" />
+                <Label Name="AttemptsLabel" StyleClasses="LabelBig" />
+            </BoxContainer>
+        </PanelContainer>
+
+        <Control MinHeight="10" />
+
+        <!-- Схема дорожек -->
+        <PanelContainer StyleClasses="AngleRect" HorizontalExpand="True" VerticalExpand="True">
+            <hack:AnCoWeaponCaseHackMap Name="Map" HorizontalExpand="True" VerticalExpand="True" MinSize="300 260" Margin="5" />
+        </PanelContainer>
+
+        <Control MinHeight="10" />
+
+        <!-- Условие и серийники -->
+        <PanelContainer StyleClasses="AngleRect" HorizontalExpand="True">
+            <BoxContainer Orientation="Vertical" Margin="10">
+                <Label Text="{Loc 'anco-weapon-case-hack-condition-header'}" StyleClasses="LabelHeading" />
+                <Control MinHeight="3" />
+                <RichTextLabel Name="RuleLabel" HorizontalExpand="True" StyleClasses="LabelKeyText" />
+                <Control MinHeight="5" />
+                <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
+                    <Label Name="SerialLeftLabel" StyleClasses="LabelSubText" />
+                    <Control HorizontalExpand="True" />
+                    <Label Name="SerialRightLabel" StyleClasses="LabelSubText" />
+                </BoxContainer>
+            </BoxContainer>
+        </PanelContainer>
+
+        <Control MinHeight="10" />
+
+        <!-- Кнопки направлений -->
+        <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
+            <Button Name="LeftButton" Text="{Loc 'anco-weapon-case-hack-dir-left'}" HorizontalExpand="True" MinHeight="35" />
+            <Control MinWidth="10" />
+            <Button Name="UpButton" Text="{Loc 'anco-weapon-case-hack-dir-up'}" HorizontalExpand="True" MinHeight="35" />
+            <Control MinWidth="10" />
+            <Button Name="RightButton" Text="{Loc 'anco-weapon-case-hack-dir-right'}" HorizontalExpand="True" MinHeight="35" />
+        </BoxContainer>
+    </BoxContainer>
+</controls:FancyWindow>

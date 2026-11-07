@@ -26,6 +26,22 @@ namespace Content.Tests.Shared
                     Assert.That(node.LegLength, Is.InRange(AnCoHackGraph.MinLeg, AnCoHackGraph.MaxLeg));
                     Assert.That(node.DeadEndLength, Is.InRange(AnCoHackGraph.MinDeadEnd, AnCoHackGraph.MaxDeadEnd));
                     Assert.That(node.CorrectDir, Is.Not.EqualTo(node.DeadEndDir));
+
+                    // Только горизонтали и вертикали.
+                    foreach (var dir in new[] { node.LeftExit, node.RightExit })
+                    {
+                        var step = AnCoHackGraph.Step(dir);
+                        Assert.That(step.X == 0 || step.Y == 0, Is.True);
+                    }
+                }
+
+                // Нет разворота назад: после шага влево нет выхода вправо и наоборот.
+                var arrival = AnCoHackDir.Up;
+                foreach (var node in nodes)
+                {
+                    Assert.That(arrival == AnCoHackDir.Left && node.RightExit == AnCoHackDir.Right, Is.False);
+                    Assert.That(arrival == AnCoHackDir.Right && node.LeftExit == AnCoHackDir.Left, Is.False);
+                    arrival = node.CorrectDir;
                 }
             }
         }

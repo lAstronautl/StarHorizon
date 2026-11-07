@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Numerics;
 using Robust.Shared.Random;
 using Robust.Shared.Serialization;
@@ -5,7 +6,7 @@ using Robust.Shared.Serialization;
 namespace Content.Shared._Horizon._Fractions.AnCo.WeaponCaseHack;
 
 /// <summary>
-/// Направление дорожки (вид сверху, схема растёт вверх). Единица длины - один шаг сетки.
+/// Направление дорожки (схема растёт вверх). Только горизонтали и вертикали, единица длины - один шаг сетки.
 /// </summary>
 [Serializable, NetSerializable]
 public enum AnCoHackDir : byte
@@ -70,9 +71,10 @@ public static class AnCoHackGraph
     public const int MinDeadEnd = 1;
     public const int MaxDeadEnd = 3;
 
-    private const int MaxLayoutTries = 200;
+    private const int MaxLayoutTries = 2000;
 
     // Пары выходов слева направо: влево+вверх, влево+вправо, вверх+вправо.
+    // Назад (в сторону, откуда пришли) выхода нет.
     private static readonly (AnCoHackDir Left, AnCoHackDir Right)[] ExitPairs =
     {
         (AnCoHackDir.Left, AnCoHackDir.Up),
@@ -87,8 +89,8 @@ public static class AnCoHackGraph
     {
         return dir switch
         {
-            AnCoHackDir.Left => new Vector2(-1, 1),
-            AnCoHackDir.Right => new Vector2(1, 1),
+            AnCoHackDir.Left => new Vector2(-1, 0),
+            AnCoHackDir.Right => new Vector2(1, 0),
             _ => new Vector2(0, 1),
         };
     }
@@ -104,8 +106,13 @@ public static class AnCoHackGraph
         for (var attempt = 0; attempt < MaxLayoutTries; attempt++)
         {
             nodes = new List<AnCoHackNode>(count);
+            var arrival = AnCoHackDir.Up;
             for (var i = 0; i < count; i++)
-                nodes.Add(CreateNode(random, rules[i]));
+            {
+                var node = CreateNode(random, rules[i], arrival);
+                nodes.Add(node);
+                arrival = node.CorrectDir;
+            }
 
             if (IsLayoutClean(nodes))
                 break;
@@ -114,12 +121,13 @@ public static class AnCoHackGraph
         return nodes;
     }
 
-    private static AnCoHackNode CreateNode(IRobustRandom random, AnCoSerialRule rule)
+    private static AnCoHackNode CreateNode(IRobustRandom random, AnCoSerialRule rule, AnCoHackDir arrival)
     {
         var correctIsB = random.Prob(0.5f);
         var matching = AnCoSerialRules.GenerateSerial(random, rule, true);
         var other = AnCoSerialRules.GenerateSerial(random, rule, false);
-        var pair = ExitPairs[random.Next(ExitPairs.Length)];
+        var pairs = ExitPairs.Where(p => !IsBack(arrival, p.Left) && !IsBack(arrival, p.Right)).ToArray();
+        var pair = pairs[random.Next(pairs.Length)];
 
         return new AnCoHackNode
         {
@@ -134,13 +142,19 @@ public static class AnCoHackGraph
         };
     }
 
+    private static bool IsBack(AnCoHackDir arrival, AnCoHackDir exit)
+    {
+        return (arrival == AnCoHackDir.Left && exit == AnCoHackDir.Right)
+               || (arrival == AnCoHackDir.Right && exit == AnCoHackDir.Left);
+    }
+
     /// <summary>
     /// Проверяет, что ветки не пересекаются и не накладываются друг на друга.
     /// </summary>
     private static bool IsLayoutClean(List<AnCoHackNode> nodes)
     {
         var points = new HashSet<(int, int)>();
-        // Середины единичных шагов в удвоенных координатах: ловит наложения и X-пересечения диагоналей.
+        // Середины единичных шагов в удвоенных координатах: ловит наложение отрезков друг на друга.
         var mids = new HashSet<(int, int)>();
 
         bool Walk(ref (int X, int Y) pos, AnCoHackDir dir, int length)

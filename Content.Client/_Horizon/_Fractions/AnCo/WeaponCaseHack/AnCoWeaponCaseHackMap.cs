@@ -2,81 +2,8 @@ using System.Numerics;
 using Content.Shared._Horizon._Fractions.AnCo.WeaponCaseHack;
 using Robust.Client.Graphics;
 using Robust.Client.UserInterface;
-using Robust.Client.UserInterface.Controls;
-using Robust.Client.UserInterface.CustomControls;
-using Robust.Shared.Localization;
-using static Robust.Client.UserInterface.Controls.BoxContainer;
 
 namespace Content.Client._Horizon._Fractions.AnCo.WeaponCaseHack;
-
-public sealed class AnCoWeaponCaseHackWindow : DefaultWindow
-{
-    public event Action<bool, int>? OnChoose;
-
-    private readonly AnCoWeaponCaseHackMap _map = new();
-    private readonly Label _attemptsLabel = new();
-    private readonly Label _ruleLabel = new() { FontColorOverride = Color.White };
-    private readonly Button _buttonB = new();
-    private readonly Button _buttonC = new();
-    private int _nodeIndex;
-
-    public AnCoWeaponCaseHackWindow()
-    {
-        Title = Loc.GetString("anco-weapon-case-hack-window-title");
-        MinSize = new Vector2(320, 520);
-
-        _map.MinSize = new Vector2(300, 300);
-        _map.VerticalExpand = true;
-
-        _buttonB.OnPressed += _ => OnChoose?.Invoke(true, _nodeIndex);
-        _buttonC.OnPressed += _ => OnChoose?.Invoke(false, _nodeIndex);
-
-        Contents.AddChild(new BoxContainer
-        {
-            Orientation = LayoutOrientation.Vertical,
-            Margin = new Thickness(6),
-            SeparationOverride = 4,
-            Children =
-            {
-                _attemptsLabel,
-                _map,
-                new Label { Text = Loc.GetString("anco-weapon-case-hack-condition-header") },
-                _ruleLabel,
-                new BoxContainer
-                {
-                    Orientation = LayoutOrientation.Horizontal,
-                    SeparationOverride = 4,
-                    Children =
-                    {
-                        new BoxContainer
-                        {
-                            Orientation = LayoutOrientation.Vertical,
-                            HorizontalExpand = true,
-                            Children = { new Label { Text = Loc.GetString("anco-weapon-case-hack-track-b") }, _buttonB }
-                        },
-                        new BoxContainer
-                        {
-                            Orientation = LayoutOrientation.Vertical,
-                            HorizontalExpand = true,
-                            Children = { new Label { Text = Loc.GetString("anco-weapon-case-hack-track-c") }, _buttonC }
-                        },
-                    }
-                },
-            }
-        });
-    }
-
-    public void UpdateState(AnCoHackBoundUserInterfaceState state)
-    {
-        _nodeIndex = state.NodeIndex;
-        _attemptsLabel.Text = Loc.GetString("anco-weapon-case-hack-attempts",
-            ("attempts", state.Attempts), ("max", state.MaxAttempts));
-        _ruleLabel.Text = Loc.GetString(state.RuleLocId);
-        _buttonB.Text = state.SerialB;
-        _buttonC.Text = state.SerialC;
-        _map.Update(state);
-    }
-}
 
 /// <summary>
 /// Схема дорожек: ломаная от зелёного старта. Видна только пройденная часть и текущая развилка,

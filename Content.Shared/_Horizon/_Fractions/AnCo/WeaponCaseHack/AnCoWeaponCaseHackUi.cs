@@ -52,19 +52,19 @@ public sealed class AnCoHackBoundUserInterfaceState : BoundUserInterfaceState
 }
 
 /// <summary>
-/// The hacker chose track B or C at the given node.
+/// The hacker moved in the given direction at the given node.
 /// </summary>
 [Serializable, NetSerializable]
 public sealed class AnCoHackChooseMessage : BoundUserInterfaceMessage
 {
-    public readonly bool ChooseB;
+    public readonly AnCoHackDir Direction;
 
     /// <summary>Node the choice was made at; the server ignores stale messages.</summary>
     public readonly int NodeIndex;
 
-    public AnCoHackChooseMessage(bool chooseB, int nodeIndex)
+    public AnCoHackChooseMessage(AnCoHackDir direction, int nodeIndex)
     {
-        ChooseB = chooseB;
+        Direction = direction;
         NodeIndex = nodeIndex;
     }
 }

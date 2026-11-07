@@ -78,7 +78,20 @@ public sealed class AnCoWeaponCaseHackSystem : EntitySystem
         }
 
         var node = comp.Nodes[comp.NodeIndex];
-        if (args.ChooseB == node.CorrectIsB)
+
+        // Выбор направления: влево/вверх/вправо. Направление без выхода игнорируем (кнопка там неактивна).
+        bool chooseB;
+        if (args.Direction == node.LeftExit)
+            chooseB = true;
+        else if (args.Direction == node.RightExit)
+            chooseB = false;
+        else
+        {
+            UpdateUi(uid, comp);
+            return;
+        }
+
+        if (chooseB == node.CorrectIsB)
         {
             comp.NodeIndex++;
             if (comp.NodeIndex >= comp.Nodes.Count)
