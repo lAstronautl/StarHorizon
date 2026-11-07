@@ -4,56 +4,64 @@
                       Title="{Loc 'anco-weapon-case-hack-window-title'}"
                       MinSize="360 520"
                       SetSize="360 520">
-    <BoxContainer Orientation="Vertical" Margin="10">
-        <!-- Попытки -->
-        <PanelContainer StyleClasses="AngleRect" HorizontalExpand="True">
-            <BoxContainer Orientation="Vertical" Margin="10 5">
-                <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
-                    <Label Text="{Loc 'anco-weapon-case-hack-attempts-title'}" StyleClasses="LabelSubText" />
-                    <Control HorizontalExpand="True" />
-                    <Label Name="AttemptsLabel" StyleClasses="LabelBig" />
+    <Control>
+        <!-- Чёрный фон консоли на всё содержимое -->
+        <PanelContainer Name="BackgroundPanel" />
+
+        <BoxContainer Orientation="Vertical" Margin="10">
+            <!-- Попытки и таймер -->
+            <PanelContainer Name="StatusPanel" HorizontalExpand="True">
+                <BoxContainer Orientation="Vertical" Margin="10 5">
+                    <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
+                        <Label Name="AttemptsTitle" Text="{Loc 'anco-weapon-case-hack-attempts-title'}" />
+                        <Control HorizontalExpand="True" />
+                        <Label Name="AttemptsLabel" />
+                    </BoxContainer>
+                    <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
+                        <Label Name="TimerTitle" Text="{Loc 'anco-weapon-case-hack-timer-title'}" />
+                        <Control HorizontalExpand="True" />
+                        <Label Name="TimerLabel" />
+                    </BoxContainer>
                 </BoxContainer>
-                <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
-                    <Label Text="{Loc 'anco-weapon-case-hack-timer-title'}" StyleClasses="LabelSubText" />
-                    <Control HorizontalExpand="True" />
-                    <Label Name="TimerLabel" StyleClasses="LabelBig" />
+            </PanelContainer>
+
+            <Control MinHeight="10" />
+
+            <!-- Схема дорожек -->
+            <PanelContainer Name="MapPanel" HorizontalExpand="True" VerticalExpand="True">
+                <hack:AnCoWeaponCaseHackMap Name="Map" HorizontalExpand="True" VerticalExpand="True" MinSize="300 260" Margin="5" />
+            </PanelContainer>
+
+            <Control MinHeight="10" />
+
+            <!-- Условие и серийники -->
+            <PanelContainer Name="RulePanel" HorizontalExpand="True">
+                <BoxContainer Orientation="Vertical" Margin="10">
+                    <Label Name="ConditionHeader" Text="{Loc 'anco-weapon-case-hack-condition-header'}" />
+                    <Control MinHeight="3" />
+                    <RichTextLabel Name="RuleLabel" HorizontalExpand="True" />
+                    <Control MinHeight="5" />
+                    <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
+                        <Label Name="SerialLeftLabel" />
+                        <Control HorizontalExpand="True" />
+                        <Label Name="SerialRightLabel" />
+                    </BoxContainer>
                 </BoxContainer>
+            </PanelContainer>
+
+            <Control MinHeight="10" />
+
+            <!-- Кнопки направлений -->
+            <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
+                <hack:AnCoConsoleButton Name="LeftButton" Text="{Loc 'anco-weapon-case-hack-dir-left'}" HorizontalExpand="True" MinHeight="35" />
+                <Control MinWidth="10" />
+                <hack:AnCoConsoleButton Name="UpButton" Text="{Loc 'anco-weapon-case-hack-dir-up'}" HorizontalExpand="True" MinHeight="35" />
+                <Control MinWidth="10" />
+                <hack:AnCoConsoleButton Name="RightButton" Text="{Loc 'anco-weapon-case-hack-dir-right'}" HorizontalExpand="True" MinHeight="35" />
             </BoxContainer>
-        </PanelContainer>
-
-        <Control MinHeight="10" />
-
-        <!-- Схема дорожек -->
-        <PanelContainer StyleClasses="AngleRect" HorizontalExpand="True" VerticalExpand="True">
-            <hack:AnCoWeaponCaseHackMap Name="Map" HorizontalExpand="True" VerticalExpand="True" MinSize="300 260" Margin="5" />
-        </PanelContainer>
-
-        <Control MinHeight="10" />
-
-        <!-- Условие и серийники -->
-        <PanelContainer StyleClasses="AngleRect" HorizontalExpand="True">
-            <BoxContainer Orientation="Vertical" Margin="10">
-                <Label Text="{Loc 'anco-weapon-case-hack-condition-header'}" StyleClasses="LabelHeading" />
-                <Control MinHeight="3" />
-                <RichTextLabel Name="RuleLabel" HorizontalExpand="True" StyleClasses="LabelKeyText" />
-                <Control MinHeight="5" />
-                <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
-                    <Label Name="SerialLeftLabel" StyleClasses="LabelSubText" />
-                    <Control HorizontalExpand="True" />
-                    <Label Name="SerialRightLabel" StyleClasses="LabelSubText" />
-                </BoxContainer>
-            </BoxContainer>
-        </PanelContainer>
-
-        <Control MinHeight="10" />
-
-        <!-- Кнопки направлений -->
-        <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
-            <Button Name="LeftButton" Text="{Loc 'anco-weapon-case-hack-dir-left'}" HorizontalExpand="True" MinHeight="35" />
-            <Control MinWidth="10" />
-            <Button Name="UpButton" Text="{Loc 'anco-weapon-case-hack-dir-up'}" HorizontalExpand="True" MinHeight="35" />
-            <Control MinWidth="10" />
-            <Button Name="RightButton" Text="{Loc 'anco-weapon-case-hack-dir-right'}" HorizontalExpand="True" MinHeight="35" />
         </BoxContainer>
-    </BoxContainer>
+
+        <!-- Scanlines поверх всего -->
+        <hack:AnCoConsoleScanlines />
+    </Control>
 </controls:FancyWindow>

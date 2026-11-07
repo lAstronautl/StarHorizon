@@ -7,16 +7,16 @@ namespace Content.Client._Horizon._Fractions.AnCo.WeaponCaseHack;
 
 /// <summary>
 /// Схема дорожек: ломаная от зелёного старта. Видна только пройденная часть и текущая развилка,
-/// чьи выходы нарисованы одинаковыми обрезанными стабами (какой верный - неизвестно). Жёлтая точка - конец
+/// чьи выходы нарисованы одинаковыми обрезанными стабами (какой верный - неизвестно). Янтарная точка - конец
 /// пройденного тупика. Карта подгоняется под размер окна и растёт по мере прохождения.
 /// </summary>
 public sealed class AnCoWeaponCaseHackMap : Control
 {
-    private static readonly Color Track = Color.FromHex("#b22222");
-    private static readonly Color Node = Color.FromHex("#3fb4e6");
-    private static readonly Color NodeActive = Color.White;
-    private static readonly Color DeadEnd = Color.FromHex("#ffe600");
-    private static readonly Color Goal = Color.FromHex("#7ed321");
+    private static readonly Color Track = AnCoConsoleTheme.Heading;
+    private static readonly Color Node = AnCoConsoleTheme.Accent;
+    private static readonly Color NodeActive = AnCoConsoleTheme.Highlight;
+    private static readonly Color DeadEnd = AnCoConsoleTheme.Warning;
+    private static readonly Color Goal = AnCoConsoleTheme.Ok;
 
     private const float Margin = 20f;
     private const float MaxUnit = 26f;
