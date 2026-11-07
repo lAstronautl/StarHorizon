@@ -27,6 +27,9 @@ public sealed class AnCoHackBoundUserInterfaceState : BoundUserInterfaceState
     public readonly AnCoHackDir CurrentLeftExit;
     public readonly AnCoHackDir CurrentRightExit;
 
+    /// <summary>Игровое время взрыва кейса; null, пока не дан первый ответ.</summary>
+    public readonly TimeSpan? Deadline;
+
     public AnCoHackBoundUserInterfaceState(
         int attempts,
         int maxAttempts,
@@ -35,7 +38,8 @@ public sealed class AnCoHackBoundUserInterfaceState : BoundUserInterfaceState
         string serialC,
         List<AnCoHackPassedNode> passed,
         AnCoHackDir currentLeftExit,
-        AnCoHackDir currentRightExit)
+        AnCoHackDir currentRightExit,
+        TimeSpan? deadline)
     {
         Attempts = attempts;
         MaxAttempts = maxAttempts;
@@ -45,6 +49,7 @@ public sealed class AnCoHackBoundUserInterfaceState : BoundUserInterfaceState
         Passed = passed;
         CurrentLeftExit = currentLeftExit;
         CurrentRightExit = currentRightExit;
+        Deadline = deadline;
     }
 
     /// <summary>Индекс текущего узла (= число пройденных).</summary>

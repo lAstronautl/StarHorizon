@@ -6,6 +6,9 @@ anco-weapon-case-hack-attempts-title = Попытки
 anco-weapon-case-hack-dir-left = ←
 anco-weapon-case-hack-dir-up = ↑
 anco-weapon-case-hack-dir-right = →
+anco-weapon-case-hack-timer-title = Таймер
+anco-weapon-case-hack-timer = { $seconds } с
+anco-weapon-case-hack-timer-idle = 30 с после первого ответа
 anco-weapon-case-hack-attempts = Попытки: { $attempts } / { $max }
 anco-weapon-case-hack-condition-header = Условие: серийный номер дорожки
 

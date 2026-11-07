@@ -7,10 +7,17 @@
     <BoxContainer Orientation="Vertical" Margin="10">
         <!-- Попытки -->
         <PanelContainer StyleClasses="AngleRect" HorizontalExpand="True">
-            <BoxContainer Orientation="Horizontal" Margin="10 5">
-                <Label Text="{Loc 'anco-weapon-case-hack-attempts-title'}" StyleClasses="LabelSubText" />
-                <Control HorizontalExpand="True" />
-                <Label Name="AttemptsLabel" StyleClasses="LabelBig" />
+            <BoxContainer Orientation="Vertical" Margin="10 5">
+                <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
+                    <Label Text="{Loc 'anco-weapon-case-hack-attempts-title'}" StyleClasses="LabelSubText" />
+                    <Control HorizontalExpand="True" />
+                    <Label Name="AttemptsLabel" StyleClasses="LabelBig" />
+                </BoxContainer>
+                <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
+                    <Label Text="{Loc 'anco-weapon-case-hack-timer-title'}" StyleClasses="LabelSubText" />
+                    <Control HorizontalExpand="True" />
+                    <Label Name="TimerLabel" StyleClasses="LabelBig" />
+                </BoxContainer>
             </BoxContainer>
         </PanelContainer>
 
