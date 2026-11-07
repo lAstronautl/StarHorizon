@@ -22,6 +22,11 @@ public sealed class AnCoConsoleButton : Button
 
     private void ApplyMode()
     {
+        // ContainerButton вызывает DrawModeChanged() из базового конструктора, когда Label у Button ещё не создан.
+        // Свой конструктор потом вызывает ApplyMode() явно, так что состояние всё равно выставится.
+        if (Label == null!)
+            return;
+
         var (background, border, text) = DrawMode switch
         {
             DrawModeEnum.Hover => (AnCoConsoleTheme.Border, AnCoConsoleTheme.Accent, AnCoConsoleTheme.Highlight),
