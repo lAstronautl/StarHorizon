@@ -1025,6 +1025,28 @@
     max: 1
     perTiles: 60
     chance: 0.8
+  - group: HorizonFurnishDgBenchMedical
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandMedical
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   decals:
   - mode: Skirting
     cardinal:
@@ -1185,6 +1207,8 @@
     chance: 0.8
     jitter: 0.45
   gapFiller: HorizonDgSolidMedical
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: roomArchetype
   id: HorizonRoomArmory
@@ -1249,6 +1273,28 @@
     max: 1
     perTiles: 60
     chance: 0.8
+  - group: HorizonFurnishDgBenchArmory
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandArmory
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   decals:
   - mode: Skirting
     cardinal:
@@ -1412,6 +1458,8 @@
     chance: 0.8
     jitter: 0.45
   gapFiller: HorizonDgSolidArmory
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: roomArchetype
   id: HorizonRoomVault
@@ -1472,6 +1520,28 @@
     max: 1
     perTiles: 60
     chance: 0.8
+  - group: HorizonFurnishDgBenchArmory
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandArmory
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   decals:
   - mode: Skirting
     cardinal:
@@ -1639,6 +1709,8 @@
     max: 2
     jitter: 0.4
   gapFiller: HorizonDgSolidArmory
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: roomArchetype
   id: HorizonRoomBarracks
@@ -1716,6 +1788,28 @@
     max: 1
     perTiles: 60
     chance: 0.8
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandGeneral
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   decals:
   - mode: Skirting
     cardinal:
@@ -1882,6 +1976,8 @@
     chance: 0.8
     jitter: 0.45
   gapFiller: HorizonDgSolidGeneral
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: roomArchetype
   id: HorizonRoomStorage
@@ -1972,6 +2068,28 @@
     max: 1
     perTiles: 90
     chance: 0.8
+  - group: HorizonFurnishDgBenchSalvage
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandSalvage
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   decals:
   - mode: Skirting
     cardinal:
@@ -2139,6 +2257,8 @@
     chance: 0.3
     jitter: 0.4
   gapFiller: HorizonDgSolidSalvage
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: roomArchetype
   id: HorizonRoomEngineering
@@ -2213,6 +2333,28 @@
     max: 1
     perTiles: 60
     chance: 0.8
+  - group: HorizonFurnishDgBenchEngineering
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandEngineering
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   decals:
   - mode: Skirting
     cardinal:
@@ -2382,6 +2524,8 @@
     chance: 0.8
     jitter: 0.45
   gapFiller: HorizonDgSolidEngineering
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: roomArchetype
   id: HorizonRoomLaboratory
@@ -2438,6 +2582,28 @@
     max: 1
     perTiles: 60
     chance: 0.8
+  - group: HorizonFurnishDgBenchScience
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandScience
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   decals:
   - mode: Skirting
     cardinal:
@@ -2598,6 +2764,8 @@
     chance: 0.8
     jitter: 0.45
   gapFiller: HorizonDgSolidScience
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: roomArchetype
   id: HorizonRoomKitchen
@@ -2653,6 +2821,28 @@
     max: 1
     perTiles: 60
     chance: 0.8
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandService
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   decals:
   - mode: Skirting
     cardinal:
@@ -2814,6 +3004,8 @@
     chance: 0.8
     jitter: 0.45
   gapFiller: HorizonDgSolidService
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: roomArchetype
   id: HorizonRoomOffice
@@ -2870,6 +3062,28 @@
     max: 1
     perTiles: 60
     chance: 0.8
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandGeneral
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   decals:
   - mode: Skirting
     cardinal:
@@ -3022,6 +3236,8 @@
     chance: 0.8
     jitter: 0.45
   gapFiller: HorizonDgSolidGeneral
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: roomArchetype
   id: HorizonRoomHydroponics
@@ -3073,6 +3289,28 @@
     max: 1
     perTiles: 60
     chance: 0.8
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandService
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   decals:
   - mode: Skirting
     cardinal:
@@ -3230,6 +3468,8 @@
     chance: 0.8
     jitter: 0.45
   gapFiller: HorizonDgSolidHydroponics
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: roomArchetype
   id: HorizonRoomLounge
@@ -3282,6 +3522,28 @@
     max: 1
     perTiles: 60
     chance: 0.8
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandService
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   decals:
   - mode: Skirting
     cardinal:
@@ -3439,6 +3701,8 @@
     chance: 0.8
     jitter: 0.45
   gapFiller: HorizonDgSolidService
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: roomArchetype
   id: HorizonRoomSalvageBay
@@ -3510,6 +3774,28 @@
     max: 1
     perTiles: 60
     chance: 0.8
+  - group: HorizonFurnishDgBenchSalvage
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandSalvage
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   decals:
   - mode: Skirting
     cardinal:
@@ -3679,6 +3965,8 @@
     chance: 0.8
     jitter: 0.45
   gapFiller: HorizonDgSolidSalvage
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: dungeonConfig
   id: HorizonRoomFurnish

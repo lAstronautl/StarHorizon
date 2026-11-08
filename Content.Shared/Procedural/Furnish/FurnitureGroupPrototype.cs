@@ -73,6 +73,13 @@ public sealed partial class FurnitureMember
     public bool Rotate = true;
 
     /// <summary>
+    /// Extra rotation in degrees on top of the group's facing (e.g. 90 for a directional window that must face
+    /// sideways to close a line across the room).
+    /// </summary>
+    [DataField]
+    public float Rotation;
+
+    /// <summary>
     /// Blocking members occupy their tile: nothing else is placed there and the walkability check treats it as solid.
     /// Non-blocking ones (rugs, floor markings) only need to be inside the room.
     /// </summary>

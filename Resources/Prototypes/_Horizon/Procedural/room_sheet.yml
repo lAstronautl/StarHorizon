@@ -205,10 +205,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchMedical
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -222,6 +218,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchMedical
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandMedical
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetChemistryFree
     min: 2
@@ -386,6 +404,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetMedbay2Solid
@@ -462,10 +482,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchMedical
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -479,6 +495,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchMedical
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandMedical
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetMedbay2Free
     min: 2
@@ -638,6 +676,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetWardsSolid
@@ -697,10 +737,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchMedical
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -714,6 +750,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchMedical
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandMedical
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonDgFreeMedical
     min: 2
@@ -868,6 +926,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetMorgueSolid
@@ -940,10 +1000,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchMedical
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -957,6 +1013,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchMedical
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandMedical
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetMorgueFree
     min: 2
@@ -1116,6 +1194,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetCmoOfficeSolid
@@ -1187,10 +1267,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchMedical
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -1204,6 +1280,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchMedical
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandMedical
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetCmoOfficeFree
     min: 2
@@ -1363,6 +1461,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetOperatingRoomSolid
@@ -1427,10 +1527,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchMedical
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -1444,6 +1540,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchMedical
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandMedical
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonDgFreeMedical
     min: 2
@@ -1598,6 +1716,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetVirologySolid
@@ -1674,10 +1794,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchMedical
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -1691,6 +1807,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchMedical
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandMedical
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetVirologyFree
     min: 2
@@ -1850,6 +1988,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetPsychologistSolid
@@ -1935,10 +2075,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchMedical
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -1952,6 +2088,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchMedical
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandMedical
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetPsychologistSeats
     min: 1
@@ -2111,6 +2269,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetCryogenicsSolid
@@ -2165,10 +2325,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchMedical
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -2182,6 +2338,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchMedical
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandMedical
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetCryogenicsFree
     min: 2
@@ -2341,6 +2519,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetMedStorageSolid
@@ -2404,10 +2584,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchMedical
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -2421,6 +2597,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchMedical
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandMedical
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonDgFreeMedical
     min: 2
@@ -2575,6 +2773,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetParamedicSolid
@@ -2637,10 +2837,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchMedical
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -2654,6 +2850,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchMedical
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandMedical
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonDgFreeMedical
     min: 2
@@ -2808,6 +3026,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetMedBreakSolid
@@ -2885,10 +3105,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchMedical
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -2902,6 +3118,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchMedical
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandMedical
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetMedBreakFree
     min: 2
@@ -3066,6 +3304,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetCryoSleepSolid
@@ -3109,10 +3349,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchMedical
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -3126,6 +3362,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchMedical
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandMedical
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonDgFreeMedical
     min: 2
@@ -3280,6 +3538,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetAnomalySolid
@@ -3349,10 +3609,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchScience
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -3366,6 +3622,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchScience
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandScience
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetAnomalyFree
     min: 2
@@ -3525,6 +3803,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetRoboticsSolid
@@ -3588,10 +3868,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchScience
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -3605,6 +3881,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchScience
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandScience
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonDgFreeScience
     min: 2
@@ -3759,6 +4057,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetXenoarchSolid
@@ -3829,10 +4129,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchScience
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -3846,6 +4142,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchScience
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandScience
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetXenoarchFree
     min: 2
@@ -4005,6 +4323,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetRdOfficeSolid
@@ -4077,10 +4397,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchScience
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -4094,6 +4410,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchScience
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandScience
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetRdOfficeFree
     min: 2
@@ -4253,6 +4591,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetRndServerSolid
@@ -4295,10 +4635,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchScience
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -4312,6 +4648,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchScience
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandScience
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonDgFreeScience
     min: 2
@@ -4466,6 +4824,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetRndLabSolid
@@ -4540,10 +4900,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchScience
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -4557,6 +4913,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchScience
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandScience
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetRndLabFree
     min: 2
@@ -4716,6 +5094,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetToxinsSolid
@@ -4771,10 +5151,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchScience
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -4788,6 +5164,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchScience
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandScience
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetToxinsFree
     min: 2
@@ -4947,6 +5345,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetCanisterStoreSolid
@@ -4990,10 +5390,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchScience
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -5007,6 +5403,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchScience
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandScience
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonDgFreeScience
     min: 2
@@ -5161,6 +5579,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetSciBreakSolid
@@ -5237,10 +5657,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchScience
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -5254,6 +5670,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchScience
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandScience
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetSciBreakFree
     min: 2
@@ -5418,6 +5856,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetGravityRoomSolid
@@ -5480,10 +5920,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchEngineering
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -5497,6 +5933,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchEngineering
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandEngineering
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonDgFreeEngineering
     min: 2
@@ -5655,6 +6113,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetCeOfficeSolid
@@ -5724,10 +6184,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchEngineering
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -5741,6 +6197,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchEngineering
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandEngineering
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetCeOfficeFree
     min: 2
@@ -5904,6 +6382,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetAtmosSolid
@@ -6000,10 +6480,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchEngineering
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -6017,6 +6493,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchEngineering
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandEngineering
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetAtmosFree
     min: 2
@@ -6180,6 +6678,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetMainEngineeringSolid
@@ -6268,10 +6768,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchEngineering
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -6285,6 +6781,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchEngineering
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandEngineering
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetMainEngineeringFree
     min: 2
@@ -6448,6 +6966,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetBoardStoreOnWall
@@ -6497,10 +7017,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchEngineering
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -6514,6 +7030,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchEngineering
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandEngineering
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetBoardStoreFree
     min: 2
@@ -6677,6 +7215,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetAtmosLockerSolid
@@ -6737,10 +7277,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchEngineering
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -6754,6 +7290,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchEngineering
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandEngineering
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonDgFreeEngineering
     min: 2
@@ -6912,6 +7470,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetEngBreakSolid
@@ -6989,10 +7549,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchEngineering
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -7006,6 +7562,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchEngineering
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandEngineering
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetEngBreakFree
     min: 2
@@ -7174,6 +7752,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetHosOfficeSolid
@@ -7243,10 +7823,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchArmory
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -7260,6 +7836,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchArmory
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandArmory
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetHosOfficeFree
     min: 2
@@ -7415,6 +8013,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetBrigSolid
@@ -7468,10 +8068,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchArmory
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -7485,6 +8081,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchArmory
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandArmory
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetBrigFree
     min: 2
@@ -7640,6 +8258,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetCellsSolid
@@ -7729,10 +8349,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchArmory
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -7746,6 +8362,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchArmory
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandArmory
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetCellsFree
     min: 2
@@ -7901,6 +8539,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetWardenOfficeSolid
@@ -7990,10 +8630,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchArmory
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -8007,6 +8643,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchArmory
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandArmory
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetWardenOfficeFree
     min: 2
@@ -8162,6 +8820,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetInterrogationSolid
@@ -8240,10 +8900,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchArmory
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -8257,6 +8913,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchArmory
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandArmory
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetInterrogationFree
     min: 2
@@ -8417,6 +9095,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetPermabrigSolid
@@ -8492,10 +9172,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchArmory
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -8509,6 +9185,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchArmory
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandArmory
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetPermabrigFree
     min: 2
@@ -8664,6 +9362,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetDetectiveOfficeSolid
@@ -8737,10 +9437,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchArmory
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -8754,6 +9450,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchArmory
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandArmory
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetDetectiveOfficeFree
     min: 2
@@ -8909,6 +9627,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetSecLockerSolid
@@ -8979,10 +9699,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchArmory
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -8996,6 +9712,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchArmory
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandArmory
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetSecLockerFree
     min: 2
@@ -9151,6 +9889,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetExecutionRoomFree
@@ -9179,10 +9919,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchArmory
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -9196,6 +9932,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchArmory
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandArmory
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetExecutionRoomFree
     min: 2
@@ -9351,6 +10109,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetCheckpointSolid
@@ -9428,10 +10188,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchArmory
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -9445,6 +10201,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchArmory
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandArmory
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetCheckpointFree
     min: 2
@@ -9605,6 +10383,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetFiringRangeSolid
@@ -9664,10 +10444,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchArmory
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -9681,6 +10457,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchArmory
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandArmory
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonDgFreeArmory
     min: 2
@@ -9831,6 +10629,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetSecMedicalSolid
@@ -9904,10 +10704,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchArmory
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -9921,6 +10717,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchArmory
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandArmory
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetSecMedicalFree
     min: 2
@@ -10076,6 +10894,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetBarSolid
@@ -10145,10 +10965,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchService
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -10162,6 +10978,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandService
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetBarSeats
     min: 1
@@ -10317,6 +11155,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetKitchen2Solid
@@ -10390,10 +11230,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchService
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -10407,6 +11243,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandService
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetKitchen2Free
     min: 2
@@ -10562,6 +11420,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetFridgeSolid
@@ -10622,10 +11482,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchService
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -10639,6 +11495,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandService
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonDgFreeService
     min: 2
@@ -10789,6 +11667,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetHydro2Solid
@@ -10865,10 +11745,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchService
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -10882,6 +11758,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandService
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetHydro2Free
     min: 2
@@ -11037,6 +11935,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetJanitorSolid
@@ -11110,10 +12010,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchService
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -11127,6 +12023,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandService
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetJanitorFree
     min: 2
@@ -11282,6 +12200,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetChapelSolid
@@ -11334,10 +12254,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchService
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -11351,6 +12267,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandService
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetChapelFree
     min: 2
@@ -11506,6 +12444,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetChaplainRoomSolid
@@ -11565,10 +12505,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchService
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -11582,6 +12518,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandService
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonDgFreeService
     min: 2
@@ -11732,6 +12690,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetBartenderRoomSolid
@@ -11774,10 +12734,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchService
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -11791,6 +12747,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandService
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonDgFreeService
     min: 2
@@ -11941,6 +12919,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetTheatreSolid
@@ -12000,10 +12980,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchService
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -12017,6 +12993,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandService
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetTheatreFree
     min: 2
@@ -12177,6 +13175,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetReporterOfficeSolid
@@ -12219,10 +13219,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchService
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -12236,6 +13232,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandService
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonDgFreeService
     min: 2
@@ -12386,6 +13404,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetChapelMorgueSolid
@@ -12438,10 +13458,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchService
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -12455,6 +13471,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandService
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetChapelMorgueFree
     min: 2
@@ -12610,6 +13648,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetClownRoomSolid
@@ -12663,10 +13703,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchService
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -12680,6 +13716,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandService
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetClownRoomFree
     min: 2
@@ -12835,6 +13893,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetMimeRoomSolid
@@ -12886,10 +13946,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchService
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -12903,6 +13959,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandService
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetMimeRoomFree
     min: 2
@@ -13058,6 +14136,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetMusicianRoomFree
@@ -13086,10 +14166,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchService
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -13103,6 +14179,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandService
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetMusicianRoomFree
     min: 2
@@ -13258,6 +14356,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetZooRoomSolid
@@ -13310,10 +14410,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchService
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -13327,6 +14423,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchService
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandService
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetZooRoomFree
     min: 2
@@ -13482,6 +14600,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetDormSolid
@@ -13558,10 +14678,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchGeneral
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -13575,6 +14691,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandGeneral
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetDormFree
     min: 2
@@ -13731,6 +14869,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetToiletsSolid
@@ -13822,10 +14962,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchGeneral
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -13839,6 +14975,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandGeneral
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetToiletsFree
     min: 2
@@ -13990,6 +15148,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetToolStoreSolid
@@ -14047,10 +15207,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchGeneral
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -14064,6 +15220,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandGeneral
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetToolStoreFree
     min: 2
@@ -14215,6 +15393,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetLibrarySolid
@@ -14285,10 +15465,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchGeneral
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -14302,6 +15478,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandGeneral
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetLibraryFree
     min: 2
@@ -14453,6 +15651,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetArrivalsSolid
@@ -14514,10 +15714,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchGeneral
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -14531,6 +15727,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandGeneral
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonDgFreeGeneral
     min: 2
@@ -14677,6 +15895,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetGymSolid
@@ -14751,10 +15971,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchGeneral
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -14768,6 +15984,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandGeneral
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetGymFree
     min: 2
@@ -14919,6 +16157,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetPublicGardenSolid
@@ -14978,10 +16218,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchGeneral
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -14995,6 +16231,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandGeneral
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonDgFreeGeneral
     min: 2
@@ -15141,6 +16399,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetCourtroomSolid
@@ -15220,10 +16480,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchGeneral
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -15237,6 +16493,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandGeneral
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetCourtroomFree
     min: 2
@@ -15393,6 +16671,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetLockerSolid
@@ -15436,10 +16716,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchGeneral
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -15453,6 +16729,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandGeneral
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonDgFreeGeneral
     min: 2
@@ -15599,6 +16897,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetBridgeSolid
@@ -15703,10 +17003,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchGeneral
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -15720,6 +17016,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandGeneral
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetBridgeFree
     min: 2
@@ -15871,6 +17189,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetCaptainQuartersSolid
@@ -15942,10 +17262,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchGeneral
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -15959,6 +17275,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandGeneral
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetCaptainQuartersFree
     min: 2
@@ -16110,6 +17448,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetHopOfficeSolid
@@ -16186,10 +17526,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchGeneral
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -16203,6 +17539,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandGeneral
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetHopOfficeFree
     min: 2
@@ -16354,6 +17712,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetLawyerOfficeSolid
@@ -16405,10 +17765,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchGeneral
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -16422,6 +17778,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandGeneral
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetLawyerOfficeFree
     min: 2
@@ -16573,6 +17951,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetVault2Solid
@@ -16646,10 +18026,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchGeneral
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -16663,6 +18039,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandGeneral
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetVault2Free
     min: 2
@@ -16814,6 +18212,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetEvaStorageSolid
@@ -16868,10 +18268,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchGeneral
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -16885,6 +18281,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandGeneral
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetEvaStorageFree
     min: 2
@@ -17036,6 +18454,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetConferenceSolid
@@ -17106,10 +18526,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchGeneral
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -17123,6 +18539,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandGeneral
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetConferenceFree
     min: 2
@@ -17274,6 +18712,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetWorkshopSolid
@@ -17317,10 +18757,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchGeneral
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -17334,6 +18770,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchGeneral
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandGeneral
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonDgFreeGeneral
     min: 2
@@ -17480,6 +18938,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.6
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetCargoReceptionSolid
@@ -17532,10 +18992,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchSalvage
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -17549,6 +19005,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchSalvage
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandSalvage
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetCargoReceptionFree
     min: 2
@@ -17705,6 +19183,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.75
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetCargoStorageSolid
@@ -17775,10 +19255,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchSalvage
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -17792,6 +19268,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchSalvage
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandSalvage
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetCargoStorageFree
     min: 2
@@ -17948,6 +19446,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.75
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetQmOfficeSolid
@@ -18016,10 +19516,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchSalvage
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -18033,6 +19529,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchSalvage
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandSalvage
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetQmOfficeFree
     min: 2
@@ -18189,6 +19707,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.75
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetSalvageRoomSolid
@@ -18252,10 +19772,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchSalvage
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -18269,6 +19785,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchSalvage
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandSalvage
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonDgFreeSalvage
     min: 2
@@ -18420,6 +19958,8 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.75
+  floorScale: 0.35
+  tableChance: 0.7
 
 - type: entityTable
   id: HorizonSheetMailRoomSolid
@@ -18470,10 +20010,6 @@
     max: 1
     perTiles: 80
     chance: 0.6
-  - group: HorizonFurnishDgBenchSalvage
-    min: 1
-    max: 1
-    perTiles: 45
   - group: HorizonFurnishPoster
     min: 0
     max: 1
@@ -18487,6 +20023,28 @@
     min: 0
     max: 1
     chance: 0.4
+  - group: HorizonFurnishDgBenchSalvage
+    min: 1
+    max: 1
+    perTiles: 34
+  - group: HorizonFurnishDgTableIslandSalvage
+    min: 1
+    max: 1
+    perTiles: 50
+  - group: HorizonFurnishGlassPartitionLine
+    min: 0
+    max: 1
+    perTiles: 90
+    chance: 0.6
+  - group: HorizonFurnishGlassPartitionWall
+    min: 0
+    max: 1
+    perTiles: 100
+    chance: 0.5
+  - group: HorizonFurnishGlassShelf
+    min: 0
+    max: 1
+    chance: 0.3
   litter:
   - table: HorizonSheetMailRoomFree
     min: 2
@@ -18643,4 +20201,5 @@
       perTiles: 20
       jitter: 0.45
   storyChance: 0.75
-
+  floorScale: 0.35
+  tableChance: 0.7

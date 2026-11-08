@@ -231,6 +231,20 @@ public sealed partial class RoomArchetypePrototype : IPrototype
     public List<FurnishDecalRule> Decals = new();
 
     /// <summary>
+    /// Multiplier for loot lying on the bare floor: litter drops that land on the floor and floor-spawner entries
+    /// (Free placement) are kept with this probability. Below 1 the floor is emptier.
+    /// </summary>
+    [DataField]
+    public float FloorScale = 1f;
+
+    /// <summary>
+    /// Chance that a litter drop lands on a table/rack top (when the room has one) instead of the floor.
+    /// Drops that land on tables are never scaled down, so loot moves from the floor onto tables.
+    /// </summary>
+    [DataField]
+    public float TableChance;
+
+    /// <summary>
     /// Solid one-tile items (crate/locker spawners, plants) that plug dead-end pockets nothing else fits into.
     /// Null disables gap filling for the room.
     /// </summary>

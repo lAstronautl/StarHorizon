@@ -2,6 +2,7 @@ using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using Content.Shared.Decals;
+using Content.Shared.Placeable;
 using Content.Shared.Procedural;
 using Content.Shared.Procedural.Furnish;
 using Content.Shared.Procedural.PostGeneration;
@@ -32,6 +33,10 @@ public sealed partial class DungeonJob
         public readonly HashSet<Vector2i> Reserved = new();
         /// <summary> Every tile already holding a member of some group (floor and wall tiles alike). </summary>
         public readonly HashSet<Vector2i> Used = new();
+        /// <summary> Tiles with a table / rack top: loot can be dropped on them. </summary>
+        public readonly List<Vector2i> TableTiles = new();
+        public float FloorScale = 1f;
+        public float TableChance;
         public readonly Dictionary<Vector2i, bool> WallCache = new();
         public HashSet<Vector2i> Reach = new();
     }
@@ -222,6 +227,9 @@ public sealed partial class DungeonJob
             // Sorted so the result only depends on the seed, not on HashSet ordering.
             TileList = room.Tiles.OrderBy(t => t.X).ThenBy(t => t.Y).ToList(),
         };
+
+        ctx.FloorScale = arch.FloorScale;
+        ctx.TableChance = arch.TableChance;
 
         foreach (var door in room.Entrances)
         {
@@ -420,22 +428,36 @@ public sealed partial class DungeonJob
 
             for (var i = 0; i < count; i++)
             {
-                // A few tries to find floor that is not under furniture or in a doorway.
+                // Drops prefer table tops; only drops that stay on the floor are thinned by FloorScale.
+                var onTable = ctx.TableTiles.Count > 0 && random.Prob(ctx.TableChance);
                 Vector2i? tile = null;
 
-                for (var attempt = 0; attempt < 12; attempt++)
+                if (onTable)
                 {
-                    var candidate = ctx.TileList[random.Next(ctx.TileList.Count)];
-
-                    if (ctx.Blocked.Contains(candidate) || ctx.DoorSeeds.Contains(candidate))
+                    tile = ctx.TableTiles[random.Next(ctx.TableTiles.Count)];
+                }
+                else
+                {
+                    if (!random.Prob(ctx.FloorScale))
                         continue;
 
-                    tile = candidate;
-                    break;
+                    // A few tries to find floor that is not under furniture or in a doorway.
+                    for (var attempt = 0; attempt < 12; attempt++)
+                    {
+                        var candidate = ctx.TileList[random.Next(ctx.TileList.Count)];
+
+                        if (ctx.Blocked.Contains(candidate) || ctx.DoorSeeds.Contains(candidate))
+                            continue;
+
+                        tile = candidate;
+                        break;
+                    }
                 }
 
                 if (tile == null)
                     continue;
+
+                var jitter = onTable ? Math.Min(rule.Jitter, 0.3f) : rule.Jitter;
 
                 List<EntProtoId> items;
 
@@ -452,8 +474,8 @@ public sealed partial class DungeonJob
                 foreach (var proto in items)
                 {
                     var shift = new Vector2(
-                        (random.NextFloat() * 2f - 1f) * rule.Jitter,
-                        (random.NextFloat() * 2f - 1f) * rule.Jitter);
+                        (random.NextFloat() * 2f - 1f) * jitter,
+                        (random.NextFloat() * 2f - 1f) * jitter);
                     var coords = _maps.GridTileToLocal(_gridUid, _grid, tile.Value).Offset(shift);
                     var uid = FurnishSpawn(proto, coords);
 
@@ -474,10 +496,24 @@ public sealed partial class DungeonJob
         if (entry.Min <= 0 && !random.Prob(entry.Chance))
             count = 0;
 
+        var group = _prototype.Index(entry.Group);
+
+        // Loot spawners lying on the bare floor are thinned out; the same loot is placed on tables instead.
+        if (group.Placement == FurnishPlacement.Free && ctx.FloorScale < 1f)
+        {
+            var kept = 0;
+
+            for (var n = 0; n < count; n++)
+            {
+                if (random.Prob(ctx.FloorScale))
+                    kept++;
+            }
+
+            count = kept;
+        }
+
         if (count <= 0)
             return;
-
-        var group = _prototype.Index(entry.Group);
         var placed = 0;
 
         for (var i = 0; i < count; i++)
@@ -979,7 +1015,18 @@ public sealed partial class DungeonJob
                     uid ??= spawned;
 
                     if (member.Rotate)
-                        _transform.SetLocalRotation(spawned.Value, new Vector2(facing.X, facing.Y).ToWorldAngle());
+                    {
+                        _transform.SetLocalRotation(
+                            spawned.Value,
+                            new Vector2(facing.X, facing.Y).ToWorldAngle() + Angle.FromDegrees(member.Rotation));
+                    }
+
+                    // Tables and racks (anything items can be put on) become spots for litter drops.
+                    if (member.Blocking && _entManager.HasComponent<PlaceableSurfaceComponent>(spawned.Value) &&
+                        !ctx.TableTiles.Contains(positions[i]))
+                    {
+                        ctx.TableTiles.Add(positions[i]);
+                    }
                 }
 
                 if (uid == null)

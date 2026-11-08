@@ -1,0 +1,272 @@
+# Glass partitions (directional panes with a sliding windoor gap) and table islands for RoomFurnishDunGen.
+# Panes face the group's facing direction, so a Center line closes a row across the room and a Wall line grows out of a
+# wall (panes turned 90 degrees). The windoor tile is passable, so a partition never cuts a room in two.
+
+- type: entityTable
+  id: HorizonGlassPanes
+  table: !type:GroupSelector
+    children:
+    - id: WindowDirectionalDungeon
+    - id: WindowReinforcedDirectionalDungeon
+    - id: WindowFrostedDirectionalDungeon
+
+- type: entityTable
+  id: HorizonGlassDoors
+  table: !type:GroupSelector
+    children:
+    - id: WindoorDungeon
+
+# Row of panes across the room with a sliding door in the middle (2 panes, door, 2 panes).
+- type: furnitureGroup
+  id: HorizonFurnishGlassPartitionLine
+  placement: Center
+  clearance: 1
+  members:
+  - table: HorizonGlassPanes
+    offset: -2,0
+  - table: HorizonGlassPanes
+    offset: -1,0
+  - table: HorizonGlassDoors
+    blocking: false
+  - table: HorizonGlassPanes
+    offset: 1,0
+  - table: HorizonGlassPanes
+    offset: 2,0
+    chance: 0.7
+
+# Partition that grows out of a wall into the room: 3 panes, then a sliding door.
+- type: furnitureGroup
+  id: HorizonFurnishGlassPartitionWall
+  placement: Wall
+  clearance: 0
+  members:
+  - table: HorizonGlassPanes
+    rotation: 90
+  - table: HorizonGlassPanes
+    offset: 0,1
+    rotation: 90
+  - table: HorizonGlassPanes
+    offset: 0,2
+    rotation: 90
+  - table: HorizonGlassDoors
+    offset: 0,3
+    rotation: 90
+    blocking: false
+    chance: 0.8
+
+# Observation window: a short pane row along a wall.
+- type: furnitureGroup
+  id: HorizonFurnishGlassShelf
+  placement: Wall
+  clearance: 1
+  members:
+  - table: HorizonGlassPanes
+    offset: 0,1
+  - table: HorizonGlassPanes
+    offset: 1,1
+  - table: HorizonGlassPanes
+    offset: 2,1
+    chance: 0.6
+
+- type: furnitureGroup
+  id: HorizonFurnishDgTableIslandMedical
+  placement: Center
+  clearance: 1
+  members:
+  - proto: TableGlass
+  - table: HorizonDgFreeMedical
+    blocking: false
+  - proto: TableGlass
+    offset: 1,0
+  - table: HorizonDgFreeMedical
+    offset: 1,0
+    blocking: false
+  - proto: TableGlass
+    offset: 2,0
+    chance: 0.6
+  - table: HorizonDgFreeMedical
+    offset: 2,0
+    blocking: false
+    chance: 0.6
+  - proto: Stool
+    offset: 0,1
+    blocking: false
+    chance: 0.6
+  - proto: Stool
+    offset: 1,-1
+    blocking: false
+    chance: 0.6
+
+- type: furnitureGroup
+  id: HorizonFurnishDgTableIslandScience
+  placement: Center
+  clearance: 1
+  members:
+  - proto: TableGlass
+  - table: HorizonDgFreeScience
+    blocking: false
+  - proto: TableGlass
+    offset: 1,0
+  - table: HorizonDgFreeScience
+    offset: 1,0
+    blocking: false
+  - proto: TableGlass
+    offset: 2,0
+    chance: 0.6
+  - table: HorizonDgFreeScience
+    offset: 2,0
+    blocking: false
+    chance: 0.6
+  - proto: Stool
+    offset: 0,1
+    blocking: false
+    chance: 0.6
+  - proto: Stool
+    offset: 1,-1
+    blocking: false
+    chance: 0.6
+
+- type: furnitureGroup
+  id: HorizonFurnishDgTableIslandEngineering
+  placement: Center
+  clearance: 1
+  members:
+  - proto: Table
+  - table: HorizonDgFreeEngineering
+    blocking: false
+  - proto: Table
+    offset: 1,0
+  - table: HorizonDgFreeEngineering
+    offset: 1,0
+    blocking: false
+  - proto: Table
+    offset: 2,0
+    chance: 0.6
+  - table: HorizonDgFreeEngineering
+    offset: 2,0
+    blocking: false
+    chance: 0.6
+  - proto: Stool
+    offset: 0,1
+    blocking: false
+    chance: 0.6
+  - proto: Stool
+    offset: 1,-1
+    blocking: false
+    chance: 0.6
+
+- type: furnitureGroup
+  id: HorizonFurnishDgTableIslandArmory
+  placement: Center
+  clearance: 1
+  members:
+  - proto: TableReinforced
+  - table: HorizonDgFreeArmory
+    blocking: false
+  - proto: TableReinforced
+    offset: 1,0
+  - table: HorizonDgFreeArmory
+    offset: 1,0
+    blocking: false
+  - proto: TableReinforced
+    offset: 2,0
+    chance: 0.6
+  - table: HorizonDgFreeArmory
+    offset: 2,0
+    blocking: false
+    chance: 0.6
+  - proto: Stool
+    offset: 0,1
+    blocking: false
+    chance: 0.6
+  - proto: Stool
+    offset: 1,-1
+    blocking: false
+    chance: 0.6
+
+- type: furnitureGroup
+  id: HorizonFurnishDgTableIslandService
+  placement: Center
+  clearance: 1
+  members:
+  - proto: Table
+  - table: HorizonDgFreeService
+    blocking: false
+  - proto: Table
+    offset: 1,0
+  - table: HorizonDgFreeService
+    offset: 1,0
+    blocking: false
+  - proto: Table
+    offset: 2,0
+    chance: 0.6
+  - table: HorizonDgFreeService
+    offset: 2,0
+    blocking: false
+    chance: 0.6
+  - proto: Stool
+    offset: 0,1
+    blocking: false
+    chance: 0.6
+  - proto: Stool
+    offset: 1,-1
+    blocking: false
+    chance: 0.6
+
+- type: furnitureGroup
+  id: HorizonFurnishDgTableIslandGeneral
+  placement: Center
+  clearance: 1
+  members:
+  - proto: Table
+  - table: HorizonDgFreeGeneral
+    blocking: false
+  - proto: Table
+    offset: 1,0
+  - table: HorizonDgFreeGeneral
+    offset: 1,0
+    blocking: false
+  - proto: Table
+    offset: 2,0
+    chance: 0.6
+  - table: HorizonDgFreeGeneral
+    offset: 2,0
+    blocking: false
+    chance: 0.6
+  - proto: Stool
+    offset: 0,1
+    blocking: false
+    chance: 0.6
+  - proto: Stool
+    offset: 1,-1
+    blocking: false
+    chance: 0.6
+
+- type: furnitureGroup
+  id: HorizonFurnishDgTableIslandSalvage
+  placement: Center
+  clearance: 1
+  members:
+  - proto: Table
+  - table: HorizonDgFreeSalvage
+    blocking: false
+  - proto: Table
+    offset: 1,0
+  - table: HorizonDgFreeSalvage
+    offset: 1,0
+    blocking: false
+  - proto: Table
+    offset: 2,0
+    chance: 0.6
+  - table: HorizonDgFreeSalvage
+    offset: 2,0
+    blocking: false
+    chance: 0.6
+  - proto: Stool
+    offset: 0,1
+    blocking: false
+    chance: 0.6
+  - proto: Stool
+    offset: 1,-1
+    blocking: false
+    chance: 0.6
