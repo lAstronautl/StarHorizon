@@ -2,8 +2,8 @@
                       xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
                       xmlns:hack="clr-namespace:Content.Client._Horizon._Fractions.AnCo.WeaponCaseHack"
                       Title="{Loc 'anco-weapon-case-hack-window-title'}"
-                      MinSize="360 520"
-                      SetSize="360 520">
+                      MinSize="440 620"
+                      SetSize="440 620">
     <Control>
         <!-- Чёрный фон консоли на всё содержимое -->
         <PanelContainer Name="BackgroundPanel" />
@@ -29,7 +29,7 @@
 
             <!-- Схема дорожек -->
             <PanelContainer Name="MapPanel" HorizontalExpand="True" VerticalExpand="True">
-                <hack:AnCoWeaponCaseHackMap Name="Map" HorizontalExpand="True" VerticalExpand="True" MinSize="300 260" Margin="5" />
+                <hack:AnCoWeaponCaseHackMap Name="Map" HorizontalExpand="True" VerticalExpand="True" MinSize="380 280" Margin="5" />
             </PanelContainer>
 
             <Control MinHeight="10" />

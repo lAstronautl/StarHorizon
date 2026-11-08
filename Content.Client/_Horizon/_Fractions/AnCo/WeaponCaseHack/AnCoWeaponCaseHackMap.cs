@@ -6,7 +6,7 @@ using Robust.Client.UserInterface;
 namespace Content.Client._Horizon._Fractions.AnCo.WeaponCaseHack;
 
 /// <summary>
-/// Схема дорожек: ломаная от зелёного старта. Видна только пройденная часть и текущая развилка,
+/// Схема дорожек: узлы по диагонали, линии к ним только горизонтальные и вертикальные, старт - зелёный. Видна только пройденная часть и текущая развилка,
 /// чьи выходы нарисованы одинаковыми обрезанными стабами (какой верный - неизвестно). Янтарная точка - конец
 /// пройденного тупика. Карта подгоняется под размер окна и растёт по мере прохождения.
 /// </summary>
@@ -33,28 +33,34 @@ public sealed class AnCoWeaponCaseHackMap : Control
         _nodes.Clear();
         _deadEnds.Clear();
 
+        // Магистраль от старта до первой развилки - вертикаль.
         var pos = Vector2.Zero;
-        var next = new Vector2(0, AnCoHackGraph.FirstLeg);
-        _segments.Add((pos, next));
-        pos = next;
+        pos = AddPath(pos, AnCoHackDir.Up, AnCoHackGraph.FirstLeg);
 
         foreach (var node in state.Passed)
         {
             _nodes.Add(pos);
 
-            var dead = pos + AnCoHackGraph.Step(node.CorrectIsB ? node.RightExit : node.LeftExit) * node.DeadEndLength;
-            _segments.Add((pos, dead));
-            _deadEnds.Add(dead);
-
-            next = pos + AnCoHackGraph.Step(node.CorrectIsB ? node.LeftExit : node.RightExit) * node.LegLength;
-            _segments.Add((pos, next));
-            pos = next;
+            _deadEnds.Add(AddPath(pos, node.CorrectIsB ? node.RightExit : node.LeftExit, node.DeadEndLength));
+            pos = AddPath(pos, node.CorrectIsB ? node.LeftExit : node.RightExit, node.LegLength);
         }
 
         // Текущая развилка: оба выхода обрезаны на одинаковой длине.
         _current = pos;
-        _segments.Add((pos, pos + AnCoHackGraph.Step(state.CurrentLeftExit) * AnCoHackGraph.StubLength));
-        _segments.Add((pos, pos + AnCoHackGraph.Step(state.CurrentRightExit) * AnCoHackGraph.StubLength));
+        AddPath(pos, state.CurrentLeftExit, AnCoHackGraph.StubLength);
+        AddPath(pos, state.CurrentRightExit, AnCoHackGraph.StubLength);
+    }
+
+    /// <summary>
+    /// Добавляет ломаную (горизонталь в сторону, затем вертикаль вверх) и возвращает её конец.
+    /// </summary>
+    private Vector2 AddPath(Vector2 from, AnCoHackDir dir, int length)
+    {
+        var points = AnCoHackGraph.PathPoints(from, dir, length);
+        for (var i = 1; i < points.Count; i++)
+            _segments.Add((points[i - 1], points[i]));
+
+        return points[^1];
     }
 
     protected override void Draw(DrawingHandleScreen handle)
