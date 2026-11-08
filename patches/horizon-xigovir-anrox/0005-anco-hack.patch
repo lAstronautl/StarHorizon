@@ -1,0 +1,33 @@
+From 6f6c83f056961509d663cdfdb12e58e05ea05f3b Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Sat, 7 Nov 2026 21:09:33 +0000
+Subject: [PATCH 5/7] =?UTF-8?q?=D0=98=D1=81=D0=BF=D1=80=D0=B0=D0=B2=D0=B8?=
+ =?UTF-8?q?=D1=82=D1=8C=20=D1=81=D0=B1=D0=BE=D1=80=D0=BA=D1=83=20=D1=82?=
+ =?UTF-8?q?=D0=B5=D0=BC=D1=8B=20=D0=B2=D0=B7=D0=BB=D0=BE=D0=BC=D0=B0=20?=
+ =?UTF-8?q?=D0=90=D0=BD=D0=9A=D0=BE:=20=D0=BF=D0=BE=D0=B4=D0=BA=D0=BB?=
+ =?UTF-8?q?=D1=8E=D1=87=D0=B8=D1=82=D1=8C=20Content.Client.Resources?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+GetFont для IResourceCache - extension-метод из Content.Client.Resources,
+using в AnCoConsoleTheme не хватало (CS1061).
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_012sYdkn9KH7r3NSM4NYKTD9
+---
+ .../_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoConsoleTheme.cs  | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoConsoleTheme.cs b/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoConsoleTheme.cs
+index be8f6489d..577fb00f0 100644
+--- a/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoConsoleTheme.cs
++++ b/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoConsoleTheme.cs
+@@ -1,3 +1,4 @@
++using Content.Client.Resources;
+ using Robust.Client.Graphics;
+ using Robust.Client.ResourceManagement;
+ 
+-- 
+2.43.0
+

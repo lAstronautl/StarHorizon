@@ -1,0 +1,479 @@
+From a764a35f4ca6754b2a4c521652947d49d7f4536a Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Sat, 7 Nov 2026 20:33:01 +0000
+Subject: [PATCH 1/7] =?UTF-8?q?=D0=92=D0=B7=D0=BB=D0=BE=D0=BC=20=D0=90?=
+ =?UTF-8?q?=D0=BD=D0=9A=D0=BE:=20=D0=BA=D0=BE=D0=BD=D1=81=D0=BE=D0=BB?=
+ =?UTF-8?q?=D1=8C=D0=BD=D1=8B=D0=B9=20=D0=B8=D0=BD=D1=82=D0=B5=D1=80=D1=84?=
+ =?UTF-8?q?=D0=B5=D0=B9=D1=81,=20=D0=BE=D1=80=D1=82=D0=BE=D0=B3=D0=BE?=
+ =?UTF-8?q?=D0=BD=D0=B0=D0=BB=D1=8C=D0=BD=D1=8B=D0=B5=20=D0=B4=D0=BE=D1=80?=
+ =?UTF-8?q?=D0=BE=D0=B6=D0=BA=D0=B8,=20=D0=BA=D0=BD=D0=BE=D0=BF=D0=BA?=
+ =?UTF-8?q?=D0=B8=20=D0=BD=D0=B0=D0=BF=D1=80=D0=B0=D0=B2=D0=BB=D0=B5=D0=BD?=
+ =?UTF-8?q?=D0=B8=D0=B9?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Окно переведено на XAML в стиле консолей АнКо (FancyWindow, AngleRect,
+LabelHeading/LabelBig). Дорожки только горизонтальные и вертикальные,
+без разворота назад. Вместо кнопок B/C три кнопки влево/вверх/вправо;
+серийники подписаны направлением, кнопка без выхода неактивна.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_012sYdkn9KH7r3NSM4NYKTD9
+---
+ .../AnCoWeaponCaseHackBoundUserInterface.cs   |  2 +-
+ ...HackWindow.cs => AnCoWeaponCaseHackMap.cs} | 73 -------------------
+ .../AnCoWeaponCaseHackWindow.xaml             | 52 +++++++++++++
+ .../AnCoWeaponCaseHackWindow.xaml.cs          | 59 +++++++++++++++
+ .../AnCoWeaponCaseHackSystem.cs               | 15 +++-
+ .../AnCo/WeaponCaseHack/AnCoHackGraph.cs      | 30 ++++++--
+ .../WeaponCaseHack/AnCoWeaponCaseHackUi.cs    |  8 +-
+ Content.Tests/Shared/AnCoHackGraphTest.cs     | 16 ++++
+ .../_Horizon/_Fractions/AnCo/weapon-case.ftl  |  6 +-
+ .../_Horizon/_Fractions/AnCo/weapon-case.ftl  |  6 +-
+ 10 files changed, 176 insertions(+), 91 deletions(-)
+ rename Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/{AnCoWeaponCaseHackWindow.cs => AnCoWeaponCaseHackMap.cs} (64%)
+ create mode 100644 Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackWindow.xaml
+ create mode 100644 Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackWindow.xaml.cs
+
+diff --git a/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackBoundUserInterface.cs b/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackBoundUserInterface.cs
+index 8a164ed71..d9df32682 100644
+--- a/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackBoundUserInterface.cs
++++ b/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackBoundUserInterface.cs
+@@ -18,7 +18,7 @@ protected override void Open()
+ 
+         _window = new AnCoWeaponCaseHackWindow();
+         _window.OnClose += Close;
+-        _window.OnChoose += (chooseB, nodeIndex) => SendMessage(new AnCoHackChooseMessage(chooseB, nodeIndex));
++        _window.OnChoose += (dir, nodeIndex) => SendMessage(new AnCoHackChooseMessage(dir, nodeIndex));
+         _window.OpenCentered();
+     }
+ 
+diff --git a/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackWindow.cs b/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackMap.cs
+similarity index 64%
+rename from Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackWindow.cs
+rename to Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackMap.cs
+index 576b5d765..304e5ce82 100644
+--- a/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackWindow.cs
++++ b/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackMap.cs
+@@ -2,82 +2,9 @@
+ using Content.Shared._Horizon._Fractions.AnCo.WeaponCaseHack;
+ using Robust.Client.Graphics;
+ using Robust.Client.UserInterface;
+-using Robust.Client.UserInterface.Controls;
+-using Robust.Client.UserInterface.CustomControls;
+-using Robust.Shared.Localization;
+-using static Robust.Client.UserInterface.Controls.BoxContainer;
+ 
+ namespace Content.Client._Horizon._Fractions.AnCo.WeaponCaseHack;
+ 
+-public sealed class AnCoWeaponCaseHackWindow : DefaultWindow
+-{
+-    public event Action<bool, int>? OnChoose;
+-
+-    private readonly AnCoWeaponCaseHackMap _map = new();
+-    private readonly Label _attemptsLabel = new();
+-    private readonly Label _ruleLabel = new() { FontColorOverride = Color.White };
+-    private readonly Button _buttonB = new();
+-    private readonly Button _buttonC = new();
+-    private int _nodeIndex;
+-
+-    public AnCoWeaponCaseHackWindow()
+-    {
+-        Title = Loc.GetString("anco-weapon-case-hack-window-title");
+-        MinSize = new Vector2(320, 520);
+-
+-        _map.MinSize = new Vector2(300, 300);
+-        _map.VerticalExpand = true;
+-
+-        _buttonB.OnPressed += _ => OnChoose?.Invoke(true, _nodeIndex);
+-        _buttonC.OnPressed += _ => OnChoose?.Invoke(false, _nodeIndex);
+-
+-        Contents.AddChild(new BoxContainer
+-        {
+-            Orientation = LayoutOrientation.Vertical,
+-            Margin = new Thickness(6),
+-            SeparationOverride = 4,
+-            Children =
+-            {
+-                _attemptsLabel,
+-                _map,
+-                new Label { Text = Loc.GetString("anco-weapon-case-hack-condition-header") },
+-                _ruleLabel,
+-                new BoxContainer
+-                {
+-                    Orientation = LayoutOrientation.Horizontal,
+-                    SeparationOverride = 4,
+-                    Children =
+-                    {
+-                        new BoxContainer
+-                        {
+-                            Orientation = LayoutOrientation.Vertical,
+-                            HorizontalExpand = true,
+-                            Children = { new Label { Text = Loc.GetString("anco-weapon-case-hack-track-b") }, _buttonB }
+-                        },
+-                        new BoxContainer
+-                        {
+-                            Orientation = LayoutOrientation.Vertical,
+-                            HorizontalExpand = true,
+-                            Children = { new Label { Text = Loc.GetString("anco-weapon-case-hack-track-c") }, _buttonC }
+-                        },
+-                    }
+-                },
+-            }
+-        });
+-    }
+-
+-    public void UpdateState(AnCoHackBoundUserInterfaceState state)
+-    {
+-        _nodeIndex = state.NodeIndex;
+-        _attemptsLabel.Text = Loc.GetString("anco-weapon-case-hack-attempts",
+-            ("attempts", state.Attempts), ("max", state.MaxAttempts));
+-        _ruleLabel.Text = Loc.GetString(state.RuleLocId);
+-        _buttonB.Text = state.SerialB;
+-        _buttonC.Text = state.SerialC;
+-        _map.Update(state);
+-    }
+-}
+-
+ /// <summary>
+ /// Схема дорожек: ломаная от зелёного старта. Видна только пройденная часть и текущая развилка,
+ /// чьи выходы нарисованы одинаковыми обрезанными стабами (какой верный - неизвестно). Жёлтая точка - конец
+diff --git a/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackWindow.xaml b/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackWindow.xaml
+new file mode 100644
+index 000000000..c02c757fd
+--- /dev/null
++++ b/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackWindow.xaml
+@@ -0,0 +1,52 @@
++<controls:FancyWindow xmlns="https://spacestation14.io"
++                      xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
++                      xmlns:hack="clr-namespace:Content.Client._Horizon._Fractions.AnCo.WeaponCaseHack"
++                      Title="{Loc 'anco-weapon-case-hack-window-title'}"
++                      MinSize="360 520"
++                      SetSize="360 520">
++    <BoxContainer Orientation="Vertical" Margin="10">
++        <!-- Попытки -->
++        <PanelContainer StyleClasses="AngleRect" HorizontalExpand="True">
++            <BoxContainer Orientation="Horizontal" Margin="10 5">
++                <Label Text="{Loc 'anco-weapon-case-hack-attempts-title'}" StyleClasses="LabelSubText" />
++                <Control HorizontalExpand="True" />
++                <Label Name="AttemptsLabel" StyleClasses="LabelBig" />
++            </BoxContainer>
++        </PanelContainer>
++
++        <Control MinHeight="10" />
++
++        <!-- Схема дорожек -->
++        <PanelContainer StyleClasses="AngleRect" HorizontalExpand="True" VerticalExpand="True">
++            <hack:AnCoWeaponCaseHackMap Name="Map" HorizontalExpand="True" VerticalExpand="True" MinSize="300 260" Margin="5" />
++        </PanelContainer>
++
++        <Control MinHeight="10" />
++
++        <!-- Условие и серийники -->
++        <PanelContainer StyleClasses="AngleRect" HorizontalExpand="True">
++            <BoxContainer Orientation="Vertical" Margin="10">
++                <Label Text="{Loc 'anco-weapon-case-hack-condition-header'}" StyleClasses="LabelHeading" />
++                <Control MinHeight="3" />
++                <RichTextLabel Name="RuleLabel" HorizontalExpand="True" StyleClasses="LabelKeyText" />
++                <Control MinHeight="5" />
++                <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
++                    <Label Name="SerialLeftLabel" StyleClasses="LabelSubText" />
++                    <Control HorizontalExpand="True" />
++                    <Label Name="SerialRightLabel" StyleClasses="LabelSubText" />
++                </BoxContainer>
++            </BoxContainer>
++        </PanelContainer>
++
++        <Control MinHeight="10" />
++
++        <!-- Кнопки направлений -->
++        <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
++            <Button Name="LeftButton" Text="{Loc 'anco-weapon-case-hack-dir-left'}" HorizontalExpand="True" MinHeight="35" />
++            <Control MinWidth="10" />
++            <Button Name="UpButton" Text="{Loc 'anco-weapon-case-hack-dir-up'}" HorizontalExpand="True" MinHeight="35" />
++            <Control MinWidth="10" />
++            <Button Name="RightButton" Text="{Loc 'anco-weapon-case-hack-dir-right'}" HorizontalExpand="True" MinHeight="35" />
++        </BoxContainer>
++    </BoxContainer>
++</controls:FancyWindow>
+diff --git a/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackWindow.xaml.cs b/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackWindow.xaml.cs
+new file mode 100644
+index 000000000..b4d83bf28
+--- /dev/null
++++ b/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackWindow.xaml.cs
+@@ -0,0 +1,59 @@
++using Content.Client.UserInterface.Controls;
++using Content.Shared._Horizon._Fractions.AnCo.WeaponCaseHack;
++using Robust.Client.AutoGenerated;
++using Robust.Client.UserInterface.Controls;
++using Robust.Client.UserInterface.XAML;
++
++namespace Content.Client._Horizon._Fractions.AnCo.WeaponCaseHack;
++
++[GenerateTypedNameReferences]
++public sealed partial class AnCoWeaponCaseHackWindow : FancyWindow
++{
++    public event Action<AnCoHackDir, int>? OnChoose;
++
++    private int _nodeIndex;
++
++    public AnCoWeaponCaseHackWindow()
++    {
++        RobustXamlLoader.Load(this);
++
++        LeftButton.OnPressed += _ => OnChoose?.Invoke(AnCoHackDir.Left, _nodeIndex);
++        UpButton.OnPressed += _ => OnChoose?.Invoke(AnCoHackDir.Up, _nodeIndex);
++        RightButton.OnPressed += _ => OnChoose?.Invoke(AnCoHackDir.Right, _nodeIndex);
++    }
++
++    public void UpdateState(AnCoHackBoundUserInterfaceState state)
++    {
++        _nodeIndex = state.NodeIndex;
++
++        AttemptsLabel.Text = Loc.GetString("anco-weapon-case-hack-attempts",
++            ("attempts", state.Attempts), ("max", state.MaxAttempts));
++        RuleLabel.SetMarkup(Loc.GetString(state.RuleLocId));
++
++        // Серийник подписан направлением, в котором лежит его дорожка.
++        SerialLeftLabel.Text = $"{Arrow(state.CurrentLeftExit)} {state.SerialB}";
++        SerialRightLabel.Text = $"{Arrow(state.CurrentRightExit)} {state.SerialC}";
++
++        // Кнопка направления без выхода неактивна.
++        LeftButton.Disabled = !HasExit(state, AnCoHackDir.Left);
++        UpButton.Disabled = !HasExit(state, AnCoHackDir.Up);
++        RightButton.Disabled = !HasExit(state, AnCoHackDir.Right);
++
++        Map.Update(state);
++    }
++
++    private static bool HasExit(AnCoHackBoundUserInterfaceState state, AnCoHackDir dir)
++    {
++        return state.CurrentLeftExit == dir || state.CurrentRightExit == dir;
++    }
++
++    private static string Arrow(AnCoHackDir dir)
++    {
++        return dir switch
++        {
++            AnCoHackDir.Left => Loc.GetString("anco-weapon-case-hack-dir-left"),
++            AnCoHackDir.Up => Loc.GetString("anco-weapon-case-hack-dir-up"),
++            _ => Loc.GetString("anco-weapon-case-hack-dir-right"),
++        };
++    }
++}
+diff --git a/Content.Server/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackSystem.cs b/Content.Server/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackSystem.cs
+index df36ead2e..276f83030 100644
+--- a/Content.Server/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackSystem.cs
++++ b/Content.Server/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackSystem.cs
+@@ -78,7 +78,20 @@ private void OnChoose(EntityUid uid, AnCoWeaponCaseHackComponent comp, AnCoHackC
+         }
+ 
+         var node = comp.Nodes[comp.NodeIndex];
+-        if (args.ChooseB == node.CorrectIsB)
++
++        // Выбор направления: влево/вверх/вправо. Направление без выхода игнорируем (кнопка там неактивна).
++        bool chooseB;
++        if (args.Direction == node.LeftExit)
++            chooseB = true;
++        else if (args.Direction == node.RightExit)
++            chooseB = false;
++        else
++        {
++            UpdateUi(uid, comp);
++            return;
++        }
++
++        if (chooseB == node.CorrectIsB)
+         {
+             comp.NodeIndex++;
+             if (comp.NodeIndex >= comp.Nodes.Count)
+diff --git a/Content.Shared/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoHackGraph.cs b/Content.Shared/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoHackGraph.cs
+index 3f0812fdd..462049732 100644
+--- a/Content.Shared/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoHackGraph.cs
++++ b/Content.Shared/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoHackGraph.cs
+@@ -1,3 +1,4 @@
++using System.Linq;
+ using System.Numerics;
+ using Robust.Shared.Random;
+ using Robust.Shared.Serialization;
+@@ -5,7 +6,7 @@
+ namespace Content.Shared._Horizon._Fractions.AnCo.WeaponCaseHack;
+ 
+ /// <summary>
+-/// Направление дорожки (вид сверху, схема растёт вверх). Единица длины - один шаг сетки.
++/// Направление дорожки (схема растёт вверх). Только горизонтали и вертикали, единица длины - один шаг сетки.
+ /// </summary>
+ [Serializable, NetSerializable]
+ public enum AnCoHackDir : byte
+@@ -70,9 +71,10 @@ public static class AnCoHackGraph
+     public const int MinDeadEnd = 1;
+     public const int MaxDeadEnd = 3;
+ 
+-    private const int MaxLayoutTries = 200;
++    private const int MaxLayoutTries = 2000;
+ 
+     // Пары выходов слева направо: влево+вверх, влево+вправо, вверх+вправо.
++    // Назад (в сторону, откуда пришли) выхода нет.
+     private static readonly (AnCoHackDir Left, AnCoHackDir Right)[] ExitPairs =
+     {
+         (AnCoHackDir.Left, AnCoHackDir.Up),
+@@ -87,8 +89,8 @@ public static Vector2 Step(AnCoHackDir dir)
+     {
+         return dir switch
+         {
+-            AnCoHackDir.Left => new Vector2(-1, 1),
+-            AnCoHackDir.Right => new Vector2(1, 1),
++            AnCoHackDir.Left => new Vector2(-1, 0),
++            AnCoHackDir.Right => new Vector2(1, 0),
+             _ => new Vector2(0, 1),
+         };
+     }
+@@ -104,8 +106,13 @@ public static List<AnCoHackNode> Generate(IRobustRandom random, int nodeCount)
+         for (var attempt = 0; attempt < MaxLayoutTries; attempt++)
+         {
+             nodes = new List<AnCoHackNode>(count);
++            var arrival = AnCoHackDir.Up;
+             for (var i = 0; i < count; i++)
+-                nodes.Add(CreateNode(random, rules[i]));
++            {
++                var node = CreateNode(random, rules[i], arrival);
++                nodes.Add(node);
++                arrival = node.CorrectDir;
++            }
+ 
+             if (IsLayoutClean(nodes))
+                 break;
+@@ -114,12 +121,13 @@ public static List<AnCoHackNode> Generate(IRobustRandom random, int nodeCount)
+         return nodes;
+     }
+ 
+-    private static AnCoHackNode CreateNode(IRobustRandom random, AnCoSerialRule rule)
++    private static AnCoHackNode CreateNode(IRobustRandom random, AnCoSerialRule rule, AnCoHackDir arrival)
+     {
+         var correctIsB = random.Prob(0.5f);
+         var matching = AnCoSerialRules.GenerateSerial(random, rule, true);
+         var other = AnCoSerialRules.GenerateSerial(random, rule, false);
+-        var pair = ExitPairs[random.Next(ExitPairs.Length)];
++        var pairs = ExitPairs.Where(p => !IsBack(arrival, p.Left) && !IsBack(arrival, p.Right)).ToArray();
++        var pair = pairs[random.Next(pairs.Length)];
+ 
+         return new AnCoHackNode
+         {
+@@ -134,13 +142,19 @@ private static AnCoHackNode CreateNode(IRobustRandom random, AnCoSerialRule rule
+         };
+     }
+ 
++    private static bool IsBack(AnCoHackDir arrival, AnCoHackDir exit)
++    {
++        return (arrival == AnCoHackDir.Left && exit == AnCoHackDir.Right)
++               || (arrival == AnCoHackDir.Right && exit == AnCoHackDir.Left);
++    }
++
+     /// <summary>
+     /// Проверяет, что ветки не пересекаются и не накладываются друг на друга.
+     /// </summary>
+     private static bool IsLayoutClean(List<AnCoHackNode> nodes)
+     {
+         var points = new HashSet<(int, int)>();
+-        // Середины единичных шагов в удвоенных координатах: ловит наложения и X-пересечения диагоналей.
++        // Середины единичных шагов в удвоенных координатах: ловит наложение отрезков друг на друга.
+         var mids = new HashSet<(int, int)>();
+ 
+         bool Walk(ref (int X, int Y) pos, AnCoHackDir dir, int length)
+diff --git a/Content.Shared/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackUi.cs b/Content.Shared/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackUi.cs
+index da5a981b1..d8602fe9b 100644
+--- a/Content.Shared/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackUi.cs
++++ b/Content.Shared/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackUi.cs
+@@ -52,19 +52,19 @@ public sealed class AnCoHackBoundUserInterfaceState : BoundUserInterfaceState
+ }
+ 
+ /// <summary>
+-/// The hacker chose track B or C at the given node.
++/// The hacker moved in the given direction at the given node.
+ /// </summary>
+ [Serializable, NetSerializable]
+ public sealed class AnCoHackChooseMessage : BoundUserInterfaceMessage
+ {
+-    public readonly bool ChooseB;
++    public readonly AnCoHackDir Direction;
+ 
+     /// <summary>Node the choice was made at; the server ignores stale messages.</summary>
+     public readonly int NodeIndex;
+ 
+-    public AnCoHackChooseMessage(bool chooseB, int nodeIndex)
++    public AnCoHackChooseMessage(AnCoHackDir direction, int nodeIndex)
+     {
+-        ChooseB = chooseB;
++        Direction = direction;
+         NodeIndex = nodeIndex;
+     }
+ }
+diff --git a/Content.Tests/Shared/AnCoHackGraphTest.cs b/Content.Tests/Shared/AnCoHackGraphTest.cs
+index 5fb1b60f4..556a76f8e 100644
+--- a/Content.Tests/Shared/AnCoHackGraphTest.cs
++++ b/Content.Tests/Shared/AnCoHackGraphTest.cs
+@@ -26,6 +26,22 @@ public void TestGeneratedNodes()
+                     Assert.That(node.LegLength, Is.InRange(AnCoHackGraph.MinLeg, AnCoHackGraph.MaxLeg));
+                     Assert.That(node.DeadEndLength, Is.InRange(AnCoHackGraph.MinDeadEnd, AnCoHackGraph.MaxDeadEnd));
+                     Assert.That(node.CorrectDir, Is.Not.EqualTo(node.DeadEndDir));
++
++                    // Только горизонтали и вертикали.
++                    foreach (var dir in new[] { node.LeftExit, node.RightExit })
++                    {
++                        var step = AnCoHackGraph.Step(dir);
++                        Assert.That(step.X == 0 || step.Y == 0, Is.True);
++                    }
++                }
++
++                // Нет разворота назад: после шага влево нет выхода вправо и наоборот.
++                var arrival = AnCoHackDir.Up;
++                foreach (var node in nodes)
++                {
++                    Assert.That(arrival == AnCoHackDir.Left && node.RightExit == AnCoHackDir.Right, Is.False);
++                    Assert.That(arrival == AnCoHackDir.Right && node.LeftExit == AnCoHackDir.Left, Is.False);
++                    arrival = node.CorrectDir;
+                 }
+             }
+         }
+diff --git a/Resources/Locale/en-US/_Horizon/_Fractions/AnCo/weapon-case.ftl b/Resources/Locale/en-US/_Horizon/_Fractions/AnCo/weapon-case.ftl
+index b82d3b4c5..6666a595d 100644
+--- a/Resources/Locale/en-US/_Horizon/_Fractions/AnCo/weapon-case.ftl
++++ b/Resources/Locale/en-US/_Horizon/_Fractions/AnCo/weapon-case.ftl
+@@ -2,10 +2,12 @@ anco-weapon-case-hack-success = Lock unlocked!
+ anco-weapon-case-hack-verb = Hack lock
+ anco-weapon-case-hack-fail-attempt = Dead end! Attempts left: { $attempts }. Back to the start.
+ anco-weapon-case-hack-window-title = AnCo lock hack
++anco-weapon-case-hack-attempts-title = Attempts
++anco-weapon-case-hack-dir-left = ←
++anco-weapon-case-hack-dir-up = ↑
++anco-weapon-case-hack-dir-right = →
+ anco-weapon-case-hack-attempts = Attempts: { $attempts } / { $max }
+ anco-weapon-case-hack-condition-header = Condition: track serial number
+-anco-weapon-case-hack-track-b = Track B
+-anco-weapon-case-hack-track-c = Track C
+ 
+ anco-hack-rule-letter-repeat = some letter repeats
+ anco-hack-rule-has-a = contains the letter A
+diff --git a/Resources/Locale/ru-RU/_Horizon/_Fractions/AnCo/weapon-case.ftl b/Resources/Locale/ru-RU/_Horizon/_Fractions/AnCo/weapon-case.ftl
+index 581e96320..b94e11c9a 100644
+--- a/Resources/Locale/ru-RU/_Horizon/_Fractions/AnCo/weapon-case.ftl
++++ b/Resources/Locale/ru-RU/_Horizon/_Fractions/AnCo/weapon-case.ftl
+@@ -2,10 +2,12 @@ anco-weapon-case-hack-success = Замок разблокирован!
+ anco-weapon-case-hack-verb = Взломать замок
+ anco-weapon-case-hack-fail-attempt = Тупик! Осталось попыток: { $attempts }. Начните сначала.
+ anco-weapon-case-hack-window-title = Взлом замка АнКо
++anco-weapon-case-hack-attempts-title = Попытки
++anco-weapon-case-hack-dir-left = ←
++anco-weapon-case-hack-dir-up = ↑
++anco-weapon-case-hack-dir-right = →
+ anco-weapon-case-hack-attempts = Попытки: { $attempts } / { $max }
+ anco-weapon-case-hack-condition-header = Условие: серийный номер дорожки
+-anco-weapon-case-hack-track-b = Дорожка B
+-anco-weapon-case-hack-track-c = Дорожка C
+ 
+ anco-hack-rule-letter-repeat = какая-либо буква повторяется
+ anco-hack-rule-has-a = содержит букву A
+-- 
+2.43.0
+

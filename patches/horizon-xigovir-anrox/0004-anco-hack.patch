@@ -1,0 +1,464 @@
+From c7fc850daf05ce2aedcb8254b9642759861d0999 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Sat, 7 Nov 2026 21:03:01 +0000
+Subject: [PATCH 4/7] =?UTF-8?q?=D0=A2=D0=B5=D0=BC=D0=B0=20=D0=BE=D0=BA?=
+ =?UTF-8?q?=D0=BD=D0=B0=20=D0=B2=D0=B7=D0=BB=D0=BE=D0=BC=D0=B0=20=D0=90?=
+ =?UTF-8?q?=D0=BD=D0=9A=D0=BE:=20=D0=BA=D0=BE=D0=BD=D1=81=D0=BE=D0=BB?=
+ =?UTF-8?q?=D1=8C=20=D1=81=20=D1=81=D0=B0=D0=B9=D1=82=D0=B0?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Чёрный фон, красная палитра сайта (themes/_anco.scss), плоские рамки,
+моноширинный шрифт, scanlines поверх окна, кнопки с состояниями
+normal/hover/pressed/disabled, мигающий блок-курсор после условия,
+схема дорожек в цветах консоли. Оформление только этого окна.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_012sYdkn9KH7r3NSM4NYKTD9
+---
+ .../AnCo/WeaponCaseHack/AnCoConsoleButton.cs  |  36 +++++++
+ .../WeaponCaseHack/AnCoConsoleScanlines.cs    |  31 ++++++
+ .../AnCo/WeaponCaseHack/AnCoConsoleTheme.cs   |  47 ++++++++
+ .../WeaponCaseHack/AnCoWeaponCaseHackMap.cs   |  12 +--
+ .../AnCoWeaponCaseHackWindow.xaml             | 102 ++++++++++--------
+ .../AnCoWeaponCaseHackWindow.xaml.cs          |  94 +++++++++++++++-
+ 6 files changed, 264 insertions(+), 58 deletions(-)
+ create mode 100644 Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoConsoleButton.cs
+ create mode 100644 Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoConsoleScanlines.cs
+ create mode 100644 Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoConsoleTheme.cs
+
+diff --git a/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoConsoleButton.cs b/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoConsoleButton.cs
+new file mode 100644
+index 000000000..e782b9280
+--- /dev/null
++++ b/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoConsoleButton.cs
+@@ -0,0 +1,36 @@
++using Robust.Client.UserInterface.Controls;
++
++namespace Content.Client._Horizon._Fractions.AnCo.WeaponCaseHack;
++
++/// <summary>
++/// Кнопка в стиле консоли: у <see cref="Button.StyleBoxOverride"/> один бокс на все состояния,
++/// поэтому бокс и цвет текста меняются при смене <see cref="BaseButton.DrawMode"/>.
++/// </summary>
++public sealed class AnCoConsoleButton : Button
++{
++    public AnCoConsoleButton()
++    {
++        Label.FontOverride = AnCoConsoleTheme.Mono(16);
++        ApplyMode();
++    }
++
++    protected override void DrawModeChanged()
++    {
++        base.DrawModeChanged();
++        ApplyMode();
++    }
++
++    private void ApplyMode()
++    {
++        var (background, border, text) = DrawMode switch
++        {
++            DrawModeEnum.Hover => (AnCoConsoleTheme.Border, AnCoConsoleTheme.Accent, AnCoConsoleTheme.Highlight),
++            DrawModeEnum.Pressed => (AnCoConsoleTheme.Accent, AnCoConsoleTheme.Accent, AnCoConsoleTheme.Background),
++            DrawModeEnum.Disabled => (AnCoConsoleTheme.Panel, AnCoConsoleTheme.Muted, AnCoConsoleTheme.Disabled),
++            _ => (AnCoConsoleTheme.Panel, AnCoConsoleTheme.Border, AnCoConsoleTheme.Accent),
++        };
++
++        StyleBoxOverride = AnCoConsoleTheme.Box(background, border, 4);
++        Label.FontColorOverride = text;
++    }
++}
+diff --git a/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoConsoleScanlines.cs b/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoConsoleScanlines.cs
+new file mode 100644
+index 000000000..e40bb14f8
+--- /dev/null
++++ b/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoConsoleScanlines.cs
+@@ -0,0 +1,31 @@
++using System.Numerics;
++using Robust.Client.Graphics;
++using Robust.Client.UserInterface;
++
++namespace Content.Client._Horizon._Fractions.AnCo.WeaponCaseHack;
++
++/// <summary>
++/// Прозрачный оверлей со scanlines консоли сайта: тонкая тёмная линия каждые 3 px.
++/// Кладётся последним ребёнком поверх содержимого и не ловит клики.
++/// </summary>
++public sealed class AnCoConsoleScanlines : Control
++{
++    private static readonly Color Line = new(0f, 0f, 0f, 0.2f);
++
++    public AnCoConsoleScanlines()
++    {
++        MouseFilter = MouseFilterMode.Ignore;
++    }
++
++    protected override void Draw(DrawingHandleScreen handle)
++    {
++        base.Draw(handle);
++
++        var thickness = MathF.Max(1f, UIScale);
++        var period = 3f * UIScale;
++        for (var y = 0f; y < PixelHeight; y += period)
++        {
++            handle.DrawRect(UIBox2.FromDimensions(new Vector2(0, y), new Vector2(PixelWidth, thickness)), Line);
++        }
++    }
++}
+diff --git a/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoConsoleTheme.cs b/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoConsoleTheme.cs
+new file mode 100644
+index 000000000..be8f6489d
+--- /dev/null
++++ b/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoConsoleTheme.cs
+@@ -0,0 +1,47 @@
++using Robust.Client.Graphics;
++using Robust.Client.ResourceManagement;
++
++namespace Content.Client._Horizon._Fractions.AnCo.WeaponCaseHack;
++
++/// <summary>
++/// Палитра и стили консоли АнКо-сайта (themes/_anco.scss и base/_console-theme.scss сайта):
++/// чёрный фон, красный текст, квадратные рамки, моноширинный шрифт.
++/// </summary>
++public static class AnCoConsoleTheme
++{
++    public static readonly Color Background = Color.FromHex("#000000");
++    public static readonly Color Panel = Color.FromHex("#0d0d0d");
++    public static readonly Color MapBackground = Color.FromHex("#050000");
++    public static readonly Color Border = Color.FromHex("#620505");
++    public static readonly Color Accent = Color.FromHex("#f05a5a");
++    public static readonly Color Heading = Color.FromHex("#d21e1e");
++    public static readonly Color Text = Color.FromHex("#9e0000");
++    public static readonly Color Highlight = Color.FromHex("#ffffff");
++    public static readonly Color Muted = Color.FromHex("#2b2f35");
++    public static readonly Color Disabled = Color.FromHex("#42464b");
++    public static readonly Color Ok = Color.FromHex("#5dff95");
++    public static readonly Color Warning = Color.FromHex("#ffb000");
++    public static readonly Color Danger = Color.FromHex("#ff3b3b");
++
++    private const string MonoFont = "/EngineFonts/NotoSans/NotoSansMono-Regular.ttf";
++
++    /// <summary>Плоская рамка без скруглений, как у <c>.card</c> на сайте.</summary>
++    public static StyleBoxFlat Box(Color background, Color border, float padding = 0)
++    {
++        return new StyleBoxFlat
++        {
++            BackgroundColor = background,
++            BorderColor = border,
++            BorderThickness = new Thickness(1),
++            ContentMarginLeftOverride = padding,
++            ContentMarginRightOverride = padding,
++            ContentMarginTopOverride = padding,
++            ContentMarginBottomOverride = padding,
++        };
++    }
++
++    public static Font Mono(int size)
++    {
++        return IoCManager.Resolve<IResourceCache>().GetFont(MonoFont, size);
++    }
++}
+diff --git a/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackMap.cs b/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackMap.cs
+index 304e5ce82..435700dfb 100644
+--- a/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackMap.cs
++++ b/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackMap.cs
+@@ -7,16 +7,16 @@ namespace Content.Client._Horizon._Fractions.AnCo.WeaponCaseHack;
+ 
+ /// <summary>
+ /// Схема дорожек: ломаная от зелёного старта. Видна только пройденная часть и текущая развилка,
+-/// чьи выходы нарисованы одинаковыми обрезанными стабами (какой верный - неизвестно). Жёлтая точка - конец
++/// чьи выходы нарисованы одинаковыми обрезанными стабами (какой верный - неизвестно). Янтарная точка - конец
+ /// пройденного тупика. Карта подгоняется под размер окна и растёт по мере прохождения.
+ /// </summary>
+ public sealed class AnCoWeaponCaseHackMap : Control
+ {
+-    private static readonly Color Track = Color.FromHex("#b22222");
+-    private static readonly Color Node = Color.FromHex("#3fb4e6");
+-    private static readonly Color NodeActive = Color.White;
+-    private static readonly Color DeadEnd = Color.FromHex("#ffe600");
+-    private static readonly Color Goal = Color.FromHex("#7ed321");
++    private static readonly Color Track = AnCoConsoleTheme.Heading;
++    private static readonly Color Node = AnCoConsoleTheme.Accent;
++    private static readonly Color NodeActive = AnCoConsoleTheme.Highlight;
++    private static readonly Color DeadEnd = AnCoConsoleTheme.Warning;
++    private static readonly Color Goal = AnCoConsoleTheme.Ok;
+ 
+     private const float Margin = 20f;
+     private const float MaxUnit = 26f;
+diff --git a/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackWindow.xaml b/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackWindow.xaml
+index ac113edfd..a0878ac37 100644
+--- a/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackWindow.xaml
++++ b/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackWindow.xaml
+@@ -4,56 +4,64 @@
+                       Title="{Loc 'anco-weapon-case-hack-window-title'}"
+                       MinSize="360 520"
+                       SetSize="360 520">
+-    <BoxContainer Orientation="Vertical" Margin="10">
+-        <!-- Попытки -->
+-        <PanelContainer StyleClasses="AngleRect" HorizontalExpand="True">
+-            <BoxContainer Orientation="Vertical" Margin="10 5">
+-                <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
+-                    <Label Text="{Loc 'anco-weapon-case-hack-attempts-title'}" StyleClasses="LabelSubText" />
+-                    <Control HorizontalExpand="True" />
+-                    <Label Name="AttemptsLabel" StyleClasses="LabelBig" />
+-                </BoxContainer>
+-                <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
+-                    <Label Text="{Loc 'anco-weapon-case-hack-timer-title'}" StyleClasses="LabelSubText" />
+-                    <Control HorizontalExpand="True" />
+-                    <Label Name="TimerLabel" StyleClasses="LabelBig" />
++    <Control>
++        <!-- Чёрный фон консоли на всё содержимое -->
++        <PanelContainer Name="BackgroundPanel" />
++
++        <BoxContainer Orientation="Vertical" Margin="10">
++            <!-- Попытки и таймер -->
++            <PanelContainer Name="StatusPanel" HorizontalExpand="True">
++                <BoxContainer Orientation="Vertical" Margin="10 5">
++                    <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
++                        <Label Name="AttemptsTitle" Text="{Loc 'anco-weapon-case-hack-attempts-title'}" />
++                        <Control HorizontalExpand="True" />
++                        <Label Name="AttemptsLabel" />
++                    </BoxContainer>
++                    <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
++                        <Label Name="TimerTitle" Text="{Loc 'anco-weapon-case-hack-timer-title'}" />
++                        <Control HorizontalExpand="True" />
++                        <Label Name="TimerLabel" />
++                    </BoxContainer>
+                 </BoxContainer>
+-            </BoxContainer>
+-        </PanelContainer>
+-
+-        <Control MinHeight="10" />
+-
+-        <!-- Схема дорожек -->
+-        <PanelContainer StyleClasses="AngleRect" HorizontalExpand="True" VerticalExpand="True">
+-            <hack:AnCoWeaponCaseHackMap Name="Map" HorizontalExpand="True" VerticalExpand="True" MinSize="300 260" Margin="5" />
+-        </PanelContainer>
+-
+-        <Control MinHeight="10" />
+-
+-        <!-- Условие и серийники -->
+-        <PanelContainer StyleClasses="AngleRect" HorizontalExpand="True">
+-            <BoxContainer Orientation="Vertical" Margin="10">
+-                <Label Text="{Loc 'anco-weapon-case-hack-condition-header'}" StyleClasses="LabelHeading" />
+-                <Control MinHeight="3" />
+-                <RichTextLabel Name="RuleLabel" HorizontalExpand="True" StyleClasses="LabelKeyText" />
+-                <Control MinHeight="5" />
+-                <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
+-                    <Label Name="SerialLeftLabel" StyleClasses="LabelSubText" />
+-                    <Control HorizontalExpand="True" />
+-                    <Label Name="SerialRightLabel" StyleClasses="LabelSubText" />
++            </PanelContainer>
++
++            <Control MinHeight="10" />
++
++            <!-- Схема дорожек -->
++            <PanelContainer Name="MapPanel" HorizontalExpand="True" VerticalExpand="True">
++                <hack:AnCoWeaponCaseHackMap Name="Map" HorizontalExpand="True" VerticalExpand="True" MinSize="300 260" Margin="5" />
++            </PanelContainer>
++
++            <Control MinHeight="10" />
++
++            <!-- Условие и серийники -->
++            <PanelContainer Name="RulePanel" HorizontalExpand="True">
++                <BoxContainer Orientation="Vertical" Margin="10">
++                    <Label Name="ConditionHeader" Text="{Loc 'anco-weapon-case-hack-condition-header'}" />
++                    <Control MinHeight="3" />
++                    <RichTextLabel Name="RuleLabel" HorizontalExpand="True" />
++                    <Control MinHeight="5" />
++                    <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
++                        <Label Name="SerialLeftLabel" />
++                        <Control HorizontalExpand="True" />
++                        <Label Name="SerialRightLabel" />
++                    </BoxContainer>
+                 </BoxContainer>
+-            </BoxContainer>
+-        </PanelContainer>
++            </PanelContainer>
+ 
+-        <Control MinHeight="10" />
++            <Control MinHeight="10" />
+ 
+-        <!-- Кнопки направлений -->
+-        <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
+-            <Button Name="LeftButton" Text="{Loc 'anco-weapon-case-hack-dir-left'}" HorizontalExpand="True" MinHeight="35" />
+-            <Control MinWidth="10" />
+-            <Button Name="UpButton" Text="{Loc 'anco-weapon-case-hack-dir-up'}" HorizontalExpand="True" MinHeight="35" />
+-            <Control MinWidth="10" />
+-            <Button Name="RightButton" Text="{Loc 'anco-weapon-case-hack-dir-right'}" HorizontalExpand="True" MinHeight="35" />
++            <!-- Кнопки направлений -->
++            <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
++                <hack:AnCoConsoleButton Name="LeftButton" Text="{Loc 'anco-weapon-case-hack-dir-left'}" HorizontalExpand="True" MinHeight="35" />
++                <Control MinWidth="10" />
++                <hack:AnCoConsoleButton Name="UpButton" Text="{Loc 'anco-weapon-case-hack-dir-up'}" HorizontalExpand="True" MinHeight="35" />
++                <Control MinWidth="10" />
++                <hack:AnCoConsoleButton Name="RightButton" Text="{Loc 'anco-weapon-case-hack-dir-right'}" HorizontalExpand="True" MinHeight="35" />
++            </BoxContainer>
+         </BoxContainer>
+-    </BoxContainer>
++
++        <!-- Scanlines поверх всего -->
++        <hack:AnCoConsoleScanlines />
++    </Control>
+ </controls:FancyWindow>
+diff --git a/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackWindow.xaml.cs b/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackWindow.xaml.cs
+index bec06fca4..7c4e19ed4 100644
+--- a/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackWindow.xaml.cs
++++ b/Content.Client/_Horizon/_Fractions/AnCo/WeaponCaseHack/AnCoWeaponCaseHackWindow.xaml.cs
+@@ -2,9 +2,12 @@
+ using Content.Client.UserInterface.Controls;
+ using Content.Shared._Horizon._Fractions.AnCo.WeaponCaseHack;
+ using Robust.Client.AutoGenerated;
++using Robust.Client.Graphics;
++using Robust.Client.UserInterface;
+ using Robust.Client.UserInterface.Controls;
+ using Robust.Client.UserInterface.XAML;
+ using Robust.Shared.Timing;
++using Robust.Shared.Utility;
+ 
+ namespace Content.Client._Horizon._Fractions.AnCo.WeaponCaseHack;
+ 
+@@ -15,23 +18,84 @@ public sealed partial class AnCoWeaponCaseHackWindow : FancyWindow
+ 
+     [Dependency] private readonly IGameTiming _timing = default!;
+ 
+-    private static readonly Color TimerNormal = Color.White;
+-    private static readonly Color TimerWarning = Color.FromHex("#ff4040");
+     private const double WarningSeconds = 10;
+ 
++    // Мигающий блок-курсор после условия (на сайте - console-cursor у заголовка): шаг ~0.55 с.
++    private const float CursorPeriod = 0.55f;
++
+     private int _nodeIndex;
+     private TimeSpan? _deadline;
++    private string _ruleText = string.Empty;
++    private bool _cursorOn = true;
++    private float _cursorTime;
+ 
+     public AnCoWeaponCaseHackWindow()
+     {
+         RobustXamlLoader.Load(this);
+         IoCManager.InjectDependencies(this);
+ 
++        ApplyTheme();
++
+         LeftButton.OnPressed += _ => OnChoose?.Invoke(AnCoHackDir.Left, _nodeIndex);
+         UpButton.OnPressed += _ => OnChoose?.Invoke(AnCoHackDir.Up, _nodeIndex);
+         RightButton.OnPressed += _ => OnChoose?.Invoke(AnCoHackDir.Right, _nodeIndex);
+     }
+ 
++    private void ApplyTheme()
++    {
++        var mono14 = AnCoConsoleTheme.Mono(14);
++        var mono16 = AnCoConsoleTheme.Mono(16);
++
++        // Чёрный фон окна и плоские рамки панелей (как .card на сайте).
++        BackgroundPanel.PanelOverride = AnCoConsoleTheme.Box(AnCoConsoleTheme.Background, AnCoConsoleTheme.Border);
++        StatusPanel.PanelOverride = AnCoConsoleTheme.Box(AnCoConsoleTheme.Panel, AnCoConsoleTheme.Border);
++        MapPanel.PanelOverride = AnCoConsoleTheme.Box(AnCoConsoleTheme.MapBackground, AnCoConsoleTheme.Border);
++        RulePanel.PanelOverride = AnCoConsoleTheme.Box(AnCoConsoleTheme.Panel, AnCoConsoleTheme.Border);
++
++        // Заголовок окна: терминальный шрифт и цвет заголовков сайта.
++        StyleTitle(this, mono16);
++
++        // Подписи - приглушённый красный, значения - акцентный, заголовки - яркий красный.
++        foreach (var label in new[] { AttemptsTitle, TimerTitle })
++        {
++            label.FontOverride = mono14;
++            label.FontColorOverride = AnCoConsoleTheme.Text;
++        }
++
++        foreach (var label in new[] { AttemptsLabel, TimerLabel })
++        {
++            label.FontOverride = mono16;
++            label.FontColorOverride = AnCoConsoleTheme.Accent;
++        }
++
++        ConditionHeader.FontOverride = mono14;
++        ConditionHeader.FontColorOverride = AnCoConsoleTheme.Heading;
++
++        foreach (var label in new[] { SerialLeftLabel, SerialRightLabel })
++        {
++            label.FontOverride = mono14;
++            label.FontColorOverride = AnCoConsoleTheme.Accent;
++        }
++    }
++
++    /// <summary>
++    /// Метка заголовка принадлежит <see cref="FancyWindow"/> и недоступна наследникам, поэтому ищем её по стилевому классу.
++    /// </summary>
++    private static void StyleTitle(Control root, Font font)
++    {
++        foreach (var child in root.Children)
++        {
++            if (child is Label label && label.HasStyleClass("FancyWindowTitle"))
++            {
++                label.FontOverride = font;
++                label.FontColorOverride = AnCoConsoleTheme.Heading;
++                return;
++            }
++
++            StyleTitle(child, font);
++        }
++    }
++
+     public void UpdateState(AnCoHackBoundUserInterfaceState state)
+     {
+         _nodeIndex = state.NodeIndex;
+@@ -40,7 +104,8 @@ public void UpdateState(AnCoHackBoundUserInterfaceState state)
+ 
+         AttemptsLabel.Text = Loc.GetString("anco-weapon-case-hack-attempts",
+             ("attempts", state.Attempts), ("max", state.MaxAttempts));
+-        RuleLabel.SetMarkup(Loc.GetString(state.RuleLocId));
++        _ruleText = Loc.GetString(state.RuleLocId);
++        UpdateRule();
+ 
+         // Серийник подписан направлением, в котором лежит его дорожка.
+         SerialLeftLabel.Text = $"{Arrow(state.CurrentLeftExit)} {state.SerialB}";
+@@ -58,6 +123,25 @@ protected override void FrameUpdate(FrameEventArgs args)
+     {
+         base.FrameUpdate(args);
+         UpdateTimer();
++
++        _cursorTime += args.DeltaSeconds;
++        if (_cursorTime >= CursorPeriod)
++        {
++            _cursorTime = 0;
++            _cursorOn = !_cursorOn;
++            UpdateRule();
++        }
++    }
++
++    /// <summary>
++    /// Условие белым моно-шрифтом с мигающим блоком в конце. Блок всегда занимает место, чтобы текст не прыгал.
++    /// </summary>
++    private void UpdateRule()
++    {
++        var cursorColor = _cursorOn ? AnCoConsoleTheme.Accent : AnCoConsoleTheme.Background;
++        RuleLabel.SetMarkupPermissive(
++            $"[font=\"Monospace\" size=14][color={AnCoConsoleTheme.Highlight.ToHex()}]{FormattedMessage.EscapeText(_ruleText)}[/color]" +
++            $" [color={cursorColor.ToHex()}]█[/color][/font]");
+     }
+ 
+     private void UpdateTimer()
+@@ -66,13 +150,13 @@ private void UpdateTimer()
+         {
+             // Таймер стартует с первого ответа.
+             TimerLabel.Text = Loc.GetString("anco-weapon-case-hack-timer-idle");
+-            TimerLabel.FontColorOverride = TimerNormal;
++            TimerLabel.FontColorOverride = AnCoConsoleTheme.Accent;
+             return;
+         }
+ 
+         var left = Math.Max(0, (deadline - _timing.CurTime).TotalSeconds);
+         TimerLabel.Text = Loc.GetString("anco-weapon-case-hack-timer", ("seconds", (int) Math.Ceiling(left)));
+-        TimerLabel.FontColorOverride = left <= WarningSeconds ? TimerWarning : TimerNormal;
++        TimerLabel.FontColorOverride = left <= WarningSeconds ? AnCoConsoleTheme.Danger : AnCoConsoleTheme.Accent;
+     }
+ 
+     private static bool HasExit(AnCoHackBoundUserInterfaceState state, AnCoHackDir dir)
+-- 
+2.43.0
+
