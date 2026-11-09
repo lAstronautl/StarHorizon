@@ -319,7 +319,30 @@ public sealed partial class SalvageSystem
 
             if (remaining < TimeSpan.Zero)
             {
-                QueueDel(uid);
+                // The auto-FTL above only *starts* a shuttle's FTL windup around the same
+                // moment this timer reaches zero (its windup length is derived from
+                // `remaining` itself) -- the shuttle doesn't actually leave this map until
+                // that windup finishes and FTLStartedEvent fires (see
+                // ShuttleSystem.FasterThanLight.cs: TrySetupFTL / UpdateFTLStarting). A slow
+                // tick or scheduling jitter can let this check run before that happens,
+                // which would QueueDel the expedition map -- and the shuttle, and anyone
+                // aboard it, still parked on it -- out from under the player. OnFTLStarted
+                // above already deletes this map safely once the last shuttle actually
+                // leaves, so just wait for that instead of deleting out from under one that
+                // hasn't yet.
+                var shuttleStillHere = false;
+                var shuttleQuery = EntityQueryEnumerator<ShuttleComponent, TransformComponent>();
+                while (shuttleQuery.MoveNext(out _, out var shuttleXform))
+                {
+                    if (shuttleXform.MapUid == uid)
+                    {
+                        shuttleStillHere = true;
+                        break;
+                    }
+                }
+
+                if (!shuttleStillHere)
+                    QueueDel(uid);
             }
         }
 
