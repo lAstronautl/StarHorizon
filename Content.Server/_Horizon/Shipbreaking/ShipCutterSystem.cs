@@ -1,5 +1,6 @@
 using System.Linq;
 using Content.Server.PowerCell;
+using Content.Server.Shuttles.Systems;
 using Content.Shared._Horizon.Shipbreaking;
 using Content.Shared.DoAfter;
 using Content.Shared.Interaction;
@@ -21,6 +22,7 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly GridCutsSystem _cuts = default!;
     [Dependency] private readonly PowerCellSystem _cell = default!;
+    [Dependency] private readonly DockingSystem _docking = default!;
     [Dependency] private readonly MetaDataSystem _meta = default!;
     [Dependency] private readonly SharedItemSystem _item = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
