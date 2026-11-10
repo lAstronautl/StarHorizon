@@ -4,7 +4,7 @@
   description: Burbling corrosive stuff. I wouldn't want to touch it.
   components:
   - type: Sprite
-    sprite: _RMC14/Interface/Actions/xenomorph.rsi # TODO: move it
+    sprite: _Horizon/RMC14/Interface/Actions/xenomorph.rsi # TODO: move it
     state: acid
   - type: AmbientSound
     sound: /Audio/Items/welder.ogg

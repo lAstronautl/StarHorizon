@@ -18,7 +18,7 @@
   price: 35000
   category: Small
   group: Shipyard
-  shuttlePath: /Maps/_NF/Shuttles/sparrow.yml
+  shuttlePath: /Maps/_Horizon/NF/Shuttles/sparrow.yml
   guidebookPage: ShipyardSparrow
   class:
   - Science
@@ -44,7 +44,7 @@
 - type: gameMap
   id: Sparrow
   mapName: 'NR Sparrow'
-  mapPath: /Maps/_NF/Shuttles/sparrow.yml
+  mapPath: /Maps/_Horizon/NF/Shuttles/sparrow.yml
   minPlayers: 0
   stations:
     Sparrow:

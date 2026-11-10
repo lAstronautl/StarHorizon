@@ -6,7 +6,7 @@
   abstract: true
   components:
   - type: Sprite
-    sprite: _RMC14/Structures/Walls/Barricades/barricade.rsi
+    sprite: _Horizon/RMC14/Structures/Walls/Barricades/barricade.rsi
     layers:
     - state: metal
     drawdepth: WallTops
@@ -42,7 +42,7 @@
         path:
           "/Audio/_RMC14/Structures/metalhit.ogg"
   - type: Sprite
-    sprite: _RMC14/Structures/Walls/Barricades/barricade.rsi
+    sprite: _Horizon/RMC14/Structures/Walls/Barricades/barricade.rsi
     layers:
     - state: metal
     drawdepth: WallTops
@@ -77,7 +77,7 @@
     damageDivisor: 2
     trackAllDamage: true
     damageOverlay:
-      sprite: _RMC14/Structures/Walls/Barricades/metal_barricade_cracks.rsi
+      sprite: _Horizon/RMC14/Structures/Walls/Barricades/metal_barricade_cracks.rsi
   - type: Construction
     graph: BarricadeMetalGraph
     node: nodeMetal
@@ -91,7 +91,7 @@
   description: A barricade incredibly resistant to corrosive and fire damage but breaks easier. Repair with a welder.
   components:
     - type: Sprite
-      sprite: _RMC14/Structures/Walls/Barricades/barricade.rsi
+      sprite: _Horizon/RMC14/Structures/Walls/Barricades/barricade.rsi
       layers:
       - state: metal
       - state: burn_upgrade
@@ -103,7 +103,7 @@
       damageDivisor: 2
       trackAllDamage: true
       damageOverlay:
-        sprite: _RMC14/Structures/Walls/Barricades/burn_barricade_cracks.rsi
+        sprite: _Horizon/RMC14/Structures/Walls/Barricades/burn_barricade_cracks.rsi
     - type: Construction
       graph: BarricadeMetalGraph
       node: nodeBurnUpgrade
@@ -115,7 +115,7 @@
   description: A heavy-duty barricade reinforced with steel and resistant against thrashing. Repair with a welder.
   components:
     - type: Sprite
-      sprite: _RMC14/Structures/Walls/Barricades/barricade.rsi
+      sprite: _Horizon/RMC14/Structures/Walls/Barricades/barricade.rsi
       layers:
       - state: metal
       - state: brute_upgrade
@@ -127,7 +127,7 @@
       damageDivisor: 2
       trackAllDamage: true
       damageOverlay:
-        sprite: _RMC14/Structures/Walls/Barricades/brute_barricade_cracks.rsi
+        sprite: _Horizon/RMC14/Structures/Walls/Barricades/brute_barricade_cracks.rsi
     - type: Construction
       graph: BarricadeMetalGraph
       node: nodeBruteUpgrade
@@ -139,7 +139,7 @@
   description: An blast-resistant barricade made out of the same stuff in EODs. Repair with a welder.
   components:
     - type: Sprite
-      sprite: _RMC14/Structures/Walls/Barricades/barricade.rsi
+      sprite: _Horizon/RMC14/Structures/Walls/Barricades/barricade.rsi
       layers:
       - state: metal
       - state: explosive_upgrade
@@ -150,7 +150,7 @@
       damageDivisor: 2
       trackAllDamage: true
       damageOverlay:
-        sprite: _RMC14/Structures/Walls/Barricades/explosive_barricade_cracks.rsi
+        sprite: _Horizon/RMC14/Structures/Walls/Barricades/explosive_barricade_cracks.rsi
     - type: Construction
       graph: BarricadeMetalGraph
       node: nodeExplosiveUpgrade
@@ -169,7 +169,7 @@
         path:
           "/Audio/Effects/Footsteps/snowstep1.ogg"
   - type: Sprite
-    sprite: _RMC14/Structures/Walls/Barricades/barricade.rsi
+    sprite: _Horizon/RMC14/Structures/Walls/Barricades/barricade.rsi
     layers:
     - state: sandbag
     drawdepth: WallTops
@@ -210,7 +210,7 @@
     damageDivisor: 2
     trackAllDamage: true
     damageOverlay:
-      sprite: _RMC14/Structures/Walls/Barricades/sandbag_cracks.rsi
+      sprite: _Horizon/RMC14/Structures/Walls/Barricades/sandbag_cracks.rsi
   - type: Construction
     graph: BarricadeSandbagGraph
     node: nodeSandbag
@@ -224,7 +224,7 @@
   description: A railing to prevent marines from stepping out of line.
   components:
     - type: Sprite
-      sprite: _RMC14/Structures/Walls/Barricades/barricade.rsi
+      sprite: _Horizon/RMC14/Structures/Walls/Barricades/barricade.rsi
       layers:
       - state: turnstile
     - type: Damageable
@@ -258,7 +258,7 @@
   description: A railing to prevent marines from stepping out of line. This one is designed specifically for medical.
   components:
     - type: Sprite
-      sprite: _RMC14/Structures/Walls/Barricades/barricade.rsi
+      sprite: _Horizon/RMC14/Structures/Walls/Barricades/barricade.rsi
       layers:
       - state: turnstile_med
     - type: Construction
@@ -280,7 +280,7 @@
         path:
           "/Audio/_RMC14/Structures/metalhit.ogg"
   - type: Sprite
-    sprite: _RMC14/Structures/Walls/Barricades/barricade.rsi
+    sprite: _Horizon/RMC14/Structures/Walls/Barricades/barricade.rsi
     layers:
     - state: folding_metal
       map: ["enum.DoorVisualLayers.Base"]
@@ -338,7 +338,7 @@
   description: A tough folding plasteel barricade stronger than its metal counterpart. Can be closed and opened at a moment's notice. Repair with a welder.
   components:
   - type: Sprite
-    sprite: _RMC14/Structures/Walls/Barricades/barricade.rsi
+    sprite: _Horizon/RMC14/Structures/Walls/Barricades/barricade.rsi
     layers:
     - state: plasteel
       map: ["enum.DoorVisualLayers.Base"]

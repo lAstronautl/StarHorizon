@@ -23,7 +23,7 @@
   - type: CartridgeAmmo
     proto: Bullet40mmGrenadeBaton
   - type: Sprite
-    sprite: _RMC14/Objects/Weapons/Guns/Ammunition/Explosives/40mm_grenade.rsi
+    sprite: _Horizon/RMC14/Objects/Weapons/Guns/Ammunition/Explosives/40mm_grenade.rsi
     layers:
     - state: stun
       map: ["enum.AmmoVisualLayers.Base"]
@@ -38,7 +38,7 @@
   - type: CartridgeAmmo
     proto:  Bullet40mmGrenadeBlast
   - type: Sprite
-    sprite: _RMC14/Objects/Weapons/Guns/Ammunition/Explosives/40mm_grenade.rsi
+    sprite: _Horizon/RMC14/Objects/Weapons/Guns/Ammunition/Explosives/40mm_grenade.rsi
     layers:
     - state: he
       map: ["enum.AmmoVisualLayers.Base"]
@@ -53,7 +53,7 @@
   - type: CartridgeAmmo
     proto: Bullet40mmGrenadeHEAT
   - type: Sprite
-    sprite: _RMC14/Objects/Weapons/Guns/Ammunition/Explosives/40mm_grenade.rsi
+    sprite: _Horizon/RMC14/Objects/Weapons/Guns/Ammunition/Explosives/40mm_grenade.rsi
     layers:
     - state: heat
       map: ["enum.AmmoVisualLayers.Base"]
@@ -68,7 +68,7 @@
   - type: CartridgeAmmo
     proto: Bullet40mmGrenadeEMP
   - type: Sprite
-    sprite: _RMC14/Objects/Weapons/Guns/Ammunition/Explosives/40mm_grenade.rsi
+    sprite: _Horizon/RMC14/Objects/Weapons/Guns/Ammunition/Explosives/40mm_grenade.rsi
     layers:
     - state: emp
       map: ["enum.AmmoVisualLayers.Base"]
@@ -83,7 +83,7 @@
   - type: CartridgeAmmo
     proto: Bullet40mmGrenadeFlash
   - type: Sprite
-    sprite: _RMC14/Objects/Weapons/Guns/Ammunition/Explosives/40mm_grenade.rsi
+    sprite: _Horizon/RMC14/Objects/Weapons/Guns/Ammunition/Explosives/40mm_grenade.rsi
     layers:
     - state: flash
       map: ["enum.AmmoVisualLayers.Base"]
@@ -98,7 +98,7 @@
   - type: CartridgeAmmo
     proto: Bullet40mmGrenadeSmoke
   - type: Sprite
-    sprite: _RMC14/Objects/Weapons/Guns/Ammunition/Explosives/40mm_grenade.rsi
+    sprite: _Horizon/RMC14/Objects/Weapons/Guns/Ammunition/Explosives/40mm_grenade.rsi
     layers:
     - state: smoke
       map: ["enum.AmmoVisualLayers.Base"]

@@ -180,9 +180,9 @@
     Легендарная классика на новых пулях. Лучше следите за руками
   components:
   - type: Sprite
-    sprite: _NF/Objects/Weapons/Guns/Pistols/magnum38.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Pistols/magnum38.rsi
   - type: Clothing
-    sprite: _NF/Objects/Weapons/Guns/Pistols/magnum38.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Pistols/magnum38.rsi
   - type: Gun
     soundGunshot:
       path: /Audio/Weapons/Guns/Gunshots/mateba.ogg
@@ -196,9 +196,9 @@
     Довольной тяжелый и вместительный револьвер для бойцов горячих точек
   components:
   - type: Sprite
-    sprite: _NF/Objects/Weapons/Guns/Pistols/m44.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Pistols/m44.rsi
   - type: Clothing
-    sprite: _NF/Objects/Weapons/Guns/Pistols/m44.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Pistols/m44.rsi
   - type: RevolverAmmoProvider
     capacity: 7
     chambers: [ True, True, True, True, True, True, True ]
@@ -213,9 +213,9 @@
     Боевой револьвер созданный для сотрудников секретных служб. Очень дорогой,но до безумия эффективный
   components:
   - type: Sprite
-    sprite: _NF/Objects/Weapons/Guns/Pistols/rsh9.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Pistols/rsh9.rsi
   - type: Clothing
-    sprite: _NF/Objects/Weapons/Guns/Pistols/rsh9.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Pistols/rsh9.rsi
   - type: RevolverAmmoProvider
     capacity: 7
     chambers: [ True, True, True, True, True, True, True ]
@@ -230,9 +230,9 @@
     Большой и грозный револьвер. Часто используется военными комисарами
   components:
   - type: Sprite
-    sprite: _NF/Objects/Weapons/Guns/Pistols/spearhead.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Pistols/spearhead.rsi
   - type: Clothing
-    sprite: _NF/Objects/Weapons/Guns/Pistols/spearhead.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Pistols/spearhead.rsi
   - type: RevolverAmmoProvider
     capacity: 7
     chambers: [ True, True, True, True, True, True, True ]
@@ -247,9 +247,9 @@
     Массивный револьвер,получивший популярность у элитных подразделений наемников Синдиката
   components:
   - type: Sprite
-    sprite: _NF/Objects/Weapons/Guns/Pistols/zhnk72.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Pistols/zhnk72.rsi
   - type: Clothing
-    sprite: _NF/Objects/Weapons/Guns/Pistols/zhnk72.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Pistols/zhnk72.rsi
   - type: RevolverAmmoProvider
     capacity: 7
     chambers: [ True, True, True, True, True, True, True ]

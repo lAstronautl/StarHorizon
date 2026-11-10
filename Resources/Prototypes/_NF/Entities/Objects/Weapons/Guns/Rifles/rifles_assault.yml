@@ -344,9 +344,9 @@
     angleDecay: 3
     fireRate: 5
   - type: Clothing
-    sprite: _NF/Objects/Weapons/Guns/Rifles/ak4047.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Rifles/ak4047.rsi
   - type: Sprite
-    sprite: _NF/Objects/Weapons/Guns/Rifles/ak4047.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Rifles/ak4047.rsi
   - type: MagazineVisuals
     magState: mag
     steps: 4
@@ -393,9 +393,9 @@
     angleDecay: 3
     fireRate: 5
   - type: Clothing
-    sprite: _NF/Objects/Weapons/Guns/Rifles/ar10.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Rifles/ar10.rsi
   - type: Sprite
-    sprite: _NF/Objects/Weapons/Guns/Rifles/ar10.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Rifles/ar10.rsi
   - type: MagazineVisuals
     magState: mag
     steps: 4
@@ -442,9 +442,9 @@
     angleDecay: 3
     fireRate: 6
   - type: Clothing
-    sprite: _NF/Objects/Weapons/Guns/Rifles/l83a2.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Rifles/l83a2.rsi
   - type: Sprite
-    sprite: _NF/Objects/Weapons/Guns/Rifles/l83a2.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Rifles/l83a2.rsi
   - type: MagazineVisuals
     magState: mag
     steps: 4
@@ -484,9 +484,9 @@
     Военная винтовка с большим прошлым. Отличный выбор для опытного солдата.
   components:
   - type: Clothing
-    sprite: _NF/Objects/Weapons/Guns/Rifles/m16.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Rifles/m16.rsi
   - type: Sprite
-    sprite: _NF/Objects/Weapons/Guns/Rifles/m16.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Rifles/m16.rsi
   - type: MagazineVisuals
     magState: mag
     steps: 3
@@ -530,9 +530,9 @@
     Тяжелая винтовка,используемая пустынными наемниками
   components:
   - type: Clothing
-    sprite: _NF/Objects/Weapons/Guns/Rifles/m4spr/desert.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Rifles/m4spr/desert.rsi
   - type: Sprite
-    sprite: _NF/Objects/Weapons/Guns/Rifles/m4spr/desert.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Rifles/m4spr/desert.rsi
   - type: MagazineVisuals
     magState: mag
     steps: 3
@@ -575,9 +575,9 @@
     Продвинутая винтовка,используемая технологически развитыми бандами наемников
   components:
   - type: Clothing
-    sprite: _NF/Objects/Weapons/Guns/Rifles/m59a/desert.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Rifles/m59a/desert.rsi
   - type: Sprite
-    sprite: _NF/Objects/Weapons/Guns/Rifles/m59a/desert.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Rifles/m59a/desert.rsi
   - type: MagazineVisuals
     magState: mag
     steps: 3
@@ -620,11 +620,11 @@
     Старый боевое карабин,обычно находят в руках преступников или бедных наемников
   components:
   - type: Sprite
-    sprite: _NF/Objects/Weapons/Guns/Rifles/mar30.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Rifles/mar30.rsi
   - type: Clothing
-    sprite: _NF/Objects/Weapons/Guns/Rifles/mar30.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Rifles/mar30.rsi
   - type: Item
-    sprite: _NF/Objects/Weapons/Guns/Rifles/mar30.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Rifles/mar30.rsi
   - type: Gun
     burstFireRate: 8
     shotsPerBurst: 3
@@ -677,9 +677,9 @@
     angleDecay: 3
     fireRate: 5
   - type: Clothing
-    sprite: _NF/Objects/Weapons/Guns/Rifles/mar40.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Rifles/mar40.rsi
   - type: Sprite
-    sprite: _NF/Objects/Weapons/Guns/Rifles/mar40.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Rifles/mar40.rsi
   - type: MagazineVisuals
     magState: mag
     steps: 4
@@ -726,9 +726,9 @@
     angleDecay: 3
     fireRate: 5
   - type: Clothing
-    sprite: _NF/Objects/Weapons/Guns/Rifles/type71.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Rifles/type71.rsi
   - type: Sprite
-    sprite: _NF/Objects/Weapons/Guns/Rifles/type71.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Rifles/type71.rsi
   - type: MagazineVisuals
     magState: mag
     steps: 4
@@ -775,9 +775,9 @@
     angleDecay: 3
     fireRate: 7
   - type: Clothing
-    sprite: _NF/Objects/Weapons/Guns/Rifles/xm40.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Rifles/xm40.rsi
   - type: Sprite
-    sprite: _NF/Objects/Weapons/Guns/Rifles/xm40.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/Rifles/xm40.rsi
   - type: MagazineVisuals
     magState: mag
     steps: 4

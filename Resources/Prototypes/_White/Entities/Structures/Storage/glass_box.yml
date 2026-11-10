@@ -7,7 +7,7 @@
     sprite: Structures/Storage/glassbox.rsi
     layers:
     - state: base
-    - sprite: _RMC14/Mobs/Aliens/Xenomorphs/facehugger.rsi
+    - sprite: _Horizon/RMC14/Mobs/Aliens/Xenomorphs/facehugger.rsi
       state: facehugger
       map: ["enum.ItemCabinetVisuals.Layer"]
       visible: true

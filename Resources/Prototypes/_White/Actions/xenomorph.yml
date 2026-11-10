@@ -4,8 +4,8 @@
   parent: ActionCombatModeToggle
   components:
   - type: Action
-    icon: { sprite: _RMC14/Interface/Actions/xenomorph.rsi, state: help }
-    iconOn: { sprite: _RMC14/Interface/Actions/xenomorph.rsi, state: harm }
+    icon: { sprite: _Horizon/RMC14/Interface/Actions/xenomorph.rsi, state: help }
+    iconOn: { sprite: _Horizon/RMC14/Interface/Actions/xenomorph.rsi, state: harm }
 
 # Evolution actions
 - type: entity
@@ -18,7 +18,7 @@
     checkCanInteract: false
     itemIconStyle: BigAction
     useDelay: 0
-    icon: { sprite: _RMC14/Interface/Actions/xenomorph.rsi, state: evolve }
+    icon: { sprite: _Horizon/RMC14/Interface/Actions/xenomorph.rsi, state: evolve }
   - type: InstantAction
     event: !type:EvolutionsActionEvent
 
@@ -29,7 +29,7 @@
   description: Evolve into the main defender of the hive.
   components:
   - type: Action
-    icon: { sprite: _RMC14/Interface/Actions/xenomorph.rsi, state: evolve_praetorian }
+    icon: { sprite: _Horizon/RMC14/Interface/Actions/xenomorph.rsi, state: evolve_praetorian }
   - type: PlasmaCostAction
     plasmaCost: 500
 
@@ -40,7 +40,7 @@
   description: Produce an internal egg sac capable of spawning children. Only one queen can exist at a time.
   components:
   - type: Action
-    icon: { sprite: _RMC14/Interface/Actions/xenomorph.rsi, state: evolve_queen }
+    icon: { sprite: _Horizon/RMC14/Interface/Actions/xenomorph.rsi, state: evolve_queen }
 
 # Structures actions
 - type: entity
@@ -52,7 +52,7 @@
   - type: Action
     itemIconStyle: BigAction
     useDelay: 2
-    icon: { sprite: _RMC14/Interface/Actions/xenomorph.rsi, state: plant_seed }
+    icon: { sprite: _Horizon/RMC14/Interface/Actions/xenomorph.rsi, state: plant_seed }
   - type: InstantAction
     event: !type:SpawnTileEntityActionEvent
       entity: ResinWeedNode
@@ -74,7 +74,7 @@
     checkCanInteract: false
     itemIconStyle: BigAction
     useDelay: 2
-    icon: { sprite: _RMC14/Interface/Actions/xenomorph.rsi, state: egg }
+    icon: { sprite: _Horizon/RMC14/Interface/Actions/xenomorph.rsi, state: egg }
   - type: InstantAction
     event: !type:SpawnTileEntityActionEvent
       entity: XenomorphEgg
@@ -192,7 +192,7 @@
   - type: Action
     useDelay: 11
     itemIconStyle: BigAction
-    icon: { sprite : _RMC14/Interface/Actions/xenomorph.rsi, state: tail_attack }
+    icon: { sprite : _Horizon/RMC14/Interface/Actions/xenomorph.rsi, state: tail_attack }
   - type: TargetAction
     range: 10
   - type: WorldTargetAction
@@ -208,7 +208,7 @@
 #  - type: Action
 #    useDelay: 11
 #    itemIconStyle: BigAction # Goobstation
-#    icon: { sprite: _RMC14/Interface/Actions/xenomorph.rsi, state: acid } # Goobstation
+#    icon: { sprite: _Horizon/RMC14/Interface/Actions/xenomorph.rsi, state: acid } # Goobstation
 #  - type: TargetAction
 #    interactOnMiss: false
 #    range: 2
@@ -229,8 +229,8 @@
   - type: Action
     priority: 0
     useDelay: 3
-    icon: { sprite : _RMC14/Interface/Actions/xenomorph.rsi, state: leap_off }
-    iconOn: { sprite : _RMC14/Interface/Actions/xenomorph.rsi, state: leap_on }
+    icon: { sprite : _Horizon/RMC14/Interface/Actions/xenomorph.rsi, state: leap_off }
+    iconOn: { sprite : _Horizon/RMC14/Interface/Actions/xenomorph.rsi, state: leap_on }
   - type: TargetAction
     range: 10
   - type: WorldTargetAction
@@ -245,8 +245,8 @@
   components:
   - type: Action
     priority: 0
-    icon: { sprite : _RMC14/Interface/Actions/xenomorph.rsi, state: plasma_transfer_off }
-    iconOn: { sprite : _RMC14/Interface/Actions/xenomorph.rsi, state: plasma_transfer_on }
+    icon: { sprite : _Horizon/RMC14/Interface/Actions/xenomorph.rsi, state: plasma_transfer_off }
+    iconOn: { sprite : _Horizon/RMC14/Interface/Actions/xenomorph.rsi, state: plasma_transfer_on }
   - type: TargetAction
     interactOnMiss: false
     range: 2
@@ -263,7 +263,7 @@
   - type: Action
     itemIconStyle: BigAction
     useDelay: 5 # Goobstation
-    icon: { sprite : _RMC14/Interface/Actions/xenomorph.rsi, state: promote }
+    icon: { sprite : _Horizon/RMC14/Interface/Actions/xenomorph.rsi, state: promote }
   - type: TargetAction # Goobstation start
     checkCanAccess: true
     range: 2

@@ -7,7 +7,7 @@
   - type: Item
     size: Small
   - type: Sprite
-    sprite: _RMC14/Objects/Devices/binoculars.rsi
+    sprite: _Horizon/RMC14/Objects/Devices/binoculars.rsi
     state: binoculars
   - type: Scope
     useInHand: true

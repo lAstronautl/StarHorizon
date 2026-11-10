@@ -155,9 +155,9 @@
     soundGunshot:
       path: /Audio/Weapons/Guns/Gunshots/atreides.ogg
   - type: Sprite
-    sprite: _NF/Objects/Weapons/Guns/SMGs/uzi.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/SMGs/uzi.rsi
   - type: Clothing
-    sprite: _NF/Objects/Weapons/Guns/SMGs/uzi.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/SMGs/uzi.rsi
 
 - type: entity
   id: NFWeaponSubMachineGunType64
@@ -169,9 +169,9 @@
     soundGunshot:
       path: /Audio/Weapons/Guns/Gunshots/atreides.ogg
   - type: Sprite
-    sprite: _NF/Objects/Weapons/Guns/SMGs/type64.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/SMGs/type64.rsi
   - type: Clothing
-    sprite: _NF/Objects/Weapons/Guns/SMGs/type64.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/SMGs/type64.rsi
   # Horizon Attachments start
   - type: AttachableHolder
     slots:
@@ -208,9 +208,9 @@
     soundGunshot:
       path: /Audio/Weapons/Guns/Gunshots/atreides.ogg
   - type: Sprite
-    sprite: _NF/Objects/Weapons/Guns/SMGs/type19.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/SMGs/type19.rsi
   - type: Clothing
-    sprite: _NF/Objects/Weapons/Guns/SMGs/type19.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/SMGs/type19.rsi
   # Horizon Attachments start
   - type: AttachableHolder
     slots:
@@ -248,9 +248,9 @@
     soundGunshot:
       path: /Audio/_DV/Weapons/Guns/Gunshots/typewriter.ogg
   - type: Sprite
-    sprite: _NF/Objects/Weapons/Guns/SMGs/p90.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/SMGs/p90.rsi
   - type: Clothing
-    sprite: _NF/Objects/Weapons/Guns/SMGs/p90.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/SMGs/p90.rsi
 
 
 - type: entity
@@ -264,9 +264,9 @@
     soundGunshot:
       path: /Audio/_DV/Weapons/Guns/Gunshots/typewriter.ogg
   - type: Sprite
-    sprite: _NF/Objects/Weapons/Guns/SMGs/mp27.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/SMGs/mp27.rsi
   - type: Clothing
-    sprite: _NF/Objects/Weapons/Guns/SMGs/mp27.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/SMGs/mp27.rsi
 
 - type: entity
   id: NFWeaponSubMachineGunFP9000
@@ -278,9 +278,9 @@
     soundGunshot:
       path: /Audio/Weapons/Guns/Gunshots/atreides.ogg
   - type: Sprite
-    sprite: _NF/Objects/Weapons/Guns/SMGs/fp9000.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/SMGs/fp9000.rsi
   - type: Clothing
-    sprite: _NF/Objects/Weapons/Guns/SMGs/fp9000.rsi
+    sprite: _Horizon/NF/Objects/Weapons/Guns/SMGs/fp9000.rsi
   # Horizon Attachments start
   - type: AttachableHolder
     slots:

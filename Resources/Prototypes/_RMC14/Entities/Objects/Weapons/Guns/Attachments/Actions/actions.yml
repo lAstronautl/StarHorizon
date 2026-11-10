@@ -11,7 +11,7 @@
   components:
   - type: Action
     icon:
-      sprite: _RMC14/Objects/Weapons/Guns/Attachments/scope_actions.rsi
+      sprite: _Horizon/RMC14/Objects/Weapons/Guns/Attachments/scope_actions.rsi
       state: sniperscope
     useDelay: 0.25
   - type: InstantAction
@@ -25,7 +25,7 @@
   components:
   - type: Action
     icon:
-      sprite: _RMC14/Objects/Weapons/Guns/Attachments/scope_actions.rsi
+      sprite: _Horizon/RMC14/Objects/Weapons/Guns/Attachments/scope_actions.rsi
       state: sniperscope
     useDelay: 0.25
   - type: InstantAction
@@ -42,7 +42,7 @@
   components:
   - type: Action
     icon:
-      sprite: _RMC14/Objects/Weapons/Guns/Attachments/scope_actions.rsi
+      sprite: _Horizon/RMC14/Objects/Weapons/Guns/Attachments/scope_actions.rsi
       state: sniperscope
   - type: InstantAction
     event: !type:AttachableToggleActionEvent
