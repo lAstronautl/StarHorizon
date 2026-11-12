@@ -86,9 +86,10 @@
 
 ### 1. Движок: вызывающий поток участвует в параллельных задачах (многопоточность)
 
-`RobustToolbox/Robust.Shared/Threading/ParallelManager.cs`. Правка закоммичена в форк движка
-`lAstronautl/RobustToolbox`, ветка `horizon/267.3.0` (коммит `2a647539`), на который теперь
-указывает сабмодуль; копия патчем — `Tools/_Horizon/engine-patches/0001-…patch`.
+`RobustToolbox/Robust.Server/Threading/ServerParallelManager.cs` — серверная реализация
+диспетчера, подключённая в `Robust.Server/ServerIoC.cs` поверх общей. `Robust.Shared` и
+`Robust.Client` совпадают с апстримом. Форк движка `lAstronautl/RobustToolbox`, ветка
+`horizon/267.3.0`; копия патчем — `Tools/_Horizon/engine-patches/0001-server-parallel-manager.patch`.
 
 Раньше `ProcessNow(IParallelRobustJob)` ставил все пачки в пул потоков, а игровой поток засыпал
 на `WaitHandle.WaitOne()`. На 4 ядрах это значит, что одно ядро из четырёх простаивает ровно

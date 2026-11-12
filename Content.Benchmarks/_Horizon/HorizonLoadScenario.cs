@@ -61,6 +61,10 @@ public static class HorizonLoadScenario
         public int ParallelCount = 0;
         public bool Pvs = true;
         public bool PrintExceptions;
+        /// <summary>Период «оборота» мира в тиках (0 — выключен): смена кораблей, игроков, предметов, разведка космоса.</summary>
+        public int Churn;
+        /// <summary>Период контрольных точек памяти в тиках (0 — выключены). Каждая точка делает полную сборку мусора.</summary>
+        public int MemEvery;
         public string PathOffset = "";
         public readonly List<(string Name, string Value)> CVars = new();
     }
@@ -105,6 +109,8 @@ public static class HorizonLoadScenario
                 case "--parallel": o.ParallelCount = int.Parse(Next()); break;
                 case "--pvs": o.Pvs = bool.Parse(Next()); break;
                 case "--print-exceptions": o.PrintExceptions = true; break;
+                case "--churn": o.Churn = int.Parse(Next()); break;
+                case "--mem-every": o.MemEvery = int.Parse(Next()); break;
                 case "--path-offset": o.PathOffset = Next(); break;
                 case "--cvar":
                     var kv = Next().Split('=', 2);
@@ -346,6 +352,111 @@ public static class HorizonLoadScenario
             }
         }
 
+        // --- «Оборот» мира: ускоренная имитация долгой смены (для поиска роста памяти).
+        var mapSys = entMan.System<SharedMapSystem>();
+        var churnItems = new List<EntityUid>();
+        var playerShips = Math.Min(ships.Count, (o.Players + 1) / 2);
+
+        async Task Churn(int tick)
+        {
+            if (o.Churn <= 0 || tick == 0 || tick % o.Churn != 0)
+                return;
+
+            var c = tick / o.Churn;
+
+            // 1) Отключение и подключение игрока (нечётные индексы — игроки на кораблях).
+            var s = 1 + 2 * (c % Math.Max(1, o.Players / 2));
+            if (s < sessions.Length)
+            {
+                EntityCoordinates spot = default;
+                await server.WaitPost(() =>
+                {
+                    spot = entMan.GetComponent<TransformComponent>(mobs[s]).Coordinates;
+                    entMan.QueueDeleteEntity(mobs[s]);
+                });
+                await server.RemoveDummySession(sessions[s], true);
+                sessions[s] = await server.AddDummySession($"churn_{c}");
+                await server.WaitPost(() =>
+                {
+                    var uid = entMan.SpawnEntity("MobHuman", spot);
+                    server.ConsoleHost.ExecuteCommand($"setoutfit {entMan.GetNetEntity(uid)} PassengerGear");
+                    entMan.System<MindSystem>().ControlMob(sessions[s].UserId, uid);
+                    entMan.System<SharedGodmodeSystem>().EnableGodmode(uid);
+                    playerMan.JoinGame(sessions[s]);
+                    mobs[s] = uid;
+                    held[s] = null;
+                });
+            }
+
+            await server.WaitPost(() =>
+            {
+                // 2) Корабль без игроков удаляется, на его место прилетает другой.
+                if (ships.Count > playerShips + 1)
+                {
+                    var j = playerShips + c % (ships.Count - playerShips);
+                    entMan.QueueDeleteEntity(ships[j]);
+                    var vessel = vessels[(c * 7) % vessels.Count];
+                    var angle = j * 2.399963f;
+                    var offset = new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * (260f + 45f * j);
+                    try
+                    {
+                        if (mapLoader.TryLoadGrid(mapId, vessel.ShuttlePath, out var grid, offset: offset))
+                            ships[j] = grid.Value.Owner;
+                    }
+                    catch (Exception ex)
+                    {
+                        Log($"churn ship {vessel.ID} failed to load: {ex.Message}");
+                    }
+                }
+
+                // 3) Игрок с аванпоста улетает в новый участок космоса (генерация мира вокруг него).
+                var e = 2 * (c % Math.Max(1, (o.Players + 1) / 2));
+                if (e < mobs.Length && mapSys.TryGetMap(mapId, out var mapUid))
+                {
+                    var a = c * 2.399963f;
+                    var pos = new Vector2(MathF.Cos(a), MathF.Sin(a)) * (3000f + (c % 25) * 400f);
+                    xformSys.SetCoordinates(mobs[e], new EntityCoordinates(mapUid.Value, pos));
+                }
+
+                // 4) Предметы: прошлая партия удаляется, появляется новая.
+                foreach (var item in churnItems)
+                {
+                    entMan.QueueDeleteEntity(item);
+                }
+                churnItems.Clear();
+                var at = entMan.GetComponent<TransformComponent>(mobs[c % mobs.Length]).Coordinates;
+                for (var i = 0; i < 30; i++)
+                {
+                    churnItems.Add(entMan.SpawnEntity("Paper", at));
+                }
+            });
+        }
+
+        // --- Контрольные точки памяти (после полной сборки мусора, чтобы видеть живые объекты, а не мусор).
+        var memLines = new List<string> { "tick,entities,grids,rssMB,heapLiveMB,gcCommittedMB,gcFragmentedMB" };
+
+        async Task MemCheckpoint(int tick)
+        {
+            if (o.MemEvery <= 0 || tick % o.MemEvery != 0)
+                return;
+
+            int ents = 0, grids = 0;
+            await server.WaitPost(() =>
+            {
+                ents = entMan.EntityCount;
+                grids = entMan.Count<MapGridComponent>();
+            });
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+            var info = GC.GetGCMemoryInfo();
+            const double mb = 1024 * 1024;
+            var line = string.Create(CultureInfo.InvariantCulture,
+                $"{tick},{ents},{grids},{Process.GetCurrentProcess().WorkingSet64 / mb:F0},{GC.GetTotalMemory(false) / mb:F0},{info.TotalCommittedBytes / mb:F0},{info.FragmentedBytes / mb:F0}");
+            memLines.Add(line);
+            Log($"MEM {line}");
+        }
+
         // --- Прогрев (JIT, tiered compilation, прибытие FTL, успокоение физики).
         sw.Restart();
         for (var t = 0; t < o.WarmupTicks; t++)
@@ -380,12 +491,21 @@ public static class HorizonLoadScenario
         for (var t = 0; t < o.MeasureTicks; t++)
         {
             var tick = o.WarmupTicks + t;
+            await MemCheckpoint(t);
+            await Churn(t);
             await server.WaitPost(() => Act(tick));
             tickSw.Restart();
             await server.WaitRunTicks(1);
             tickMs[t] = tickSw.Elapsed.TotalMilliseconds;
         }
         wall.Stop();
+        await MemCheckpoint(o.MeasureTicks);
+
+        var memInfo = GC.GetGCMemoryInfo();
+        var rssMb = Process.GetCurrentProcess().WorkingSet64 / 1048576.0;
+        var peakRssMb = Process.GetCurrentProcess().PeakWorkingSet64 / 1048576.0;
+        var heapMb = GC.GetTotalMemory(false) / 1048576.0;
+        var committedMb = memInfo.TotalCommittedBytes / 1048576.0;
 
         var cpuAfter = Process.GetCurrentProcess().TotalProcessorTime;
         var allocAfter = GC.GetTotalAllocatedBytes(true);
@@ -434,6 +554,7 @@ public static class HorizonLoadScenario
         json.AppendLine(string.Create(inv, $"  \"allocBytesPerTick\": {allocPerTick:F0},"));
         json.AppendLine(string.Create(inv, $"  \"gc\": {{\"gen0\": {GC.CollectionCount(0) - gc0}, \"gen1\": {GC.CollectionCount(1) - gc1}, \"gen2\": {GC.CollectionCount(2) - gc2}, \"pauseMsTotal\": {pauseMs:F2}}},"));
         json.AppendLine(string.Create(inv, $"  \"wallSeconds\": {wall.Elapsed.TotalSeconds:F2},"));
+        json.AppendLine(string.Create(inv, $"  \"memory\": {{\"rssMB\": {rssMb:F0}, \"peakRssMB\": {peakRssMb:F0}, \"heapMB\": {heapMb:F0}, \"gcCommittedMB\": {committedMb:F0}, \"churn\": {o.Churn}}},"));
         json.AppendLine("  \"systems\": [");
         for (var i = 0; i < systems.Count; i++)
         {
@@ -451,7 +572,9 @@ public static class HorizonLoadScenario
         Log($"RESULT {o.Label}: mean={mean:F3}ms p50={Pct(0.5):F3} p95={Pct(0.95):F3} p99={Pct(0.99):F3} max={sorted[^1]:F1} " +
             $"systems={sysTotalMs:F3}ms cpu={cpuMsPerTick:F3}ms alloc={allocPerTick / 1024:F0}KB/tick " +
             $"gc={GC.CollectionCount(0) - gc0}/{GC.CollectionCount(1) - gc1}/{GC.CollectionCount(2) - gc2} pause={pauseMs:F0}ms " +
-            $"ents={entityCount} grids={gridCount}");
+            $"ents={entityCount} grids={gridCount} rss={rssMb:F0}MB heap={heapMb:F0}MB committed={committedMb:F0}MB");
+        if (memLines.Count > 1)
+            await File.WriteAllLinesAsync(Path.Combine(o.OutDir, $"{o.Label}.mem.csv"), memLines);
         foreach (var (name, sec) in systems.Take(25))
         {
             Log(string.Create(inv, $"  {name,-44} {sec * 1000 / o.MeasureTicks,9:F4} ms/tick"));

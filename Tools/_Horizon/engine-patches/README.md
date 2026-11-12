@@ -10,10 +10,10 @@
 
 Применение на чистый апстримный движок (из корня репозитория игры):
 
-    git -C RobustToolbox apply ../Tools/_Horizon/engine-patches/0001-parallel-manager-caller-participation.patch
+    git -C RobustToolbox apply ../Tools/_Horizon/engine-patches/0001-server-parallel-manager.patch
 
 Откат: `git -C RobustToolbox checkout -- .`
 
 | Патч | Что делает |
 |---|---|
-| 0001 | `ParallelManager.ProcessNow`: вызывающий (игровой) поток сам выполняет пачки параллельной задачи вместе с пулом потоков, а не спит на kernel-хэндле. |
+| 0001 | Новый `Robust.Server/Threading/ServerParallelManager.cs`, подключённый в `ServerIoC`: вызывающий (игровой) поток сам выполняет пачки параллельной задачи вместе с пулом потоков, а не спит на kernel-хэндле. `Robust.Shared` и `Robust.Client` не затронуты. |

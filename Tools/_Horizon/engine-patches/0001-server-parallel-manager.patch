@@ -1,0 +1,405 @@
+diff --git a/Robust.Server/ServerIoC.cs b/Robust.Server/ServerIoC.cs
+index 382596902..ecc2a0326 100644
+--- a/Robust.Server/ServerIoC.cs
++++ b/Robust.Server/ServerIoC.cs
+@@ -45,6 +45,10 @@ namespace Robust.Server
+         {
+             SharedIoC.RegisterIoC(deps);
+ 
++            // StarHorizon: server-only parallel manager whose caller takes part in parallel jobs.
++            deps.Register<Robust.Shared.Threading.IParallelManager, Robust.Server.Threading.ServerParallelManager>(overwrite: true);
++            deps.Register<Robust.Shared.Threading.IParallelManagerInternal, Robust.Server.Threading.ServerParallelManager>(overwrite: true);
++
+             deps.Register<IBaseServer, BaseServer>();
+             deps.Register<IBaseServerInternal, BaseServer>();
+             deps.Register<BaseServer, BaseServer>();
+diff --git a/Robust.Server/Threading/ServerParallelManager.cs b/Robust.Server/Threading/ServerParallelManager.cs
+new file mode 100644
+index 000000000..54a0d3510
+--- /dev/null
++++ b/Robust.Server/Threading/ServerParallelManager.cs
+@@ -0,0 +1,384 @@
++using System;
++using System.Threading;
++using Microsoft.Extensions.ObjectPool;
++using Robust.Shared.Configuration;
++using Robust.Shared.IoC;
++using Robust.Shared.Log;
++using Robust.Shared.Threading;
++using Robust.Shared;
++
++namespace Robust.Server.Threading;
++
++/// <summary>
++/// Server-side replacement for the shared parallel manager (StarHorizon).
++/// Identical to <c>Robust.Shared.Threading.ParallelManager</c> except that the calling thread takes part
++/// in <see cref="ProcessNow(IParallelRobustJob, int)"/> instead of sleeping on a kernel wait handle.
++/// Lives in Robust.Server so that Robust.Shared and Robust.Client stay unmodified.
++/// </summary>
++internal sealed class ServerParallelManager : IParallelManagerInternal
++{
++    [Dependency] private readonly IConfigurationManager _cfg = default!;
++    [Dependency] private readonly ILogManager _logs = default!;
++
++    public event Action? ParallelCountChanged;
++    public int ParallelProcessCount { get; private set; }
++
++    public static readonly ManualResetEventSlim DummyResetEvent = new(true);
++
++    private ISawmill _sawmill = default!;
++
++    // Without pooling it's hard to keep task allocations down for classes
++    // This lets us avoid re-allocating the ManualResetEventSlims constantly when we just need a way to signal job completion
++    // and Parallel.For is really not built for running parallel tasks every tick.
++
++    private readonly ObjectPool<InternalJob> _jobPool =
++        new DefaultObjectPool<InternalJob>(new DefaultPooledObjectPolicy<InternalJob>(), 1024);
++
++    private readonly ObjectPool<InternalParallelJob> _parallelPool =
++        new DefaultObjectPool<InternalParallelJob>(new DefaultPooledObjectPolicy<InternalParallelJob>(), 1024);
++
++    /// <summary>
++    /// Used internally for Parallel jobs, for external callers it gets garbage collected.
++    /// </summary>
++    private readonly ObjectPool<ParallelTracker> _trackerPool =
++        new DefaultObjectPool<ParallelTracker>(new DefaultPooledObjectPolicy<ParallelTracker>(), 1024);
++
++    public void Initialize()
++    {
++        _sawmill = _logs.GetSawmill("parallel");
++        _cfg.OnValueChanged(CVars.ThreadParallelCount, UpdateCVar, true);
++    }
++
++    public void AddAndInvokeParallelCountChanged(Action changed)
++    {
++        ParallelCountChanged += changed;
++        changed();
++    }
++
++    private InternalJob GetJob(IRobustJob job)
++    {
++        var robustJob = _jobPool.Get();
++        robustJob.Event.Reset();
++        robustJob.Set(_sawmill, job, _jobPool);
++        return robustJob;
++    }
++
++    private InternalParallelJob GetParallelJob(IParallelRobustJob job, int start, int end, ParallelTracker tracker)
++    {
++        var internalJob = _parallelPool.Get();
++        internalJob.Set(_sawmill, job, start, end, tracker, _parallelPool);
++        return internalJob;
++    }
++
++    private void UpdateCVar(int value)
++    {
++        var oldCount = ParallelProcessCount;
++        ThreadPool.GetAvailableThreads(out var oldWorker, out var oldCompletion);
++        ParallelProcessCount = value == 0 ? oldWorker : value;
++
++        if (oldCount != ParallelProcessCount)
++        {
++            ParallelCountChanged?.Invoke();
++            ThreadPool.SetMaxThreads(ParallelProcessCount, oldCompletion);
++        }
++    }
++
++    /// <inheritdoc/>
++    public WaitHandle Process(IRobustJob job)
++    {
++        var subJob = GetJob(job);
++        // From what I can tell preferLocal is more of a !forceGlobal flag.
++        // Also UnsafeQueue should be fine as long as we don't use async locals.
++        ThreadPool.UnsafeQueueUserWorkItem(subJob, true);
++        return subJob.Event.WaitHandle;
++    }
++
++    public void ProcessNow(IRobustJob job)
++    {
++        job.Execute();
++    }
++
++    /// <inheritdoc/>
++    public void ProcessNow(IParallelRobustJob job, int amount)
++    {
++        var batches = amount / (float) job.BatchSize;
++
++        // Below the threshold so just do it now.
++        if (batches <= job.MinimumBatchParallel)
++        {
++            ProcessSerialNow(job, amount);
++            return;
++        }
++
++        // The calling thread takes part in the work instead of sleeping on a kernel wait handle
++        // while pool threads do everything. Batches are claimed through a shared atomic counter.
++        ProcessShared(job, amount);
++    }
++
++    private readonly ObjectPool<SharedParallelJob> _sharedPool =
++        new DefaultObjectPool<SharedParallelJob>(new DefaultPooledObjectPolicy<SharedParallelJob>(), 64);
++
++    private void ProcessShared(IParallelRobustJob job, int amount)
++    {
++        var batchSize = job.BatchSize;
++        var batches = (amount + batchSize - 1) / batchSize;
++
++        // ParallelProcessCount may be the thread pool maximum (tens of thousands), so also clamp to real cores.
++        var helpers = Math.Min(batches, Math.Min(ParallelProcessCount, Environment.ProcessorCount)) - 1;
++
++        if (helpers <= 0)
++        {
++            ProcessSerialNow(job, amount);
++            return;
++        }
++
++        var shared = _sharedPool.Get();
++        shared.Set(_sawmill, job, amount, batchSize, batches, helpers, _sharedPool);
++
++        for (var i = 0; i < helpers; i++)
++        {
++            ThreadPool.UnsafeQueueUserWorkItem(shared, false);
++        }
++
++        shared.Run();
++        shared.Done.Wait();
++        shared.Release();
++    }
++
++    /// <summary>
++    /// A parallel job whose batches are claimed by whichever thread gets there first, including the caller.
++    /// The same instance is queued to the thread pool several times; it returns to its pool only once
++    /// every queued copy has run and the caller has let go of it.
++    /// </summary>
++    private sealed class SharedParallelJob : IThreadPoolWorkItem
++    {
++        public readonly ManualResetEventSlim Done = new(false, 200);
++
++        private ISawmill _sawmill = default!;
++        private IParallelRobustJob _job = default!;
++        private ObjectPool<SharedParallelJob> _pool = default!;
++        private int _amount;
++        private int _batchSize;
++        private int _batches;
++        private int _next;
++        private int _pending;
++        private int _refs;
++
++        public void Set(ISawmill sawmill, IParallelRobustJob job, int amount, int batchSize, int batches, int helpers,
++            ObjectPool<SharedParallelJob> pool)
++        {
++            _sawmill = sawmill;
++            _job = job;
++            _pool = pool;
++            _amount = amount;
++            _batchSize = batchSize;
++            _batches = batches;
++            _next = 0;
++            _pending = batches;
++            // One reference per queued copy plus one for the caller.
++            _refs = helpers + 1;
++            Done.Reset();
++        }
++
++        public void Run()
++        {
++            var job = _job;
++            int batch;
++            while ((batch = Interlocked.Increment(ref _next) - 1) < _batches)
++            {
++                var start = batch * _batchSize;
++                var end = Math.Min(start + _batchSize, _amount);
++
++                try
++                {
++                    for (var i = start; i < end; i++)
++                    {
++                        job.Execute(i);
++                    }
++                }
++                catch (Exception exc)
++                {
++                    _sawmill.Error($"Exception in ParallelManager: {exc}");
++                }
++
++                if (Interlocked.Decrement(ref _pending) == 0)
++                    Done.Set();
++            }
++        }
++
++        public void Execute()
++        {
++            Run();
++            Release();
++        }
++
++        public void Release()
++        {
++            if (Interlocked.Decrement(ref _refs) != 0)
++                return;
++
++            _job = default!;
++            _pool.Return(this);
++        }
++    }
++
++    /// <inheritdoc/>
++    public void ProcessSerialNow(IParallelRobustJob jobs, int amount)
++    {
++        for (var i = 0; i < amount; i++)
++        {
++            jobs.Execute(i);
++        }
++    }
++
++    /// <inheritdoc/>
++    public WaitHandle Process(IParallelRobustJob job, int amount)
++    {
++        var tracker = InternalProcess(job, amount);
++        return tracker.Event.WaitHandle;
++    }
++
++    /// <summary>
++    /// Runs a parallel job internally. Used so we can pool the tracker task for ProcessParallelNow
++    /// and not rely on external callers to return it where they don't want to wait.
++    /// </summary>
++    private ParallelTracker InternalProcess(IParallelRobustJob job, int amount)
++    {
++        var batches = (int) MathF.Ceiling(amount / (float) job.BatchSize);
++        var batchSize = job.BatchSize;
++        var tracker = _trackerPool.Get();
++
++        // Need to set this up front to avoid firing too early.
++        tracker.Event.Reset();
++        if (amount <= 0)
++        {
++            tracker.Event.Set();
++            return tracker;
++        }
++
++        tracker.PendingTasks = batches;
++
++        for (var i = 0; i < batches; i++)
++        {
++            var start = i * batchSize;
++            var end = Math.Min(start + batchSize, amount);
++            var subJob = GetParallelJob(job, start, end, tracker);
++
++            // From what I can tell preferLocal is more of a !forceGlobal flag.
++            // Also UnsafeQueue should be fine as long as we don't use async locals.
++            ThreadPool.UnsafeQueueUserWorkItem(subJob, true);
++        }
++
++        return tracker;
++    }
++
++    #region Jobs
++
++    /// <summary>
++    /// Runs an <see cref="IRobustJob"/> and handles cleanup.
++    /// </summary>
++    private sealed class InternalJob : IRobustJob, IThreadPoolWorkItem
++    {
++        private ISawmill _sawmill = default!;
++        private IRobustJob _robust = default!;
++
++        public readonly ManualResetEventSlim Event = new();
++        private ObjectPool<InternalJob> _parentPool = default!;
++
++        public void Set(ISawmill sawmill, IRobustJob job, ObjectPool<InternalJob> parentPool)
++        {
++            _sawmill = sawmill;
++            _robust = job;
++            _parentPool = parentPool;
++        }
++
++        public void Execute()
++        {
++            try
++            {
++                _robust.Execute();
++            }
++            catch (Exception exc)
++            {
++                _sawmill.Error($"Exception in ParallelManager: {exc}");
++            }
++            finally
++            {
++                Event.Set();
++                _parentPool.Return(this);
++            }
++        }
++    }
++
++    /// <summary>
++    /// Runs an <see cref="IParallelRobustJob"/> and handles cleanup.
++    /// </summary>
++    private sealed class InternalParallelJob : IRobustJob, IThreadPoolWorkItem
++    {
++        private IParallelRobustJob _robust = default!;
++        private int _start;
++        private int _end;
++
++        private ISawmill _sawmill = default!;
++
++        private ParallelTracker _tracker = default!;
++        private ObjectPool<InternalParallelJob> _parentPool = default!;
++
++        public void Set(ISawmill sawmill, IParallelRobustJob robust, int start, int end, ParallelTracker tracker, ObjectPool<InternalParallelJob> parentPool)
++        {
++            _sawmill = sawmill;
++
++            _robust = robust;
++            _start = start;
++            _end = end;
++
++            _tracker = tracker;
++            _parentPool = parentPool;
++        }
++
++        public void Execute()
++        {
++            try
++            {
++                for (var i = _start; i < _end; i++)
++                {
++                    _robust.Execute(i);
++                }
++            }
++            catch (Exception exc)
++            {
++                _sawmill.Error($"Exception in ParallelManager: {exc}");
++            }
++            finally
++            {
++                // Set the event and return it to the pool for re-use.
++                _tracker.Set();
++                _parentPool.Return(this);
++            }
++        }
++    }
++
++    /// <summary>
++    /// Tracks jobs internally. This is because WaitHandle has a max limit of 64 tasks.
++    /// So we'll just decrement PendingTasks in lieu.
++    /// </summary>
++    private sealed class ParallelTracker
++    {
++        public readonly ManualResetEventSlim Event = new();
++        public int PendingTasks;
++
++        /// <summary>
++        /// Marks the tracker as having 1 less pending task.
++        /// </summary>
++        public void Set()
++        {
++            // We should atomically get new value of PendingTasks
++            // as the result of Decrement call and use it to prevent data race.
++            if (Interlocked.Decrement(ref PendingTasks) <= 0)
++                Event.Set();
++        }
++    }
++
++    #endregion
++}
++
