@@ -1,0 +1,17 @@
+# Патчи движка RobustToolbox (StarHorizon)
+
+Правки исходников движка, измеренные на нагрузочном стенде (`Tools/_Horizon/perf`).
+Сабмодуль `RobustToolbox` указывает на апстрим space-wizards, поэтому правки лежат здесь патчами,
+пока не появится собственный форк движка.
+
+Базовый коммит движка: `feb9e1db69ab97acfd07580918f5d20ffaa6b770`.
+
+Применение (из корня репозитория игры):
+
+    git -C RobustToolbox apply ../Tools/_Horizon/engine-patches/0001-parallel-manager-caller-participation.patch
+
+Откат: `git -C RobustToolbox checkout -- .`
+
+| Патч | Что делает |
+|---|---|
+| 0001 | `ParallelManager.ProcessNow`: вызывающий (игровой) поток сам выполняет пачки параллельной задачи вместе с пулом потоков, а не спит на kernel-хэндле. |

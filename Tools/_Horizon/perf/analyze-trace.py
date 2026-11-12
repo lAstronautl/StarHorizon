@@ -10,6 +10,7 @@ import sys
 from collections import defaultdict
 
 ROOT_MARK = "Robust.Server.BaseServer.Update"
+PSEUDO = {"UNMANAGED_CODE_TIME", "CPU_TIME", "BLOCKED_TIME", "?!?"}
 
 
 def load(path):
@@ -26,6 +27,10 @@ def analyze(profile, frames):
     root_total = 0.0
     for ev in profile["events"]:
         name = frames[ev["frame"]]["name"]
+        # Служебные листовые кадры сэмплера (UNMANAGED_CODE_TIME, CPU_TIME, ...) прозрачны:
+        # их время относим к вызвавшему управляемому методу.
+        if name in PSEUDO:
+            continue
         at = ev["at"]
         if ev["type"] == "O":
             stack.append([name, at, 0.0])
