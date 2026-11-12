@@ -174,7 +174,14 @@ public static class HorizonLoadScenario
                 cfg.SetCVar(name, value);
             }
 
-            server.ResolveDependency<IRobustRandom>().SetSeed(o.Seed);
+            // Тестовый пул задаёт серверному генератору зерно, а Random(seed) — старая реализация .NET.
+            // На боевом сервере зерна нет, поэтому возвращаем обычный генератор.
+            var robustRandom = server.ResolveDependency<IRobustRandom>();
+            robustRandom.GetType()
+                .GetField("_random", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+                ?.SetValue(robustRandom, new Random());
+            // Зерно серверному IRobustRandom не задаём: Random(seed) — старая реализация .NET, которая при
+            // обращении из нескольких потоков (параллельные задачи игры) ломается и выдаёт одни нули.
         });
 
         _countExceptions = true;

@@ -12,6 +12,7 @@ using Robust.Shared.Map;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Components;
 using ClimbingComponent = Content.Shared.Climbing.Components.ClimbingComponent;
+using Robust.Shared.Random; // Horizon
 
 namespace Content.Server.NPC.Systems;
 
@@ -700,7 +701,9 @@ public sealed partial class NPCSteeringSystem
                 // Welp
                 if (obstacleDirection == Vector2.Zero)
                 {
-                    obstacleDirection = _random.NextAngle().ToVec();
+                    // Horizon: Steer выполняется в Parallel.For, а общий IRobustRandom не потокобезопасен —
+                    // гонка ломает его состояние (дальше он выдаёт нули). Random.Shared потокобезопасен.
+                    obstacleDirection = System.Random.Shared.NextAngle().ToVec();
                 }
             }
             else
