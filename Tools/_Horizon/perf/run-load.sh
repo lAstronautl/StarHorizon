@@ -14,7 +14,8 @@ out="$(cd "$out" && pwd)"
 # Боевой сервер собирается с Server GC (Content.Server.csproj), повторяем это для стенда.
 export DOTNET_gcServer="${DOTNET_gcServer:-1}"
 
-cd "$root/bin/Content.Benchmarks"
+# BENCH_DIR позволяет сравнивать две заранее собранные версии (например, базовую и итоговую).
+cd "${BENCH_DIR:-$root/bin/Content.Benchmarks}"
 for i in $(seq 1 "$runs"); do
     dotnet Content.Benchmarks.dll horizon-load --label "${label}-${i}" --out "$out" "$@" > "$out/${label}-${i}.log" 2>&1 \
         || echo "run ${label}-${i} failed, see $out/${label}-${i}.log"
