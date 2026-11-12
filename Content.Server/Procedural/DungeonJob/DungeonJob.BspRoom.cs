@@ -11,24 +11,25 @@ namespace Content.Server.Procedural.DungeonJob;
 public sealed partial class DungeonJob
 {
     /// <summary>
-    /// One cell of the BSP partition. A leaf holds a room of <c>(W-1) x (H-1)</c> tiles anchored at its lower-left corner,
-    /// so two neighbouring rooms are separated by exactly one tile that serves as their shared wall.
+    /// One cell of the BSP partition. Without corridors a leaf holds a room of <c>(W-1) x (H-1)</c> tiles anchored at its
+    /// lower-left corner, so neighbours are separated by one shared wall tile. With corridors the room fills the whole
+    /// cell and the cells are separated by corridor bands.
     /// </summary>
     private sealed class BspNode
     {
         public int X, Y, W, H;
+        public int Shrink; // 1 = shared wall mode, 0 = corridor mode
         public BspNode? A, B;
         public bool CutX;
-        public int Line; // coordinate of the cut (first tile of B)
+        public int Line; // first coordinate of the cut: shared-wall mode = first tile of B, corridor mode = first tile of the band
         public DungeonRoom? Room;
 
         public bool IsLeaf => A == null;
 
-        // Room rectangle: lower-left anchored, one tile narrower/shorter than the cell (the shared wall).
         public int RoomX => X;
         public int RoomY => Y;
-        public int RoomW => W - 1;
-        public int RoomH => H - 1;
+        public int RoomW => W - Shrink;
+        public int RoomH => H - Shrink;
     }
 
     /// <summary>
@@ -42,8 +43,11 @@ public sealed partial class DungeonJob
     {
         var dungeon = new Dungeon();
         var tileDef = (ContentTileDefinition) _tileDefManager[gen.Tile];
+        var corridorWidth = Math.Max(0, gen.CorridorWidth);
 
-        var root = BspBuild(gen, position.X - gen.Size.X / 2, position.Y - gen.Size.Y / 2, gen.Size.X, gen.Size.Y, random, 0);
+        var areaX = position.X - gen.Size.X / 2;
+        var areaY = position.Y - gen.Size.Y / 2;
+        var root = BspBuild(gen, areaX, areaY, gen.Size.X, gen.Size.Y, random, 0, corridorWidth);
         var leaves = new List<BspNode>();
         BspLeaves(root, leaves);
 
@@ -73,7 +77,7 @@ public sealed partial class DungeonJob
             if (blocked)
                 continue;
 
-            // Same exterior ring as prefab rooms: one tile around, corners included. Neighbouring rooms share it.
+            // Same exterior ring as prefab rooms: one tile around, corners included.
             var exterior = new HashSet<Vector2i>(leaf.RoomW * 2 + leaf.RoomH * 2 + 4);
 
             for (var x = -1; x <= leaf.RoomW; x++)
@@ -106,25 +110,51 @@ public sealed partial class DungeonJob
                 return Dungeon.Empty;
         }
 
-        _maps.SetTiles(_gridUid, _grid, setTiles);
-
-        // Doors straight through the shared walls: one per BSP split, so every room is reachable...
-        var connected = new HashSet<(DungeonRoom, DungeonRoom)>();
-        BspConnect(root, random, connected);
-
-        // ...plus a few extra doors between other neighbours so the complex has loops.
-        for (var i = 0; i < leaves.Count; i++)
+        if (corridorWidth > 0)
         {
-            for (var j = i + 1; j < leaves.Count; j++)
+            // Hallways along every split, branching off each other like a station's corridor network.
+            var corridor = new HashSet<Vector2i>();
+            BspCarve(root, areaX, areaY, gen.Size.X, gen.Size.Y, corridorWidth, corridor);
+            corridor.ExceptWith(dungeon.RoomTiles);
+            corridor.ExceptWith(reservedTiles);
+
+            foreach (var tile in corridor)
             {
-                if (leaves[i].Room == null || leaves[j].Room == null || !random.Prob(gen.LoopChance))
-                    continue;
+                setTiles.Add((tile, _tile.GetVariantTile(tileDef, random)));
+            }
 
-                if (connected.Contains((leaves[i].Room!, leaves[j].Room!)) || connected.Contains((leaves[j].Room!, leaves[i].Room!)))
-                    continue;
+            _maps.SetTiles(_gridUid, _grid, setTiles);
+            dungeon.CorridorTiles.UnionWith(corridor);
 
-                if (BspSharedWall(leaves[i], leaves[j], out var from, out var to) && to - from >= 3)
-                    BspAddDoor(leaves[i], leaves[j], from + (to - from) / 2, connected);
+            // Every room opens onto a corridor: a door in its wall next to a corridor tile, sometimes a second one.
+            foreach (var leaf in leaves)
+            {
+                if (leaf.Room != null)
+                    BspAddCorridorDoors(leaf, corridor, random);
+            }
+        }
+        else
+        {
+            _maps.SetTiles(_gridUid, _grid, setTiles);
+
+            // Doors straight through the shared walls: one per BSP split, so every room is reachable...
+            var connected = new HashSet<(DungeonRoom, DungeonRoom)>();
+            BspConnect(root, random, connected);
+
+            // ...plus a few extra doors between other neighbours so the complex has loops.
+            for (var i = 0; i < leaves.Count; i++)
+            {
+                for (var j = i + 1; j < leaves.Count; j++)
+                {
+                    if (leaves[i].Room == null || leaves[j].Room == null || !random.Prob(gen.LoopChance))
+                        continue;
+
+                    if (connected.Contains((leaves[i].Room!, leaves[j].Room!)) || connected.Contains((leaves[j].Room!, leaves[i].Room!)))
+                        continue;
+
+                    if (BspSharedWall(leaves[i], leaves[j], out var from, out var to) && to - from >= 3)
+                        BspAddDoor(leaves[i], leaves[j], from + (to - from) / 2, connected);
+                }
             }
         }
 
@@ -136,21 +166,30 @@ public sealed partial class DungeonJob
         }
 
         dungeon.Rebuild();
+
+        if (corridorWidth > 0)
+        {
+            dungeon.RefreshAllTiles();
+            BuildCorridorExterior(dungeon);
+        }
+
         return dungeon;
     }
 
-    private BspNode BspBuild(BspRoomDunGen gen, int x, int y, int w, int h, Random random, int depth)
+    private BspNode BspBuild(BspRoomDunGen gen, int x, int y, int w, int h, Random random, int depth, int corridorWidth)
     {
-        var node = new BspNode { X = x, Y = y, W = w, H = h };
+        var shrink = corridorWidth > 0 ? 0 : 1;
+        // Corridor band: the rooms' exterior rings on both sides plus the corridor itself.
+        var gap = corridorWidth > 0 ? corridorWidth + 2 : 0;
+        var node = new BspNode { X = x, Y = y, W = w, H = h, Shrink = shrink };
 
-        // A leaf cell is room size + the shared wall tile.
-        var minW = gen.MinRoom.X + 1;
-        var minH = gen.MinRoom.Y + 1;
-        var maxLeafW = gen.MaxRoom.X + 1;
-        var maxLeafH = gen.MaxRoom.Y + 1;
+        var minW = gen.MinRoom.X + shrink;
+        var minH = gen.MinRoom.Y + shrink;
+        var maxLeafW = gen.MaxRoom.X + shrink;
+        var maxLeafH = gen.MaxRoom.Y + shrink;
 
-        var canCutX = w >= 2 * minW;
-        var canCutY = h >= 2 * minH;
+        var canCutX = w >= 2 * minW + gap;
+        var canCutY = h >= 2 * minH + gap;
         var tooBig = w > maxLeafW || h > maxLeafH;
 
         if ((!canCutX && !canCutY) || depth >= 12 || (!tooBig && !random.Prob(gen.SplitChance)))
@@ -177,17 +216,17 @@ public sealed partial class DungeonJob
 
         if (cutX)
         {
-            var cut = random.Next(minW, w - minW + 1);
+            var cut = random.Next(minW, w - gap - minW + 1);
             node.Line = x + cut;
-            node.A = BspBuild(gen, x, y, cut, h, random, depth + 1);
-            node.B = BspBuild(gen, x + cut, y, w - cut, h, random, depth + 1);
+            node.A = BspBuild(gen, x, y, cut, h, random, depth + 1, corridorWidth);
+            node.B = BspBuild(gen, x + cut + gap, y, w - cut - gap, h, random, depth + 1, corridorWidth);
         }
         else
         {
-            var cut = random.Next(minH, h - minH + 1);
+            var cut = random.Next(minH, h - gap - minH + 1);
             node.Line = y + cut;
-            node.A = BspBuild(gen, x, y, w, cut, random, depth + 1);
-            node.B = BspBuild(gen, x, y + cut, w, h - cut, random, depth + 1);
+            node.A = BspBuild(gen, x, y, w, cut, random, depth + 1, corridorWidth);
+            node.B = BspBuild(gen, x, y + cut + gap, w, h - cut - gap, random, depth + 1, corridorWidth);
         }
 
         return node;
@@ -206,8 +245,91 @@ public sealed partial class DungeonJob
     }
 
     /// <summary>
+    /// Carves the corridor of every split. A band is [ring][corridor x width][ring]; the corridor runs the whole
+    /// length of the cell and one tile past each end that touches another band, so branches join the hallway they end at.
+    /// Ends on the outer boundary stay closed (walls are added later).
+    /// </summary>
+    private static void BspCarve(BspNode node, int areaX, int areaY, int areaW, int areaH, int width, HashSet<Vector2i> corridor)
+    {
+        if (node.IsLeaf)
+            return;
+
+        if (node.CutX)
+        {
+            var from = node.Y > areaY ? node.Y - 1 : node.Y;
+            var to = node.Y + node.H < areaY + areaH ? node.Y + node.H : node.Y + node.H - 1;
+
+            for (var cx = node.Line + 1; cx <= node.Line + width; cx++)
+            {
+                for (var y = from; y <= to; y++)
+                {
+                    corridor.Add(new Vector2i(cx, y));
+                }
+            }
+        }
+        else
+        {
+            var from = node.X > areaX ? node.X - 1 : node.X;
+            var to = node.X + node.W < areaX + areaW ? node.X + node.W : node.X + node.W - 1;
+
+            for (var cy = node.Line + 1; cy <= node.Line + width; cy++)
+            {
+                for (var x = from; x <= to; x++)
+                {
+                    corridor.Add(new Vector2i(x, cy));
+                }
+            }
+        }
+
+        BspCarve(node.A!, areaX, areaY, areaW, areaH, width, corridor);
+        BspCarve(node.B!, areaX, areaY, areaW, areaH, width, corridor);
+    }
+
+    /// <summary>
+    /// Door(s) from a room onto an adjacent corridor tile (never at a ring corner).
+    /// </summary>
+    private void BspAddCorridorDoors(BspNode leaf, HashSet<Vector2i> corridor, Random random)
+    {
+        var room = leaf.Room!;
+        var candidates = new List<Vector2i>();
+
+        void Side(int fixedCoord, int from, int to, bool horizontalSide, int outward)
+        {
+            for (var i = from; i <= to; i++)
+            {
+                var door = horizontalSide ? new Vector2i(i, fixedCoord) : new Vector2i(fixedCoord, i);
+                var beyond = horizontalSide ? new Vector2i(i, fixedCoord + outward) : new Vector2i(fixedCoord + outward, i);
+
+                if (corridor.Contains(beyond))
+                    candidates.Add(door);
+            }
+        }
+
+        // Bottom, top, left, right ring tiles without the corners.
+        Side(leaf.RoomY - 1, leaf.RoomX, leaf.RoomX + leaf.RoomW - 1, true, -1);
+        Side(leaf.RoomY + leaf.RoomH, leaf.RoomX, leaf.RoomX + leaf.RoomW - 1, true, 1);
+        Side(leaf.RoomX - 1, leaf.RoomY, leaf.RoomY + leaf.RoomH - 1, false, -1);
+        Side(leaf.RoomX + leaf.RoomW, leaf.RoomY, leaf.RoomY + leaf.RoomH - 1, false, 1);
+
+        if (candidates.Count == 0)
+            return;
+
+        var first = candidates[random.Next(candidates.Count)];
+        room.Entrances.Add(first);
+
+        // A second door a few tiles away, so bigger rooms are not dead ends.
+        if (candidates.Count > 8 && random.Prob(0.5f))
+        {
+            var far = candidates.FindAll(c => Math.Abs(c.X - first.X) + Math.Abs(c.Y - first.Y) >= 4);
+
+            if (far.Count > 0)
+                room.Entrances.Add(far[random.Next(far.Count)]);
+        }
+    }
+
+    /// <summary>
     /// Do the two leaves' rooms share a wall tile (exactly one tile apart) with an overlap of at least one tile?
-    /// Returns the overlap range along the wall: [from, to).
+    /// Returns the overlap range along the wall: [from, to). Shared-wall mode only.
     /// </summary>
     private static bool BspSharedWall(BspNode a, BspNode b, out int from, out int to)
     {

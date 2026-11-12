@@ -9,6 +9,8 @@ namespace Content.Shared.Procedural.DungeonGenerators;
 /// a single shared wall tile, and doors are cut straight through it following the BSP tree (every room is reachable,
 /// no corridors needed). Only floors are placed; walls, door contents and furnishing come from the layers after it
 /// (BoundaryWall, RoomEntrance, RoomFurnish, ...).
+/// With <see cref="CorridorWidth"/> above 0 the rooms are instead separated by corridor bands carved along every split
+/// (a station layout: main hallways with side branches), and each room gets a door onto a corridor.
 /// </summary>
 public sealed partial class BspRoomDunGen : IDunGenLayer
 {
@@ -29,6 +31,13 @@ public sealed partial class BspRoomDunGen : IDunGenLayer
     /// </summary>
     [DataField]
     public float SplitChance = 0.6f;
+
+    /// <summary>
+    /// Width of the corridors that run along every BSP split, like the hallways of a space station with the rooms
+    /// opening onto them. 0 = no corridors: neighbouring rooms share one wall tile and doors are cut through it.
+    /// </summary>
+    [DataField]
+    public int CorridorWidth = 0;
 
     /// <summary>
     /// Chance that two neighbouring rooms which are not connected through the BSP tree also get a door between them
