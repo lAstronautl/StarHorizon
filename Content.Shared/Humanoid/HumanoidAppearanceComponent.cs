@@ -105,10 +105,10 @@ public sealed partial class HumanoidAppearanceComponent : Component
     ///     Which markings the humanoid defaults to when nudity is toggled off.
     /// </summary>
     [DataField]
-    public ProtoId<MarkingPrototype>? UndergarmentTop = new ProtoId<MarkingPrototype>("UndergarmentTopTanktop");
+    public ProtoId<MarkingPrototype>? UndergarmentTop = null; // Horizon: маркинги белья отключены (бельё - одежда)
 
     [DataField]
-    public ProtoId<MarkingPrototype>? UndergarmentBottom = new ProtoId<MarkingPrototype>("UndergarmentBottomBoxers");
+    public ProtoId<MarkingPrototype>? UndergarmentBottom = null; // Horizon: маркинги белья отключены (бельё - одежда)
 
     // _Horizon: Hair gradient
     [DataField, AutoNetworkedField]
