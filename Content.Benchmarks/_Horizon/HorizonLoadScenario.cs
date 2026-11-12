@@ -127,6 +127,15 @@ public static class HorizonLoadScenario
         Console.WriteLine($"[horizon-load {DateTime.UtcNow:HH:mm:ss}] {msg}");
     }
 
+    /// <summary>Память по этапам запуска: живые объекты после полной сборки мусора и память процесса.</summary>
+    private static void LogStageMemory(string stage)
+    {
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        GC.Collect();
+        Log($"STAGE {stage}: heapLive={GC.GetTotalMemory(false) / 1048576}MB rss={Process.GetCurrentProcess().WorkingSet64 / 1048576}MB");
+    }
+
     private static async Task RunAsync(Options o)
     {
         Directory.CreateDirectory(o.OutDir);
@@ -159,6 +168,7 @@ public static class HorizonLoadScenario
         var entMan = server.EntMan;
         var cfg = server.CfgMan;
         Log($"server up in {total.Elapsed.TotalSeconds:F1}s");
+        LogStageMemory("server+client started (prototypes, resources)");
 
         // Приближаем настройки к боевым: тестовый пул отключает PVS, параллелизм и генерацию мира.
         await server.WaitPost(() =>
@@ -195,6 +205,7 @@ public static class HorizonLoadScenario
         });
         await server.WaitRunTicks(30);
         Log($"round started ({o.Preset}) in {sw.Elapsed.TotalSeconds:F1}s, runlevel={ticker.RunLevel}");
+        LogStageMemory($"round started, entities={entMan.EntityCount}");
 
         var mapId = ticker.DefaultMap;
         var mapLoader = entMan.System<MapLoaderSystem>();
@@ -232,6 +243,7 @@ public static class HorizonLoadScenario
         });
         await server.WaitRunTicks(5);
         Log($"loaded {ships.Count} ships in {sw.Elapsed.TotalSeconds:F1}s");
+        LogStageMemory($"ships loaded, entities={entMan.EntityCount}");
 
         // --- Точки появления игроков: пульты шаттлов на кораблях и на аванпосте.
         var shipSet = ships.ToHashSet();
@@ -378,7 +390,9 @@ public static class HorizonLoadScenario
                 EntityCoordinates spot = default;
                 await server.WaitPost(() =>
                 {
-                    spot = entMan.GetComponent<TransformComponent>(mobs[s]).Coordinates;
+                    spot = entMan.TryGetComponent(mobs[s], out TransformComponent? oldXform)
+                        ? oldXform.Coordinates
+                        : stationSpots[s % stationSpots.Count];
                     entMan.QueueDeleteEntity(mobs[s]);
                 });
                 await server.RemoveDummySession(sessions[s], true);
@@ -431,7 +445,9 @@ public static class HorizonLoadScenario
                     entMan.QueueDeleteEntity(item);
                 }
                 churnItems.Clear();
-                var at = entMan.GetComponent<TransformComponent>(mobs[c % mobs.Length]).Coordinates;
+                if (!entMan.TryGetComponent(mobs[c % mobs.Length], out TransformComponent? atXform))
+                    return;
+                var at = atXform.Coordinates;
                 for (var i = 0; i < 30; i++)
                 {
                     churnItems.Add(entMan.SpawnEntity("Paper", at));
@@ -473,6 +489,7 @@ public static class HorizonLoadScenario
             await server.WaitRunTicks(1);
         }
         Log($"warmup {o.WarmupTicks} ticks in {sw.Elapsed.TotalSeconds:F1}s");
+        LogStageMemory($"after warmup, entities={entMan.EntityCount}");
 
         // --- Замер.
         var sysMan = server.ResolveDependency<IEntitySystemManager>();
