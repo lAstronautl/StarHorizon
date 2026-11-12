@@ -82,8 +82,18 @@ public sealed partial class WorldControllerSystem : EntitySystem
     }
 
     /// <inheritdoc />
+    // Horizon: чанки мира — 128 м, пересчитывать набор загружаемых чанков каждый тик незачем.
+    private const float HorizonUpdateInterval = 0.2f;
+    private float _horizonAccumulator;
+
     public override void Update(float frameTime)
     {
+        // Horizon: троттлинг (каждый тик здесь выделялись словари и списки на всех игроков и загрузчики)
+        _horizonAccumulator += frameTime;
+        if (_horizonAccumulator < HorizonUpdateInterval)
+            return;
+        _horizonAccumulator = 0f;
+
         //there was a to-do here about every frame alloc but it turns out it's a nothing burger here.
         var chunksToLoad = new Dictionary<EntityUid, Dictionary<Vector2i, List<EntityUid>>>();
 

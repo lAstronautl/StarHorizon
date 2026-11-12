@@ -91,10 +91,12 @@ public sealed partial class MaterialStorageMagnetPickupSystem : EntitySystem
 
         while (query.MoveNext(out var uid, out var comp, out var storage, out var xform))
         {
-            if (comp.NextScan < currentTime)
+            // Horizon: условие было перевёрнуто (<), из-за чего магнит сканировал окрестность каждый тик,
+            // а не раз в ScanDelay: NextScan всё время убегал вперёд на секунду за тик.
+            if (comp.NextScan > currentTime)
                 continue;
 
-            comp.NextScan += ScanDelay;
+            comp.NextScan = currentTime + ScanDelay;
 
             // Frontier - magnet disabled
             if (!comp.MagnetEnabled)

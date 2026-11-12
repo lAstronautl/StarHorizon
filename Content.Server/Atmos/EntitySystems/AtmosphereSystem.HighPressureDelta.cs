@@ -150,7 +150,13 @@ namespace Content.Server.Atmos.EntitySystems
                     tile.PressureSpecificTarget = curTile;
             }
 
-            _entSet.Clear();
+            // Horizon: HashSet.Clear() обнуляет весь массив корзин. Если набор однажды разросся
+            // (клетка с кучей предметов), каждая следующая очистка — memset на тысячи элементов
+            // на каждую клетку с перепадом давления. Разросшийся набор дешевле заменить новым.
+            if (_entSet.Capacity > 256)
+                _entSet = new HashSet<EntityUid>();
+            else
+                _entSet.Clear();
             _lookup.GetLocalEntitiesIntersecting(tile.GridIndex, tile.GridIndices, _entSet, 0f);
 
             foreach (var entity in _entSet)

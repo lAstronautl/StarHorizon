@@ -1,4 +1,4 @@
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using Robust.Shared.Utility;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -455,7 +455,9 @@ namespace Content.Server.Power.Pow3r
 
         private record struct UpdateNetworkJob : IParallelRobustJob
         {
-            public int BatchSize => 4;
+            // Horizon: 4 -> 32. Сеть считается за доли микросекунды, пачка из 4 сетей дешевле,
+            // чем её диспетчеризация между потоками (сотни микрозадач за тик на Frontier).
+            public int BatchSize => 32;
 
             public BatteryRampPegSolver Solver;
             public PowerState State;

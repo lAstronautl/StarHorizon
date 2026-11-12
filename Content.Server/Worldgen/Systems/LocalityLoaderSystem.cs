@@ -22,8 +22,18 @@ public sealed partial class LocalityLoaderSystem : BaseWorldSystem
     // End Frontier: space debris destruction
 
     /// <inheritdoc />
+    // Horizon: проверка «игрок подошёл к обломку» не обязана выполняться каждый тик.
+    private const float HorizonUpdateInterval = 0.2f;
+    private float _horizonAccumulator;
+
     public override void Update(float frameTime)
     {
+        // Horizon: троттлинг
+        _horizonAccumulator += frameTime;
+        if (_horizonAccumulator < HorizonUpdateInterval)
+            return;
+        _horizonAccumulator = 0f;
+
         var e = EntityQueryEnumerator<LocalityLoaderComponent, TransformComponent>();
         var loadedQuery = GetEntityQuery<LoadedChunkComponent>();
         var xformQuery = GetEntityQuery<TransformComponent>();
