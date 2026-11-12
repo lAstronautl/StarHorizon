@@ -5,7 +5,7 @@
   id: UnderAttachmentBase
   components:
   - type: Sprite
-    sprite: _Horizon/RMC14/Objects/Weapons/Guns/Attachments/under.rsi
+    sprite: _RMC14/Objects/Weapons/Guns/Attachments/under.rsi
   - type: Tag
     tags:
     - AttachmentUnderbarrel
@@ -66,10 +66,10 @@
     actionName: Switch to the M90 Grenade Launcher
     actionDesc: Switch to using the underbarrel grenade launcher.
     icon:
-      sprite: _Horizon/RMC14/Objects/Weapons/Guns/Attachments/under.rsi
+      sprite: _RMC14/Objects/Weapons/Guns/Attachments/under.rsi
       state: grenade
     iconActive:
-      sprite: _Horizon/RMC14/Objects/Weapons/Guns/Attachments/under.rsi
+      sprite: _RMC14/Objects/Weapons/Guns/Attachments/under.rsi
       state: grenade-on
   - type: AttachableVisuals
     redrawOnAppearanceChange: true
@@ -78,7 +78,7 @@
     - AttachmentUnderbarrel
     - AttachmentM90GrenadeLauncher
   - type: Item
-    sprite: _Horizon/RMC14/Objects/Weapons/Guns/Attachments/under.rsi
+    sprite: _RMC14/Objects/Weapons/Guns/Attachments/under.rsi
     storedRotation: -90
   - type: StaticPrice
     price: 200
@@ -128,15 +128,15 @@
     actionName: Switch to the M90 underbarrel shotgun
     actionDesc: Switch to using the underbarrel shotgun.
     icon:
-      sprite: _Horizon/RMC14/Objects/Weapons/Guns/Attachments/under.rsi
+      sprite: _RMC14/Objects/Weapons/Guns/Attachments/under.rsi
       state: masterkey
     iconActive:
-      sprite: _Horizon/RMC14/Objects/Weapons/Guns/Attachments/under.rsi
+      sprite: _RMC14/Objects/Weapons/Guns/Attachments/under.rsi
       state: masterkey-on
   - type: AttachableVisuals
   - type: UniqueAction
   - type: Item
-    sprite: _Horizon/RMC14/Objects/Weapons/Guns/Attachments/under.rsi
+    sprite: _RMC14/Objects/Weapons/Guns/Attachments/under.rsi
     storedRotation: -90
   - type: StaticPrice
     price: 200

@@ -157,7 +157,7 @@
   id: UplinkRailAttachmentsBundle
   name: uplink-rail-attachments-name
   description: uplink-rail-attachments-description
-  icon: { sprite: /Textures/_Horizon/RMC14/Objects/Weapons/Guns/Attachments/under.rsi, state: uplink_modules }
+  icon: { sprite: /Textures/_RMC14/Objects/Weapons/Guns/Attachments/under.rsi, state: uplink_modules }
   productEntity: ClothingBackpackDuffelSyndicateFilledRailAttachments
   discountCategory: usualDiscounts
   discountDownTo:
@@ -171,7 +171,7 @@
   id: UplinkBarrelAttachmentsBundle
   name: uplink-barrel-attachments-name
   description: uplink-barrel-attachments-description
-  icon: { sprite: /Textures/_Horizon/RMC14/Objects/Weapons/Guns/Attachments/under.rsi, state: uplink_modules }
+  icon: { sprite: /Textures/_RMC14/Objects/Weapons/Guns/Attachments/under.rsi, state: uplink_modules }
   productEntity: ClothingBackpackDuffelSyndicateFilledBarrelAttachments
   discountCategory: usualDiscounts
   discountDownTo:
@@ -185,7 +185,7 @@
   id: UplinkUnderAttachmentsBundle
   name: uplink-under-attachments-name
   description: uplink-under-attachments-description
-  icon: { sprite: /Textures/_Horizon/RMC14/Objects/Weapons/Guns/Attachments/under.rsi, state: uplink_modules }
+  icon: { sprite: /Textures/_RMC14/Objects/Weapons/Guns/Attachments/under.rsi, state: uplink_modules }
   productEntity: ClothingBackpackDuffelSyndicateFilledUnderAttachments
   discountCategory: usualDiscounts
   discountDownTo:
@@ -201,7 +201,7 @@
   id: UplinkLethalGrenadesBundle
   name: uplink-lethal-grenades-name
   description: uplink-lethal-grenades-description
-  icon: { sprite: /Textures/_Horizon/RMC14/Objects/Weapons/Guns/Ammunition/Explosives/40mm_grenade.rsi, state: heat }
+  icon: { sprite: /Textures/_RMC14/Objects/Weapons/Guns/Ammunition/Explosives/40mm_grenade.rsi, state: heat }
   productEntity: ClothingBackpackDuffelSyndicateFilledLethalGrenades
   discountCategory: usualDiscounts
   discountDownTo:
@@ -215,7 +215,7 @@
   id: UplinkNonLethalGrenadesBundle
   name: uplink-nonlethal-grenades-name
   description: uplink-nonlethal-grenades-description
-  icon: { sprite: /Textures/_Horizon/RMC14/Objects/Weapons/Guns/Ammunition/Explosives/40mm_grenade.rsi, state: stun }
+  icon: { sprite: /Textures/_RMC14/Objects/Weapons/Guns/Ammunition/Explosives/40mm_grenade.rsi, state: stun }
   productEntity: ClothingBackpackDuffelSyndicateFilledNonLethalGrenades
   discountCategory: usualDiscounts
   discountDownTo:

@@ -6,7 +6,7 @@
   abstract: true
   components:
   - type: Sprite
-    sprite: _Horizon/RMC14/Mobs/Aliens/Xenomorphs/queen.rsi
+    sprite: _RMC14/Mobs/Aliens/Xenomorphs/queen.rsi
     layers:
     - map: [ "enum.DamageStateVisualLayers.Base" ]
       state: xenomorph

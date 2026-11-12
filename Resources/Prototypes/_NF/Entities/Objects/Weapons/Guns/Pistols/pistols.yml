@@ -153,9 +153,9 @@
     Один из самых популярных пистолетов среди полиции.
   components:
   - type: Sprite
-    sprite: _Horizon/NF/Objects/Weapons/Guns/Pistols/b92fs.rsi
+    sprite: _NF/Objects/Weapons/Guns/Pistols/b92fs.rsi
   - type: Clothing
-    sprite: _Horizon/NF/Objects/Weapons/Guns/Pistols/b92fs.rsi
+    sprite: _NF/Objects/Weapons/Guns/Pistols/b92fs.rsi
   # Horizon Attachments end
   - type: AttachableHolder
     slots:

@@ -234,9 +234,9 @@
   - type: Tag
     tags: [] # ignore "WhitelistChameleon" tag
   - type: Sprite
-    sprite: _Horizon/Nyanotrasen/Mobs/Customization/bunny_ears.rsi
+    sprite: Nyanotrasen/Mobs/Customization/bunny_ears.rsi
   - type: Clothing
-    sprite: _Horizon/Nyanotrasen/Mobs/Customization/bunny_ears.rsi
+    sprite: Nyanotrasen/Mobs/Customization/bunny_ears.rsi
 
 # Horizon end
 

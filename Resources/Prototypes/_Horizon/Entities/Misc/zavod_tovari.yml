@@ -19,7 +19,7 @@
   description: Товары из драгоценных металлов. Крепко запечатаны, не открыть.
   components:
   - type: Sprite
-    sprite: _Horizon/NF/Objects/Tools/bundles2.rsi
+    sprite: _NF/Objects/Tools/bundles2.rsi
     state: engi-base
   - type: Item
     size: Normal
@@ -33,7 +33,7 @@
   description: Товары для снабжения маленькой армии или складов NanoTrasen. Крепко запечатаны, не открыть.
   components:
   - type: Sprite
-    sprite: _Horizon/NF/Objects/Tools/bundles3.rsi
+    sprite: _NF/Objects/Tools/bundles3.rsi
     state: engi-base
   - type: Item
     size: Normal
@@ -47,7 +47,7 @@
   description: Передовые разработки в упаковке. Крепко запечатаны, не открыть.
   components:
   - type: Sprite
-    sprite: _Horizon/NF/Objects/Tools/bundles4.rsi
+    sprite: _NF/Objects/Tools/bundles4.rsi
     state: engi-base
   - type: Item
     size: Normal
@@ -61,7 +61,7 @@
   description: Топливные стержни в упаковке. Крепко запечатаны, не открыть.
   components:
   - type: Sprite
-    sprite: _Horizon/NF/Objects/Tools/bundles5.rsi
+    sprite: _NF/Objects/Tools/bundles5.rsi
     state: engi-base
   - type: Item
     size: Normal

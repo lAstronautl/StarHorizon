@@ -265,11 +265,11 @@
     Простой,но отлично работающий
   components:
   - type: Sprite
-    sprite: _Horizon/NF/Objects/Weapons/Guns/Shotguns/custombuilt.rsi
+    sprite: _NF/Objects/Weapons/Guns/Shotguns/custombuilt.rsi
   - type: Clothing
-    sprite: _Horizon/NF/Objects/Weapons/Guns/Shotguns/custombuilt.rsi
+    sprite: _NF/Objects/Weapons/Guns/Shotguns/custombuilt.rsi
   - type: Item
-    sprite: _Horizon/NF/Objects/Weapons/Guns/Shotguns/custombuilt.rsi
+    sprite: _NF/Objects/Weapons/Guns/Shotguns/custombuilt.rsi
   - type: BallisticAmmoProvider
     capacity: 2
     proto: null
@@ -282,11 +282,11 @@
     Помповый дробовик,побывавший во множестве колониальных конфликтов
   components:
   - type: Sprite
-    sprite: _Horizon/NF/Objects/Weapons/Guns/Shotguns/hg3712.rsi
+    sprite: _NF/Objects/Weapons/Guns/Shotguns/hg3712.rsi
   - type: Clothing
-    sprite: _Horizon/NF/Objects/Weapons/Guns/Shotguns/hg3712.rsi
+    sprite: _NF/Objects/Weapons/Guns/Shotguns/hg3712.rsi
   - type: Item
-    sprite: _Horizon/NF/Objects/Weapons/Guns/Shotguns/hg3712.rsi
+    sprite: _NF/Objects/Weapons/Guns/Shotguns/hg3712.rsi
   - type: BallisticAmmoProvider
     capacity: 6
   - type: NFWeaponDetails
@@ -322,11 +322,11 @@
     availableModes:
     - FullAuto
   - type: Sprite
-    sprite: _Horizon/NF/Objects/Weapons/Guns/Shotguns/xm38.rsi
+    sprite: _NF/Objects/Weapons/Guns/Shotguns/xm38.rsi
   - type: Clothing
-    sprite: _Horizon/NF/Objects/Weapons/Guns/Shotguns/xm38.rsi
+    sprite: _NF/Objects/Weapons/Guns/Shotguns/xm38.rsi
   - type: Item
-    sprite: _Horizon/NF/Objects/Weapons/Guns/Shotguns/xm38.rsi
+    sprite: _NF/Objects/Weapons/Guns/Shotguns/xm38.rsi
   - type: BallisticAmmoProvider
     capacity: 6
   - type: NFWeaponDetails
@@ -358,11 +358,11 @@
     Отличное оружие для подавления беспорядков и уничтожение ксеносов
   components:
   - type: Sprite
-    sprite: _Horizon/NF/Objects/Weapons/Guns/Shotguns/m890_riot.rsi
+    sprite: _NF/Objects/Weapons/Guns/Shotguns/m890_riot.rsi
   - type: Clothing
-    sprite: _Horizon/NF/Objects/Weapons/Guns/Shotguns/m890_riot.rsi
+    sprite: _NF/Objects/Weapons/Guns/Shotguns/m890_riot.rsi
   - type: Item
-    sprite: _Horizon/NF/Objects/Weapons/Guns/Shotguns/m890_riot.rsi
+    sprite: _NF/Objects/Weapons/Guns/Shotguns/m890_riot.rsi
   - type: BallisticAmmoProvider
     capacity: 6
   - type: NFWeaponDetails
@@ -394,11 +394,11 @@
     Бессмертная классика. Бьет больно и метко
   components:
   - type: Sprite
-    sprite: _Horizon/NF/Objects/Weapons/Guns/Shotguns/type23.rsi
+    sprite: _NF/Objects/Weapons/Guns/Shotguns/type23.rsi
   - type: Clothing
-    sprite: _Horizon/NF/Objects/Weapons/Guns/Shotguns/type23.rsi
+    sprite: _NF/Objects/Weapons/Guns/Shotguns/type23.rsi
   - type: Item
-    sprite: _Horizon/NF/Objects/Weapons/Guns/Shotguns/type23.rsi
+    sprite: _NF/Objects/Weapons/Guns/Shotguns/type23.rsi
   - type: BallisticAmmoProvider
     capacity: 5
   - type: NFWeaponDetails

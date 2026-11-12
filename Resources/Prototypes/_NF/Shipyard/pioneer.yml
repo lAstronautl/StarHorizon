@@ -18,7 +18,7 @@
   price: 12750 # ~9781$ on mapinit + 15% markup #StarHorizon + 15% markup
   category: Small
   group: Shipyard
-  shuttlePath: /Maps/_Horizon/NF/Shuttles/pioneer.yml
+  shuttlePath: /Maps/_NF/Shuttles/pioneer.yml
   guidebookPage: ShipyardPioneer
   class:
   - Salvage
@@ -55,7 +55,7 @@
 - type: gameMap
   id: Pioneer
   mapName: 'Pioneer'
-  mapPath: /Maps/_Horizon/NF/Shuttles/pioneer.yml
+  mapPath: /Maps/_NF/Shuttles/pioneer.yml
   minPlayers: 0
   stations:
     Pioneer:

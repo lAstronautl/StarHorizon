@@ -169,7 +169,7 @@
   name:  Beretta M92FS
   description: Один из самых популярных пистолетов среди полиции.
   productEntity: NFWeaponPistolBeretta
-  icon: { sprite: _Horizon/NF/Objects/Weapons/Guns/Pistols/b92fs.rsi, state: base }
+  icon: { sprite: _NF/Objects/Weapons/Guns/Pistols/b92fs.rsi, state: base }
   cost:
     FrontierUplinkCoin: 3
   categories:
@@ -185,7 +185,7 @@
   name:  P-90
   description: Несмотря на древность дизайна,все еще является верным другом на поле боя.
   productEntity: NFWeaponSubMachineGunP90
-  icon: { sprite: _Horizon/NF/Objects/Weapons/Guns/SMGs/p90.rsi, state: base }
+  icon: { sprite: _NF/Objects/Weapons/Guns/SMGs/p90.rsi, state: base }
   cost:
     FrontierUplinkCoin: 4
   categories:
@@ -201,7 +201,7 @@
   name: Копье
   description: Большой и грозный револьвер. Часто используется военными комисарами
   productEntity: NFWeaponRevolverSpearhead
-  icon: { sprite: _Horizon/NF/Objects/Weapons/Guns/Pistols/spearhead.rsi, state: icon }
+  icon: { sprite: _NF/Objects/Weapons/Guns/Pistols/spearhead.rsi, state: icon }
   cost:
     FrontierUplinkCoin: 3
   categories:
@@ -286,7 +286,7 @@
   name:  Type-71
   description: Штурмовая винтовка,специально поставляемая в сектор для ДСФБ
   productEntity: NFWeaponRifleAssaultType71
-  icon: { sprite: _Horizon/NF/Objects/Weapons/Guns/Rifles/type71.rsi, state: base }
+  icon: { sprite: _NF/Objects/Weapons/Guns/Rifles/type71.rsi, state: base }
   cost:
     FrontierUplinkCoin: 5
   categories:
@@ -307,7 +307,7 @@
   name:  XM-38
   description: Пару лет назад была проверена в колониальный конфликтах. Теперь же она в ваших руках.
   productEntity: NFWeaponShotgunXM38
-  icon: { sprite: _Horizon/NF/Objects/Weapons/Guns/Shotguns/xm38.rsi, state: icon }
+  icon: { sprite: _NF/Objects/Weapons/Guns/Shotguns/xm38.rsi, state: icon }
   cost:
     FrontierUplinkCoin: 6
   categories:

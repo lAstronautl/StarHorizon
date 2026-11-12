@@ -26,7 +26,7 @@
   id: UplinkNFRevolverRS9
   name: РШ-9
   description: Боевой револьвер созданный для сотрудников секретных служб. Очень дорогой,но до безумия эффективный
-  icon: { sprite: _Horizon/NF/Objects/Weapons/Guns/Pistols/rsh9.rsi, state: base }
+  icon: { sprite: _NF/Objects/Weapons/Guns/Pistols/rsh9.rsi, state: base }
   productEntity: NFWeaponRevolverRS9
   discountCategory: rareDiscounts
   cost:
@@ -38,7 +38,7 @@
   id: UplinkNFRevolverXM40
   name: XM-40
   description: Эксперементальная штурмовая винтовка созданная для элитных подразделений Горлакса
-  icon: { sprite: _Horizon/NF/Objects/Weapons/Guns/Rifles/xm40.rsi, state: base }
+  icon: { sprite: _NF/Objects/Weapons/Guns/Rifles/xm40.rsi, state: base }
   productEntity: NFWeaponRifleAssaultXM40
   discountCategory: rareDiscounts
   cost:

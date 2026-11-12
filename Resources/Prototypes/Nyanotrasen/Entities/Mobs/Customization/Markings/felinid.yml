@@ -8,9 +8,9 @@
   markingCategory: HeadTop
   speciesRestriction: [Human,Felinid]
   sprites:
-  - sprite: _Horizon/Nyanotrasen/Mobs/Customization/bunny_ears.rsi
+  - sprite: Nyanotrasen/Mobs/Customization/bunny_ears.rsi
     state: ears_bunny_outer
-  - sprite: _Horizon/Nyanotrasen/Mobs/Customization/bunny_ears.rsi
+  - sprite: Nyanotrasen/Mobs/Customization/bunny_ears.rsi
     state: ears_bunny_inner
 
 # Horizon end
@@ -175,7 +175,7 @@
   markingCategory: Tail
   speciesRestriction: [Human,Felinid]
   sprites:
-  - sprite: _Horizon/Nyanotrasen/Mobs/Customization/bunny_ears.rsi
+  - sprite: Nyanotrasen/Mobs/Customization/bunny_ears.rsi
     state: tail_bunny
 
 # Horizon end

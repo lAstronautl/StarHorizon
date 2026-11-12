@@ -5,7 +5,7 @@
   description: Don't ask it to lay eggs in you.
   components:
   - type: Sprite
-    sprite: _Horizon/RMC14/Mobs/Aliens/Xenomorphs/maid.rsi
+    sprite: _RMC14/Mobs/Aliens/Xenomorphs/maid.rsi
     layers:
     - map: ["enum.DamageStateVisualLayers.Base"]
       state: xenomorph

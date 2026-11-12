@@ -144,7 +144,7 @@ public sealed partial class AttachableToggleableComponent : Component
     public EntityWhitelist? ActionsToRelayWhitelist;
 
     [DataField, AutoNetworkedField]
-    public SpriteSpecifier Icon = new SpriteSpecifier.Rsi(new ResPath("_Horizon/RMC14/Objects/Weapons/Guns/Attachments/rail.rsi"), "flashlight");
+    public SpriteSpecifier Icon = new SpriteSpecifier.Rsi(new ResPath("_RMC14/Objects/Weapons/Guns/Attachments/rail.rsi"), "flashlight");
 
     [DataField, AutoNetworkedField]
     public SpriteSpecifier? IconActive;

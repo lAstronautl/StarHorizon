@@ -10,7 +10,7 @@
   placementMode: SnapgridCenter
   canBuildInImpassable: false
   icon:
-    sprite: _Horizon/RMC14/Structures/Walls/Barricades/barricade.rsi
+    sprite: _RMC14/Structures/Walls/Barricades/barricade.rsi
     state: metal
   conditions:
     - !type:TileNotBlocked
@@ -27,7 +27,7 @@
   placementMode: SnapgridCenter
   canBuildInImpassable: false
   icon:
-    sprite: _Horizon/RMC14/Structures/Walls/Barricades/barricade.rsi
+    sprite: _RMC14/Structures/Walls/Barricades/barricade.rsi
     state: sandbag
   conditions:
     - !type:TileNotBlocked
@@ -44,7 +44,7 @@
   placementMode: SnapgridCenter
   canBuildInImpassable: false
   icon:
-    sprite: _Horizon/RMC14/Structures/Walls/Barricades/barricade.rsi
+    sprite: _RMC14/Structures/Walls/Barricades/barricade.rsi
     state: turnstile
   conditions:
     - !type:TileNotBlocked
@@ -61,7 +61,7 @@
   placementMode: SnapgridCenter
   canBuildInImpassable: false
   icon:
-    sprite: _Horizon/RMC14/Structures/Walls/Barricades/barricade.rsi
+    sprite: _RMC14/Structures/Walls/Barricades/barricade.rsi
     state: turnstile_med
   conditions:
     - !type:TileNotBlocked
@@ -78,7 +78,7 @@
   placementMode: SnapgridCenter
   canBuildInImpassable: false
   icon:
-    sprite: _Horizon/RMC14/Structures/Walls/Barricades/barricade.rsi
+    sprite: _RMC14/Structures/Walls/Barricades/barricade.rsi
     state: folding_metal
   conditions:
     - !type:TileNotBlocked
@@ -95,7 +95,7 @@
   placementMode: SnapgridCenter
   canBuildInImpassable: false
   icon:
-    sprite: _Horizon/RMC14/Structures/Walls/Barricades/barricade.rsi
+    sprite: _RMC14/Structures/Walls/Barricades/barricade.rsi
     state: plasteel
   conditions:
     - !type:TileNotBlocked
