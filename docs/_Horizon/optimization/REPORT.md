@@ -173,7 +173,19 @@
   `Content.IntegrationTests`) — без ошибок.
 - Нагрузочный сценарий на итоговой версии: раунд стартует, 2000 тиков без исключений
   `ParallelManager` в логе.
-- Интеграционные тесты: см. раздел ниже.
+- Интеграционные тесты по затронутым подсистемам (Power, Atmos, Movement, Lathe, Materials,
+  Physics, Station, Round), запуск с локально ослабленным порогом ошибок лога (правка порога
+  в ветку не вошла): 27 тестов, **19 прошли, 7 упали, 1 пропущен**. Все тесты энергосетей
+  прошли. Упавшие не касаются изменённого кода — это последствия слияния с Frontier:
+  - `TotalGasesTest` — число газов не совпадает с таблицей сокращений;
+  - `TestLatheRecipeIngredientsFitLathe`, `MaterialPrototypeSpawnsStackMaterial` — прототипы
+    материалов (`TopazOre1`);
+  - `TestStaticAnchorPrototypes` — `CrateBaseAnCoGranite` закреплён, но не статичен;
+  - `PullTest`, `TestEggIsEgg` — `NullReferenceException` в клиентском
+    `SponsorShopUIController.OnReconnect`, несуществующий прототип `MagazineShotgun`;
+  - `TestThrownEggBreaks` — `OutOfMemoryException` в тесте.
+  Проверить, падали ли они до этой ветки, прогоном на базовом коммите я не успел; по
+  сообщениям об ошибках связи с правками производительности нет.
 
 ## Сырые данные
 
