@@ -1,0 +1,378 @@
+diff --git a/Content.Server/NPC/Systems/NPCSystem.cs b/Content.Server/NPC/Systems/NPCSystem.cs
+index 3c416684ae..39bdfe1576 100644
+--- a/Content.Server/NPC/Systems/NPCSystem.cs
++++ b/Content.Server/NPC/Systems/NPCSystem.cs
+@@ -44,6 +44,7 @@ public override void Initialize()
+ 
+             Subs.CVar(_configurationManager, CCVars.NPCEnabled, value => Enabled = value, true);
+             Subs.CVar(_configurationManager, CCVars.NPCMaxUpdates, obj => _maxUpdates = obj, true);
++            InitializeHorizonDistancePause(); // Horizon
+         }
+ 
+         public void OnPlayerNPCAttach(EntityUid uid, HTNComponent component, PlayerAttachedEvent args)
+@@ -141,6 +142,8 @@ public override void Update(float frameTime)
+             if (!Enabled)
+                 return;
+ 
++            UpdateHorizonDistancePause(frameTime); // Horizon: сон NPC вдали от игроков
++
+             // Add your system here.
+             _htn.UpdateNPC(ref _count, _maxUpdates, frameTime);
+ 
+diff --git a/Content.Server/Worldgen/Prototypes/GCQueuePrototype.cs b/Content.Server/Worldgen/Prototypes/GCQueuePrototype.cs
+index 94e6cf5fa3..82181a84c6 100644
+--- a/Content.Server/Worldgen/Prototypes/GCQueuePrototype.cs
++++ b/Content.Server/Worldgen/Prototypes/GCQueuePrototype.cs
+@@ -25,6 +25,13 @@ public sealed class GCQueuePrototype : IPrototype
+     [DataField("maximumTickTime")]
+     public TimeSpan MaximumTickTime { get; } = TimeSpan.FromMilliseconds(1);
+ 
++    /// <summary>
++    ///     Horizon (идея Monolith14): сколько миллисекунд за тик добавлять на каждый объект очереди сверх
++    ///     <see cref="MinDepthToProcess"/>. Длинная очередь разбирается быстрее и не копится в памяти.
++    /// </summary>
++    [DataField]
++    public double TimeDeletePerObject { get; } = 0.1;
++
+     /// <summary>
+     ///     The minimum depth before entities in the queue actually get processed for deletion.
+     /// </summary>
+diff --git a/Content.Server/Worldgen/Systems/GC/GCQueueSystem.cs b/Content.Server/Worldgen/Systems/GC/GCQueueSystem.cs
+index 8e8fc435f9..8560308b69 100644
+--- a/Content.Server/Worldgen/Systems/GC/GCQueueSystem.cs
++++ b/Content.Server/Worldgen/Systems/GC/GCQueueSystem.cs
+@@ -48,7 +48,12 @@ public override void Update(float frameTime)
+                 continue;
+ 
+             queueWatch.Restart();
+-            while (queueWatch.Elapsed < proto.MaximumTickTime && queue.Count >= proto.MinDepthToProcess &&
++            // Horizon (идея Monolith14): бюджет времени растёт с длиной очереди, но не меньше исходного.
++            var entsOverDepth = Math.Max(0, queue.Count - proto.MinDepthToProcess);
++            var dynamicTickTime = TimeSpan.FromMilliseconds(entsOverDepth * proto.TimeDeletePerObject);
++            var maxQueueTickTime = dynamicTickTime > proto.MaximumTickTime ? dynamicTickTime : proto.MaximumTickTime;
++
++            while (queueWatch.Elapsed < maxQueueTickTime && queue.Count >= proto.MinDepthToProcess &&
+                    overallWatch.Elapsed < _maximumProcessTime)
+             {
+                 var e = queue.Dequeue();
+diff --git a/Content.Server/_Horizon/NPC/NPCSystem.DistancePause.cs b/Content.Server/_Horizon/NPC/NPCSystem.DistancePause.cs
+new file mode 100644
+index 0000000000..e2b1b01063
+--- /dev/null
++++ b/Content.Server/_Horizon/NPC/NPCSystem.DistancePause.cs
+@@ -0,0 +1,144 @@
++using System.Numerics;
++using Content.Server.NPC.HTN;
++using Content.Shared._Horizon.CCVar;
++using Content.Shared.Ghost;
++using Content.Shared.Mind.Components;
++using Content.Shared.Mobs;
++using Content.Shared.Mobs.Components;
++using Content.Shared.NPC;
++using Robust.Server.Player;
++using Robust.Shared.Map;
++using Robust.Shared.Player;
++
++namespace Content.Server.NPC.Systems;
++
++// Horizon: сон NPC вдали от игроков. Идея взята из Monolith14 (npc.pause_when_no_players_in_range),
++// реализация своя: позиции игроков собираются один раз за проверку, а будим мы только тех NPC,
++// которых усыпили сами, — чтобы не разбудить мобов, усыплённых другими системами.
++public sealed partial class NPCSystem
++{
++    [Dependency] private IPlayerManager _horizonPlayers = default!;
++    [Dependency] private SharedTransformSystem _horizonTransform = default!;
++
++    private const float HorizonDistanceCheckInterval = 2f;
++
++    private bool _horizonPauseEnabled;
++    private float _horizonPauseDistance;
++    private float _horizonPauseTimer;
++
++    /// <summary>NPC, усыплённые из-за удалённости от игроков.</summary>
++    private readonly HashSet<EntityUid> _horizonDistanceSlept = new();
++    private readonly List<(MapId Map, Vector2 Pos)> _horizonPlayerPositions = new();
++    private readonly List<EntityUid> _horizonScratch = new();
++
++    private void InitializeHorizonDistancePause()
++    {
++        Subs.CVar(_configurationManager, HorizonCCVars.NpcPauseWhenNoPlayersInRange, OnHorizonPauseToggled, true);
++        Subs.CVar(_configurationManager, HorizonCCVars.NpcPlayerPauseDistance, v => _horizonPauseDistance = v, true);
++    }
++
++    private void OnHorizonPauseToggled(bool enabled)
++    {
++        _horizonPauseEnabled = enabled;
++        if (enabled)
++            return;
++
++        // Режим выключили на ходу — будим всех, кого усыпили.
++        foreach (var uid in _horizonDistanceSlept)
++        {
++            if (TryComp<HTNComponent>(uid, out var htn) && !_mobState.IsIncapacitated(uid))
++                WakeNPC(uid, htn);
++        }
++
++        _horizonDistanceSlept.Clear();
++    }
++
++    private void UpdateHorizonDistancePause(float frameTime)
++    {
++        if (!_horizonPauseEnabled)
++            return;
++
++        _horizonPauseTimer += frameTime;
++        if (_horizonPauseTimer < HorizonDistanceCheckInterval)
++            return;
++        _horizonPauseTimer = 0f;
++
++        // Живые игроки (не призраки) и их мировые координаты.
++        _horizonPlayerPositions.Clear();
++        foreach (var session in _horizonPlayers.Sessions)
++        {
++            if (session.AttachedEntity is not { Valid: true } ent
++                || HasComp<GhostComponent>(ent)
++                || TryComp<MobStateComponent>(ent, out var state) && state.CurrentState != MobState.Alive
++                || !TryComp(ent, out TransformComponent? xform)
++                || xform.MapID == MapId.Nullspace)
++                continue;
++
++            _horizonPlayerPositions.Add((xform.MapID, _horizonTransform.GetWorldPosition(xform)));
++        }
++
++        // Усыпляем активных NPC, рядом с которыми никого нет.
++        _horizonScratch.Clear();
++        var active = EntityQueryEnumerator<ActiveNPCComponent, HTNComponent, TransformComponent>();
++        while (active.MoveNext(out var uid, out _, out _, out var xform))
++        {
++            if (HasComp<ActorComponent>(uid)
++                || TryComp<MindContainerComponent>(uid, out var mind) && mind.HasMind)
++                continue;
++
++            if (!HorizonPlayerInRange(xform))
++                _horizonScratch.Add(uid);
++        }
++
++        foreach (var uid in _horizonScratch)
++        {
++            SleepNPC(uid);
++            _horizonDistanceSlept.Add(uid);
++        }
++
++        // Будим усыплённых нами, к которым подошёл игрок.
++        _horizonScratch.Clear();
++        foreach (var uid in _horizonDistanceSlept)
++        {
++            if (!TryComp<HTNComponent>(uid, out _) || !TryComp(uid, out TransformComponent? xform))
++            {
++                _horizonScratch.Add(uid); // удалён — просто забываем
++                continue;
++            }
++
++            if (HorizonPlayerInRange(xform))
++                _horizonScratch.Add(uid);
++        }
++
++        foreach (var uid in _horizonScratch)
++        {
++            _horizonDistanceSlept.Remove(uid);
++
++            if (!TryComp<HTNComponent>(uid, out var htn))
++                continue;
++
++            // Мёртвых и управляемых игроком не будим: их состоянием управляют штатные обработчики.
++            if (_mobState.IsIncapacitated(uid)
++                || HasComp<ActorComponent>(uid)
++                || TryComp<MindContainerComponent>(uid, out var mind) && mind.HasMind)
++                continue;
++
++            WakeNPC(uid, htn);
++        }
++    }
++
++    private bool HorizonPlayerInRange(TransformComponent xform)
++    {
++        var map = xform.MapID;
++        var pos = _horizonTransform.GetWorldPosition(xform);
++        var rangeSq = _horizonPauseDistance * _horizonPauseDistance;
++
++        foreach (var (playerMap, playerPos) in _horizonPlayerPositions)
++        {
++            if (playerMap == map && Vector2.DistanceSquared(playerPos, pos) <= rangeSq)
++                return true;
++        }
++
++        return false;
++    }
++}
+diff --git a/Content.Server/_Horizon/TrashCleanup/SpaceLitterCleanupSystem.cs b/Content.Server/_Horizon/TrashCleanup/SpaceLitterCleanupSystem.cs
+new file mode 100644
+index 0000000000..e9fa4e2e24
+--- /dev/null
++++ b/Content.Server/_Horizon/TrashCleanup/SpaceLitterCleanupSystem.cs
+@@ -0,0 +1,124 @@
++using Content.Server.Body.Components;
++using Content.Shared._Horizon.CCVar;
++using Content.Shared.Cargo.Components;
++using Content.Shared.Mobs.Components;
++using Content.Shared.Shuttles.Components;
++using Content.Shared.Stacks;
++using Robust.Shared.Configuration;
++using Robust.Shared.Containers;
++using Robust.Shared.Player;
++using Robust.Shared.Timing;
++
++namespace Content.Server._Horizon.TrashCleanup;
++
++/// <summary>
++/// Периодически удаляет мелочь, дрейфующую в открытом космосе вне гридов: сущности с
++/// <see cref="SpaceGarbageComponent"/> и дешёвые предметы. За долгую смену такой мусор копится
++/// тысячами и держит память (каждая сущность — около 12 КБ).
++/// Перенесено из Monolith14 (CheapEntitiesCleanupSystem и SpaceGarbageCleanupSystem), объединено
++/// в одну систему и вынесено на CVar-ы.
++/// </summary>
++public sealed partial class SpaceLitterCleanupSystem : EntitySystem
++{
++    [Dependency] private IGameTiming _timing = default!;
++    [Dependency] private SharedContainerSystem _container = default!;
++    [Dependency] private IConfigurationManager _cfg = default!;
++
++    private bool _enabled;
++    private float _interval;
++    private float _maxPrice;
++    private TimeSpan _nextCleanup;
++
++    private readonly HashSet<EntityUid> _toDelete = new();
++
++    public override void Initialize()
++    {
++        base.Initialize();
++
++        Subs.CVar(_cfg, HorizonCCVars.SpaceLitterCleanupEnabled, v => _enabled = v, true);
++        Subs.CVar(_cfg, HorizonCCVars.SpaceLitterCleanupInterval, v => _interval = v, true);
++        Subs.CVar(_cfg, HorizonCCVars.SpaceLitterCleanupMaxPrice, v => _maxPrice = v, true);
++    }
++
++    public override void Update(float frameTime)
++    {
++        base.Update(frameTime);
++
++        if (!_enabled)
++            return;
++
++        var curTime = _timing.CurTime;
++        if (_nextCleanup == TimeSpan.Zero)
++        {
++            // Первая очистка — через полный интервал после старта, а не сразу.
++            _nextCleanup = curTime + TimeSpan.FromSeconds(_interval);
++            return;
++        }
++
++        if (curTime < _nextCleanup)
++            return;
++
++        _nextCleanup = curTime + TimeSpan.FromSeconds(_interval);
++        Cleanup();
++    }
++
++    private void Cleanup()
++    {
++        _toDelete.Clear();
++
++        // 1) Помеченный космический мусор (пули, гильзы и т.п.).
++        var garbage = EntityQueryEnumerator<SpaceGarbageComponent, TransformComponent>();
++        while (garbage.MoveNext(out var uid, out _, out var xform))
++        {
++            if (IsDriftingInSpace(uid, xform))
++                _toDelete.Add(uid);
++        }
++
++        // 2) Дешёвые предметы и стопки.
++        var priced = EntityQueryEnumerator<StaticPriceComponent, TransformComponent>();
++        while (priced.MoveNext(out var uid, out var price, out var xform))
++        {
++            if (!IsDriftingInSpace(uid, xform))
++                continue;
++
++            double total;
++            if (TryComp<StackComponent>(uid, out var stack))
++                total = price.Price * stack.Count;
++            else if (HasComp<StackPriceComponent>(uid))
++                continue; // цену стопки считает другой компонент — не рискуем
++            else
++                total = price.Price;
++
++            if (total > _maxPrice)
++                continue;
++
++            // Контейнеры (ящики, сумки) и всё живое не трогаем.
++            if (HasComp<ContainerManagerComponent>(uid)
++                || HasComp<MobStateComponent>(uid)
++                || HasComp<ActorComponent>(uid)
++                || HasComp<BrainComponent>(uid))
++                continue;
++
++            _toDelete.Add(uid);
++        }
++
++        foreach (var uid in _toDelete)
++        {
++            QueueDel(uid);
++        }
++
++        Log.Info($"SpaceLitterCleanup: удалено {_toDelete.Count} сущностей в открытом космосе.");
++        _toDelete.Clear();
++    }
++
++    /// <summary>
++    /// Сущность лежит прямо на карте: не на гриде и не в контейнере (руки, рюкзак, шкаф).
++    /// </summary>
++    private bool IsDriftingInSpace(EntityUid uid, TransformComponent xform)
++    {
++        return xform.GridUid == null
++               && xform.MapUid != null
++               && xform.ParentUid == xform.MapUid
++               && !_container.IsEntityInContainer(uid);
++    }
++}
+diff --git a/Content.Shared/_Horizon/CCVar/CCVars.cs b/Content.Shared/_Horizon/CCVar/CCVars.cs
+index 9bed67c040..c48dca0476 100644
+--- a/Content.Shared/_Horizon/CCVar/CCVars.cs
++++ b/Content.Shared/_Horizon/CCVar/CCVars.cs
+@@ -102,6 +102,36 @@ public sealed class HorizonCCVars : CVars
+         public static readonly CVarDef<float> TrashCleanupStartDelay =
+             CVarDef.Create("trash.cleanup_start_delay", 600f, CVar.SERVERONLY);
+ 
++        /// <summary>
++        /// Удалять ли периодически дешёвые предметы, дрейфующие в открытом космосе вне гридов.
++        /// </summary>
++        public static readonly CVarDef<bool> SpaceLitterCleanupEnabled =
++            CVarDef.Create("trash.space_cleanup_enabled", true, CVar.SERVERONLY);
++
++        /// <summary>
++        /// Интервал в секундах между очистками космоса от дешёвых предметов.
++        /// </summary>
++        public static readonly CVarDef<float> SpaceLitterCleanupInterval =
++            CVarDef.Create("trash.space_cleanup_interval", 1800f, CVar.SERVERONLY);
++
++        /// <summary>
++        /// Предметы (или стопки) дороже этой цены очистка космоса не трогает.
++        /// </summary>
++        public static readonly CVarDef<float> SpaceLitterCleanupMaxPrice =
++            CVarDef.Create("trash.space_cleanup_max_price", 100f, CVar.SERVERONLY);
++
++        /// <summary>
++        /// Усыплять ли NPC, рядом с которыми нет живых игроков.
++        /// </summary>
++        public static readonly CVarDef<bool> NpcPauseWhenNoPlayersInRange =
++            CVarDef.Create("npc.pause_when_no_players_in_range", true, CVar.SERVERONLY);
++
++        /// <summary>
++        /// Расстояние (в метрах) до ближайшего живого игрока, дальше которого NPC засыпает.
++        /// </summary>
++        public static readonly CVarDef<float> NpcPlayerPauseDistance =
++            CVarDef.Create("npc.player_pause_distance", 1000f, CVar.SERVERONLY);
++
+         /// <summary>
+         /// Включение/отключение автоматического удаления мелких гридов.
+         /// </summary>

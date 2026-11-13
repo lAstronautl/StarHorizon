@@ -1,0 +1,252 @@
+diff --git a/Content.Server/Atmos/EntitySystems/AtmosphereSystem.HighPressureDelta.cs b/Content.Server/Atmos/EntitySystems/AtmosphereSystem.HighPressureDelta.cs
+index 9720cd38a8..273d9e2c83 100644
+--- a/Content.Server/Atmos/EntitySystems/AtmosphereSystem.HighPressureDelta.cs
++++ b/Content.Server/Atmos/EntitySystems/AtmosphereSystem.HighPressureDelta.cs
+@@ -150,7 +150,13 @@ private void HighPressureMovements(Entity<GridAtmosphereComponent> gridAtmospher
+                     tile.PressureSpecificTarget = curTile;
+             }
+ 
+-            _entSet.Clear();
++            // Horizon: HashSet.Clear() обнуляет весь массив корзин. Если набор однажды разросся
++            // (клетка с кучей предметов), каждая следующая очистка — memset на тысячи элементов
++            // на каждую клетку с перепадом давления. Разросшийся набор дешевле заменить новым.
++            if (_entSet.Capacity > 256)
++                _entSet = new HashSet<EntityUid>();
++            else
++                _entSet.Clear();
+             _lookup.GetLocalEntitiesIntersecting(tile.GridIndex, tile.GridIndices, _entSet, 0f);
+ 
+             foreach (var entity in _entSet)
+diff --git a/Content.Server/Materials/OreSiloSystem.cs b/Content.Server/Materials/OreSiloSystem.cs
+index 8e7625dd1c..1b8c03cab1 100644
+--- a/Content.Server/Materials/OreSiloSystem.cs
++++ b/Content.Server/Materials/OreSiloSystem.cs
+@@ -83,10 +83,20 @@ protected override void UpdateOreSiloUi(Entity<OreSiloComponent> ent)
+         _userInterface.SetUiState(ent.Owner, OreSiloUiKey.Key, new OreSiloBuiState(_clientInformation));
+     }
+ 
++    // Horizon: троттлинг Update
++    private const float HorizonUpdateInterval = 0.5f;
++    private float _horizonAccumulator;
++
+     public override void Update(float frameTime)
+     {
+         base.Update(frameTime);
+ 
++        // Horizon: перебор «игроки × клиенты силоса» незачем делать каждый тик — хватит раза в полсекунды.
++        _horizonAccumulator += frameTime;
++        if (_horizonAccumulator < HorizonUpdateInterval)
++            return;
++        _horizonAccumulator = 0f;
++
+         // Solving an annoying problem: we need to send the silo to people who are near the silo so that
+         // Things don't start wildly mispredicting. We do this as cheaply as possible via grid-based local-pos checks.
+         // Sloth okay-ed this in the interim until a better solution comes around.
+diff --git a/Content.Server/NPC/Systems/NPCSteeringSystem.Context.cs b/Content.Server/NPC/Systems/NPCSteeringSystem.Context.cs
+index d8950bc887..d0dfbd5c94 100644
+--- a/Content.Server/NPC/Systems/NPCSteeringSystem.Context.cs
++++ b/Content.Server/NPC/Systems/NPCSteeringSystem.Context.cs
+@@ -12,6 +12,7 @@
+ using Robust.Shared.Physics;
+ using Robust.Shared.Physics.Components;
+ using ClimbingComponent = Content.Shared.Climbing.Components.ClimbingComponent;
++using Robust.Shared.Random; // Horizon
+ 
+ namespace Content.Server.NPC.Systems;
+ 
+@@ -700,7 +701,9 @@ private float MapValue(float value, float minValue, float maxValue)
+                 // Welp
+                 if (obstacleDirection == Vector2.Zero)
+                 {
+-                    obstacleDirection = _random.NextAngle().ToVec();
++                    // Horizon: Steer выполняется в Parallel.For, а общий IRobustRandom не потокобезопасен —
++                    // гонка ломает его состояние (дальше он выдаёт нули). Random.Shared потокобезопасен.
++                    obstacleDirection = System.Random.Shared.NextAngle().ToVec();
+                 }
+             }
+             else
+diff --git a/Content.Server/NPC/Systems/NPCSteeringSystem.Obstacles.cs b/Content.Server/NPC/Systems/NPCSteeringSystem.Obstacles.cs
+index a31c7850f3..4efa83ce68 100644
+--- a/Content.Server/NPC/Systems/NPCSteeringSystem.Obstacles.cs
++++ b/Content.Server/NPC/Systems/NPCSteeringSystem.Obstacles.cs
+@@ -167,7 +167,8 @@ private SteeringObstacleStatus TryHandleFlags(EntityUid uid, NPCSteeringComponen
+                     var destructibleQuery = GetEntityQuery<DestructibleComponent>();
+ 
+                     // TODO: This is a hack around grilles and windows.
+-                    _random.Shuffle(obstacleEnts);
++                    // Horizon: потокобезопасный генератор, см. комментарий в NPCSteeringSystem.Context.cs
++                    System.Random.Shared.Shuffle(System.Runtime.InteropServices.CollectionsMarshal.AsSpan(obstacleEnts));
+                     var attackResult = false;
+ 
+                     foreach (var ent in obstacleEnts)
+diff --git a/Content.Server/Power/Pow3r/BatteryRampPegSolver.cs b/Content.Server/Power/Pow3r/BatteryRampPegSolver.cs
+index 91e80e39ad..d3e17d2f7e 100644
+--- a/Content.Server/Power/Pow3r/BatteryRampPegSolver.cs
++++ b/Content.Server/Power/Pow3r/BatteryRampPegSolver.cs
+@@ -1,4 +1,4 @@
+-using System.Diagnostics.CodeAnalysis;
++﻿using System.Diagnostics.CodeAnalysis;
+ using Robust.Shared.Utility;
+ using System.Linq;
+ using System.Runtime.CompilerServices;
+@@ -455,7 +455,9 @@ private static void RecursivelyEstimateNetworkDepth(PowerState state, Network ne
+ 
+         private record struct UpdateNetworkJob : IParallelRobustJob
+         {
+-            public int BatchSize => 4;
++            // Horizon: 4 -> 32. Сеть считается за доли микросекунды, пачка из 4 сетей дешевле,
++            // чем её диспетчеризация между потоками (сотни микрозадач за тик на Frontier).
++            public int BatchSize => 32;
+ 
+             public BatteryRampPegSolver Solver;
+             public PowerState State;
+diff --git a/Content.Server/Worldgen/Systems/LocalityLoaderSystem.cs b/Content.Server/Worldgen/Systems/LocalityLoaderSystem.cs
+index 6c75cb8657..0f25d9400a 100644
+--- a/Content.Server/Worldgen/Systems/LocalityLoaderSystem.cs
++++ b/Content.Server/Worldgen/Systems/LocalityLoaderSystem.cs
+@@ -22,8 +22,18 @@ public override void Initialize()
+     // End Frontier: space debris destruction
+ 
+     /// <inheritdoc />
++    // Horizon: проверка «игрок подошёл к обломку» не обязана выполняться каждый тик.
++    private const float HorizonUpdateInterval = 0.2f;
++    private float _horizonAccumulator;
++
+     public override void Update(float frameTime)
+     {
++        // Horizon: троттлинг
++        _horizonAccumulator += frameTime;
++        if (_horizonAccumulator < HorizonUpdateInterval)
++            return;
++        _horizonAccumulator = 0f;
++
+         var e = EntityQueryEnumerator<LocalityLoaderComponent, TransformComponent>();
+         var loadedQuery = GetEntityQuery<LoadedChunkComponent>();
+         var xformQuery = GetEntityQuery<TransformComponent>();
+diff --git a/Content.Server/Worldgen/Systems/WorldControllerSystem.cs b/Content.Server/Worldgen/Systems/WorldControllerSystem.cs
+index 1933721637..c237087cd7 100644
+--- a/Content.Server/Worldgen/Systems/WorldControllerSystem.cs
++++ b/Content.Server/Worldgen/Systems/WorldControllerSystem.cs
+@@ -82,8 +82,18 @@ private void OnChunkUnloadedCore(EntityUid uid, LoadedChunkComponent component,
+     }
+ 
+     /// <inheritdoc />
++    // Horizon: чанки мира — 128 м, пересчитывать набор загружаемых чанков каждый тик незачем.
++    private const float HorizonUpdateInterval = 0.2f;
++    private float _horizonAccumulator;
++
+     public override void Update(float frameTime)
+     {
++        // Horizon: троттлинг (каждый тик здесь выделялись словари и списки на всех игроков и загрузчики)
++        _horizonAccumulator += frameTime;
++        if (_horizonAccumulator < HorizonUpdateInterval)
++            return;
++        _horizonAccumulator = 0f;
++
+         //there was a to-do here about every frame alloc but it turns out it's a nothing burger here.
+         var chunksToLoad = new Dictionary<EntityUid, Dictionary<Vector2i, List<EntityUid>>>();
+ 
+diff --git a/Content.Shared/Movement/Systems/SharedMoverController.Input.cs b/Content.Shared/Movement/Systems/SharedMoverController.Input.cs
+index 91f7339fc5..7544770169 100644
+--- a/Content.Shared/Movement/Systems/SharedMoverController.Input.cs
++++ b/Content.Shared/Movement/Systems/SharedMoverController.Input.cs
+@@ -210,7 +210,8 @@ private bool TryUpdateRelative(EntityUid uid, InputMoverComponent mover, Transfo
+             // 2. If we go from grid -> grid then (after lerp time) snap to nearest cardinal (probably imperceptible)
+             // 3. If we go from map -> grid then (after lerp time) snap to nearest cardinal
+ 
+-            if (mover.RelativeEntity.Equals(relative))
++            // Horizon: Nullable<EntityUid>.Equals(object) упаковывал аргумент в кучу на каждого моба каждый тик.
++            if (mover.RelativeEntity == relative)
+                 return false;
+ 
+             // Okay need to get our old relative rotation with respect to our new relative rotation
+diff --git a/Content.Shared/Storage/EntitySystems/MaterialReclaimerMagnetPickupSystem.cs b/Content.Shared/Storage/EntitySystems/MaterialReclaimerMagnetPickupSystem.cs
+index e94ebb8e93..c0b4de49ec 100644
+--- a/Content.Shared/Storage/EntitySystems/MaterialReclaimerMagnetPickupSystem.cs
++++ b/Content.Shared/Storage/EntitySystems/MaterialReclaimerMagnetPickupSystem.cs
+@@ -91,10 +91,12 @@ public override void Update(float frameTime)
+ 
+         while (query.MoveNext(out var uid, out var comp, out var storage, out var xform))
+         {
+-            if (comp.NextScan < currentTime)
++            // Horizon: условие было перевёрнуто (<), из-за чего магнит сканировал окрестность каждый тик,
++            // а не раз в ScanDelay: NextScan всё время убегал вперёд на секунду за тик.
++            if (comp.NextScan > currentTime)
+                 continue;
+ 
+-            comp.NextScan += ScanDelay;
++            comp.NextScan = currentTime + ScanDelay;
+ 
+             // Frontier - magnet disabled
+             if (!comp.MagnetEnabled)
+diff --git a/Content.Shared/Storage/EntitySystems/MaterialStorageMagnetPickupSystem.cs b/Content.Shared/Storage/EntitySystems/MaterialStorageMagnetPickupSystem.cs
+index e1ddfee793..3d678ab3ef 100644
+--- a/Content.Shared/Storage/EntitySystems/MaterialStorageMagnetPickupSystem.cs
++++ b/Content.Shared/Storage/EntitySystems/MaterialStorageMagnetPickupSystem.cs
+@@ -91,10 +91,12 @@ public override void Update(float frameTime)
+ 
+         while (query.MoveNext(out var uid, out var comp, out var storage, out var xform))
+         {
+-            if (comp.NextScan < currentTime)
++            // Horizon: условие было перевёрнуто (<), из-за чего магнит сканировал окрестность каждый тик,
++            // а не раз в ScanDelay: NextScan всё время убегал вперёд на секунду за тик.
++            if (comp.NextScan > currentTime)
+                 continue;
+ 
+-            comp.NextScan += ScanDelay;
++            comp.NextScan = currentTime + ScanDelay;
+ 
+             // Frontier - magnet disabled
+             if (!comp.MagnetEnabled)
+diff --git a/Resources/Prototypes/_NF/Catalog/Fills/Paper/forms_stc.yml b/Resources/Prototypes/_NF/Catalog/Fills/Paper/forms_stc.yml
+index dbea91f10c..757960b7f7 100644
+--- a/Resources/Prototypes/_NF/Catalog/Fills/Paper/forms_stc.yml
++++ b/Resources/Prototypes/_NF/Catalog/Fills/Paper/forms_stc.yml
+@@ -207,3 +207,47 @@
+ 
+         # Horizon
+         [color=#AAAAAA]Форма недействительна без подписи и печати Командования Фронтира (Шерифа или Представителя Станции)[/color]
++
++# Horizon: прототип из апстрима Frontier (#4915), потерянный при слиянии — без него раунд не стартует
++- type: entity #Creator: Renieken / verbiage borrowed from DmitriTheDemon
++  id: PaperWrittenStcTrafficWarning
++  name: traffic warning
++  categories: [ HideSpawnMenu ]
++  parent: Paper
++  components:
++  - type: Paper
++    content: >+
++      [color=#4f6e40]◥[bold]N[/bold]◣ [bold]New Frontier Traffic Department[/bold][/color]
++
++      [color=#4f6e40]‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾[/color]
++
++      [head=2]Traffic Warning[/head]
++
++
++      [head=2]Time of Offense:[/head][form]
++
++      [head=2]Vessel Callsign:[/head][form]
++
++      [head=2]Infraction:[/head]
++
++      [check]: Dock Loitering
++
++      [check]: Reckless Operation
++
++      [check]: Unauthorized Docking Maneuver
++
++      [check]: Failure to Broadcast IFF
++
++
++      [bold]Notes:[/bold]
++
++      [form]
++
++
++      This a formal warning from the Station Traffic Controller to notify the crew of the vessel of a violation of Space Law §6.4, governing the traffic guidelines in and around Frontier Station and the Trade Outpost.
++
++
++      If further infractions occur, traffic citations will be issued, with punishments that can include fines, forceful undocking, and/or declaration of your vessel as legal salvage.
++
++
++      [color=#AAAAAA]This warning is only valid when stamped and signed by the Station Traffic Controller, or authorized Station Representative.[/color]

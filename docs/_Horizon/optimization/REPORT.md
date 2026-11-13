@@ -89,7 +89,7 @@
 `RobustToolbox/Robust.Server/Threading/ServerParallelManager.cs` — серверная реализация
 диспетчера, подключённая в `Robust.Server/ServerIoC.cs` поверх общей. `Robust.Shared` и
 `Robust.Client` совпадают с апстримом. Форк движка `lAstronautl/RobustToolbox`, ветка
-`horizon/267.3.0`; копия патчем — `Tools/_Horizon/engine-patches/0001-server-parallel-manager.patch`.
+`horizon/267.3.0`; копия патчем — `Tools/_Horizon/patches/0001-engine-server-parallel-manager.patch`.
 
 Раньше `ProcessNow(IParallelRobustJob)` ставил все пачки в пул потоков, а игровой поток засыпал
 на `WaitHandle.WaitOne()`. На 4 ядрах это значит, что одно ядро из четырёх простаивает ровно
