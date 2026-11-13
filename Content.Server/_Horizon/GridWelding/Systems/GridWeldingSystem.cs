@@ -83,7 +83,12 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
 
     private void OnAfterInteract(Entity<SeamWelderComponent> ent, ref AfterInteractEvent args)
     {
-        if (args.Handled || !args.CanReach || !IsWelding(ent))
+        if (args.Handled || !IsWelding(ent))
+            return;
+
+        // The same reach as the cutting mode of the tool: a click within its range counts, whatever the size of the user.
+        var range = TryComp<ShipCutterComponent>(ent, out var cutter) ? cutter.Range : 0f;
+        if (!args.CanReach && !_xform.InRange(Transform(args.User).Coordinates, args.ClickLocation, range))
             return;
 
         var comp = ent.Comp;
