@@ -75,7 +75,11 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
 
     private void OnAfterInteract(Entity<ShipCutterComponent> ent, ref AfterInteractEvent args)
     {
-        if (args.Handled || !args.CanReach || ent.Comp.Mode != ShipToolMode.Cut)
+        if (args.Handled || ent.Comp.Mode != ShipToolMode.Cut)
+            return;
+
+        // The tool reaches further than a hand: a click within its range counts, whatever the size of the user.
+        if (!args.CanReach && !TransformSystem.InRange(Transform(args.User).Coordinates, args.ClickLocation, ent.Comp.Range))
             return;
 
         var pick = Pick(TransformSystem.ToMapCoordinates(args.ClickLocation), ent.Comp);
@@ -111,6 +115,7 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
             BreakOnDamage = true,
             BreakOnMove = true,
             NeedHand = true,
+            DistanceThreshold = ent.Comp.Range,
         };
 
         if (_doAfter.TryStartDoAfter(doAfter))
