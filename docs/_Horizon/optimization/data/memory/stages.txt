@@ -1,4 +1,0 @@
-oad 22:23:30] STAGE server+client started (prototypes, resources): heapLive=2327MB rss=3408MB
-oad 22:23:50] STAGE round started, entities=87804: heapLive=3428MB rss=4665MB
-oad 22:23:56] STAGE ships loaded, entities=115314: heapLive=3736MB rss=5097MB
-oad 22:24:14] STAGE after warmup, entities=119550: heapLive=3864MB rss=5537MB

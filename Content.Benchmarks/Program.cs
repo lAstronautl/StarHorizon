@@ -10,14 +10,6 @@ namespace Content.Benchmarks
 
         public static void Main(string[] args)
         {
-            // Horizon: нагрузочный сценарий сервера (см. _Horizon/HorizonLoadScenario.cs)
-            if (args.Length > 0 && args[0] == "horizon-load")
-            {
-                Environment.Exit(Content.Benchmarks._Horizon.HorizonLoadScenario.Run(args[1..]));
-                return;
-            }
-            // Horizon end
-
 #if DEBUG
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("\nWARNING: YOU ARE RUNNING A DEBUG BUILD, USE A RELEASE BUILD FOR AN ACCURATE BENCHMARK");
