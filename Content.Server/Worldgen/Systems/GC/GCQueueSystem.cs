@@ -48,7 +48,12 @@ public sealed partial class GCQueueSystem : EntitySystem
                 continue;
 
             queueWatch.Restart();
-            while (queueWatch.Elapsed < proto.MaximumTickTime && queue.Count >= proto.MinDepthToProcess &&
+            // Horizon (идея Monolith14): бюджет времени растёт с длиной очереди, но не меньше исходного.
+            var entsOverDepth = Math.Max(0, queue.Count - proto.MinDepthToProcess);
+            var dynamicTickTime = TimeSpan.FromMilliseconds(entsOverDepth * proto.TimeDeletePerObject);
+            var maxQueueTickTime = dynamicTickTime > proto.MaximumTickTime ? dynamicTickTime : proto.MaximumTickTime;
+
+            while (queueWatch.Elapsed < maxQueueTickTime && queue.Count >= proto.MinDepthToProcess &&
                    overallWatch.Elapsed < _maximumProcessTime)
             {
                 var e = queue.Dequeue();

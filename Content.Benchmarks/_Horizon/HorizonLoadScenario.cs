@@ -65,6 +65,8 @@ public static class HorizonLoadScenario
         public int Churn;
         /// <summary>Период контрольных точек памяти в тиках (0 — выключены). Каждая точка делает полную сборку мусора.</summary>
         public int MemEvery;
+        /// <summary>Сколько NPC поставить на корабли без игроков (для замера сна NPC вдали от игроков).</summary>
+        public int FarNpcs;
         public string PathOffset = "";
         public readonly List<(string Name, string Value)> CVars = new();
     }
@@ -111,6 +113,7 @@ public static class HorizonLoadScenario
                 case "--print-exceptions": o.PrintExceptions = true; break;
                 case "--churn": o.Churn = int.Parse(Next()); break;
                 case "--mem-every": o.MemEvery = int.Parse(Next()); break;
+                case "--far-npcs": o.FarNpcs = int.Parse(Next()); break;
                 case "--path-offset": o.PathOffset = Next(); break;
                 case "--cvar":
                     var kv = Next().Split('=', 2);
@@ -322,6 +325,29 @@ public static class HorizonLoadScenario
                 }
             }
         });
+
+        // --- NPC вдали от игроков: на кораблях, где игроков нет.
+        if (o.FarNpcs > 0)
+        {
+            var emptyShipSpots = shipSpots.Skip(Math.Min(shipSpots.Count, (o.Players + 1) / 2)).ToList();
+            if (emptyShipSpots.Count == 0)
+                Log("no player-less ships for --far-npcs");
+
+            await server.WaitPost(() =>
+            {
+                for (var i = 0; i < o.FarNpcs && emptyShipSpots.Count > 0; i++)
+                {
+                    try
+                    {
+                        entMan.SpawnEntity(NpcProtos[i % NpcProtos.Length], emptyShipSpots[i % emptyShipSpots.Count]);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log($"far npc spawn failed: {ex.Message}");
+                    }
+                }
+            });
+        }
 
         var mover = entMan.System<SharedMoverController>();
         var atmos = entMan.System<AtmosphereSystem>();

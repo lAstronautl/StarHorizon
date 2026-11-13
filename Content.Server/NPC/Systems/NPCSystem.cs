@@ -44,6 +44,7 @@ namespace Content.Server.NPC.Systems
 
             Subs.CVar(_configurationManager, CCVars.NPCEnabled, value => Enabled = value, true);
             Subs.CVar(_configurationManager, CCVars.NPCMaxUpdates, obj => _maxUpdates = obj, true);
+            InitializeHorizonDistancePause(); // Horizon
         }
 
         public void OnPlayerNPCAttach(EntityUid uid, HTNComponent component, PlayerAttachedEvent args)
@@ -140,6 +141,8 @@ namespace Content.Server.NPC.Systems
 
             if (!Enabled)
                 return;
+
+            UpdateHorizonDistancePause(frameTime); // Horizon: сон NPC вдали от игроков
 
             // Add your system here.
             _htn.UpdateNPC(ref _count, _maxUpdates, frameTime);
