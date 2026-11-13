@@ -172,12 +172,55 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
             return;
         }
 
-        if (args.Cut.IsWall)
-            CutWall(ent.Comp, entity, args.Cut.Edge);
-        else
-            CutSeam(entity, args.Cut.Tile, args.Cut.Edge);
+        ApplyCut(ent.Comp, args.Cut, entity);
 
         _audio.PlayPvs(ent.Comp.DoneSound, ent);
+    }
+
+    /// <summary>
+    /// One cut separates everything at that edge: the seam between the floor tiles and the wall edge held by walls on
+    /// both sides of it, whichever of the two was aimed at. Otherwise the same edge would have to be cut twice, and which
+    /// of them a click picks would be a matter of where exactly the cursor is.
+    /// </summary>
+    public void ApplyCut(ShipCutterComponent cutter, ShipCutterTarget cut, EntityUid entity)
+    {
+        if (cut.IsWall)
+        {
+            // The edge before the wall is let go: where it comes loose (None) there is no seam to speak of.
+            var seam = TryGetWallTile(entity, out var gridUid, out var grid, out var tile) && cut.Edge != CutEdges.None &&
+                       CanCut(gridUid, grid, tile, cut.Edge)
+                ? (Grid: gridUid, Tile: tile)
+                : ((EntityUid Grid, Vector2i Tile)?) null;
+
+            CutWall(cutter, entity, cut.Edge);
+
+            if (seam is { } found)
+                CutSeam(found.Grid, found.Tile, cut.Edge);
+
+            return;
+        }
+
+        if (!TryComp<MapGridComponent>(entity, out var seamGrid))
+            return;
+
+        // The walls first: the grid may split when the seam is cut, and that moves them.
+        var other = cut.Tile + cut.Edge.Offset();
+        CutWallsAtEdge(cutter, entity, seamGrid, cut.Tile, cut.Edge);
+        CutWallsAtEdge(cutter, entity, seamGrid, other, cut.Edge.Opposite());
+
+        CutSeam(entity, cut.Tile, cut.Edge);
+    }
+
+    private void CutWallsAtEdge(ShipCutterComponent cutter, EntityUid gridUid, MapGridComponent grid, Vector2i tile, CutEdges edge)
+    {
+        foreach (var wall in MapSystem.GetAnchoredEntities((gridUid, grid), tile).ToList())
+        {
+            if (!Whitelist.IsWhitelistPass(cutter.WallWhitelist, wall) ||
+                !WallHeldEdges(cutter, gridUid, grid, tile, wall).HasFlag(edge))
+                continue;
+
+            CutWall(cutter, wall, edge);
+        }
     }
 
     private bool TryGetWallTile(EntityUid wall, out EntityUid gridUid, out MapGridComponent grid, out Vector2i tile)
