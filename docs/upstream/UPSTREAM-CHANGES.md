@@ -11,6 +11,42 @@
 
 Что при слиянии осталось в версии Horizon или заменено с потерями: см. `MERGE-ISSUES.md`.
 
+## Главное
+
+**Крупные механики и системы**
+- Pirate Bounty Rework, переработка пиратских баунти ([#4807](https://github.com/new-frontiers-14/frontier-station-14/pull/4807)).
+- Handheld radio rework, переработка ручных раций ([#4342](https://github.com/new-frontiers-14/frontier-station-14/pull/4342)).
+- Шаттлы можно покупать с бескислородной атмосферой ([#4209](https://github.com/new-frontiers-14/frontier-station-14/pull/4209)). Серверная часть влита, выбор атмосферы в UI верфи Horizon не перенесён.
+- Overhaul jukebox UI, новый интерфейс музыкального автомата, порт wizden#42210 ([#4259](https://github.com/new-frontiers-14/frontier-station-14/pull/4259)). Правка Horizon «все треки доступны» заменена апстримной версией.
+- Melee animations (cherrypick из апстрима) и правка штыков ([#4742](https://github.com/new-frontiers-14/frontier-station-14/pull/4742)).
+- Подвесные постеры и картины, `NFWallmountableSystem` ([#4481](https://github.com/new-frontiers-14/frontier-station-14/pull/4481)).
+- Консоль экспедиций отправляет грид, на котором стоит ([#4446](https://github.com/new-frontiers-14/frontier-station-14/pull/4446)).
+- Puddles predicted и багфиксы (Wizden#38871 и др., [#4617](https://github.com/new-frontiers-14/frontier-station-14/pull/4617)).
+
+**Экспедиции**
+- Новая: Syndicate HQ Expedition Dungeon и выбор подземелий по фракциям ([#4526](https://github.com/new-frontiers-14/frontier-station-14/pull/4526)). Карта `Resources/Maps/_NF/Dungeon/syndicate_headquarters.yml`, тема `Procedural/Themes/syndicate_headquarters.yml`, интерфейс `IFactionSpecificMod`.
+- Правки существующих: вернули чертежи T4 в экспедициях silicon ([#4730](https://github.com/new-frontiers-14/frontier-station-14/pull/4730)), убрали учебные патроны из лута ([#4519](https://github.com/new-frontiers-14/frontier-station-14/pull/4519)), Kestrel больше не экспедиционное судно ([#4494](https://github.com/new-frontiers-14/frontier-station-14/pull/4494)).
+- Событийная точка The Ninth Circle ([#4512](https://github.com/new-frontiers-14/frontier-station-14/pull/4512)) и обновления POI: NFSDO ([#4854](https://github.com/new-frontiers-14/frontier-station-14/pull/4854)), Edison ([#4695](https://github.com/new-frontiers-14/frontier-station-14/pull/4695)), аванпост NFSD ([#4310](https://github.com/new-frontiers-14/frontier-station-14/pull/4310)).
+
+**Порты из других форков**
+- Cyborg chips из DeltaV ([#4400](https://github.com/new-frontiers-14/frontier-station-14/pull/4400)).
+- Mail trolley из Starlight ([#4552](https://github.com/new-frontiers-14/frontier-station-14/pull/4552)).
+- Pipe layer selector из Starlight ([#4886](https://github.com/new-frontiers-14/frontier-station-14/pull/4886)).
+- Inline filters / multifilter из Coyote ([#4723](https://github.com/new-frontiers-14/frontier-station-14/pull/4723)).
+- Optical Thermal temperature shading ([#4641](https://github.com/new-frontiers-14/frontier-station-14/pull/4641)).
+- Оповещения о просроченных ID-картах из Harmony ([#4545](https://github.com/new-frontiers-14/frontier-station-14/pull/4545)).
+- Energy Shotgun возвращён из апстрима ([#4891](https://github.com/new-frontiers-14/frontier-station-14/pull/4891)), Meat Hook исправлен ([#4932](https://github.com/new-frontiers-14/frontier-station-14/pull/4932)).
+
+**Мелочи**
+- Эмоция Blink ([#4939](https://github.com/new-frontiers-14/frontier-station-14/pull/4939)), портативный телевизор ([#4945](https://github.com/new-frontiers-14/frontier-station-14/pull/4945)), Plant Analyzer в медицинском техфабе ([#4971](https://github.com/new-frontiers-14/frontier-station-14/pull/4971)).
+- Верфи: ещё одна для персонала FO ([#4753](https://github.com/new-frontiers-14/frontier-station-14/pull/4753)), CentComm Shipyards ([#4611](https://github.com/new-frontiers-14/frontier-station-14/pull/4611)); NSF Wasp убран из верфи ([#4878](https://github.com/new-frontiers-14/frontier-station-14/pull/4878)).
+- Движок: Frontier подготовил код под генератор `[Dependency]` из RT 277 ([#4811](https://github.com/new-frontiers-14/frontier-station-14/pull/4811)); `RobustToolbox` остаётся на `feb9e1db`.
+
+**Что проверить после слияния**
+- Горизонтовские правки, замещённые апстримом: heat-distortion, Jukebox «все треки доступны», ретаргет пинпоинтера, выбор атмосферы шаттла в UI верфи, блоки Frontier в `NavScreen.xaml`. Подробно в `MERGE-ISSUES.md`.
+- В игре проверены только запуск сервера и клиента и вход на `dev_map`. Основные карты, верфь, навигация и экспедиции не запускались.
+- YAML-линтер выдаёт 901 ошибку, из них исправлено около 160. Сравнения с состоянием до слияния нет.
+
 ## Оглавление
 
 - Исправления (47)
