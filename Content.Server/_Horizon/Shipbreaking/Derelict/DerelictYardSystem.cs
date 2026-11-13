@@ -1,6 +1,7 @@
 using Content.Server.Cargo.Systems;
 using Content.Server.Radio.EntitySystems;
 using System.Linq;
+using Content.Server.Shuttles.Systems;
 using Content.Server.Station.Systems;
 using Content.Server.StationEvents.Events;
 using Content.Server._NF.Bank;
@@ -41,6 +42,7 @@ public sealed class DerelictYardSystem : EntitySystem
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly DockingSystem _docking = default!;
     [Dependency] private readonly ShipyardSystem _shipyard = default!;
     [Dependency] private readonly StationSystem _station = default!;
     [Dependency] private readonly ITileDefinitionManager _tileDefs = default!;
@@ -169,6 +171,9 @@ public sealed class DerelictYardSystem : EntitySystem
             _popup.PopupEntity(Loc.GetString("derelict-yard-failed"), ent, args.Actor);
             return;
         }
+
+        // It is brought to the nearest port and then let go of every port, so it is easier to take apart.
+        _docking.UndockDocks(shuttle.Value);
 
         // The job is kept under an entity of its own, so it can be closed out even when every grid of the wreck is gone.
         var group = Spawn(null, MapCoordinates.Nullspace);
