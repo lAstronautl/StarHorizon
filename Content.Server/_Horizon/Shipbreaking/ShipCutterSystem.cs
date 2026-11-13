@@ -270,6 +270,35 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
         CutLoose(wall);
     }
 
+    /// <summary>
+    /// Welds the walls at an edge shut: the cut edge of both is gone, and a wall with no cut edge left holds air again.
+    /// </summary>
+    public void SealWallsAtEdge(EntityUid gridUid, MapGridComponent grid, Vector2i tile, CutEdges edge)
+    {
+        SealWalls(gridUid, grid, tile, edge);
+        SealWalls(gridUid, grid, tile + edge.Offset(), edge.Opposite());
+    }
+
+    private void SealWalls(EntityUid gridUid, MapGridComponent grid, Vector2i tile, CutEdges edge)
+    {
+        foreach (var wall in MapSystem.GetAnchoredEntities((gridUid, grid), tile).ToList())
+        {
+            if (!TryComp<WallCutsComponent>(wall, out var cuts) || !cuts.Cuts.HasFlag(edge))
+                continue;
+
+            cuts.Cuts &= ~edge;
+            if (cuts.Cuts != CutEdges.None)
+            {
+                Dirty(wall, cuts);
+                continue;
+            }
+
+            RemComp<WallCutsComponent>(wall);
+            if (TryComp<AirtightComponent>(wall, out var airtight))
+                _airtight.SetAirblocked((wall, airtight), true);
+        }
+    }
+
     private void OpenToVacuum(EntityUid wall)
     {
         if (TryComp<AirtightComponent>(wall, out var airtight))

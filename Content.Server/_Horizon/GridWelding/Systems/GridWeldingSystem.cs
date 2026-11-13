@@ -36,6 +36,7 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly GridCutsSystem _cuts = default!;
     [Dependency] private readonly SharedShipCutterSystem _cutter = default!;
+    [Dependency] private readonly ShipCutterSystem _shipCutter = default!;
     [Dependency] private readonly GridGravitySystem _gridGravity = default!;
     [Dependency] private readonly DockingSystem _docking = default!;
 
@@ -334,6 +335,10 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
         var gridUid = GetEntity(args.Grid);
         if (!_cuts.RemoveCut(gridUid, args.Tile, args.Edge))
             return;
+
+        // The walls at the seam are welded shut with it.
+        if (TryComp<MapGridComponent>(gridUid, out var sealedGrid))
+            _shipCutter.SealWallsAtEdge(gridUid, sealedGrid, args.Tile, args.Edge);
 
         _cell.TryUseCharge(ent, ent.Comp.SealCharge, user: args.User);
 
