@@ -212,6 +212,8 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
             ? new Dictionary<Vector2i, CutEdges>(bCuts.Cuts)
             : null;
 
+        var gridBSealed = bCuts != null ? new Dictionary<Vector2i, CutEdges>(bCuts.Sealed) : null;
+
         var bInherentGravity = false;
         var bGravityEnabled = false;
         if (TryComp<GravityComponent>(gridBUid, out var bGravity))
@@ -230,7 +232,7 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
 
         _gridGravity.AfterMerge(gridAUid, bInherentGravity, bGravityEnabled);
 
-        ApplyMergeSeams(gridAUid, gridA, gridAFootprint, gridBTiles, gridBCuts, offset, rotation, tileA, tileB);
+        ApplyMergeSeams(gridAUid, gridA, gridAFootprint, gridBTiles, gridBCuts, gridBSealed, offset, rotation, tileA, tileB);
     }
 
     private void UndockBetween(EntityUid gridAUid, EntityUid gridBUid)
@@ -250,6 +252,39 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
         {
             _docking.Undock(dock);
         }
+    }
+
+    private bool TryNearestTile(EntityUid gridUid, MapGridComponent grid, Vector2 local, out Vector2 clamped)
+    {
+        clamped = default;
+        var size = grid.TileSize;
+        var origin = new Vector2i((int) MathF.Floor(local.X / size), (int) MathF.Floor(local.Y / size));
+        var best = float.MaxValue;
+        var found = false;
+
+        for (var x = -1; x <= 1; x++)
+        {
+            for (var y = -1; y <= 1; y++)
+            {
+                var indices = origin + new Vector2i(x, y);
+                if (!_maps.TryGetTile(grid, indices, out var tile) || tile.IsEmpty)
+                    continue;
+
+                const float inset = 0.05f;
+                var min = new Vector2(indices.X, indices.Y) * size + new Vector2(inset);
+                var max = new Vector2(indices.X + 1, indices.Y + 1) * size - new Vector2(inset);
+                var point = Vector2.Clamp(local, min, max);
+                var distance = (point - local).LengthSquared();
+                if (distance >= best)
+                    continue;
+
+                best = distance;
+                clamped = point;
+                found = true;
+            }
+        }
+
+        return found;
     }
 
     private void ReleaseStrays(EntityUid gridBUid, MapGridComponent gridB, TransformComponent xformB)
@@ -275,6 +310,15 @@ public sealed partial class GridWeldingSystem : SharedGridWeldingSystem
         foreach (var stray in strays)
         {
             var xform = Transform(stray);
+
+            // Something that stands on the edge of the platform goes with it: it is put on the nearest tile. Only what has no
+            // tile close by is let out to the map.
+            if (TryNearestTile(gridBUid, gridB, xform.LocalPosition, out var nearest))
+            {
+                _xform.SetLocalPosition(stray, nearest, xform);
+                continue;
+            }
+
             _xform.SetCoordinates(stray, xform, new EntityCoordinates(map, _xform.GetWorldPosition(xform)),
                 _xform.GetWorldRotation(xform));
         }
