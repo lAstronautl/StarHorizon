@@ -1,4 +1,6 @@
 using System.Linq;
+using Content.Server.Atmos.EntitySystems;
+using Content.Server.Atmos.Components;
 using Content.Server.PowerCell;
 using Content.Server.Shuttles.Systems;
 using Content.Shared._Horizon.Shipbreaking;
@@ -22,6 +24,7 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly GridCutsSystem _cuts = default!;
     [Dependency] private readonly PowerCellSystem _cell = default!;
+    [Dependency] private readonly AirtightSystem _airtight = default!;
     [Dependency] private readonly DockingSystem _docking = default!;
     [Dependency] private readonly MetaDataSystem _meta = default!;
     [Dependency] private readonly SharedItemSystem _item = default!;
@@ -245,6 +248,10 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
         {
             EnsureComp<WallCutsComponent>(wall).Cuts |= edge;
             Dirty(wall, Comp<WallCutsComponent>(wall));
+            OpenToVacuum(wall);
+
+            // A cut in a wall lets the air out: the tile leaks to space like a cut seam of the floor.
+            _cuts.AddCut(gridUid, tile, edge);
 
             foreach (var other in MapSystem.GetAnchoredEntities((gridUid, grid), tile + edge.Offset()).ToList())
             {
@@ -254,12 +261,19 @@ public sealed partial class ShipCutterSystem : SharedShipCutterSystem
                 var otherCuts = EnsureComp<WallCutsComponent>(other);
                 otherCuts.Cuts |= edge.Opposite();
                 Dirty(other, otherCuts);
+                OpenToVacuum(other);
             }
 
             return;
         }
 
         CutLoose(wall);
+    }
+
+    private void OpenToVacuum(EntityUid wall)
+    {
+        if (TryComp<AirtightComponent>(wall, out var airtight))
+            _airtight.SetAirblocked((wall, airtight), false);
     }
 
     private void CutLoose(EntityUid wall)
