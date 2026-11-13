@@ -184,7 +184,8 @@ public static class HorizonLoadScenario
             cfg.SetCVar(CCVars.GameLobbyDefaultPreset, o.Preset);
             foreach (var (name, value) in o.CVars)
             {
-                cfg.SetCVar(name, value);
+                // Через консоль: она сама приводит строку к типу CVar-а.
+                server.ConsoleHost.ExecuteCommand($"cvar {name} {value}");
             }
 
             // Тестовый пул задаёт серверному генератору зерно, а Random(seed) — старая реализация .NET.
@@ -565,10 +566,14 @@ public static class HorizonLoadScenario
 
         var entityCount = 0;
         var gridCount = 0;
+        var activeNpcs = 0;
+        var totalNpcs = 0;
         await server.WaitPost(() =>
         {
             entityCount = entMan.EntityCount;
             gridCount = entMan.Count<MapGridComponent>();
+            activeNpcs = entMan.Count<Content.Shared.NPC.ActiveNPCComponent>();
+            totalNpcs = entMan.Count<Content.Server.NPC.HTN.HTNComponent>();
         });
 
         // --- Отчёт.
@@ -597,7 +602,7 @@ public static class HorizonLoadScenario
         json.AppendLine($"  \"warmupTicks\": {o.WarmupTicks}, \"measureTicks\": {o.MeasureTicks}, \"seed\": {o.Seed},");
         json.AppendLine($"  \"pvs\": {o.Pvs.ToString().ToLowerInvariant()}, \"parallelCount\": {o.ParallelCount},");
         json.AppendLine($"  \"serverGC\": {GCSettings.IsServerGC.ToString().ToLowerInvariant()}, \"gcLatencyMode\": \"{GCSettings.LatencyMode}\", \"processorCount\": {Environment.ProcessorCount},");
-        json.AppendLine($"  \"entities\": {entityCount}, \"grids\": {gridCount},");
+        json.AppendLine($"  \"entities\": {entityCount}, \"grids\": {gridCount}, \"npcsActive\": {activeNpcs}, \"npcsTotal\": {totalNpcs},");
         json.AppendLine(string.Create(inv, $"  \"tickMs\": {{\"mean\": {mean:F4}, \"std\": {std:F4}, \"p50\": {Pct(0.50):F4}, \"p95\": {Pct(0.95):F4}, \"p99\": {Pct(0.99):F4}, \"max\": {sorted[^1]:F4}}},"));
         json.AppendLine(string.Create(inv, $"  \"systemsMsPerTick\": {sysTotalMs:F4},"));
         json.AppendLine(string.Create(inv, $"  \"cpuMsPerTick\": {cpuMsPerTick:F4},"));
@@ -622,7 +627,7 @@ public static class HorizonLoadScenario
         Log($"RESULT {o.Label}: mean={mean:F3}ms p50={Pct(0.5):F3} p95={Pct(0.95):F3} p99={Pct(0.99):F3} max={sorted[^1]:F1} " +
             $"systems={sysTotalMs:F3}ms cpu={cpuMsPerTick:F3}ms alloc={allocPerTick / 1024:F0}KB/tick " +
             $"gc={GC.CollectionCount(0) - gc0}/{GC.CollectionCount(1) - gc1}/{GC.CollectionCount(2) - gc2} pause={pauseMs:F0}ms " +
-            $"ents={entityCount} grids={gridCount} rss={rssMb:F0}MB heap={heapMb:F0}MB committed={committedMb:F0}MB");
+            $"ents={entityCount} grids={gridCount} npc={activeNpcs}/{totalNpcs} rss={rssMb:F0}MB heap={heapMb:F0}MB committed={committedMb:F0}MB");
         if (memLines.Count > 1)
             await File.WriteAllLinesAsync(Path.Combine(o.OutDir, $"{o.Label}.mem.csv"), memLines);
         foreach (var (name, sec) in systems.Take(25))
