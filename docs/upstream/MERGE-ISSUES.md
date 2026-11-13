@@ -18,15 +18,27 @@
 | Игровой процесс (верфь, навигация, пинпоинтер, экспедиции, карго, медицина, оружие) | **Не проверялся** |
 | Миграции БД | Апстрим новых не добавлял; предупреждение EF про `PRAGMA` от миграций Horizon (в т. ч. `HairGradient`) присутствует и ломает `PoolTestLogHandler` в тестах/линтере |
 
-## 2. Потерянные или заменённые фичи Horizon (нужен перенос)
+## 2. Потерянные или заменённые фичи Horizon
 
-Апстримная версия файла взята целиком, правки Horizon в нём потеряны:
+Статус по каждому пункту:
+
+| № | Фича | Статус |
+|---|---|---|
+| 1 | Heat-distortion | не восстанавливается по решению владельца (это не фича Horizon и не Frontier, пришла массовым импортом `7b1418d8`) |
+| 2 | Jukebox «все треки доступны» | **восстановлено** (коммит `85bf53e8`) |
+| 3 | Пинпоинтер, ретаргет Frontier по do-after | не восстанавливается по решению владельца, оставлена версия Horizon (Goob) |
+| 4 | Выбор атмосферы шаттла в верфи | **восстановлено** (коммит `b94bafa5`) |
+| 5 | `NavScreen.xaml`: блоки Frontier | **не требовалось**: Service Flags, Inertia dampener, IFF search и остальные блоки в разметке есть; прежняя запись об их потере была ошибкой |
+| 6 | `DockingScreen.xaml` | UndockAllButton Horizon добавлен вручную, раскладка Frontier |
+| 7 | Радиальные меню | типы переименованы под новый API, поведение в игре не проверено |
+
+Подробности:
 
 1. **Heat-distortion** (тепловое искажение) в атмос-оверлее: `SharedGasTileOverlaySystem` (Shared), `GasTileOverlaySystem` (Server и Client). Удалён `Content.Client/Atmos/Overlays/GasTileHeatOverlay.cs`. Ресурсы (шейдер и т. п.) остались без использования. Frontier переписал оверлей (file-scoped namespace, `partial`, `ThermalByte`), правка Horizon на старой структуре не совмещается.
-2. **Jukebox «все треки доступны без пластинок»**: `Content.Server/Audio/Jukebox/JukeboxSystem.cs` и клиентский `JukeboxBoundUserInterface.cs` взяты у апстрима (новый UI по wizden#42210, очередь треков вместо шаффла). Поле `artist` добавлено в 9 ваших треков вручную: из `Артист - Название` разделено у 3 треков `mediaplayer.yml`, у 6 треков `Standard.yml` поставлено `Unknown`.
+2. **Jukebox «все треки доступны без пластинок» (восстановлено)**: поведение возвращено правкой `SharedJukeboxSystem.GetAvailableTracks` (отдаёт все `JukeboxPrototype`). Исходно было: `Content.Server/Audio/Jukebox/JukeboxSystem.cs` и клиентский `JukeboxBoundUserInterface.cs` взяты у апстрима (новый UI по wizden#42210, очередь треков вместо шаффла). Поле `artist` добавлено в 9 ваших треков вручную: из `Артист - Название` разделено у 3 треков `mediaplayer.yml`, у 6 треков `Standard.yml` поставлено `Unknown`.
 3. **Пинпоинтер**: оставлена версия Horizon (`SharedPinpointerSystem`, Goobstation-ретаргет по whitelist). Ретаргет Frontier по do-after (`PinpointerDoAfterEvent`, `OnPinpointerDoAfter`) не перенесён. В `PinpointerComponent` добавлено поле `MaxRange` из Frontier, в `PinpointerSystem` — `oldDist`.
-4. **Верфь, UI**: `ShipyardConsoleMenu.xaml(.cs)`, `ShipyardConsoleBoundUserInterface.cs`, `VesselRow.xaml` оставлены версией Horizon (cash slot, rename, deed). Выбор атмосферы шаттла Frontier (#4209, шаттлы без кислорода) в UI **не перенесён**; серверная часть есть, у `ShipyardConsolePurchaseMessage` аргумент `atmosphere` сделан необязательным.
-5. **`NavScreen.xaml`** оставлен версией Horizon. Блоки Frontier (Service Flags, часть Inertia dampener) в разметке отсутствуют; компиляция проходит, т. к. код на них не ссылается, но в игре этих органов управления нет.
+4. **Верфь, UI (выбор атмосферы восстановлен)**: в меню Horizon добавлены `AtmosOptionButton` и `PopulateAtmos`, выбранная атмосфера передаётся в `ShipyardConsolePurchaseMessage`. Ранее: `ShipyardConsoleMenu.xaml(.cs)`, `ShipyardConsoleBoundUserInterface.cs`, `VesselRow.xaml` оставлены версией Horizon (cash slot, rename, deed). Выбор атмосферы шаттла Frontier (#4209, шаттлы без кислорода) в UI **не перенесён**; серверная часть есть, у `ShipyardConsolePurchaseMessage` аргумент `atmosphere` сделан необязательным.
+5. **`NavScreen.xaml`** оставлен версией Horizon. Блоки Frontier (Service Flags, Inertia dampener, IFF search, settable target) в разметке присутствуют, потерь нет.
 6. **`DockingScreen.xaml`**: взят апстримный layout со scroll-контейнером, кнопка `UndockAllButton` Horizon добавлена вручную.
 7. **Радиальные меню**: типы переименованы под новый API Wizden (`RadialMenuTextureButton`→`RadialMenuButton`, `RadialMenuOption`→`RadialMenuOptionBase`, `Sprite`→`IconSpecifier`) в `_White/RadialSelector`, `_Horizon/Mech/UI/MechEquipmentMenu`, `AdvancedRCD`. Внешний вид и поведение этих меню в игре не проверялись.
 

@@ -16,8 +16,8 @@
 **Крупные механики и системы**
 - Pirate Bounty Rework, переработка пиратских баунти ([#4807](https://github.com/new-frontiers-14/frontier-station-14/pull/4807)).
 - Handheld radio rework, переработка ручных раций ([#4342](https://github.com/new-frontiers-14/frontier-station-14/pull/4342)).
-- Шаттлы можно покупать с бескислородной атмосферой ([#4209](https://github.com/new-frontiers-14/frontier-station-14/pull/4209)). Серверная часть влита, выбор атмосферы в UI верфи Horizon не перенесён.
-- Overhaul jukebox UI, новый интерфейс музыкального автомата, порт wizden#42210 ([#4259](https://github.com/new-frontiers-14/frontier-station-14/pull/4259)). Правка Horizon «все треки доступны» заменена апстримной версией.
+- Шаттлы можно покупать с бескислородной атмосферой ([#4209](https://github.com/new-frontiers-14/frontier-station-14/pull/4209)). Серверная часть влита, выбор атмосферы добавлен в меню верфи Horizon.
+- Overhaul jukebox UI, новый интерфейс музыкального автомата, порт wizden#42210 ([#4259](https://github.com/new-frontiers-14/frontier-station-14/pull/4259)). Правка Horizon «все треки доступны» возвращена поверх нового Jukebox.
 - Melee animations (cherrypick из апстрима) и правка штыков ([#4742](https://github.com/new-frontiers-14/frontier-station-14/pull/4742)).
 - Подвесные постеры и картины, `NFWallmountableSystem` ([#4481](https://github.com/new-frontiers-14/frontier-station-14/pull/4481)).
 - Консоль экспедиций отправляет грид, на котором стоит ([#4446](https://github.com/new-frontiers-14/frontier-station-14/pull/4446)).
@@ -43,7 +43,7 @@
 - Движок: Frontier подготовил код под генератор `[Dependency]` из RT 277 ([#4811](https://github.com/new-frontiers-14/frontier-station-14/pull/4811)); `RobustToolbox` остаётся на `feb9e1db`.
 
 **Что проверить после слияния**
-- Горизонтовские правки, замещённые апстримом: heat-distortion, Jukebox «все треки доступны», ретаргет пинпоинтера, выбор атмосферы шаттла в UI верфи, блоки Frontier в `NavScreen.xaml`. Подробно в `MERGE-ISSUES.md`.
+- Не восстановлено по решению владельца: heat-distortion и ретаргет пинпоинтера Frontier по do-after. Подробно в `MERGE-ISSUES.md`.
 - В игре проверены только запуск сервера и клиента и вход на `dev_map`. Основные карты, верфь, навигация и экспедиции не запускались.
 - YAML-линтер выдаёт 901 ошибку, из них исправлено около 160. Сравнения с состоянием до слияния нет.
 
