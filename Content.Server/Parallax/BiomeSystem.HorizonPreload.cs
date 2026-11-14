@@ -51,6 +51,7 @@ public sealed partial class BiomeSystem
     private void OnHorizonBiomeShutdown(EntityUid uid, BiomeComponent component, ComponentShutdown args)
     {
         _pendingUnload.Remove(uid);
+        _hidden.Remove(uid);
     }
 
     private bool IsHorizonSpawner(EntityUid uid)

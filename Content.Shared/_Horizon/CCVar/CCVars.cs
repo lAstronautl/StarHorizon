@@ -175,6 +175,13 @@ namespace Content.Shared._Horizon.CCVar
         public static readonly CVarDef<float> BiomeLoadTimeBudget =
             CVarDef.Create("biome.load_time_budget_ms", 3f, CVar.SERVERONLY);
 
+        /// <summary>
+        /// Не создавать породу в глубине скальных массивов (все 8 соседей — тоже порода).
+        /// Она достраивается, когда соседнюю породу убирают.
+        /// </summary>
+        public static readonly CVarDef<bool> BiomeHideInteriorWalls =
+            CVarDef.Create("biome.hide_interior_walls", true, CVar.SERVERONLY);
+
         public static readonly CVarDef<float> BiomeUnloadDelay =
             CVarDef.Create("biome.unload_delay", 30f, CVar.SERVERONLY);
 

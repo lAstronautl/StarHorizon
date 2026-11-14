@@ -95,12 +95,15 @@ public sealed partial class BiomeSystem : SharedBiomeSystem
         SubscribeLocalEvent<ShuttleFlattenEvent>(OnShuttleFlatten);
         Subs.CVar(_configManager, CVars.NetMaxUpdateRange, SetLoadRange, true);
         InitializeHorizonPreload(); // Horizon
+        InitializeHorizonSurface(); // Horizon
         InitializeCommands();
         SubscribeLocalEvent<PrototypesReloadedEventArgs>(ProtoReload);
     }
 
     private void ProtoReload(PrototypesReloadedEventArgs obj)
     {
+        _occluderProtos.Clear(); // Horizon
+
         if (!obj.ByType.TryGetValue(typeof(BiomeTemplatePrototype), out var reloads))
             return;
 
@@ -295,6 +298,7 @@ public sealed partial class BiomeSystem : SharedBiomeSystem
                     var chunk = SharedMapSystem.GetChunkIndices(index, ChunkSize);
 
                     var mod = biome.ModifiedTiles.GetOrNew(chunk * ChunkSize);
+                    QueueReveal(ev.MapUid, index); // Horizon
 
                     if (!mod.Add(index) || !TryGetBiomeTile(index, biome.Layers, biome.Seed, (ev.MapUid, grid), out var tile))
                         continue;
@@ -391,6 +395,7 @@ public sealed partial class BiomeSystem : SharedBiomeSystem
         }
 
         QueueHorizonPreloadMarkers(); // Horizon
+        ProcessReveals(); // Horizon
 
         var loadBiomes = AllEntityQuery<BiomeComponent, MapGridComponent>();
 
@@ -794,8 +799,12 @@ public sealed partial class BiomeSystem : SharedBiomeSystem
                 foreach (var replaced in _markerReplaced)
                 {
                     chunkEntities!.Remove(replaced);
+                    _biomeDeleting = true;
                     Del(replaced);
+                    _biomeDeleting = false;
                 }
+
+                RemoveHidden(gridUid, node);
 
                 // Need to ensure the tile under it has loaded for anchoring.
                 if ((!_mapSystem.TryGetTileRef(gridUid, grid, node, out var tileRef) || tileRef.Tile.IsEmpty) &&
@@ -823,6 +832,7 @@ public sealed partial class BiomeSystem : SharedBiomeSystem
             RemComp<GhostTakeoverAvailableComponent>(uid);
             RemComp<GhostRoleComponent>(uid);
             EntityManager.InitializeAndStartEntity(uid);
+            MarkIfNearHidden(gridUid, uid, node);
         }
 
         _markerSpawns.Clear();
@@ -883,6 +893,9 @@ public sealed partial class BiomeSystem : SharedBiomeSystem
         // Now do entities
         var loadedEntities = new Dictionary<EntityUid, Vector2i>();
         component.LoadedEntities.Add(chunk, loadedEntities);
+        // Horizon: скрытая порода
+        HashSet<Vector2i>? hidden = null;
+        _rockScratch.Clear();
 
         for (var x = 0; x < ChunkSize; x++)
         {
@@ -898,6 +911,15 @@ public sealed partial class BiomeSystem : SharedBiomeSystem
 
                 if (anchored.MoveNext(out _) || !TryGetEntity(indices, component, (gridUid, grid), out var entPrototype))
                     continue;
+
+                // Horizon: порода в глубине массива не создаётся
+                if (_hideInterior && IsOccluderProto(entPrototype) &&
+                    IsInteriorRock(component, gridUid, grid, indices, chunk, modified))
+                {
+                    hidden ??= _hidden.GetOrNew(gridUid).GetOrNew(chunk);
+                    hidden.Add(indices);
+                    continue;
+                }
 
                 // TODO: Fix non-anchored ents spawning.
                 // Just track loaded chunks for now.
@@ -919,8 +941,13 @@ public sealed partial class BiomeSystem : SharedBiomeSystem
                 }
 
                 loadedEntities.Add(ent, indices);
+                MarkIfNearHidden(gridUid, ent, indices); // Horizon: скрытые клетки соседних чанков
             }
         }
+
+        // Horizon
+        if (hidden != null)
+            MarkAroundHidden(gridUid, grid, hidden);
 
         // Decals
         var loadedDecals = new Dictionary<uint, Vector2i>();
@@ -1026,10 +1053,13 @@ public sealed partial class BiomeSystem : SharedBiomeSystem
                 continue;
             }
 
+            _biomeDeleting = true; // Horizon
             Del(ent);
+            _biomeDeleting = false; // Horizon
         }
 
         component.LoadedEntities.Remove(chunk);
+        DropHiddenChunk(gridUid, chunk); // Horizon
 
         // Unset tiles (if the data is custom)
 
@@ -1135,6 +1165,7 @@ public sealed partial class BiomeSystem : SharedBiomeSystem
 
         foreach (var tileSet in _mapSystem.GetLocalTilesIntersecting(mapUid, mapGrid, bounds, false))
         {
+            QueueReveal(mapUid, tileSet.GridIndices); // Horizon
             Vector2i chunkOrigin;
             HashSet<Vector2i> modified;
 
