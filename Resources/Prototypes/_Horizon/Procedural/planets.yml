@@ -1,5 +1,6 @@
 - type: planet
   id: Grasslands
+  preloadRadius: 96
   biome: GrasslandsMobs
   mapName: shuttle-destination-grasslands
   mapLight: "#413e2c"
@@ -58,6 +59,7 @@
 
 - type: planet
   id: Lavaland
+  preloadRadius: 96
   biome: LavaLand
   mapName: shuttle-destination-lavaland
   mapLight: "#664940"
@@ -116,6 +118,7 @@
 
 - type: planet
   id: Snow
+  preloadRadius: 96
   biome: SnowMobs
   mapName: shuttle-destination-snow
   mapLight: "#2c4041"

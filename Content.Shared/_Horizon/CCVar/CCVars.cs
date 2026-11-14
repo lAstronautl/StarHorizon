@@ -151,6 +151,18 @@ namespace Content.Shared._Horizon.CCVar
             CVarDef.Create("game.spawn_roundstart_planets", false, CVar.SERVERONLY);
 
         /// <summary>
+        /// Сколько миллисекунд тика можно тратить на фоновую прогрузку постоянной зоны планет.
+        /// </summary>
+        public static readonly CVarDef<float> BiomePreloadTimeBudget =
+            CVarDef.Create("biome.preload_time_budget_ms", 3f, CVar.SERVERONLY);
+
+        /// <summary>
+        /// Радиус (в клетках) заранее прогружаемой зоны на картах экспедиций. 0 — выключено.
+        /// </summary>
+        public static readonly CVarDef<int> BiomeExpeditionPreloadRadius =
+            CVarDef.Create("biome.expedition_preload_radius", 0, CVar.SERVERONLY);
+
+        /// <summary>
         /// Если true, вызов эвакуационного шаттла через коммуникационную консоль заблокирован.
         /// </summary>
         public static readonly CVarDef<bool> EvacBlocked =

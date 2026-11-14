@@ -159,6 +159,9 @@ public sealed class PlanetSystem : EntitySystem
             _biome.AddMarkerLayer(map, biome, layer);
         }
 
+        if (planet.PreloadRadius > 0)
+            _biome.SetPreload(map, planet.PreloadRadius);
+
         if (planet.AddedComponents is { } added)
             EntityManager.AddComponents(map, added);
 

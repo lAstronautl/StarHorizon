@@ -374,7 +374,27 @@ public abstract partial class SharedBiomeSystem : EntitySystem
         return TryGetDecals(indices, layers, seed, grid == null ? null : (grid.Owner, grid), out decals);
     }
 
+    // Horizon start: кэш генераторов шума. Раньше копия через сериализатор создавалась на каждый слой каждой клетки.
+    private readonly System.Runtime.CompilerServices.ConditionalWeakTable<FastNoiseLite, Dictionary<int, FastNoiseLite>> _noiseCache = new();
+
     private FastNoiseLite GetNoise(FastNoiseLite seedNoise, int seed)
+    {
+        var perSeed = _noiseCache.GetOrCreateValue(seedNoise);
+
+        // Рудные слои считают шум из нескольких потоков.
+        lock (perSeed)
+        {
+            if (perSeed.TryGetValue(seed, out var cached))
+                return cached;
+
+            var created = CreateNoise(seedNoise, seed);
+            perSeed[seed] = created;
+            return created;
+        }
+    }
+
+    private FastNoiseLite CreateNoise(FastNoiseLite seedNoise, int seed)
+    // Horizon end
     {
         var noiseCopy = new FastNoiseLite();
         _serManager.CopyTo(seedNoise, ref noiseCopy, notNullableOverride: true);

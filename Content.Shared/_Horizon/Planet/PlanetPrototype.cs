@@ -59,4 +59,12 @@ public sealed partial class PlanetPrototype : IPrototype
     /// </summary>
     [DataField]
     public List<ProtoId<BiomeMarkerLayerPrototype>> BiomeMarkerLayers = new();
+
+    /// <summary>
+    /// Радиус (в клетках) зоны вокруг центра планеты, которая генерируется заранее и никогда не выгружается.
+    /// За её пределами планета остаётся бесконечной и подгружается за игроком.
+    /// 0 — зона выключена.
+    /// </summary>
+    [DataField]
+    public int PreloadRadius = 0;
 }

@@ -272,6 +272,22 @@ public sealed partial class DungeonSystem : SharedDungeonSystem
         return job.Result!;
     }
 
+    // Horizon start
+    /// <summary>
+    /// Идёт ли сейчас генерация данжа на указанной сетке.
+    /// </summary>
+    public bool IsGenerating(EntityUid gridUid)
+    {
+        foreach (var job in _dungeonJobs.Keys)
+        {
+            if (job.GridUid == gridUid && job.Status != Robust.Shared.CPUJob.JobQueues.JobStatus.Finished)
+                return true;
+        }
+
+        return false;
+    }
+    // Horizon end
+
     public Angle GetDungeonRotation(int seed)
     {
         // Mask 0 | 1 for rotation seed

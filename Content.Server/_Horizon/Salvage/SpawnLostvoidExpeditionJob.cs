@@ -184,6 +184,12 @@ public sealed class SpawnLostvoidExpeditionJob : Job<bool>
         DungeonLocation = dungeonOffset;
         MapUid = mapUid;
 
+        // Постоянная зона между точкой посадки и данжем, прогружается пока карта ждёт шаттлы
+        var preloadRadius = IoCManager.Resolve<Robust.Shared.Configuration.IConfigurationManager>()
+            .GetCVar(Content.Shared._Horizon.CCVar.HorizonCCVars.BiomeExpeditionPreloadRadius);
+        if (preloadRadius > 0 && _entManager.HasComponent<BiomeComponent>(mapUid))
+            _entManager.System<BiomeSystem>().SetPreload(mapUid, preloadRadius, (Vector2i)(dungeonOffset / 2f));
+
         var budgetEntries = new List<IBudgetEntry>();
 
         // Guaranteed loot (e.g. ore layers)

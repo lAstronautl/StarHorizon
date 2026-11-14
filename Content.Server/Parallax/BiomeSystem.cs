@@ -93,6 +93,7 @@ public sealed partial class BiomeSystem : SharedBiomeSystem
         SubscribeLocalEvent<FTLStartedEvent>(OnFTLStarted);
         SubscribeLocalEvent<ShuttleFlattenEvent>(OnShuttleFlatten);
         Subs.CVar(_configManager, CVars.NetMaxUpdateRange, SetLoadRange, true);
+        InitializeHorizonPreload(); // Horizon
         InitializeCommands();
         SubscribeLocalEvent<PrototypesReloadedEventArgs>(ProtoReload);
     }
@@ -388,6 +389,8 @@ public sealed partial class BiomeSystem : SharedBiomeSystem
             }
         }
 
+        QueueHorizonPreloadMarkers(); // Horizon
+
         var loadBiomes = AllEntityQuery<BiomeComponent, MapGridComponent>();
 
         while (loadBiomes.MoveNext(out var gridUid, out var biome, out var grid))
@@ -466,6 +469,8 @@ public sealed partial class BiomeSystem : SharedBiomeSystem
             // Load NOW!
             LoadChunk(component, gridUid, grid, chunk, seed);
         }
+
+        UpdateHorizonPreload(component, gridUid, grid, seed); // Horizon
     }
 
     /// <summary>
@@ -893,9 +898,14 @@ public sealed partial class BiomeSystem : SharedBiomeSystem
     {
         var active = _activeChunks[component];
         List<(Vector2i, Tile)>? tiles = null;
+        _preloadQuery.TryGetComponent(gridUid, out var preload); // Horizon
 
         foreach (var chunk in component.LoadedChunks)
         {
+            // Horizon: чанки постоянной зоны не выгружаются
+            if (preload != null && IsHorizonPreloadChunk(preload, chunk))
+                continue;
+
             if (active.Contains(chunk) || !component.LoadedChunks.Remove(chunk))
                 continue;
 

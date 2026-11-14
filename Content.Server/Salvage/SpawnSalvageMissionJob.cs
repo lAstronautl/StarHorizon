@@ -248,6 +248,13 @@ public sealed class SpawnSalvageMissionJob : Job<bool>
 
         expedition.DungeonLocation = dungeonOffset;
 
+        // Horizon start: постоянная зона вокруг данжа, прогружается пока карта ждёт шаттл
+        var preloadRadius = IoCManager.Resolve<Robust.Shared.Configuration.IConfigurationManager>()
+            .GetCVar(Content.Shared._Horizon.CCVar.HorizonCCVars.BiomeExpeditionPreloadRadius);
+        if (preloadRadius > 0 && _entManager.HasComponent<BiomeComponent>(mapUid))
+            _entManager.System<BiomeSystem>().SetPreload(mapUid, preloadRadius, (Vector2i)(dungeonOffset / 2f)); // центр между точкой посадки и данжем
+        // Horizon end
+
         // Frontier: map generation and offset
         #region Frontier map generation
 

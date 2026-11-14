@@ -54,6 +54,7 @@ public sealed partial class DungeonJob : Job<List<Dungeon>>
     private readonly Vector2i _position;
 
     private readonly EntityUid _gridUid;
+    public EntityUid GridUid => _gridUid; // Horizon
     private readonly MapGridComponent _grid;
 
     private readonly EntityCoordinates? _targetCoordinates;
