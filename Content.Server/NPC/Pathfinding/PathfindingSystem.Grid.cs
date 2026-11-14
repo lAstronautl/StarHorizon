@@ -101,6 +101,21 @@ public sealed partial class PathfindingSystem
                 continue;
             }
 
+            // Horizon start: на планетах чанки далеко от бодрствующих NPC не перестраиваются, а ждут
+            _horizonDeferred.Clear();
+            if (HasComp<Content.Shared.Parallax.Biomes.BiomeComponent>(uid))
+            {
+                HorizonDeferFarChunks(uid, comp);
+
+                if (comp.DirtyChunks.Count == 0)
+                {
+                    comp.DirtyChunks.UnionWith(_horizonDeferred);
+                    comp.NextUpdate = curTime + UpdateCooldown;
+                    continue;
+                }
+            }
+            // Horizon end
+
             var dirtyPortals = comp.DirtyPortals;
             dirtyPortals.Clear();
 
@@ -215,8 +230,58 @@ public sealed partial class PathfindingSystem
             }
 
             comp.DirtyChunks.Clear();
+
+            // Horizon: отложенные чанки возвращаются в очередь до следующей проверки
+            if (_horizonDeferred.Count > 0)
+            {
+                comp.DirtyChunks.UnionWith(_horizonDeferred);
+                comp.NextUpdate = curTime + UpdateCooldown;
+            }
         }
     }
+
+    // Horizon start
+    private const float HorizonNpcPathRange = 80f;
+    private readonly HashSet<Vector2i> _horizonDeferred = new();
+    private readonly List<Vector2> _horizonNpcPositions = new();
+
+    /// <summary>
+    /// Переносит из очереди перестройки в <see cref="_horizonDeferred"/> чанки, рядом с которыми нет бодрствующих NPC.
+    /// </summary>
+    private void HorizonDeferFarChunks(EntityUid gridUid, GridPathfindingComponent comp)
+    {
+        _horizonNpcPositions.Clear();
+        var npcs = EntityQueryEnumerator<Content.Shared.NPC.ActiveNPCComponent, TransformComponent>();
+
+        while (npcs.MoveNext(out _, out var xform))
+        {
+            if (xform.GridUid == gridUid)
+                _horizonNpcPositions.Add(xform.LocalPosition);
+        }
+
+        var rangeSq = HorizonNpcPathRange * HorizonNpcPathRange;
+
+        foreach (var origin in comp.DirtyChunks)
+        {
+            var center = new Vector2((origin.X + 0.5f) * ChunkSize, (origin.Y + 0.5f) * ChunkSize);
+            var near = false;
+
+            foreach (var pos in _horizonNpcPositions)
+            {
+                if (Vector2.DistanceSquared(pos, center) > rangeSq)
+                    continue;
+
+                near = true;
+                break;
+            }
+
+            if (!near)
+                _horizonDeferred.Add(origin);
+        }
+
+        comp.DirtyChunks.ExceptWith(_horizonDeferred);
+    }
+    // Horizon end
 
     private bool IsBodyRelevant(FixturesComponent fixtures)
     {
