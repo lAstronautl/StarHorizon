@@ -134,7 +134,7 @@ public sealed class GridCleanupSystem : EntitySystem
             // and LocalAABB may be inaccurate until tiles are generated
             if (HasComp<BiomeComponent>(mapUid))
             {
-                _sawmill.Debug($"CheckGrid: Skipping grid {gridUid} on biome map {mapUid} - tiles generated dynamically");
+                // Строка не собирается: этот путь вызывается на каждое изменение плиток планеты.
                 return;
             }
         }

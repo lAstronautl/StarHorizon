@@ -90,6 +90,7 @@ public sealed partial class BiomeSystem : SharedBiomeSystem
         _ghostQuery = GetEntityQuery<GhostComponent>();
         _xformQuery = GetEntityQuery<TransformComponent>();
         SubscribeLocalEvent<BiomeComponent, MapInitEvent>(OnBiomeMapInit);
+        SubscribeLocalEvent<BiomeComponent, ComponentShutdown>(OnHorizonBiomeShutdown); // Horizon
         SubscribeLocalEvent<FTLStartedEvent>(OnFTLStarted);
         SubscribeLocalEvent<ShuttleFlattenEvent>(OnShuttleFlatten);
         Subs.CVar(_configManager, CVars.NetMaxUpdateRange, SetLoadRange, true);
@@ -837,6 +838,15 @@ public sealed partial class BiomeSystem : SharedBiomeSystem
                 // Just track loaded chunks for now.
                 var ent = Spawn(entPrototype, _mapSystem.GridTileToLocal(gridUid, grid, indices));
 
+                // Horizon: спавнер (фауна и т.п.) срабатывает один раз. Клетка помечается изменённой,
+                // иначе при каждой повторной загрузке чанка он рождал бы ещё одного моба.
+                if (IsHorizonSpawner(ent))
+                {
+                    modified.Add(indices);
+                    QueueDel(ent);
+                    continue;
+                }
+
                 // At least for now unless we do lookups or smth, only work with anchoring.
                 if (_xformQuery.TryGetComponent(ent, out var xform) && !xform.Anchored)
                 {
@@ -896,23 +906,8 @@ public sealed partial class BiomeSystem : SharedBiomeSystem
     /// </summary>
     private void UnloadChunks(BiomeComponent component, EntityUid gridUid, MapGridComponent grid, int seed)
     {
-        var active = _activeChunks[component];
-        List<(Vector2i, Tile)>? tiles = null;
-        _preloadQuery.TryGetComponent(gridUid, out var preload); // Horizon
-
-        foreach (var chunk in component.LoadedChunks)
-        {
-            // Horizon: чанки постоянной зоны не выгружаются
-            if (preload != null && IsHorizonPreloadChunk(preload, chunk))
-                continue;
-
-            if (active.Contains(chunk) || !component.LoadedChunks.Remove(chunk))
-                continue;
-
-            // Unload NOW!
-            tiles ??= new List<(Vector2i, Tile)>(ChunkSize * ChunkSize);
-            UnloadChunk(component, gridUid, grid, chunk, seed, tiles);
-        }
+        // Horizon: выгрузка с задержкой и лимитом времени, см. BiomeSystem.HorizonPreload.cs
+        UnloadChunksHorizon(component, gridUid, grid, seed);
     }
 
     /// <summary>

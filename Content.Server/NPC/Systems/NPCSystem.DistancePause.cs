@@ -22,6 +22,7 @@ public sealed partial class NPCSystem
 
     private bool _horizonPauseEnabled;
     private float _horizonPauseDistance;
+    private float _horizonPlanetPauseDistance;
     private float _horizonPauseTimer;
 
     private readonly HashSet<EntityUid> _horizonDistanceSlept = new();
@@ -32,6 +33,7 @@ public sealed partial class NPCSystem
     {
         Subs.CVar(_configurationManager, HorizonCCVars.NpcPauseWhenNoPlayersInRange, OnHorizonPauseToggled, true);
         Subs.CVar(_configurationManager, HorizonCCVars.NpcPlayerPauseDistance, v => _horizonPauseDistance = v, true);
+        Subs.CVar(_configurationManager, HorizonCCVars.NpcPlanetPauseDistance, v => _horizonPlanetPauseDistance = v, true);
     }
 
     private void OnHorizonPauseToggled(bool enabled)
@@ -123,7 +125,11 @@ public sealed partial class NPCSystem
     {
         var map = xform.MapID;
         var pos = _horizonTransform.GetWorldPosition(xform);
-        var rangeSq = _horizonPauseDistance * _horizonPauseDistance;
+        // На планетах и экспедициях порог свой, меньше общего.
+        var range = HasComp<Content.Shared.Parallax.Biomes.BiomeComponent>(xform.MapUid)
+            ? MathF.Min(_horizonPlanetPauseDistance, _horizonPauseDistance)
+            : _horizonPauseDistance;
+        var rangeSq = range * range;
 
         foreach (var (playerMap, playerPos) in _horizonPlayerPositions)
         {

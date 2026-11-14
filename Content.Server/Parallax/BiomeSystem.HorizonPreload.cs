@@ -1,6 +1,9 @@
 using System.Numerics;
 using Content.Server._Horizon.Planet;
 using Content.Server.Procedural;
+using Content.Server.Spawners.Components;
+using Robust.Shared.Map;
+using Robust.Shared.Utility;
 using Content.Shared._Horizon.CCVar;
 using Content.Shared.Parallax.Biomes;
 using Robust.Shared.Map.Components;
@@ -14,7 +17,18 @@ public sealed partial class BiomeSystem
 {
     [Dependency] private DungeonSystem _dungeon = default!;
 
+    [Dependency] private IGameTiming _timing = default!;
+
     private EntityQuery<BiomePreloadComponent> _preloadQuery;
+    private float _unloadDelay = 30f;
+    private float _unloadBudgetMs = 2f;
+
+    /// <summary>
+    /// По каждой карте: чанк → момент, когда он перестал быть нужен игрокам.
+    /// </summary>
+    private readonly Dictionary<EntityUid, Dictionary<Vector2i, TimeSpan>> _pendingUnload = new();
+    private readonly List<Vector2i> _unloadScratch = new();
+    private readonly Stopwatch _unloadStopwatch = new();
     private readonly HashSet<EntityUid> _preloadReady = new();
     private float _preloadBudgetMs = 3f;
     private readonly Stopwatch _preloadStopwatch = new();
@@ -28,6 +42,73 @@ public sealed partial class BiomeSystem
     {
         _preloadQuery = GetEntityQuery<BiomePreloadComponent>();
         Subs.CVar(_configManager, HorizonCCVars.BiomePreloadTimeBudget, value => _preloadBudgetMs = value, true);
+        Subs.CVar(_configManager, HorizonCCVars.BiomeUnloadDelay, value => _unloadDelay = value, true);
+        Subs.CVar(_configManager, HorizonCCVars.BiomeUnloadTimeBudget, value => _unloadBudgetMs = value, true);
+    }
+
+    private void OnHorizonBiomeShutdown(EntityUid uid, BiomeComponent component, ComponentShutdown args)
+    {
+        _pendingUnload.Remove(uid);
+    }
+
+    private bool IsHorizonSpawner(EntityUid uid)
+    {
+        return HasComp<ConditionalSpawnerComponent>(uid)
+               || HasComp<RandomSpawnerComponent>(uid)
+               || HasComp<EntityTableSpawnerComponent>(uid);
+    }
+
+    /// <summary>
+    /// Выгружает чанки, которые не нужны игрокам дольше задержки, пока не истёк лимит времени на тик.
+    /// Чанки постоянной зоны не выгружаются никогда.
+    /// </summary>
+    private void UnloadChunksHorizon(BiomeComponent component, EntityUid gridUid, MapGridComponent grid, int seed)
+    {
+        var active = _activeChunks[component];
+        _preloadQuery.TryGetComponent(gridUid, out var preload);
+        var pending = _pendingUnload.GetOrNew(gridUid);
+        var now = _timing.CurTime;
+        var delay = TimeSpan.FromSeconds(_unloadDelay);
+        _unloadScratch.Clear();
+
+        foreach (var chunk in component.LoadedChunks)
+        {
+            if (active.Contains(chunk))
+            {
+                if (pending.Count > 0)
+                    pending.Remove(chunk);
+
+                continue;
+            }
+
+            if (preload != null && IsHorizonPreloadChunk(preload, chunk))
+                continue;
+
+            if (!pending.TryGetValue(chunk, out var since))
+            {
+                since = now;
+                pending[chunk] = now;
+            }
+
+            if (now - since >= delay)
+                _unloadScratch.Add(chunk);
+        }
+
+        if (_unloadScratch.Count == 0)
+            return;
+
+        var tiles = new List<(Vector2i, Tile)>(ChunkSize * ChunkSize);
+        _unloadStopwatch.Restart();
+
+        foreach (var chunk in _unloadScratch)
+        {
+            component.LoadedChunks.Remove(chunk);
+            pending.Remove(chunk);
+            UnloadChunk(component, gridUid, grid, chunk, seed, tiles);
+
+            if (_unloadStopwatch.Elapsed.TotalMilliseconds >= _unloadBudgetMs)
+                break;
+        }
     }
 
     /// <summary>

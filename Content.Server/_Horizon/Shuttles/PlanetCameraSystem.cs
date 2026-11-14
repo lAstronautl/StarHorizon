@@ -19,13 +19,14 @@ public sealed class PlanetCameraSystem : EntitySystem
 {
     private const float MaxDistance = 300f;
     private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(6);
+    private static readonly TimeSpan MoveInterval = TimeSpan.FromSeconds(1.5);
 
     [Dependency] private readonly ViewSubscriberSystem _viewSubscriber = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly IPlayerManager _players = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
 
-    private readonly Dictionary<ICommonSession, (EntityUid Anchor, TimeSpan LastRequest)> _anchors = new();
+    private readonly Dictionary<ICommonSession, (EntityUid Anchor, TimeSpan LastRequest, TimeSpan LastMove)> _anchors = new();
 
     public override void Initialize()
     {
@@ -73,14 +74,23 @@ public sealed class PlanetCameraSystem : EntitySystem
 
         if (_anchors.TryGetValue(session, out var existing) && !TerminatingOrDeleted(existing.Anchor))
         {
+            // Якорь переносится не чаще раза в MoveInterval: каждый перенос заставляет биом
+            // грузить новую область. Запросы в промежутке только продлевают жизнь якоря.
+            var now = _timing.CurTime;
+            if (now - existing.LastMove < MoveInterval)
+            {
+                _anchors[session] = (existing.Anchor, now, existing.LastMove);
+                return;
+            }
+
             _transform.SetWorldPosition(existing.Anchor, wanted);
-            _anchors[session] = (existing.Anchor, _timing.CurTime);
+            _anchors[session] = (existing.Anchor, now, now);
             return;
         }
 
         var anchor = Spawn(null, coordinates);
         _viewSubscriber.AddViewSubscriber(anchor, session);
-        _anchors[session] = (anchor, _timing.CurTime);
+        _anchors[session] = (anchor, _timing.CurTime, _timing.CurTime);
     }
 
     private void Remove(ICommonSession session)

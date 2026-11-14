@@ -133,6 +133,12 @@ namespace Content.Shared._Horizon.CCVar
             CVarDef.Create("npc.player_pause_distance", 1000f, CVar.SERVERONLY);
 
         /// <summary>
+        /// То же расстояние, но для карт с биомом (планеты, экспедиции).
+        /// </summary>
+        public static readonly CVarDef<float> NpcPlanetPauseDistance =
+            CVarDef.Create("npc.planet_pause_distance", 64f, CVar.SERVERONLY);
+
+        /// <summary>
         /// Включение/отключение автоматического удаления мелких гридов.
         /// </summary>
         public static readonly CVarDef<bool> AutoGridCleanupEnabled =
@@ -159,6 +165,18 @@ namespace Content.Shared._Horizon.CCVar
         /// <summary>
         /// Радиус (в клетках) заранее прогружаемой зоны на картах экспедиций. 0 — выключено.
         /// </summary>
+        /// <summary>
+        /// Сколько секунд чанк биома остаётся загруженным после того, как вышел из зоны видимости игроков.
+        /// </summary>
+        public static readonly CVarDef<float> BiomeUnloadDelay =
+            CVarDef.Create("biome.unload_delay", 30f, CVar.SERVERONLY);
+
+        /// <summary>
+        /// Сколько миллисекунд тика можно тратить на выгрузку чанков биома (на одну планету).
+        /// </summary>
+        public static readonly CVarDef<float> BiomeUnloadTimeBudget =
+            CVarDef.Create("biome.unload_time_budget_ms", 2f, CVar.SERVERONLY);
+
         public static readonly CVarDef<int> BiomeExpeditionPreloadRadius =
             CVarDef.Create("biome.expedition_preload_radius", 0, CVar.SERVERONLY);
 
