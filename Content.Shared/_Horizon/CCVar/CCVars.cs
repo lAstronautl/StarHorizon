@@ -168,6 +168,13 @@ namespace Content.Shared._Horizon.CCVar
         /// <summary>
         /// Сколько секунд чанк биома остаётся загруженным после того, как вышел из зоны видимости игроков.
         /// </summary>
+        /// <summary>
+        /// Сколько миллисекунд тика можно тратить на загрузку чанков биома за пределами видимости игрока
+        /// (на одну планету). Чанки в пределах видимости грузятся сразу.
+        /// </summary>
+        public static readonly CVarDef<float> BiomeLoadTimeBudget =
+            CVarDef.Create("biome.load_time_budget_ms", 3f, CVar.SERVERONLY);
+
         public static readonly CVarDef<float> BiomeUnloadDelay =
             CVarDef.Create("biome.unload_delay", 30f, CVar.SERVERONLY);
 

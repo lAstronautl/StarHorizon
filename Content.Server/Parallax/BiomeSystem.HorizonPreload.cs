@@ -41,6 +41,8 @@ public sealed partial class BiomeSystem
     private void InitializeHorizonPreload()
     {
         _preloadQuery = GetEntityQuery<BiomePreloadComponent>();
+        _metaQuery = GetEntityQuery<MetaDataComponent>();
+        Subs.CVar(_configManager, HorizonCCVars.BiomeLoadTimeBudget, value => _loadBudgetMs = value, true);
         Subs.CVar(_configManager, HorizonCCVars.BiomePreloadTimeBudget, value => _preloadBudgetMs = value, true);
         Subs.CVar(_configManager, HorizonCCVars.BiomeUnloadDelay, value => _unloadDelay = value, true);
         Subs.CVar(_configManager, HorizonCCVars.BiomeUnloadTimeBudget, value => _unloadBudgetMs = value, true);
@@ -55,7 +57,72 @@ public sealed partial class BiomeSystem
     {
         return HasComp<ConditionalSpawnerComponent>(uid)
                || HasComp<RandomSpawnerComponent>(uid)
-               || HasComp<EntityTableSpawnerComponent>(uid);
+               || HasComp<EntityTableSpawnerComponent>(uid)
+               || HasComp<RoomFillComponent>(uid);
+    }
+
+    /// <summary>
+    /// Во сколько раз радиус круга загрузки больше половины стороны прежнего квадрата.
+    /// </summary>
+    private const float LoadCircleFactor = 1.2f;
+
+    /// <summary>
+    /// Чанки ближе этого расстояния (в клетках) до зрителя грузятся сразу, без очереди.
+    /// </summary>
+    private const float NearLoadDistance = 24f + ChunkSize;
+
+    private float _loadBudgetMs = 3f;
+    private readonly Dictionary<BiomeComponent, List<Vector2>> _viewerPositions = new();
+    private readonly List<(Vector2i Chunk, float Distance)> _deferredLoads = new();
+    private readonly Stopwatch _loadStopwatch = new();
+    private EntityQuery<MetaDataComponent> _metaQuery;
+
+    private float HorizonViewerDistanceSquared(BiomeComponent component, Vector2i chunkOrigin)
+    {
+        if (!_viewerPositions.TryGetValue(component, out var viewers) || viewers.Count == 0)
+            return 0f;
+
+        var center = new Vector2(chunkOrigin.X + ChunkSize / 2f, chunkOrigin.Y + ChunkSize / 2f);
+        var best = float.MaxValue;
+
+        foreach (var viewer in viewers)
+        {
+            best = MathF.Min(best, Vector2.DistanceSquared(center, viewer));
+        }
+
+        return best;
+    }
+
+    /// <summary>
+    /// Грузит отложенные дальние чанки, ближние первыми, пока не истёк лимит времени на тик.
+    /// </summary>
+    private void LoadDeferredChunks(BiomeComponent component, EntityUid gridUid, MapGridComponent grid, int seed)
+    {
+        if (_deferredLoads.Count == 0)
+            return;
+
+        _deferredLoads.Sort(static (a, b) => a.Distance.CompareTo(b.Distance));
+        _loadStopwatch.Restart();
+
+        foreach (var (chunk, _) in _deferredLoads)
+        {
+            component.LoadedChunks.Add(chunk);
+            LoadChunk(component, gridUid, grid, chunk, seed);
+
+            if (_loadStopwatch.Elapsed.TotalMilliseconds >= _loadBudgetMs)
+                break;
+        }
+
+        _deferredLoads.Clear();
+    }
+
+    /// <summary>
+    /// Сущность не менялась с момента создания: тик последнего изменения не позже тика создания + 1.
+    /// </summary>
+    private bool IsHorizonUntouched(EntityUid uid)
+    {
+        return _metaQuery.TryGetComponent(uid, out var meta) &&
+               meta.EntityLastModifiedTick.Value <= meta.CreationTick.Value + 1;
     }
 
     /// <summary>

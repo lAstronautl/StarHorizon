@@ -350,7 +350,7 @@ public sealed partial class BiomeSystem : SharedBiomeSystem
         }
 
         // Get chunks in range
-        foreach (var pSession in Filter.GetAllPlayers(_playerManager))
+        foreach (var pSession in _playerManager.Sessions) // Horizon: без выделения списка каждый тик
         {
             if (_xformQuery.TryGetComponent(pSession.AttachedEntity, out var xform) &&
                 _handledEntities.Add(pSession.AttachedEntity.Value) &&
@@ -418,16 +418,33 @@ public sealed partial class BiomeSystem : SharedBiomeSystem
 
         _activeChunks.Clear();
         _markerChunks.Clear();
+
+        // Horizon
+        foreach (var list in _viewerPositions.Values)
+        {
+            list.Clear();
+        }
     }
 
     private void AddChunksInRange(BiomeComponent biome, Vector2 worldPos)
     {
         var enumerator = new ChunkIndicesEnumerator(_loadArea.Translated(worldPos), ChunkSize);
+        // Horizon start: круг вместо квадрата и запоминание позиций зрителей для очереди загрузки
+        _viewerPositions.GetOrNew(biome).Add(worldPos);
+        var maxDistance = _loadRange * LoadCircleFactor;
+        var maxDistanceSq = maxDistance * maxDistance;
+        var half = new Vector2(ChunkSize / 2f);
 
         while (enumerator.MoveNext(out var chunkOrigin))
         {
-            _activeChunks[biome].Add(chunkOrigin.Value * ChunkSize);
+            var origin = chunkOrigin.Value * ChunkSize;
+
+            if (Vector2.DistanceSquared(origin + half, worldPos) > maxDistanceSq)
+                continue;
+
+            _activeChunks[biome].Add(origin);
         }
+        // Horizon end
     }
 
     private void AddMarkerChunksInRange(BiomeComponent biome, Vector2 worldPos, IBiomeMarkerLayer layer)
@@ -464,13 +481,24 @@ public sealed partial class BiomeSystem : SharedBiomeSystem
         {
             LoadChunkMarkers(component, gridUid, grid, chunk, seed);
 
-            if (!component.LoadedChunks.Add(chunk))
+            // Horizon start: ближние чанки грузятся сразу, дальние — в очередь с лимитом времени
+            if (component.LoadedChunks.Contains(chunk))
                 continue;
 
-            // Load NOW!
+            var distance = HorizonViewerDistanceSquared(component, chunk);
+
+            if (distance > NearLoadDistance * NearLoadDistance)
+            {
+                _deferredLoads.Add((chunk, distance));
+                continue;
+            }
+
+            component.LoadedChunks.Add(chunk);
             LoadChunk(component, gridUid, grid, chunk, seed);
+            // Horizon end
         }
 
+        LoadDeferredChunks(component, gridUid, grid, seed); // Horizon
         UpdateHorizonPreload(component, gridUid, grid, seed); // Horizon
     }
 
@@ -991,7 +1019,8 @@ public sealed partial class BiomeSystem : SharedBiomeSystem
                 continue;
             }
 
-            if (!EntityManager.IsDefault(ent))
+            // Horizon: сначала дешёвая проверка по тику изменения, полная сериализация — только если что-то меняли
+            if (!IsHorizonUntouched(ent) && !EntityManager.IsDefault(ent))
             {
                 modified.Add(tile);
                 continue;
