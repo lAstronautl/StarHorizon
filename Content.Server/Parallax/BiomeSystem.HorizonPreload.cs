@@ -211,6 +211,11 @@ public sealed partial class BiomeSystem
         while (preload.NextIndex < end)
         {
             var chunk = preload.Queue[preload.NextIndex];
+
+            // Руда считается в фоне: ждём, пока районы, накрывающие чанк, будут готовы.
+            if (!AreMarkersReady(component, chunk))
+                break;
+
             preload.NextIndex++;
 
             LoadChunkMarkers(component, gridUid, grid, chunk, seed);

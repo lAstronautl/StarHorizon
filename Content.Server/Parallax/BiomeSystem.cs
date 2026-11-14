@@ -480,99 +480,90 @@ public sealed partial class BiomeSystem : SharedBiomeSystem
     /// </summary>
     private void BuildMarkerChunks(BiomeComponent component, EntityUid gridUid, MapGridComponent grid, int seed)
     {
-        var markers = _markerChunks[component];
+        // Horizon: обычные слои считаются в фоне, см. BiomeSystem.HorizonMarkers.cs
+        BuildMarkerChunksHorizon(component, gridUid, grid, seed);
+    }
+
+    /// <summary>
+    /// Старый синхронный расчёт одного района. Horizon: остался только для принудительных слоёв.
+    /// </summary>
+    private void BuildMarkerChunkSync(BiomeComponent component, EntityUid gridUid, MapGridComponent grid, int seed, string layer, int localIdx, Vector2i chunk)
+    {
         var loadedMarkers = component.LoadedMarkers;
-        var idx = 0;
+        var forced = component.ForcedMarkerLayers.Contains(layer);
 
-        foreach (var (layer, chunks) in markers)
+        // Make a temporary version and copy back in later.
+        var pending = new Dictionary<Vector2i, Dictionary<string, List<Vector2i>>>();
+
+        // Essentially get the seed + work out a buffer to adjacent chunks so we don't
+        // inadvertantly spawn too many near the edges.
+        var layerProto = ProtoManager.Index<BiomeMarkerLayerPrototype>(layer);
+        var markerSeed = seed + chunk.X * ChunkSize + chunk.Y + localIdx;
+        var rand = new Random(markerSeed);
+        var buffer = (int)(layerProto.Radius / 2f);
+        var bounds = new Box2i(chunk + buffer, chunk + layerProto.Size - buffer);
+        var count = (int)(bounds.Area / (layerProto.Radius * layerProto.Radius));
+        count = Math.Min(count, layerProto.MaxCount);
+
+        GetMarkerNodes(gridUid, component, grid, layerProto, forced, bounds, count, rand,
+            out var spawnSet, out var existing);
+
+        // Forcing markers to spawn so delete any that were found to be in the way.
+        if (forced && existing.Count > 0)
         {
-            // I know dictionary ordering isn't guaranteed but I just need something to differentiate seeds.
-            idx++;
-            var localIdx = idx;
-
-            Parallel.ForEach(chunks, new ParallelOptions() { MaxDegreeOfParallelism = _parallel.ParallelProcessCount }, chunk =>
+            // Lock something so we can delete these safely.
+            lock (component.PendingMarkers)
             {
-                if (loadedMarkers.TryGetValue(layer, out var mobChunks) && mobChunks.Contains(chunk))
-                    return;
-
-                var forced = component.ForcedMarkerLayers.Contains(layer);
-
-                // Make a temporary version and copy back in later.
-                var pending = new Dictionary<Vector2i, Dictionary<string, List<Vector2i>>>();
-
-                // Essentially get the seed + work out a buffer to adjacent chunks so we don't
-                // inadvertantly spawn too many near the edges.
-                var layerProto = ProtoManager.Index<BiomeMarkerLayerPrototype>(layer);
-                var markerSeed = seed + chunk.X * ChunkSize + chunk.Y + localIdx;
-                var rand = new Random(markerSeed);
-                var buffer = (int)(layerProto.Radius / 2f);
-                var bounds = new Box2i(chunk + buffer, chunk + layerProto.Size - buffer);
-                var count = (int)(bounds.Area / (layerProto.Radius * layerProto.Radius));
-                count = Math.Min(count, layerProto.MaxCount);
-
-                GetMarkerNodes(gridUid, component, grid, layerProto, forced, bounds, count, rand,
-                    out var spawnSet, out var existing);
-
-                // Forcing markers to spawn so delete any that were found to be in the way.
-                if (forced && existing.Count > 0)
+                foreach (var ent in existing)
                 {
-                    // Lock something so we can delete these safely.
-                    lock (component.PendingMarkers)
-                    {
-                        foreach (var ent in existing)
-                        {
-                            Del(ent);
-                        }
-                    }
+                    Del(ent);
                 }
-
-                foreach (var node in spawnSet.Keys)
-                {
-                    var chunkOrigin = SharedMapSystem.GetChunkIndices(node, ChunkSize) * ChunkSize;
-
-                    if (!pending.TryGetValue(chunkOrigin, out var pendingMarkers))
-                    {
-                        pendingMarkers = new Dictionary<string, List<Vector2i>>();
-                        pending[chunkOrigin] = pendingMarkers;
-                    }
-
-                    if (!pendingMarkers.TryGetValue(layer, out var layerMarkers))
-                    {
-                        layerMarkers = new List<Vector2i>();
-                        pendingMarkers[layer] = layerMarkers;
-                    }
-
-                    layerMarkers.Add(node);
-                }
-
-                lock (loadedMarkers)
-                {
-                    if (!loadedMarkers.TryGetValue(layer, out var lockMobChunks))
-                    {
-                        lockMobChunks = new HashSet<Vector2i>();
-                        loadedMarkers[layer] = lockMobChunks;
-                    }
-
-                    lockMobChunks.Add(chunk);
-
-                    foreach (var (chunkOrigin, layers) in pending)
-                    {
-                        if (!component.PendingMarkers.TryGetValue(chunkOrigin, out var lockMarkers))
-                        {
-                            lockMarkers = new Dictionary<string, List<Vector2i>>();
-                            component.PendingMarkers[chunkOrigin] = lockMarkers;
-                        }
-
-                        foreach (var (lockLayer, nodes) in layers)
-                        {
-                            lockMarkers[lockLayer] = nodes;
-                        }
-                    }
-                }
-            });
+            }
         }
 
-        component.ForcedMarkerLayers.Clear();
+        foreach (var node in spawnSet.Keys)
+        {
+            var chunkOrigin = SharedMapSystem.GetChunkIndices(node, ChunkSize) * ChunkSize;
+
+            if (!pending.TryGetValue(chunkOrigin, out var pendingMarkers))
+            {
+                pendingMarkers = new Dictionary<string, List<Vector2i>>();
+                pending[chunkOrigin] = pendingMarkers;
+            }
+
+            if (!pendingMarkers.TryGetValue(layer, out var layerMarkers))
+            {
+                layerMarkers = new List<Vector2i>();
+                pendingMarkers[layer] = layerMarkers;
+            }
+
+            layerMarkers.Add(node);
+        }
+
+        lock (loadedMarkers)
+        {
+            if (!loadedMarkers.TryGetValue(layer, out var lockMobChunks))
+            {
+                lockMobChunks = new HashSet<Vector2i>();
+                loadedMarkers[layer] = lockMobChunks;
+            }
+
+            lockMobChunks.Add(chunk);
+
+            foreach (var (chunkOrigin, layers) in pending)
+            {
+                if (!component.PendingMarkers.TryGetValue(chunkOrigin, out var lockMarkers))
+                {
+                    lockMarkers = new Dictionary<string, List<Vector2i>>();
+                    component.PendingMarkers[chunkOrigin] = lockMarkers;
+                }
+
+                foreach (var (lockLayer, nodes) in layers)
+                {
+                    lockMarkers[lockLayer] = nodes;
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -729,6 +720,13 @@ public sealed partial class BiomeSystem : SharedBiomeSystem
         component.ModifiedTiles.TryGetValue(chunk, out var modified);
         modified ??= _tilePool.Get();
 
+        // Horizon start: руда может прийти из фонового расчёта уже после загрузки чанка,
+        // поэтому биомные сущности на клетке заменяются, чужие постройки не трогаются,
+        // а плитки ставятся одной пачкой.
+        component.LoadedEntities.TryGetValue(chunk, out var chunkEntities);
+        _markerSpawns.Clear();
+        _tiles.Clear();
+
         foreach (var (layer, nodes) in layers)
         {
             var layerProto = ProtoManager.Index<BiomeMarkerLayerPrototype>(layer);
@@ -738,11 +736,20 @@ public sealed partial class BiomeSystem : SharedBiomeSystem
                 if (modified.Contains(node))
                     continue;
 
-                // Need to ensure the tile under it has loaded for anchoring.
-                if (TryGetBiomeTile(node, component.Layers, seed, (gridUid, grid), out var tile))
+                var blocked = false;
+                _markerReplaced.Clear();
+                var anchored = _mapSystem.GetAnchoredEntitiesEnumerator(gridUid, grid, node);
+
+                while (anchored.MoveNext(out var existing))
                 {
-                    _mapSystem.SetTile(gridUid, grid, node, tile.Value);
+                    if (chunkEntities != null && chunkEntities.ContainsKey(existing.Value))
+                        _markerReplaced.Add(existing.Value);
+                    else
+                        blocked = true;
                 }
+
+                if (blocked)
+                    continue;
 
                 string? prototype;
 
@@ -756,21 +763,51 @@ public sealed partial class BiomeSystem : SharedBiomeSystem
                     prototype = layerProto.Prototype;
                 }
 
-                // If it is a ghost role then purge it
-                // TODO: This is *kind* of a bandaid but natural mobs spawns needs a lot more work.
-                // Ideally we'd just have ghost role and non-ghost role variants for some stuff.
-                var uid = EntityManager.CreateEntityUninitialized(prototype, _mapSystem.GridTileToLocal(gridUid, grid, node));
-                RemComp<GhostTakeoverAvailableComponent>(uid);
-                RemComp<GhostRoleComponent>(uid);
-                EntityManager.InitializeAndStartEntity(uid);
+                foreach (var replaced in _markerReplaced)
+                {
+                    chunkEntities!.Remove(replaced);
+                    Del(replaced);
+                }
+
+                // Need to ensure the tile under it has loaded for anchoring.
+                if ((!_mapSystem.TryGetTileRef(gridUid, grid, node, out var tileRef) || tileRef.Tile.IsEmpty) &&
+                    TryGetBiomeTile(node, component.Layers, seed, (gridUid, grid), out var tile))
+                {
+                    _tiles.Add((node, tile.Value));
+                }
+
+                _markerSpawns.Add((node, prototype));
                 modified.Add(node);
             }
         }
+
+        if (_tiles.Count > 0)
+            _mapSystem.SetTiles(gridUid, grid, _tiles);
+
+        _tiles.Clear();
+
+        foreach (var (node, prototype) in _markerSpawns)
+        {
+            // If it is a ghost role then purge it
+            // TODO: This is *kind* of a bandaid but natural mobs spawns needs a lot more work.
+            // Ideally we'd just have ghost role and non-ghost role variants for some stuff.
+            var uid = EntityManager.CreateEntityUninitialized(prototype, _mapSystem.GridTileToLocal(gridUid, grid, node));
+            RemComp<GhostTakeoverAvailableComponent>(uid);
+            RemComp<GhostRoleComponent>(uid);
+            EntityManager.InitializeAndStartEntity(uid);
+        }
+
+        _markerSpawns.Clear();
+        // Horizon end
 
         if (modified.Count == 0)
         {
             component.ModifiedTiles.Remove(chunk);
             _tilePool.Return(modified);
+        }
+        else
+        {
+            component.ModifiedTiles[chunk] = modified; // Horizon: раньше новый набор терялся
         }
 
         component.PendingMarkers.Remove(chunk);
