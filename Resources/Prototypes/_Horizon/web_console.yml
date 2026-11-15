@@ -1,0 +1,66 @@
+- type: webPage
+  id: StarHorizonWiki
+  name: Вики StarHorizon
+  url: https://wiki.starhorizon.ru/
+
+- type: entity
+  id: ComputerWebConsoleFree
+  parent: BaseComputer
+  name: web console
+  description: A console that opens any given link in an external browser.
+  components:
+  - type: Sprite
+    layers:
+    - map: ["computerLayerBody"]
+      state: computer
+    - map: ["computerLayerKeyboard"]
+      state: generic_keyboard
+    - map: ["computerLayerScreen"]
+      state: comm
+    - map: ["computerLayerKeys"]
+      state: generic_keys
+    - map: [ "enum.WiresVisualLayers.MaintenancePanel" ]
+      state: generic_panel_open
+  - type: WebConsole
+    mode: Free
+  - type: ActivatableUI
+    key: enum.WebConsoleUiKey.Key
+  - type: UserInterface
+    interfaces:
+      enum.WebConsoleUiKey.Key:
+        type: WebConsoleBoundUserInterface
+  - type: Computer
+    board: WebConsoleFreeCircuitboard
+
+- type: entity
+  id: ComputerWebConsoleRestricted
+  parent: ComputerWebConsoleFree
+  name: restricted web console
+  description: A console that opens only approved server pages.
+  components:
+  - type: WebConsole
+    mode: Whitelist
+  - type: Computer
+    board: WebConsoleRestrictedCircuitboard
+
+- type: entity
+  parent: BaseComputerCircuitboard
+  id: WebConsoleFreeCircuitboard
+  name: web console board
+  description: A computer printed circuit board for a web console.
+  components:
+  - type: Sprite
+    state: cpu_command
+  - type: ComputerBoard
+    prototype: ComputerWebConsoleFree
+
+- type: entity
+  parent: BaseComputerCircuitboard
+  id: WebConsoleRestrictedCircuitboard
+  name: restricted web console board
+  description: A computer printed circuit board for a restricted web console.
+  components:
+  - type: Sprite
+    state: cpu_command
+  - type: ComputerBoard
+    prototype: ComputerWebConsoleRestricted
