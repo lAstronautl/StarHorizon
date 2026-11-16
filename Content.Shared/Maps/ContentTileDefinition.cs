@@ -124,6 +124,15 @@ namespace Content.Shared.Maps
         /// </summary>
         [DataField("indestructible")] public bool Indestructible = false;
 
+        // Horizon: landing pads
+        /// <summary>
+        /// Landing pad tile. It makes no grid collision, so other grids can fly over it,
+        /// it loses to normal tiles of other grids when an entity looks for the grid it stands on,
+        /// and it is drawn below other grids.
+        /// </summary>
+        [DataField] public bool GridUnderlay { get; private set; }
+        // End Horizon
+
         public void AssignTileId(ushort id)
         {
             TileId = id;

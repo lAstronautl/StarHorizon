@@ -61,6 +61,11 @@ public sealed class NavInterfaceState
     /// </summary>
     public bool HideTarget = true;
     // End Frontier fields
+
+    /// <summary>
+    /// Horizon: the shuttle is sitting on a landing pad.
+    /// </summary>
+    public bool Landed;
     public NavInterfaceState(
         float maxRange,
         NetCoordinates? coordinates,
