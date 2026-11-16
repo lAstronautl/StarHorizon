@@ -29,6 +29,7 @@ public partial class BaseShuttleControl
         _gridTileList.Clear();
         _gridNeighborSet.Clear();
         _edges.Clear();
+        gridData.HasUnderlay = false;
 
         var rator = Maps.GetAllTilesEnumerator(grid.Owner, grid.Comp);
         var tileSize = grid.Comp.TileSize;
@@ -40,6 +41,7 @@ public partial class BaseShuttleControl
             // Drawing logic rewritten: use a convex polygon defined on the tile prototype.
             var def = (ContentTileDefinition) _tileDef[tileRef.Value.Tile.TypeId];
             _gridTileList.Add((index, def));
+            gridData.HasUnderlay |= def.GridUnderlay;
 
             // Since our shape has to be convex, draw it by taking our first vertex as origin.
             var bl = Maps.TileToVector(grid, index);
