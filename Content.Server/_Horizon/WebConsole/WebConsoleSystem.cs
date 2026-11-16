@@ -33,7 +33,7 @@ public sealed class WebConsoleSystem : EntitySystem
         _ui.SetUiState(ent.Owner, WebConsoleUiKey.Key, new WebConsoleBoundState(ent.Comp.Mode, pages));
     }
 
-    private void OnOpenUrl(Entity<WebConsoleComponent> ent, WebConsoleOpenUrlMessage args)
+    private void OnOpenUrl(Entity<WebConsoleComponent> ent, ref WebConsoleOpenUrlMessage args)
     {
         if (ent.Comp.Mode != WebConsoleMode.Free)
             return;
@@ -44,7 +44,7 @@ public sealed class WebConsoleSystem : EntitySystem
         Send(ent, args.Actor, uri.AbsoluteUri);
     }
 
-    private void OnOpenPage(Entity<WebConsoleComponent> ent, WebConsoleOpenPageMessage args)
+    private void OnOpenPage(Entity<WebConsoleComponent> ent, ref WebConsoleOpenPageMessage args)
     {
         if (ent.Comp.Mode != WebConsoleMode.Whitelist)
             return;
