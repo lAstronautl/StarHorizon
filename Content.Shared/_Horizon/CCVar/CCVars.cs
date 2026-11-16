@@ -8,6 +8,12 @@ namespace Content.Shared._Horizon.CCVar
     public sealed class HorizonCCVars : CVars
     {
         /*
+         * Веб-консоли
+         */
+        public static readonly CVarDef<bool> WebConsoleEnabled =
+            CVarDef.Create("webconsole.enabled", true, CVar.SERVER | CVar.REPLICATED);
+
+        /*
          * Barks (Звуки речи)
          */
         public static readonly CVarDef<bool> BarksEnabled =

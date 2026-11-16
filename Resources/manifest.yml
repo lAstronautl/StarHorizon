@@ -1,5 +1,6 @@
 defaultWindowTitle: StarHorizon
 windowIconSet: /Textures/_Horizon/Logo/icon
 splashLogo: /Textures/_Horizon/Logo/logo.png
+modules: [ "Robust.Client.WebView" ]
 
 # PJB PLEASE

@@ -60,16 +60,25 @@ public sealed class WebConsoleOpenPageMessage(string pageId) : BoundUserInterfac
 }
 
 [Serializable, NetSerializable]
-public sealed class WebConsoleBoundState(WebConsoleMode mode, List<(string Id, string Name)> pages)
+public sealed class WebConsoleBoundState(
+    WebConsoleMode mode,
+    List<(string Id, string Name)> pages,
+    List<string> allowedHosts,
+    bool enabled)
     : BoundUserInterfaceState
 {
     public readonly WebConsoleMode Mode = mode;
     public readonly List<(string Id, string Name)> Pages = pages;
+
+    /// <summary>Хосты, на которые можно переходить в режиме Whitelist.</summary>
+    public readonly List<string> AllowedHosts = allowedHosts;
+
+    public readonly bool Enabled = enabled;
 }
 
-/// <summary>Сервер → клиент: открыть URL во внешнем браузере.</summary>
+/// <summary>Сервер → клиент: перейти на проверенный сервером URL внутри окна консоли.</summary>
 [Serializable, NetSerializable]
-public sealed class OpenWebUrlEvent(string url) : EntityEventArgs
+public sealed class WebConsoleNavigateMessage(string url) : BoundUserInterfaceMessage
 {
     public readonly string Url = url;
 }
@@ -112,5 +121,17 @@ public static class WebConsoleUtils
 
         url = s;
         return true;
+    }
+
+    /// <summary>Хост из уже проверенного URL в нижнем регистре, без порта.</summary>
+    public static string GetHost(string url)
+    {
+        var rest = url.Substring(url.IndexOf("://", StringComparison.Ordinal) + 3);
+        var end = rest.IndexOfAny(new[] { '/', '?', '#' });
+        var authority = end < 0 ? rest : rest.Substring(0, end);
+        var colon = authority.LastIndexOf(':');
+        if (colon > 0 && authority.IndexOf(']') < colon)
+            authority = authority.Substring(0, colon);
+        return authority.ToLowerInvariant();
     }
 }
