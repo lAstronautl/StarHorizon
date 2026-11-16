@@ -16,7 +16,7 @@ public sealed class WebConsoleSystem : EntitySystem
     private void OnOpenUrl(OpenWebUrlEvent ev)
     {
         // Повторная проверка схемы на клиенте.
-        if (WebConsoleUtils.TryValidate(ev.Url, out var uri))
-            _uriOpener.OpenUri(uri.AbsoluteUri);
+        if (WebConsoleUtils.TryValidate(ev.Url, out var url))
+            _uriOpener.OpenUri(url);
     }
 }

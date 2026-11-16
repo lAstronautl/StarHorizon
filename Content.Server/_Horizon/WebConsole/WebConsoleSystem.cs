@@ -38,10 +38,10 @@ public sealed class WebConsoleSystem : EntitySystem
         if (ent.Comp.Mode != WebConsoleMode.Free)
             return;
 
-        if (!WebConsoleUtils.TryValidate(args.Url, out var uri))
+        if (!WebConsoleUtils.TryValidate(args.Url, out var url))
             return;
 
-        Send(ent, args.Actor, uri.AbsoluteUri);
+        Send(ent, args.Actor, url);
     }
 
     private void OnOpenPage(Entity<WebConsoleComponent> ent, ref WebConsoleOpenPageMessage args)
@@ -53,10 +53,10 @@ public sealed class WebConsoleSystem : EntitySystem
         if (!_proto.TryIndex<WebPagePrototype>(args.PageId, out var page))
             return;
 
-        if (!WebConsoleUtils.TryValidate(page.Url, out var uri))
+        if (!WebConsoleUtils.TryValidate(page.Url, out var url))
             return;
 
-        Send(ent, args.Actor, uri.AbsoluteUri);
+        Send(ent, args.Actor, url);
     }
 
     private void Send(Entity<WebConsoleComponent> ent, EntityUid user, string url)

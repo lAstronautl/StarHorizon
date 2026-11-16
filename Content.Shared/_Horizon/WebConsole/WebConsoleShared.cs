@@ -78,22 +78,39 @@ public static class WebConsoleUtils
 {
     public const int MaxUrlLength = 512;
 
-    public static bool TryValidate(string? raw, out Uri uri)
+    // Без System.Uri: UriKind и UriFormatException не входят в белый список песочницы.
+    public static bool TryValidate(string? raw, out string url)
     {
-        uri = default!;
-        if (string.IsNullOrWhiteSpace(raw) || raw.Length > MaxUrlLength)
+        url = string.Empty;
+        if (string.IsNullOrWhiteSpace(raw))
             return false;
 
-        if (!Uri.TryCreate(raw.Trim(), UriKind.Absolute, out var parsed))
+        var s = raw.Trim();
+        if (s.Length > MaxUrlLength)
             return false;
 
-        if (parsed.Scheme != Uri.UriSchemeHttp && parsed.Scheme != Uri.UriSchemeHttps)
+        string rest;
+        if (s.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+            rest = s.Substring(8);
+        else if (s.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
+            rest = s.Substring(7);
+        else
             return false;
 
-        if (!string.IsNullOrEmpty(parsed.UserInfo) || string.IsNullOrEmpty(parsed.Host))
+        foreach (var c in s)
+        {
+            if (c <= ' ' || c == '\\' || c == '<' || c == '>' || c == '"' || c > '~')
+                return false;
+        }
+
+        var end = rest.IndexOfAny(new[] { '/', '?', '#' });
+        var authority = end < 0 ? rest : rest.Substring(0, end);
+
+        // Пустой хост или логин:пароль@ недопустимы.
+        if (authority.Length == 0 || authority.Contains('@') || authority[0] == ':' || authority[0] == '.')
             return false;
 
-        uri = parsed;
+        url = s;
         return true;
     }
 }
