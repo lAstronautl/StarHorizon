@@ -21,7 +21,7 @@
     <ProjectReference Include="..\RobustToolbox\Robust.Shared.Maths\Robust.Shared.Maths.csproj" />
     <ProjectReference Include="..\RobustToolbox\Robust.Shared\Robust.Shared.csproj" />
     <ProjectReference Include="..\RobustToolbox\Robust.Client\Robust.Client.csproj" />
-    <ProjectReference Include="..\RobustToolbox\Robust.Client.WebView\Robust.Client.WebView.csproj" Private="false" />
+    <ProjectReference Include="..\RobustToolbox\Robust.Client.WebView\Robust.Client.WebView.csproj" />
     <ProjectReference Include="..\Content.Shared\Content.Shared.csproj" />
   </ItemGroup>
   <Import Project="..\RobustToolbox\MSBuild\Robust.Properties.targets" />
