@@ -120,7 +120,7 @@ namespace Content.Server._Horizon.SponsorManager
                 var rootDir = _resourceManager.UserData.RootDir;
                 if (rootDir == null)
                 {
-                    _sawmill.Warning("Cannot start file watcher: UserData.RootDir is null (virtual provider). " +
+                    _sawmill.Info("Cannot start file watcher: UserData.RootDir is null (virtual provider). " +
                                      "Sponsor hot-reload will not be available.");
                     return;
                 }

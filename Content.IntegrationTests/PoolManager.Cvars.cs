@@ -18,6 +18,7 @@ public static partial class PoolManager
         (CCVars.GameMap.Name,                 TestMap),
         (CCVars.AdminLogsQueueSendDelay.Name, "0"),
         (CVars.NetPVS.Name,                   "false"),
+        (CVars.NetLogLateMsg.Name,            "false"),
         (CCVars.NPCMaxUpdates.Name,           "999999"),
         (CVars.ThreadParallelCount.Name,      "1"),
         (CCVars.GameRoleTimers.Name,          "false"),
@@ -41,7 +42,6 @@ public static partial class PoolManager
         (CCVars.InteractionRateLimitPeriod.Name, "0.1"),
         (CCVars.MovementMobPushing.Name, "false"),
         (CCVars.GameLobbyDefaultPreset.Name, "nftest"), // Frontier: Adventure takes ages, default to nftest (no need to test events we will not run, e.g. meteor swarm)
-        (CCVars.StaticStorageUI.Name, "true"), // Frontier: causes storage test failures
         (CCVars.StorageLimit.Name, "1")// Frontier: test failures with multiple storage enabled
     };
 
@@ -56,17 +56,19 @@ public static partial class PoolManager
             if (cfg.IsCVarRegistered(CCVars.GameLobbyEnabled.Name))
                 cfg.SetCVar(CCVars.GameLobbyEnabled, settings.InLobby);
 
-            if (cfg.IsCVarRegistered(CVars.NetInterp.Name))
-                cfg.SetCVar(CVars.NetInterp, settings.DisableInterpolate);
-
             if (cfg.IsCVarRegistered(CCVars.GameMap.Name))
                 cfg.SetCVar(CCVars.GameMap, settings.Map);
 
             if (cfg.IsCVarRegistered(CCVars.AdminLogsEnabled.Name))
                 cfg.SetCVar(CCVars.AdminLogsEnabled, settings.AdminLogsEnabled);
 
-            if (cfg.IsCVarRegistered(CVars.NetInterp.Name))
+            // Client-flagged cvar: the server refuses (and warns about) changes to it.
+            if (instance is RobustIntegrationTest.ClientIntegrationInstance && cfg.IsCVarRegistered(CVars.NetInterp.Name))
                 cfg.SetCVar(CVars.NetInterp, !settings.DisableInterpolate);
+
+            // Frontier: causes storage test failures. Client-only cvar, so it must not be given to the server as an override.
+            if (cfg.IsCVarRegistered(CCVars.StaticStorageUI.Name))
+                cfg.SetCVar(CCVars.StaticStorageUI, true);
 
             if (cfg.IsCVarRegistered(CCVars.GameLobbyDefaultPreset.Name) && !string.IsNullOrEmpty(settings.GameLobbyDefaultPreset)) // Frontier
                 cfg.SetCVar(CCVars.GameLobbyDefaultPreset, settings.GameLobbyDefaultPreset); // Frontier

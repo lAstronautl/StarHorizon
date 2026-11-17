@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Sqlite.Diagnostics.Internal;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NpgsqlTypes;
@@ -26,6 +27,8 @@ namespace Content.Server.Database
             options.ConfigureWarnings(x =>
             {
                 x.Ignore(CoreEventId.ManyServiceProvidersCreatedWarning);
+                x.Ignore(RelationalEventId.NonTransactionalMigrationOperationWarning);
+                x.Ignore(SqliteEventId.TableRebuildPendingWarning);
 #if DEBUG
                 // for tests
                 x.Ignore(CoreEventId.SensitiveDataLoggingEnabledWarning);
