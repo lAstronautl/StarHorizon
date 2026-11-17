@@ -1,0 +1,313 @@
+From 5f1f833dcbd93da5ba02eae652e5c9da79c3ec22 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Tue, 17 Nov 2026 07:37:58 +0000
+Subject: [PATCH] =?UTF-8?q?Add:=20=D1=82=D0=B2=D1=91=D1=80=D0=B4=D1=8B?=
+ =?UTF-8?q?=D0=B5=20=D0=BF=D0=BE=D1=81=D1=82=D1=80=D0=BE=D0=B9=D0=BA=D0=B8?=
+ =?UTF-8?q?=20=D0=BD=D0=B0=20=D1=82=D0=B0=D0=B9=D0=BB=D0=B0=D1=85-=D0=BF?=
+ =?UTF-8?q?=D0=BE=D0=B4=D0=BB=D0=BE=D0=B6=D0=BA=D0=B0=D1=85=20=D0=BE=D1=81?=
+ =?UTF-8?q?=D1=82=D0=B0=D0=BD=D0=B0=D0=B2=D0=BB=D0=B8=D0=B2=D0=B0=D1=8E?=
+ =?UTF-8?q?=D1=82=20=D0=B4=D1=80=D1=83=D0=B3=D0=B8=D0=B5=20=D0=B3=D1=80?=
+ =?UTF-8?q?=D0=B8=D0=B4=D1=8B?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Дополнение к патчу GridUnderlay. Тайл-подложка (посадочная площадка) снова
+получает коллизию грида, если на нём закреплена сущность с твёрдой фикстурой,
+у которой есть слой коллизии: стена, окно, дверь, стол, машина. Кабели и трубы
+(фикстуры без слоя) площадку не перекрывают.
+
+Коллизия чанка пересчитывается на сервере при закреплении, откреплении
+и удалении такой сущности.
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_012sYdkmm9X3ErX4smMyRkAx
+---
+ .../Systems/SharedGridFixtureSystem.cs        |  6 +-
+ .../Systems/SharedMapSystem.Grid.cs           | 48 ++++++++++++++
+ Robust.Shared/Map/GridChunkPartition.cs       | 59 ++++++++++++++++-
+ .../Shared/Map/GridUnderlay_Tests.cs          | 64 +++++++++++++++++++
+ 4 files changed, 174 insertions(+), 3 deletions(-)
+
+diff --git a/Robust.Shared/GameObjects/Systems/SharedGridFixtureSystem.cs b/Robust.Shared/GameObjects/Systems/SharedGridFixtureSystem.cs
+index 81c5b3a..edfca11 100644
+--- a/Robust.Shared/GameObjects/Systems/SharedGridFixtureSystem.cs
++++ b/Robust.Shared/GameObjects/Systems/SharedGridFixtureSystem.cs
+@@ -28,6 +28,7 @@ namespace Robust.Shared.GameObjects
+ 
+         private bool _enabled;
+         private float _fixtureEnlargement;
++        private EntityQuery<FixturesComponent> _fixturesQuery; // Horizon
+ 
+         internal const string ShowGridNodesCommand = "showgridnodes";
+ 
+@@ -35,6 +36,7 @@ namespace Robust.Shared.GameObjects
+         {
+             base.Initialize();
+             UpdatesBefore.Add(typeof(SharedBroadphaseSystem));
++            _fixturesQuery = GetEntityQuery<FixturesComponent>(); // Horizon
+ 
+             Subs.CVar(_cfg, CVars.GenerateGridFixtures, SetEnabled, true);
+             Subs.CVar(_cfg, CVars.GridFixtureEnlargement, SetEnlargement, true);
+@@ -110,14 +112,14 @@ namespace Robust.Shared.GameObjects
+ 
+         /// <summary>
+         /// Horizon: the rectangles of a chunk that should have collision,
+-        /// i.e. everything but <see cref="ITileDefinition.GridUnderlay"/> tiles.
++        /// i.e. everything but <see cref="ITileDefinition.GridUnderlay"/> tiles that have nothing solid anchored on them.
+         /// </summary>
+         private List<Box2i> GetCollisionRectangles(MapChunk chunk, List<Box2i> rectangles)
+         {
+             if (!GridChunkPartition.HasGridUnderlay(chunk, _tileDefs))
+                 return rectangles;
+ 
+-            GridChunkPartition.PartitionChunk(chunk, _tileDefs, out _, out var collision);
++            GridChunkPartition.PartitionChunk(chunk, _tileDefs, _fixturesQuery, out _, out var collision);
+             return collision;
+         }
+ 
+diff --git a/Robust.Shared/GameObjects/Systems/SharedMapSystem.Grid.cs b/Robust.Shared/GameObjects/Systems/SharedMapSystem.Grid.cs
+index 93748f4..5ea9434 100644
+--- a/Robust.Shared/GameObjects/Systems/SharedMapSystem.Grid.cs
++++ b/Robust.Shared/GameObjects/Systems/SharedMapSystem.Grid.cs
+@@ -1291,9 +1291,56 @@ public abstract partial class SharedMapSystem
+             return false;
+ 
+         chunk.AddToSnapGridCell((ushort)chunkTile.X, (ushort)chunkTile.Y, euid);
++        UnderlayAnchorChanged(gridUid, grid, chunk, chunkTile, euid, false); // Horizon
+         return true;
+     }
+ 
++    /// <summary>
++    /// Horizon: an entity was anchored on a tile or removed from it. If the tile is an underlay tile (a landing pad)
++    /// and the entity is solid (a wall), the tile's collision for other grids has changed.
++    /// </summary>
++    private void UnderlayAnchorChanged(
++        EntityUid gridUid,
++        MapGridComponent grid,
++        MapChunk chunk,
++        Vector2i chunkTile,
++        EntityUid anchored,
++        bool removed)
++    {
++        // Clients get grid fixtures from the server.
++        if (_netManager.IsClient)
++            return;
++
++        // A grid that is still being set up regenerates all of its collision once it is ready,
++        // a bulk tile change does so when it is done, and planet maps have no grid collision.
++        if (grid.LifeStage < ComponentLifeStage.Initialized ||
++            grid.LifeStage > ComponentLifeStage.Running ||
++            chunk.SuppressCollisionRegeneration ||
++            _mapQuery.HasComp(gridUid) ||
++            TerminatingOrDeleted(gridUid))
++        {
++            return;
++        }
++
++        var tile = chunk.GetTile((ushort)chunkTile.X, (ushort)chunkTile.Y);
++
++        if (!GridChunkPartition.IsGridUnderlay(_tileMan, tile))
++            return;
++
++        // If the entity's fixtures are already gone (it is being deleted) we cannot tell what it was, so assume a blocker.
++        var known = _fixturesQuery.HasComp(anchored);
++
++        if (known ? !GridChunkPartition.IsGridBlocker(anchored, _fixturesQuery) : !removed)
++            return;
++
++        // The chunk's fixture ids are sent to clients along with its tiles.
++        chunk.LastTileModifiedTick = _timing.CurTick;
++        grid.LastTileModifiedTick = _timing.CurTick;
++        Dirty(gridUid, grid);
++
++        RegenerateCollision(gridUid, grid, chunk);
++    }
++
+     public bool AddToSnapGridCell(EntityUid gridUid, MapGridComponent grid, EntityCoordinates coords, EntityUid euid)
+     {
+         return AddToSnapGridCell(gridUid, grid, TileIndicesFor(gridUid, grid, coords), euid);
+@@ -1308,6 +1355,7 @@ public abstract partial class SharedMapSystem
+ 
+         var chunkTile = chunk.GridTileToChunkTile(pos);
+         chunk.RemoveFromSnapGridCell((ushort)chunkTile.X, (ushort)chunkTile.Y, euid);
++        UnderlayAnchorChanged(gridUid, grid, chunk, chunkTile, euid, true); // Horizon
+     }
+ 
+     public void RemoveFromSnapGridCell(EntityUid gridUid, MapGridComponent grid, EntityCoordinates coords, EntityUid euid)
+diff --git a/Robust.Shared/Map/GridChunkPartition.cs b/Robust.Shared/Map/GridChunkPartition.cs
+index 343fd25..4bb5ccd 100644
+--- a/Robust.Shared/Map/GridChunkPartition.cs
++++ b/Robust.Shared/Map/GridChunkPartition.cs
+@@ -1,6 +1,8 @@
+ using System;
+ using System.Collections.Generic;
++using Robust.Shared.GameObjects;
+ using Robust.Shared.Maths;
++using Robust.Shared.Physics;
+ 
+ namespace Robust.Shared.Map
+ {
+@@ -47,6 +49,44 @@ namespace Robust.Shared.Map
+             return false;
+         }
+ 
++        /// <summary>
++        /// Horizon: does this anchored entity make the underlay tile it stands on solid for other grids?
++        /// True for anything other things can bump into: an entity with a hard fixture that has a collision layer.
++        /// Whether it can collide right now does not matter, so a door blocks open or closed.
++        /// </summary>
++        public static bool IsGridBlocker(EntityUid uid, EntityQuery<FixturesComponent> fixturesQuery)
++        {
++            if (!fixturesQuery.TryComp(uid, out var fixtures))
++                return false;
++
++            foreach (var fixture in fixtures.Fixtures.Values)
++            {
++                if (fixture.Hard && fixture.CollisionLayer != 0)
++                    return true;
++            }
++
++            return false;
++        }
++
++        /// <summary>
++        /// Horizon: is there a <see cref="IsGridBlocker">blocker</see> anchored on this tile of the chunk?
++        /// </summary>
++        public static bool HasGridBlocker(MapChunk chunk, ushort x, ushort y, EntityQuery<FixturesComponent> fixturesQuery)
++        {
++            var anchored = chunk.GetSnapGrid(x, y);
++
++            if (anchored == null)
++                return false;
++
++            foreach (var uid in anchored)
++            {
++                if (IsGridBlocker(uid, fixturesQuery))
++                    return true;
++            }
++
++            return false;
++        }
++
+         /// <summary>
+         /// Horizon: partitions the chunk the same way, but if <paramref name="collisionTileDefs"/> is given
+         /// then <see cref="ITileDefinition.GridUnderlay"/> tiles count as empty.
+@@ -57,6 +97,20 @@ namespace Robust.Shared.Map
+             ITileDefinitionManager? collisionTileDefs,
+             out Box2i bounds,
+             out List<Box2i> rectangles)
++        {
++            PartitionChunk(chunk, collisionTileDefs, null, out bounds, out rectangles);
++        }
++
++        /// <summary>
++        /// Horizon: as above, but if <paramref name="blockerQuery"/> is given then an underlay tile
++        /// with a <see cref="IsGridBlocker">blocker</see> anchored on it (a wall on a landing pad) stays solid.
++        /// </summary>
++        public static void PartitionChunk(
++            MapChunk chunk,
++            ITileDefinitionManager? collisionTileDefs,
++            EntityQuery<FixturesComponent>? blockerQuery,
++            out Box2i bounds,
++            out List<Box2i> rectangles)
+         {
+             rectangles = new List<Box2i>();
+ 
+@@ -71,7 +125,10 @@ namespace Robust.Shared.Map
+                 {
+                     var tile = chunk.GetTile(x, y);
+ 
+-                    if (!tile.IsEmpty && (collisionTileDefs == null || !IsGridUnderlay(collisionTileDefs, tile)))
++                    if (!tile.IsEmpty &&
++                        (collisionTileDefs == null ||
++                         !IsGridUnderlay(collisionTileDefs, tile) ||
++                         blockerQuery != null && HasGridBlocker(chunk, x, y, blockerQuery.Value)))
+                     {
+                         running = true;
+                         continue;
+diff --git a/Robust.UnitTesting/Shared/Map/GridUnderlay_Tests.cs b/Robust.UnitTesting/Shared/Map/GridUnderlay_Tests.cs
+index b42681a..f5236d3 100644
+--- a/Robust.UnitTesting/Shared/Map/GridUnderlay_Tests.cs
++++ b/Robust.UnitTesting/Shared/Map/GridUnderlay_Tests.cs
+@@ -9,6 +9,9 @@ using Robust.Shared.Map;
+ using Robust.Shared.Map.Components;
+ using Robust.Shared.Maths;
+ using Robust.Shared.Physics;
++using Robust.Shared.Physics.Systems;
++using Robust.Shared.Physics.Components;
++using Robust.Shared.Physics.Collision.Shapes;
+ using Robust.Shared.Prototypes;
+ using Robust.Shared.Utility;
+ using Robust.UnitTesting.Server;
+@@ -110,6 +113,67 @@ public sealed class GridUnderlay_Tests
+         Assert.That(fixtures.FixtureCount, Is.EqualTo(1));
+     }
+ 
++    /// <summary>
++    /// Something solid anchored on an underlay tile (a wall on a landing pad) makes that tile collide again,
++    /// and stops doing so when it is unanchored or deleted. Things with no collision layer (cables) change nothing.
++    /// </summary>
++    [Test]
++    public void AnchoredBlockerMakesUnderlaySolid()
++    {
++        var sim = GetSim(out _, out var pad);
++        var entManager = sim.Resolve<IEntityManager>();
++        var mapManager = sim.Resolve<IMapManager>();
++        var mapSystem = entManager.System<SharedMapSystem>();
++        var xformSystem = entManager.System<SharedTransformSystem>();
++        var fixtureSystem = entManager.System<FixtureSystem>();
++        var mapId = sim.CreateMap().MapId;
++        var grid = mapManager.CreateGridEntity(mapId);
++        var fixtures = entManager.GetComponent<FixturesComponent>(grid);
++
++        for (var x = 0; x < 3; x++)
++        {
++            mapSystem.SetTile(grid, new Vector2i(x, 0), pad);
++        }
++
++        Assert.That(fixtures.FixtureCount, Is.EqualTo(0));
++
++        EntityUid Spawn(float x, int layer)
++        {
++            var uid = entManager.SpawnEntity(null, new EntityCoordinates(grid, new Vector2(x, 0.5f)));
++            entManager.AddComponent<PhysicsComponent>(uid);
++            Assert.That(fixtureSystem.TryCreateFixture(uid, new PhysShapeAabb(), "fix", collisionLayer: layer));
++            return uid;
++        }
++
++        // A cable: a fixture with no layer.
++        var cable = Spawn(0.5f, 0);
++        Assert.That(xformSystem.AnchorEntity(cable));
++        Assert.That(fixtures.FixtureCount, Is.EqualTo(0), "An entity with no collision layer made the pad solid");
++
++        // A wall.
++        var wall = Spawn(1.5f, 2);
++        Assert.That(xformSystem.AnchorEntity(wall));
++        Assert.That(fixtures.FixtureCount, Is.EqualTo(1), "A wall on the pad did not make its tile solid");
++
++        var aabb = fixtures.Fixtures.Values.First().Shape.ComputeAABB(Transform.Empty, 0);
++        Assert.Multiple(() =>
++        {
++            Assert.That(aabb.Contains(new Vector2(1.5f, 0.5f)), "The fixture is not under the wall");
++            Assert.That(aabb.Contains(new Vector2(0.5f, 0.5f)), Is.False, "The fixture also covers the cable's tile");
++            Assert.That(aabb.Contains(new Vector2(2.5f, 0.5f)), Is.False, "The fixture also covers a bare pad tile");
++        });
++
++        xformSystem.Unanchor(wall);
++        Assert.That(fixtures.FixtureCount, Is.EqualTo(0), "The tile stayed solid after the wall was unanchored");
++
++        Assert.That(xformSystem.AnchorEntity(wall));
++        Assert.That(fixtures.FixtureCount, Is.EqualTo(1));
++
++        entManager.DeleteEntity(wall);
++        Assert.That(fixtures.FixtureCount, Is.EqualTo(0), "The tile stayed solid after the wall was deleted");
++        Assert.That(mapManager.GetAllGrids(mapId).Count(), Is.EqualTo(1));
++    }
++
+     /// <summary>
+     /// Where a normal tile of one grid overlaps an underlay tile of another, the normal tile's grid is found,
+     /// whichever grid was made first.
+-- 
+2.43.0
+
