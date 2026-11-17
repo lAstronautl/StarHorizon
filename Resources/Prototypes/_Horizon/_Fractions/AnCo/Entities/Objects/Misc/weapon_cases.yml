@@ -4,6 +4,7 @@
   name: оружейный кейс АнКо
   parent: BaseStorageItem
   id: AnCoWeaponCaseBase
+  abstract: true
   categories: [ HideSpawnMenu ]
   description: Прочный ящик для безопасности вашего оружия, а не вас.
   suffix: StarHorizon, AnCo
