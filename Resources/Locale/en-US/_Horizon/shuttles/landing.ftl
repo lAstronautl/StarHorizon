@@ -9,3 +9,4 @@ shuttle-landing-no-pad = There is no landing pad under the shuttle.
 shuttle-landing-too-fast = Too fast to land.
 shuttle-landing-in-ftl = Cannot land during a jump.
 shuttle-landing-already-landed = The shuttle is already on a landing pad.
+shuttle-landing-occupied = The landing pad under the shuttle is occupied.

@@ -9,3 +9,4 @@ shuttle-landing-no-pad = Под шаттлом нет посадочной пл�
 shuttle-landing-too-fast = Слишком высокая скорость для посадки.
 shuttle-landing-in-ftl = Нельзя сесть во время прыжка.
 shuttle-landing-already-landed = Шаттл уже стоит на площадке.
+shuttle-landing-occupied = Площадка под шаттлом занята.

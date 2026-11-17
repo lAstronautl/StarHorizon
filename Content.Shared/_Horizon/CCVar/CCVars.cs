@@ -142,6 +142,13 @@ namespace Content.Shared._Horizon.CCVar
         public static readonly CVarDef<float> ShuttleLandingMaxSpeed =
             CVarDef.Create("shuttle.landing_max_speed", 5f, CVar.SERVERONLY | CVar.ARCHIVE);
 
+        /// <summary>
+        /// Что делать, если площадка под садящимся шаттлом занята:
+        /// "block" — не давать сесть, "crush" — раздавить всё под шаттлом, "none" — ничего не проверять.
+        /// </summary>
+        public static readonly CVarDef<string> ShuttleLandingOccupiedMode =
+            CVarDef.Create("shuttle.landing_occupied_mode", "block", CVar.SERVERONLY | CVar.ARCHIVE);
+
         /*
          * Планетки
          */

@@ -1,14 +1,21 @@
 using System.Numerics;
 using Content.Server._Horizon.Shuttles.Components;
+using Content.Server.Administration.Logs;
+using Content.Server.Body.Systems;
 using Content.Server.Shuttles.Components;
 using Content.Server.Shuttles.Events;
 using Content.Server.Shuttles.Systems;
 using Content.Shared._Horizon.CCVar;
 using Content.Shared._Horizon.Shuttles.Events;
+using Content.Shared.Body.Components;
+using Content.Shared.Database;
 using Content.Shared.Maps;
+using Content.Shared.Mobs.Components;
+using Content.Shared.Mobs.Systems;
 using Content.Shared.Movement.Events;
 using Content.Shared.Popups;
 using Content.Shared.Shuttles.Components;
+using Content.Shared.SubFloor;
 using Robust.Shared.Configuration;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
@@ -24,9 +31,13 @@ namespace Content.Server._Horizon.Shuttles.Systems;
 /// </summary>
 public sealed class ShuttleLandingSystem : EntitySystem
 {
+    [Dependency] private readonly IAdminLogManager _adminLog = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
     [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly ITileDefinitionManager _tileDefs = default!;
+    [Dependency] private readonly BodySystem _body = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly SharedJointSystem _joints = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
@@ -42,9 +53,28 @@ public sealed class ShuttleLandingSystem : EntitySystem
     /// </summary>
     private const float CheckInterval = 1f;
 
+    /// <summary>
+    /// What to do with whatever is on the pad under a landing shuttle.
+    /// </summary>
+    private enum OccupiedMode : byte
+    {
+        /// <summary>Nothing is checked, things on the pad end up inside the shuttle.</summary>
+        None,
+
+        /// <summary>The shuttle cannot land on a living mob or an anchored structure.</summary>
+        Block,
+
+        /// <summary>Landing destroys everything under the shuttle, like arriving from FTL on a planet does.</summary>
+        Crush,
+    }
+
     private float _minCoverage;
     private float _maxSpeed;
+    private OccupiedMode _occupiedMode;
     private float _checkAccumulator;
+
+    private readonly HashSet<EntityUid> _lookupEnts = new();
+    private readonly List<EntityUid> _under = new();
 
     private List<Entity<MapGridComponent>> _grids = new();
     private readonly List<(EntityUid Uid, Matrix3x2 InvMatrix, MapGridComponent Grid)> _candidates = new();
@@ -66,6 +96,27 @@ public sealed class ShuttleLandingSystem : EntitySystem
 
         Subs.CVar(_cfg, HorizonCCVars.ShuttleLandingMinCoverage, value => _minCoverage = value, true);
         Subs.CVar(_cfg, HorizonCCVars.ShuttleLandingMaxSpeed, value => _maxSpeed = value, true);
+        Subs.CVar(_cfg, HorizonCCVars.ShuttleLandingOccupiedMode, SetOccupiedMode, true);
+    }
+
+    private void SetOccupiedMode(string value)
+    {
+        switch (value.Trim().ToLowerInvariant())
+        {
+            case "none":
+                _occupiedMode = OccupiedMode.None;
+                break;
+            case "crush":
+                _occupiedMode = OccupiedMode.Crush;
+                break;
+            case "block":
+                _occupiedMode = OccupiedMode.Block;
+                break;
+            default:
+                Log.Warning($"Unknown value '{value}' of {HorizonCCVars.ShuttleLandingOccupiedMode.Name}, expected none, block or crush. Using block.");
+                _occupiedMode = OccupiedMode.Block;
+                break;
+        }
     }
 
     public override void Update(float frameTime)
@@ -150,6 +201,20 @@ public sealed class ShuttleLandingSystem : EntitySystem
         {
             reason = Loc.GetString("shuttle-landing-too-fast");
             return false;
+        }
+
+        if (_occupiedMode != OccupiedMode.None)
+        {
+            GetEntitiesUnder((shuttle, grid), host, _under);
+
+            if (_occupiedMode == OccupiedMode.Block && IsBlocked(_under))
+            {
+                reason = Loc.GetString("shuttle-landing-occupied");
+                return false;
+            }
+
+            if (_occupiedMode == OccupiedMode.Crush)
+                Crush(shuttle, _under);
         }
 
         Land(shuttle, host);
@@ -259,6 +324,102 @@ public sealed class ShuttleLandingSystem : EntitySystem
         }
 
         return best > 0 && (float) best / total >= _minCoverage;
+    }
+
+    /// <summary>
+    /// Collects what is on the host under the shuttle: entities of the host whose position is over one of the shuttle's tiles.
+    /// Things under the floor (cables, pipes) and things immune to an FTL arrival are left out.
+    /// </summary>
+    private void GetEntitiesUnder(Entity<MapGridComponent> shuttle, EntityUid host, List<EntityUid> under)
+    {
+        under.Clear();
+        _lookupEnts.Clear();
+
+        var xform = Transform(shuttle);
+        var worldAABB = _transform.GetWorldMatrix(xform).TransformBox(shuttle.Comp.LocalAABB);
+        var invMatrix = _transform.GetInvWorldMatrix(xform);
+        var tileSize = shuttle.Comp.TileSize;
+
+        _lookup.GetEntitiesIntersecting(xform.MapID, worldAABB, _lookupEnts, LookupFlags.Uncontained);
+
+        foreach (var ent in _lookupEnts)
+        {
+            if (ent == shuttle.Owner || ent == host)
+                continue;
+
+            var entXform = Transform(ent);
+
+            if (entXform.GridUid != host ||
+                HasComp<SubFloorHideComponent>(ent) ||
+                HasComp<FTLSmashImmuneComponent>(ent))
+            {
+                continue;
+            }
+
+            // The box above is rough, so check the tile the entity is actually over.
+            var local = Vector2.Transform(_transform.GetWorldPosition(entXform), invMatrix) / tileSize;
+            var indices = new Vector2i((int) MathF.Floor(local.X), (int) MathF.Floor(local.Y));
+
+            if (!_map.TryGetTileRef(shuttle.Owner, shuttle.Comp, indices, out var tile) || tile.Tile.IsEmpty)
+                continue;
+
+            under.Add(ent);
+        }
+    }
+
+    /// <summary>
+    /// Is there something under the shuttle that it must not land on: a living mob or an anchored solid structure?
+    /// Loose items and corpses do not count.
+    /// </summary>
+    private bool IsBlocked(List<EntityUid> under)
+    {
+        foreach (var ent in under)
+        {
+            if (TryComp<MobStateComponent>(ent, out var mobState))
+            {
+                if (!_mobState.IsDead(ent, mobState))
+                    return true;
+
+                continue;
+            }
+
+            if (Transform(ent).Anchored &&
+                TryComp<PhysicsComponent>(ent, out var entBody) &&
+                entBody.CanCollide &&
+                entBody.Hard)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Destroys everything under the landing shuttle, the same way an FTL arrival does.
+    /// </summary>
+    private void Crush(EntityUid shuttle, List<EntityUid> under)
+    {
+        // Gibbing a body spawns its parts, and those must not be handled a second time.
+        _lookupEnts.Clear();
+
+        foreach (var ent in under)
+        {
+            if (_lookupEnts.Contains(ent) || TerminatingOrDeleted(ent))
+                continue;
+
+            if (TryComp<BodyComponent>(ent, out var body))
+            {
+                _adminLog.Add(LogType.Gib,
+                    LogImpact.Extreme,
+                    $"{ToPrettyString(ent):player} got gibbed by the shuttle {ToPrettyString(shuttle)} landing on a landing pad at {Transform(ent).Coordinates:coordinates}");
+
+                _lookupEnts.UnionWith(_body.GibBody(ent, body: body));
+                continue;
+            }
+
+            QueueDel(ent);
+        }
     }
 
     private bool IsLandingPad(Tile tile)
