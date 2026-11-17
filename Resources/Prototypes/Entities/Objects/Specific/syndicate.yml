@@ -22,6 +22,9 @@
   - type: Currency
     price:
       Telecrystal: 1
+  - type: Tag # Horizon: fits in wallets
+    tags:
+    - Telecrystal
 
 - type: entity
   parent: Telecrystal
@@ -113,6 +116,32 @@
       Telecrystal: 60
   - type: Tag
     tags:
+    - NukeOpsUplink
+
+- type: entity
+  parent: BaseUplinkRadio
+  id: TelecomOfficerUplinkRadio60TC
+  suffix: 60 TC, TelecomOfficer
+  components:
+  - type: Store
+    balance:
+      Telecrystal: 60
+  - type: Tag
+    tags:
+    - TelecomOfficerUplink
+    - NukeOpsUplink
+
+- type: entity
+  parent: BaseUplinkRadio
+  id: OperativeUplinkRadio25TC
+  suffix: 25 TC, Operative
+  components:
+  - type: Store
+    balance:
+      Telecrystal: 25
+  - type: Tag
+    tags:
+    - OperativeUplink
     - NukeOpsUplink
 
 - type: entity

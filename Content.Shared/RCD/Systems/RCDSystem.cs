@@ -143,6 +143,16 @@ public sealed class RCDSystem : EntitySystem
             args.Handled = true;
     }
 
+    /// <summary>
+    /// Horizon: the entity holding this RCD's charges and grid access (itself, unless redirected, e.g. by a mech).
+    /// </summary>
+    public EntityUid GetResourceEntity(EntityUid uid)
+    {
+        var ev = new GetRCDResourceEntityEvent(uid);
+        RaiseLocalEvent(uid, ref ev);
+        return ev.Resource;
+    }
+
     // Horizon - вот сюда
     public bool TryInteract(EntityUid uid, EntityUid user, EntityUid? target, EntityCoordinates location, RCDComponent? component = null)
     {
@@ -177,7 +187,7 @@ public sealed class RCDSystem : EntitySystem
         }
 
         // Frontier - Grid access restriction
-        if (TryComp<GridAccessComponent>(uid, out var gridAccessComponent))
+        if (TryComp<GridAccessComponent>(GetResourceEntity(uid), out var gridAccessComponent)) // Horizon: resource entity
         {
             if (!_gridAccess.IsAuthorized(gridUid.Value, gridAccessComponent, out var popupMessage))
             {
@@ -333,7 +343,7 @@ public sealed class RCDSystem : EntitySystem
 
         // Play audio and consume charges
         _audio.PlayPredicted(component.SuccessSound, uid, args.User);
-        _sharedCharges.AddCharges(uid, -args.Cost);
+        _sharedCharges.AddCharges(GetResourceEntity(uid), -args.Cost); // Horizon: resource entity
     }
 
     private void OnRCDconstructionGhostRotationEvent(RCDConstructionGhostRotationEvent ev, EntitySessionEventArgs session)
@@ -364,7 +374,7 @@ public sealed class RCDSystem : EntitySystem
         var prototype = _protoManager.Index(component.ProtoId);
 
         // Check that the RCD has enough ammo to get the job done
-        var charges = _sharedCharges.GetCurrentCharges(uid);
+        var charges = _sharedCharges.GetCurrentCharges(GetResourceEntity(uid)); // Horizon: resource entity
 
         // Both of these were messages were suppose to be predicted, but HasInsufficientCharges wasn't being checked on the client for some reason?
         if (charges == 0)

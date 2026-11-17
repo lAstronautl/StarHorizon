@@ -20,6 +20,7 @@ public sealed partial class ShuttleConsoleWindow : FancyWindow,
     public event Action<MapCoordinates, Angle>? RequestFTL;
     public event Action<NetEntity, Angle>? RequestBeaconFTL;
     public event Action<NetEntity?, NetEntity>? RequestTrackEntity; // Frontier
+    public event Action<MapCoordinates, Angle>? RequestAutopilot; // Mono
 
     public event Action<NetEntity, NetEntity>? DockRequest;
     public event Action<NetEntity>? UndockRequest;
@@ -47,6 +48,9 @@ public sealed partial class ShuttleConsoleWindow : FancyWindow,
         NavModeButton.Pressed = true;
         SetupMode(_mode);
 
+        LayoutContainer.SetAnchorPreset(Contents, LayoutContainer.LayoutPreset.Wide);
+        LayoutContainer.SetAnchorPreset(DistortionOverlay, LayoutContainer.LayoutPreset.Wide);
+
         MapContainer.RequestFTL += (coords, angle) =>
         {
             RequestFTL?.Invoke(coords, angle);
@@ -55,6 +59,12 @@ public sealed partial class ShuttleConsoleWindow : FancyWindow,
         MapContainer.RequestBeaconFTL += (ent, angle) =>
         {
             RequestBeaconFTL?.Invoke(ent, angle);
+        };
+
+        // Mono
+        MapContainer.RequestAutopilot += (coords, angle) =>
+        {
+            RequestAutopilot?.Invoke(coords, angle);
         };
 
         // Frontier: entity tracking
@@ -167,6 +177,8 @@ public sealed partial class ShuttleConsoleWindow : FancyWindow,
 
     public void UpdateState(EntityUid owner, ShuttleBoundUserInterfaceState cState)
     {
+        DistortionOverlay.Console = owner;
+
         var coordinates = _entManager.GetCoordinates(cState.NavState.Coordinates);
         NavContainer.SetShuttle(coordinates?.EntityId);
         NavContainer.SetConsole(owner);

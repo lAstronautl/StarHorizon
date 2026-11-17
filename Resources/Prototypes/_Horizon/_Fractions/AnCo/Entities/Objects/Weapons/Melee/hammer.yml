@@ -1,6 +1,6 @@
 - type: entity
   name: казмиевый молот АнКо
-  parent: BaseAnCoWeapon
+  parent: [ManufacturerAnCo, BaseAnCoWeapon]
   id: AnCoHammer
   description: Тяжёлый казмиевый молот, способный накапливать кинетическую энергию и при полном заполнений высвобождает её.
   suffix: StarHorizon, AnCo, Weapon
@@ -32,4 +32,5 @@
     throwStrength: 10
     distance: 5
   - type: StaticPrice
-    price: 8000
+    price: 500
+    vendPrise: 8000
