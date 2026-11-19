@@ -34,4 +34,10 @@ public sealed partial class LandedShuttleComponent : Component
     /// </summary>
     [ViewVariables]
     public Angle LocalRotation;
+
+    /// <summary>
+    /// When the shuttle finishes taking off and is released. Null while it just sits on the pad.
+    /// </summary>
+    [ViewVariables]
+    public TimeSpan? TakeOffAt;
 }

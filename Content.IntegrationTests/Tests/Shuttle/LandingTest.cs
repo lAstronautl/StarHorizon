@@ -161,11 +161,19 @@ public sealed class LandingTest
         var movedOffset = await GetOffset(pair, host, shuttle);
         Assert.That((movedOffset - offset).Length(), Is.LessThan(0.3f), "Shuttle did not stay in place on the moving host");
 
-        // Take off.
+        // Take off: the engines spin up first, like for FTL.
         await server.WaitAssertion(() =>
         {
             entMan.EventBus.RaiseLocalEvent(console, new ShuttleConsoleLandingRequest { Land = false });
 
+            Assert.That(landing.IsLanded(shuttle), "Shuttle left the pad before its engines spun up");
+            Assert.That(shuttleSys.CanFTL(shuttle, out _), Is.False, "Shuttle can FTL while taking off");
+        });
+
+        await server.WaitRunTicks((int) ((shuttleSys.DefaultStartupTime + 1f) * 30));
+
+        await server.WaitAssertion(() =>
+        {
             Assert.That(landing.IsLanded(shuttle), Is.False);
             Assert.That(!entMan.TryGetComponent<JointComponent>(shuttle, out var joints) || joints.JointCount == 0, "The weld was left behind");
             Assert.That(shuttleSys.CanFTL(shuttle, out _), "Shuttle cannot FTL after take off");

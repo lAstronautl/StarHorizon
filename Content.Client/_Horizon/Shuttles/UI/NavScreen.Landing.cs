@@ -1,3 +1,4 @@
+using Content.Shared._Horizon.Shuttles;
 using Content.Shared.Shuttles.BUIStates;
 
 namespace Content.Client.Shuttles.UI;
@@ -10,18 +11,28 @@ public sealed partial class NavScreen
     /// </summary>
     public event Action<bool>? OnLandingRequest;
 
-    private bool _landed;
+    private ShuttleLandingState _landingState;
 
     private void HorizonInitialize()
     {
-        LandingToggle.OnPressed += _ => OnLandingRequest?.Invoke(!_landed);
+        LandingToggle.OnPressed += _ =>
+        {
+            if (_landingState == ShuttleLandingState.TakingOff)
+                return;
+
+            OnLandingRequest?.Invoke(_landingState == ShuttleLandingState.None);
+        };
     }
 
     private void HorizonUpdateState(NavInterfaceState state)
     {
-        _landed = state.Landed;
-        LandingToggle.Text = Loc.GetString(_landed
-            ? "shuttle-console-landing-takeoff"
-            : "shuttle-console-landing-land");
+        _landingState = state.LandingState;
+        LandingToggle.Disabled = _landingState == ShuttleLandingState.TakingOff;
+        LandingToggle.Text = Loc.GetString(_landingState switch
+        {
+            ShuttleLandingState.Landed => "shuttle-console-landing-takeoff",
+            ShuttleLandingState.TakingOff => "shuttle-console-landing-taking-off",
+            _ => "shuttle-console-landing-land",
+        });
     }
 }

@@ -63,9 +63,9 @@ public sealed class NavInterfaceState
     // End Frontier fields
 
     /// <summary>
-    /// Horizon: the shuttle is sitting on a landing pad.
+    /// Horizon: where the shuttle is with landing pads.
     /// </summary>
-    public bool Landed;
+    public Content.Shared._Horizon.Shuttles.ShuttleLandingState LandingState;
     public NavInterfaceState(
         float maxRange,
         NetCoordinates? coordinates,

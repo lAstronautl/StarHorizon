@@ -132,22 +132,16 @@ namespace Content.Shared._Horizon.CCVar
 
         /// <summary>
         /// Какая доля тайлов шаттла должна быть над тайлами посадочной площадки, чтобы он мог сесть.
+        /// Если после посадки доля стала меньше (тайлы площадки убрали), шаттл взлетает сам.
         /// </summary>
         public static readonly CVarDef<float> ShuttleLandingMinCoverage =
-            CVarDef.Create("shuttle.landing_min_coverage", 0.5f, CVar.SERVERONLY | CVar.ARCHIVE);
+            CVarDef.Create("shuttle.landing_min_coverage", 1f, CVar.SERVERONLY | CVar.ARCHIVE);
 
         /// <summary>
         /// Максимальная скорость шаттла относительно площадки, при которой он может сесть.
         /// </summary>
         public static readonly CVarDef<float> ShuttleLandingMaxSpeed =
             CVarDef.Create("shuttle.landing_max_speed", 5f, CVar.SERVERONLY | CVar.ARCHIVE);
-
-        /// <summary>
-        /// Что делать, если площадка под садящимся шаттлом занята:
-        /// "block" — не давать сесть, "crush" — раздавить всё под шаттлом, "none" — ничего не проверять.
-        /// </summary>
-        public static readonly CVarDef<string> ShuttleLandingOccupiedMode =
-            CVarDef.Create("shuttle.landing_occupied_mode", "block", CVar.SERVERONLY | CVar.ARCHIVE);
 
         /*
          * Планетки

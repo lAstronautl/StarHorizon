@@ -20,6 +20,9 @@ public partial class BaseShuttleControl
     // Stores inward directions of borders.
     private readonly Dictionary<Vector2i, DirectionFlag> _gridNeighborSet = new();
     private readonly List<(Vector2 Start, Vector2 End)> _edges = new();
+    // Horizon: landing pad tiles and their triangles, drawn after the rest of the floor.
+    private readonly HashSet<Vector2i> _padTiles = new();
+    private readonly List<Vector2> _padVertices = new();
 
     private void RebuildGridData(Entity<MapGridComponent> grid, GridDrawData gridData)
     {
@@ -30,6 +33,8 @@ public partial class BaseShuttleControl
         _gridNeighborSet.Clear();
         _edges.Clear();
         gridData.HasUnderlay = false;
+        _padTiles.Clear();
+        _padVertices.Clear();
 
         var rator = Maps.GetAllTilesEnumerator(grid.Owner, grid.Comp);
         var tileSize = grid.Comp.TileSize;
@@ -43,6 +48,11 @@ public partial class BaseShuttleControl
             _gridTileList.Add((index, def));
             gridData.HasUnderlay |= def.GridUnderlay;
 
+            if (def.GridUnderlay)
+                _padTiles.Add(index);
+
+            var triangles = def.GridUnderlay ? _padVertices : gridData.Vertices;
+
             // Since our shape has to be convex, draw it by taking our first vertex as origin.
             var bl = Maps.TileToVector(grid, index);
             var origin = bl + def.Vertices[0] * tileSize;
@@ -51,9 +61,9 @@ public partial class BaseShuttleControl
             for (var i = 2; i < def.Vertices.Count; i++)
             {
                 var vert = bl + def.Vertices[i] * tileSize;
-                gridData.Vertices.Add(origin);
-                gridData.Vertices.Add(prev);
-                gridData.Vertices.Add(vert);
+                triangles.Add(origin);
+                triangles.Add(prev);
+                triangles.Add(vert);
                 prev = vert;
             }
 
@@ -82,6 +92,8 @@ public partial class BaseShuttleControl
             _gridNeighborSet[index] = dirFlag;
         }
 
+        gridData.PadIndex = gridData.Vertices.Count;
+        gridData.Vertices.AddRange(_padVertices);
         gridData.EdgeIndex = gridData.Vertices.Count;
 
         foreach (var (index, def) in _gridTileList)
@@ -107,9 +119,13 @@ public partial class BaseShuttleControl
                 else if (prev.Y == 1 && vert.Y == 1)
                     dirFlag = DirectionFlag.North;
 
+                // Horizon: a landing pad next to normal floor still gets a border, so the pad stands out.
+                var neighbourIndex = dirFlag == DirectionFlag.None ? index : index + dirFlag.AsDir().ToIntVec();
+
                 if (dirFlag != DirectionFlag.None
-                    && _gridNeighborSet.TryGetValue(index + dirFlag.AsDir().ToIntVec(), out var otherNeighbours)
-                    && (otherNeighbours & dirFlag) != 0)
+                    && _gridNeighborSet.TryGetValue(neighbourIndex, out var otherNeighbours)
+                    && (otherNeighbours & dirFlag) != 0
+                    && _padTiles.Contains(neighbourIndex) == def.GridUnderlay)
                 {
                     prev = vert;
                     continue;
