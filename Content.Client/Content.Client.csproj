@@ -34,4 +34,19 @@
       <Generator>MSBuild:Compile</Generator>
     </AdditionalFiles>
   </ItemGroup>
+  <!-- Ссылка на проект копирует только DLL, а CEF нужен ещё и подпроцесс (apphost, runtimeconfig, deps). -->
+  <Target Name="CopyWebViewSubprocess" AfterTargets="Build">
+    <MSBuild Projects="..\RobustToolbox\Robust.Client.WebView\Robust.Client.WebView.csproj"
+             Targets="GetTargetPath" Properties="Configuration=$(Configuration)">
+      <Output TaskParameter="TargetOutputs" ItemName="_WebViewTargetPath" />
+    </MSBuild>
+    <ItemGroup>
+      <_WebViewSubprocess Include="@(_WebViewTargetPath->'%(RootDir)%(Directory)Robust.Client.WebView.exe')" />
+      <_WebViewSubprocess Include="@(_WebViewTargetPath->'%(RootDir)%(Directory)Robust.Client.WebView')" />
+      <_WebViewSubprocess Include="@(_WebViewTargetPath->'%(RootDir)%(Directory)Robust.Client.WebView.runtimeconfig.json')" />
+      <_WebViewSubprocess Include="@(_WebViewTargetPath->'%(RootDir)%(Directory)Robust.Client.WebView.deps.json')" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_WebViewSubprocess)" DestinationFolder="$(TargetDir)"
+          SkipUnchangedFiles="true" Condition="Exists('%(_WebViewSubprocess.Identity)')" />
+  </Target>
 </Project>

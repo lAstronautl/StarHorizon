@@ -160,6 +160,8 @@ namespace Content.Client.Entry
 
         public override void Shutdown()
         {
+            // Закрыть браузеры консолей, пока CEF ещё жив.
+            Content.Client._Horizon.WebConsole.WebConsoleLifetime.Shutdown();
             base.Shutdown();
             _titleWindowManager.Shutdown();
         }
