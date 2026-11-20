@@ -265,7 +265,15 @@ binds:
   key: V
 - function: OpenBelt
   type: State
-  key: V
+  key: Q
+  mod1: Shift
+- function: OpenPocket1
+  type: State
+  key: Num1
+  mod1: Shift
+- function: OpenPocket2
+  type: State
+  key: Num2
   mod1: Shift
 - function: ShowDebugConsole
   type: State
@@ -569,14 +577,6 @@ binds:
 - function: HotbarShift0
   type: State
   key: Num0
-  mod1: Shift
-- function: HotbarShift1
-  type: State
-  key: Num1
-  mod1: Shift
-- function: HotbarShift2
-  type: State
-  key: Num2
   mod1: Shift
 - function: HotbarShift3
   type: State
