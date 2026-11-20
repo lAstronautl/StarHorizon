@@ -205,6 +205,7 @@ namespace Content.Client.Options.UI.Tabs
             AddButton(ContentKeyFunctions.OpenBackpack);
             AddButton(ContentKeyFunctions.OpenBelt);
             AddButton(ContentKeyFunctions.OpenWallet); // Frontier
+            AddButton(ContentKeyFunctions.OpenOuterClothing);
             AddButton(ContentKeyFunctions.OpenPocket1);
             AddButton(ContentKeyFunctions.OpenPocket2);
             AddButton(ContentKeyFunctions.ThrowItemInHand);

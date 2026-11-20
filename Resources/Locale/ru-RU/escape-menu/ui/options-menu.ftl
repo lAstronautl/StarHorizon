@@ -170,6 +170,7 @@ ui-options-function-smart-equip-backpack = Умная экипировка в р
 ui-options-function-smart-equip-belt = Умная экипировка на пояс
 ui-options-function-open-backpack = Открыть рюкзак
 ui-options-function-open-belt = Открыть пояс
+ui-options-function-open-outer-clothing = Открыть верхнюю одежду
 ui-options-function-open-pocket1 = Открыть карман 1
 ui-options-function-open-pocket2 = Открыть карман 2
 ui-options-function-rotate-object-clockwise = Повернуть по часовой

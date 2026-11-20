@@ -173,6 +173,7 @@ ui-options-function-smart-equip-backpack = Smart-equip to backpack
 ui-options-function-smart-equip-belt = Smart-equip to belt
 ui-options-function-open-backpack = Open backpack
 ui-options-function-open-belt = Open belt
+ui-options-function-open-outer-clothing = Open outer clothing
 ui-options-function-open-pocket1 = Open pocket 1
 ui-options-function-open-pocket2 = Open pocket 2
 ui-options-function-throw-item-in-hand = Throw item

@@ -265,6 +265,10 @@ binds:
   key: V
 - function: OpenBelt
   type: State
+  key: V
+  mod1: Shift
+- function: OpenOuterClothing
+  type: State
   key: Q
   mod1: Shift
 - function: OpenPocket1

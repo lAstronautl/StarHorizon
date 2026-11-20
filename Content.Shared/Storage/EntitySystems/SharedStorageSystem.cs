@@ -173,6 +173,7 @@ public abstract class SharedStorageSystem : EntitySystem
             .Bind(ContentKeyFunctions.OpenBackpack, InputCmdHandler.FromDelegate(HandleOpenBackpack, handle: false))
             .Bind(ContentKeyFunctions.OpenBelt, InputCmdHandler.FromDelegate(HandleOpenBelt, handle: false))
             .Bind(ContentKeyFunctions.OpenWallet, InputCmdHandler.FromDelegate(HandleOpenWallet, handle: false)) // Frontier
+            .Bind(ContentKeyFunctions.OpenOuterClothing, InputCmdHandler.FromDelegate(session => HandleToggleSlotUI(session, "outerClothing"), handle: false))
             .Bind(ContentKeyFunctions.OpenPocket1, InputCmdHandler.FromDelegate(session => HandleToggleSlotUI(session, "pocket1"), handle: false))
             .Bind(ContentKeyFunctions.OpenPocket2, InputCmdHandler.FromDelegate(session => HandleToggleSlotUI(session, "pocket2"), handle: false))
             .Register<SharedStorageSystem>();
