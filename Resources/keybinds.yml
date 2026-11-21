@@ -267,7 +267,7 @@ binds:
   type: State
   key: V
   mod1: Shift
-- function: OpenOuterClothing
+- function: OpenSuitStorage
   type: State
   key: Q
   mod1: Shift
