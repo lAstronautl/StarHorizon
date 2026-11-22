@@ -1,4 +1,5 @@
 using System.Numerics;
+using Content.Shared.Salvage.Expeditions;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared._StarHorizon.DropPod;
@@ -32,7 +33,8 @@ public sealed class DropPodConsoleState(
     TimeSpan captureEnd,
     TimeSpan captureTime,
     int mapId,
-    float captureRange) : BoundUserInterfaceState
+    float captureRange,
+    List<PlanetExpeditionInfo> planets) : BoundUserInterfaceState
 {
     public bool Linked = linked;
     /// <summary>Сколько капсул привязано.</summary>
@@ -58,6 +60,8 @@ public sealed class DropPodConsoleState(
     public int MapId = mapId;
     /// <summary>Дальность удержания захвата, метры.</summary>
     public float CaptureRange = captureRange;
+    /// <summary>Планеты с экспедициями: на них можно сбросить капсулу (экспедиция создаётся при сбросе).</summary>
+    public List<PlanetExpeditionInfo> Planets = planets;
 }
 
 /// <summary>Запустить капсулу в указанные мировые координаты.</summary>
@@ -75,6 +79,20 @@ public sealed class DropPodLaunchMessage(Vector2 target) : BoundUserInterfaceMes
 public sealed class DropPodArmMessage(Vector2 target) : BoundUserInterfaceMessage
 {
     public Vector2 Target = target;
+}
+
+/// <summary>Задать целью планету (выбор в списке): взлёт - по триггеру любого привязанного устройства.</summary>
+[Serializable, NetSerializable]
+public sealed class DropPodArmPlanetMessage(NetEntity planet) : BoundUserInterfaceMessage
+{
+    public NetEntity Planet = planet;
+}
+
+/// <summary>Задать целью планету и сразу послать сигнал запуска.</summary>
+[Serializable, NetSerializable]
+public sealed class DropPodLaunchToPlanetMessage(NetEntity planet) : BoundUserInterfaceMessage
+{
+    public NetEntity Planet = planet;
 }
 
 /// <summary>Запустить капсулу на захваченный шаттл (на случайный свободный тайл).</summary>

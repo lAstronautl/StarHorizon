@@ -37,6 +37,21 @@ public sealed partial class DropPodComponent : Component
     [ViewVariables]
     public DropPodLaunchPlan? Plan;
 
+    /// <summary>Планета, на которую сбрасывается капсула (экспедиция планеты). Только сервер.</summary>
+    [ViewVariables]
+    public EntityUid? TargetPlanet;
+
+    /// <summary>Капсула уже в пути, но экспедиция на планете ещё создаётся: ждём готовности карты.</summary>
+    [ViewVariables]
+    public bool WaitingForExpedition;
+
+    [ViewVariables]
+    public TimeSpan ExpeditionWaitEnd;
+
+    /// <summary>Сколько максимум ждать, пока построится карта экспедиции, прежде чем сесть где придётся.</summary>
+    [DataField]
+    public TimeSpan ExpeditionWaitTime = TimeSpan.FromSeconds(90);
+
     /// <summary>Запасная точка приземления, если метка пропала.</summary>
     [ViewVariables]
     public MapCoordinates Target;
@@ -168,6 +183,9 @@ public sealed class DropPodLaunchPlan
 
     /// <summary>Захваченный шаттл, если летим на него.</summary>
     public EntityUid? Grid;
+
+    /// <summary>Планета с экспедицией, если сбрасываемся на неё (карта экспедиции создаётся при взлёте).</summary>
+    public EntityUid? Planet;
 
     /// <summary>Очередь запуска: на сколько позже обычного отсчёта стартует эта капсула.</summary>
     public TimeSpan Delay;

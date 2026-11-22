@@ -1,5 +1,7 @@
 using System.Linq;
 using System.Numerics;
+using Content.Server.Salvage;
+using Content.Server.Salvage.Expeditions;
 using Content.Server.Shuttles.Components;
 using Content.Server.Shuttles.Events;
 using Content.Server.Shuttles.Systems;
@@ -8,7 +10,9 @@ using Content.Shared._StarHorizon.DropPod;
 using Content.Shared.Damage;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Movement.Systems;
+using Content.Shared._Horizon.SpaceHazards;
 using Content.Shared.DeviceLinking;
+using Content.Shared.Salvage.Expeditions;
 using Content.Shared.Popups;
 using Content.Shared.Trigger;
 using Content.Shared.Storage.Components;
@@ -45,6 +49,10 @@ public sealed class DropPodSystem : EntitySystem
     [Dependency] private readonly ShuttleSystem _shuttle = default!;
     [Dependency] private readonly SharedPointLightSystem _light = default!;
     [Dependency] private readonly SharedDeviceLinkSystem _deviceLink = default!;
+    [Dependency] private readonly SalvageSystem _salvage = default!;
+
+    /// <summary>Меньше этого времени до закрытия экспедиции сбрасываться на неё уже поздно.</summary>
+    private static readonly TimeSpan PlanetMinTimeLeft = TimeSpan.FromSeconds(90);
     [Dependency] private readonly DamageableSystem _damageable = default!;
 
     public override void Initialize()
@@ -61,6 +69,8 @@ public sealed class DropPodSystem : EntitySystem
         SubscribeLocalEvent<DropPodConsoleComponent, DropPodLaunchMessage>(OnLaunchMessage);
         SubscribeLocalEvent<DropPodConsoleComponent, DropPodAbortMessage>(OnAbortMessage);
         SubscribeLocalEvent<DropPodConsoleComponent, DropPodArmMessage>(OnArmMessage);
+        SubscribeLocalEvent<DropPodConsoleComponent, DropPodArmPlanetMessage>(OnArmPlanetMessage);
+        SubscribeLocalEvent<DropPodConsoleComponent, DropPodLaunchToPlanetMessage>(OnLaunchToPlanetMessage);
         SubscribeLocalEvent<DropPodConsoleComponent, DropPodLaunchToCapturedMessage>(OnLaunchToCapturedMessage);
         SubscribeLocalEvent<DropPodConsoleComponent, DropPodCaptureMessage>(OnCaptureMessage);
         SubscribeLocalEvent<DropPodConsoleComponent, DropPodReleaseMessage>(OnReleaseMessage);
@@ -101,6 +111,66 @@ public sealed class DropPodSystem : EntitySystem
     private void OnArmMessage(Entity<DropPodConsoleComponent> ent, ref DropPodArmMessage args)
     {
         ArmPoint(ent, args.Target);
+    }
+
+    /// <summary>Только цель-планета: взлёт позже, от триггера любого привязанного устройства.</summary>
+    private void OnArmPlanetMessage(Entity<DropPodConsoleComponent> ent, ref DropPodArmPlanetMessage args)
+    {
+        ArmPlanet(ent, args.Planet);
+    }
+
+    /// <summary>Цель-планета + сигнал.</summary>
+    private void OnLaunchToPlanetMessage(Entity<DropPodConsoleComponent> ent, ref DropPodLaunchToPlanetMessage args)
+    {
+        if (ArmPlanet(ent, args.Planet))
+            SendLaunchSignal(ent);
+    }
+
+    /// <summary>
+    /// Записывает привязанным готовым капсулам план сброса на планету. Карта экспедиции при этом не создаётся:
+    /// она появится, только когда капсула действительно взлетит (<see cref="FinishCountdown"/>).
+    /// </summary>
+    private bool ArmPlanet(Entity<DropPodConsoleComponent> console, NetEntity netPlanet)
+    {
+        var pods = ReadyPods(console, out var error);
+        if (pods.Count == 0)
+        {
+            UpdateConsole(console, error);
+            return false;
+        }
+
+        if (!TryGetEntity(netPlanet, out var planetUid) || !TryComp(planetUid, out ExpeditionPlanetComponent? planet))
+        {
+            UpdateConsole(console, "droppod-error-no-planet");
+            return false;
+        }
+
+        // На идущую экспедицию нужно успеть: капсулам лететь около 20 секунд.
+        if (!PlanetAcceptsPods(planet))
+        {
+            UpdateConsole(console, "droppod-error-planet-closing");
+            return false;
+        }
+
+        for (var i = 0; i < pods.Count; i++)
+        {
+            pods[i].Comp.Plan = new DropPodLaunchPlan
+            {
+                Target = new MapCoordinates(_xform.GetWorldPosition(planetUid.Value), Transform(console).MapID),
+                Planet = planetUid,
+                Delay = console.Comp.LaunchInterval * i,
+            };
+        }
+
+        UpdateConsole(console);
+        return true;
+    }
+
+    /// <summary>Планета принимает капсулы: экспедиции нет (создастся) или она идёт и ещё не скоро закроется.</summary>
+    private bool PlanetAcceptsPods(ExpeditionPlanetComponent planet)
+    {
+        return planet.Status != PlanetExpeditionStatus.Active
+               || planet.EndTime - _timing.CurTime >= PlanetMinTimeLeft;
     }
 
     /// <summary>Цель-шаттл + сигнал.</summary>
@@ -234,6 +304,7 @@ public sealed class DropPodSystem : EntitySystem
 
         ent.Comp.Plan = null;
         ent.Comp.TargetGrid = plan.Grid;
+        ent.Comp.TargetPlanet = plan.Planet;
         StartCountdown(ent, plan.Target, plan.Coords, plan.Delay);
         args.Handled = true;
     }
@@ -419,7 +490,8 @@ public sealed class DropPodSystem : EntitySystem
             console.Comp.CaptureEnd,
             console.Comp.CaptureTime,
             consoleMap.GetHashCode(),
-            console.Comp.CaptureRange);
+            console.Comp.CaptureRange,
+            _salvage.GetPlanetInfos());
 
         _ui.SetUiState(console.Owner, DropPodUiKey.Key, state);
     }
@@ -469,7 +541,11 @@ public sealed class DropPodSystem : EntitySystem
             ent.Comp.TargetGrid = null;
 
         QueueDel(ent.Comp.Marker);
-        ent.Comp.Marker = Spawn(ent.Comp.MarkerPrototype, coords ?? _xform.ToCoordinates(target));
+        ent.Comp.Marker = null;
+
+        // На планете карты экспедиции ещё нет (она создаётся при взлёте), поэтому метки до прилёта нет.
+        if (ent.Comp.TargetPlanet == null)
+            ent.Comp.Marker = Spawn(ent.Comp.MarkerPrototype, coords ?? _xform.ToCoordinates(target));
 
         // delay - очередь запуска: капсула стартует через i * интервал после предыдущей.
         SetState(ent, DropPodState.Countdown, ent.Comp.CountdownTime + delay);
@@ -479,6 +555,8 @@ public sealed class DropPodSystem : EntitySystem
     {
         QueueDel(ent.Comp.Marker);
         ent.Comp.Marker = null;
+        ent.Comp.TargetPlanet = null;
+        ent.Comp.TargetGrid = null;
         SetState(ent, DropPodState.Idle, TimeSpan.Zero);
     }
 
@@ -521,6 +599,10 @@ public sealed class DropPodSystem : EntitySystem
                 case DropPodState.InBluespace:
                     // Выход из БСС приходит событием FTLCompletedEvent.
                     SetZoom(ent, comp.PeakZoom);
+
+                    // Прилетели, но карта экспедиции ещё строится: проверяем готовность каждый тик.
+                    if (comp.WaitingForExpedition)
+                        Arrive(ent);
                     break;
 
                 case DropPodState.Arriving:
@@ -607,6 +689,10 @@ public sealed class DropPodSystem : EntitySystem
             if (pod.Comp.Plan is not { } plan)
                 continue;
 
+            // Цель-планета лежит за радиусом радара и от расстояния не зависит.
+            if (plan.Planet != null)
+                continue;
+
             var inRange = plan.Grid is { } planGrid
                 ? !TerminatingOrDeleted(planGrid) && InCaptureRange(console, planGrid)
                 : plan.Target.MapId == consoleMap && (plan.Target.Position - consolePos).Length() <= console.Comp.CaptureRange;
@@ -643,21 +729,43 @@ public sealed class DropPodSystem : EntitySystem
 
         // Настоящий БСС, как у команды ftlentity: старт, FTL-карта, фаза прибытия, телепорт.
         // Летим на координаты метки; точное место (в т.ч. тайл захваченного шаттла) определяется при посадке.
-        var target = ent.Comp.Target;
-        if (ent.Comp.Marker is { } marker && !TerminatingOrDeleted(marker))
-            target = _xform.GetMapCoordinates(marker);
-
-        var mapUid = _map.GetMap(target.MapId);
-        if (mapUid == EntityUid.Invalid)
+        EntityCoordinates ftlTarget;
+        if (ent.Comp.TargetPlanet is { } planetUid)
         {
-            Abort(ent);
-            return;
+            // Сброс на планету: экспедиция создаётся именно сейчас, когда капсула взлетает (а не при выборе цели).
+            // Если она уже идёт - летим на её карту, ничего не создавая.
+            if (!TryComp(planetUid, out ExpeditionPlanetComponent? planet)
+                || !PlanetAcceptsPods(planet)
+                || !_salvage.StartPlanetExpedition((planetUid, planet))
+                || planet.ExpeditionMap is not { } expeditionMap)
+            {
+                _popup.PopupEntity(Loc.GetString("droppod-error-planet-closing"), ent, PopupType.MediumCaution);
+                Abort(ent);
+                return;
+            }
+
+            ftlTarget = new EntityCoordinates(expeditionMap, Vector2.Zero);
+        }
+        else
+        {
+            var target = ent.Comp.Target;
+            if (ent.Comp.Marker is { } marker && !TerminatingOrDeleted(marker))
+                target = _xform.GetMapCoordinates(marker);
+
+            var mapUid = _map.GetMap(target.MapId);
+            if (mapUid == EntityUid.Invalid)
+            {
+                Abort(ent);
+                return;
+            }
+
+            ftlTarget = new EntityCoordinates(mapUid, target.Position);
         }
 
         _shuttle.FTLToCoordinates(
             ent.Owner,
             null,
-            new EntityCoordinates(mapUid, target.Position),
+            ftlTarget,
             Angle.Zero,
             (float) ent.Comp.ZoomOutTime.TotalSeconds,
             (float) ent.Comp.FlightTime.TotalSeconds + _shuttle.DefaultArrivalTime);
@@ -708,7 +816,13 @@ public sealed class DropPodSystem : EntitySystem
     private void Arrive(Entity<DropPodComponent> ent)
     {
         EntityCoordinates coords;
-        if (ent.Comp.TargetGrid is { } grid && !TerminatingOrDeleted(grid) && HasComp<MapGridComponent>(grid))
+        if (ent.Comp.TargetPlanet is { } planetUid)
+        {
+            // Сброс на планету: ждём, пока построится карта экспедиции, и садимся на её точку посадки.
+            if (!TryGetExpeditionLanding(ent, planetUid, out coords))
+                return;
+        }
+        else if (ent.Comp.TargetGrid is { } grid && !TerminatingOrDeleted(grid) && HasComp<MapGridComponent>(grid))
         {
             // Шаттл мог улететь куда угодно - приземляемся на него. Метка едет вместе с гридом,
             // но если под ней успели что-то построить или поставить, выбираем новый свободный тайл.
@@ -742,6 +856,51 @@ public sealed class DropPodSystem : EntitySystem
 
         SetVignette(ent, 1f, 0f, ent.Comp.ArrivalViewTime);
         SetState(ent, DropPodState.Arriving, ent.Comp.ArrivalViewTime);
+    }
+
+    /// <summary>
+    /// Точка посадки на карте экспедиции планеты. Если карта ещё строится (job работает несколько секунд),
+    /// возвращает false: капсула остаётся в БСС и повторит попытку, но не дольше <see cref="DropPodComponent.ExpeditionWaitTime"/>.
+    /// </summary>
+    private bool TryGetExpeditionLanding(Entity<DropPodComponent> ent, EntityUid planetUid, out EntityCoordinates coords)
+    {
+        coords = default;
+
+        if (!TryComp(planetUid, out ExpeditionPlanetComponent? planet)
+            || planet.ExpeditionMap is not { } map
+            || TerminatingOrDeleted(map))
+        {
+            // Экспедиция закрылась по пути: садимся там, куда капсулу привёз FTL.
+            ent.Comp.WaitingForExpedition = false;
+            coords = Transform(ent).Coordinates;
+            return true;
+        }
+
+        if (planet.Status != PlanetExpeditionStatus.Active || !TryComp(map, out SalvageExpeditionComponent? expedition))
+        {
+            if (!ent.Comp.WaitingForExpedition)
+            {
+                ent.Comp.WaitingForExpedition = true;
+                ent.Comp.ExpeditionWaitEnd = _timing.CurTime + ent.Comp.ExpeditionWaitTime;
+            }
+
+            if (_timing.CurTime < ent.Comp.ExpeditionWaitEnd)
+                return false;
+
+            // Карта так и не построилась: садимся в начале координат.
+            ent.Comp.WaitingForExpedition = false;
+            coords = new EntityCoordinates(map, Vector2.Zero);
+            return true;
+        }
+
+        ent.Comp.WaitingForExpedition = false;
+
+        // Карта экспедиции создаётся на паузе; с прилётом капсулы она оживает для всех.
+        _map.SetPaused(map, false);
+
+        // Каждой капсуле своя точка рядом с площадкой посадки, чтобы не садились друг на друга.
+        coords = new EntityCoordinates(map, expedition.LandingCoordinates + _random.NextVector2(0.5f, 3f));
+        return true;
     }
 
     /// <summary>
@@ -787,6 +946,7 @@ public sealed class DropPodSystem : EntitySystem
         QueueDel(ent.Comp.Marker);
         ent.Comp.Marker = null;
         ent.Comp.TargetGrid = null;
+        ent.Comp.TargetPlanet = null;
 
         if (TryComp(ent, out PhysicsComponent? physics))
             _physics.SetCanCollide(ent, true, body: physics);

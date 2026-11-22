@@ -1,9 +1,11 @@
 using System.Globalization;
+using System.Linq;
 using System.Numerics;
 using Content.Client.Shuttles.UI;
 using Content.Shared._StarHorizon.DropPod;
 using Content.Shared._NF.Shuttles.Events;
 using Content.Shared.Shuttles.BUIStates;
+using Content.Shared.Salvage.Expeditions;
 using Content.Shared.Shuttles.Components;
 using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
@@ -34,6 +36,7 @@ public sealed class DropPodWindow : DefaultWindow
     {
         Target,
         Capture,
+        Planet,
     }
 
     // Радиус радара задаётся фиксированным: он равен дальности захвата (state.CaptureRange).
@@ -55,6 +58,15 @@ public sealed class DropPodWindow : DefaultWindow
 
     private readonly Button _modeTarget = new() { ToggleMode = true, HorizontalExpand = true };
     private readonly Button _modeCapture = new() { ToggleMode = true, HorizontalExpand = true };
+    private readonly Button _modePlanet = new() { ToggleMode = true, HorizontalExpand = true };
+
+    // Планеты с экспедициями: выбор цели списком (планеты далеко за радиусом радара).
+    private readonly BoxContainer _planetBox = new() { Orientation = BoxContainer.LayoutOrientation.Vertical, SeparationOverride = 4, Visible = false };
+    private readonly BoxContainer _planetRows = new() { Orientation = BoxContainer.LayoutOrientation.Vertical, SeparationOverride = 4 };
+    private readonly Button _launchPlanet = new();
+    private readonly List<(Label Status, PlanetExpeditionInfo Info)> _planetStatuses = new();
+    private NetEntity? _selectedPlanet;
+    private string _planetSignature = string.Empty;
     private readonly Label _targetLabel = new();
     private readonly Button _launch = new();
     private readonly Button _abort = new();
@@ -77,6 +89,8 @@ public sealed class DropPodWindow : DefaultWindow
     public event Action? OnLaunchToCaptured;
     public event Action? OnAbort;
     public event Action<NetEntity>? OnCapture;
+    public event Action<NetEntity>? OnArmPlanet;
+    public event Action<NetEntity>? OnLaunchPlanet;
     public event Action? OnRelease;
 
     public DropPodWindow()
@@ -91,6 +105,8 @@ public sealed class DropPodWindow : DefaultWindow
 
         _modeTarget.Text = Loc.GetString("droppod-ui-mode-target");
         _modeCapture.Text = Loc.GetString("droppod-ui-mode-capture");
+        _modePlanet.Text = Loc.GetString("droppod-ui-mode-planet");
+        _launchPlanet.Text = Loc.GetString("droppod-ui-launch-planet");
         _launch.Text = Loc.GetString("droppod-ui-launch");
         _launchCaptured.Text = Loc.GetString("droppod-ui-launch-captured");
         _abort.Text = Loc.GetString("droppod-ui-abort");
@@ -99,6 +115,7 @@ public sealed class DropPodWindow : DefaultWindow
         var group = new ButtonGroup(false);
         _modeTarget.Group = group;
         _modeCapture.Group = group;
+        _modePlanet.Group = group;
         _modeTarget.Pressed = true;
 
         // Радар сканера масс: центрирован на консоли, клик выбирает точку или шаттл.
@@ -123,7 +140,14 @@ public sealed class DropPodWindow : DefaultWindow
         var modes = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Vertical, SeparationOverride = 4 };
         modes.AddChild(_modeTarget);
         modes.AddChild(_modeCapture);
+        modes.AddChild(_modePlanet);
         side.AddChild(modes);
+
+        _planetBox.AddChild(Header(Loc.GetString("droppod-ui-section-planets")));
+        _planetBox.AddChild(_planetRows);
+        _launchPlanet.ModulateSelfOverride = Good;
+        _planetBox.AddChild(_launchPlanet);
+        side.AddChild(_planetBox);
 
         side.AddChild(Header(Loc.GetString("droppod-ui-section-coords")));
         side.AddChild(_targetLabel);
@@ -150,8 +174,14 @@ public sealed class DropPodWindow : DefaultWindow
         root.AddChild(new ScrollContainer { HScrollEnabled = false, VerticalExpand = true, MinWidth = 340, Children = { side } });
         Contents.AddChild(root);
 
-        _modeTarget.OnPressed += _ => _mode = ClickMode.Target;
-        _modeCapture.OnPressed += _ => _mode = ClickMode.Capture;
+        _modeTarget.OnPressed += _ => SetMode(ClickMode.Target);
+        _modeCapture.OnPressed += _ => SetMode(ClickMode.Capture);
+        _modePlanet.OnPressed += _ => SetMode(ClickMode.Planet);
+        _launchPlanet.OnPressed += _ =>
+        {
+            if (_selectedPlanet is { } planet)
+                OnLaunchPlanet?.Invoke(planet);
+        };
 
         _launch.OnPressed += _ =>
         {
@@ -170,6 +200,88 @@ public sealed class DropPodWindow : DefaultWindow
         box.AddChild(new PanelContainer { MinHeight = 2, PanelOverride = new StyleBoxFlat { BackgroundColor = Accent } });
         return box;
     }
+
+    private void SetMode(ClickMode mode)
+    {
+        _mode = mode;
+        _planetBox.Visible = mode == ClickMode.Planet;
+    }
+
+    #region Planets
+
+    /// <summary>Перестраивает список планет, если он изменился. Выбранная планета остаётся выбранной.</summary>
+    private void RefreshPlanets(List<PlanetExpeditionInfo> planets)
+    {
+        var signature = string.Join(";", planets.Select(p => $"{p.Planet}:{p.Status}:{p.Mission.Index}:{p.EndTime.Ticks}"));
+        if (signature == _planetSignature)
+            return;
+
+        _planetSignature = signature;
+        _planetRows.DisposeAllChildren();
+        _planetStatuses.Clear();
+
+        var group = new ButtonGroup();
+        foreach (var info in planets)
+        {
+            var type = Loc.GetString($"salvage-expedition-type-{info.Mission.MissionType}");
+            var difficulty = Loc.GetString($"salvage-expedition-difficulty-{info.Mission.Difficulty}");
+
+            var button = new Button
+            {
+                Text = $"{info.Name}  -  {type}, {difficulty}",
+                ToggleMode = true,
+                Group = group,
+                HorizontalExpand = true,
+                ClipText = true,
+            };
+            button.Pressed = _selectedPlanet == info.Planet;
+            button.OnPressed += _ =>
+            {
+                _selectedPlanet = info.Planet;
+                UpdateButtons();
+                OnArmPlanet?.Invoke(info.Planet);
+            };
+
+            var status = new Label { Margin = new Thickness(8, 0, 0, 2) };
+
+            var row = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Vertical };
+            row.AddChild(button);
+            row.AddChild(status);
+            _planetRows.AddChild(row);
+            _planetStatuses.Add((status, info));
+        }
+
+        UpdatePlanetStatuses();
+        UpdateButtons();
+    }
+
+    private void UpdatePlanetStatuses()
+    {
+        foreach (var (label, info) in _planetStatuses)
+        {
+            switch (info.Status)
+            {
+                case PlanetExpeditionStatus.Idle:
+                    label.Text = Loc.GetString("salvage-expedition-planet-status-idle");
+                    label.FontColorOverride = Color.Gray;
+                    break;
+                case PlanetExpeditionStatus.Generating:
+                    label.Text = Loc.GetString("salvage-expedition-planet-status-generating");
+                    label.FontColorOverride = Capturing;
+                    break;
+                default:
+                    var remaining = info.EndTime - _timing.CurTime;
+                    label.Text = remaining <= TimeSpan.Zero
+                        ? Loc.GetString("salvage-expedition-planet-status-closing")
+                        : Loc.GetString("salvage-expedition-planet-status-active",
+                            ("time", $"{(int) remaining.TotalMinutes:00}:{remaining.Seconds:00}"));
+                    label.FontColorOverride = Good;
+                    break;
+            }
+        }
+    }
+
+    #endregion
 
     #region Radar
 
@@ -192,7 +304,7 @@ public sealed class DropPodWindow : DefaultWindow
 
     private void OnRadarClicked(EntityCoordinates coords)
     {
-        if (_state is not { } state || !coords.IsValid(_ent))
+        if (_mode == ClickMode.Planet || _state is not { } state || !coords.IsValid(_ent))
             return;
 
         var world = _xform.ToMapCoordinates(coords).Position;
@@ -335,6 +447,7 @@ public sealed class DropPodWindow : DefaultWindow
         _launch.Disabled = !idle || _target == null;
         _launchCaptured.Disabled = !idle || !captured;
         _armed.Text = state.ArmedCount > 0 ? Loc.GetString("droppod-ui-armed", ("count", state.ArmedCount)) : string.Empty;
+        _launchPlanet.Disabled = !idle || _selectedPlanet == null;
         _abort.Disabled = !(state.Linked && state.PodState == DropPodState.Countdown);
         _release.Disabled = !captured && !capturing;
     }
@@ -350,6 +463,7 @@ public sealed class DropPodWindow : DefaultWindow
         }
 
         UpdateRadar(state);
+        RefreshPlanets(state.Planets);
 
         _error.Text = state.Error ?? string.Empty;
 
@@ -403,6 +517,8 @@ public sealed class DropPodWindow : DefaultWindow
 
         if (_state is not { } state)
             return;
+
+        UpdatePlanetStatuses();
 
         // Прогресс капсулы.
         if (state.Linked && state.PodState != DropPodState.Idle)
