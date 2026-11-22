@@ -61,7 +61,6 @@ public sealed class DropPodSystem : EntitySystem
         SubscribeLocalEvent<DropPodConsoleComponent, DropPodLaunchMessage>(OnLaunchMessage);
         SubscribeLocalEvent<DropPodConsoleComponent, DropPodAbortMessage>(OnAbortMessage);
         SubscribeLocalEvent<DropPodConsoleComponent, DropPodArmMessage>(OnArmMessage);
-        SubscribeLocalEvent<DropPodConsoleComponent, DropPodArmCapturedMessage>(OnArmCapturedMessage);
         SubscribeLocalEvent<DropPodConsoleComponent, DropPodLaunchToCapturedMessage>(OnLaunchToCapturedMessage);
         SubscribeLocalEvent<DropPodConsoleComponent, DropPodCaptureMessage>(OnCaptureMessage);
         SubscribeLocalEvent<DropPodConsoleComponent, DropPodReleaseMessage>(OnReleaseMessage);
@@ -111,12 +110,6 @@ public sealed class DropPodSystem : EntitySystem
             SendLaunchSignal(ent);
     }
 
-    /// <summary>Только цель-шаттл.</summary>
-    private void OnArmCapturedMessage(Entity<DropPodConsoleComponent> ent, ref DropPodArmCapturedMessage args)
-    {
-        ArmCaptured(ent);
-    }
-
     /// <summary>
     /// Записывает привязанным готовым капсулам план полёта в точку. Капсулы стартуют по очереди; на месте посадки
     /// их разводим в ряд, чтобы не падали друг на друга.
@@ -153,6 +146,16 @@ public sealed class DropPodSystem : EntitySystem
 
         UpdateConsole(console);
         return true;
+    }
+
+    /// <summary>Сбрасывает цель у капсул, которые целились в этот шаттл (захват потерян или сброшен).</summary>
+    private void DisarmGrid(Entity<DropPodConsoleComponent> console, EntityUid grid)
+    {
+        foreach (var pod in LinkedPods(console))
+        {
+            if (pod.Comp.Plan?.Grid == grid)
+                pod.Comp.Plan = null;
+        }
     }
 
     /// <summary>Записывает привязанным готовым капсулам план: каждой - свой свободный тайл захваченного шаттла.</summary>
@@ -206,6 +209,12 @@ public sealed class DropPodSystem : EntitySystem
     /// </summary>
     private void OnTrigger(Entity<DropPodComponent> ent, ref TriggerEvent args)
     {
+        // TriggerOnActivate срабатывает на любое взаимодействие (например, клик, которым открывают дверь).
+        // Для TriggerOnSignal пользователь триггера - отправитель сигнала, то есть устройство с DeviceLinkSource.
+        // Запускаем только по сигналу, а обычные клики игнорируем.
+        if (args.User is not { } sender || !HasComp<DeviceLinkSourceComponent>(sender))
+            return;
+
         if (ent.Comp.State != DropPodState.Idle || ent.Comp.Used)
             return;
 
@@ -257,6 +266,9 @@ public sealed class DropPodSystem : EntitySystem
 
     private void OnReleaseMessage(Entity<DropPodConsoleComponent> ent, ref DropPodReleaseMessage args)
     {
+        if (ent.Comp.CapturedGrid is { } released)
+            DisarmGrid(ent, released);
+
         ent.Comp.CapturingGrid = null;
         ent.Comp.CapturedGrid = null;
         UpdateConsole(ent);
@@ -550,6 +562,7 @@ public sealed class DropPodSystem : EntitySystem
         if (console.Comp.CapturedGrid is { } held && !InCaptureRange(console, held))
         {
             console.Comp.CapturedGrid = null;
+            DisarmGrid(console, held);
             UpdateConsole(console, "droppod-error-capture-lost");
         }
 
@@ -569,7 +582,12 @@ public sealed class DropPodSystem : EntitySystem
             {
                 console.Comp.CapturedGrid = grid;
                 console.Comp.CapturingGrid = null;
-                UpdateConsole(console);
+
+                // Захваченный шаттл сразу становится целью привязанных капсул (если они есть).
+                if (LinkedPods(console).Count > 0)
+                    ArmCaptured(console);
+                else
+                    UpdateConsole(console);
             }
         }
 

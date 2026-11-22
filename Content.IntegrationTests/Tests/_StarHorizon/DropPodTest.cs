@@ -264,6 +264,8 @@ public sealed class DropPodTest
         Assert.That(consoleComp.CapturedGrid, Is.Null, "захват ещё не завершён");
         await pair.RunSeconds(1.0f);
         Assert.That(consoleComp.CapturedGrid, Is.EqualTo(shuttle));
+        var armed = server.EntMan.GetComponent<DropPodComponent>(pod).Plan;
+        Assert.That(armed?.Grid, Is.EqualTo(shuttle), "захваченный шаттл сразу стал целью капсулы");
 
         await server.WaitPost(() =>
         {

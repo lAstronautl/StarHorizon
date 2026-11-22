@@ -68,7 +68,7 @@ public sealed class DropPodLaunchMessage(Vector2 target) : BoundUserInterfaceMes
 }
 
 /// <summary>
-/// Задать цель-точку привязанным капсулам без запуска: взлёт случится от триггера любого устройства
+/// Задать цель-точку привязанным капсулам (клик по карте): взлёт случится от триггера любого устройства
 /// (кнопка, сигнал DeviceLink), привязанного к капсуле.
 /// </summary>
 [Serializable, NetSerializable]
@@ -76,10 +76,6 @@ public sealed class DropPodArmMessage(Vector2 target) : BoundUserInterfaceMessag
 {
     public Vector2 Target = target;
 }
-
-/// <summary>Задать целью захваченный шаттл без запуска.</summary>
-[Serializable, NetSerializable]
-public sealed class DropPodArmCapturedMessage : BoundUserInterfaceMessage;
 
 /// <summary>Запустить капсулу на захваченный шаттл (на случайный свободный тайл).</summary>
 [Serializable, NetSerializable]

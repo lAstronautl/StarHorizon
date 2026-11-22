@@ -38,7 +38,10 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
     private readonly SharedTransformSystem _xformSystem;
     private readonly Content.Client.Parallax.ParallaxSystem _parallaxSystem;
 
-    protected override bool Draggable => true;
+    /// <summary>StarHorizon: консоль дроп-подов отключает перетаскивание карты правой кнопкой.</summary>
+    public bool AllowDragging = true;
+
+    protected override bool Draggable => AllowDragging;
     protected override bool AllowResize => true; // Lua
     protected override bool ScaleWithControlSize => true; // Lua
     protected override Vector2 MidPointVector => new Vector2(PixelWidth * 0.5f, PixelHeight * 0.5f);
