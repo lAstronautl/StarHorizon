@@ -52,7 +52,7 @@ public sealed class DropPodSystem : EntitySystem
     [Dependency] private readonly SalvageSystem _salvage = default!;
 
     /// <summary>Меньше этого времени до закрытия экспедиции сбрасываться на неё уже поздно.</summary>
-    private static readonly TimeSpan PlanetMinTimeLeft = TimeSpan.FromSeconds(90);
+    private static readonly TimeSpan PlanetMinTimeLeft = TimeSpan.FromMinutes(5);
     [Dependency] private readonly DamageableSystem _damageable = default!;
 
     public override void Initialize()
@@ -166,11 +166,10 @@ public sealed class DropPodSystem : EntitySystem
         return true;
     }
 
-    /// <summary>Планета принимает капсулы: экспедиции нет (создастся) или она идёт и ещё не скоро закроется.</summary>
+    /// <summary>Планета принимает капсулы, пока до смены задания (закрытия экспедиции) осталось не меньше 5 минут.</summary>
     private bool PlanetAcceptsPods(ExpeditionPlanetComponent planet)
     {
-        return planet.Status != PlanetExpeditionStatus.Active
-               || planet.EndTime - _timing.CurTime >= PlanetMinTimeLeft;
+        return planet.EndTime - _timing.CurTime >= PlanetMinTimeLeft;
     }
 
     /// <summary>Цель-шаттл + сигнал.</summary>

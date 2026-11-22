@@ -179,4 +179,54 @@ public sealed class ExpeditionPlanetTest
 
         await pair.CleanReturnAsync();
     }
+
+    /// <summary>Таймер планеты идёт всегда: без карты задание само меняется по его концу; в последние 5 минут капсулы не принимаются.</summary>
+    [Test]
+    public async Task PlanetTimerRunsAlways()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { FailureLogLevel = LogLevel.Fatal });
+        var server = pair.Server;
+        var map = await pair.CreateTestMap();
+        var salvage = server.System<SalvageSystem>();
+        var timing = server.Resolve<IGameTiming>();
+
+        EntityUid planet = default, console = default, pod = default;
+        await server.WaitPost(() =>
+        {
+            planet = server.EntMan.SpawnEntity("ExpeditionPlanet", new Robust.Shared.Map.MapCoordinates(new Vector2(3000, 0), map.MapId));
+            var planetComp = server.EntMan.GetComponent<ExpeditionPlanetComponent>(planet);
+            server.System<ExpeditionPlanetSystem>().SetupPlanet(planet, planetComp, "Grasslands", 0.5f);
+            console = server.EntMan.SpawnEntity("StarHorizonDropPodConsole", map.GridCoords);
+            pod = server.EntMan.SpawnEntity("StarHorizonDropPod", map.GridCoords);
+            server.System<EntityStorageSystem>().CloseStorage(pod);
+            server.System<SharedDeviceLinkSystem>().LinkDefaults(null, console, pod);
+        });
+        await pair.RunSeconds(1f);
+
+        var comp = server.EntMan.GetComponent<ExpeditionPlanetComponent>(planet);
+        var duration = TimeSpan.FromSeconds(server.CfgMan.GetCVar(CCVars.SalvageExpeditionDuration));
+        Assert.That(salvage.GetPlanetInfos(), Has.Count.EqualTo(1));
+        Assert.That(comp.EndTime - timing.CurTime, Is.GreaterThan(duration - TimeSpan.FromMinutes(1)),
+            "таймер идёт у задания без карты");
+
+        // Меньше 5 минут: капсулы не принимаются.
+        await server.WaitPost(() =>
+        {
+            comp.EndTime = timing.CurTime + TimeSpan.FromMinutes(4);
+            server.EntMan.EventBus.RaiseLocalEvent(console, (object) new DropPodArmPlanetMessage(server.EntMan.GetNetEntity(planet)));
+        });
+        await pair.RunSeconds(0.3f);
+        Assert.That(server.EntMan.GetComponent<DropPodComponent>(pod).Plan?.Planet, Is.Null, "в последние 5 минут не пускаем");
+
+        // Таймер кончился, карты нет: задание сменилось, время уже идёт.
+        var first = comp.Mission!;
+        await server.WaitPost(() => comp.EndTime = timing.CurTime - TimeSpan.FromSeconds(1));
+        await pair.RunSeconds(1f);
+        Assert.That(comp.Mission, Is.Not.EqualTo(first), "задание сменилось");
+        Assert.That(comp.EndTime - timing.CurTime, Is.GreaterThan(duration - TimeSpan.FromMinutes(1)), "у нового задания время уже идёт");
+        Assert.That(comp.Status, Is.EqualTo(PlanetExpeditionStatus.Idle));
+        Assert.That(CountExpeditionMaps(server), Is.EqualTo(0));
+
+        await pair.CleanReturnAsync();
+    }
 }

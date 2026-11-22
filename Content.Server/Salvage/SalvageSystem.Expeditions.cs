@@ -115,6 +115,9 @@ public sealed partial class SalvageSystem
             Difficulty = difficulty,
             Biome = planet.Comp.BiomeId,
         };
+
+        // Время планеты идёт всегда: у нового задания таймер уже запущен, по его концу задание сменится.
+        planet.Comp.EndTime = _timing.CurTime + TimeSpan.FromSeconds(_configurationManager.GetCVar(CCVars.SalvageExpeditionDuration));
     }
 
     /// <summary>The planet's task, rolled on first use.</summary>
@@ -181,13 +184,14 @@ public sealed partial class SalvageSystem
 
         if (!args.Success || !TryComp<SalvageExpeditionComponent>(args.Map, out var expedition))
         {
-            // Generation failed: the map is deleted by the job, give the planet a fresh task.
-            ResetPlanet((uid, planet));
+            // Generation failed: the map is deleted by the job, the task stays and its timer keeps running.
+            planet.ExpeditionMap = null;
+            planet.Status = PlanetExpeditionStatus.Idle;
+            RefreshConsoles();
             return;
         }
 
         planet.Status = PlanetExpeditionStatus.Active;
-        planet.EndTime = expedition.EndTime;
         RefreshConsoles();
     }
 
@@ -196,7 +200,6 @@ public sealed partial class SalvageSystem
     {
         planet.Comp.ExpeditionMap = null;
         planet.Comp.Status = PlanetExpeditionStatus.Idle;
-        planet.Comp.EndTime = TimeSpan.Zero;
         RollPlanetMission(planet);
         RefreshConsoles();
     }
@@ -255,9 +258,24 @@ public sealed partial class SalvageSystem
         }
     }
 
+    /// <summary>Таймер каждой планеты идёт всегда: когда он кончился, а карты нет, задание меняется на новое.</summary>
+    private void UpdatePlanetCycles()
+    {
+        var query = EntityQueryEnumerator<ExpeditionPlanetComponent>();
+        while (query.MoveNext(out var uid, out var planet))
+        {
+            if (planet.Mission == null || (planet.Status == PlanetExpeditionStatus.Idle && _timing.CurTime >= planet.EndTime))
+            {
+                RollPlanetMission((uid, planet));
+                RefreshConsoles();
+            }
+        }
+    }
+
     private void UpdateExpeditions()
     {
         _salvageQueue.Process();
+        UpdatePlanetCycles();
 
         foreach (var (job, cancelToken) in _salvageJobs.ToArray())
         {

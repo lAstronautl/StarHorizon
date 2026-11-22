@@ -243,13 +243,17 @@ public sealed class SpawnSalvageMissionJob : Job<bool>
         }
 
         _map.InitializeMap(mapId);
-        _map.SetPaused(mapUid, true);
+        // Planet expeditions run on the planet's own timer, so their map is never paused.
+        if (!Planet.IsValid())
+            _map.SetPaused(mapUid, true);
 
         // Setup expedition
         var expedition = _entManager.AddComponent<SalvageExpeditionComponent>(mapUid);
         expedition.Station = Station;
         expedition.Planet = Planet;
-        expedition.EndTime = _timing.CurTime + mission.Duration;
+        expedition.EndTime = Planet.IsValid()
+            ? _entManager.GetComponent<Content.Shared._Horizon.SpaceHazards.ExpeditionPlanetComponent>(Planet).EndTime
+            : _timing.CurTime + mission.Duration;
         expedition.MissionParams = _missionParams;
 
         if (difficultyProto.EndSound != null)

@@ -89,7 +89,11 @@ public sealed partial class SalvageExpeditionWindow : FancyWindow
             switch (info.Status)
             {
                 case PlanetExpeditionStatus.Idle:
-                    label.Text = Loc.GetString("salvage-expedition-planet-status-idle");
+                    var idleLeft = info.EndTime - _timing.CurTime;
+                    if (idleLeft < TimeSpan.Zero)
+                        idleLeft = TimeSpan.Zero;
+                    label.Text = Loc.GetString("salvage-expedition-planet-status-idle",
+                        ("time", $"{(int) idleLeft.TotalMinutes:00}:{idleLeft.Seconds:00}"));
                     label.FontColorOverride = Muted;
                     break;
                 case PlanetExpeditionStatus.Generating:
