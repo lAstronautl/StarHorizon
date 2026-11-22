@@ -228,12 +228,13 @@ public sealed class DropPodWindow : DefaultWindow
 
             var button = new Button
             {
-                Text = $"{info.Name}  -  {type}, {difficulty}",
+                Text = info.Name,
                 ToggleMode = true,
                 Group = group,
                 HorizontalExpand = true,
                 ClipText = true,
             };
+            var missionText = $"{type}, {difficulty}";
             button.Pressed = _selectedPlanet == info.Planet;
             button.OnPressed += _ =>
             {
@@ -242,10 +243,12 @@ public sealed class DropPodWindow : DefaultWindow
                 OnArmPlanet?.Invoke(info.Planet);
             };
 
-            var status = new Label { Margin = new Thickness(8, 0, 0, 2) };
+            var mission = new Label { Text = missionText, Margin = new Thickness(8, 0, 0, 0), ClipText = true };
+            var status = new Label { Margin = new Thickness(8, 0, 0, 2), ClipText = true };
 
             var row = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Vertical };
             row.AddChild(button);
+            row.AddChild(mission);
             row.AddChild(status);
             _planetRows.AddChild(row);
             _planetStatuses.Add((status, info));
