@@ -7,7 +7,8 @@ using Robust.Shared.Animations;
 namespace Content.Client._StarHorizon.DropPod;
 
 /// <summary>
-/// Анимации капсулы: тряска и взлёт перед уходом в блюспейс, падение "с неба" при приземлении.
+/// Анимации капсулы: тряска и уход вниз перед БСС. Падение при приземлении здесь не анимируется:
+/// его показывает отдельная сущность с диагональным спрайтом (см. <c>StarHorizonDropPodLandingAnimation</c>).
 /// </summary>
 public sealed class DropPodVisualizerSystem : VisualizerSystem<DropPodComponent>
 {
@@ -32,9 +33,6 @@ public sealed class DropPodVisualizerSystem : VisualizerSystem<DropPodComponent>
         {
             case DropPodState.ZoomingOut:
                 AnimationSystem.Play((uid, player), MakeLaunchAnimation(component), AnimationKey);
-                break;
-            case DropPodState.Landing:
-                AnimationSystem.Play((uid, player), MakeLandingAnimation(), AnimationKey);
                 break;
             default:
                 SpriteSystem.SetScale((uid, args.Sprite), BaseScale);
@@ -99,72 +97,6 @@ public sealed class DropPodVisualizerSystem : VisualizerSystem<DropPodComponent>
         {
             Length = TimeSpan.FromSeconds(length),
             AnimationTracks = { offset, scale, color },
-        };
-    }
-
-    /// <summary>Капсула падает под углом 45°: большая и прозрачная, затем садится на место и выпрямляется.</summary>
-    private static Animation MakeLandingAnimation()
-    {
-        const float fall = DropPodTrailSystem.FallTime;
-        const float bounce = 0.15f;
-        const float length = fall + bounce;
-
-        return new Animation
-        {
-            Length = TimeSpan.FromSeconds(length),
-            AnimationTracks =
-            {
-                new AnimationTrackComponentProperty
-                {
-                    ComponentType = typeof(SpriteComponent),
-                    Property = nameof(SpriteComponent.Offset),
-                    InterpolationMode = AnimationInterpolationMode.Linear,
-                    KeyFrames =
-                    {
-                        new AnimationTrackProperty.KeyFrame(DropPodTrailSystem.FallDirection * DropPodTrailSystem.FallHeight, 0),
-                        new AnimationTrackProperty.KeyFrame(new Vector2(0, 0), fall),
-                        new AnimationTrackProperty.KeyFrame(new Vector2(0, 0.12f), bounce / 2),
-                        new AnimationTrackProperty.KeyFrame(new Vector2(0, 0), bounce / 2),
-                    },
-                },
-                // Летит под углом 45° и выпрямляется при касании.
-                new AnimationTrackComponentProperty
-                {
-                    ComponentType = typeof(SpriteComponent),
-                    Property = nameof(SpriteComponent.Rotation),
-                    InterpolationMode = AnimationInterpolationMode.Linear,
-                    KeyFrames =
-                    {
-                        new AnimationTrackProperty.KeyFrame(DropPodTrailSystem.Tilt, 0),
-                        new AnimationTrackProperty.KeyFrame(DropPodTrailSystem.Tilt, fall),
-                        new AnimationTrackProperty.KeyFrame(Angle.Zero, bounce),
-                    },
-                },
-                new AnimationTrackComponentProperty
-                {
-                    ComponentType = typeof(SpriteComponent),
-                    Property = nameof(SpriteComponent.Scale),
-                    InterpolationMode = AnimationInterpolationMode.Linear,
-                    KeyFrames =
-                    {
-                        new AnimationTrackProperty.KeyFrame(BaseScale * 2f, 0),
-                        new AnimationTrackProperty.KeyFrame(BaseScale, fall),
-                        new AnimationTrackProperty.KeyFrame(BaseScale, bounce),
-                    },
-                },
-                new AnimationTrackComponentProperty
-                {
-                    ComponentType = typeof(SpriteComponent),
-                    Property = nameof(SpriteComponent.Color),
-                    InterpolationMode = AnimationInterpolationMode.Linear,
-                    KeyFrames =
-                    {
-                        new AnimationTrackProperty.KeyFrame(new Color(1f, 1f, 1f, 0f), 0),
-                        new AnimationTrackProperty.KeyFrame(Color.White, fall * 0.6f),
-                        new AnimationTrackProperty.KeyFrame(Color.White, fall * 0.4f + bounce),
-                    },
-                },
-            },
         };
     }
 }

@@ -65,9 +65,12 @@ public sealed partial class DropPodComponent : Component
     [DataField]
     public TimeSpan ArrivalViewTime = TimeSpan.FromSeconds(3);
 
-    /// <summary>Падение капсулы и блокировка двери после касания.</summary>
+    /// <summary>
+    /// Падение: анимация-сущность (диагональный спрайт Goobstation) и шлейф дыма, капсула в это время скрыта.
+    /// Когда падение закончено, капсула появляется и приземляется. По умолчанию - длина спрайта.
+    /// </summary>
     [DataField]
-    public TimeSpan LandingTime = TimeSpan.FromSeconds(1);
+    public TimeSpan FallTime = TimeSpan.FromSeconds(DropPodLandingGeometry.TotalTime);
 
     /// <summary>Максимальное отдаление камеры перед уходом в блюспейс.</summary>
     [DataField]
@@ -94,6 +97,29 @@ public sealed partial class DropPodComponent : Component
     [DataField]
     public EntProtoId TrailEffect = "StarHorizonDropPodTrail";
 
+    /// <summary>Падающая капсула: анимированный диагональный спрайт, пока настоящая капсула скрыта.</summary>
+    [DataField]
+    public EntProtoId LandingAnimationEffect = "StarHorizonDropPodLandingAnimation";
+
+    /// <summary>Клуб дыма: по траектории падения и при ударе.</summary>
+    [DataField]
+    public EntProtoId SmokePuffEffect = "StarHorizonDropPodSmokePuff";
+
+    /// <summary>Сколько клубов дыма остаётся вдоль траектории, пока капсула падает.</summary>
+    [DataField]
+    public int TrailPuffCount = 9;
+
+    /// <summary>Сколько клубов дыма вылетает при ударе.</summary>
+    [DataField]
+    public int ImpactPuffCount = 7;
+
+    [DataField]
+    public SoundSpecifier LandingAnimationSound = new SoundPathSpecifier("/Audio/_Goobstation/DropPod/supplypodlanding.ogg");
+
+    /// <summary>Сколько клубов дыма вдоль траектории уже создано (только сервер).</summary>
+    [ViewVariables]
+    public int PuffsSpawned;
+
     [DataField]
     public SoundSpecifier LandingSound = new SoundPathSpecifier("/Audio/Effects/explosion1.ogg");
 }
@@ -111,7 +137,7 @@ public enum DropPodState : byte
     InBluespace,
     /// <summary>Камера переброшена на место посадки, виньетка снимается, капсулы ещё не видно.</summary>
     Arriving,
-    /// <summary>Виньетка снята: капсула физически приземляется с анимацией падения.</summary>
+    /// <summary>Падение: капсулы ещё не видно, летит анимация и дым; потом капсула появляется и приземляется.</summary>
     Landing,
 }
 

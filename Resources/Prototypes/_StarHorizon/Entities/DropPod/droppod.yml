@@ -68,7 +68,7 @@
           ZoomingOut: { visible: true, state: glow_blue }
           InBluespace: { visible: true, state: glow_blue }
           Arriving: { visible: false }
-          Landing: { visible: true, state: glow_red }
+          Landing: { visible: false }
   - type: Damageable
     damageContainer: StructuralInorganic
     damageModifierSet: Metallic
@@ -139,6 +139,49 @@
     tags:
     - HideContextMenu
 
+# Падающая капсула: анимированный диагональный спрайт (механика посадки из Goobstation/tgstation).
+# Настоящая капсула в это время скрыта, по окончании анимации она появляется на месте.
+- type: entity
+  id: StarHorizonDropPodLandingAnimation
+  name: falling drop pod
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Transform
+    noRot: true
+  - type: Sprite
+    sprite: _Goobstation/Objects/Specific/DropPod/landingpod.rsi
+    state: landing
+    offset: -1.7, 4.3
+    drawdepth: Objects
+    noRot: true
+  - type: TimedDespawn
+    lifetime: 1.81
+  - type: Tag
+    tags:
+    - HideContextMenu
+
+# Клуб дыма по траектории падения и при ударе; растёт и тает (DropPodTrailSystem).
+- type: entity
+  id: StarHorizonDropPodSmokePuff
+  name: smoke
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Transform
+    noRot: true
+  - type: Sprite
+    sprite: Effects/chemsmoke.rsi
+    state: chemsmoke_white
+    drawdepth: Effects
+    noRot: true
+    scale: 0.35, 0.35
+  - type: DropPodSmokePuff
+    lifetime: 2.5
+  - type: TimedDespawn
+    lifetime: 2.5
+  - type: Tag
+    tags:
+    - HideContextMenu
+
 - type: entity
   id: StarHorizonDropPodTrail
   name: drop pod trail
@@ -148,19 +191,19 @@
     noRot: true
   - type: Sprite
     # Длина, положение и прозрачность задаются клиентской анимацией (DropPodTrailSystem):
-    # полоса в 3 тайла постепенно вырастает за падающей капсулой.
+    # полоса в 3 тайла постепенно вырастает позади падающей капсулы, начиная с момента её падения.
     drawdepth: HighFloorObjects
     sprite: _StarHorizon/Effects/droppod_marker.rsi
     noRot: true
-    # Шлейф лежит вдоль траектории падения (45° по часовой стрелке).
-    rotation: -45
+    # Шлейф лежит вдоль диагональной траектории падения (см. DropPodLandingGeometry): ~22.4° против часовой.
+    rotation: 22.4
     color: "#ffffff00"
     layers:
     - state: smoke
   - type: DropPodTrail
-    lifetime: 2.5
+    lifetime: 3.6
   - type: TimedDespawn
-    lifetime: 2.5
+    lifetime: 3.6
   - type: Tag
     tags:
     - HideContextMenu

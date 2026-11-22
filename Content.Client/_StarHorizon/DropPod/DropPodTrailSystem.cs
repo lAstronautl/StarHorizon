@@ -7,25 +7,13 @@ using Robust.Shared.Animations;
 namespace Content.Client._StarHorizon.DropPod;
 
 /// <summary>
-/// Шлейф за падающей капсулой. Нижний край следует за капсулой (она падает под углом 45° на место посадки),
-/// а полоса постепенно вырастает до <see cref="TrailLength"/> тайлов позади неё. Потом плавно гаснет.
+/// Шлейф за падающей капсулой и клубы дыма. Падение идёт по диагонали (см. <see cref="DropPodLandingGeometry"/>):
+/// нижний край шлейфа следует за капсулой, а полоса вырастает позади неё до <see cref="DropPodLandingGeometry.TrailLength"/>
+/// тайлов, потом гаснет. Клубы дыма растут и тают.
 /// </summary>
 public sealed class DropPodTrailSystem : EntitySystem
 {
     [Dependency] private readonly AnimationPlayerSystem _animation = default!;
-
-    /// <summary>Должно совпадать с падением в <see cref="DropPodVisualizerSystem"/>.</summary>
-    public const float FallTime = 0.5f;
-    public const float FallHeight = 4f;
-
-    /// <summary>Капсула падает под углом: летит справа-сверху налево-вниз.</summary>
-    public static readonly Vector2 FallDirection = Vector2.Normalize(new Vector2(1f, 1f));
-
-    /// <summary>Наклон капсулы и шлейфа вдоль траектории (по часовой стрелке на 45°).</summary>
-    public static readonly Angle Tilt = Angle.FromDegrees(-45);
-
-    /// <summary>Длина шлейфа в тайлах.</summary>
-    public const float TrailLength = 3f;
 
     private const float Width = 1.5f;
 
@@ -33,17 +21,90 @@ public sealed class DropPodTrailSystem : EntitySystem
     {
         base.Initialize();
 
-        SubscribeLocalEvent<DropPodTrailComponent, ComponentStartup>(OnStartup);
+        SubscribeLocalEvent<DropPodTrailComponent, ComponentStartup>(OnTrailStartup);
+        SubscribeLocalEvent<DropPodSmokePuffComponent, ComponentStartup>(OnPuffStartup);
     }
 
-    private void OnStartup(Entity<DropPodTrailComponent> ent, ref ComponentStartup args)
+    private void OnTrailStartup(Entity<DropPodTrailComponent> ent, ref ComponentStartup args)
     {
-        var length = MathF.Max((float) ent.Comp.Lifetime.TotalSeconds, FallTime + 0.5f);
+        const int first = DropPodLandingGeometry.FirstVisibleFrame;
+        const int last = DropPodLandingGeometry.LastFrame;
+        const float step = DropPodLandingGeometry.FrameTime;
+        const float tiny = 0.01f;
+
+        var dir = DropPodLandingGeometry.PathDirection;
+        var begin = DropPodLandingGeometry.FrameStart(first);
+        var fallEnd = DropPodLandingGeometry.FrameStart(last);
+        var length = MathF.Max((float) ent.Comp.Lifetime.TotalSeconds, fallEnd + 1.5f);
         var player = EnsureComp<AnimationPlayerComponent>(ent);
 
-        // Центр полосы = низ (позиция капсулы) + половина длины; длина растёт от 0 до TrailLength,
-        // пока капсула падает с FallHeight до 0, так что нижний край всё время у капсулы.
-        const float start = 0.01f;
+        // Нижний край шлейфа идёт по реальным позициям капсулы в кадрах спрайта (она разгоняется),
+        // а длина растёт по мере пролёта, пока не дойдёт до TrailLength.
+        var origin = DropPodLandingGeometry.FrameOffset(first);
+        var offset = new AnimationTrackComponentProperty
+        {
+            ComponentType = typeof(SpriteComponent),
+            Property = nameof(SpriteComponent.Offset),
+            InterpolationMode = AnimationInterpolationMode.Linear,
+            KeyFrames =
+            {
+                new AnimationTrackProperty.KeyFrame(origin + dir * (tiny / 2), 0),
+                new AnimationTrackProperty.KeyFrame(origin + dir * (tiny / 2), begin),
+            },
+        };
+        var scale = new AnimationTrackComponentProperty
+        {
+            ComponentType = typeof(SpriteComponent),
+            Property = nameof(SpriteComponent.Scale),
+            InterpolationMode = AnimationInterpolationMode.Linear,
+            KeyFrames =
+            {
+                new AnimationTrackProperty.KeyFrame(new Vector2(Width, tiny), 0),
+                new AnimationTrackProperty.KeyFrame(new Vector2(Width, tiny), begin),
+            },
+        };
+
+        for (var frame = first + 1; frame <= last; frame++)
+        {
+            var pod = DropPodLandingGeometry.FrameOffset(frame);
+            var travelled = (pod - origin).Length();
+            var len = MathF.Min(DropPodLandingGeometry.TrailLength, MathF.Max(tiny, travelled));
+            offset.KeyFrames.Add(new AnimationTrackProperty.KeyFrame(pod + dir * (len / 2), step));
+            scale.KeyFrames.Add(new AnimationTrackProperty.KeyFrame(new Vector2(Width, len), step));
+        }
+
+        var rest = length - fallEnd;
+        var endPod = DropPodLandingGeometry.FrameOffset(last);
+        offset.KeyFrames.Add(new AnimationTrackProperty.KeyFrame(endPod + dir * (DropPodLandingGeometry.TrailLength / 2), rest));
+        scale.KeyFrames.Add(new AnimationTrackProperty.KeyFrame(new Vector2(Width, DropPodLandingGeometry.TrailLength), rest));
+
+        var color = new AnimationTrackComponentProperty
+        {
+            ComponentType = typeof(SpriteComponent),
+            Property = nameof(SpriteComponent.Color),
+            InterpolationMode = AnimationInterpolationMode.Linear,
+            KeyFrames =
+            {
+                new AnimationTrackProperty.KeyFrame(new Color(1f, 1f, 1f, 0f), 0),
+                new AnimationTrackProperty.KeyFrame(new Color(1f, 1f, 1f, 0f), begin),
+                new AnimationTrackProperty.KeyFrame(new Color(1f, 1f, 1f, 0.85f), step),
+                new AnimationTrackProperty.KeyFrame(new Color(1f, 1f, 1f, 0.85f), fallEnd - begin - step),
+                new AnimationTrackProperty.KeyFrame(new Color(1f, 1f, 1f, 0f), rest),
+            },
+        };
+
+        _animation.Play((ent, player), new Animation
+        {
+            Length = TimeSpan.FromSeconds(length),
+            AnimationTracks = { offset, scale, color },
+        }, "trail");
+    }
+
+    private void OnPuffStartup(Entity<DropPodSmokePuffComponent> ent, ref ComponentStartup args)
+    {
+        var length = MathF.Max((float) ent.Comp.Lifetime.TotalSeconds, 0.5f);
+        var player = EnsureComp<AnimationPlayerComponent>(ent);
+
         var animation = new Animation
         {
             Length = TimeSpan.FromSeconds(length),
@@ -52,25 +113,12 @@ public sealed class DropPodTrailSystem : EntitySystem
                 new AnimationTrackComponentProperty
                 {
                     ComponentType = typeof(SpriteComponent),
-                    Property = nameof(SpriteComponent.Offset),
-                    InterpolationMode = AnimationInterpolationMode.Linear,
-                    KeyFrames =
-                    {
-                        new AnimationTrackProperty.KeyFrame(FallDirection * (FallHeight + start / 2), 0),
-                        new AnimationTrackProperty.KeyFrame(FallDirection * (TrailLength / 2), FallTime),
-                        new AnimationTrackProperty.KeyFrame(FallDirection * (TrailLength / 2), length - FallTime),
-                    },
-                },
-                new AnimationTrackComponentProperty
-                {
-                    ComponentType = typeof(SpriteComponent),
                     Property = nameof(SpriteComponent.Scale),
                     InterpolationMode = AnimationInterpolationMode.Linear,
                     KeyFrames =
                     {
-                        new AnimationTrackProperty.KeyFrame(new Vector2(Width, start), 0),
-                        new AnimationTrackProperty.KeyFrame(new Vector2(Width, TrailLength), FallTime),
-                        new AnimationTrackProperty.KeyFrame(new Vector2(Width, TrailLength), length - FallTime),
+                        new AnimationTrackProperty.KeyFrame(new Vector2(ent.Comp.StartScale), 0),
+                        new AnimationTrackProperty.KeyFrame(new Vector2(ent.Comp.EndScale), length),
                     },
                 },
                 new AnimationTrackComponentProperty
@@ -80,14 +128,14 @@ public sealed class DropPodTrailSystem : EntitySystem
                     InterpolationMode = AnimationInterpolationMode.Linear,
                     KeyFrames =
                     {
-                        new AnimationTrackProperty.KeyFrame(new Color(1f, 1f, 1f, 0.9f), 0),
-                        new AnimationTrackProperty.KeyFrame(new Color(1f, 1f, 1f, 0.9f), FallTime),
-                        new AnimationTrackProperty.KeyFrame(new Color(1f, 1f, 1f, 0f), length - FallTime),
+                        new AnimationTrackProperty.KeyFrame(new Color(1f, 1f, 1f, 0.75f), 0),
+                        new AnimationTrackProperty.KeyFrame(new Color(1f, 1f, 1f, 0.45f), length * 0.5f),
+                        new AnimationTrackProperty.KeyFrame(new Color(1f, 1f, 1f, 0f), length * 0.5f),
                     },
                 },
             },
         };
 
-        _animation.Play((ent, player), animation, "trail");
+        _animation.Play((ent, player), animation, "puff");
     }
 }

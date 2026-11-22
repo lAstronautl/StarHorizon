@@ -470,12 +470,14 @@ public sealed class DropPodSystem : EntitySystem
                     // Камера на месте посадки: зум возвращается, виньетка (отдельный компонент) снимается.
                     SetZoom(ent, Lerp(comp.PeakZoom, 1f, Smooth(t)));
                     if (now >= comp.StateEnd)
-                        Land(ent);
+                        BeginFall(ent);
                     break;
 
                 case DropPodState.Landing:
+                    // Падение: клубы дыма появляются вдоль траектории по мере того, как капсула пролетает.
+                    SpawnTrailPuffs(ent, (float) (now - comp.StateStart).TotalSeconds);
                     if (now >= comp.StateEnd)
-                        FinishLanding(ent);
+                        Land(ent);
                     break;
             }
         }
@@ -656,14 +658,49 @@ public sealed class DropPodSystem : EntitySystem
         SetState(ent, DropPodState.Arriving, ent.Comp.ArrivalViewTime);
     }
 
-    /// <summary>Виньетка снята: капсула физически приземляется с анимацией падения.</summary>
+    /// <summary>
+    /// Виньетка снята: начинается падение. Настоящая капсула остаётся скрытой, вместо неё летит анимированная
+    /// сущность (диагональный спрайт Goobstation), а за ней по траектории остаётся шлейф и клубы дыма.
+    /// </summary>
+    private void BeginFall(Entity<DropPodComponent> ent)
+    {
+        ClearVignette(ent);
+        ent.Comp.PuffsSpawned = 0;
+
+        var coords = Transform(ent).Coordinates;
+        SpawnAtPosition(ent.Comp.LandingAnimationEffect, coords);
+        SpawnAtPosition(ent.Comp.TrailEffect, coords);
+        _audio.PlayPvs(ent.Comp.LandingAnimationSound, ent);
+
+        SetState(ent, DropPodState.Landing, ent.Comp.FallTime);
+    }
+
+    /// <summary>Клубы дыма вдоль траектории: каждый появляется там, где в этот момент пролетает капсула.</summary>
+    private void SpawnTrailPuffs(Entity<DropPodComponent> ent, float elapsed)
+    {
+        var count = ent.Comp.TrailPuffCount;
+        if (count <= 0)
+            return;
+
+        var origin = _xform.GetMapCoordinates(ent.Owner);
+        while (ent.Comp.PuffsSpawned < count)
+        {
+            var frame = DropPodLandingGeometry.PuffFrame(ent.Comp.PuffsSpawned, count);
+            if (elapsed < DropPodLandingGeometry.FrameStart(frame))
+                return;
+
+            var pos = origin.Position + DropPodLandingGeometry.FrameOffset(frame);
+            SpawnAtPosition(ent.Comp.SmokePuffEffect, _xform.ToCoordinates(new MapCoordinates(pos, origin.MapId)));
+            ent.Comp.PuffsSpawned++;
+        }
+    }
+
+    /// <summary>Падение закончено: капсула появляется, бьёт по земле, поднимает дым и становится прикрученной.</summary>
     private void Land(Entity<DropPodComponent> ent)
     {
         QueueDel(ent.Comp.Marker);
         ent.Comp.Marker = null;
         ent.Comp.TargetGrid = null;
-
-        ClearVignette(ent);
 
         if (TryComp(ent, out PhysicsComponent? physics))
             _physics.SetCanCollide(ent, true, body: physics);
@@ -678,15 +715,21 @@ public sealed class DropPodSystem : EntitySystem
             _physics.SetBodyType(ent, BodyType.Static, body: body);
         }
 
-        SpawnAtPosition(ent.Comp.LandingEffect, Transform(ent).Coordinates);
-        SpawnAtPosition(ent.Comp.TrailEffect, Transform(ent).Coordinates);
-        SpawnAtPosition(ent.Comp.LaunchEffect, Transform(ent).Coordinates);
+        var coords = Transform(ent).Coordinates;
+        SpawnAtPosition(ent.Comp.LandingEffect, coords);
         _audio.PlayPvs(ent.Comp.LandingSound, ent);
+
+        // Удар: облако дыма вокруг капсулы.
+        var impact = _xform.GetMapCoordinates(ent.Owner);
+        for (var i = 0; i < ent.Comp.ImpactPuffCount; i++)
+        {
+            var offset = _random.NextVector2(0.2f, 1.1f);
+            SpawnAtPosition(ent.Comp.SmokePuffEffect, _xform.ToCoordinates(new MapCoordinates(impact.Position + offset, impact.MapId)));
+        }
 
         if (!ent.Comp.LandingDamage.Empty)
         {
-            var landing = _xform.GetMapCoordinates(ent.Owner);
-            foreach (var mob in _lookup.GetEntitiesInRange<MobStateComponent>(landing, ent.Comp.LandingRadius))
+            foreach (var mob in _lookup.GetEntitiesInRange<MobStateComponent>(impact, ent.Comp.LandingRadius))
             {
                 if (mob.Owner == ent.Owner)
                     continue;
@@ -695,11 +738,6 @@ public sealed class DropPodSystem : EntitySystem
             }
         }
 
-        SetState(ent, DropPodState.Landing, ent.Comp.LandingTime);
-    }
-
-    private void FinishLanding(Entity<DropPodComponent> ent)
-    {
         ResetZoom(ent);
         RemCompDeferred<FTLComponent>(ent);
         SetState(ent, DropPodState.Idle, TimeSpan.Zero);

@@ -55,6 +55,19 @@ public sealed class DropPodTest
         });
     }
 
+    private static int CountEntities(Robust.UnitTesting.RobustIntegrationTest.ServerIntegrationInstance server, string proto)
+    {
+        var count = 0;
+        var query = server.EntMan.AllEntityQueryEnumerator<MetaDataComponent>();
+        while (query.MoveNext(out var meta))
+        {
+            if (meta.EntityPrototype?.ID == proto && meta.EntityLifeStage < EntityLifeStage.Terminating)
+                count++;
+        }
+
+        return count;
+    }
+
     private static void MakeFast(DropPodComponent pod)
     {
         pod.CountdownTime = Fast;
@@ -62,7 +75,6 @@ public sealed class DropPodTest
         pod.VignetteDelay = TimeSpan.FromSeconds(0.3);
         pod.FlightTime = Fast;
         pod.ArrivalViewTime = Fast;
-        pod.LandingTime = Fast;
     }
 
     [Test]
@@ -147,22 +159,27 @@ public sealed class DropPodTest
         Assert.That(eye.TargetZoom.X, Is.GreaterThan(1.0f).And.LessThan(comp.PeakZoom));
         Assert.That(comp.Used, Is.False, "физически ещё не приземлилась");
 
-        // Виньетка снята: капсула физически приземляется.
+        // Виньетка снята: началось падение. Настоящая капсула ещё скрыта, вместо неё летит анимация и дым.
         await pair.RunSeconds(1.0f);
         Assert.That(comp.State, Is.EqualTo(DropPodState.Landing));
+        Assert.That(server.EntMan.HasComponent<DropPodVignetteComponent>(mob), Is.False, "виньетка снята");
+        Assert.That(appearance.TryGetData<bool>(pod, DropPodVisuals.InFlight, out hidden) && hidden, "капсула в падении скрыта");
+        Assert.That(comp.Used, Is.False, "физически ещё не приземлилась");
+        Assert.That(CountEntities(server, "StarHorizonDropPodLandingAnimation"), Is.EqualTo(1), "летит анимация падения");
+        Assert.That(CountEntities(server, "StarHorizonDropPodTrail"), Is.EqualTo(1), "и шлейф");
+
+        // Падение закончилось (анимация длится 1.81 с): капсула появилась, ударила, поднялся дым.
+        await pair.RunSeconds(1.9f);
+        Assert.That(comp.State, Is.EqualTo(DropPodState.Idle));
         Assert.That((xform.GetWorldPosition(pod) - target).Length(), Is.LessThan(0.5f), "капсула в точке метки");
         Assert.That(appearance.TryGetData<bool>(pod, DropPodVisuals.InFlight, out hidden) && hidden, Is.False, "капсула появилась");
         Assert.That(server.EntMan.Deleted(comp.Marker), "метка исчезла");
-        Assert.That(server.EntMan.HasComponent<DropPodVignetteComponent>(mob), Is.False, "виньетка снята");
         Assert.That(comp.Used, "приземлилась");
-
-        await pair.RunSeconds(1.5f);
-        Assert.That(comp.State, Is.EqualTo(DropPodState.Idle));
+        Assert.That(CountEntities(server, "StarHorizonDropPodSmokePuff"), Is.GreaterThanOrEqualTo(comp.TrailPuffCount + comp.ImpactPuffCount), "дым вдоль траектории и при ударе");
         Assert.That(eye.TargetZoom.X, Is.EqualTo(1f).Within(0.01f));
         Assert.That(server.EntMan.HasComponent<DropPodVignetteComponent>(mob), Is.False);
 
         // Одноразовая: помечена использованной, на месте, повторный запуск отклоняется.
-        Assert.That(comp.Used, "капсула одноразовая");
         Assert.That(server.EntMan.GetComponent<Robust.Shared.Physics.Components.PhysicsComponent>(pod).BodyType, Is.EqualTo(Robust.Shared.Physics.BodyType.Static), "в космосе капсула неподвижна");
         await server.WaitPost(() => server.EntMan.EventBus.RaiseLocalEvent(console, (object) new DropPodLaunchMessage(new Vector2(10, 10))));
         await pair.RunSeconds(0.3f);
@@ -249,7 +266,7 @@ public sealed class DropPodTest
         Assert.That((world - wallPos).Length(), Is.GreaterThan(0.4f));
 
         // После посадки на грид капсула одноразовая и снова прикручена (на время полёта движок её открепил).
-        await pair.RunSeconds(1.5f);
+        await pair.RunSeconds(2.2f);
         Assert.That(podComp.Used);
         Assert.That(server.EntMan.GetComponent<TransformComponent>(pod).Anchored, "капсула прикручена к полу после посадки");
 
@@ -302,7 +319,7 @@ public sealed class DropPodTest
         Assert.That(comp2.State, Is.EqualTo(DropPodState.ZoomingOut), "вторая стартовала секундой позже");
 
         // Обе приземляются, в разных точках и не друг на друге; обе одноразовые.
-        await pair.RunSeconds(5.0f);
+        await pair.RunSeconds(6.0f);
         Assert.That(comp1.Used && comp2.Used, "обе приземлились");
         var d = (xform.GetWorldPosition(pod1) - xform.GetWorldPosition(pod2)).Length();
         Assert.That(d, Is.GreaterThan(1.0f), "капсулы разведены в разные точки");
