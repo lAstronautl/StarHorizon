@@ -1,7 +1,9 @@
-salvage-expedition-no-planet = No planet in range! Fly closer to a planet to start an expedition.
-salvage-expedition-no-planet-title = There are no orders near you that you can take
-salvage-expedition-no-planet-hint = Fly to a place where orders are available
 sector-map-planet = Planet
 sector-map-black-hole = Black hole (danger)
 sector-map-star = Star (danger)
 sector-map-star-boost = Star: panels x{ $multiplier }, dangerous up close
+salvage-expedition-window-hint = A planet's expedition starts when a drop pod is dropped on it and runs for everyone. A drop pod is the only way in.
+salvage-expedition-planet-status-idle = Waiting for a drop pod
+salvage-expedition-planet-status-generating = Being created...
+salvage-expedition-planet-status-active = Running, { $time } left
+salvage-expedition-planet-status-closing = Closing

@@ -60,6 +60,12 @@ public sealed class SpawnSalvageMissionJob : Job<bool>
     public readonly EntityUid Station;
 
     public readonly EntityUid Shuttle; // Frontier
+
+    /// <summary>Expedition planet this job builds the map for (planet expeditions have no station and no shuttle).</summary>
+    public readonly EntityUid Planet;
+
+    /// <summary>Map entity created in advance by the caller, so drop pods have a valid destination at once.</summary>
+    private readonly EntityUid _presetMap;
     public readonly EntityUid? CoordinatesDisk;
     private readonly SalvageMissionParams _missionParams;
 
@@ -90,7 +96,9 @@ public sealed class SpawnSalvageMissionJob : Job<bool>
         EntityUid shuttle, // Frontier
         EntityUid? coordinatesDisk,
         SalvageMissionParams missionParams,
-        CancellationToken cancellation = default) : base(maxTime, cancellation)
+        CancellationToken cancellation = default,
+        EntityUid planet = default,
+        EntityUid presetMap = default) : base(maxTime, cancellation)
     {
         _entManager = entManager;
         _timing = timing;
@@ -107,6 +115,8 @@ public sealed class SpawnSalvageMissionJob : Job<bool>
         Shuttle = shuttle; // Frontier
         CoordinatesDisk = coordinatesDisk;
         _missionParams = missionParams;
+        Planet = planet;
+        _presetMap = presetMap;
         _sawmill = logManager.GetSawmill("salvage_job");
 #if !DEBUG
         _sawmill.Level = LogLevel.Info;
@@ -124,8 +134,16 @@ public sealed class SpawnSalvageMissionJob : Job<bool>
         }
         finally
         {
-            ExpeditionSpawnCompleteEvent ev = new(Station, success, _missionParams.Index);
-            _entManager.EventBus.RaiseLocalEvent(Station, ev);
+            if (Planet.IsValid())
+            {
+                // Planet expedition: tell the planet (no station involved).
+                _entManager.EventBus.RaiseLocalEvent(Planet, new PlanetExpeditionSpawnCompleteEvent(mapUid, success));
+            }
+            else
+            {
+                ExpeditionSpawnCompleteEvent ev = new(Station, success, _missionParams.Index);
+                _entManager.EventBus.RaiseLocalEvent(Station, ev);
+            }
             if (errorStackTrace != null)
                 _sawmill.Error("salvage", $"Expedition generation failed with exception: {errorStackTrace}!");
             if (!success)
@@ -144,18 +162,34 @@ public sealed class SpawnSalvageMissionJob : Job<bool>
     private async Task<bool> InternalProcess() // Frontier: make process an internal function (for a try block indenting an entire), add "out EntityUid mapUid" param
     {
         _sawmill.Debug("salvage", $"Spawning salvage mission with seed {_missionParams.Seed}");
-        mapUid = _map.CreateMap(out var mapId, runMapInit: false); // Frontier: remove var
+        MapId mapId;
+        if (_presetMap.IsValid())
+        {
+            // Planet expedition: the map was created by the caller (not initialized yet).
+            mapUid = _presetMap;
+            mapId = _entManager.GetComponent<MapComponent>(mapUid).MapId;
+        }
+        else
+        {
+            mapUid = _map.CreateMap(out mapId, runMapInit: false); // Frontier: remove var
+        }
+
         MetaDataComponent? metadata = null;
         var grid = _entManager.EnsureComponent<MapGridComponent>(mapUid);
         var random = new Random(_missionParams.Seed);
-        var destComp = _entManager.AddComponent<FTLDestinationComponent>(mapUid);
-        destComp.BeaconsOnly = true;
-        destComp.RequireCoordinateDisk = true;
-        destComp.Enabled = true;
+        // Planet expeditions are reached only by drop pods: no FTL destination and no beacon for ships.
+        if (!Planet.IsValid())
+        {
+            var destComp = _entManager.AddComponent<FTLDestinationComponent>(mapUid);
+            destComp.BeaconsOnly = true;
+            destComp.RequireCoordinateDisk = true;
+            destComp.Enabled = true;
+        }
         _metaData.SetEntityName(
             mapUid,
             _entManager.System<SharedSalvageSystem>().GetFTLName(_prototypeManager.Index(SalvageSystem.PlanetNames), _missionParams.Seed));
-        _entManager.AddComponent<FTLBeaconComponent>(mapUid);
+        if (!Planet.IsValid())
+            _entManager.AddComponent<FTLBeaconComponent>(mapUid);
         _entManager.EnsureComponent<AtmosDisabledMapComponent>(mapUid); // Frontier: disable atmos devices on exped map
 
         // Saving the mission mapUid to a CD is made optional, in case one is somehow made in a process without a CD entity
@@ -214,6 +248,7 @@ public sealed class SpawnSalvageMissionJob : Job<bool>
         // Setup expedition
         var expedition = _entManager.AddComponent<SalvageExpeditionComponent>(mapUid);
         expedition.Station = Station;
+        expedition.Planet = Planet;
         expedition.EndTime = _timing.CurTime + mission.Duration;
         expedition.MissionParams = _missionParams;
 
@@ -258,8 +293,6 @@ public sealed class SpawnSalvageMissionJob : Job<bool>
             dungeonBox = dungeonBox.ExtendToContain(tile);
         }
 
-        var stationData = _entManager.GetComponent<StationDataComponent>(Station);
-
         // Get ship bounding box relative to largest grid coords
         var shuttleUid = Shuttle;
 
@@ -278,6 +311,7 @@ public sealed class SpawnSalvageMissionJob : Job<bool>
         Vector2 shuttleProjection = new Vector2(shuttleBox.Width * -sin / 2, shuttleBox.Height * cos / 2); // Note: sine is negative because of CCW rotation (starting north, then west)
         Vector2 coords = dungeonBox.Center - dungeonProjection - dungeonOffset - shuttleProjection - shuttleBox.Center; // Coordinates to spawn the ship at to center it with the dungeon's bounding boxes
         coords = coords.Rounded(); // Ensure grid is aligned to map coords
+        expedition.LandingCoordinates = coords; // Drop pods land where an expedition ship used to arrive
 
         // List<Vector2i> reservedTiles = new();
 

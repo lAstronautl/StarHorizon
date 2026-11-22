@@ -35,6 +35,16 @@ public sealed partial class SalvageExpeditionComponent : SharedSalvageExpedition
     [DataField("station")]
     public EntityUid Station;
 
+    /// <summary>
+    /// Expedition planet this expedition belongs to (planet expeditions have no station and no shuttle).
+    /// </summary>
+    [ViewVariables]
+    public EntityUid Planet;
+
+    /// <summary>Where on this map drop pods land (the spot where an expedition ship used to arrive).</summary>
+    [ViewVariables]
+    public Vector2 LandingCoordinates = Vector2.Zero;
+
     [ViewVariables] public bool Completed = false;
 
     // Frontier: moved to Client

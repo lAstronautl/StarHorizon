@@ -8,33 +8,43 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
 namespace Content.Shared.Salvage.Expeditions;
 
+/// <summary>В каком состоянии экспедиция планеты.</summary>
+[Serializable, NetSerializable]
+public enum PlanetExpeditionStatus : byte
+{
+    /// <summary>Задание выбрано, карты ещё нет: она создастся, когда на планету сбросят дроп-под.</summary>
+    Idle,
+
+    /// <summary>Дроп-под сброшен, карта экспедиции создаётся.</summary>
+    Generating,
+
+    /// <summary>Экспедиция идёт, до закрытия осталось время до <see cref="PlanetExpeditionInfo.EndTime"/>.</summary>
+    Active,
+}
+
+/// <summary>Одна планета и её экспедиция для консоли экспедиций и консоли дроп-подов.</summary>
+[Serializable, NetSerializable]
+public sealed record PlanetExpeditionInfo(
+    NetEntity Planet,
+    string Name,
+    PlanetExpeditionStatus Status,
+    SalvageMissionParams Mission,
+    TimeSpan EndTime);
+
+/// <summary>Консоль экспедиций информационная: показывает экспедицию каждой планеты и сколько времени осталось.</summary>
 [Serializable, NetSerializable]
 public sealed class SalvageExpeditionConsoleState : BoundUserInterfaceState
 {
-    public TimeSpan NextOffer;
-    public bool Claimed;
-    public bool Cooldown;
-    public ushort ActiveMission;
-    public List<SalvageMissionParams> Missions;
-    public bool CanFinish; // Frontier
-    public TimeSpan CooldownTime; // Frontier: separate fail vs. success time
-    public bool NoPlanet; // Horizon: console is not near an expedition planet, so expeditions cannot be started
-    public string? PlanetBiome; // Horizon: biome of the nearby expedition planet; missions use it
+    public List<PlanetExpeditionInfo> Planets;
 
-    public SalvageExpeditionConsoleState(TimeSpan nextOffer, bool claimed, bool cooldown, ushort activeMission, List<SalvageMissionParams> missions, bool canFinish, TimeSpan cooldownTime) // Frontier: add canFinish, cooldownTime
+    public SalvageExpeditionConsoleState(List<PlanetExpeditionInfo> planets)
     {
-        NextOffer = nextOffer;
-        Claimed = claimed;
-        Cooldown = cooldown;
-        ActiveMission = activeMission;
-        Missions = missions;
-        CanFinish = canFinish; // Frontier
-        CooldownTime = cooldownTime; // Frontier
+        Planets = planets;
     }
 }
 
 /// <summary>
-/// Used to interact with salvage expeditions and claim them.
+/// Показывает экспедиции планет. Экспедиции запускаются сбросом дроп-пода на планету, а не через консоль.
 /// </summary>
 [RegisterComponent, NetworkedComponent]
 public sealed partial class SalvageExpeditionConsoleComponent : Component
@@ -59,17 +69,6 @@ public sealed partial class SalvageExpeditionConsoleComponent : Component
     public bool Debug = false;
     // End Frontier: 
 }
-
-[Serializable, NetSerializable]
-public sealed class ClaimSalvageMessage : BoundUserInterfaceMessage
-{
-    public ushort Index;
-}
-
-// Frontier: early expedition finish
-[Serializable, NetSerializable]
-public sealed class FinishSalvageMessage : BoundUserInterfaceMessage;
-// End Frontier: early expedition finish
 
 /// <summary>
 /// Added per station to store data on their available salvage missions.

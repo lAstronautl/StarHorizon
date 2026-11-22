@@ -108,14 +108,6 @@ public sealed partial class SalvageSystem
         if (component.Stage != ExpeditionStage.Added)
             return;
 
-        // Frontier: early finish
-        if (TryComp<SalvageExpeditionDataComponent>(component.Station, out var data))
-        {
-            data.CanFinish = true;
-            UpdateConsoles((component.Station, data));
-        }
-        // End Frontier: early finish
-
         var isInferno = component.MissionParams.Difficulty == "Inferno";
         var countdownMinutesKey = isInferno ? "salvage-expedition-inferno-countdown-minutes" : "salvage-expedition-announcement-countdown-minutes";
         Announce(args.MapUid, Loc.GetString(countdownMinutesKey, ("duration", (component.EndTime - _timing.CurTime).Minutes)));

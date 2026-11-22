@@ -4,8 +4,8 @@ using Robust.Shared.GameStates;
 namespace Content.Shared._Horizon.SpaceHazards;
 
 /// <summary>
-/// A planet in the sector map that expeditions can be started from. Salvage expedition consoles only work within
-/// <see cref="Range"/> of one, and the expedition uses this planet's biome.
+/// A planet in the sector map with exactly one expedition. The expedition map is generated only when a drop pod is
+/// dropped on the planet, runs for the normal expedition time for everybody, and a new task is rolled when it closes.
 /// </summary>
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
 public sealed partial class ExpeditionPlanetComponent : Component
@@ -33,9 +33,24 @@ public sealed partial class ExpeditionPlanetComponent : Component
     public float Range = 450f;
 
     /// <summary>
-    /// The planet's own pool of expedition offers, identical for every console that comes near. Server-side only,
-    /// filled lazily and replaced once an offer is claimed.
+    /// The planet's single expedition task. Chosen randomly when first needed and re-rolled as soon as the
+    /// expedition on this planet closes. Server-side only.
     /// </summary>
     [ViewVariables]
-    public List<SalvageMissionParams> Missions = new();
+    public SalvageMissionParams? Mission;
+
+    /// <summary>The expedition map, once a drop pod has been dropped on this planet. Server-side only.</summary>
+    [ViewVariables]
+    public EntityUid? ExpeditionMap;
+
+    /// <summary>When the running expedition closes. Server-side only.</summary>
+    [ViewVariables]
+    public TimeSpan EndTime;
+
+    /// <summary>
+    /// Idle: the map does not exist (it is only generated when a pod is dropped). Generating: the map is being built.
+    /// Active: the expedition is running for everybody. Server-side only.
+    /// </summary>
+    [ViewVariables]
+    public PlanetExpeditionStatus Status = PlanetExpeditionStatus.Idle;
 }

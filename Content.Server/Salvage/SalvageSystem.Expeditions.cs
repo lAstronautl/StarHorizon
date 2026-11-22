@@ -28,8 +28,6 @@ public sealed partial class SalvageSystem
      * Handles setup / teardown of salvage expeditions.
      */
 
-    private const int MissionLimit = 5; // Frontier: 3<5
-
     private readonly JobQueue _salvageQueue = new();
     private readonly List<(SpawnSalvageMissionJob Job, CancellationTokenSource CancelToken)> _salvageJobs = new();
     private const double SalvageJobTime = 0.002;
@@ -37,8 +35,9 @@ public sealed partial class SalvageSystem
 
     [Dependency] private IConfigurationManager _configurationManager = default!; // Frontier
 
-    private float _cooldown;
-    private float _failedCooldown; // Frontier
+    /// <summary>Indices of planet tasks (unique per task, used as the mission id).</summary>
+    private ushort _planetMissionIndex = 1;
+
     public float TravelTime { get; private set; } // Frontier
     public bool ProximityCheck { get; private set; } // Frontier
 
@@ -46,9 +45,8 @@ public sealed partial class SalvageSystem
     {
         SubscribeLocalEvent<SalvageExpeditionConsoleComponent, ComponentInit>(OnSalvageConsoleInit);
         SubscribeLocalEvent<SalvageExpeditionConsoleComponent, EntParentChangedMessage>(OnSalvageConsoleParent);
-        SubscribeLocalEvent<SalvageExpeditionConsoleComponent, ClaimSalvageMessage>(OnSalvageClaimMessage);
-        SubscribeLocalEvent<SalvageExpeditionDataComponent, ExpeditionSpawnCompleteEvent>(OnExpeditionSpawnComplete); // Frontier: more gracefully handle expedition generation failures
-        SubscribeLocalEvent<SalvageExpeditionConsoleComponent, FinishSalvageMessage>(OnSalvageFinishMessage); // Frontier: For early finish
+        SubscribeLocalEvent<SalvageExpeditionConsoleComponent, BoundUIOpenedEvent>(OnSalvageConsoleOpened);
+        SubscribeLocalEvent<ExpeditionPlanetComponent, PlanetExpeditionSpawnCompleteEvent>(OnPlanetExpeditionSpawnComplete);
 
         SubscribeLocalEvent<SalvageExpeditionComponent, MapInitEvent>(OnExpeditionMapInit);
         SubscribeLocalEvent<SalvageExpeditionComponent, ComponentShutdown>(OnExpeditionShutdown);
@@ -57,11 +55,6 @@ public sealed partial class SalvageSystem
 
         SubscribeLocalEvent<SalvageStructureComponent, ExaminedEvent>(OnStructureExamine); // Frontier
 
-        _cooldown = _configurationManager.GetCVar(CCVars.SalvageExpeditionCooldown);
-        Subs.CVar(_configurationManager, CCVars.SalvageExpeditionCooldown, SetCooldownChange);
-
-        _failedCooldown = _configurationManager.GetCVar(NFCCVars.SalvageExpeditionFailedCooldown); // Frontier
-        Subs.CVar(_configurationManager, NFCCVars.SalvageExpeditionFailedCooldown, SetFailedCooldownChange); // Frontier
         TravelTime = _configurationManager.GetCVar(NFCCVars.SalvageExpeditionTravelTime); // Frontier
         Subs.CVar(_configurationManager, NFCCVars.SalvageExpeditionTravelTime, SetTravelTime); // Frontier
         ProximityCheck = _configurationManager.GetCVar(NFCCVars.SalvageExpeditionProximityCheck); // Frontier
@@ -77,28 +70,6 @@ public sealed partial class SalvageSystem
         };
     }
 
-    private void SetCooldownChange(float obj)
-    {
-        // Update the active cooldowns if we change it.
-        var diff = obj - _cooldown;
-
-        var query = AllEntityQuery<SalvageExpeditionDataComponent>();
-
-        while (query.MoveNext(out var comp))
-        {
-            comp.NextOffer += TimeSpan.FromSeconds(diff);
-        }
-
-        _cooldown = obj;
-    }
-
-    // Frontier: failed cooldowns
-    private void SetFailedCooldownChange(float obj)
-    {
-        // Note: we don't know whether or not players have failed missions, so let's not punish/reward them if this gets changed.
-        _failedCooldown = obj;
-    }
-
     private void SetTravelTime(float obj)
     {
         TravelTime = obj;
@@ -108,12 +79,135 @@ public sealed partial class SalvageSystem
     {
         ProximityCheck = obj;
     }
-    // End Frontier
 
     private void OnExpeditionMapInit(EntityUid uid, SalvageExpeditionComponent component, MapInitEvent args)
     {
         component.SelectedSong = _audio.ResolveSound(component.Sound);
     }
+
+    #region Planet expeditions
+
+    /// <summary>
+    /// Rolls the planet's single expedition task: a random mission type and a random difficulty that fits the planet's
+    /// biome. Called when the planet needs its first task and again as soon as its expedition closes.
+    /// </summary>
+    public void RollPlanetMission(Entity<ExpeditionPlanetComponent> planet)
+    {
+        var pickable = _missionDifficulties.Where(d => BiomeFitsDifficulty(planet.Comp.BiomeId, d.id)).ToList();
+        if (pickable.Count <= 0)
+        {
+            Log.Error($"No expedition mission difficulties fit the biome {planet.Comp.BiomeId}!");
+            return;
+        }
+
+        var difficulty = pickable[_random.Next(pickable.Count)].id;
+
+        // For Inferno difficulty, always use Combined mission type
+        var missionType = difficulty == "Inferno"
+            ? SalvageMissionType.Combined
+            : (SalvageMissionType) _random.NextByte((byte) SalvageMissionType.Max + 1);
+
+        planet.Comp.Mission = new SalvageMissionParams
+        {
+            Index = _planetMissionIndex++,
+            MissionType = missionType,
+            Seed = _random.Next(),
+            Difficulty = difficulty,
+            Biome = planet.Comp.BiomeId,
+        };
+    }
+
+    /// <summary>The planet's task, rolled on first use.</summary>
+    public SalvageMissionParams? EnsurePlanetMission(Entity<ExpeditionPlanetComponent> planet)
+    {
+        if (planet.Comp.Mission == null)
+            RollPlanetMission(planet);
+
+        return planet.Comp.Mission;
+    }
+
+    /// <summary>
+    /// Starts the planet's expedition (a drop pod was dropped on it). The map is created at once so pods have a valid
+    /// destination, the dungeon and loot are generated by a background job. Does nothing if the expedition already runs.
+    /// </summary>
+    /// <returns>True if the expedition exists afterwards (started now or already running).</returns>
+    public bool StartPlanetExpedition(Entity<ExpeditionPlanetComponent> planet)
+    {
+        if (planet.Comp.Status != PlanetExpeditionStatus.Idle)
+            return planet.Comp.ExpeditionMap != null;
+
+        if (EnsurePlanetMission(planet) is not { } mission)
+            return false;
+
+        var mapUid = _mapSystem.CreateMap(out _, runMapInit: false);
+        planet.Comp.ExpeditionMap = mapUid;
+        planet.Comp.Status = PlanetExpeditionStatus.Generating;
+
+        var cancelToken = new CancellationTokenSource();
+        var job = new SpawnSalvageMissionJob(
+            SalvageJobTime,
+            EntityManager,
+            _timing,
+            _logManager,
+            _prototypeManager,
+            _anchorable,
+            _biome,
+            _dungeon,
+            _metaData,
+            _mapSystem,
+            _station,
+            _shuttle,
+            this,
+            EntityUid.Invalid, // no station
+            EntityUid.Invalid, // no shuttle: drop pods arrive instead
+            null,
+            mission,
+            cancelToken.Token,
+            planet.Owner,
+            mapUid);
+
+        _salvageJobs.Add((job, cancelToken));
+        _salvageQueue.EnqueueJob(job);
+
+        RefreshConsoles();
+        return true;
+    }
+
+    /// <summary>The expedition map is built: the expedition is open for everybody and its time is running.</summary>
+    private void OnPlanetExpeditionSpawnComplete(EntityUid uid, ExpeditionPlanetComponent planet, PlanetExpeditionSpawnCompleteEvent args)
+    {
+        if (planet.ExpeditionMap != args.Map)
+            return;
+
+        if (!args.Success || !TryComp<SalvageExpeditionComponent>(args.Map, out var expedition))
+        {
+            // Generation failed: the map is deleted by the job, give the planet a fresh task.
+            ResetPlanet((uid, planet));
+            return;
+        }
+
+        planet.Status = PlanetExpeditionStatus.Active;
+        planet.EndTime = expedition.EndTime;
+        RefreshConsoles();
+    }
+
+    /// <summary>The expedition of the planet ended: no map, a new task is rolled at once.</summary>
+    private void ResetPlanet(Entity<ExpeditionPlanetComponent> planet)
+    {
+        planet.Comp.ExpeditionMap = null;
+        planet.Comp.Status = PlanetExpeditionStatus.Idle;
+        planet.Comp.EndTime = TimeSpan.Zero;
+        RollPlanetMission(planet);
+        RefreshConsoles();
+    }
+
+    /// <summary>The map of a planet expedition at the planet. Null while the planet has none.</summary>
+    public EntityUid? GetPlanetExpeditionMap(EntityUid planet)
+    {
+        return TryComp<ExpeditionPlanetComponent>(planet, out var comp) ? comp.ExpeditionMap : null;
+    }
+
+    #endregion
 
     private void OnExpeditionShutdown(EntityUid uid, SalvageExpeditionComponent component, ComponentShutdown args)
     {
@@ -128,6 +222,29 @@ public sealed partial class SalvageSystem
             Dirty(disk, diskComp);
         }
 
+        // Planet expedition: close it and give the planet a new task.
+        if (component.Planet.IsValid())
+        {
+            foreach (var (job, cancelToken) in _salvageJobs.ToArray())
+            {
+                if (job.Planet == component.Planet)
+                {
+                    cancelToken.Cancel();
+                    _salvageJobs.Remove((job, cancelToken));
+                }
+            }
+
+            if (Exists(component.Planet)
+                && TryComp<ExpeditionPlanetComponent>(component.Planet, out var planet)
+                && planet.ExpeditionMap == uid)
+            {
+                Announce(uid, Loc.GetString(component.Completed ? "salvage-expedition-completed" : "salvage-expedition-failed"));
+                ResetPlanet((component.Planet, planet));
+            }
+
+            return;
+        }
+
         foreach (var (job, cancelToken) in _salvageJobs.ToArray())
         {
             if (job.Station == component.Station)
@@ -136,20 +253,10 @@ public sealed partial class SalvageSystem
                 _salvageJobs.Remove((job, cancelToken));
             }
         }
-
-        if (Deleted(component.Station))
-            return;
-
-        // Finish mission
-        if (TryComp<SalvageExpeditionDataComponent>(component.Station, out var data))
-        {
-            FinishExpedition((component.Station, data), component, uid); // Frontier: add component
-        }
     }
 
     private void UpdateExpeditions()
     {
-        var currentTime = _timing.CurTime;
         _salvageQueue.Process();
 
         foreach (var (job, cancelToken) in _salvageJobs.ToArray())
@@ -161,172 +268,12 @@ public sealed partial class SalvageSystem
                     break;
             }
         }
-
-        // Horizon
-        // Horizon: one timer, the same for everybody, re-rolls the offers of every expedition planet
-        if (currentTime >= _planetPoolNext)
-        {
-            _planetPoolNext = currentTime + TimeSpan.FromSeconds(_cooldown);
-            var planetQuery = EntityQueryEnumerator<ExpeditionPlanetComponent>();
-            while (planetQuery.MoveNext(out _, out var planetComp))
-            {
-                planetComp.Missions.Clear();
-            }
-            RefreshAllConsoles();
-        }
-        // End Horizon
-
-        // Frontier: exped console oriented query
-        var query = EntityQueryEnumerator<SalvageExpeditionConsoleComponent>();
-        while (query.MoveNext(out var consoleUid, out _))
-        {
-            var uid = _station.GetOwningStation(consoleUid);
-            if (uid is not { Valid: true })
-                continue;
-
-            if (!TryComp<SalvageExpeditionDataComponent>(uid, out var comp))
-                continue;
-            // End Frontier: exped console oriented query
-
-            // Update offers
-            if (comp.NextOffer > currentTime || comp.Claimed)
-                continue;
-
-            // Frontier: disable cooldown when still in FTL
-            if (!HasComp<FTLComponent>(Transform(consoleUid).GridUid))
-
-            {
-                comp.Cooldown = false;
-            }
-            // End Frontier: disable cooldown when still in FTL
-            // comp.NextOffer += TimeSpan.FromSeconds(_cooldown); // Frontier
-            comp.NextOffer = currentTime + TimeSpan.FromSeconds(_cooldown); // Frontier
-            comp.CooldownTime = TimeSpan.FromSeconds(_cooldown); // Frontier
-            GenerateMissions(comp);
-            UpdateConsoles((uid.Value, comp));
-        }
     }
 
-    private void FinishExpedition(Entity<SalvageExpeditionDataComponent> expedition, SalvageExpeditionComponent expeditionComp, EntityUid uid)
-    {
-        var component = expedition.Comp;
-        // Frontier: separate timeout/announcement for success/failures
-        if (expeditionComp.Completed)
-        {
-            component.NextOffer = _timing.CurTime + TimeSpan.FromSeconds(_cooldown);
-            component.CooldownTime = TimeSpan.FromSeconds(_cooldown);
-            Announce(uid, Loc.GetString("salvage-expedition-completed"));
-        }
-        else
-        {
-            component.NextOffer = _timing.CurTime + TimeSpan.FromSeconds(_failedCooldown);
-            component.CooldownTime = TimeSpan.FromSeconds(_failedCooldown);
-            Announce(uid, Loc.GetString("salvage-expedition-failed"));
-        }
-        // End Frontier: separate timeout/announcement for success/failures
-        component.ActiveMission = 0;
-        component.Cooldown = true;
-        UpdateConsoles(expedition);
-    }
-
-    private void GenerateMissions(SalvageExpeditionDataComponent component, Func<string, bool>? difficultyFilter = null) // Horizon: difficultyFilter
-    {
-        component.Missions.Clear();
-
-        // Frontier: generate missions from an arbitrary set of difficulties
-        // Horizon: planets only offer the difficulties that fit their biome
-        var pickable = difficultyFilter == null
-            ? _missionDifficulties
-            : _missionDifficulties.Where(d => difficultyFilter(d.id)).ToList();
-
-        if (pickable.Count <= 0)
-        {
-            Log.Error("No expedition mission difficulties to pick from!");
-            return;
-        }
-
-        // this doesn't support having more missions than types of ratings
-        // but the previous system didn't do that either.
-        var allDifficulties = pickable; // Frontier: Enum.GetValues<DifficultyRating>() < _missionDifficulties
-        _random.Shuffle(allDifficulties);
-        var difficulties = allDifficulties.Take(MissionLimit).ToList();
-
-        // If we support more missions than there are accepted types, pick more until you're up to MissionLimit
-        while (difficulties.Count < MissionLimit)
-        {
-            var difficultyIndex = _random.Next(pickable.Count);
-            difficulties.Add(pickable[difficultyIndex]);
-        }
-        difficulties.Sort((x, y) => { return Comparer<int>.Default.Compare(x.value, y.value); });
-
-        for (var i = 0; i < MissionLimit; i++)
-        {
-            // For Inferno difficulty, always use Combined mission type
-            var missionType = difficulties[i].id == "Inferno"
-                ? SalvageMissionType.Combined
-                : (SalvageMissionType)_random.NextByte((byte)SalvageMissionType.Max + 1);
-
-            var mission = new SalvageMissionParams
-            {
-                Index = component.NextIndex,
-                MissionType = missionType, // Frontier
-                Seed = _random.Next(),
-                Difficulty = difficulties[i].id,
-            };
-
-            component.Missions[component.NextIndex++] = mission;
-        }
-        // End Frontier: generate missions from an arbitrary set of difficulties
-    }
-
-    private SalvageExpeditionConsoleState GetState(SalvageExpeditionDataComponent component)
-    {
-        var missions = component.Missions.Values.ToList();
-        return new SalvageExpeditionConsoleState(component.NextOffer, component.Claimed, component.Cooldown, component.ActiveMission, missions, component.CanFinish, component.CooldownTime); // Frontier: add CanFinish, CooldownTime
-    }
-
-    private void SpawnMission(SalvageMissionParams missionParams, EntityUid station, EntityUid shuttle, EntityUid? coordinatesDisk) // Frontier: add shuttle
-    {
-        var cancelToken = new CancellationTokenSource();
-        var job = new SpawnSalvageMissionJob(
-            SalvageJobTime,
-            EntityManager,
-            _timing,
-            _logManager,
-            _prototypeManager,
-            _anchorable,
-            _biome,
-            _dungeon,
-            _metaData,
-            _mapSystem,
-            _station, // Frontier
-            _shuttle, // Frontier
-            this, // Frontier
-            station,
-            shuttle,
-            coordinatesDisk,
-            missionParams,
-            cancelToken.Token);
-
-        _salvageJobs.Add((job, cancelToken));
-        _salvageQueue.EnqueueJob(job);
-    }
-
-    // Frontier: Restore salvage structure examine, exped job handling, ghost reparenting
+    // Frontier: Restore salvage structure examine, ghost reparenting
     private void OnStructureExamine(EntityUid uid, SalvageStructureComponent component, ExaminedEvent args)
     {
         args.PushMarkup(Loc.GetString("salvage-expedition-structure-examine"));
-    }
-
-    // Handle exped spawn job failures gracefully - reset the console
-    private void OnExpeditionSpawnComplete(EntityUid uid, SalvageExpeditionDataComponent component, ExpeditionSpawnCompleteEvent ev)
-    {
-        if (component.ActiveMission == ev.MissionIndex && !ev.Success)
-        {
-            component.ActiveMission = 0;
-            component.Cooldown = false;
-            UpdateConsoles((uid, component));
-        }
     }
 
     // Send all ghosts (relevant for admins) back to the default map so they don't lose their stuff.

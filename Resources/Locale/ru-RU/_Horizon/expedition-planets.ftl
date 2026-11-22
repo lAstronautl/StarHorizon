@@ -1,7 +1,9 @@
-salvage-expedition-no-planet = Поблизости нет планеты! Подлетите ближе к планете, чтобы начать экспедицию.
-salvage-expedition-no-planet-title = Рядом с вами сейчас нету заказов, которые вы можете взять
-salvage-expedition-no-planet-hint = Подлетите к точке, где есть заказы
 sector-map-planet = Планета
 sector-map-black-hole = Чёрная дыра
 sector-map-star = Звезда
 sector-map-star-boost = Звезда
+salvage-expedition-window-hint = Экспедиция на планете начинается, когда на неё сбросили дроп-под, и идёт для всех. Попасть на неё можно только дроп-подом.
+salvage-expedition-planet-status-idle = Ждёт дроп-под
+salvage-expedition-planet-status-generating = Создаётся...
+salvage-expedition-planet-status-active = Идёт, осталось { $time }
+salvage-expedition-planet-status-closing = Закрывается
