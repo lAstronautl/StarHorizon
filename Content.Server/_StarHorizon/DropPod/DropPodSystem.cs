@@ -8,17 +8,14 @@ using Content.Shared._StarHorizon.DropPod;
 using Content.Shared.Damage;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Movement.Systems;
-using Content.Shared.Interaction;
+using Content.Shared.DeviceLinking;
 using Content.Shared.Popups;
-using Content.Shared.Storage.EntitySystems;
-using Content.Shared.Tools.Systems;
+using Content.Shared.Trigger;
 using Content.Shared.Storage.Components;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
-using Content.Shared.Tools;
-using Robust.Shared.Prototypes;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Random;
@@ -47,9 +44,7 @@ public sealed class DropPodSystem : EntitySystem
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly ShuttleSystem _shuttle = default!;
     [Dependency] private readonly SharedPointLightSystem _light = default!;
-    [Dependency] private readonly SharedToolSystem _tool = default!;
-
-    private static readonly ProtoId<ToolQualityPrototype> LinkQuality = "Pulsing";
+    [Dependency] private readonly SharedDeviceLinkSystem _deviceLink = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
 
     public override void Initialize()
@@ -58,16 +53,15 @@ public sealed class DropPodSystem : EntitySystem
 
         SubscribeLocalEvent<DropPodComponent, StorageOpenAttemptEvent>(OnStorageOpenAttempt);
         SubscribeLocalEvent<DropPodComponent, ComponentShutdown>(OnPodShutdown);
-        SubscribeLocalEvent<DropPodComponent, InteractUsingEvent>(OnPodInteractUsing,
-            before: new[] { typeof(SharedEntityStorageSystem) });
-        SubscribeLocalEvent<DropPodConsoleComponent, InteractUsingEvent>(OnConsoleInteractUsing,
-            before: new[] { typeof(SharedEntityStorageSystem) });
+        SubscribeLocalEvent<DropPodComponent, TriggerEvent>(OnTrigger);
         SubscribeLocalEvent<DropPodComponent, FTLStartedEvent>(OnFTLStarted);
         SubscribeLocalEvent<DropPodComponent, FTLCompletedEvent>(OnFTLCompleted);
 
         SubscribeLocalEvent<DropPodConsoleComponent, BoundUIOpenedEvent>(OnConsoleOpened);
         SubscribeLocalEvent<DropPodConsoleComponent, DropPodLaunchMessage>(OnLaunchMessage);
         SubscribeLocalEvent<DropPodConsoleComponent, DropPodAbortMessage>(OnAbortMessage);
+        SubscribeLocalEvent<DropPodConsoleComponent, DropPodArmMessage>(OnArmMessage);
+        SubscribeLocalEvent<DropPodConsoleComponent, DropPodArmCapturedMessage>(OnArmCapturedMessage);
         SubscribeLocalEvent<DropPodConsoleComponent, DropPodLaunchToCapturedMessage>(OnLaunchToCapturedMessage);
         SubscribeLocalEvent<DropPodConsoleComponent, DropPodCaptureMessage>(OnCaptureMessage);
         SubscribeLocalEvent<DropPodConsoleComponent, DropPodReleaseMessage>(OnReleaseMessage);
@@ -97,73 +91,148 @@ public sealed class DropPodSystem : EntitySystem
         UpdateConsole(ent);
     }
 
+    /// <summary>Цель-точка + сигнал: кнопка «Запуск» на консоли.</summary>
     private void OnLaunchMessage(Entity<DropPodConsoleComponent> ent, ref DropPodLaunchMessage args)
     {
-        var pods = ReadyPods(ent, out var error);
+        if (ArmPoint(ent, args.Target))
+            SendLaunchSignal(ent);
+    }
+
+    /// <summary>Только цель-точка: взлёт позже, от триггера любого привязанного устройства.</summary>
+    private void OnArmMessage(Entity<DropPodConsoleComponent> ent, ref DropPodArmMessage args)
+    {
+        ArmPoint(ent, args.Target);
+    }
+
+    /// <summary>Цель-шаттл + сигнал.</summary>
+    private void OnLaunchToCapturedMessage(Entity<DropPodConsoleComponent> ent, ref DropPodLaunchToCapturedMessage args)
+    {
+        if (ArmCaptured(ent))
+            SendLaunchSignal(ent);
+    }
+
+    /// <summary>Только цель-шаттл.</summary>
+    private void OnArmCapturedMessage(Entity<DropPodConsoleComponent> ent, ref DropPodArmCapturedMessage args)
+    {
+        ArmCaptured(ent);
+    }
+
+    /// <summary>
+    /// Записывает привязанным готовым капсулам план полёта в точку. Капсулы стартуют по очереди; на месте посадки
+    /// их разводим в ряд, чтобы не падали друг на друга.
+    /// </summary>
+    private bool ArmPoint(Entity<DropPodConsoleComponent> console, Vector2 target)
+    {
+        var pods = ReadyPods(console, out var error);
         if (pods.Count == 0)
         {
-            UpdateConsole(ent, error);
-            return;
+            UpdateConsole(console, error);
+            return false;
         }
 
-        var target = args.Target;
         if (!float.IsFinite(target.X) || !float.IsFinite(target.Y) ||
-            MathF.Abs(target.X) > ent.Comp.MaxCoordinate || MathF.Abs(target.Y) > ent.Comp.MaxCoordinate)
+            MathF.Abs(target.X) > console.Comp.MaxCoordinate || MathF.Abs(target.Y) > console.Comp.MaxCoordinate)
         {
-            UpdateConsole(ent, "droppod-error-bad-target");
-            return;
+            UpdateConsole(console, "droppod-error-bad-target");
+            return false;
         }
 
-        var mapId = Transform(ent).MapID;
+        var mapId = Transform(console).MapID;
         if (mapId == MapId.Nullspace)
-            return;
+            return false;
 
-        // Капсулы стартуют по очереди; на месте посадки их разводим в ряд, чтобы не падали друг на друга.
         for (var i = 0; i < pods.Count; i++)
         {
             var offset = new Vector2((i - (pods.Count - 1) / 2f) * 1.5f, 0f);
-            StartCountdown(pods[i], new MapCoordinates(target + offset, mapId), null, ent.Comp.LaunchInterval * i);
+            pods[i].Comp.Plan = new DropPodLaunchPlan
+            {
+                Target = new MapCoordinates(target + offset, mapId),
+                Delay = console.Comp.LaunchInterval * i,
+            };
         }
+
+        UpdateConsole(console);
+        return true;
     }
 
-    private void OnAbortMessage(Entity<DropPodConsoleComponent> ent, ref DropPodAbortMessage args)
+    /// <summary>Записывает привязанным готовым капсулам план: каждой - свой свободный тайл захваченного шаттла.</summary>
+    private bool ArmCaptured(Entity<DropPodConsoleComponent> console)
     {
-        foreach (var pod in LinkedPods(ent))
-        {
-            if (pod.Comp.State == DropPodState.Countdown)
-                Abort(pod);
-        }
-    }
-
-    private void OnLaunchToCapturedMessage(Entity<DropPodConsoleComponent> ent, ref DropPodLaunchToCapturedMessage args)
-    {
-        var pods = ReadyPods(ent, out var error);
+        var pods = ReadyPods(console, out var error);
         if (pods.Count == 0)
         {
-            UpdateConsole(ent, error);
-            return;
+            UpdateConsole(console, error);
+            return false;
         }
 
-        if (ent.Comp.CapturedGrid is not { } grid || TerminatingOrDeleted(grid))
+        if (console.Comp.CapturedGrid is not { } grid || TerminatingOrDeleted(grid))
         {
-            ent.Comp.CapturedGrid = null;
-            UpdateConsole(ent, "droppod-error-not-captured");
-            return;
+            console.Comp.CapturedGrid = null;
+            UpdateConsole(console, "droppod-error-not-captured");
+            return false;
         }
 
-        // Каждой капсуле - свой свободный тайл, по очереди с интервалом.
         var taken = new HashSet<Vector2i>();
         for (var i = 0; i < pods.Count; i++)
         {
             if (PickLandingTile(grid, taken) is not { } coords)
             {
-                UpdateConsole(ent, "droppod-error-bad-target");
-                return;
+                UpdateConsole(console, "droppod-error-bad-target");
+                return false;
             }
 
-            pods[i].Comp.TargetGrid = grid;
-            StartCountdown(pods[i], _xform.ToMapCoordinates(coords), coords, ent.Comp.LaunchInterval * i);
+            pods[i].Comp.Plan = new DropPodLaunchPlan
+            {
+                Target = _xform.ToMapCoordinates(coords),
+                Coords = coords,
+                Grid = grid,
+                Delay = console.Comp.LaunchInterval * i,
+            };
         }
+
+        UpdateConsole(console);
+        return true;
+    }
+
+    /// <summary>Шлёт сигнал на порт запуска: каждая привязанная капсула получает его как <see cref="TriggerEvent"/>.</summary>
+    private void SendLaunchSignal(Entity<DropPodConsoleComponent> console)
+    {
+        _deviceLink.InvokePort(console.Owner, DropPodConsoleComponent.LaunchPort);
+    }
+
+    /// <summary>
+    /// Капсула получила триггер (сигнал DeviceLink через <c>TriggerOnSignal</c> или активация через
+    /// <c>TriggerOnActivate</c>). Стартует, только если консоль уже записала ей план запуска.
+    /// </summary>
+    private void OnTrigger(Entity<DropPodComponent> ent, ref TriggerEvent args)
+    {
+        if (ent.Comp.State != DropPodState.Idle || ent.Comp.Used)
+            return;
+
+        if (ent.Comp.Plan is not { } plan)
+        {
+            // Триггер пришёл, а цель на консоли не задана.
+            _popup.PopupEntity(Loc.GetString("droppod-fail-no-target"), ent);
+            return;
+        }
+
+        ent.Comp.Plan = null;
+        ent.Comp.TargetGrid = plan.Grid;
+        StartCountdown(ent, plan.Target, plan.Coords, plan.Delay);
+        args.Handled = true;
+    }
+
+    private void OnAbortMessage(Entity<DropPodConsoleComponent> ent, ref DropPodAbortMessage args)
+    {
+        // «Отмена»: сбрасывает цель у ждущих капсул и останавливает те, что в обратном отсчёте.
+        foreach (var pod in LinkedPods(ent))
+        {
+            pod.Comp.Plan = null;
+            if (pod.Comp.State == DropPodState.Countdown)
+                Abort(pod);
+        }
+
+        UpdateConsole(ent);
     }
 
     private void OnCaptureMessage(Entity<DropPodConsoleComponent> ent, ref DropPodCaptureMessage args)
@@ -193,17 +262,30 @@ public sealed class DropPodSystem : EntitySystem
         UpdateConsole(ent);
     }
 
-    /// <summary>Капсулы, привязанные к консоли мультитулом (мёртвые отвязываются).</summary>
+    /// <summary>
+    /// Капсулы, привязанные к порту запуска консоли штатной системой DeviceLink. Порядок стабильный
+    /// (по номеру сущности), от него зависит очередь запуска.
+    /// </summary>
     private List<Entity<DropPodComponent>> LinkedPods(Entity<DropPodConsoleComponent> console)
     {
         var result = new List<Entity<DropPodComponent>>();
-        console.Comp.LinkedPods.RemoveAll(p => TerminatingOrDeleted(p) || !HasComp<DropPodComponent>(p));
+        if (!TryComp(console, out DeviceLinkSourceComponent? source))
+            return result;
 
-        foreach (var uid in console.Comp.LinkedPods)
+        // Поле закрыто атрибутом Access: читаем его в локальную переменную, дальше работаем с ней.
+        var outputs = source.Outputs;
+        if (!outputs.TryGetValue(DropPodConsoleComponent.LaunchPort, out var sinks))
+            return result;
+
+        foreach (var uid in sinks)
         {
-            result.Add((uid, Comp<DropPodComponent>(uid)));
+            if (TerminatingOrDeleted(uid) || !TryComp(uid, out DropPodComponent? pod))
+                continue;
+
+            result.Add((uid, pod));
         }
 
+        result.Sort((a, b) => a.Owner.Id.CompareTo(b.Owner.Id));
         return result;
     }
 
@@ -245,66 +327,6 @@ public sealed class DropPodSystem : EntitySystem
         return distance <= console.Comp.CaptureRange;
     }
 
-    #region Multitool linking
-
-    private void OnPodInteractUsing(EntityUid uid, DropPodComponent comp, InteractUsingEvent args)
-    {
-        if (args.Handled || !_tool.HasQuality(args.Used, LinkQuality))
-            return;
-
-        args.Handled = true;
-
-        var buffer = EnsureComp<DropPodLinkBufferComponent>(args.Used);
-        if (buffer.Console is { } console && !TerminatingOrDeleted(console) &&
-            TryComp(console, out DropPodConsoleComponent? consoleComp))
-        {
-            Link((console, consoleComp), uid, args.User);
-            buffer.Console = null;
-            return;
-        }
-
-        buffer.Pod = uid;
-        buffer.Console = null;
-        _popup.PopupEntity(Loc.GetString("droppod-link-pod-saved"), uid, args.User);
-    }
-
-    private void OnConsoleInteractUsing(EntityUid uid, DropPodConsoleComponent comp, InteractUsingEvent args)
-    {
-        if (args.Handled || !_tool.HasQuality(args.Used, LinkQuality))
-            return;
-
-        args.Handled = true;
-
-        var buffer = EnsureComp<DropPodLinkBufferComponent>(args.Used);
-        if (buffer.Pod is { } pod && !TerminatingOrDeleted(pod) && HasComp<DropPodComponent>(pod))
-        {
-            Link((uid, comp), pod, args.User);
-            buffer.Pod = null;
-            return;
-        }
-
-        buffer.Console = uid;
-        buffer.Pod = null;
-        _popup.PopupEntity(Loc.GetString("droppod-link-console-saved"), uid, args.User);
-    }
-
-    /// <summary>Привязывает капсулу к консоли; если уже привязана - отвязывает.</summary>
-    private void Link(Entity<DropPodConsoleComponent> console, EntityUid pod, EntityUid user)
-    {
-        if (console.Comp.LinkedPods.Remove(pod))
-        {
-            _popup.PopupEntity(Loc.GetString("droppod-link-removed"), console, user);
-        }
-        else
-        {
-            console.Comp.LinkedPods.Add(pod);
-            _popup.PopupEntity(Loc.GetString("droppod-link-done", ("count", console.Comp.LinkedPods.Count)), console, user);
-        }
-
-        UpdateConsole(console);
-    }
-
-    #endregion
 
     private void UpdateConsole(Entity<DropPodConsoleComponent> console, string? error = null)
     {
@@ -364,12 +386,13 @@ public sealed class DropPodSystem : EntitySystem
             pods.Count > 0,
             pods.Count,
             pods.Count(p => !p.Comp.Used),
+            pods.Count(p => p.Comp.Plan != null),
             rep?.Comp.State ?? DropPodState.Idle,
             rep?.Comp.StateEnd ?? TimeSpan.Zero,
             rep?.Comp.StateStart ?? TimeSpan.Zero,
             occupants,
             origin,
-            rep != null && rep.Value.Comp.State != DropPodState.Idle ? rep.Value.Comp.Target.Position : null,
+            ConsoleTarget(pods, rep),
             err,
             grids,
             console.Comp.CapturingGrid == null ? null : GetNetEntity(console.Comp.CapturingGrid.Value),
@@ -382,12 +405,27 @@ public sealed class DropPodSystem : EntitySystem
         _ui.SetUiState(console.Owner, DropPodUiKey.Key, state);
     }
 
+    /// <summary>Куда летит (или будет лететь) капсула: цель активной капсулы, иначе задуманная цель.</summary>
+    private static Vector2? ConsoleTarget(List<Entity<DropPodComponent>> pods, Entity<DropPodComponent>? rep)
+    {
+        if (rep != null && rep.Value.Comp.State != DropPodState.Idle)
+            return rep.Value.Comp.Target.Position;
+
+        foreach (var pod in pods)
+        {
+            if (pod.Comp.Plan is { } plan)
+                return plan.Target.Position;
+        }
+
+        return null;
+    }
+
     private void UpdateConsolesFor(EntityUid pod)
     {
         var query = EntityQueryEnumerator<DropPodConsoleComponent>();
         while (query.MoveNext(out var uid, out var console))
         {
-            if (console.LinkedPods.Contains(pod))
+            if (LinkedPods((uid, console)).Exists(p => p.Owner == pod))
                 UpdateConsole((uid, console));
         }
     }

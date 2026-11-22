@@ -3,7 +3,7 @@
   parent: BaseStructureDynamic
   id: StarHorizonDropPod
   name: drop pod
-  description: A bluespace drop pod. Load it with cargo or climb in yourself, link it to a drop pod console with a multitool and launch.
+  description: A bluespace drop pod. Load it with cargo or climb in yourself, link it to a drop pod console with a multitool (device linking) and launch.
   components:
   - type: Transform
     anchored: true
@@ -15,6 +15,8 @@
     noRot: true
     sprite: _StarHorizon/Structures/Misc/droppod.rsi
     scale: 0.75, 0.75
+    # Капсула стоит носом вверх: спрайт повёрнут на 180° (клиентская анимация взлёта это учитывает).
+    rotation: 180
     layers:
     - state: base
       map: ["enum.StorageVisualLayers.Base"]
@@ -88,6 +90,12 @@
     radius: 3.5
     energy: 3
     color: "#4aa8ff"
+  # Запуск штатной системой сигналов: консоль (DeviceLinkSource) шлёт сигнал на порт Trigger.
+  - type: TriggerOnActivate
+  - type: TriggerOnSignal
+  - type: DeviceLinkSink
+    ports:
+    - Trigger
   - type: DropPod
     landingDamage:
       types:
@@ -141,6 +149,12 @@
 
 # Падающая капсула: анимированный диагональный спрайт (механика посадки из Goobstation/tgstation).
 # Настоящая капсула в это время скрыта, по окончании анимации она появляется на месте.
+- type: sourcePort
+  id: DropPodLaunch
+  name: signal-port-name-droppod-launch
+  description: signal-port-description-droppod-launch
+  defaultLinks: [ Trigger ]
+
 - type: entity
   id: StarHorizonDropPodLandingAnimation
   name: falling drop pod
@@ -240,6 +254,10 @@
   - type: Computer
     board: StarHorizonDropPodConsoleCircuitboard
   - type: DropPodConsole
+  # Капсулы привязываются к этому порту мультитулом (NetworkConfigurator), как любые устройства.
+  - type: DeviceLinkSource
+    ports:
+    - DropPodLaunch
   - type: ActivatableUI
     key: enum.DropPodUiKey.Key
   - type: UserInterface

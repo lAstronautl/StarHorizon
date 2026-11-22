@@ -52,13 +52,16 @@ public sealed class DropPodWindow : DefaultWindow
     private readonly Button _modeTarget = new() { ToggleMode = true, HorizontalExpand = true };
     private readonly Button _modeCapture = new() { ToggleMode = true, HorizontalExpand = true };
     private readonly Label _targetLabel = new();
+    private readonly Button _arm = new();
     private readonly Button _launch = new();
     private readonly Button _abort = new();
 
     private readonly Button _release = new();
     private readonly ProgressBar _captureProgress = new() { MinHeight = 14, MaxValue = 1f, HorizontalExpand = true };
     private readonly Label _captureStatus = new() { HorizontalExpand = true };
+    private readonly Button _armCaptured = new();
     private readonly Button _launchCaptured = new();
+    private readonly Label _armed = new() { HorizontalExpand = true, FontColorOverride = Good };
 
     private DropPodConsoleState? _state;
     private ClickMode _mode = ClickMode.Target;
@@ -66,6 +69,8 @@ public sealed class DropPodWindow : DefaultWindow
     private bool _mapReady;
     private TimeSpan _nextMapObjects;
 
+    public event Action<Vector2>? OnArm;
+    public event Action? OnArmCaptured;
     public event Action<Vector2>? OnLaunch;
     public event Action? OnLaunchToCaptured;
     public event Action? OnAbort;
@@ -83,6 +88,8 @@ public sealed class DropPodWindow : DefaultWindow
 
         _modeTarget.Text = Loc.GetString("droppod-ui-mode-target");
         _modeCapture.Text = Loc.GetString("droppod-ui-mode-capture");
+        _arm.Text = Loc.GetString("droppod-ui-arm");
+        _armCaptured.Text = Loc.GetString("droppod-ui-arm-captured");
         _launch.Text = Loc.GetString("droppod-ui-launch");
         _launchCaptured.Text = Loc.GetString("droppod-ui-launch-captured");
         _abort.Text = Loc.GetString("droppod-ui-abort");
@@ -124,19 +131,27 @@ public sealed class DropPodWindow : DefaultWindow
         side.AddChild(Header(Loc.GetString("droppod-ui-section-coords")));
         side.AddChild(_targetLabel);
         var buttons = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Horizontal, SeparationOverride = 4 };
+        _arm.HorizontalExpand = true;
         _launch.HorizontalExpand = true;
-        _abort.HorizontalExpand = true;
+        buttons.AddChild(_arm);
         buttons.AddChild(_launch);
-        buttons.AddChild(_abort);
         side.AddChild(buttons);
+        _abort.HorizontalExpand = true;
+        side.AddChild(_abort);
 
         side.AddChild(Header(Loc.GetString("droppod-ui-section-capture")));
         side.AddChild(_captureStatus);
         side.AddChild(_captureProgress);
         _release.HorizontalExpand = true;
         side.AddChild(_release);
+        var capturedButtons = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Horizontal, SeparationOverride = 4 };
+        _armCaptured.HorizontalExpand = true;
+        _launchCaptured.HorizontalExpand = true;
         _launchCaptured.ModulateSelfOverride = Good;
-        side.AddChild(_launchCaptured);
+        capturedButtons.AddChild(_armCaptured);
+        capturedButtons.AddChild(_launchCaptured);
+        side.AddChild(capturedButtons);
+        side.AddChild(_armed);
         side.AddChild(_error);
 
         var root = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Horizontal };
@@ -147,6 +162,12 @@ public sealed class DropPodWindow : DefaultWindow
         _modeTarget.OnPressed += _ => _mode = ClickMode.Target;
         _modeCapture.OnPressed += _ => _mode = ClickMode.Capture;
 
+        _arm.OnPressed += _ =>
+        {
+            if (_target is { } t)
+                OnArm?.Invoke(t);
+        };
+        _armCaptured.OnPressed += _ => OnArmCaptured?.Invoke();
         _launch.OnPressed += _ =>
         {
             if (_target is { } t)
@@ -298,8 +319,11 @@ public sealed class DropPodWindow : DefaultWindow
         var captured = state.CapturedGrid != null;
         var capturing = state.CapturingGrid != null;
 
+        _arm.Disabled = !idle || _target == null;
         _launch.Disabled = !idle || _target == null;
+        _armCaptured.Disabled = !idle || !captured;
         _launchCaptured.Disabled = !idle || !captured;
+        _armed.Text = state.ArmedCount > 0 ? Loc.GetString("droppod-ui-armed", ("count", state.ArmedCount)) : string.Empty;
         _abort.Disabled = !(state.Linked && state.PodState == DropPodState.Countdown);
         _release.Disabled = !captured && !capturing;
     }

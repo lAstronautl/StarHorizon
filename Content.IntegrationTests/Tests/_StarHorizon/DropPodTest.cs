@@ -1,9 +1,12 @@
+using System.Linq;
+using System.Collections.Generic;
 using System.Numerics;
 using Content.Server.Shuttles.Components;
 using Content.Shared.Shuttles.Components;
 using Content.Server.Storage.EntitySystems;
 using Content.Shared._StarHorizon.DropPod;
 using Content.Shared.CCVar;
+using Content.Shared.DeviceLinking;
 using Content.Shared.Interaction;
 using Content.Shared.Movement.Components;
 using Content.Shared.Storage.Components;
@@ -42,17 +45,26 @@ public sealed class DropPodTest
 
     private static readonly TimeSpan Fast = TimeSpan.FromSeconds(1);
 
-    /// <summary>Привязка капсулы к консоли мультитулом: сначала капсула, потом консоль.</summary>
+    /// <summary>
+    /// Привязка капсулы к порту запуска консоли штатной системой DeviceLink (так же, как это делает мультитул
+    /// через NetworkConfigurator: связываются порты DropPodLaunch -> Trigger).
+    /// </summary>
     private static async Task LinkWithMultitool(Pair.TestPair pair, EntityUid user, EntityUid pod, EntityUid console)
     {
         var server = pair.Server;
         await server.WaitPost(() =>
         {
-            var tool = server.EntMan.SpawnEntity("Multitool", server.EntMan.GetComponent<TransformComponent>(user).Coordinates);
-            var coords = server.EntMan.GetComponent<TransformComponent>(user).Coordinates;
-            server.EntMan.EventBus.RaiseLocalEvent(pod, new InteractUsingEvent(user, tool, pod, coords));
-            server.EntMan.EventBus.RaiseLocalEvent(console, new InteractUsingEvent(user, tool, console, coords));
+            server.System<SharedDeviceLinkSystem>().LinkDefaults(user, console, pod);
         });
+    }
+
+    private static List<EntityUid> LinkedPods(Robust.UnitTesting.RobustIntegrationTest.ServerIntegrationInstance server, EntityUid console)
+    {
+        var source = server.EntMan.GetComponent<DeviceLinkSourceComponent>(console);
+        var outputs = source.Outputs; // поле закрыто атрибутом Access, читаем в локальную переменную
+        return outputs.TryGetValue(DropPodConsoleComponent.LaunchPort, out var sinks)
+            ? sinks.OrderBy(e => e.Id).ToList()
+            : new List<EntityUid>();
     }
 
     private static int CountEntities(Robust.UnitTesting.RobustIntegrationTest.ServerIntegrationInstance server, string proto)
@@ -110,12 +122,22 @@ public sealed class DropPodTest
         Assert.That(server.EntMan.GetComponent<DropPodComponent>(pod).State, Is.EqualTo(DropPodState.Idle), "без привязки запуск невозможен");
 
         await LinkWithMultitool(pair, mob, pod, console);
-        Assert.That(server.EntMan.GetComponent<DropPodConsoleComponent>(console).LinkedPods, Does.Contain(pod), "мультитул привязал капсулу");
+        Assert.That(LinkedPods(server, console), Does.Contain(pod), "капсула привязана штатным DeviceLink");
 
+        // Консоль только задаёт цель: капсула ждёт триггера и сама не стартует.
+        await server.WaitPost(() => server.EntMan.EventBus.RaiseLocalEvent(console, (object) new DropPodArmMessage(target)));
+        await pair.RunSeconds(0.3f);
+        Assert.That(server.EntMan.GetComponent<DropPodComponent>(pod).State, Is.EqualTo(DropPodState.Idle), "без триггера не стартует");
+        Assert.That(server.EntMan.GetComponent<DropPodComponent>(pod).Plan, Is.Not.Null, "цель задана на консоли");
+
+        // Взлёт - от триггера любого устройства: настоящая кнопка, привязанная к порту Trigger капсулы.
+        EntityUid button = default;
         await server.WaitPost(() =>
         {
-            var msg = new DropPodLaunchMessage(target);
-            server.EntMan.EventBus.RaiseLocalEvent(console, (object) msg);
+            button = server.EntMan.SpawnEntity("SignalButton", map.GridCoords);
+            var links = server.System<SharedDeviceLinkSystem>();
+            links.LinkDefaults(null, button, pod);
+            links.InvokePort(button, "Pressed");
         });
         await pair.RunSeconds(0.2f);
 
@@ -303,7 +325,7 @@ public sealed class DropPodTest
         await LinkWithMultitool(pair, user, pod1, console);
         await LinkWithMultitool(pair, user, pod2, console);
         var consoleComp = server.EntMan.GetComponent<DropPodConsoleComponent>(console);
-        Assert.That(consoleComp.LinkedPods, Is.EqualTo(new[] { pod1, pod2 }));
+        Assert.That(LinkedPods(server, console), Is.EqualTo(new[] { pod1, pod2 }));
 
         var target = new Vector2(80, 80);
         await server.WaitPost(() => server.EntMan.EventBus.RaiseLocalEvent(console, (object) new DropPodLaunchMessage(target)));

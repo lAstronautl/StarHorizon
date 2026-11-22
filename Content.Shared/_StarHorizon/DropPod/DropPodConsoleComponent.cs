@@ -3,17 +3,16 @@ using Robust.Shared.GameStates;
 namespace Content.Shared._StarHorizon.DropPod;
 
 /// <summary>
-/// Консоль управления дроп-подами. Капсулы привязываются мультитулом.
+/// Консоль управления дроп-подами. Капсулы привязываются штатной системой DeviceLink.
 /// </summary>
 [RegisterComponent, NetworkedComponent]
 public sealed partial class DropPodConsoleComponent : Component
 {
     /// <summary>
-    /// Привязанные капсулы (мультитулом: нажать на капсулу и на консоль, повторная привязка отвязывает).
-    /// Запускаются по очереди с интервалом <see cref="LaunchInterval"/>.
+    /// Выходной порт сигнала (<c>DeviceLinkSource</c>), к которому штатно привязываются капсулы
+    /// (мультитулом через <c>NetworkConfigurator</c>, как любые устройства). Запуск шлёт на него сигнал.
     /// </summary>
-    [ViewVariables]
-    public List<EntityUid> LinkedPods = new();
+    public const string LaunchPort = "DropPodLaunch";
 
     /// <summary>Интервал между стартами соседних капсул.</summary>
     [DataField]

@@ -17,6 +17,9 @@ public sealed class DropPodVisualizerSystem : VisualizerSystem<DropPodComponent>
     /// <summary>Масштаб спрайта капсулы из прототипа.</summary>
     private static readonly Vector2 BaseScale = new(0.75f, 0.75f);
 
+    /// <summary>Капсула стоит носом вверх: спрайт повёрнут на 180° (как в прототипе).</summary>
+    private static readonly Angle BaseRotation = Angle.FromDegrees(180);
+
     protected override void OnAppearanceChange(EntityUid uid, DropPodComponent component, ref AppearanceChangeEvent args)
     {
         if (args.Sprite == null)
@@ -37,13 +40,13 @@ public sealed class DropPodVisualizerSystem : VisualizerSystem<DropPodComponent>
             default:
                 SpriteSystem.SetScale((uid, args.Sprite), BaseScale);
                 SpriteSystem.SetOffset((uid, args.Sprite), Vector2.Zero);
-                SpriteSystem.SetRotation((uid, args.Sprite), Angle.Zero);
+                SpriteSystem.SetRotation((uid, args.Sprite), BaseRotation);
                 SpriteSystem.SetColor((uid, args.Sprite), Color.White);
                 break;
         }
     }
 
-    /// <summary>Нарастающая тряска, затем капсула уходит вниз (как в люк корабля): уменьшается и исчезает.</summary>
+    /// <summary>Нарастающая тряска, затем капсула взлетает носом вверх: уменьшается и исчезает.</summary>
     private static Animation MakeLaunchAnimation(DropPodComponent comp)
     {
         var length = (float) Math.Max(0.5, comp.ZoomOutTime.TotalSeconds);
@@ -64,8 +67,8 @@ public sealed class DropPodVisualizerSystem : VisualizerSystem<DropPodComponent>
             offset.KeyFrames.Add(new AnimationTrackProperty.KeyFrame(new Vector2(i % 2 == 0 ? amp : -amp, 0), i == 0 ? 0 : shakeEnd / shakes));
         }
 
-        // Уход вниз.
-        offset.KeyFrames.Add(new AnimationTrackProperty.KeyFrame(new Vector2(0, -1.5f), length - shakeEnd));
+        // Взлёт вверх.
+        offset.KeyFrames.Add(new AnimationTrackProperty.KeyFrame(new Vector2(0, 2.5f), length - shakeEnd));
 
         var scale = new AnimationTrackComponentProperty
         {

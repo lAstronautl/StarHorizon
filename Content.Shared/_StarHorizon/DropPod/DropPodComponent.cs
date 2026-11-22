@@ -30,6 +30,13 @@ public sealed partial class DropPodComponent : Component
     [ViewVariables]
     public TimeSpan StateEnd;
 
+    /// <summary>
+    /// План запуска, который консоль записывает в капсулу перед сигналом. Капсула стартует по
+    /// <c>TriggerEvent</c> (сигнал DeviceLink или активация), если план есть. Только сервер.
+    /// </summary>
+    [ViewVariables]
+    public DropPodLaunchPlan? Plan;
+
     /// <summary>Запасная точка приземления, если метка пропала.</summary>
     [ViewVariables]
     public MapCoordinates Target;
@@ -148,4 +155,20 @@ public enum DropPodVisuals : byte
     InFlight,
     /// <summary>Текущая <see cref="DropPodState"/>, для подсветки и анимаций.</summary>
     State,
+}
+
+/// <summary>Куда и когда должна лететь капсула (задаёт консоль).</summary>
+public sealed class DropPodLaunchPlan
+{
+    /// <summary>Мировая точка посадки.</summary>
+    public MapCoordinates Target;
+
+    /// <summary>Точка метки в координатах грида, если летим на захваченный шаттл.</summary>
+    public EntityCoordinates? Coords;
+
+    /// <summary>Захваченный шаттл, если летим на него.</summary>
+    public EntityUid? Grid;
+
+    /// <summary>Очередь запуска: на сколько позже обычного отсчёта стартует эта капсула.</summary>
+    public TimeSpan Delay;
 }

@@ -18,6 +18,7 @@ public sealed class DropPodConsoleState(
     bool linked,
     int podCount,
     int readyCount,
+    int armedCount,
     DropPodState podState,
     TimeSpan stateEnd,
     TimeSpan stateStart,
@@ -38,6 +39,8 @@ public sealed class DropPodConsoleState(
     public int PodCount = podCount;
     /// <summary>Сколько из них готово к запуску (не использованы).</summary>
     public int ReadyCount = readyCount;
+    /// <summary>Сколько капсул уже получили цель и ждут триггера (кнопка, сигнал, консоль).</summary>
+    public int ArmedCount = armedCount;
     public DropPodState PodState = podState;
     public TimeSpan StateEnd = stateEnd;
     public TimeSpan StateStart = stateStart;
@@ -63,6 +66,20 @@ public sealed class DropPodLaunchMessage(Vector2 target) : BoundUserInterfaceMes
 {
     public Vector2 Target = target;
 }
+
+/// <summary>
+/// Задать цель-точку привязанным капсулам без запуска: взлёт случится от триггера любого устройства
+/// (кнопка, сигнал DeviceLink), привязанного к капсуле.
+/// </summary>
+[Serializable, NetSerializable]
+public sealed class DropPodArmMessage(Vector2 target) : BoundUserInterfaceMessage
+{
+    public Vector2 Target = target;
+}
+
+/// <summary>Задать целью захваченный шаттл без запуска.</summary>
+[Serializable, NetSerializable]
+public sealed class DropPodArmCapturedMessage : BoundUserInterfaceMessage;
 
 /// <summary>Запустить капсулу на захваченный шаттл (на случайный свободный тайл).</summary>
 [Serializable, NetSerializable]
