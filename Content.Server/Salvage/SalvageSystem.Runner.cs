@@ -70,7 +70,7 @@ public sealed partial class SalvageSystem
     /// <summary>
     /// Announces status updates to salvage crewmembers on the state of the expedition.
     /// </summary>
-    private void Announce(EntityUid mapUid, string text)
+    public void Announce(EntityUid mapUid, string text)
     {
         var mapId = Comp<MapComponent>(mapUid).MapId;
 
