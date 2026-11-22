@@ -259,10 +259,7 @@ public sealed class ShuttleLandingSystem : EntitySystem
 
         // A shuttle carried to an expedition stays on its carrier: it must not be used to fly around the expedition.
         if (HasComp<SalvageExpeditionComponent>(Transform(shuttle).MapUid))
-        {
-            reason = Loc.GetString("shuttle-landing-expedition");
             return false;
-        }
 
         landed.TakeOffAt = _timing.CurTime + TimeSpan.FromSeconds(_shuttle.DefaultStartupTime);
 
@@ -344,17 +341,11 @@ public sealed class ShuttleLandingSystem : EntitySystem
 
         if (!args.Land)
         {
-            if (TryTakeOff(shuttle, out var takeOffReason))
-                _popup.PopupEntity(Loc.GetString("shuttle-landing-taking-off"), uid, args.Actor);
-            else if (takeOffReason != null)
-                _popup.PopupEntity(takeOffReason, uid, args.Actor, PopupType.MediumCaution);
-
+            TryTakeOff(shuttle, out _);
             return;
         }
 
-        if (TryLand(shuttle, out var reason))
-            _popup.PopupEntity(Loc.GetString("shuttle-landing-landed"), uid, args.Actor);
-        else if (reason != null)
+        if (!TryLand(shuttle, out var reason) && reason != null)
             _popup.PopupEntity(reason, uid, args.Actor, PopupType.MediumCaution);
     }
 
