@@ -38,10 +38,7 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
     private readonly SharedTransformSystem _xformSystem;
     private readonly Content.Client.Parallax.ParallaxSystem _parallaxSystem;
 
-    /// <summary>StarHorizon: консоль дроп-подов отключает перетаскивание карты правой кнопкой.</summary>
-    public bool AllowDragging = true;
-
-    protected override bool Draggable => AllowDragging;
+    protected override bool Draggable => true;
     protected override bool AllowResize => true; // Lua
     protected override bool ScaleWithControlSize => true; // Lua
     protected override Vector2 MidPointVector => new Vector2(PixelWidth * 0.5f, PixelHeight * 0.5f);
@@ -122,12 +119,6 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
     /// Lua: Raised when the player clicks the map while in marker-placement mode.
     /// </summary>
     public event Action<MapCoordinates>? MarkPlaced;
-
-    /// <summary>
-    /// StarHorizon: hook for overlays drawn on top of the map (drop pod console: target marker, capture range).
-    /// The second argument converts a map position (in the viewed map) to a position on this control.
-    /// </summary>
-    public event Action<DrawingHandleScreen, Func<Vector2, Vector2>>? DrawOverlay;
 
     /// <summary>
     /// Set every draw to determine the beacons that are clickable for mouse events
@@ -879,8 +870,6 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
                 }
             }
         }
-
-        DrawOverlay?.Invoke(handle, pos => MapToScreen(pos, matty)); // StarHorizon
 
         // Draw the coordinates
         // Frontier

@@ -124,6 +124,21 @@ public sealed class DropPodTest
         await LinkWithMultitool(pair, mob, pod, console);
         Assert.That(LinkedPods(server, console), Does.Contain(pod), "капсула привязана штатным DeviceLink");
 
+        // Цель вне зоны радара (дальше 256 м) не принимается.
+        await server.WaitPost(() => server.EntMan.EventBus.RaiseLocalEvent(console, (object) new DropPodArmMessage(new Vector2(400, 0))));
+        await pair.RunSeconds(0.2f);
+        Assert.That(server.EntMan.GetComponent<DropPodComponent>(pod).Plan, Is.Null, "цель дальше 256 м отклонена");
+
+        // Цель спадает, если шаттл с консолью уехал дальше 256 м от неё.
+        await server.WaitPost(() => server.EntMan.EventBus.RaiseLocalEvent(console, (object) new DropPodArmMessage(target)));
+        await pair.RunSeconds(0.2f);
+        Assert.That(server.EntMan.GetComponent<DropPodComponent>(pod).Plan, Is.Not.Null);
+        await server.WaitPost(() => server.System<SharedTransformSystem>().SetWorldPosition(map.Grid.Owner, new Vector2(900, 900)));
+        await pair.RunSeconds(0.3f);
+        Assert.That(server.EntMan.GetComponent<DropPodComponent>(pod).Plan, Is.Null, "метка спала: консоль ушла дальше 256 м от цели");
+        await server.WaitPost(() => server.System<SharedTransformSystem>().SetWorldPosition(map.Grid.Owner, Vector2.Zero));
+        await pair.RunSeconds(0.3f);
+
         // Консоль только задаёт цель: капсула ждёт триггера и сама не стартует.
         await server.WaitPost(() => server.EntMan.EventBus.RaiseLocalEvent(console, (object) new DropPodArmMessage(target)));
         await pair.RunSeconds(0.3f);

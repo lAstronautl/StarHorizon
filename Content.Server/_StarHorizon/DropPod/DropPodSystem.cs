@@ -134,6 +134,13 @@ public sealed class DropPodSystem : EntitySystem
         if (mapId == MapId.Nullspace)
             return false;
 
+        // Цель должна быть в зоне радара консоли (радиус = дальность захвата).
+        if ((target - _xform.GetWorldPosition(console)).Length() > console.Comp.CaptureRange)
+        {
+            UpdateConsole(console, "droppod-error-target-too-far");
+            return false;
+        }
+
         for (var i = 0; i < pods.Count; i++)
         {
             var offset = new Vector2((i - (pods.Count - 1) / 2f) * 1.5f, 0f);
@@ -590,6 +597,29 @@ public sealed class DropPodSystem : EntitySystem
                     UpdateConsole(console);
             }
         }
+
+        // Цель (метка) спадает, если ушла дальше CaptureRange от консоли: шаттл-цель улетел или консоль уехала.
+        var dropped = false;
+        var consolePos = _xform.GetWorldPosition(console);
+        var consoleMap = Transform(console).MapID;
+        foreach (var pod in LinkedPods(console))
+        {
+            if (pod.Comp.Plan is not { } plan)
+                continue;
+
+            var inRange = plan.Grid is { } planGrid
+                ? !TerminatingOrDeleted(planGrid) && InCaptureRange(console, planGrid)
+                : plan.Target.MapId == consoleMap && (plan.Target.Position - consolePos).Length() <= console.Comp.CaptureRange;
+
+            if (inRange)
+                continue;
+
+            pod.Comp.Plan = null;
+            dropped = true;
+        }
+
+        if (dropped)
+            UpdateConsole(console, "droppod-error-target-lost");
 
         // Пока окно открыто, шлём свежие позиции шаттлов на карту.
         if (now >= console.Comp.NextUiUpdate && _ui.IsUiOpen(console.Owner, DropPodUiKey.Key))

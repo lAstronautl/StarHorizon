@@ -19,6 +19,7 @@ public sealed class DropPodConsoleBoundUserInterface : BoundUserInterface
         base.Open();
 
         _window = this.CreateWindow<DropPodWindow>();
+        _window.SetConsole(Owner);
         _window.OnLaunch += target => SendMessage(new DropPodLaunchMessage(target));
         _window.OnLaunchToCaptured += () => SendMessage(new DropPodLaunchToCapturedMessage());
         _window.OnArm += target => SendMessage(new DropPodArmMessage(target));

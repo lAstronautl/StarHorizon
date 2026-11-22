@@ -2,25 +2,27 @@ using System.Globalization;
 using System.Numerics;
 using Content.Client.Shuttles.UI;
 using Content.Shared._StarHorizon.DropPod;
-using Content.Shared.Shuttles.UI.MapObjects;
+using Content.Shared._NF.Shuttles.Events;
+using Content.Shared.Shuttles.BUIStates;
+using Content.Shared.Shuttles.Components;
 using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.CustomControls;
 using Robust.Shared.Map;
+using Robust.Shared.Map.Components;
 using Robust.Shared.Timing;
 
 namespace Content.Client._StarHorizon.DropPod;
 
 /// <summary>
-/// Окно консоли дроп-пода. Слева карта, как в консоли управления шаттлом: клик задаёт точку посадки
-/// или захватывает шаттл (в зависимости от режима). Справа состояние капсул, прогресс и кнопки.
+/// Окно консоли дроп-пода. Слева радар сканера масс (центр - консоль, радиус - дальность захвата): клик задаёт
+/// точку посадки или захватывает шаттл (в зависимости от режима). Справа состояние капсул, прогресс и кнопки.
 /// </summary>
 public sealed class DropPodWindow : DefaultWindow
 {
     [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly IEntityManager _ent = default!;
 
     private static readonly Color Accent = Color.FromHex("#ff9a30");
@@ -34,11 +36,13 @@ public sealed class DropPodWindow : DefaultWindow
         Capture,
     }
 
-    private readonly ShuttleMapControl _map = new()
+    // Радиус радара задаётся фиксированным: он равен дальности захвата (state.CaptureRange).
+    private readonly ShuttleNavControl _radar = new(256f, 256f, 256f)
     {
         HorizontalExpand = true,
         VerticalExpand = true,
         MinSize = new Vector2(480, 480),
+        ShowDocks = false,
     };
 
     private readonly Font _font;
@@ -64,8 +68,9 @@ public sealed class DropPodWindow : DefaultWindow
     private DropPodConsoleState? _state;
     private ClickMode _mode = ClickMode.Target;
     private Vector2? _target;
-    private bool _mapReady;
-    private TimeSpan _nextMapObjects;
+    private EntityUid? _console;
+    private bool _initialized;
+    private readonly SharedTransformSystem _xform;
 
     public event Action<Vector2>? OnArm;
     public event Action<Vector2>? OnLaunch;
@@ -77,11 +82,12 @@ public sealed class DropPodWindow : DefaultWindow
     public DropPodWindow()
     {
         IoCManager.InjectDependencies(this);
+        _xform = _ent.System<SharedTransformSystem>();
 
         _font = new VectorFont(IoCManager.Resolve<IResourceCache>().GetResource<FontResource>("/Fonts/NotoSans/NotoSans-Regular.ttf"), 10);
 
         Title = Loc.GetString("droppod-ui-title");
-        MinSize = new Vector2(820, 560);
+        MinSize = new Vector2(900, 620);
 
         _modeTarget.Text = Loc.GetString("droppod-ui-mode-target");
         _modeCapture.Text = Loc.GetString("droppod-ui-mode-capture");
@@ -95,21 +101,16 @@ public sealed class DropPodWindow : DefaultWindow
         _modeCapture.Group = group;
         _modeTarget.Pressed = true;
 
-        // Карта как в консоли шаттла: клик по ней выбирает точку или шаттл.
-        _map.ShowFTLRange = false;
-        _map.NoFTLRange = true;
-        _map.ShowBeacons = false;
-        _map.MarkMode = true;
-        _map.AllowDragging = false;
-        _map.MarkPlaced += OnMapClicked;
-        _map.DrawOverlay += DrawOverlay;
+        // Радар сканера масс: центрирован на консоли, клик выбирает точку или шаттл.
+        _radar.OnRadarClick += OnRadarClicked;
+        _radar.DrawOverlay += DrawOverlay;
 
         var side = new BoxContainer
         {
             Orientation = BoxContainer.LayoutOrientation.Vertical,
             SeparationOverride = 6,
             Margin = new Thickness(8, 0, 0, 0),
-            MinWidth = 280,
+            MinWidth = 320,
         };
 
         side.AddChild(Header(Loc.GetString("droppod-ui-section-pod")));
@@ -119,7 +120,7 @@ public sealed class DropPodWindow : DefaultWindow
         side.AddChild(_timer);
 
         side.AddChild(Header(Loc.GetString("droppod-ui-section-click")));
-        var modes = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Horizontal, SeparationOverride = 4 };
+        var modes = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Vertical, SeparationOverride = 4 };
         modes.AddChild(_modeTarget);
         modes.AddChild(_modeCapture);
         side.AddChild(modes);
@@ -144,8 +145,9 @@ public sealed class DropPodWindow : DefaultWindow
         side.AddChild(_error);
 
         var root = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Horizontal };
-        root.AddChild(_map);
-        root.AddChild(new ScrollContainer { HScrollEnabled = false, VerticalExpand = true, Children = { side } });
+        root.AddChild(_radar);
+        // У ScrollContainer нет собственной минимальной ширины: без неё радар забирает всё место и панель пропадает.
+        root.AddChild(new ScrollContainer { HScrollEnabled = false, VerticalExpand = true, MinWidth = 340, Children = { side } });
         Contents.AddChild(root);
 
         _modeTarget.OnPressed += _ => _mode = ClickMode.Target;
@@ -169,29 +171,55 @@ public sealed class DropPodWindow : DefaultWindow
         return box;
     }
 
-    #region Map
+    #region Radar
 
-    private void OnMapClicked(MapCoordinates coords)
+    /// <summary>Живая позиция консоли (радар центрирован на ней и следует за её шаттлом).</summary>
+    private Vector2 ConsoleWorld(DropPodConsoleState state)
     {
-        if (_state == null)
+        return _console is { } console && _ent.EntityExists(console)
+            ? _xform.GetWorldPosition(console)
+            : state.ConsolePosition;
+    }
+
+    /// <summary>Живая позиция шаттла: если клиент знает сетку - центр её корпуса, иначе позиция из состояния.</summary>
+    private Vector2 GridWorld(DropPodGridInfo info)
+    {
+        if (_ent.TryGetEntity(info.Grid, out var uid) && _ent.TryGetComponent(uid, out MapGridComponent? grid))
+            return Vector2.Transform(grid.LocalAABB.Center, _xform.GetWorldMatrix(uid.Value));
+
+        return info.Position;
+    }
+
+    private void OnRadarClicked(EntityCoordinates coords)
+    {
+        if (_state is not { } state || !coords.IsValid(_ent))
             return;
+
+        var world = _xform.ToMapCoordinates(coords).Position;
+
+        // Радар показывает область в радиусе захвата; клики в углах квадратного контрола за её пределами не принимаем.
+        if ((world - ConsoleWorld(state)).Length() > state.CaptureRange)
+        {
+            _error.Text = Loc.GetString("droppod-ui-out-of-range");
+            return;
+        }
 
         if (_mode == ClickMode.Target)
         {
             // Выбор точки сразу задаёт цель привязанным капсулам: дальше они ждут триггера любого устройства.
-            _target = coords.Position;
+            _target = world;
             UpdateTargetLabel();
             UpdateButtons();
-            OnArm?.Invoke(coords.Position);
+            OnArm?.Invoke(world);
             return;
         }
 
         // Режим захвата: ближайший шаттл под курсором (в радиусе корпуса + небольшой запас).
         DropPodGridInfo? best = null;
         var bestDist = float.MaxValue;
-        foreach (var info in _state.Grids)
+        foreach (var info in state.Grids)
         {
-            var dist = (info.Position - coords.Position).Length();
+            var dist = (GridWorld(info) - world).Length();
             if (dist > info.Radius + 15f || dist >= bestDist)
                 continue;
 
@@ -205,21 +233,16 @@ public sealed class DropPodWindow : DefaultWindow
             _error.Text = Loc.GetString("droppod-ui-no-shuttle-there");
     }
 
+    /// <summary>
+    /// Поверх радара: захват шаттла, выбранная точка посадки и цель летящей капсулы. Круг дальности и метка консоли
+    /// уже есть на самом радаре (его радиус равен дальности захвата).
+    /// </summary>
     private void DrawOverlay(DrawingHandleScreen handle, Func<Vector2, Vector2> toControl)
     {
         if (_state is not { } state)
             return;
 
-        // Дальность захвата вокруг консоли.
-        var console = toControl(state.ConsolePosition);
-        var edge = toControl(state.ConsolePosition + new Vector2(state.CaptureRange, 0f));
-        var rangePx = (edge - console).Length();
-        handle.DrawCircle(console, rangePx, Capturing.WithAlpha(0.04f), true);
-        handle.DrawCircle(console, rangePx, Capturing.WithAlpha(0.55f), false);
-
-        // Консоль.
-        handle.DrawCircle(console, 4f, Color.Cyan, true);
-        DrawLabel(handle, Loc.GetString("droppod-ui-console"), console + new Vector2(8f, 2f), Color.Cyan);
+        var console = toControl(ConsoleWorld(state));
 
         // Захват / идущий захват.
         foreach (var info in state.Grids)
@@ -233,8 +256,9 @@ public sealed class DropPodWindow : DefaultWindow
             if (color is not { } c)
                 continue;
 
-            var pos = toControl(info.Position);
-            var radius = MathF.Max(12f, (toControl(info.Position + new Vector2(info.Radius, 0f)) - pos).Length() + 6f);
+            var world = GridWorld(info);
+            var pos = toControl(world);
+            var radius = MathF.Max(12f, (toControl(world + new Vector2(info.Radius, 0f)) - pos).Length() + 6f);
             handle.DrawCircle(pos, radius, c.WithAlpha(0.1f), true);
             handle.DrawCircle(pos, radius, c, false);
             handle.DrawLine(console, pos, c.WithAlpha(0.6f));
@@ -266,23 +290,28 @@ public sealed class DropPodWindow : DefaultWindow
         handle.DrawString(_font, pos, text, color);
     }
 
-    /// <summary>Передаём карте сетки (шаттлы и станции), известные клиенту на карте консоли.</summary>
-    private void RefreshMapObjects(MapId mapId)
+    /// <summary>Передаёт радару консоль как центр и дальность захвата как радиус.</summary>
+    private void UpdateRadar(DropPodConsoleState state)
     {
-        var objects = new List<IMapObject>();
-        foreach (var grid in _mapManager.GetAllGrids(mapId))
-        {
-            if (!_ent.TryGetComponent(grid.Owner, out MetaDataComponent? meta))
-                continue;
+        if (_console is not { } console || !_ent.TryGetComponent(console, out TransformComponent? xform))
+            return;
 
-            objects.Add(new GridMapObject
-            {
-                Name = meta.EntityName,
-                Entity = grid.Owner,
-            });
-        }
+        _radar.SetConsole(console);
+        _radar.UpdateState(new NavInterfaceState(
+            state.CaptureRange,
+            _ent.GetNetCoordinates(xform.Coordinates),
+            Angle.Zero,
+            new Dictionary<NetEntity, List<DockingPortState>>(),
+            InertiaDampeningMode.Dampen,
+            ServiceFlags.None,
+            null,
+            null,
+            false));
+    }
 
-        _map.SetMapObjects(new Dictionary<MapId, List<IMapObject>> { [mapId] = objects });
+    public void SetConsole(EntityUid console)
+    {
+        _console = console;
     }
 
     #endregion
@@ -314,16 +343,13 @@ public sealed class DropPodWindow : DefaultWindow
     {
         _state = state;
 
-        var mapId = new MapId(state.MapId);
-        if (!_mapReady)
+        if (!_initialized)
         {
-            _mapReady = true;
-            _map.SetMap(mapId, state.ConsolePosition);
-            _map.Offset = state.ConsolePosition;
-            _map.SetRadarZoom(0.08f);
+            _initialized = true;
             UpdateTargetLabel();
-            RefreshMapObjects(mapId);
         }
+
+        UpdateRadar(state);
 
         _error.Text = state.Error ?? string.Empty;
 
@@ -377,12 +403,6 @@ public sealed class DropPodWindow : DefaultWindow
 
         if (_state is not { } state)
             return;
-
-        if (_mapReady && _timing.RealTime >= _nextMapObjects)
-        {
-            _nextMapObjects = _timing.RealTime + TimeSpan.FromSeconds(0.5);
-            RefreshMapObjects(new MapId(state.MapId));
-        }
 
         // Прогресс капсулы.
         if (state.Linked && state.PodState != DropPodState.Idle)

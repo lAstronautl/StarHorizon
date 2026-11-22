@@ -145,6 +145,12 @@ public partial class ShuttleNavControl : BaseShuttleControl // Mono
     /// </summary>
     public Action<EntityCoordinates>? OnRadarClick;
 
+    /// <summary>
+    /// StarHorizon: overlay drawn on top of the radar (drop pod console: target marker, capture highlight).
+    /// The second argument converts a world position (in the viewed map) to a position on this control.
+    /// </summary>
+    public event Action<DrawingHandleScreen, Func<Vector2, Vector2>>? DrawOverlay;
+
     private List<Entity<MapGridComponent>> _grids = new();
     public ShuttleNavControl() : this(64f, 256f, 256f) { } // Mono
 
@@ -916,6 +922,8 @@ public partial class ShuttleNavControl : BaseShuttleControl // Mono
 
         ClearShader(handle);
         #endregion
+
+        DrawOverlay?.Invoke(handle, world => Vector2.Transform(Vector2.Transform(world, worldToShuttle), shuttleToView)); // StarHorizon
     }
 
     private void DrawDocks(DrawingHandleScreen handle, EntityUid uid, Matrix3x2 gridToView)
