@@ -33,8 +33,6 @@ public sealed class ExpeditionMusicTest
         Assert.That(library.Win, Is.Not.Empty, "победа");
         Assert.That(library.Loss, Is.Not.Empty, "проигрыш");
         Assert.That(library.Rig, Is.Not.Null, "ожидание в капсуле");
-        Assert.That(library.Intro, Is.Not.Null, "интро волны");
-        Assert.That(library.Loop, Is.Not.Null, "петля волны");
         Assert.That(library.Wave.Any(p => p.Contains("_WD-")), Is.False, "интро, петля и босс не попадают в обычные треки волны");
 
         await pair.CleanReturnAsync();
@@ -83,11 +81,9 @@ public sealed class ExpeditionMusicTest
         await pair.RunSeconds(1.5f);
         Assert.That(music.LocalHasKey, "ключ в гарнитуре: музыка включена");
 
-        // Файлы стыка интро -> петля подгружены заранее, по одному за проверку, а не в момент перехода.
-        var library = ExpeditionMusicLibrary.Load(client.Resolve<IResourceManager>());
+        // Файлы подгружаются заранее, по одному за проверку, а не в момент смены трека.
         await pair.RunSeconds(10f);
-        Assert.That(music.IsPreloaded(library.Intro!), "интро загружено заранее");
-        Assert.That(music.IsPreloaded(library.Loop!), "петля загружена заранее");
+        Assert.That(music.IsPreloaded(ExpeditionMusicLibrary.Load(client.Resolve<IResourceManager>()).Rig!), "ожидание в капсуле загружено заранее");
         var clientMap = client.EntMan.GetEntity(server.EntMan.GetNetEntity(mapEntity));
         Assert.That(client.EntMan.GetComponent<ExpeditionWaveStateComponent>(clientMap).Active, "клиент знает про волну");
         Assert.That(client.EntMan.GetComponent<ExpeditionExtractionStateComponent>(clientMap).Active, "клиент знает про эвакуацию");

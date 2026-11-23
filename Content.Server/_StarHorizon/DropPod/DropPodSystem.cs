@@ -52,6 +52,7 @@ public sealed class DropPodSystem : EntitySystem
     [Dependency] private readonly SharedDeviceLinkSystem _deviceLink = default!;
     [Dependency] private readonly SalvageSystem _salvage = default!;
     [Dependency] private readonly SharedEntityStorageSystem _storage = default!;
+    [Dependency] private readonly Content.Server._StarHorizon.Expedition.RockClearSystem _rocks = default!;
 
     /// <summary>Меньше этого времени до закрытия экспедиции сбрасываться на неё уже поздно.</summary>
     private static readonly TimeSpan PlanetMinTimeLeft = TimeSpan.FromMinutes(5);
@@ -962,6 +963,9 @@ public sealed class DropPodSystem : EntitySystem
             _physics.SetCanCollide(ent, true, body: physics);
         // Обычный спрайт остаётся скрытым (InFlight), вместо него рисуется упавшая капсула.
         _appearance.SetData(ent, DropPodVisuals.Landed, true);
+
+        // Капсула не сажает игрока в камень: порода вокруг расчищается.
+        _rocks.ClearRocks(Transform(ent).Coordinates, ent.Comp.ClearRadius);
 
         // Одноразовая: больше не запускается. В прототипе капсула прикручена, при взлёте движок её
         // откручивает (перемещение снимает крепление), а после посадки прикручиваем обратно.

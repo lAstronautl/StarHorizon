@@ -1,3 +1,4 @@
+using Robust.Shared.Maths;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -27,6 +28,27 @@ public sealed class ExpeditionWaveTest
 {
     [TestPrototypes]
     private const string Prototypes = @"
+- type: entity
+  id: PursueTestMelee
+  components:
+  - type: HTN
+    rootTask:
+      task: SimpleHostileCompound
+
+- type: entity
+  id: PursueTestRanged
+  components:
+  - type: HTN
+    rootTask:
+      task: SimpleRangedHostileCompound
+
+- type: entity
+  id: PursueTestHumanoid
+  components:
+  - type: HTN
+    rootTask:
+      task: SimpleHumanoidHostileCompound
+
 - type: entity
   id: WaveTestPlayer
   components:
@@ -154,18 +176,39 @@ public sealed class ExpeditionWaveTest
         var startMin = mobs.Min(m => (xform.GetWorldPosition(m) - playerPos).Length());
         await pair.RunSeconds(15f);
         var endMin = mobs.Where(server.EntMan.EntityExists).Min(m => (xform.GetWorldPosition(m) - xform.GetWorldPosition(player)).Length());
-        Assert.That(endMin, Is.LessThanOrEqualTo(Math.Min(startMin, 3f)), "мобы дошли до игрока (или были уже рядом)");
+        Assert.That(endMin, Is.LessThanOrEqualTo(Math.Min(startMin, 11f)), "мобы подошли к игроку (дальники встают на дальности стрельбы)");
 
-        // 5b. Все мобы волны убиты: музыка волны прекращается.
+        // 5a. Моб в крите ещё жив: волна продолжается.
         await server.WaitPost(() =>
         {
             var mobState = server.System<Content.Shared.Mobs.Systems.MobStateSystem>();
             foreach (var mob in Pursuers(server))
-                mobState.ChangeMobState(mob, Content.Shared.Mobs.MobState.Dead);
+                mobState.ChangeMobState(mob, Content.Shared.Mobs.MobState.Critical);
         });
         await pair.RunSeconds(1.5f);
+        Assert.That(server.EntMan.GetComponent<Content.Shared._StarHorizon.Expedition.ExpeditionWaveStateComponent>(expeditionMap).Active,
+            "мобы в крите не считаются убитыми: волна идёт");
+
+        // 5b. Осталось больше 10% мобов волны: музыка идёт; осталось 10% и меньше: волна считается законченной.
+        var total = waves.WaveTotal;
+        var keepAlive = (int) Math.Floor(total * 0.1f);
+        var all = Pursuers(server);
+        Assert.That(total, Is.GreaterThan(0));
+        await server.WaitPost(() =>
+        {
+            var mobState = server.System<Content.Shared.Mobs.Systems.MobStateSystem>();
+            for (var i = keepAlive + 1; i < all.Count; i++)
+                mobState.ChangeMobState(all[i], Content.Shared.Mobs.MobState.Dead);
+        });
+        await pair.RunSeconds(1.5f);
+        Assert.That(server.EntMan.GetComponent<Content.Shared._StarHorizon.Expedition.ExpeditionWaveStateComponent>(expeditionMap).Active,
+            $"живых {keepAlive + 1} из {total}: больше 10%, музыка идёт");
+
+        await server.WaitPost(() =>
+            server.System<Content.Shared.Mobs.Systems.MobStateSystem>().ChangeMobState(all[keepAlive], Content.Shared.Mobs.MobState.Dead));
+        await pair.RunSeconds(1.5f);
         Assert.That(server.EntMan.GetComponent<Content.Shared._StarHorizon.Expedition.ExpeditionWaveStateComponent>(expeditionMap).Active, Is.False,
-            "все убиты: волна закончилась");
+            $"живых {keepAlive} из {total}: осталось 10%, музыка выключена");
 
         // 6. В последние секунды экспедиции волн нет.
         var countBefore = Pursuers(server).Count;
@@ -176,6 +219,66 @@ public sealed class ExpeditionWaveTest
         });
         await pair.RunSeconds(2f);
         Assert.That(Pursuers(server).Count, Is.LessThanOrEqualTo(countBefore), "новых мобов нет");
+
+        await pair.CleanReturnAsync();
+    }
+
+    /// <summary>Дальники остаются дальниками: у стрелков корень погони с дальним боем, а не только ближним.</summary>
+    [Test]
+    public async Task PursueRootKeepsCombatStyle()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { FailureLogLevel = LogLevel.Fatal });
+        var server = pair.Server;
+        var map = await pair.CreateTestMap();
+
+        await server.WaitPost(() =>
+        {
+            foreach (var (proto, expected) in new[]
+                     {
+                         ("PursueTestMelee", "PursueMeleeCompound"),
+                         ("PursueTestRanged", "PursueRangedCompound"),
+                         ("PursueTestHumanoid", "PursueHumanoidCompound"),
+                     })
+            {
+                var mob = server.EntMan.SpawnEntity(proto, map.GridCoords);
+                server.EntMan.AddComponent<PursuePlayerComponent>(mob);
+                Assert.That(server.EntMan.GetComponent<HTNComponent>(mob).RootTask.Task, Is.EqualTo(expected), proto);
+            }
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
+    /// <summary>Дроп-под расчищает породу вокруг, остальные стены остаются.</summary>
+    [Test]
+    public async Task RocksAroundAreCleared()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { FailureLogLevel = LogLevel.Fatal });
+        var server = pair.Server;
+        var map = await pair.CreateTestMap();
+        var rocks = server.System<RockClearSystem>();
+
+        EntityUid near = default, far = default, wall = default;
+        await server.WaitPost(() =>
+        {
+            var mapSys = server.System<SharedMapSystem>();
+            var gridUid = map.Grid.Owner;
+            for (var x = -2; x <= 4; x++)
+            {
+                for (var y = -2; y <= 4; y++)
+                    mapSys.SetTile(gridUid, map.Grid.Comp, new EntityCoordinates(gridUid, x + 0.5f, y + 0.5f), map.Tile.Tile);
+            }
+
+            near = server.EntMan.SpawnEntity("WallRockBasalt", map.GridCoords.Offset(new Vector2(1.5f, 0.5f)));
+            far = server.EntMan.SpawnEntity("WallRockBasalt", map.GridCoords.Offset(new Vector2(2.5f, 0.5f)));
+            wall = server.EntMan.SpawnEntity("WallSolid", map.GridCoords.Offset(new Vector2(0.5f, 1.5f)));
+            Assert.That(rocks.ClearRocks(map.GridCoords.Offset(new Vector2(0.5f, 0.5f)), 1f), Is.EqualTo(1));
+        });
+        await pair.RunSeconds(0.5f);
+
+        Assert.That(server.EntMan.Deleted(near), "порода у капсулы расчищена");
+        Assert.That(server.EntMan.Deleted(far), Is.False, "дальняя порода осталась");
+        Assert.That(server.EntMan.Deleted(wall), Is.False, "обычная стена осталась");
 
         await pair.CleanReturnAsync();
     }

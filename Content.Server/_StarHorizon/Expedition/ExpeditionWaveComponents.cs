@@ -28,6 +28,12 @@ public sealed partial class ExpeditionWavesComponent : Component
     /// <summary>Где упали первые поды: позиция первого игрока на карте. Запоминается один раз.</summary>
     [ViewVariables] public System.Numerics.Vector2? DropAnchor;
 
+    /// <summary>Сколько мобов в текущей волне (для выключения музыки, когда осталось 10%).</summary>
+    [ViewVariables] public int WaveTotal;
+
+    /// <summary>Невидимая сущность в якоре: держит землю вокруг подгруженной, пока игроков рядом нет.</summary>
+    [ViewVariables] public EntityUid? AnchorLoader;
+
     /// <summary>Сколько мобов волн может жить на карте одновременно, дальше волна пропускается.</summary>
     [DataField] public int MaxAliveWaveMobs = 60;
 
@@ -35,8 +41,11 @@ public sealed partial class ExpeditionWavesComponent : Component
     /// Кольцо падения дроп-подов вокруг якоря (места, где начал первый игрок), метры. Если у якоря нет подгруженной
     /// земли (биом подгружается только вокруг игроков), поды падают в таком же кольце вокруг ближайшего игрока.
     /// </summary>
-    [DataField] public float DropRingMin = 6f;
-    [DataField] public float DropRingMax = 18f;
+    [DataField] public float DropRingMin = 5f;
+    [DataField] public float DropRingMax = 14f;
+
+    /// <summary>Музыка волны выключается, когда живых мобов волны осталось столько долей от всех.</summary>
+    [DataField] public float MusicOffFraction = 0.1f;
 
     /// <summary>Сколько после появления волны клиентам играет боевая музыка (волна считается идущей).</summary>
     [DataField] public TimeSpan WaveMusicDuration = TimeSpan.FromSeconds(120);

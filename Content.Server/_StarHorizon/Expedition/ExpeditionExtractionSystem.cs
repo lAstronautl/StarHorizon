@@ -87,7 +87,7 @@ public sealed class ExpeditionExtractionSystem : EntitySystem
             SendShuttle(ent, expedition);
 
         if (comp.Stage == ExtractionStage.ShuttleSent
-            && remaining < comp.DepartBefore
+            && remaining < TimeSpan.FromSeconds(_shuttle.DefaultStartupTime) + comp.DepartMargin
             && comp.Shuttle is { } shuttle
             && TryComp<ExtractionShuttleComponent>(shuttle, out var shuttleComp)
             && shuttleComp.Arrived
@@ -140,10 +140,7 @@ public sealed class ExpeditionExtractionSystem : EntitySystem
             shuttle.Arrived = true;
             if (Exists(shuttle.Expedition))
             {
-                var seconds = TryComp<ExpeditionExtractionComponent>(shuttle.Expedition, out var extraction)
-                    ? (int) extraction.DepartBefore.TotalSeconds
-                    : 30;
-                _salvage.Announce(shuttle.Expedition, Loc.GetString("expedition-extraction-arrived", ("seconds", seconds)));
+                _salvage.Announce(shuttle.Expedition, Loc.GetString("expedition-extraction-arrived"));
             }
         }
         else
@@ -178,10 +175,17 @@ public sealed class ExpeditionExtractionSystem : EntitySystem
         var planetPos = _xform.GetWorldPosition(planetXform);
         var target = new EntityCoordinates(spaceMap, planetPos + _random.NextAngle().ToVec() * ent.Comp.PlanetDistance);
         TryComp<ShuttleComponent>(shuttle, out var shuttleData);
-        _shuttle.FTLToCoordinates(shuttle, shuttleData, target, Angle.Zero,
-            _shuttle.DefaultStartupTime, _shuttle.DefaultTravelTime);
 
-        _salvage.Announce(ent.Owner, Loc.GetString("expedition-extraction-departing", ("seconds", (int) ent.Comp.DepartBefore.TotalSeconds)));
+        // Как у экспедиционного шаттла (SalvageSystem.Runner): старт FTL рассчитан так, чтобы уйти в БСС в конце экспедиции.
+        var remaining = expedition.EndTime - _timing.CurTime;
+        var startup = (float) remaining.TotalSeconds;
+        if (remaining < TimeSpan.FromSeconds(_shuttle.DefaultStartupTime))
+            startup = MathF.Max(0, (float) remaining.TotalSeconds - 0.5f);
+        startup = MathF.Min(startup, _shuttle.DefaultStartupTime);
+
+        _shuttle.FTLToCoordinates(shuttle, shuttleData, target, Angle.Zero, startup, _shuttle.DefaultTravelTime);
+
+        _salvage.Announce(ent.Owner, Loc.GetString("expedition-extraction-departing"));
     }
 
     private void DeleteShuttle(Entity<ExtractionShuttleComponent> shuttle)

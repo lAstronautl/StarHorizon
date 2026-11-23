@@ -28,6 +28,22 @@
         - !type:HTNCompoundTask
           task: IdleCompound
 
+# Дальники идут к игроку только до дальности стрельбы (RangedRange), а не вплотную: ближний бой у них запасной.
+- type: htnCompound
+  id: PursuePlayerRangedCompound
+  branches:
+    - tasks:
+        - !type:HTNPrimitiveTask
+          preconditions:
+            - !type:KeyExistsPrecondition
+              key: FollowTarget
+          operator: !type:MoveToOperator
+            targetKey: FollowTarget
+            rangeKey: RangedRange
+            pathfindInPlanning: false
+            removeKeyOnFinish: false
+
+# Корень SimpleRangedHostileCompound (стрелки-животные) с погоней.
 - type: htnCompound
   id: PursueRangedCompound
   branches:
@@ -36,10 +52,27 @@
           task: InnateRangedCombatCompound
     - tasks:
         - !type:HTNCompoundTask
+          task: PursuePlayerRangedCompound
+    - tasks:
+        - !type:HTNCompoundTask
           task: MeleeCombatCompound
     - tasks:
         - !type:HTNCompoundTask
-          task: PursuePlayerCompound
+          task: IdleCompound
+
+# Корень SimpleHumanoidHostileCompound (гуманоиды со стволами) с погоней.
+- type: htnCompound
+  id: PursueHumanoidCompound
+  branches:
+    - tasks:
+        - !type:HTNCompoundTask
+          task: RangedCombatCompound
+    - tasks:
+        - !type:HTNCompoundTask
+          task: PursuePlayerRangedCompound
+    - tasks:
+        - !type:HTNCompoundTask
+          task: MeleeCombatCompound
     - tasks:
         - !type:HTNCompoundTask
           task: IdleCompound

@@ -241,13 +241,11 @@ public sealed class ExpeditionMusicSystem : EntitySystem
                 break;
 
             case Scene.Wave:
+                // Только перемешанные _WD_ треки по кругу до конца волны (интро и петля не используются).
+                // Первый трек выбран и загружен заранее.
                 if (lib.Wave.Count > 0)
-                    _queue.Enqueue(new Track(Take("wave", lib.Wave)!, false, Gapless: lib.Intro != null));
-                // Интро и петля идут встык: следующий трек стартует чуть раньше конца предыдущего.
-                if (lib.Intro != null)
-                    _queue.Enqueue(new Track(lib.Intro, false, Gapless: lib.Loop != null));
-                if (lib.Loop != null)
-                    _queue.Enqueue(new Track(lib.Loop, true));
+                    _queue.Enqueue(new Track(Take("wave", lib.Wave)!, false, Gapless: true));
+                _refill = () => Shuffled(lib.Wave);
                 break;
 
             case Scene.Extraction:
@@ -361,8 +359,6 @@ public sealed class ExpeditionMusicSystem : EntitySystem
     {
         var lib = Library;
         Preload(lib.Rig);
-        Preload(lib.Intro);
-        Preload(lib.Loop);
 
         foreach (var (kind, list) in new[] { ("tittle", lib.Tittle), ("wave", lib.Wave), ("win", lib.Win) })
         {

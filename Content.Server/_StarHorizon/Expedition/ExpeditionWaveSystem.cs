@@ -39,6 +39,7 @@ public sealed class ExpeditionWaveSystem : EntitySystem
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly TriggerSystem _trigger = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly RockClearSystem _rocks = default!;
 
     public const string PodProto = "DropPodspawner";
     public const string PodContainer = "clowncar_container";
@@ -69,9 +70,10 @@ public sealed class ExpeditionWaveSystem : EntitySystem
 
         // Клиентам: волна закончилась по истечении времени или когда все мобы волны убиты.
         if (TryComp<ExpeditionWaveStateComponent>(ent, out var waveState) && waveState.Active
-            && (now >= waveState.End || CountAliveWaveMobs(ent.Owner) == 0))
+            && (now >= waveState.End || CountAliveWaveMobs(ent.Owner) <= ent.Comp.WaveTotal * ent.Comp.MusicOffFraction))
         {
             waveState.Active = false;
+            ent.Comp.WaveTotal = 0;
             Dirty(ent.Owner, waveState);
         }
 
@@ -87,7 +89,18 @@ public sealed class ExpeditionWaveSystem : EntitySystem
         }
 
         // Место падения: где начал первый игрок.
-        ent.Comp.DropAnchor ??= _players[0].Pos;
+        if (ent.Comp.DropAnchor == null)
+        {
+            ent.Comp.DropAnchor = _players[0].Pos;
+
+            // Земля вокруг места падения остаётся подгруженной, даже когда игроки ушли далеко.
+            if (TryComp<MapGridComponent>(ent, out _))
+            {
+                var loader = Spawn(null, new EntityCoordinates(ent.Owner, _players[0].Pos));
+                AddComp<Content.Server.Parallax.BiomeForceLoadComponent>(loader);
+                ent.Comp.AnchorLoader = loader;
+            }
+        }
 
         if (ent.Comp.NextWave is not { } next)
         {
@@ -182,6 +195,7 @@ public sealed class ExpeditionWaveSystem : EntitySystem
 
         if (spawned > 0)
         {
+            ent.Comp.WaveTotal += spawned;
             var state = EnsureComp<ExpeditionWaveStateComponent>(ent.Owner);
             state.Active = true;
             state.End = _timing.CurTime + ent.Comp.WaveMusicDuration;
@@ -240,7 +254,8 @@ public sealed class ExpeditionWaveSystem : EntitySystem
             if (!_map.TryGetTileRef(grid, grid.Comp, coords, out var tile) || tile.Tile.IsEmpty)
                 continue;
 
-            if (!_anchorable.TileFree(grid, tile.GridIndices, (int) CollisionGroup.MachineLayer, (int) CollisionGroup.MachineLayer))
+            // Не на камень и не в стену.
+            if (!_rocks.TileClear(grid, grid.Comp, tile.GridIndices))
                 continue;
 
             return _map.GridTileToLocal(grid, grid.Comp, tile.GridIndices);

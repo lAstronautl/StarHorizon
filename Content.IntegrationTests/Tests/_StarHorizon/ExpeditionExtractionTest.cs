@@ -103,8 +103,8 @@ public sealed class ExpeditionExtractionTest
         });
         Assert.That(server.EntMan.GetComponent<TransformComponent>(aboard).GridUid, Is.EqualTo(shuttle), "на борту");
 
-        // 3. За 30 секунд: шаттл улетает (после перезарядки прыжка).
-        await server.WaitPost(() => SetRemaining(TimeSpan.FromSeconds(29)));
+        // 3. Шаттл улетает ближе к концу, как экспедиционный (после перезарядки прыжка).
+        await server.WaitPost(() => SetRemaining(TimeSpan.FromSeconds(25)));
         for (var i = 0; i < 30 && extraction.Stage != ExtractionStage.Departed; i++)
             await pair.RunSeconds(1f);
         Assert.That(extraction.Stage, Is.EqualTo(ExtractionStage.Departed));

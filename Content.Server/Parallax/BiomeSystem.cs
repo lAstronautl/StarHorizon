@@ -388,6 +388,17 @@ public sealed partial class BiomeSystem : SharedBiomeSystem
             }
         }
 
+        // StarHorizon: точки, вокруг которых биом держится подгруженным без игроков (место падения дроп-подов).
+        var forceLoaders = EntityQueryEnumerator<BiomeForceLoadComponent, TransformComponent>();
+        while (forceLoaders.MoveNext(out _, out _, out var loaderXform))
+        {
+            if (_biomeQuery.TryGetComponent(loaderXform.MapUid, out var loaderBiome) && loaderBiome.Enabled
+                && _activeChunks.ContainsKey(loaderBiome))
+            {
+                AddChunksInRange(loaderBiome, _transform.GetWorldPosition(loaderXform));
+            }
+        }
+
         var loadBiomes = AllEntityQuery<BiomeComponent, MapGridComponent>();
 
         while (loadBiomes.MoveNext(out var gridUid, out var biome, out var grid))

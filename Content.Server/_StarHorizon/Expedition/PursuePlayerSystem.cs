@@ -26,7 +26,7 @@ public sealed class PursuePlayerSystem : EntitySystem
 
     private const string MeleeRoot = "PursueMeleeCompound";
     private const string RangedRoot = "PursueRangedCompound";
-    private const string RangedHostile = "SimpleRangedHostileCompound";
+    private const string HumanoidRoot = "PursueHumanoidCompound";
 
     private TimeSpan _nextUpdate;
     private readonly List<(EntityUid Uid, MapId Map, Vector2 Pos)> _players = new();
@@ -41,8 +41,16 @@ public sealed class PursuePlayerSystem : EntitySystem
         if (!TryComp<HTNComponent>(ent, out var htn))
             return;
 
-        var ranged = htn.RootTask.Task == RangedHostile;
-        htn.RootTask = new HTNCompoundTask { Task = ranged ? RangedRoot : MeleeRoot };
+        // Корень с погоней подбираем по исходному: дальники остаются дальниками (стреляют), а не лезут в ближний бой.
+        var original = htn.RootTask.Task.ToString();
+        var root = original switch
+        {
+            "SimpleHumanoidHostileCompound" => HumanoidRoot,
+            "SimpleRangedHostileCompound" => RangedRoot,
+            _ when original.Contains("Ranged") => RangedRoot,
+            _ => MeleeRoot,
+        };
+        htn.RootTask = new HTNCompoundTask { Task = root };
         _htn.Replan(htn);
     }
 
