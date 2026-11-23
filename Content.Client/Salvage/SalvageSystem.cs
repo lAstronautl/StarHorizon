@@ -1,3 +1,4 @@
+using Content.Client._StarHorizon.Expedition;
 using Content.Client.Audio;
 using Content.Shared.Salvage;
 using Content.Shared.Salvage.Expeditions;
@@ -17,6 +18,7 @@ public sealed partial class SalvageSystem : SharedSalvageSystem
     [Dependency] private ContentAudioSystem _audio = default!;
     [Dependency] private AudioSystem _audioSystem = default!; // Frontier
     [Dependency] private IConfigurationManager _cfg = default!; // Frontier
+    [Dependency] private ExpeditionMusicSystem _expeditionMusic = default!; // StarHorizon: key music
 
     const float SalvageExpeditionMinMusicVolume = -30f; // Frontier: expedition volume range
     const float SalvageExpeditionMaxMusicVolume = 3.0f; // Frontier: expedition volume range
@@ -39,15 +41,17 @@ public sealed partial class SalvageSystem : SharedSalvageSystem
         if (state.SelectedSong != null) // Frontier
             component.SelectedSong = state.SelectedSong; // Frontier
 
-        if (component.Stage >= ExpeditionStage.MusicCountdown)
+        if (component.Stage >= ExpeditionStage.MusicCountdown && !_expeditionMusic.LocalHasKey)
         {
             _audio.DisableAmbientMusic();
         }
 
         // Frontier: add music (only on music countdown, no music on forced exit)
+        // StarHorizon: у игрока с ключом экспедиции играет своя музыка, старой нет.
         if (component.Stage == ExpeditionStage.MusicCountdown
             && component.SelectedSong != null
-            && component.Stream == null)
+            && component.Stream == null
+            && !_expeditionMusic.LocalHasKey)
         {
             var volume = ConvertSliderValueToVolume(_cfg.GetCVar(NFCCVars.SalvageExpeditionMusicVolume));
             var audioParams = AudioParams.Default.WithVolume(volume).WithMaxDistance(float.MaxValue);

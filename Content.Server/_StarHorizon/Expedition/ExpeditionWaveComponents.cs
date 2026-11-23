@@ -32,6 +32,9 @@ public sealed partial class ExpeditionWavesComponent : Component
     [DataField] public float RingMin = 15f;
     [DataField] public float RingMax = 30f;
 
+    /// <summary>Сколько после появления волны клиентам играет боевая музыка (волна считается идущей).</summary>
+    [DataField] public TimeSpan WaveMusicDuration = TimeSpan.FromSeconds(120);
+
     /// <summary>За сколько до конца экспедиции волны прекращаются.</summary>
     [DataField] public TimeSpan StopBefore = TimeSpan.FromSeconds(30);
 }

@@ -1,5 +1,6 @@
 using System.Numerics;
 using Content.Server.StationEvents.Events;
+using Content.Shared._StarHorizon.Expedition;
 using Content.Server.Salvage;
 using Content.Server.Salvage.Expeditions;
 using Content.Server.Shuttles.Components;
@@ -112,6 +113,10 @@ public sealed class ExpeditionExtractionSystem : EntitySystem
 
         var shuttle = grid.Value.Owner;
         ent.Comp.Shuttle = shuttle;
+        EnsureComp<ExtractionShuttleMarkerComponent>(shuttle);
+        var state = EnsureComp<ExpeditionExtractionStateComponent>(ent.Owner);
+        state.Active = true;
+        Dirty(ent.Owner, state);
         var shuttleComp = EnsureComp<ExtractionShuttleComponent>(shuttle);
         shuttleComp.Expedition = ent.Owner;
         shuttleComp.DeleteAfter = ent.Comp.DeleteAfter;
@@ -152,6 +157,17 @@ public sealed class ExpeditionExtractionSystem : EntitySystem
     {
         ent.Comp.Stage = ExtractionStage.Departed;
         shuttle.Comp.Departed = true;
+
+        // Клиентам: эвакуация закончилась, шаттл ушёл в БСС.
+        if (TryComp<ExpeditionExtractionStateComponent>(ent.Owner, out var extractionState))
+        {
+            extractionState.Active = false;
+            Dirty(ent.Owner, extractionState);
+        }
+
+        var marker = EnsureComp<ExtractionShuttleMarkerComponent>(shuttle);
+        marker.Departed = true;
+        Dirty(shuttle, marker);
 
         if (!TryComp<TransformComponent>(expedition.Planet, out var planetXform) || planetXform.MapUid is not { } spaceMap)
         {

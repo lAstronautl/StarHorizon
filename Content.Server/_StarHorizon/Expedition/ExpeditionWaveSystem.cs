@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Numerics;
 using Content.Server.Ghost.Roles.Components;
+using Content.Shared._StarHorizon.Expedition;
 using Content.Server.Salvage;
 using Content.Server.Salvage.Expeditions;
 using Content.Shared.Construction.EntitySystems;
@@ -55,6 +56,14 @@ public sealed class ExpeditionWaveSystem : EntitySystem
     private void UpdateExpedition(Entity<ExpeditionWavesComponent> ent, SalvageExpeditionComponent expedition)
     {
         var now = _timing.CurTime;
+
+        // Клиентам: волна закончилась по истечении времени.
+        if (TryComp<ExpeditionWaveStateComponent>(ent, out var waveState) && waveState.Active && now >= waveState.End)
+        {
+            waveState.Active = false;
+            Dirty(ent.Owner, waveState);
+        }
+
         if (expedition.EndTime - now < ent.Comp.StopBefore)
             return;
 
@@ -134,6 +143,14 @@ public sealed class ExpeditionWaveSystem : EntitySystem
 
             if (SpawnAroundPlayer(ent, (ent.Owner, gridComp), entry.Proto))
                 spawned++;
+        }
+
+        if (spawned > 0)
+        {
+            var state = EnsureComp<ExpeditionWaveStateComponent>(ent.Owner);
+            state.Active = true;
+            state.End = _timing.CurTime + ent.Comp.WaveMusicDuration;
+            Dirty(ent.Owner, state);
         }
 
         if (spawned > 0)

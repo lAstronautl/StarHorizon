@@ -1,0 +1,15 @@
+# Ключ шифрования экспедиции: пока он вставлен в гарнитуру, у игрока локально играет музыка экспедиции.
+- type: entity
+  parent: EncryptionKey
+  id: StarHorizonExpeditionMusicKey
+  name: expedition encryption key
+  description: Encryption key tuned to expedition music. Insert into a headset to hear the expedition soundtrack, take it out to switch it off.
+  components:
+  - type: ExpeditionMusicKey
+  - type: Item
+    sprite: _NF/Objects/Devices/encryption_keys.rsi
+  - type: Sprite
+    sprite: _NF/Objects/Devices/encryption_keys.rsi
+    layers:
+    - state: crypt_gray
+    - state: stc_label
