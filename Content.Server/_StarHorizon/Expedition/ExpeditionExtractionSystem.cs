@@ -50,6 +50,7 @@ public sealed class ExpeditionExtractionSystem : EntitySystem
     {
         SubscribeLocalEvent<ExpeditionExtractionComponent, ComponentShutdown>(OnExpeditionShutdown);
         SubscribeLocalEvent<FTLCompletedEvent>(OnFTLCompleted);
+        SubscribeLocalEvent<FTLStartedEvent>(OnFTLStarted);
         SubscribeLocalEvent<ExtractionShuttleComponent, ComponentShutdown>(OnShuttleShutdown);
     }
 
@@ -130,6 +131,23 @@ public sealed class ExpeditionExtractionSystem : EntitySystem
             ("x", (int) landing.X), ("y", (int) landing.Y), ("minutes", (int) ent.Comp.ArriveBefore.TotalMinutes)));
     }
 
+    /// <summary>Шаттл ушёл в БСС (после старта FTL): только теперь клиентам играет победная музыка.</summary>
+    private void OnFTLStarted(ref FTLStartedEvent args)
+    {
+        if (!TryComp<ExtractionShuttleComponent>(args.Entity, out var shuttle) || !shuttle.Departed)
+            return;
+
+        if (Exists(shuttle.Expedition) && TryComp<ExpeditionExtractionStateComponent>(shuttle.Expedition, out var state))
+        {
+            state.Active = false;
+            Dirty(shuttle.Expedition, state);
+        }
+
+        var marker = EnsureComp<ExtractionShuttleMarkerComponent>(args.Entity);
+        marker.Departed = true;
+        Dirty(args.Entity, marker);
+    }
+
     private void OnFTLCompleted(ref FTLCompletedEvent args)
     {
         if (!TryComp<ExtractionShuttleComponent>(args.Entity, out var shuttle))
@@ -154,17 +172,6 @@ public sealed class ExpeditionExtractionSystem : EntitySystem
     {
         ent.Comp.Stage = ExtractionStage.Departed;
         shuttle.Comp.Departed = true;
-
-        // Клиентам: эвакуация закончилась, шаттл ушёл в БСС.
-        if (TryComp<ExpeditionExtractionStateComponent>(ent.Owner, out var extractionState))
-        {
-            extractionState.Active = false;
-            Dirty(ent.Owner, extractionState);
-        }
-
-        var marker = EnsureComp<ExtractionShuttleMarkerComponent>(shuttle);
-        marker.Departed = true;
-        Dirty(shuttle, marker);
 
         if (!TryComp<TransformComponent>(expedition.Planet, out var planetXform) || planetXform.MapUid is not { } spaceMap)
         {

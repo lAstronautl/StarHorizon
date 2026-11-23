@@ -80,6 +80,12 @@ public sealed class ExpeditionWaveTest
         return list;
     }
 
+    /// <summary>Не у всех мобов есть состояние крита: таким в тесте вместо него ставим смерть.</summary>
+    private static bool CanBeCritical(Robust.UnitTesting.RobustIntegrationTest.ServerIntegrationInstance server, EntityUid mob)
+    {
+        return server.System<Content.Shared.Mobs.Systems.MobStateSystem>().HasState(mob, Content.Shared.Mobs.MobState.Critical);
+    }
+
     [Test]
     public async Task WavesPursuePlayer()
     {
@@ -178,37 +184,31 @@ public sealed class ExpeditionWaveTest
         var endMin = mobs.Where(server.EntMan.EntityExists).Min(m => (xform.GetWorldPosition(m) - xform.GetWorldPosition(player)).Length());
         Assert.That(endMin, Is.LessThanOrEqualTo(Math.Min(startMin, 11f)), "мобы подошли к игроку (дальники встают на дальности стрельбы)");
 
-        // 5a. Моб в крите ещё жив: волна продолжается.
-        await server.WaitPost(() =>
-        {
-            var mobState = server.System<Content.Shared.Mobs.Systems.MobStateSystem>();
-            foreach (var mob in Pursuers(server))
-                mobState.ChangeMobState(mob, Content.Shared.Mobs.MobState.Critical);
-        });
-        await pair.RunSeconds(1.5f);
-        Assert.That(server.EntMan.GetComponent<Content.Shared._StarHorizon.Expedition.ExpeditionWaveStateComponent>(expeditionMap).Active,
-            "мобы в крите не считаются убитыми: волна идёт");
-
-        // 5b. Осталось больше 10% мобов волны: музыка идёт; осталось 10% и меньше: волна считается законченной.
+        // 5a. Музыка выключается, когда 90% мобов волны в крите или убиты (остаётся 10% и меньше в строю).
         var total = waves.WaveTotal;
-        var keepAlive = (int) Math.Floor(total * 0.1f);
+        var keepFighting = (int) Math.Floor(total * 0.1f);
         var all = Pursuers(server);
         Assert.That(total, Is.GreaterThan(0));
+        var waveState = server.EntMan.GetComponent<Content.Shared._StarHorizon.Expedition.ExpeditionWaveStateComponent>(expeditionMap);
         await server.WaitPost(() =>
         {
             var mobState = server.System<Content.Shared.Mobs.Systems.MobStateSystem>();
-            for (var i = keepAlive + 1; i < all.Count; i++)
-                mobState.ChangeMobState(all[i], Content.Shared.Mobs.MobState.Dead);
+            for (var i = keepFighting + 1; i < all.Count; i++)
+            {
+                // Половина в крите, половина убита.
+                mobState.ChangeMobState(all[i], i % 2 == 0 && CanBeCritical(server, all[i])
+                    ? Content.Shared.Mobs.MobState.Critical
+                    : Content.Shared.Mobs.MobState.Dead);
+            }
         });
         await pair.RunSeconds(1.5f);
-        Assert.That(server.EntMan.GetComponent<Content.Shared._StarHorizon.Expedition.ExpeditionWaveStateComponent>(expeditionMap).Active,
-            $"живых {keepAlive + 1} из {total}: больше 10%, музыка идёт");
+        Assert.That(waveState.Active, $"в строю {keepFighting + 1} из {total}: больше 10%, музыка идёт");
 
         await server.WaitPost(() =>
-            server.System<Content.Shared.Mobs.Systems.MobStateSystem>().ChangeMobState(all[keepAlive], Content.Shared.Mobs.MobState.Dead));
+            server.System<Content.Shared.Mobs.Systems.MobStateSystem>().ChangeMobState(all[keepFighting],
+                CanBeCritical(server, all[keepFighting]) ? Content.Shared.Mobs.MobState.Critical : Content.Shared.Mobs.MobState.Dead));
         await pair.RunSeconds(1.5f);
-        Assert.That(server.EntMan.GetComponent<Content.Shared._StarHorizon.Expedition.ExpeditionWaveStateComponent>(expeditionMap).Active, Is.False,
-            $"живых {keepAlive} из {total}: осталось 10%, музыка выключена");
+        Assert.That(waveState.Active, Is.False, $"в строю {keepFighting} из {total} (мобов {all.Count}, живых {all.Count(m => server.System<Content.Shared.Mobs.Systems.MobStateSystem>().IsAlive(m))}): 90% в крите или убиты, музыка выключена");
 
         // 6. В последние секунды экспедиции волн нет.
         var countBefore = Pursuers(server).Count;

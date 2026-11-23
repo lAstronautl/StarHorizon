@@ -70,7 +70,7 @@ public sealed class ExpeditionWaveSystem : EntitySystem
 
         // Клиентам: волна закончилась по истечении времени или когда все мобы волны убиты.
         if (TryComp<ExpeditionWaveStateComponent>(ent, out var waveState) && waveState.Active
-            && (now >= waveState.End || CountAliveWaveMobs(ent.Owner) <= ent.Comp.WaveTotal * ent.Comp.MusicOffFraction))
+            && (now >= waveState.End || CountFightingWaveMobs(ent.Owner) <= ent.Comp.WaveTotal * ent.Comp.MusicOffFraction))
         {
             waveState.Active = false;
             ent.Comp.WaveTotal = 0;
@@ -116,6 +116,25 @@ public sealed class ExpeditionWaveSystem : EntitySystem
     }
 
     private TimeSpan Delay(float min, float max) => TimeSpan.FromSeconds(_random.NextFloat(min, max));
+
+    /// <summary>Мобы волны, которые ещё в строю: не убиты и не в крите (для музыки, 90% выбыло: волна закончилась).</summary>
+    private int CountFightingWaveMobs(EntityUid map)
+    {
+        var fighting = 0;
+        var query = EntityQueryEnumerator<PursuePlayerComponent, TransformComponent>();
+        while (query.MoveNext(out var uid, out _, out var xform))
+        {
+            if (xform.MapUid != map)
+                continue;
+
+            if (TryComp<MobStateComponent>(uid, out var state) && !_mobState.IsAlive(uid, state))
+                continue;
+
+            fighting++;
+        }
+
+        return fighting;
+    }
 
     private int CountAliveWaveMobs(EntityUid map)
     {
@@ -211,7 +230,10 @@ public sealed class ExpeditionWaveSystem : EntitySystem
     private bool DropPod(Entity<ExpeditionWavesComponent> ent, Entity<MapGridComponent> grid, List<string> mobs)
     {
         if (FindDropTile(ent, grid) is not { } coords)
+        {
+            Log.Warning($"Expedition wave: no free tile for a drop pod on {ToPrettyString(ent.Owner)}");
             return false;
+        }
 
         var pod = Spawn(PodProto, coords);
         if (!_container.TryGetContainer(pod, PodContainer, out var container))
@@ -246,9 +268,11 @@ public sealed class ExpeditionWaveSystem : EntitySystem
 
     private EntityCoordinates? TryRingTile(Entity<ExpeditionWavesComponent> ent, Entity<MapGridComponent> grid, Vector2 center)
     {
-        for (var attempt = 0; attempt < 30; attempt++)
+        // Чем дольше ищем, тем шире кольцо: в густой породе или лесу свободное место может быть дальше.
+        for (var attempt = 0; attempt < 80; attempt++)
         {
-            var pos = center + _random.NextAngle().ToVec() * _random.NextFloat(ent.Comp.DropRingMin, ent.Comp.DropRingMax);
+            var spread = attempt / 20f * 3f;
+            var pos = center + _random.NextAngle().ToVec() * _random.NextFloat(ent.Comp.DropRingMin, ent.Comp.DropRingMax + spread);
             var coords = new EntityCoordinates(grid, pos);
 
             if (!_map.TryGetTileRef(grid, grid.Comp, coords, out var tile) || tile.Tile.IsEmpty)
