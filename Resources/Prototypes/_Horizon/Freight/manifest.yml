@@ -1,0 +1,25 @@
+- type: entity
+  id: FreightManifestBase
+  parent: Paper
+  abstract: true
+  name: накладная на перевозку
+  description: Бумага с перечнем грузов, адресатами и расценками. Вставьте её в консоль перевозок.
+  components:
+  - type: FreightManifest
+
+# Пример накладной: инженерные грузы разным адресатам.
+- type: entity
+  id: FreightManifestExample
+  parent: FreightManifestBase
+  suffix: Example
+  components:
+  - type: FreightManifest
+    addressee: Склад NT
+    entries:
+    - crate: TradeGoodsEngineerTools
+      count: 2
+      pool: FreightPoolDeports
+      price: 3000
+    - crate: TradeGoodsMedChem
+      count: 1
+      pool: FreightPoolAnywhere

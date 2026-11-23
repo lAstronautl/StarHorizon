@@ -1,0 +1,22 @@
+<controls:FancyWindow xmlns="https://spacestation14.io"
+                      xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
+                      Title="{Loc 'freight-console-window-title'}"
+                      MinSize="450 400"
+                      SetSize="500 500">
+    <BoxContainer Orientation="Vertical" Margin="10" VerticalExpand="True" HorizontalExpand="True">
+        <Label Name="DestinationLabel"/>
+        <Label Name="AddresseeLabel"/>
+        <BoxContainer Orientation="Vertical" VerticalExpand="True" Margin="0 5 0 5">
+            <Label Text="{Loc 'freight-console-manifest-header'}" HorizontalAlignment="Center"/>
+            <ScrollContainer VerticalExpand="True" HScrollEnabled="False">
+                <BoxContainer Name="EntriesContainer" Orientation="Vertical"/>
+            </ScrollContainer>
+        </BoxContainer>
+        <Button Name="SpawnButton" Text="{Loc 'freight-console-spawn-button'}"/>
+        <Label Name="SellStatusLabel" Margin="0 5 0 0"/>
+        <BoxContainer Orientation="Horizontal">
+            <Button Name="SellButton" Text="{Loc 'freight-console-sell-button'}" HorizontalExpand="True"/>
+            <Button Name="RefreshButton" Text="{Loc 'freight-console-refresh-button'}"/>
+        </BoxContainer>
+    </BoxContainer>
+</controls:FancyWindow>

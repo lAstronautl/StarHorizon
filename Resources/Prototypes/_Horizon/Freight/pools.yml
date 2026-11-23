@@ -1,0 +1,26 @@
+# Пул адресатов: выбирается по весу на каждый ящик. destination не указан = любой грид с консолью перевозок.
+# credits / tokens - оплата продавцу, bankPayout - перевод на аккаунт ATM банка грида (если он там есть).
+- type: freightRecipientPool
+  id: FreightPoolDeports
+  recipients:
+  - destination: NTDeport
+    weight: 4
+    credits: 2500
+    tokens: 2
+    bankPayout: 500
+  - destination: SindiDeport
+    weight: 2
+    credits: 3500
+    tokens: 3
+  - destination: PirateDeport
+    weight: 1
+    credits: 4500
+    tokens: 4
+
+- type: freightRecipientPool
+  id: FreightPoolAnywhere
+  recipients:
+  - weight: 1
+    credits: 1500
+    tokens: 1
+    bankPayout: 250

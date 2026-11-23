@@ -1,0 +1,15 @@
+- type: freightDestination
+  id: NTDeport
+  name: freight-destination-nt-deport
+
+- type: freightDestination
+  id: PirateDeport
+  name: freight-destination-pirate-deport
+
+- type: freightDestination
+  id: SindiDeport
+  name: freight-destination-sindi-deport
+
+- type: freightDestination
+  id: GSecDeport
+  name: freight-destination-gsec-deport

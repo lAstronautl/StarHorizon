@@ -1,0 +1,27 @@
+- type: entity
+  id: ComputerFreightConsole
+  parent: BaseComputer
+  name: консоль перевозок
+  description: Принимает накладные на перевозку и выдаёт грузы. Поставьте доставленные ящики на поддоны и нажмите «Продать», чтобы получить оплату.
+  components:
+  - type: FreightConsole
+    manifestSlot:
+      name: freight-console-manifestSlot
+      insertSound: /Audio/Machines/scanning.ogg
+      ejectSound: /Audio/Machines/tray_eject.ogg
+      ejectOnBreak: true
+      swap: false
+      whitelist:
+        components:
+        - FreightManifest
+  - type: ActivatableUI
+    key: enum.FreightConsoleUiKey.Key
+  - type: UserInterface
+    interfaces:
+      enum.FreightConsoleUiKey.Key:
+        type: FreightConsoleBoundUserInterface
+  - type: ItemSlots
+  - type: ContainerContainer
+    containers:
+      board: !type:Container
+      freight-console-manifestSlot: !type:ContainerSlot

@@ -32,3 +32,5 @@
           mapNameTemplate: 'Торговый аутпост Горлекс' # Has a letter appended in PointOfInterestSystemh
         - type: HorizonStationFaction
           faction: GSec
+        - type: FreightDestination
+          id: GSecDeport

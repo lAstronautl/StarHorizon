@@ -36,3 +36,5 @@
         - type: NoMailStation # Horizon: Disable mail for Syndicate
         - type: HorizonStationFaction
           faction: Syndicate
+        - type: FreightDestination
+          id: SindiDeport

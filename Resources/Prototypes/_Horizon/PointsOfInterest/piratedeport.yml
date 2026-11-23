@@ -36,3 +36,5 @@
         - type: NoMailStation # Horizon: Disable mail for Pirates
         - type: HorizonStationFaction
           faction: Pirate
+        - type: FreightDestination
+          id: PirateDeport

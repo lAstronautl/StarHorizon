@@ -1,0 +1,23 @@
+- type: stack
+  id: TradeToken
+  name: stack-trade-token
+  spawn: TradeToken
+  maxCount: 100
+
+- type: entity
+  parent: BaseItem
+  id: TradeToken
+  name: торговый токен
+  description: Подтверждает успешную доставку груза. Принимается торговцами.
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/coins.rsi
+    state: coin_gold
+  - type: Item
+    size: Tiny
+  - type: Stack
+    stackType: TradeToken
+    count: 1
+  - type: StaticPrice
+    price: 0
+  - type: CargoSellBlacklist
