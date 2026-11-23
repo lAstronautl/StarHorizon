@@ -6,7 +6,6 @@ using Content.Server.Salvage.Expeditions;
 using Content.Shared._Horizon.SpaceHazards;
 using Content.Shared.CCVar;
 using Content.Shared.Salvage.Expeditions;
-using Content.Shared.Weapons.Ranged.Components;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Log;
 using Robust.Shared.Map;
@@ -16,17 +15,14 @@ using Robust.Shared.Timing;
 namespace Content.IntegrationTests.Tests._StarHorizon;
 
 /// <summary>
-/// Эвакуация с экспедиции: за 5 минут маяк и крюки, за 2 прилетает alleycat, за 1 он улетает с теми, кто зацепился
-/// за маяк, через 10 минут после прилёта к планете корабль удаляется и люди остаются в космосе.
+/// Эвакуация с экспедиции: за 2 минуты прилетает alleycat, за 30 секунд улетает с теми, кто на борту, через 10 минут
+/// после прилёта к планете корабль удаляется и люди остаются в космосе.
 /// </summary>
 [TestFixture]
 public sealed class ExpeditionExtractionTest
 {
     [TestPrototypes]
     private const string Prototypes = @"
-- type: entity
-  id: ExtractionTestHook
-
 - type: entity
   id: ExtractionTestPassenger
   components:
@@ -80,34 +76,13 @@ public sealed class ExpeditionExtractionTest
         void SetRemaining(TimeSpan remaining) =>
             server.EntMan.GetComponent<SalvageExpeditionComponent>(expeditionMap).EndTime = timing.CurTime + remaining;
 
-        // До пяти минут ничего нет.
+        // До двух минут ничего нет.
         await pair.RunSeconds(1.5f);
         var extraction = server.EntMan.GetComponent<ExpeditionExtractionComponent>(expeditionMap);
         Assert.That(extraction.Stage, Is.EqualTo(ExtractionStage.None));
+        Assert.That(extraction.Shuttle, Is.Null);
 
-        // 1. За 5 минут: маяк и крюки.
-        await server.WaitPost(() => SetRemaining(TimeSpan.FromMinutes(4.9)));
-        await pair.RunSeconds(1.5f);
-        Assert.That(extraction.Stage, Is.EqualTo(ExtractionStage.BeaconPlaced));
-        var beacon = extraction.Beacon!.Value;
-        Assert.That(server.EntMan.GetComponent<TransformComponent>(beacon).MapUid, Is.EqualTo(expeditionMap));
-
-        // Игрок с крюком, который зацепился за маяк, и игрок, который не зацепился.
-        EntityUid hooked = default, free = default, gun = default, hook = default;
-        await server.WaitPost(() =>
-        {
-            var beaconCoords = server.EntMan.GetComponent<TransformComponent>(beacon).Coordinates;
-            hooked = server.EntMan.SpawnEntity("ExtractionTestPassenger", beaconCoords.Offset(new Vector2(0, -3)));
-            free = server.EntMan.SpawnEntity("ExtractionTestPassenger", beaconCoords.Offset(new Vector2(3, 3)));
-            gun = server.EntMan.SpawnEntity("WeaponGrapplingGun", beaconCoords.Offset(new Vector2(0, -3)));
-            xform.SetParent(gun, hooked);
-            hook = server.EntMan.SpawnEntity("ExtractionTestHook", beaconCoords);
-            xform.SetParent(hook, beacon);
-            var gunComp = server.EntMan.GetComponent<GrapplingGunComponent>(gun);
-            gunComp.Projectile = hook;
-        });
-
-        // 2. За 2 минуты: прилетает alleycat, берёт маяк.
+        // 1. За 2 минуты: прилетает alleycat.
         await server.WaitPost(() => SetRemaining(TimeSpan.FromMinutes(1.9)));
         await pair.RunSeconds(1.5f);
         Assert.That(extraction.Stage, Is.EqualTo(ExtractionStage.ShuttleSent));
@@ -115,24 +90,26 @@ public sealed class ExpeditionExtractionTest
         var shuttleComp = server.EntMan.GetComponent<ExtractionShuttleComponent>(shuttle);
         for (var i = 0; i < 60 && !shuttleComp.Arrived; i++)
             await pair.RunSeconds(1f);
-        Assert.That(shuttleComp.Arrived, "корабль прилетел");
+        Assert.That(shuttleComp.Arrived, "шаттл прилетел");
         Assert.That(server.EntMan.GetComponent<TransformComponent>(shuttle).MapUid, Is.EqualTo(expeditionMap));
-        await pair.RunSeconds(0.5f);
-        Assert.That(server.EntMan.HasComponent<ExtractionPassengerComponent>(beacon), "beacon passenger comp");
-        var bpass = server.EntMan.GetComponent<ExtractionPassengerComponent>(beacon);
-        Assert.That(bpass.Grid, Is.EqualTo(shuttle), $"grid {bpass.Grid} local {bpass.Local}");
-        Assert.That(server.EntMan.GetComponent<TransformComponent>(beacon).ParentUid, Is.EqualTo(shuttle), "маяк на корабле");
 
-        await pair.RunSeconds(1f);
+        // 2. Один игрок заходит на шаттл, второй остаётся на карте.
+        EntityUid aboard = default, left = default;
+        await server.WaitPost(() =>
+        {
+            var grid = server.EntMan.GetComponent<MapGridComponent>(shuttle);
+            aboard = server.EntMan.SpawnEntity("ExtractionTestPassenger", new EntityCoordinates(shuttle, grid.LocalAABB.Center));
+            left = server.EntMan.SpawnEntity("ExtractionTestPassenger", server.EntMan.GetComponent<TransformComponent>(shuttle).Coordinates.Offset(new Vector2(30, 0)));
+        });
+        Assert.That(server.EntMan.GetComponent<TransformComponent>(aboard).GridUid, Is.EqualTo(shuttle), "на борту");
 
-        // 3. За минуту: корабль улетает вместе с зацепившимся, второй остаётся.
-        await server.WaitPost(() => SetRemaining(TimeSpan.FromSeconds(50)));
-        // Сначала у корабля идёт перезарядка прыжка после прилёта, потом он улетает.
+        // 3. За 30 секунд: шаттл улетает (после перезарядки прыжка).
+        await server.WaitPost(() => SetRemaining(TimeSpan.FromSeconds(29)));
         for (var i = 0; i < 30 && extraction.Stage != ExtractionStage.Departed; i++)
             await pair.RunSeconds(1f);
         Assert.That(extraction.Stage, Is.EqualTo(ExtractionStage.Departed));
-        Assert.That(server.EntMan.GetComponent<TransformComponent>(hooked).ParentUid, Is.EqualTo(shuttle), "висит снаружи корабля");
-        Assert.That(server.EntMan.GetComponent<TransformComponent>(free).MapUid, Is.EqualTo(expeditionMap));
+        Assert.That(server.EntMan.GetComponent<TransformComponent>(left).MapUid, Is.EqualTo(expeditionMap), "второй остался на карте");
+        await server.WaitPost(() => SetRemaining(TimeSpan.FromMinutes(5))); // карта нужна до конца теста
 
         // 4. Корабль в космосе у планеты, зацепившийся с ним.
         Assert.That(shuttleComp.Departed);
@@ -141,16 +118,15 @@ public sealed class ExpeditionExtractionTest
             await pair.RunSeconds(1f);
         Assert.That(shuttleComp.DeleteAt, Is.Not.Null, "прилетел к планете");
         Assert.That(server.EntMan.GetComponent<TransformComponent>(shuttle).MapUid, Is.EqualTo(planetMap));
-        Assert.That(server.EntMan.GetComponent<TransformComponent>(hooked).MapUid, Is.EqualTo(planetMap), "пассажир долетел");
-        Assert.That(server.EntMan.GetComponent<TransformComponent>(hooked).ParentUid, Is.EqualTo(shuttle));
+        Assert.That(server.EntMan.GetComponent<TransformComponent>(aboard).MapUid, Is.EqualTo(planetMap), "пассажир долетел");
+        Assert.That(server.EntMan.GetComponent<TransformComponent>(aboard).ParentUid, Is.EqualTo(shuttle));
 
         // 5. Через 10 минут корабль удаляется, человек остаётся в космосе.
         await server.WaitPost(() => shuttleComp.DeleteAt = timing.CurTime);
         await pair.RunSeconds(1.5f);
         Assert.That(server.EntMan.EntityExists(shuttle), Is.False, "корабль удалён");
-        Assert.That(server.EntMan.EntityExists(hooked), "пассажир жив");
-        Assert.That(server.EntMan.GetComponent<TransformComponent>(hooked).MapUid, Is.EqualTo(planetMap), "остался в космосе у планеты");
-        Assert.That(server.EntMan.HasComponent<ExtractionPassengerComponent>(hooked), Is.False);
+        Assert.That(server.EntMan.EntityExists(aboard), "пассажир жив");
+        Assert.That(server.EntMan.GetComponent<TransformComponent>(aboard).MapUid, Is.EqualTo(planetMap), "остался в космосе у планеты");
 
         // 6. Карта закрывается, не зацепившийся пропадает с ней.
         await server.WaitPost(() => SetRemaining(TimeSpan.FromSeconds(-1)));
