@@ -1,0 +1,45 @@
+# Мобы волн экспедиции всегда знают, где игрок, и идут к нему (FollowTarget ставит PursuePlayerSystem).
+# Ближний/дальний бой раньше погони: рядом с игроком они дерутся, вдали идут к нему напрямую.
+- type: htnCompound
+  id: PursuePlayerCompound
+  branches:
+    - tasks:
+        - !type:HTNPrimitiveTask
+          preconditions:
+            - !type:KeyExistsPrecondition
+              key: FollowTarget
+          operator: !type:MoveToOperator
+            targetKey: FollowTarget
+            rangeKey: MeleeRange
+            # У A* лимит узлов: длинные пути иначе срывают план. Движение к цели ведёт steering.
+            pathfindInPlanning: false
+            removeKeyOnFinish: false
+
+- type: htnCompound
+  id: PursueMeleeCompound
+  branches:
+    - tasks:
+        - !type:HTNCompoundTask
+          task: MeleeCombatCompound
+    - tasks:
+        - !type:HTNCompoundTask
+          task: PursuePlayerCompound
+    - tasks:
+        - !type:HTNCompoundTask
+          task: IdleCompound
+
+- type: htnCompound
+  id: PursueRangedCompound
+  branches:
+    - tasks:
+        - !type:HTNCompoundTask
+          task: InnateRangedCombatCompound
+    - tasks:
+        - !type:HTNCompoundTask
+          task: MeleeCombatCompound
+    - tasks:
+        - !type:HTNCompoundTask
+          task: PursuePlayerCompound
+    - tasks:
+        - !type:HTNCompoundTask
+          task: IdleCompound

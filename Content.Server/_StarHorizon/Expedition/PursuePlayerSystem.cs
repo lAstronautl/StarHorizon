@@ -1,0 +1,113 @@
+using System.Numerics;
+using Content.Server.NPC;
+using Content.Server.NPC.HTN;
+using Content.Server.NPC.Systems;
+using Content.Shared.Ghost;
+using Content.Shared.Mobs.Components;
+using Content.Shared.Mobs.Systems;
+using Robust.Server.GameObjects;
+using Robust.Shared.Map;
+using Robust.Shared.Player;
+using Robust.Shared.Timing;
+
+namespace Content.Server._StarHorizon.Expedition;
+
+/// <summary>
+/// Мобы с <see cref="PursuePlayerComponent"/> всегда знают, где ближайший живой игрок на их карте (зрение и аггро не
+/// нужны), и идут к нему: ставим им FollowTarget, а корень ИИ меняем на вариант с погоней.
+/// </summary>
+public sealed class PursuePlayerSystem : EntitySystem
+{
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly NPCSystem _npc = default!;
+    [Dependency] private readonly HTNSystem _htn = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly TransformSystem _xform = default!;
+
+    private const string MeleeRoot = "PursueMeleeCompound";
+    private const string RangedRoot = "PursueRangedCompound";
+    private const string RangedHostile = "SimpleRangedHostileCompound";
+
+    private TimeSpan _nextUpdate;
+    private readonly List<(EntityUid Uid, MapId Map, Vector2 Pos)> _players = new();
+
+    public override void Initialize()
+    {
+        SubscribeLocalEvent<PursuePlayerComponent, ComponentStartup>(OnStartup);
+    }
+
+    private void OnStartup(Entity<PursuePlayerComponent> ent, ref ComponentStartup args)
+    {
+        if (!TryComp<HTNComponent>(ent, out var htn))
+            return;
+
+        var ranged = htn.RootTask.Task == RangedHostile;
+        htn.RootTask = new HTNCompoundTask { Task = ranged ? RangedRoot : MeleeRoot };
+        _htn.Replan(htn);
+    }
+
+    /// <summary>Живые игроки (с сессией) на карте.</summary>
+    public void GetAlivePlayers(EntityUid map, List<(EntityUid Uid, Vector2 Pos)> result)
+    {
+        result.Clear();
+        var query = EntityQueryEnumerator<ActorComponent, MobStateComponent, TransformComponent>();
+        while (query.MoveNext(out var uid, out _, out var state, out var xform))
+        {
+            if (xform.MapUid != map || HasComp<GhostComponent>(uid) || _mobState.IsDead(uid, state))
+                continue;
+
+            result.Add((uid, _xform.GetWorldPosition(xform)));
+        }
+    }
+
+    public override void Update(float frameTime)
+    {
+        if (_timing.CurTime < _nextUpdate)
+            return;
+        _nextUpdate = _timing.CurTime + TimeSpan.FromSeconds(1);
+
+        _players.Clear();
+        var playerQuery = EntityQueryEnumerator<ActorComponent, MobStateComponent, TransformComponent>();
+        while (playerQuery.MoveNext(out var uid, out _, out var state, out var xform))
+        {
+            if (HasComp<GhostComponent>(uid) || _mobState.IsDead(uid, state) || xform.MapID == MapId.Nullspace)
+                continue;
+
+            _players.Add((uid, xform.MapID, _xform.GetWorldPosition(xform)));
+        }
+
+        var query = EntityQueryEnumerator<PursuePlayerComponent, HTNComponent, TransformComponent>();
+        while (query.MoveNext(out var uid, out var pursue, out var htn, out var xform))
+        {
+            if (_mobState.IsIncapacitated(uid))
+                continue;
+
+            var pos = _xform.GetWorldPosition(xform);
+            EntityUid? best = null;
+            var bestDist = float.MaxValue;
+            foreach (var (player, map, playerPos) in _players)
+            {
+                if (map != xform.MapID)
+                    continue;
+
+                var dist = Vector2.DistanceSquared(pos, playerPos);
+                if (dist < bestDist)
+                {
+                    bestDist = dist;
+                    best = player;
+                }
+            }
+
+            if (best == pursue.Target)
+                continue;
+
+            pursue.Target = best;
+            if (best is { } target)
+                _npc.SetBlackboard(uid, NPCBlackboard.FollowTarget, new EntityCoordinates(target, Vector2.Zero), htn);
+            else
+                htn.Blackboard.Remove<EntityCoordinates>(NPCBlackboard.FollowTarget);
+
+            _htn.Replan(htn);
+        }
+    }
+}
