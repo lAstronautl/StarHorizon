@@ -73,6 +73,12 @@ public sealed class ExpeditionExtractionTest
         // Карта ждёт первого прибытия (капсулы) на паузе; здесь снимаем её сами.
         await server.WaitPost(() => server.System<SharedMapSystem>().SetPaused(expeditionMap, false));
 
+        // Консольная команда мотает время экспедиции до 5 минут (и у карты, и у планеты).
+        await server.WaitPost(() => server.ConsoleHost.ExecuteCommand($"expeditionskip 5 {server.EntMan.GetNetEntity(expeditionMap)}"));
+        var skipped = server.EntMan.GetComponent<SalvageExpeditionComponent>(expeditionMap).EndTime - timing.CurTime;
+        Assert.That(skipped, Is.GreaterThan(TimeSpan.FromMinutes(4.9)).And.LessThanOrEqualTo(TimeSpan.FromMinutes(5)), "до конца 5 минут");
+        Assert.That(planetComp1.EndTime, Is.EqualTo(server.EntMan.GetComponent<SalvageExpeditionComponent>(expeditionMap).EndTime), "у планеты тоже");
+
         void SetRemaining(TimeSpan remaining) =>
             server.EntMan.GetComponent<SalvageExpeditionComponent>(expeditionMap).EndTime = timing.CurTime + remaining;
 
