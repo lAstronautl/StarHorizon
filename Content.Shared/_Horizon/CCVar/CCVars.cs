@@ -130,7 +130,7 @@ namespace Content.Shared._Horizon.CCVar
         /// Расстояние (в метрах) до ближайшего живого игрока, дальше которого NPC засыпает.
         /// </summary>
         public static readonly CVarDef<float> NpcPlayerPauseDistance =
-            CVarDef.Create("npc.player_pause_distance", 1000f, CVar.SERVERONLY);
+            CVarDef.Create("npc.player_pause_distance", 50f, CVar.SERVERONLY);
 
         /// <summary>
         /// Включение/отключение автоматического удаления мелких гридов.

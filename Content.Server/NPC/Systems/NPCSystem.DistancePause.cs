@@ -80,6 +80,10 @@ public sealed partial class NPCSystem
                 || TryComp<MindContainerComponent>(uid, out var mind) && mind.HasMind)
                 continue;
 
+            // Мобы волн экспедиции всегда идут к игроку, как бы далеко он ни убежал.
+            if (HasComp<Content.Server._StarHorizon.Expedition.PursuePlayerComponent>(uid))
+                continue;
+
             if (!HorizonPlayerInRange(xform))
                 _horizonScratch.Add(uid);
         }
