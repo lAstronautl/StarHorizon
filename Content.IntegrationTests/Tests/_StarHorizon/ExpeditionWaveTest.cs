@@ -169,7 +169,8 @@ public sealed class ExpeditionWaveTest
 
         // 4. Мобы знают, где игрок (FollowTarget) и сменили корень ИИ на погоню.
         await pair.RunSeconds(1.5f);
-        foreach (var mob in mobs.Where(server.EntMan.EntityExists))
+        // Не у всех мобов фракции есть ИИ (HTN): проверяем тех, у кого есть.
+        foreach (var mob in mobs.Where(m => server.EntMan.EntityExists(m) && server.EntMan.HasComponent<HTNComponent>(m)))
         {
             var htn = server.EntMan.GetComponent<HTNComponent>(mob);
             Assert.That(htn.RootTask.Task, Does.StartWith("Pursue"));

@@ -15,9 +15,9 @@ public sealed partial class ExpeditionWavesComponent : Component
     [DataField] public float IntervalMin = 90f;
     [DataField] public float IntervalMax = 180f;
 
-    /// <summary>Доля mobBudget сложности на одну волну: тратится весь бюджет.</summary>
-    [DataField] public float BudgetFractionMin = 1f;
-    [DataField] public float BudgetFractionMax = 1f;
+    /// <summary>Доля mobBudget сложности на одну волну: случайно от 40% до 60%.</summary>
+    [DataField] public float BudgetFractionMin = 0.4f;
+    [DataField] public float BudgetFractionMax = 0.6f;
 
     /// <summary>Потолок бюджета одной волны (по умолчанию не ограничен, ограничивает MaxAliveWaveMobs).</summary>
     [DataField] public float MaxWaveBudget = 10000f;
