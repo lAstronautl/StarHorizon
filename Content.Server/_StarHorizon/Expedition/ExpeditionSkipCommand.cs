@@ -9,8 +9,9 @@ using Robust.Shared.Timing;
 namespace Content.Server._StarHorizon.Expedition;
 
 /// <summary>
-/// Отладка: мотает время планетной экспедиции так, чтобы до конца оставалось 5 минут (или заданное число минут).
-/// Без аргумента: экспедиция, на карте которой стоит вызвавший команду, а если его там нет, все идущие экспедиции.
+/// Отладка: двигает время планетной экспедиции. <c>5</c> ставит остаток 5 минут, <c>+2</c> прибавляет 2 минуты к остатку,
+/// <c>-3</c> убавляет 3 минуты (до 0: экспедиция закрывается). Без аргументов ставит остаток 5 минут.
+/// Без uid: экспедиция, на карте которой стоит вызвавший команду, а если его там нет, все идущие экспедиции.
 /// </summary>
 [AdminCommand(AdminFlags.Debug)]
 public sealed class ExpeditionSkipCommand : LocalizedEntityCommands
@@ -18,17 +19,28 @@ public sealed class ExpeditionSkipCommand : LocalizedEntityCommands
     [Dependency] private readonly IGameTiming _timing = default!;
 
     public override string Command => "expeditionskip";
-    public override string Description => "Мотает время планетной экспедиции: до конца остаётся 5 минут (или указанное число минут).";
-    public override string Help => $"{Command} [минут=5] [uid карты экспедиции]";
+    public override string Description => "Двигает время планетной экспедиции: N ставит остаток N минут, +N прибавляет, -N убавляет.";
+    public override string Help => $"{Command} [N | +N | -N] [uid карты экспедиции]   (минуты, по умолчанию 5)";
 
     public override void Execute(IConsoleShell shell, string argStr, string[] args)
     {
+        var mode = Mode.Set;
         var minutes = 5f;
-        if (args.Length >= 1
-            && (!float.TryParse(args[0], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out minutes) || minutes <= 0))
+        if (args.Length >= 1)
         {
-            shell.WriteError(Loc.GetString("shell-argument-must-be-number"));
-            return;
+            var text = args[0];
+            if (text.StartsWith('+'))
+                mode = Mode.Add;
+            else if (text.StartsWith('-'))
+                mode = Mode.Subtract;
+
+            var number = mode == Mode.Set ? text : text[1..];
+            if (!float.TryParse(number, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out minutes)
+                || minutes < 0)
+            {
+                shell.WriteError(Loc.GetString("shell-argument-must-be-number"));
+                return;
+            }
         }
 
         EntityUid? only = null;
@@ -50,7 +62,8 @@ public sealed class ExpeditionSkipCommand : LocalizedEntityCommands
             only = map;
         }
 
-        var target = _timing.CurTime + TimeSpan.FromMinutes(minutes);
+        var delta = TimeSpan.FromMinutes(minutes);
+        var now = _timing.CurTime;
         var count = 0;
         var query = EntityManager.AllEntityQueryEnumerator<SalvageExpeditionComponent>();
         while (query.MoveNext(out var uid, out var expedition))
@@ -58,30 +71,41 @@ public sealed class ExpeditionSkipCommand : LocalizedEntityCommands
             if (!expedition.Planet.IsValid() || only != null && only != uid)
                 continue;
 
-            // Только вперёд: если до конца уже меньше, ничего не меняем.
-            if (expedition.EndTime <= target)
+            var target = mode switch
             {
-                shell.WriteLine($"{uid}: до конца уже {(expedition.EndTime - _timing.CurTime).TotalMinutes:F1} мин., не трогаю.");
-                continue;
-            }
+                Mode.Add => expedition.EndTime + delta,
+                Mode.Subtract => expedition.EndTime - delta,
+                _ => now + delta,
+            };
+
+            // Не раньше «сейчас»: экспедиция закрывается, а не уходит в прошлое.
+            if (target < now)
+                target = now;
 
             expedition.EndTime = target;
             if (EntityManager.TryGetComponent(expedition.Planet, out ExpeditionPlanetComponent? planet))
                 planet.EndTime = target;
 
-            shell.WriteLine($"{uid}: до конца экспедиции {minutes:F1} мин.");
+            shell.WriteLine($"{uid}: до конца экспедиции {(target - now).TotalMinutes:F1} мин.");
             count++;
         }
 
-        if (count == 0 && only == null)
+        if (count == 0)
             shell.WriteLine("Идущих планетных экспедиций нет.");
+    }
+
+    private enum Mode : byte
+    {
+        Set,
+        Add,
+        Subtract,
     }
 
     public override CompletionResult GetCompletion(IConsoleShell shell, string[] args)
     {
         return args.Length switch
         {
-            1 => CompletionResult.FromHint("минут (по умолчанию 5)"),
+            1 => CompletionResult.FromHint("N: остаток N минут, +N: прибавить, -N: убавить (по умолчанию 5)"),
             2 => CompletionResult.FromHint("uid карты экспедиции (по умолчанию ваша)"),
             _ => CompletionResult.Empty,
         };

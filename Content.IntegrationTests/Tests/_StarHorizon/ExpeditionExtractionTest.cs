@@ -79,6 +79,15 @@ public sealed class ExpeditionExtractionTest
         Assert.That(skipped, Is.GreaterThan(TimeSpan.FromMinutes(4.9)).And.LessThanOrEqualTo(TimeSpan.FromMinutes(5)), "до конца 5 минут");
         Assert.That(planetComp1.EndTime, Is.EqualTo(server.EntMan.GetComponent<SalvageExpeditionComponent>(expeditionMap).EndTime), "у планеты тоже");
 
+        // +N прибавляет и -N убавляет минуты от текущего остатка.
+        await server.WaitPost(() => server.ConsoleHost.ExecuteCommand($"expeditionskip +2 {server.EntMan.GetNetEntity(expeditionMap)}"));
+        Assert.That(server.EntMan.GetComponent<SalvageExpeditionComponent>(expeditionMap).EndTime - timing.CurTime,
+            Is.GreaterThan(TimeSpan.FromMinutes(6.9)).And.LessThanOrEqualTo(TimeSpan.FromMinutes(7)), "5 + 2 минуты");
+        await server.WaitPost(() => server.ConsoleHost.ExecuteCommand($"expeditionskip -3 {server.EntMan.GetNetEntity(expeditionMap)}"));
+        Assert.That(server.EntMan.GetComponent<SalvageExpeditionComponent>(expeditionMap).EndTime - timing.CurTime,
+            Is.GreaterThan(TimeSpan.FromMinutes(3.9)).And.LessThanOrEqualTo(TimeSpan.FromMinutes(4)), "7 - 3 минуты");
+        Assert.That(planetComp1.EndTime, Is.EqualTo(server.EntMan.GetComponent<SalvageExpeditionComponent>(expeditionMap).EndTime), "у планеты тоже");
+
         void SetRemaining(TimeSpan remaining) =>
             server.EntMan.GetComponent<SalvageExpeditionComponent>(expeditionMap).EndTime = timing.CurTime + remaining;
 
