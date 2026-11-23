@@ -41,6 +41,14 @@ public sealed class ExpeditionMusicTest
     }
 
     [Test]
+    public void GaplessStartsJustBeforeTheEnd()
+    {
+        Assert.That(ExpeditionMusicSystem.ShouldStartNext(12.7f, 5f), Is.False, "середина трека: ждём");
+        Assert.That(ExpeditionMusicSystem.ShouldStartNext(12.7f, 12.6f), Is.True, "за долю секунды до конца: стартуем следующий");
+        Assert.That(ExpeditionMusicSystem.ShouldStartNext(0f, 0f), Is.False, "неизвестная длина: обычный путь");
+    }
+
+    [Test]
     public async Task KeyInHeadsetTogglesMusic()
     {
         await using var pair = await PoolManager.GetServerClient(new PoolSettings { Connected = true, FailureLogLevel = LogLevel.Fatal });
@@ -74,6 +82,12 @@ public sealed class ExpeditionMusicTest
 
         await pair.RunSeconds(1.5f);
         Assert.That(music.LocalHasKey, "ключ в гарнитуре: музыка включена");
+
+        // Файлы стыка интро -> петля подгружены заранее, по одному за проверку, а не в момент перехода.
+        var library = ExpeditionMusicLibrary.Load(client.Resolve<IResourceManager>());
+        await pair.RunSeconds(10f);
+        Assert.That(music.IsPreloaded(library.Intro!), "интро загружено заранее");
+        Assert.That(music.IsPreloaded(library.Loop!), "петля загружена заранее");
         var clientMap = client.EntMan.GetEntity(server.EntMan.GetNetEntity(mapEntity));
         Assert.That(client.EntMan.GetComponent<ExpeditionWaveStateComponent>(clientMap).Active, "клиент знает про волну");
         Assert.That(client.EntMan.GetComponent<ExpeditionExtractionStateComponent>(clientMap).Active, "клиент знает про эвакуацию");

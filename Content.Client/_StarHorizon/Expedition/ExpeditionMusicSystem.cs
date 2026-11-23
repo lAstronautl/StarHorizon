@@ -10,14 +10,18 @@ using Content.Shared.Radio.Components;
 using Content.Shared.Salvage.Expeditions;
 using Robust.Client.Audio;
 using Robust.Client.Player;
+using Robust.Client.ResourceManagement;
 using Robust.Shared.Audio;
+using Robust.Shared.Audio.Components;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Configuration;
+using Robust.Shared.Maths;
 using Robust.Shared.Containers;
 using Robust.Shared.ContentPack;
 using Robust.Shared.Player;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
+using Robust.Shared.Utility;
 
 namespace Content.Client._StarHorizon.Expedition;
 
@@ -32,6 +36,7 @@ public sealed class ExpeditionMusicSystem : EntitySystem
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly IResourceManager _resources = default!;
+    [Dependency] private readonly IResourceCache _cache = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
     [Dependency] private readonly AudioSystem _audio = default!;
     [Dependency] private readonly ContentAudioSystem _contentAudio = default!;
@@ -43,9 +48,13 @@ public sealed class ExpeditionMusicSystem : EntitySystem
     private const float KeyOffFadeTime = 0.4f;
     private const float MinVolume = -30f;
     private const float MaxVolume = 3f;
-    private static readonly TimeSpan CritDelay = TimeSpan.FromSeconds(5);
+    private const float DimmedGain = 0.5f;
+    private const float DimTime = 1.5f;
     private static readonly TimeSpan LossCooldown = TimeSpan.FromMinutes(5);
     private static readonly TimeSpan CheckInterval = TimeSpan.FromSeconds(0.5);
+
+    /// <summary>За сколько до конца трека стартует следующий (бесшовный переход), секунды.</summary>
+    public const float GaplessLead = 0.15f;
 
     private enum Scene : byte
     {
@@ -63,15 +72,28 @@ public sealed class ExpeditionMusicSystem : EntitySystem
     private TimeSpan _nextCheck;
 
     private EntityUid? _stream;
-    private readonly Queue<(string Path, bool Loop)> _queue = new();
-    private Func<List<(string, bool)>>? _refill;
+    private readonly record struct Track(string Path, bool Loop, bool Gapless = false);
 
-    private TimeSpan? _critSince;
+    private readonly Queue<Track> _queue = new();
+    private bool _currentGapless;
+    private float _currentLength;
+    private readonly Queue<string> _preload = new();
+    private readonly HashSet<string> _preloaded = new();
+    private readonly HashSet<string> _loaded = new();
+    private string? _nextWaveTrack;
+    private Func<List<Track>>? _refill;
+
+    private float _dim = 1f;
+    private float _dimTarget = 1f;
+    private bool _wasDead;
     private TimeSpan _nextLoss;
     private EntityUid? _lossStream;
 
     /// <summary>У локального игрока в гарнитуре стоит ключ музыки экспедиции.</summary>
     public bool LocalHasKey => _hasKey;
+
+    /// <summary>Файл уже загружен и декодирован заранее (переход на него не будет тормозить).</summary>
+    public bool IsPreloaded(string path) => _loaded.Contains(path);
 
     private ExpeditionMusicLibrary Library => _library ??= ExpeditionMusicLibrary.Load(_resources);
 
@@ -90,6 +112,8 @@ public sealed class ExpeditionMusicSystem : EntitySystem
 
     public override void Update(float frameTime)
     {
+        UpdateDim(frameTime);
+
         if (_timing.CurTime < _nextCheck)
         {
             ContinueChain();
@@ -109,10 +133,25 @@ public sealed class ExpeditionMusicSystem : EntitySystem
         }
 
         if (!hadKey)
+        {
             SilenceOldMusic();
+            _contentAudio.DisableAmbientMusic();
+            PreloadAhead();
+        }
 
-        // Старый фон игры не должен проскакивать между треками.
-        _contentAudio.DisableAmbientMusic();
+        // Декодирование музыки растянуто по времени: по одному файлу за проверку, а не в момент смены трека.
+        if (_preload.TryDequeue(out var preloadPath))
+        {
+            try
+            {
+                _cache.GetResource<AudioResource>(new ResPath(preloadPath));
+                _loaded.Add(preloadPath);
+            }
+            catch (Exception e)
+            {
+                Log.Warning($"Could not preload expedition music {preloadPath}: {e.Message}");
+            }
+        }
 
         var scene = ComputeScene();
         if (scene != _scene)
@@ -184,29 +223,31 @@ public sealed class ExpeditionMusicSystem : EntitySystem
         _stream = null;
         _queue.Clear();
         _refill = null;
+        _contentAudio.DisableAmbientMusic();
 
         var lib = Library;
         switch (scene)
         {
             case Scene.Pod:
                 if (lib.Rig != null)
-                    _queue.Enqueue((lib.Rig, true));
+                    _queue.Enqueue(new Track(lib.Rig, true));
                 break;
 
             case Scene.Ambient:
                 // После посадки капсулы сначала стингер, потом фон по кругу.
                 if (previous == Scene.Pod && lib.Tittle.Count > 0)
-                    _queue.Enqueue((_random.Pick(lib.Tittle), false));
+                    _queue.Enqueue(new Track(Take("tittle", lib.Tittle)!, false));
                 _refill = () => Shuffled(lib.Ambiance);
                 break;
 
             case Scene.Wave:
                 if (lib.Wave.Count > 0)
-                    _queue.Enqueue((_random.Pick(lib.Wave), false));
+                    _queue.Enqueue(new Track(Take("wave", lib.Wave)!, false, Gapless: lib.Intro != null));
+                // Интро и петля идут встык: следующий трек стартует чуть раньше конца предыдущего.
                 if (lib.Intro != null)
-                    _queue.Enqueue((lib.Intro, false));
+                    _queue.Enqueue(new Track(lib.Intro, false, Gapless: lib.Loop != null));
                 if (lib.Loop != null)
-                    _queue.Enqueue((lib.Loop, true));
+                    _queue.Enqueue(new Track(lib.Loop, true));
                 break;
 
             case Scene.Extraction:
@@ -215,18 +256,24 @@ public sealed class ExpeditionMusicSystem : EntitySystem
 
             case Scene.Win:
                 if (lib.Win.Count > 0)
-                    _queue.Enqueue((_random.Pick(lib.Win), false));
+                    _queue.Enqueue(new Track(Take("win", lib.Win)!, false));
                 break;
         }
 
         StartNext(fadeIn: true);
     }
 
-    private List<(string, bool)> Shuffled(List<string> tracks)
+    private List<Track> Shuffled(List<string> tracks)
     {
         var list = new List<string>(tracks);
         _random.Shuffle(list);
-        return list.ConvertAll(t => (t, false));
+        return list.ConvertAll(t => new Track(t, false, Gapless: true));
+    }
+
+    /// <summary>Пора ли стартовать следующий трек, чтобы не было паузы между ними.</summary>
+    public static bool ShouldStartNext(float length, float position, float lead = GaplessLead)
+    {
+        return length > lead && position >= length - lead;
     }
 
     private void ContinueChain()
@@ -234,8 +281,19 @@ public sealed class ExpeditionMusicSystem : EntitySystem
         if (!_hasKey || _scene == Scene.None)
             return;
 
-        if (_stream != null && Exists(_stream.Value) && !Terminating(_stream.Value))
+        if (_stream is { } stream && Exists(stream) && !Terminating(stream))
+        {
+            // Бесшовный переход: следующий (уже предзагруженный) трек стартует за долю секунды до конца текущего.
+            if (_currentGapless
+                && (_queue.Count > 0 || _refill != null)
+                && TryComp<AudioComponent>(stream, out var audio)
+                && ShouldStartNext(_currentLength, audio.PlaybackPosition))
+            {
+                StartNext(fadeIn: false);
+            }
+
             return;
+        }
 
         StartNext(fadeIn: false);
     }
@@ -243,6 +301,7 @@ public sealed class ExpeditionMusicSystem : EntitySystem
     private void StartNext(bool fadeIn)
     {
         _stream = null;
+        _currentGapless = false;
 
         if (_queue.Count == 0 && _refill != null)
         {
@@ -253,37 +312,113 @@ public sealed class ExpeditionMusicSystem : EntitySystem
         if (_queue.Count == 0)
             return;
 
-        var (path, loop) = _queue.Dequeue();
-        var stream = _audio.PlayGlobal(path, Filter.Local(), false, AudioParams.Default.WithVolume(Volume()).WithLoop(loop));
+        var track0 = _queue.Dequeue();
+        var stream = _audio.PlayGlobal(track0.Path, Filter.Local(), false, AudioParams.Default.WithVolume(Volume()).WithLoop(track0.Loop));
         _stream = stream?.Entity;
+        _currentGapless = track0.Gapless && !track0.Loop;
+        _currentLength = (float) _audio.GetAudioLength(new ResolvedPathSpecifier(new ResPath(track0.Path))).TotalSeconds;
 
         if (fadeIn)
             _contentAudio.FadeIn(_stream, duration: FadeTime);
+
+        // Следующий трек заранее в кэш, чтобы переход не тормозил.
+        if (_queue.Count == 0 && _refill != null)
+        {
+            foreach (var track in _refill())
+                _queue.Enqueue(track);
+        }
+
+        if (_queue.TryPeek(out var next))
+            Preload(next.Path);
+    }
+
+    #endregion
+
+    #region Preload
+
+    private void Preload(string? path)
+    {
+        if (path != null && _preloaded.Add(path))
+            _preload.Enqueue(path);
+    }
+
+    /// <summary>Выбирает первый трек сцены заранее и ставит его в предзагрузку, вместе с повторным выбором на будущее.</summary>
+    private string? Take(string kind, List<string> list)
+    {
+        if (list.Count == 0)
+            return null;
+
+        var picked = _pre.TryGetValue(kind, out var ahead) ? ahead : _random.Pick(list);
+        _pre[kind] = _random.Pick(list);
+        Preload(_pre[kind]);
+        return picked;
+    }
+
+    private readonly Dictionary<string, string> _pre = new();
+
+    /// <summary>При появлении ключа: заранее выбираем первые треки сцен и грузим всё, что понадобится на стыках.</summary>
+    private void PreloadAhead()
+    {
+        var lib = Library;
+        Preload(lib.Rig);
+        Preload(lib.Intro);
+        Preload(lib.Loop);
+
+        foreach (var (kind, list) in new[] { ("tittle", lib.Tittle), ("wave", lib.Wave), ("win", lib.Win) })
+        {
+            if (list.Count == 0 || _pre.ContainsKey(kind))
+                continue;
+
+            _pre[kind] = _random.Pick(list);
+            Preload(_pre[kind]);
+        }
+
+        if (lib.Extraction.Count > 0)
+            Preload(_random.Pick(lib.Extraction));
+        if (lib.Ambiance.Count > 0)
+            Preload(_random.Pick(lib.Ambiance));
     }
 
     #endregion
 
     #region Loss
 
-    /// <summary>Игрок упал в крит и не встал за 5 секунд: играет проигрышная мелодия, не чаще раза в 5 минут.</summary>
+    /// <summary>
+    /// В крите музыка плавно затухает до половины громкости (встал - возвращается). Проигрышная мелодия играет в момент
+    /// смерти, не чаще раза в 5 минут.
+    /// </summary>
     private void UpdateLoss()
     {
-        if (_player.LocalEntity is not { } player || !TryComp<MobStateComponent>(player, out var state)
-            || !_mobState.IsCritical(player, state))
+        var critical = false;
+        var dead = false;
+        if (_player.LocalEntity is { } player && TryComp<MobStateComponent>(player, out var state))
         {
-            _critSince = null;
-            return;
+            critical = _mobState.IsCritical(player, state);
+            dead = _mobState.IsDead(player, state);
         }
 
-        var now = _timing.CurTime;
-        _critSince ??= now;
+        _dimTarget = critical || dead ? DimmedGain : 1f;
 
-        if (now - _critSince.Value < CritDelay || now < _nextLoss || Library.Loss.Count == 0)
+        var now = _timing.CurTime;
+        if (dead && !_wasDead && now >= _nextLoss && Library.Loss.Count > 0)
+        {
+            _nextLoss = now + LossCooldown;
+            _lossStream = _audio.PlayGlobal(_random.Pick(Library.Loss), Filter.Local(), false,
+                AudioParams.Default.WithVolume(Volume(dim: false)))?.Entity;
+        }
+
+        _wasDead = dead;
+    }
+
+    /// <summary>Плавное приглушение каждый кадр (в крите до половины громкости).</summary>
+    private void UpdateDim(float frameTime)
+    {
+        if (MathHelper.CloseTo(_dim, _dimTarget))
             return;
 
-        _nextLoss = now + LossCooldown;
-        _lossStream = _audio.PlayGlobal(_random.Pick(Library.Loss), Filter.Local(), false,
-            AudioParams.Default.WithVolume(Volume()))?.Entity;
+        var step = frameTime / DimTime * (1f - DimmedGain);
+        _dim = _dim < _dimTarget ? MathF.Min(_dim + step, _dimTarget) : MathF.Max(_dim - step, _dimTarget);
+        ApplyVolume();
     }
 
     #endregion
@@ -297,7 +432,9 @@ public sealed class ExpeditionMusicSystem : EntitySystem
         _queue.Clear();
         _refill = null;
         _scene = Scene.None;
-        _critSince = null;
+        _dim = 1f;
+        _dimTarget = 1f;
+        _wasDead = false;
     }
 
     /// <summary>У игрока с ключом старая музыка конца экспедиции не играет: останавливаем уже запущенную.</summary>
@@ -314,9 +451,10 @@ public sealed class ExpeditionMusicSystem : EntitySystem
         }
     }
 
-    private float Volume()
+    private float Volume(bool dim = true)
     {
-        var value = AudioSystem.GainToVolume(_cfg.GetCVar(NFCCVars.SalvageExpeditionMusicVolume));
+        var gain = _cfg.GetCVar(NFCCVars.SalvageExpeditionMusicVolume) * (dim ? _dim : 1f);
+        var value = AudioSystem.GainToVolume(gain);
         return float.IsFinite(value) ? Math.Clamp(value, MinVolume, MaxVolume) : MinVolume;
     }
 

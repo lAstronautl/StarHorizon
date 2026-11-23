@@ -21,8 +21,11 @@ public sealed class ExpeditionMusicLibrary
     /// <summary>Стингер при приземлении дроп-пода.</summary>
     public readonly List<string> Tittle = new();
 
-    /// <summary>Музыка волны (<c>_CI_*</c> и <c>_WD_*</c>).</summary>
+    /// <summary>Музыка волны (пока только <c>_WD_*</c>).</summary>
     public readonly List<string> Wave = new();
+
+    /// <summary><c>_CI_*</c>: пока не используются в волнах (отключены по просьбе), список оставлен для возврата.</summary>
+    public readonly List<string> Ci = new();
 
     public readonly List<string> Extraction = new();
     public readonly List<string> Win = new();
@@ -57,7 +60,9 @@ public sealed class ExpeditionMusicLibrary
                 library.Ambiance.Add(path);
             else if (name.EndsWith("_Tittle.ogg"))
                 library.Tittle.Add(path);
-            else if (name.StartsWith("_CI_") || name.StartsWith("_WD_"))
+            else if (name.StartsWith("_CI_"))
+                library.Ci.Add(path);
+            else if (name.StartsWith("_WD_"))
                 library.Wave.Add(path);
             else if (name.StartsWith("_EXTRACTION_"))
                 library.Extraction.Add(path);

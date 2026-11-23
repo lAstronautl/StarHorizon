@@ -15,22 +15,28 @@ public sealed partial class ExpeditionWavesComponent : Component
     [DataField] public float IntervalMin = 90f;
     [DataField] public float IntervalMax = 180f;
 
-    /// <summary>Доля mobBudget сложности на одну волну (случайно между).</summary>
-    [DataField] public float BudgetFractionMin = 0.2f;
-    [DataField] public float BudgetFractionMax = 0.5f;
+    /// <summary>Доля mobBudget сложности на одну волну: тратится весь бюджет.</summary>
+    [DataField] public float BudgetFractionMin = 1f;
+    [DataField] public float BudgetFractionMax = 1f;
 
-    /// <summary>Потолок бюджета одной волны (у Inferno mobBudget = 240).</summary>
-    [DataField] public float MaxWaveBudget = 40f;
+    /// <summary>Потолок бюджета одной волны (по умолчанию не ограничен, ограничивает MaxAliveWaveMobs).</summary>
+    [DataField] public float MaxWaveBudget = 10000f;
+
+    /// <summary>Сколько мобов падает в одном дроп-поде.</summary>
+    [DataField] public int MobsPerPod = 6;
+
+    /// <summary>Где упали первые поды: позиция первого игрока на карте. Запоминается один раз.</summary>
+    [ViewVariables] public System.Numerics.Vector2? DropAnchor;
 
     /// <summary>Сколько мобов волн может жить на карте одновременно, дальше волна пропускается.</summary>
     [DataField] public int MaxAliveWaveMobs = 60;
 
     /// <summary>
-    /// Кольцо появления вокруг игрока, метры. Биом подгружается только в ~16 м вокруг игроков (чанки), дальше пустота,
-    /// поэтому кольцо держим в пределах подгруженной земли: за пределами экрана, но на тайлах.
+    /// Кольцо падения дроп-подов вокруг якоря (места, где начал первый игрок), метры. Если у якоря нет подгруженной
+    /// земли (биом подгружается только вокруг игроков), поды падают в таком же кольце вокруг ближайшего игрока.
     /// </summary>
-    [DataField] public float RingMin = 15f;
-    [DataField] public float RingMax = 30f;
+    [DataField] public float DropRingMin = 6f;
+    [DataField] public float DropRingMax = 18f;
 
     /// <summary>Сколько после появления волны клиентам играет боевая музыка (волна считается идущей).</summary>
     [DataField] public TimeSpan WaveMusicDuration = TimeSpan.FromSeconds(120);

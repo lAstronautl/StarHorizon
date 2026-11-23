@@ -10,6 +10,7 @@ using Content.Server.Salvage.Expeditions;
 using Content.Shared._Horizon.SpaceHazards;
 using Content.Shared.Salvage.Expeditions;
 using Robust.Shared.GameObjects;
+using Content.Server._StarHorizon.Expedition;
 using Robust.Shared.Log;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
@@ -112,18 +113,30 @@ public sealed class ExpeditionWaveTest
         Assert.That(waves.NextWave!.Value - timing.CurTime, Is.GreaterThan(TimeSpan.FromSeconds(30)).And.LessThan(TimeSpan.FromSeconds(80)));
         Assert.That(Pursuers(server), Is.Empty);
 
-        // 3. Волна приходит: мобы фракции вокруг игрока, у каждого маркер погони.
+        // 3. Волна приходит: мобы фракции в дроп-подах DropPodspawner, у каждого маркер погони.
+        Assert.That(waves.DropAnchor, Is.Not.Null, "место падения запомнено: где начал первый игрок");
+        var anchor = waves.DropAnchor!.Value;
+        Assert.That((anchor - xform.GetWorldPosition(player)).Length(), Is.LessThan(2f));
+
         await server.WaitPost(() => waves.NextWave = timing.CurTime);
         await pair.RunSeconds(1.5f);
         var mobs = Pursuers(server);
         Assert.That(mobs, Is.Not.Empty, "волна пришла");
         Assert.That(mobs.Count, Is.LessThanOrEqualTo(waves.MaxAliveWaveMobs));
-        var playerPos = xform.GetWorldPosition(player);
+        var pods = server.EntMan.AllEntities<MetaDataComponent>()
+            .Count(e => e.Comp.EntityPrototype?.ID == ExpeditionWaveSystem.PodProto);
+        Assert.That(pods, Is.GreaterThan(0), "мобы падают в дроп-подах");
+        Assert.That(pods, Is.GreaterThanOrEqualTo((int) Math.Ceiling(mobs.Count / (double) waves.MobsPerPod)), "по MobsPerPod мобов в поде");
+        Assert.That(server.EntMan.GetComponent<Content.Shared._StarHorizon.Expedition.ExpeditionWaveStateComponent>(expeditionMap).Active, "волна идёт");
+
+        // Дроп-под падает и открывается: мобы выходят у якоря (не там, где игрок сейчас).
+        await pair.RunSeconds(14f);
+        var container = server.System<Robust.Shared.Containers.SharedContainerSystem>();
         foreach (var mob in mobs)
         {
+            Assert.That(server.EntMan.EntityExists(mob));
+            Assert.That(container.IsEntityInContainer(mob), Is.False, "вышли из пода");
             Assert.That(server.EntMan.GetComponent<TransformComponent>(mob).MapUid, Is.EqualTo(expeditionMap));
-            var dist = (xform.GetWorldPosition(mob) - playerPos).Length();
-            Assert.That(dist, Is.InRange(waves.RingMin - 2f, waves.RingMax + 2f), "кольцо вокруг игрока");
         }
 
         // 4. Мобы знают, где игрок (FollowTarget) и сменили корень ИИ на погоню.
@@ -137,10 +150,22 @@ public sealed class ExpeditionWaveTest
         }
 
         // 5. Мобы идут к игроку: ближайший заметно приблизился.
+        var playerPos = xform.GetWorldPosition(player);
         var startMin = mobs.Min(m => (xform.GetWorldPosition(m) - playerPos).Length());
         await pair.RunSeconds(15f);
         var endMin = mobs.Where(server.EntMan.EntityExists).Min(m => (xform.GetWorldPosition(m) - xform.GetWorldPosition(player)).Length());
-        Assert.That(endMin, Is.LessThan(startMin - 3f), "мобы идут к игроку");
+        Assert.That(endMin, Is.LessThanOrEqualTo(Math.Min(startMin, 3f)), "мобы дошли до игрока (или были уже рядом)");
+
+        // 5b. Все мобы волны убиты: музыка волны прекращается.
+        await server.WaitPost(() =>
+        {
+            var mobState = server.System<Content.Shared.Mobs.Systems.MobStateSystem>();
+            foreach (var mob in Pursuers(server))
+                mobState.ChangeMobState(mob, Content.Shared.Mobs.MobState.Dead);
+        });
+        await pair.RunSeconds(1.5f);
+        Assert.That(server.EntMan.GetComponent<Content.Shared._StarHorizon.Expedition.ExpeditionWaveStateComponent>(expeditionMap).Active, Is.False,
+            "все убиты: волна закончилась");
 
         // 6. В последние секунды экспедиции волн нет.
         var countBefore = Pursuers(server).Count;

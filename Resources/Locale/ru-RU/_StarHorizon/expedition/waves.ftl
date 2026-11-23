@@ -1,1 +1,1 @@
-expedition-wave-announcement = Приближаются враги! Они знают, где вы.
+expedition-wave-announcement = Приближаются враги! Они падают в дроп-подах и знают, где вы.

@@ -2,6 +2,10 @@ using System.Linq;
 using System.Numerics;
 using Content.Server.Ghost.Roles.Components;
 using Content.Shared._StarHorizon.Expedition;
+using Content.Shared.Mobs.Components;
+using Content.Shared.Mobs.Systems;
+using Content.Shared.Trigger.Systems;
+using Robust.Shared.Containers;
 using Content.Server.Salvage;
 using Content.Server.Salvage.Expeditions;
 using Content.Shared.Construction.EntitySystems;
@@ -32,6 +36,12 @@ public sealed class ExpeditionWaveSystem : EntitySystem
     [Dependency] private readonly AnchorableSystem _anchorable = default!;
     [Dependency] private readonly PursuePlayerSystem _pursue = default!;
     [Dependency] private readonly MapSystem _map = default!;
+    [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly TriggerSystem _trigger = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+
+    public const string PodProto = "DropPodspawner";
+    public const string PodContainer = "clowncar_container";
 
     private TimeSpan _nextUpdate;
     private readonly List<(EntityUid Uid, Vector2 Pos)> _players = new();
@@ -57,8 +67,9 @@ public sealed class ExpeditionWaveSystem : EntitySystem
     {
         var now = _timing.CurTime;
 
-        // Клиентам: волна закончилась по истечении времени.
-        if (TryComp<ExpeditionWaveStateComponent>(ent, out var waveState) && waveState.Active && now >= waveState.End)
+        // Клиентам: волна закончилась по истечении времени или когда все мобы волны убиты.
+        if (TryComp<ExpeditionWaveStateComponent>(ent, out var waveState) && waveState.Active
+            && (now >= waveState.End || CountAliveWaveMobs(ent.Owner) == 0))
         {
             waveState.Active = false;
             Dirty(ent.Owner, waveState);
@@ -75,6 +86,9 @@ public sealed class ExpeditionWaveSystem : EntitySystem
             return;
         }
 
+        // Место падения: где начал первый игрок.
+        ent.Comp.DropAnchor ??= _players[0].Pos;
+
         if (ent.Comp.NextWave is not { } next)
         {
             ent.Comp.NextWave = now + Delay(ent.Comp.FirstWaveMin, ent.Comp.FirstWaveMax);
@@ -90,20 +104,34 @@ public sealed class ExpeditionWaveSystem : EntitySystem
 
     private TimeSpan Delay(float min, float max) => TimeSpan.FromSeconds(_random.NextFloat(min, max));
 
-    /// <summary>Спавнит волну: тратит случайную долю mobBudget сложности, возвращает потраченное число мобов.</summary>
+    private int CountAliveWaveMobs(EntityUid map)
+    {
+        var alive = 0;
+        var query = EntityQueryEnumerator<PursuePlayerComponent, TransformComponent>();
+        while (query.MoveNext(out var uid, out _, out var xform))
+        {
+            if (xform.MapUid != map)
+                continue;
+
+            if (TryComp<MobStateComponent>(uid, out var state) && _mobState.IsDead(uid, state))
+                continue;
+
+            alive++;
+        }
+
+        return alive;
+    }
+
+    /// <summary>
+    /// Спавнит волну: тратит бюджет сложности целиком, мобы падают группами в дроп-подах Goobstation (DropPodspawner)
+    /// у места, где начал первый игрок. Возвращает число мобов.
+    /// </summary>
     public int SpawnWave(Entity<ExpeditionWavesComponent> ent, SalvageExpeditionComponent expedition)
     {
         if (!TryComp<MapGridComponent>(ent, out var gridComp) || _players.Count == 0)
             return 0;
 
-        var alive = 0;
-        var pursuers = EntityQueryEnumerator<PursuePlayerComponent, TransformComponent>();
-        while (pursuers.MoveNext(out _, out _, out var xform))
-        {
-            if (xform.MapUid == ent.Owner)
-                alive++;
-        }
-
+        var alive = CountAliveWaveMobs(ent.Owner);
         if (alive >= ent.Comp.MaxAliveWaveMobs)
             return 0;
 
@@ -133,16 +161,23 @@ public sealed class ExpeditionWaveSystem : EntitySystem
             ent.Comp.MaxWaveBudget);
         var probSum = budgetEntries.Sum(x => x.Prob);
         var random = new Random(_random.Next());
-        var spawned = 0;
+        var protos = new List<string>();
 
-        while (budget > 0f && alive + spawned < ent.Comp.MaxAliveWaveMobs)
+        while (budget > 0f && alive + protos.Count < ent.Comp.MaxAliveWaveMobs)
         {
             var entry = _randomSys.GetBudgetEntry(ref budget, ref probSum, budgetEntries, random);
             if (entry == null)
                 break;
 
-            if (SpawnAroundPlayer(ent, (ent.Owner, gridComp), entry.Proto))
-                spawned++;
+            protos.Add(entry.Proto);
+        }
+
+        var spawned = 0;
+        for (var i = 0; i < protos.Count; i += ent.Comp.MobsPerPod)
+        {
+            var group = protos.GetRange(i, Math.Min(ent.Comp.MobsPerPod, protos.Count - i));
+            if (DropPod(ent, (ent.Owner, gridComp), group))
+                spawned += group.Count;
         }
 
         if (spawned > 0)
@@ -151,20 +186,55 @@ public sealed class ExpeditionWaveSystem : EntitySystem
             state.Active = true;
             state.End = _timing.CurTime + ent.Comp.WaveMusicDuration;
             Dirty(ent.Owner, state);
-        }
 
-        if (spawned > 0)
             _salvage.Announce(ent.Owner, Loc.GetString("expedition-wave-announcement"));
+        }
 
         return spawned;
     }
 
-    private bool SpawnAroundPlayer(Entity<ExpeditionWavesComponent> ent, Entity<MapGridComponent> grid, string proto)
+    /// <summary>Один дроп-под с группой мобов: падает у якоря, мобы выходят из него на земле.</summary>
+    private bool DropPod(Entity<ExpeditionWavesComponent> ent, Entity<MapGridComponent> grid, List<string> mobs)
+    {
+        if (FindDropTile(ent, grid) is not { } coords)
+            return false;
+
+        var pod = Spawn(PodProto, coords);
+        if (!_container.TryGetContainer(pod, PodContainer, out var container))
+        {
+            QueueDel(pod);
+            return false;
+        }
+
+        foreach (var proto in mobs)
+        {
+            var mob = SpawnAtPosition(proto, coords);
+            RemComp<GhostRoleComponent>(mob);
+            RemComp<GhostTakeoverAvailableComponent>(mob);
+            EnsureComp<PursuePlayerComponent>(mob);
+            _container.Insert(mob, container);
+        }
+
+        _trigger.Trigger(pod);
+        return true;
+    }
+
+    /// <summary>Свободный тайл в кольце вокруг якоря; нет подгруженной земли у якоря: в кольце вокруг ближайшего игрока.</summary>
+    private EntityCoordinates? FindDropTile(Entity<ExpeditionWavesComponent> ent, Entity<MapGridComponent> grid)
+    {
+        if (ent.Comp.DropAnchor is { } anchor && TryRingTile(ent, grid, anchor) is { } near)
+            return near;
+
+        // Запасной вариант: игрок рядом, значит земля вокруг него подгружена.
+        var center = _random.Pick(_players).Pos;
+        return TryRingTile(ent, grid, center);
+    }
+
+    private EntityCoordinates? TryRingTile(Entity<ExpeditionWavesComponent> ent, Entity<MapGridComponent> grid, Vector2 center)
     {
         for (var attempt = 0; attempt < 30; attempt++)
         {
-            var (_, center) = _random.Pick(_players);
-            var pos = center + _random.NextAngle().ToVec() * _random.NextFloat(ent.Comp.RingMin, ent.Comp.RingMax);
+            var pos = center + _random.NextAngle().ToVec() * _random.NextFloat(ent.Comp.DropRingMin, ent.Comp.DropRingMax);
             var coords = new EntityCoordinates(grid, pos);
 
             if (!_map.TryGetTileRef(grid, grid.Comp, coords, out var tile) || tile.Tile.IsEmpty)
@@ -173,13 +243,9 @@ public sealed class ExpeditionWaveSystem : EntitySystem
             if (!_anchorable.TileFree(grid, tile.GridIndices, (int) CollisionGroup.MachineLayer, (int) CollisionGroup.MachineLayer))
                 continue;
 
-            var mob = SpawnAtPosition(proto, _map.GridTileToLocal(grid, grid.Comp, tile.GridIndices));
-            RemComp<GhostRoleComponent>(mob);
-            RemComp<GhostTakeoverAvailableComponent>(mob);
-            EnsureComp<PursuePlayerComponent>(mob);
-            return true;
+            return _map.GridTileToLocal(grid, grid.Comp, tile.GridIndices);
         }
 
-        return false;
+        return null;
     }
 }
