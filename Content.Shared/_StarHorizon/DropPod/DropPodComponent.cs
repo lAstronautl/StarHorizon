@@ -22,6 +22,14 @@ public sealed partial class DropPodComponent : Component
     [ViewVariables]
     public bool Used;
 
+    /// <summary>Через сколько после посадки дверца сама открывается.</summary>
+    [DataField]
+    public TimeSpan AutoOpenDelay = TimeSpan.FromSeconds(3);
+
+    /// <summary>Когда дверца откроется сама (после посадки). Null: уже открыта или не садилась.</summary>
+    [ViewVariables]
+    public TimeSpan? OpenAt;
+
     /// <summary>Когда текущая стадия началась (<see cref="Robust.Shared.Timing.IGameTiming.CurTime"/>).</summary>
     [ViewVariables]
     public TimeSpan StateStart;
@@ -170,6 +178,8 @@ public enum DropPodVisuals : byte
     InFlight,
     /// <summary>Текущая <see cref="DropPodState"/>, для подсветки и анимаций.</summary>
     State,
+    /// <summary>true - капсула приземлилась: вместо обычного спрайта рисуется спрайт упавшей капсулы (как у Goobstation).</summary>
+    Landed,
 }
 
 /// <summary>Куда и когда должна лететь капсула (задаёт консоль).</summary>

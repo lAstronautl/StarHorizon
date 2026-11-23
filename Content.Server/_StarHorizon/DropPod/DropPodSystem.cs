@@ -16,6 +16,7 @@ using Content.Shared.Salvage.Expeditions;
 using Content.Shared.Popups;
 using Content.Shared.Trigger;
 using Content.Shared.Storage.Components;
+using Content.Shared.Storage.EntitySystems;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
@@ -50,6 +51,7 @@ public sealed class DropPodSystem : EntitySystem
     [Dependency] private readonly SharedPointLightSystem _light = default!;
     [Dependency] private readonly SharedDeviceLinkSystem _deviceLink = default!;
     [Dependency] private readonly SalvageSystem _salvage = default!;
+    [Dependency] private readonly SharedEntityStorageSystem _storage = default!;
 
     /// <summary>Меньше этого времени до закрытия экспедиции сбрасываться на неё уже поздно.</summary>
     private static readonly TimeSpan PlanetMinTimeLeft = TimeSpan.FromMinutes(5);
@@ -577,7 +579,16 @@ public sealed class DropPodSystem : EntitySystem
         while (query.MoveNext(out var uid, out var comp))
         {
             if (comp.State == DropPodState.Idle)
+            {
+                // Приземлившаяся капсула сама открывается с задержкой.
+                if (comp.OpenAt is { } openAt && now >= openAt)
+                {
+                    comp.OpenAt = null;
+                    _storage.OpenStorage(uid);
+                }
+
                 continue;
+            }
 
             var ent = (uid, comp);
             var duration = (comp.StateEnd - comp.StateStart).TotalSeconds;
@@ -949,11 +960,13 @@ public sealed class DropPodSystem : EntitySystem
 
         if (TryComp(ent, out PhysicsComponent? physics))
             _physics.SetCanCollide(ent, true, body: physics);
-        _appearance.SetData(ent, DropPodVisuals.InFlight, false);
+        // Обычный спрайт остаётся скрытым (InFlight), вместо него рисуется упавшая капсула.
+        _appearance.SetData(ent, DropPodVisuals.Landed, true);
 
         // Одноразовая: больше не запускается. В прототипе капсула прикручена, при взлёте движок её
         // откручивает (перемещение снимает крепление), а после посадки прикручиваем обратно.
         ent.Comp.Used = true;
+        ent.Comp.OpenAt = _timing.CurTime + ent.Comp.AutoOpenDelay;
         if (!_xform.AnchorEntity(ent.Owner) && TryComp(ent, out PhysicsComponent? body))
         {
             // Посадка не на грид (в космос): прикрутить не к чему, капсула остаётся неподвижной.

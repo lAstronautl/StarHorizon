@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Linq;
+using Content.Client._StarHorizon.Expedition;
 using System.Numerics;
 using Content.Client.Shuttles.UI;
 using Content.Shared._StarHorizon.DropPod;
@@ -243,7 +244,18 @@ public sealed class DropPodWindow : DefaultWindow
                 OnArmPlanet?.Invoke(info.Planet);
             };
 
-            var mission = new Label { Text = missionText, Margin = new Thickness(8, 0, 0, 0), ClipText = true };
+            var detailLines = PlanetExpeditionDetails.Get(info);
+            var mission = new Label
+            {
+                Text = missionText,
+                Margin = new Thickness(8, 0, 0, 0),
+                ClipText = true,
+                ToolTip = string.Join("\n", detailLines.Select(l => $"{l.Title} {l.Value}")),
+            };
+            // Биом (растительность) и враги прямо в списке, остальное во всплывающей подсказке.
+            var shortDetails = string.Join(", ", detailLines.Take(2).Select(l => l.Value));
+            if (shortDetails.Length > 0)
+                mission.Text = $"{missionText}\n{shortDetails}";
             var status = new Label { Margin = new Thickness(8, 0, 0, 2), ClipText = true };
 
             var row = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Vertical };

@@ -209,7 +209,7 @@ public sealed class DropPodTest
         await pair.RunSeconds(1.9f);
         Assert.That(comp.State, Is.EqualTo(DropPodState.Idle));
         Assert.That((xform.GetWorldPosition(pod) - target).Length(), Is.LessThan(0.5f), "капсула в точке метки");
-        Assert.That(appearance.TryGetData<bool>(pod, DropPodVisuals.InFlight, out hidden) && hidden, Is.False, "капсула появилась");
+        Assert.That(appearance.TryGetData<bool>(pod, DropPodVisuals.Landed, out var landed) && landed, "капсула появилась: рисуется упавшая");
         Assert.That(server.EntMan.Deleted(comp.Marker), "метка исчезла");
         Assert.That(comp.Used, "приземлилась");
         Assert.That(CountEntities(server, "StarHorizonDropPodSmokePuff"), Is.GreaterThanOrEqualTo(comp.TrailPuffCount + comp.ImpactPuffCount), "дым вдоль траектории и при ударе");

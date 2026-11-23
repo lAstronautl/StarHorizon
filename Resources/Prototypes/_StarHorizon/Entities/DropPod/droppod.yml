@@ -28,6 +28,15 @@
       map: ["droppodGlow"]
       visible: false
       shader: unshaded
+    # Упавшая капсула: спрайт и вид как у дроп-пода Goobstation (наклонённая, закрытая/открытая).
+    # Родительский поворот спрайта (180) и масштаб (0.75) компенсируются, смещение пересчитано под них.
+    - sprite: _Goobstation/Objects/Specific/DropPod/supplypod.rsi
+      state: landed
+      map: ["droppodLanded"]
+      visible: false
+      rotation: -180
+      scale: 1.3333, 1.3333
+      offset: 0, -0.3333
   - type: InteractionOutline
   - type: Physics
     bodyType: Dynamic
@@ -63,6 +72,14 @@
         droppodDecal:
           True: { visible: false }
           False: { visible: true }
+      enum.DropPodVisuals.Landed:
+        droppodLanded:
+          True: { visible: true }
+          False: { visible: false }
+      enum.StorageVisuals.Open:
+        droppodLanded:
+          True: { state: landed-opened }
+          False: { state: landed }
       enum.DropPodVisuals.State:
         droppodGlow:
           Idle: { visible: false }

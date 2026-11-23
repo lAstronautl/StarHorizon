@@ -1,4 +1,5 @@
 using System.Globalization;
+using Content.Client._StarHorizon.Expedition;
 using Content.Client.UserInterface.Controls;
 using Content.Shared.Procedural;
 using Content.Shared.Salvage.Expeditions;
@@ -61,6 +62,15 @@ public sealed partial class SalvageExpeditionWindow : FancyWindow
             var mission = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Vertical, HorizontalExpand = true };
             mission.AddChild(new Label { Text = type });
             mission.AddChild(new Label { Text = difficulty, FontColorOverride = difficultyColor });
+            foreach (var line in PlanetExpeditionDetails.Get(info))
+            {
+                mission.AddChild(new Label
+                {
+                    Text = $"{line.Title} {line.Value}",
+                    FontColorOverride = Muted,
+                    ClipText = true,
+                });
+            }
 
             var status = new Label { MinWidth = 220, HorizontalAlignment = Control.HAlignment.Right };
 

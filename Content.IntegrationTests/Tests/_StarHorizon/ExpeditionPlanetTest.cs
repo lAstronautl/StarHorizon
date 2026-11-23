@@ -10,6 +10,7 @@ using Content.Shared._StarHorizon.DropPod;
 using Content.Shared.CCVar;
 using Content.Shared.DeviceLinking;
 using Content.Shared.Salvage.Expeditions;
+using Content.Shared.Storage.Components;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Log;
 using Robust.Shared.Timing;
@@ -147,6 +148,11 @@ public sealed class ExpeditionPlanetTest
 
         Assert.That(podComp1.Used, "капсула приземлилась");
         Assert.That(server.EntMan.GetComponent<TransformComponent>(pod1).MapUid, Is.EqualTo(expeditionMap), "на карте экспедиции");
+
+        // Приземлившаяся капсула сама открывается с задержкой.
+        Assert.That(server.EntMan.GetComponent<EntityStorageComponent>(pod1).Open, Is.False, "сразу после посадки закрыта");
+        await pair.RunSeconds(4f);
+        Assert.That(server.EntMan.GetComponent<EntityStorageComponent>(pod1).Open, Is.True, "через задержку открылась сама");
 
         // 6. Вторая капсула присоединяется к той же экспедиции: новая карта не создаётся.
         await server.WaitPost(() =>
