@@ -129,9 +129,21 @@ public sealed class ExpeditionPlanetTest
         await pair.RunSeconds(1.0f);
         Assert.That(planetComp1.ExpeditionMap, Is.Not.Null, "карта создана при взлёте");
 
-        for (var i = 0; i < 60 && planetComp1.Status != PlanetExpeditionStatus.Active; i++)
-            await pair.RunSeconds(2f);
+        // Пока экспедиция генерируется, БСС удлиняется: капсула не прилетает на недостроенную карту.
+        var podState1 = server.EntMan.GetComponent<DropPodComponent>(pod1);
+        var generatingBeyondFlight = 0;
+        for (var i = 0; i < 120 && planetComp1.Status != PlanetExpeditionStatus.Active; i++)
+        {
+            await pair.RunSeconds(1f);
+            // Полёт (1 с) и прибытие (5 с) уже закончились бы, а карта ещё строится.
+            if (i >= 9 && planetComp1.Status == PlanetExpeditionStatus.Generating)
+            {
+                generatingBeyondFlight++;
+                Assert.That(podState1.State, Is.EqualTo(DropPodState.InBluespace), "карта строится: капсула ещё в БСС");
+            }
+        }
 
+        TestContext.WriteLine($"Ticks of extended bluespace while generating: {generatingBeyondFlight}");
         Assert.That(planetComp1.Status, Is.EqualTo(PlanetExpeditionStatus.Active), "экспедиция создана и идёт");
         var expeditionMap = planetComp1.ExpeditionMap!.Value;
         Assert.That(CountExpeditionMaps(server), Is.EqualTo(1));
@@ -232,6 +244,67 @@ public sealed class ExpeditionPlanetTest
         Assert.That(comp.EndTime - timing.CurTime, Is.GreaterThan(duration - TimeSpan.FromMinutes(1)), "у нового задания время уже идёт");
         Assert.That(comp.Status, Is.EqualTo(PlanetExpeditionStatus.Idle));
         Assert.That(CountExpeditionMaps(server), Is.EqualTo(0));
+
+        await pair.CleanReturnAsync();
+    }
+
+    /// <summary>
+    /// БСС капсулы полный (15 с полёта + 5 с прибытия), а пока экспедиция генерируется, он удлиняется: капсула не прилетает
+    /// на недостроенную карту и садится, только когда экспедиция идёт.
+    /// </summary>
+    [Test]
+    public async Task BluespaceExtendsWhileGenerating()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { FailureLogLevel = LogLevel.Fatal });
+        var server = pair.Server;
+        server.CfgMan.SetCVar(CCVars.FTLArrivalTime, 1f);
+        var map = await pair.CreateTestMap();
+        var storage = server.System<EntityStorageSystem>();
+        var links = server.System<SharedDeviceLinkSystem>();
+
+        // Полный БСС по умолчанию, как у команды ftlentity: полёт не короче 15 с.
+        Assert.That(new DropPodComponent().FlightTime, Is.GreaterThanOrEqualTo(TimeSpan.FromSeconds(15)));
+
+        EntityUid planet = default, console = default, pod = default;
+        await server.WaitPost(() =>
+        {
+            planet = server.EntMan.SpawnEntity("ExpeditionPlanet", new Robust.Shared.Map.MapCoordinates(new Vector2(3000, 0), map.MapId));
+            var planetComp = server.EntMan.GetComponent<ExpeditionPlanetComponent>(planet);
+            server.System<ExpeditionPlanetSystem>().SetupPlanet(planet, planetComp, "Grasslands", 0.5f);
+            console = server.EntMan.SpawnEntity("StarHorizonDropPodConsole", map.GridCoords);
+            pod = server.EntMan.SpawnEntity("StarHorizonDropPod", map.GridCoords);
+            var comp = server.EntMan.GetComponent<DropPodComponent>(pod);
+            Fast(comp);
+            comp.FlightTime = TimeSpan.FromSeconds(1);
+            storage.CloseStorage(pod);
+            links.LinkDefaults(null, console, pod);
+        });
+
+        // Планета бросает задание и запускает таймер цикла (иначе капсулы не принимаются).
+        await pair.RunSeconds(1.5f);
+        await server.WaitPost(() =>
+            server.EntMan.EventBus.RaiseLocalEvent(console, (object) new DropPodLaunchToPlanetMessage(server.EntMan.GetNetEntity(planet))));
+
+        var planetState = server.EntMan.GetComponent<ExpeditionPlanetComponent>(planet);
+        var podState = server.EntMan.GetComponent<DropPodComponent>(pod);
+
+        // Капсула в БСС: притворяемся, что генерация идёт всё время (настоящая успевает за пару секунд).
+        for (var i = 0; i < 40 && podState.State != DropPodState.InBluespace; i++)
+            await pair.RunSeconds(0.5f);
+        Assert.That(podState.State, Is.EqualTo(DropPodState.InBluespace));
+
+        for (var i = 0; i < 40; i++)
+        {
+            await server.WaitPost(() => planetState.Status = PlanetExpeditionStatus.Generating);
+            await pair.RunSeconds(0.5f);
+            Assert.That(podState.State, Is.EqualTo(DropPodState.InBluespace), $"генерация идёт ({i * 0.5f} с): БСС удлиняется");
+        }
+
+        // Экспедиция построена: капсула прилетает и садится.
+        await server.WaitPost(() => planetState.Status = PlanetExpeditionStatus.Active);
+        for (var i = 0; i < 60 && !podState.Used; i++)
+            await pair.RunSeconds(1f);
+        Assert.That(podState.Used, "экспедиция готова: капсула приземлилась");
 
         await pair.CleanReturnAsync();
     }

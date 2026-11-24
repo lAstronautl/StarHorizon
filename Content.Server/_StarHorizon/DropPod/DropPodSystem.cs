@@ -6,6 +6,7 @@ using Content.Server.Shuttles.Components;
 using Content.Server.Shuttles.Events;
 using Content.Server.Shuttles.Systems;
 using Content.Shared.Shuttles.Components;
+using Content.Shared.Shuttles.Systems;
 using Content.Shared._StarHorizon.DropPod;
 using Content.Shared.Damage;
 using Content.Shared.Mobs.Components;
@@ -611,6 +612,9 @@ public sealed class DropPodSystem : EntitySystem
                     // Выход из БСС приходит событием FTLCompletedEvent.
                     SetZoom(ent, comp.PeakZoom);
 
+                    // Карта экспедиции ещё строится, а БСС подходит к концу: удлиняем БСС, чтобы капсула прилетела на готовую карту.
+                    ExtendBluespaceWhileGenerating(ent);
+
                     // Прилетели, но карта экспедиции ещё строится: проверяем готовность каждый тик.
                     if (comp.WaitingForExpedition)
                         Arrive(ent);
@@ -631,6 +635,31 @@ public sealed class DropPodSystem : EntitySystem
                     break;
             }
         }
+    }
+
+    /// <summary>
+    /// Пока экспедиция планеты генерируется, не даём БСС закончиться: продлеваем фазу полёта на
+    /// <see cref="DropPodComponent.FlightExtension"/>, но не дольше <see cref="DropPodComponent.ExpeditionWaitTime"/>.
+    /// </summary>
+    private void ExtendBluespaceWhileGenerating(Entity<DropPodComponent> ent)
+    {
+        if (ent.Comp.TargetPlanet is not { } planetUid
+            || !TryComp(planetUid, out ExpeditionPlanetComponent? planet)
+            || planet.Status != PlanetExpeditionStatus.Generating
+            || !TryComp(ent, out FTLComponent? ftl)
+            || ftl.State != FTLState.Travelling)
+        {
+            return;
+        }
+
+        var now = _timing.CurTime;
+        ent.Comp.ExtendUntil ??= now + ent.Comp.ExpeditionWaitTime;
+        if (now >= ent.Comp.ExtendUntil)
+            return;
+
+        // Продлеваем, когда до конца фазы полёта остаётся мало.
+        if (ftl.StateTime.End - now < TimeSpan.FromSeconds(1.5))
+            ftl.StateTime = new Content.Shared.Timing.StartEndTime(ftl.StateTime.Start, now + ent.Comp.FlightExtension);
     }
 
     /// <summary>Снимает затемнение с тех, кто больше не в капсуле, или если капсула уничтожена / не летит.</summary>

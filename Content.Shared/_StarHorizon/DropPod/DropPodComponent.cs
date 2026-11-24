@@ -88,9 +88,20 @@ public sealed partial class DropPodComponent : Component
     [DataField]
     public TimeSpan VignetteDelay = TimeSpan.FromSeconds(2);
 
-    /// <summary>Время в гиперпространстве (без фазы прибытия, её длину задаёт FTL).</summary>
+    /// <summary>
+    /// Время в гиперпространстве (без фазы прибытия, её длину задаёт FTL). По умолчанию как у полного БСС
+    /// (shuttle.travel_time 20 с = 15 с полёта + 5 с прибытия). Если карта экспедиции ещё строится, БСС удлиняется.
+    /// </summary>
     [DataField]
-    public TimeSpan FlightTime = TimeSpan.FromSeconds(4);
+    public TimeSpan FlightTime = TimeSpan.FromSeconds(15);
+
+    /// <summary>На сколько секунд за раз удлиняется БСС, пока строится карта экспедиции.</summary>
+    [DataField]
+    public TimeSpan FlightExtension = TimeSpan.FromSeconds(3);
+
+    /// <summary>Когда БСС перестаёт удлиняться (карта так и не построилась): по <see cref="ExpeditionWaitTime"/> от начала удлинения.</summary>
+    [ViewVariables]
+    public TimeSpan? ExtendUntil;
 
     /// <summary>
     /// Камера уже на месте посадки (капсулы ещё нет): за это время виньетка снимается и зум возвращается,
