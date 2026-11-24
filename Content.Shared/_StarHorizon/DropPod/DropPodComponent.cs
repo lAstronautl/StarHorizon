@@ -123,7 +123,7 @@ public sealed partial class DropPodComponent : Component
 
     /// <summary>Максимальное отдаление камеры перед уходом в блюспейс.</summary>
     [DataField]
-    public float PeakZoom = 3f;
+    public float PeakZoom = 1.5f;
 
     /// <summary>Радиус удара при приземлении.</summary>
     [DataField]
