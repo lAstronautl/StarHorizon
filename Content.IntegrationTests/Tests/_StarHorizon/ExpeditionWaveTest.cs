@@ -183,12 +183,14 @@ public sealed class ExpeditionWaveTest
         var startMin = mobs.Min(m => (xform.GetWorldPosition(m) - playerPos).Length());
         await pair.RunSeconds(15f);
         var endMin = mobs.Where(server.EntMan.EntityExists).Min(m => (xform.GetWorldPosition(m) - xform.GetWorldPosition(player)).Length());
-        Assert.That(endMin, Is.LessThanOrEqualTo(Math.Min(startMin, 11f)), "мобы подошли к игроку (дальники встают на дальности стрельбы)");
+        Assert.That(endMin, Is.LessThan(startMin).Or.LessThanOrEqualTo(11f), "мобы подошли к игроку (дальники встают на дальности стрельбы, медленные просто ближе, чем были)");
 
         // 5a. Музыка выключается, когда 90% мобов волны в крите или убиты (остаётся 10% и меньше в строю).
         var total = waves.WaveTotal;
         var keepFighting = (int) Math.Floor(total * 0.1f);
-        var all = Pursuers(server);
+        // Считаются только мобы, которых можно убить (с MobState): у строений и турелей его нет.
+        var all = Pursuers(server).Where(m => server.EntMan.HasComponent<Content.Shared.Mobs.Components.MobStateComponent>(m)).ToList();
+        Assert.That(total, Is.EqualTo(all.Count), "в волне считаются мобы с MobState");
         Assert.That(total, Is.GreaterThan(0));
         var waveState = server.EntMan.GetComponent<Content.Shared._StarHorizon.Expedition.ExpeditionWaveStateComponent>(expeditionMap);
         await server.WaitPost(() =>

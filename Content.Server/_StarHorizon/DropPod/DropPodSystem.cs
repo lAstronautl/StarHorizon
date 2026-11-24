@@ -1,6 +1,9 @@
 using System.Linq;
 using System.Numerics;
 using Content.Server.Salvage;
+using Content.Server.Stunnable;
+using Content.Server._NF.Shuttles.Components;
+using Robust.Shared.Configuration;
 using Content.Server.Salvage.Expeditions;
 using Content.Server.Shuttles.Components;
 using Content.Server.Shuttles.Events;
@@ -53,6 +56,8 @@ public sealed class DropPodSystem : EntitySystem
     [Dependency] private readonly SharedDeviceLinkSystem _deviceLink = default!;
     [Dependency] private readonly SalvageSystem _salvage = default!;
     [Dependency] private readonly SharedEntityStorageSystem _storage = default!;
+    [Dependency] private readonly StunSystem _stuns = default!;
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
     [Dependency] private readonly Content.Server._StarHorizon.Expedition.RockClearSystem _rocks = default!;
 
     /// <summary>Меньше этого времени до закрытия экспедиции сбрасываться на неё уже поздно.</summary>
@@ -864,7 +869,23 @@ public sealed class DropPodSystem : EntitySystem
         if (ent.Comp.State != DropPodState.InBluespace)
             return;
 
+        // Как при настоящем БСС: на выходе пассажиров валит с ног.
+        KnockDownPassengers(ent);
         Arrive(ent);
+    }
+
+    /// <summary>Валит пассажиров с ног на то же время, что и штатный БСС (shuttle.hyperspace_knockdown_time).</summary>
+    private void KnockDownPassengers(Entity<DropPodComponent> ent)
+    {
+        if (!TryComp(ent, out EntityStorageComponent? storage))
+            return;
+
+        var duration = TimeSpan.FromSeconds(_cfg.GetCVar(Content.Shared.CCVar.CCVars.HyperspaceKnockdownTime));
+        foreach (var occupant in storage.Contents.ContainedEntities.ToArray())
+        {
+            if (!HasComp<FTLKnockdownImmuneComponent>(occupant))
+                _stuns.TryUpdateParalyzeDuration(occupant, duration);
+        }
     }
 
     /// <summary>
@@ -1048,6 +1069,7 @@ public sealed class DropPodSystem : EntitySystem
             }
         }
 
+        KnockDownPassengers(ent);
         ResetZoom(ent);
         RemCompDeferred<FTLComponent>(ent);
         SetState(ent, DropPodState.Idle, TimeSpan.Zero);

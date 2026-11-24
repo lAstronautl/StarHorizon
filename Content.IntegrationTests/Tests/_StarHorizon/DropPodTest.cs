@@ -377,15 +377,18 @@ public sealed class DropPodTest
         var storage = server.System<EntityStorageSystem>();
         var links = server.System<Content.Shared.DeviceLinking.SharedDeviceLinkSystem>();
 
-        EntityUid console = default, pod = default;
+        EntityUid console = default, pod = default, human = default;
         await server.WaitPost(() =>
         {
             console = server.EntMan.SpawnEntity("StarHorizonDropPodConsole", map.GridCoords);
+            human = server.EntMan.SpawnEntity("MobHuman", map.GridCoords.Offset(new Vector2(2, 0)));
             pod = server.EntMan.SpawnEntity("StarHorizonDropPod", map.GridCoords);
             var comp = server.EntMan.GetComponent<DropPodComponent>(pod);
             comp.CountdownTime = TimeSpan.FromSeconds(1);
             comp.ZoomOutTime = TimeSpan.FromSeconds(1);
             comp.FlightTime = TimeSpan.FromSeconds(8);
+            storage.OpenStorage(pod);
+            storage.Insert(human, pod);
             storage.CloseStorage(pod);
             links.LinkDefaults(null, console, pod);
             server.EntMan.EventBus.RaiseLocalEvent(console, (object) new DropPodArmMessage(new Vector2(60, 0)));
@@ -406,6 +409,12 @@ public sealed class DropPodTest
         await pair.RunSeconds(2f);
         var moved = (xform.LocalPosition - before).Length();
         Assert.That(moved, Is.GreaterThan(20f), "БСС толкает капсулу: за 2 с она улетела на десятки метров");
+
+        // На выходе из БСС пассажира валит с ног, как при настоящем БСС.
+        for (var i = 0; i < 40 && podComp.State == DropPodState.InBluespace; i++)
+            await pair.RunSeconds(0.25f);
+        await pair.RunSeconds(0.5f);
+        Assert.That(server.EntMan.HasComponent<Content.Shared.Stunnable.KnockedDownComponent>(human), "вышли из БСС: пассажир сбит с ног");
 
         // Прилетела: скорость снята, капсула садится.
         for (var i = 0; i < 40 && podComp.State != DropPodState.Idle; i++)

@@ -127,7 +127,8 @@ public sealed class ExpeditionWaveSystem : EntitySystem
             if (xform.MapUid != map)
                 continue;
 
-            if (TryComp<MobStateComponent>(uid, out var state) && !_mobState.IsAlive(uid, state))
+            // Без MobState (турели, строения) моба убить нельзя: в счёт волны не входят.
+            if (!TryComp<MobStateComponent>(uid, out var state) || !_mobState.IsAlive(uid, state))
                 continue;
 
             fighting++;
@@ -145,7 +146,7 @@ public sealed class ExpeditionWaveSystem : EntitySystem
             if (xform.MapUid != map)
                 continue;
 
-            if (TryComp<MobStateComponent>(uid, out var state) && _mobState.IsDead(uid, state))
+            if (!TryComp<MobStateComponent>(uid, out var state) || _mobState.IsDead(uid, state))
                 continue;
 
             alive++;
@@ -161,28 +162,41 @@ public sealed class ExpeditionWaveSystem : EntitySystem
     public int SpawnWave(Entity<ExpeditionWavesComponent> ent, SalvageExpeditionComponent expedition)
     {
         if (!TryComp<MapGridComponent>(ent, out var gridComp) || _players.Count == 0)
+        {
+            Log.Warning($"Expedition wave: no grid or no players ({_players.Count}) on {ToPrettyString(ent.Owner)}");
             return 0;
+        }
 
         var alive = CountAliveWaveMobs(ent.Owner);
         if (alive >= ent.Comp.MaxAliveWaveMobs)
+        {
+            Log.Warning($"Expedition wave: {alive} wave mobs alive already, skipping");
             return 0;
+        }
 
         var missionParams = expedition.MissionParams;
         if (!_proto.TryIndex<SalvageDifficultyPrototype>(missionParams.Difficulty, out var difficulty))
+        {
+            Log.Warning($"Expedition wave: unknown difficulty {missionParams.Difficulty}");
             return 0;
+        }
 
         string factionId;
         try
         {
             factionId = _salvage.GetMission(missionParams.MissionType, difficulty, missionParams.Seed, missionParams.Biome).Faction;
         }
-        catch (InvalidOperationException)
+        catch (InvalidOperationException e)
         {
+            Log.Warning($"Expedition wave: could not roll the mission of {ToPrettyString(ent.Owner)}: {e.Message}");
             return 0;
         }
 
         if (!_proto.TryIndex<SalvageFactionPrototype>(factionId, out var faction))
+        {
+            Log.Warning($"Expedition wave: unknown faction {factionId}");
             return 0;
+        }
 
         var budgetEntries = new List<IBudgetEntry>();
         foreach (var entry in faction.MobGroups)
@@ -204,17 +218,25 @@ public sealed class ExpeditionWaveSystem : EntitySystem
             protos.Add(entry.Proto);
         }
 
+        if (protos.Count == 0)
+            Log.Warning($"Expedition wave: budget {budget} bought no mobs from faction {factionId} (entries {budgetEntries.Count})");
+
+        Log.Info($"Expedition wave: {protos.Count} mobs from {factionId} (budget fraction {budget})");
         var spawned = 0;
+        var counted = 0;
         for (var i = 0; i < protos.Count; i += ent.Comp.MobsPerPod)
         {
             var group = protos.GetRange(i, Math.Min(ent.Comp.MobsPerPod, protos.Count - i));
-            if (DropPod(ent, (ent.Owner, gridComp), group))
+            if (DropPod(ent, (ent.Owner, gridComp), group) is { } fighters)
+            {
                 spawned += group.Count;
+                counted += fighters;
+            }
         }
 
         if (spawned > 0)
         {
-            ent.Comp.WaveTotal += spawned;
+            ent.Comp.WaveTotal += counted;
             var state = EnsureComp<ExpeditionWaveStateComponent>(ent.Owner);
             state.Active = true;
             state.End = _timing.CurTime + ent.Comp.WaveMusicDuration;
@@ -227,24 +249,29 @@ public sealed class ExpeditionWaveSystem : EntitySystem
     }
 
     /// <summary>Один дроп-под с группой мобов: падает у якоря, мобы выходят из него на земле.</summary>
-    private bool DropPod(Entity<ExpeditionWavesComponent> ent, Entity<MapGridComponent> grid, List<string> mobs)
+    /// <returns>Сколько в поде мобов, которых можно убить (с MobState); null, если под не упал.</returns>
+    private int? DropPod(Entity<ExpeditionWavesComponent> ent, Entity<MapGridComponent> grid, List<string> mobs)
     {
         if (FindDropTile(ent, grid) is not { } coords)
         {
             Log.Warning($"Expedition wave: no free tile for a drop pod on {ToPrettyString(ent.Owner)}");
-            return false;
+            return null;
         }
 
         var pod = Spawn(PodProto, coords);
         if (!_container.TryGetContainer(pod, PodContainer, out var container))
         {
+            Log.Warning($"Expedition wave: drop pod {ToPrettyString(pod)} has no container {PodContainer}");
             QueueDel(pod);
-            return false;
+            return null;
         }
 
+        var fighters = 0;
         foreach (var proto in mobs)
         {
             var mob = SpawnAtPosition(proto, coords);
+            if (HasComp<MobStateComponent>(mob))
+                fighters++;
             RemComp<GhostRoleComponent>(mob);
             RemComp<GhostTakeoverAvailableComponent>(mob);
             EnsureComp<PursuePlayerComponent>(mob);
@@ -252,7 +279,7 @@ public sealed class ExpeditionWaveSystem : EntitySystem
         }
 
         _trigger.Trigger(pod);
-        return true;
+        return fighters;
     }
 
     /// <summary>Свободный тайл в кольце вокруг якоря; нет подгруженной земли у якоря: в кольце вокруг ближайшего игрока.</summary>
