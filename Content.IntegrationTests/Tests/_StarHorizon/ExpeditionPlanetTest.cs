@@ -57,6 +57,14 @@ public sealed class ExpeditionPlanetTest
         return count;
     }
 
+    /// <summary>Длительность задания планеты (случайная у биомов вроде Анко, плюс редкие модификаторы времени).</summary>
+    private static TimeSpan MissionDuration(Robust.UnitTesting.RobustIntegrationTest.ServerIntegrationInstance server,
+        SalvageSystem salvage, Content.Shared.Salvage.Expeditions.SalvageMissionParams mission)
+    {
+        return salvage.GetMission(mission.MissionType,
+            server.ProtoMan.Index<Content.Shared.Procedural.SalvageDifficultyPrototype>(mission.Difficulty), mission.Seed, mission.Biome).Duration;
+    }
+
     private static void Fast(DropPodComponent pod)
     {
         pod.CountdownTime = TimeSpan.FromSeconds(1);
@@ -149,7 +157,7 @@ public sealed class ExpeditionPlanetTest
         Assert.That(CountExpeditionMaps(server), Is.EqualTo(1));
 
         var now = server.Resolve<IGameTiming>().CurTime;
-        var duration = TimeSpan.FromSeconds(server.CfgMan.GetCVar(CCVars.SalvageExpeditionDuration));
+        var duration = MissionDuration(server, salvage, planetComp1.Mission!);
         Assert.That(planetComp1.EndTime - now, Is.GreaterThan(duration - TimeSpan.FromMinutes(5)).And.LessThanOrEqualTo(duration),
             "идёт обычное время экспедиции");
 
@@ -222,7 +230,7 @@ public sealed class ExpeditionPlanetTest
         await pair.RunSeconds(1f);
 
         var comp = server.EntMan.GetComponent<ExpeditionPlanetComponent>(planet);
-        var duration = TimeSpan.FromSeconds(server.CfgMan.GetCVar(CCVars.SalvageExpeditionDuration));
+        var duration = MissionDuration(server, salvage, comp.Mission!);
         Assert.That(salvage.GetPlanetInfos(), Has.Count.EqualTo(1));
         Assert.That(comp.EndTime - timing.CurTime, Is.GreaterThan(duration - TimeSpan.FromMinutes(1)),
             "таймер идёт у задания без карты");
@@ -241,7 +249,8 @@ public sealed class ExpeditionPlanetTest
         await server.WaitPost(() => comp.EndTime = timing.CurTime - TimeSpan.FromSeconds(1));
         await pair.RunSeconds(1f);
         Assert.That(comp.Mission, Is.Not.EqualTo(first), "задание сменилось");
-        Assert.That(comp.EndTime - timing.CurTime, Is.GreaterThan(duration - TimeSpan.FromMinutes(1)), "у нового задания время уже идёт");
+        var newDuration = MissionDuration(server, salvage, comp.Mission!);
+        Assert.That(comp.EndTime - timing.CurTime, Is.GreaterThan(newDuration - TimeSpan.FromMinutes(1)), "у нового задания время уже идёт");
         Assert.That(comp.Status, Is.EqualTo(PlanetExpeditionStatus.Idle));
         Assert.That(CountExpeditionMaps(server), Is.EqualTo(0));
 
@@ -305,6 +314,53 @@ public sealed class ExpeditionPlanetTest
         for (var i = 0; i < 60 && !podState.Used; i++)
             await pair.RunSeconds(1f);
         Assert.That(podState.Used, "экспедиция готова: капсула приземлилась");
+
+        await pair.CleanReturnAsync();
+    }
+
+    /// <summary>
+    /// У биома Анко длительность случайная (20-50 минут по биому), у остальных 30 минут; редкие модификаторы времени
+    /// (-5 и +10 минут) выпадают по сиду и показываются в списке модификаторов.
+    /// </summary>
+    [Test]
+    public async Task RandomDurationAndRareTimeMods()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { FailureLogLevel = LogLevel.Fatal });
+        var server = pair.Server;
+        var salvage = server.System<SalvageSystem>();
+        var cvar = TimeSpan.FromSeconds(server.CfgMan.GetCVar(CCVars.SalvageExpeditionDuration));
+        var inferno = server.ProtoMan.Index<Content.Shared.Procedural.SalvageDifficultyPrototype>("Inferno");
+        var moderate = server.ProtoMan.Index<Content.Shared.Procedural.SalvageDifficultyPrototype>("NFModerate");
+        var anco = new List<TimeSpan>();
+        var shortCount = 0;
+        var longCount = 0;
+        const int samples = 1500;
+
+        await server.WaitPost(() =>
+        {
+            for (var seed = 1; seed <= samples; seed++)
+            {
+                var a = salvage.GetMission(Content.Shared.Salvage.SalvageMissionType.Combined, inferno, seed, "ArdoniumWastes");
+                anco.Add(a.Duration);
+
+                var m = salvage.GetMission(Content.Shared.Salvage.SalvageMissionType.Destruction, moderate, seed, "Grasslands");
+                if (m.Duration == cvar - TimeSpan.FromMinutes(5))
+                    shortCount++;
+                else if (m.Duration == cvar + TimeSpan.FromMinutes(10))
+                    longCount++;
+                else
+                    Assert.That(m.Duration, Is.EqualTo(cvar), "без модификатора времени: стандартные 30 минут");
+            }
+        });
+
+        // Анко: случайное время 20-50 минут по биому (плюс возможный сдвиг модификатором).
+        Assert.That(anco.Distinct().Count(), Is.GreaterThan(50), "время у Анко случайное");
+        Assert.That(anco.Min(), Is.GreaterThanOrEqualTo(TimeSpan.FromSeconds(1200) - TimeSpan.FromMinutes(5)));
+        Assert.That(anco.Max(), Is.LessThanOrEqualTo(TimeSpan.FromSeconds(3000) + TimeSpan.FromMinutes(10)));
+
+        // Модификаторы редкие: примерно 7% каждого.
+        Assert.That(shortCount, Is.InRange(samples * 0.03, samples * 0.12), $"-5 минут: {shortCount} из {samples}");
+        Assert.That(longCount, Is.InRange(samples * 0.03, samples * 0.12), $"+10 минут: {longCount} из {samples}");
 
         await pair.CleanReturnAsync();
     }

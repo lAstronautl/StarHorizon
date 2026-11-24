@@ -117,7 +117,19 @@ public sealed partial class SalvageSystem
         };
 
         // Время планеты идёт всегда: у нового задания таймер уже запущен, по его концу задание сменится.
-        planet.Comp.EndTime = _timing.CurTime + TimeSpan.FromSeconds(_configurationManager.GetCVar(CCVars.SalvageExpeditionDuration));
+        // Длительность берётся из задания: у биомов вроде Анко она случайная, плюс редкие модификаторы времени.
+        var duration = TimeSpan.FromSeconds(_configurationManager.GetCVar(CCVars.SalvageExpeditionDuration));
+        try
+        {
+            duration = GetMission(missionType, _prototypeManager.Index<SalvageDifficultyPrototype>(difficulty),
+                planet.Comp.Mission.Seed, planet.Comp.BiomeId).Duration;
+        }
+        catch (InvalidOperationException e)
+        {
+            Log.Error($"Could not roll the duration of the planet mission: {e.Message}");
+        }
+
+        planet.Comp.EndTime = _timing.CurTime + duration;
     }
 
     /// <summary>The planet's task, rolled on first use.</summary>

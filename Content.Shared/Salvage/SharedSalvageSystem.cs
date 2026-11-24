@@ -107,6 +107,23 @@ public abstract partial class SharedSalvageSystem : EntitySystem
             duration = TimeSpan.FromSeconds(CfgManager.GetCVar(CCVars.SalvageExpeditionDuration));
         }
 
+        // StarHorizon: редкие модификаторы времени (-5 / +10 минут). Бросок по сиду после остальных, чтобы не менять прежние результаты.
+        var timeMods = _proto.EnumeratePrototypes<SalvageTimeMod>().ToList();
+        timeMods.Sort((x, y) => string.Compare(x.ID, y.ID, StringComparison.Ordinal));
+        foreach (var timeMod in timeMods)
+        {
+            if (rand.NextDouble() >= timeMod.Prob)
+                continue;
+
+            duration += TimeSpan.FromSeconds(timeMod.Offset);
+            if (timeMod.Description != string.Empty)
+                mods.Add(Loc.GetString(timeMod.Description));
+            break;
+        }
+
+        if (duration < TimeSpan.FromMinutes(5))
+            duration = TimeSpan.FromMinutes(5);
+
         return new SalvageMission(seed, dungeon.ID, faction.ID, biome.ID, air.ID, temp.Temperature, light.Color, duration, mods, difficulty.ID, config);
     }
 

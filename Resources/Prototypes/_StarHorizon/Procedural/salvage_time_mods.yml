@@ -1,0 +1,12 @@
+# Редкие модификаторы времени экспедиции.
+- type: salvageTimeMod
+  id: TimeShort
+  desc: salvage-time-mod-short
+  offset: -300
+  prob: 0.07
+
+- type: salvageTimeMod
+  id: TimeLong
+  desc: salvage-time-mod-long
+  offset: 600
+  prob: 0.07
