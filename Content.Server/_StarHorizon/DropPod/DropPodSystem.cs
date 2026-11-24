@@ -933,7 +933,8 @@ public sealed class DropPodSystem : EntitySystem
         if (TryComp(ent, out PhysicsComponent? hidden))
             _physics.SetCanCollide(ent, false, body: hidden);
 
-        SetVignette(ent, 1f, 0f, ent.Comp.ArrivalViewTime);
+        // Камера на месте посадки за 5 с до столкновения: виньетка сразу падает до 50% и дальше плавно снимается, зум плавно приближается.
+        SetVignette(ent, 0.5f, 0f, ent.Comp.ArrivalViewTime);
         SetState(ent, DropPodState.Arriving, ent.Comp.ArrivalViewTime);
     }
 
@@ -1069,7 +1070,6 @@ public sealed class DropPodSystem : EntitySystem
             }
         }
 
-        KnockDownPassengers(ent);
         ResetZoom(ent);
         RemCompDeferred<FTLComponent>(ent);
         SetState(ent, DropPodState.Idle, TimeSpan.Zero);

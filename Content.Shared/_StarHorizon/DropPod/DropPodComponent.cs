@@ -112,7 +112,7 @@ public sealed partial class DropPodComponent : Component
     /// чтобы игрок увидел, куда падает. Когда виньетка снята, капсула физически приземляется.
     /// </summary>
     [DataField]
-    public TimeSpan ArrivalViewTime = TimeSpan.FromSeconds(3);
+    public TimeSpan ArrivalViewTime = TimeSpan.FromSeconds(5 - DropPodLandingGeometry.TotalTime);
 
     /// <summary>
     /// Падение: анимация-сущность (диагональный спрайт Goobstation) и шлейф дыма, капсула в это время скрыта.

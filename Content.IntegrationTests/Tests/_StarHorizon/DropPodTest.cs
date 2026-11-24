@@ -190,7 +190,7 @@ public sealed class DropPodTest
         Assert.That(comp.State, Is.EqualTo(DropPodState.Arriving));
         Assert.That(server.EntMan.HasComponent<FTLMapComponent>(server.EntMan.GetComponent<TransformComponent>(pod).MapUid), Is.False);
         Assert.That((xform.GetWorldPosition(mob) - target).Length(), Is.LessThan(0.5f), "камера уже на месте посадки");
-        Assert.That((vignette.From, vignette.To), Is.EqualTo((1f, 0f)), "виньетка снимается");
+        Assert.That((vignette.From, vignette.To), Is.EqualTo((0.5f, 0f)), "виньетка сразу на 50% и дальше плавно снимается");
         Assert.That(appearance.TryGetData<bool>(pod, DropPodVisuals.InFlight, out hidden) && hidden, "капсулы ещё не видно");
         Assert.That(server.EntMan.Deleted(comp.Marker), Is.False, "метка остаётся до приземления");
         Assert.That(eye.TargetZoom.X, Is.GreaterThan(1.0f).And.LessThan(comp.PeakZoom));
@@ -421,6 +421,15 @@ public sealed class DropPodTest
             await pair.RunSeconds(1f);
         Assert.That(podComp.Used, "приземлилась");
         Assert.That(body.LinearDamping, Is.EqualTo(podComp.SavedLinearDamping), "демпфирование возвращено");
+
+        // От камеры на месте посадки до столкновения 5 с; после посадки капсула закрыта 3 с, потом открывается,
+        // и к этому моменту стан от БСС уже прошёл.
+        Assert.That(podComp.ArrivalViewTime + podComp.FallTime, Is.EqualTo(TimeSpan.FromSeconds(5)).Within(TimeSpan.FromMilliseconds(50)));
+        Assert.That(podComp.AutoOpenDelay, Is.EqualTo(TimeSpan.FromSeconds(3)));
+        Assert.That(server.EntMan.GetComponent<EntityStorageComponent>(pod).Open, Is.False, "после посадки капсула закрыта");
+        await pair.RunSeconds(3.5f);
+        Assert.That(server.EntMan.GetComponent<EntityStorageComponent>(pod).Open, "через 3 с открылась");
+        Assert.That(server.EntMan.HasComponent<Content.Shared.Stunnable.KnockedDownComponent>(human), Is.False, "стан уже прошёл, человек выбирается на ногах");
 
         await pair.CleanReturnAsync();
     }
