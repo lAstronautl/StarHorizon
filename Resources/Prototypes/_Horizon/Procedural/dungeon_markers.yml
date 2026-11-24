@@ -28,7 +28,7 @@
     - NFXenos
     - NFCarps
     - NFFlesh
-    mobBudget: 30
+    mobBudget: 60
 
 - type: entity
   id: SnowDungeonMarker
@@ -47,4 +47,4 @@
     - NFArgocytes
     - NFDinosaurs
     - NFSilicons
-    mobBudget: 34
+    mobBudget: 68
