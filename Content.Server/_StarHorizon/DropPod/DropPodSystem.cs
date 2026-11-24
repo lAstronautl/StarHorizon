@@ -833,11 +833,29 @@ public sealed class DropPodSystem : EntitySystem
         // В БСС капсула остаётся видимой, как шаттл в FTL: на FTL-карте нет освещения,
         // поэтому подсвечиваем её собственным светом, а на корпусе горит синий индикатор.
         _light.SetEnabled(ent, true);
-        if (TryComp(ent, out PhysicsComponent? physics))
-            _physics.SetCanCollide(ent, false, body: physics);
+
+        // БСС сам толкает капсулу: FTL задаёт ей скорость 20 м/с по FTL-карте. Поэтому тело должно остаться в симуляции
+        // (CanCollide = false выкидывает его из физики, и капсула стоит на месте): фикстуры делаем не твёрдыми, чтобы она
+        // пролетала сквозь шаттлы, а демпфирование снимаем, как у шаттлов в БСС.
+        SetFlightPhysics(ent, true);
 
         var total = TryComp(ent, out FTLComponent? ftl) ? ftl.TravelTime : (float) ent.Comp.FlightTime.TotalSeconds;
         SetState(ent, DropPodState.InBluespace, TimeSpan.FromSeconds(total));
+    }
+
+    /// <summary>В полёте: не твёрдая и без демпфирования (летит со скоростью, заданной FTL); после полёта возвращается.</summary>
+    private void SetFlightPhysics(Entity<DropPodComponent> ent, bool flying)
+    {
+        if (!TryComp(ent, out PhysicsComponent? physics) || !TryComp(ent, out FixturesComponent? fixtures))
+            return;
+
+        foreach (var fixture in fixtures.Fixtures.Values)
+            _physics.SetHard(ent, fixture, !flying, fixtures);
+
+        if (flying)
+            ent.Comp.SavedLinearDamping = physics.LinearDamping;
+
+        _physics.SetLinearDamping(ent, physics, flying ? 0f : ent.Comp.SavedLinearDamping);
     }
 
     /// <summary>БСС закончился (FTL доставил капсулу): камера переезжает на место посадки.</summary>
@@ -990,6 +1008,7 @@ public sealed class DropPodSystem : EntitySystem
 
         if (TryComp(ent, out PhysicsComponent? physics))
             _physics.SetCanCollide(ent, true, body: physics);
+        SetFlightPhysics(ent, false);
         // Обычный спрайт остаётся скрытым (InFlight), вместо него рисуется упавшая капсула.
         _appearance.SetData(ent, DropPodVisuals.Landed, true);
 

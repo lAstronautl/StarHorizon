@@ -365,4 +365,54 @@ public sealed class DropPodTest
 
         await pair.CleanReturnAsync();
     }
+
+    /// <summary>БСС толкает капсулу (скорость задаёт FTL), поэтому она летит по FTL-карте, а не стоит на месте.</summary>
+    [Test]
+    public async Task BluespacePushesThePod()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { FailureLogLevel = LogLevel.Fatal });
+        var server = pair.Server;
+        server.CfgMan.SetCVar(CCVars.FTLArrivalTime, 1f);
+        var map = await pair.CreateTestMap();
+        var storage = server.System<EntityStorageSystem>();
+        var links = server.System<Content.Shared.DeviceLinking.SharedDeviceLinkSystem>();
+
+        EntityUid console = default, pod = default;
+        await server.WaitPost(() =>
+        {
+            console = server.EntMan.SpawnEntity("StarHorizonDropPodConsole", map.GridCoords);
+            pod = server.EntMan.SpawnEntity("StarHorizonDropPod", map.GridCoords);
+            var comp = server.EntMan.GetComponent<DropPodComponent>(pod);
+            comp.CountdownTime = TimeSpan.FromSeconds(1);
+            comp.ZoomOutTime = TimeSpan.FromSeconds(1);
+            comp.FlightTime = TimeSpan.FromSeconds(8);
+            storage.CloseStorage(pod);
+            links.LinkDefaults(null, console, pod);
+            server.EntMan.EventBus.RaiseLocalEvent(console, (object) new DropPodArmMessage(new Vector2(60, 0)));
+            server.EntMan.EventBus.RaiseLocalEvent(console, (object) new DropPodLaunchMessage(new Vector2(60, 0)));
+        });
+
+        var podComp = server.EntMan.GetComponent<DropPodComponent>(pod);
+        for (var i = 0; i < 40 && podComp.State != DropPodState.InBluespace; i++)
+            await pair.RunSeconds(0.5f);
+        Assert.That(podComp.State, Is.EqualTo(DropPodState.InBluespace));
+
+        var xform = server.EntMan.GetComponent<TransformComponent>(pod);
+        var body = server.EntMan.GetComponent<Robust.Shared.Physics.Components.PhysicsComponent>(pod);
+        Assert.That(body.CanCollide, "тело в симуляции: иначе скорость от БСС не применяется");
+
+        await pair.RunSeconds(0.5f);
+        var before = xform.LocalPosition;
+        await pair.RunSeconds(2f);
+        var moved = (xform.LocalPosition - before).Length();
+        Assert.That(moved, Is.GreaterThan(20f), "БСС толкает капсулу: за 2 с она улетела на десятки метров");
+
+        // Прилетела: скорость снята, капсула садится.
+        for (var i = 0; i < 40 && podComp.State != DropPodState.Idle; i++)
+            await pair.RunSeconds(1f);
+        Assert.That(podComp.Used, "приземлилась");
+        Assert.That(body.LinearDamping, Is.EqualTo(podComp.SavedLinearDamping), "демпфирование возвращено");
+
+        await pair.CleanReturnAsync();
+    }
 }

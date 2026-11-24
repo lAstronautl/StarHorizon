@@ -95,6 +95,10 @@ public sealed partial class DropPodComponent : Component
     [DataField]
     public TimeSpan FlightTime = TimeSpan.FromSeconds(15);
 
+    /// <summary>Линейное демпфирование тела до полёта (в БСС оно снимается, чтобы капсула летела с постоянной скоростью).</summary>
+    [ViewVariables]
+    public float SavedLinearDamping = 0.2f;
+
     /// <summary>На сколько секунд за раз удлиняется БСС, пока строится карта экспедиции.</summary>
     [DataField]
     public TimeSpan FlightExtension = TimeSpan.FromSeconds(3);
