@@ -1,8 +1,8 @@
 - type: entity
   id: ComputerMarketplace
   parent: BaseComputer
-  name: marketplace console
-  description: Connects to the sector-wide trading network. Put an item inside to sell it to other spacers, or browse goods listed from any station.
+  name: StarOZON pickup point
+  description: A StarOZON marketplace terminal. List your goods, buy from other spacers and pick up your orders. Returns cost your own credits and your own oxygen.
   components:
   - type: Sprite
     layers:
@@ -58,8 +58,8 @@
 - type: entity
   id: MarketplaceComputerCircuitboard
   parent: BaseComputerCircuitboard
-  name: marketplace console board
-  description: A computer printed circuit board for a marketplace console.
+  name: StarOZON pickup point board
+  description: A computer printed circuit board for a StarOZON pickup point.
   components:
   - type: Sprite
     state: cpu_supply

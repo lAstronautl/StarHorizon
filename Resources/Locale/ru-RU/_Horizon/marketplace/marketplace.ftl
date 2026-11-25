@@ -1,9 +1,9 @@
-marketplace-item-slot-name = Лоток торговой площадки
+marketplace-item-slot-name = Лоток пункта выдачи
 
 ## Окно
 
-marketplace-window-title = Торговая площадка сектора
-marketplace-header-title = [font size=16][bold][color=#7CC4FF]ТОРГОВАЯ ПЛОЩАДКА[/color] [color=#E8EEF7]СЕКТОРА[/color][/bold][/font]
+marketplace-window-title = Пункт выдачи StarOZON
+marketplace-header-title = [font size=16][bold][color=#7CC4FF]Star[/color][color=#E8EEF7]OZON[/color][/bold][/font]  [color=#8391A5]· пункт выдачи · возврат за ваш кислород[/color]
 marketplace-header-terminal = [color={$mutedColor}]Терминал:[/color] [color={$accentColor}]{$grid}[/color]  [color={$mutedColor}]· ПКМ или Shift+ЛКМ по предмету — осмотреть[/color]
 
 marketplace-stat-balance = [color={$mutedColor}]Баланс[/color]  [bold][color={$priceColor}]{$balance}[/color][/bold]
@@ -86,15 +86,15 @@ marketplace-popup-merged = {$item} добавлен к вашему лоту #{$
 marketplace-popup-withdrawn = Лот #{$id} снят с продажи.
 marketplace-popup-bought = Куплено: {$item} ×{$amount} за {$total}.
 marketplace-popup-sold = Продано: {$item} ×{$amount}. Зачислено {$payout} (налог {$tax}).
-marketplace-popup-sold-pending = Продано: {$item} ×{$amount}. {$payout} ожидает выплаты на консоли торговой площадки.
-marketplace-popup-pending-paid = Зачислена выручка с торговой площадки: {$amount}.
+marketplace-popup-sold-pending = Продано: {$item} ×{$amount}. {$payout} ожидает выплаты — заберите в пункте выдачи или терминале.
+marketplace-popup-pending-paid = Зачислена выручка с продаж: {$amount}.
 
 ## Прототипы
 
-ent-ComputerMarketplace = консоль торговой площадки
-    .desc = Подключена к торговой сети сектора. Положите предмет внутрь, чтобы продать его другим космонавтам, или купите товары, выставленные на любой станции.
-ent-MarketplaceComputerCircuitboard = плата консоли торговой площадки
-    .desc = Печатная плата для консоли торговой площадки.
+ent-ComputerMarketplace = пункт выдачи StarOZON
+    .desc = Терминал маркетплейса StarOZON: выставляйте товары, покупайте у других космонавтов и забирайте заказы. Возврат — за ваш счёт и ваш кислород.
+ent-MarketplaceComputerCircuitboard = плата пункта выдачи StarOZON
+    .desc = Печатная плата для пункта выдачи StarOZON.
 
 ## Запросы
 
@@ -154,11 +154,11 @@ marketplace-offer-popup-made = {$item} предложен на запрос «{$
 marketplace-offer-popup-received = Новое предложение на ваш запрос «{$title}»: {$item}.
 marketplace-offer-popup-accepted = Сделка состоялась: вы получили {$item} по запросу «{$title}».
 marketplace-offer-popup-paid = Ваше предложение по запросу «{$title}» принято! Зачислено {$payout} (налог {$tax}).
-marketplace-offer-popup-paid-pending = Ваше предложение по запросу «{$title}» принято! {$payout} ожидает выплаты на консоли торговой площадки.
+marketplace-offer-popup-paid-pending = Ваше предложение по запросу «{$title}» принято! {$payout} ожидает выплаты — заберите в пункте выдачи или терминале.
 marketplace-offer-popup-rejected = Предложение «{$item}» отклонено.
 marketplace-offer-popup-withdrawn = {$item} возвращён вам.
 
-marketplace-error-contraband = Контрабанду 2-го класса и выше нельзя продавать на торговой площадке.
+marketplace-error-contraband = Контрабанду 2-го класса и выше нельзя продавать в StarOZON.
 marketplace-error-contraband-inside = Внутри предмета контрабанда 2-го класса или выше — выньте её, прежде чем продавать.
 
 ## Чёрный рынок
@@ -176,16 +176,16 @@ ent-MarketplaceBlackMarketComputerCircuitboard = плата терминала �
 
 ## Программы КПК
 
-marketplace-pda-program-name = Торговая площадка
+marketplace-pda-program-name = StarOZON
 marketplace-black-pda-program-name = Чёрный рынок
 marketplace-pda-tab-new-request = Новый запрос
 marketplace-pda-subtitle = [color={$mutedColor}]Налог[/color] {$tax}%  [color={$mutedColor}]· Лотов[/color] {$listings}  [color={$mutedColor}]· Запросов[/color] {$requests}  [color={$mutedColor}]· Баланс[/color] [color={$priceColor}]{$balance}[/color]
-marketplace-pda-request-note = [color={$mutedColor}]Награда списывается сразу. Покупки, предложения и их принятие — только в терминале торговой площадки.[/color]
-marketplace-card-total-all = [color={$mutedColor}]За всё:[/color] [bold][color={$priceColor}]{$total}[/color][/bold]  [color={$mutedColor}]· купить в терминале[/color]
-marketplace-request-card-own-pda = [color={$accentColor}]Ваш запрос.[/color] Предложений: {$count} [color={$mutedColor}]— принять можно в терминале.[/color]
-marketplace-request-card-offer-pda = [color={$mutedColor}]Предложить предмет можно в терминале торговой площадки.[/color]
+marketplace-pda-request-note = [color={$mutedColor}]Награда списывается сразу. Покупки, предложения и их принятие — только в пункте выдачи или терминале.[/color]
+marketplace-card-total-all = [color={$mutedColor}]За всё:[/color] [bold][color={$priceColor}]{$total}[/color][/bold]  [color={$mutedColor}]· купить в пункте выдачи[/color]
+marketplace-request-card-own-pda = [color={$accentColor}]Ваш запрос.[/color] Предложений: {$count} [color={$mutedColor}]— принять можно в пункте выдачи.[/color]
+marketplace-request-card-offer-pda = [color={$mutedColor}]Предложить предмет можно в пункте выдачи.[/color]
 
-ent-MarketplaceViewerCartridge = картридж «ТоргЛинк»
-    .desc = Программа для КПК: просмотр торговой площадки сектора и размещение запросов на ходу.
+ent-MarketplaceViewerCartridge = картридж «StarOZON»
+    .desc = Приложение StarOZON для КПК: смотрите товары и оставляйте заявки, не вставая с кресла пилота.
 ent-BlackMarketViewerCartridge = картридж «ТёмныйЛинк»
     .desc = Картридж без маркировки с зашифрованным подключением к чёрному рынку.

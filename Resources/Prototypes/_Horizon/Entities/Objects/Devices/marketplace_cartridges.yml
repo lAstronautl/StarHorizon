@@ -1,8 +1,8 @@
 - type: entity
   parent: NFBasePDACartridge
   id: MarketplaceViewerCartridge
-  name: TradeLink cartridge
-  description: A PDA program for browsing the sector marketplace and posting requests on the go.
+  name: StarOZON cartridge
+  description: The StarOZON PDA app. Browse goods and post requests without leaving the pilot's seat.
   components:
   - type: Sprite
     sprite: Objects/Devices/cartridge.rsi

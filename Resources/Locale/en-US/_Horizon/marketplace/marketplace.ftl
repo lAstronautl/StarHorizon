@@ -1,9 +1,9 @@
-marketplace-item-slot-name = Marketplace tray
+marketplace-item-slot-name = Pickup point tray
 
 ## Window
 
-marketplace-window-title = Sector Marketplace
-marketplace-header-title = [font size=16][bold][color=#7CC4FF]SECTOR[/color] [color=#E8EEF7]MARKETPLACE[/color][/bold][/font]
+marketplace-window-title = StarOZON Pickup Point
+marketplace-header-title = [font size=16][bold][color=#7CC4FF]Star[/color][color=#E8EEF7]OZON[/color][/bold][/font]  [color=#8391A5]· pickup point · returns cost your oxygen[/color]
 marketplace-header-terminal = [color={$mutedColor}]Terminal:[/color] [color={$accentColor}]{$grid}[/color]  [color={$mutedColor}]· Right click or Shift+click an item to examine it[/color]
 
 marketplace-stat-balance = [color={$mutedColor}]Balance[/color]  [bold][color={$priceColor}]{$balance}[/color][/bold]
@@ -86,8 +86,8 @@ marketplace-popup-merged = {$item} added to your listing #{$id}.
 marketplace-popup-withdrawn = Listing #{$id} withdrawn.
 marketplace-popup-bought = Bought {$item} ×{$amount} for {$total}.
 marketplace-popup-sold = Sold {$item} ×{$amount}. Received {$payout} (tax {$tax}).
-marketplace-popup-sold-pending = Sold {$item} ×{$amount}. {$payout} is waiting for you at any marketplace console.
-marketplace-popup-pending-paid = Marketplace earnings received: {$amount}.
+marketplace-popup-sold-pending = Sold {$item} ×{$amount}. {$payout} is waiting for you at any pickup point or terminal.
+marketplace-popup-pending-paid = Sales earnings received: {$amount}.
 
 ## Requests
 
@@ -147,11 +147,11 @@ marketplace-offer-popup-made = {$item} offered for "{$title}".
 marketplace-offer-popup-received = New offer on your request "{$title}": {$item}.
 marketplace-offer-popup-accepted = Deal done: you received {$item} for "{$title}".
 marketplace-offer-popup-paid = Your offer for "{$title}" was accepted! Received {$payout} (tax {$tax}).
-marketplace-offer-popup-paid-pending = Your offer for "{$title}" was accepted! {$payout} is waiting for you at any marketplace console.
+marketplace-offer-popup-paid-pending = Your offer for "{$title}" was accepted! {$payout} is waiting for you at any pickup point or terminal.
 marketplace-offer-popup-rejected = Offer "{$item}" rejected.
 marketplace-offer-popup-withdrawn = {$item} returned to you.
 
-marketplace-error-contraband = Class 2 and higher contraband can't be traded on the marketplace.
+marketplace-error-contraband = Class 2 and higher contraband can't be sold on StarOZON.
 marketplace-error-contraband-inside = There is class 2 or higher contraband inside this item - take it out before selling.
 
 ## Black market
@@ -164,11 +164,11 @@ marketplace-anon-grid = Cipher {$code}
 
 ## PDA programs
 
-marketplace-pda-program-name = Marketplace
+marketplace-pda-program-name = StarOZON
 marketplace-black-pda-program-name = Black Market
 marketplace-pda-tab-new-request = New request
 marketplace-pda-subtitle = [color={$mutedColor}]Tax[/color] {$tax}%  [color={$mutedColor}]· Listings[/color] {$listings}  [color={$mutedColor}]· Requests[/color] {$requests}  [color={$mutedColor}]· Balance[/color] [color={$priceColor}]{$balance}[/color]
-marketplace-pda-request-note = [color={$mutedColor}]The reward is held right away. Buying, offering and accepting offers happen at a marketplace terminal.[/color]
-marketplace-card-total-all = [color={$mutedColor}]For all:[/color] [bold][color={$priceColor}]{$total}[/color][/bold]  [color={$mutedColor}]· buy at a terminal[/color]
-marketplace-request-card-own-pda = [color={$accentColor}]Your request.[/color] Offers: {$count} [color={$mutedColor}]- accept them at a terminal.[/color]
-marketplace-request-card-offer-pda = [color={$mutedColor}]Offer an item at a marketplace terminal.[/color]
+marketplace-pda-request-note = [color={$mutedColor}]The reward is held right away. Buying, offering and accepting offers happen at a pickup point or terminal.[/color]
+marketplace-card-total-all = [color={$mutedColor}]For all:[/color] [bold][color={$priceColor}]{$total}[/color][/bold]  [color={$mutedColor}]· buy at a pickup point[/color]
+marketplace-request-card-own-pda = [color={$accentColor}]Your request.[/color] Offers: {$count} [color={$mutedColor}]- accept them at a pickup point.[/color]
+marketplace-request-card-offer-pda = [color={$mutedColor}]Offer an item at a pickup point.[/color]
