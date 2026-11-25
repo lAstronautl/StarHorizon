@@ -124,7 +124,7 @@ public sealed class MarketplaceRequestCard : PanelContainer
     }
 
     /// <summary>
-    /// PDA view: offers are made and accepted at a terminal, so only say so.
+    /// PDA view: offers are made at a terminal. The requester can accept them here and have them teleported.
     /// </summary>
     private void BuildReadOnlyFooter(BoxContainer root, MarketplaceRequestData data)
     {
@@ -136,6 +136,23 @@ public sealed class MarketplaceRequestCard : PanelContainer
                 ("mutedColor", MutedColor))
             : Loc.GetString("marketplace-request-card-offer-pda", ("mutedColor", MutedColor))));
         root.AddChild(label);
+
+        if (!data.IsOwn)
+            return;
+
+        foreach (var offer in data.Offers)
+        {
+            var row = CreateOfferRow(_theme, offer, showRequest: false);
+            var accept = new Button
+            {
+                Text = Loc.GetString("marketplace-delivery-accept"),
+                VerticalAlignment = VAlignment.Center,
+            };
+            accept.AddStyleClass(StyleNano.StyleClassButtonColorGreen);
+            accept.OnPressed += _ => OnAccept?.Invoke(offer.Id);
+            row.Buttons.AddChild(accept);
+            root.AddChild(row);
+        }
     }
 
     private void BuildOwnerControls(BoxContainer root, MarketplaceRequestData data)

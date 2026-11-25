@@ -28,6 +28,8 @@ public sealed partial class MarketplaceCartridgeUi : UIFragment
         _fragment.OnCreateRequest += (title, description, quantity, reward) =>
             userInterface.SendMessage(new CartridgeUiMessage(
                 new MarketplaceCartridgeCreateRequestEvent(title, description, quantity, reward)));
+        _fragment.OnAcceptOffer += (offerId, teleporter) =>
+            userInterface.SendMessage(new CartridgeUiMessage(new MarketplaceCartridgeAcceptOfferEvent(offerId, teleporter)));
     }
 
     public override void UpdateState(BoundUserInterfaceState state)

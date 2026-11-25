@@ -2,6 +2,7 @@ using System.Linq;
 using Content.Server.CartridgeLoader;
 using Content.Shared._Horizon.Marketplace;
 using Content.Shared.CartridgeLoader;
+using Robust.Shared.Utility;
 
 namespace Content.Server._Horizon.Marketplace;
 
@@ -26,6 +27,12 @@ public sealed partial class MarketplaceSystem
 
     private void OnCartridgeMessage(Entity<MarketplaceCartridgeComponent> ent, ref CartridgeMessageEvent args)
     {
+        if (args is MarketplaceCartridgeAcceptOfferEvent accept)
+        {
+            OnCartridgeAccept(ent, GetEntity(args.LoaderUid), args.Actor, accept);
+            return;
+        }
+
         if (args is not MarketplaceCartridgeCreateRequestEvent create)
             return;
 
@@ -105,16 +112,18 @@ public sealed partial class MarketplaceSystem
                     includeEntity: false));
             }
 
-            var offerCounts = new Dictionary<int, int>();
+            var offersByRequest = new Dictionary<int, List<MarketplaceOffer>>();
             foreach (var offer in storage.Offers.Values)
             {
                 if (offer.Status == MarketplaceOfferStatus.Pending)
-                    offerCounts[offer.RequestId] = offerCounts.GetValueOrDefault(offer.RequestId) + 1;
+                    offersByRequest.GetOrNew(offer.RequestId).Add(offer);
             }
 
             foreach (var request in storage.Requests.Values)
             {
-                state.Requests.Add(new MarketplaceRequestData
+                var isOwn = viewerId == request.RequesterUserId && viewerName == request.RequesterCharacterName;
+                var offers = offersByRequest.GetValueOrDefault(request.Id);
+                var data = new MarketplaceRequestData
                 {
                     Id = request.Id,
                     Title = request.Title,
@@ -125,11 +134,27 @@ public sealed partial class MarketplaceSystem
                     RequesterIdName = DisplayIdName(ent.Comp.Anonymous, request.RequesterIdName),
                     GridName = DisplayGrid(ent.Comp.Anonymous, storage, request.GridName),
                     CreatedAt = request.CreatedAt,
-                    IsOwn = viewerId == request.RequesterUserId && viewerName == request.RequesterCharacterName,
-                    OfferCount = offerCounts.GetValueOrDefault(request.Id),
-                });
+                    IsOwn = isOwn,
+                    OfferCount = offers?.Count ?? 0,
+                };
+
+                // The requester can accept offers from the PDA and have them teleported over.
+                if (isOwn && offers != null)
+                {
+                    foreach (var offer in offers)
+                    {
+                        data.Offers.Add(ToData(ent.Comp.Anonymous, storage, offer));
+                    }
+                }
+
+                state.Requests.Add(data);
             }
         }
+
+        state.DeliveryCost = ent.Comp.DeliveryCost;
+        state.Crystals = GetCrystalCount(loader);
+        if (viewer.Valid)
+            state.DeliveryPoints = GetDeliveryPoints(viewer);
 
         _cartridgeLoader.UpdateCartridgeUiState(loader, state, loader: loaderComp);
     }

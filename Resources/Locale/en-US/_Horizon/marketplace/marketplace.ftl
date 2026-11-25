@@ -167,6 +167,23 @@ marketplace-pda-tab-new-request = New request
 marketplace-pda-subtitle = [color={$mutedColor}]Tax[/color] {$tax}%  [color={$mutedColor}]· Listings[/color] {$listings}  [color={$mutedColor}]· Requests[/color] {$requests}  [color={$mutedColor}]· Balance[/color] [color={$priceColor}]{$balance}[/color]
 marketplace-pda-request-note = [color={$mutedColor}]The reward is held right away. Buying, offering and accepting offers happen at a pickup point or terminal.[/color]
 marketplace-card-total-all = [color={$mutedColor}]For all:[/color] [bold][color={$priceColor}]{$total}[/color][/bold]  [color={$mutedColor}]· buy at a pickup point[/color]
-marketplace-request-card-own-pda = [color={$accentColor}]Your request.[/color] Offers: {$count} [color={$mutedColor}]- accept them at a pickup point.[/color]
+marketplace-request-card-own-pda = [color={$accentColor}]Your request.[/color] Offers: {$count} [color={$mutedColor}]- accept here with teleport delivery, or at a pickup point.[/color]
 marketplace-request-card-offer-pda = [color={$mutedColor}]Offer an item at a pickup point.[/color]
 marketplace-examine-more = Right click or Shift+click for the full examine with actions
+
+## Teleport delivery
+
+marketplace-crystal-slot-name = Bluespace crystals
+marketplace-delivery-accept = Accept and deliver
+marketplace-delivery-title = [bold]Delivery via sector teleporter[/bold]
+marketplace-delivery-item = [color={$mutedColor}]Parcel:[/color] {$item} ×{$count}
+marketplace-delivery-crystals = [color={$mutedColor}]Bluespace crystals in PDA:[/color] [color={$accentColor}]{$count}[/color] [color={$mutedColor}]· a delivery uses {$cost}[/color]
+marketplace-delivery-crystals-missing = [color=#FF6B6B]You need {$cost} bluespace crystal in your PDA (now {$count}).[/color] [color={$mutedColor}]Insert crystals into the PDA.[/color]
+marketplace-delivery-no-teleporters = There are no sector teleporters in the sector.
+marketplace-delivery-unpowered = no power
+marketplace-delivery-send = Deliver here
+marketplace-delivery-cancel = Cancel
+marketplace-delivery-error-teleporter = That teleporter is unavailable.
+marketplace-delivery-error-unpowered = The teleporter has no power.
+marketplace-delivery-error-crystals = A delivery needs {$cost} bluespace crystal in your PDA.
+marketplace-delivery-popup-sent = {$item} sent through the teleporter: {$destination}.
