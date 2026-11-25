@@ -1769,6 +1769,7 @@ async function loadBlockModules() {
         onChange: saveDraft,
         toast,
     });
+    UINodes.init({ toast });
     if (!loadDraft()) loadDocument(TEMPLATES[1].xaml, null);
     if (serverMode) await loadLocale();
 })();

@@ -71,11 +71,19 @@
             </div>
             <div id="blkMain">
                 <div class="srcbar">
-                    <button id="blkTidy" title="Выстроить скрипты в столбик">Упорядочить</button>
+                    <span class="seg">
+                        <button id="blkModeBlocks" title="Блоки как в Scratch">Блоки</button>
+                        <button id="blkModeNodes" title="Узлы со стрелками, как в Blender">Узлы</button>
+                    </span>
+                    <button id="blkTidy" class="only-blocks" title="Выстроить скрипты в столбик">Упорядочить</button>
+                    <button id="nodeLayout" class="only-nodes" title="Расставить узлы автоматически">Авторасстановка</button>
+                    <span class="only-nodes zoomctl"><button id="nodeZoomOut">−</button><span id="nodeZoom">100%</span><button id="nodeZoomIn">+</button></span>
                     <button id="blkClear">Очистить</button>
-                    <span class="hint">Тяните блоки из палитры. Блок в палитру — удалить. ПКМ — меню. Ctrl+Z — отменить.</span>
+                    <span class="hint only-blocks">Тяните блоки из палитры. Блок в палитру — удалить. ПКМ — меню. Ctrl+Z — отменить.</span>
+                    <span class="hint only-nodes">Тяните провод от порта к порту. ▶ — порядок выполнения, ● — значения. Del — удалить узел, Ctrl+D — копия, Shift+тянуть — узел с подключёнными, Ctrl+колесо — масштаб.</span>
                 </div>
                 <div id="blkScroll"><div id="blkWorkspace"></div></div>
+                <div id="nodeScroll"><div id="nodeInner"></div></div>
                 <div id="blkWarnings" class="err"></div>
             </div>
             <div id="blkCodeWrap">
@@ -142,6 +150,7 @@
 
 <script src="schema.js"></script>
 <script src="blocks/engine.js"></script>
+<script src="blocks/nodes.js"></script>
 <script src="editor.js"></script>
 </body>
 </html>

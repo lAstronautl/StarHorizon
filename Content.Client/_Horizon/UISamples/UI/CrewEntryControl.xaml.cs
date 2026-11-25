@@ -14,6 +14,7 @@ public sealed partial class CrewEntryControl : BoxContainer
     public CrewEntryControl()
     {
         RobustXamlLoader.Load(this);
+        InitializeLogic(); // логика из блоков: CrewEntryControl.logic.cs
 
         SelectButton.OnPressed += _ => SelectButtonPressed?.Invoke();
     }

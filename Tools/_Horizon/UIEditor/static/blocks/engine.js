@@ -91,7 +91,10 @@ const UIBlocks = (() => {
     }
     let genTimer = null;
     function changed(rerender = true) {
-        if (rerender) renderWorkspace();
+        if (rerender) {
+            renderWorkspace();
+            if (api.afterRender) api.afterRender();
+        }
         clearTimeout(genTimer);
         genTimer = setTimeout(updateCodePreview, 120);
         if (host && host.onChange) host.onChange();
@@ -261,6 +264,7 @@ const UIBlocks = (() => {
             cats.appendChild(c);
         }
         pal.innerHTML = "";
+        if (api.paletteOverride) { api.paletteOverride(pal); return; }
         const isWin = host && host.isWindow();
         for (const m of modules) {
             const head = el("div", "blk-pal-head", m.name);
@@ -812,6 +816,10 @@ const UIBlocks = (() => {
         refresh() { renderPalette(); renderWorkspace(); updateCodePreview(); },
         undo, redo, addVariable, removeVariable, addProc,
         controlsOf, host: () => host,
+        // для других видов (узлы)
+        makeBlock, snapshot, changed, reId, outType, shapeOf, isReporter, isBlock, validateBlock,
+        renderPalette, el,
+        afterRender: null, paletteOverride: null,
     };
     return api;
 })();
