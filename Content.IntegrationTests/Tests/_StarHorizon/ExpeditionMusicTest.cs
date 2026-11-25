@@ -95,4 +95,49 @@ public sealed class ExpeditionMusicTest
 
         await pair.CleanReturnAsync();
     }
+
+    /// <summary>Музыка полёта в капсуле играет только в БСС, не на взлёте; на посадке (экран переключён) её сменяют стингер и фон.</summary>
+    [Test]
+    public async Task PodMusicPlaysOnlyInBluespace()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Connected = true, FailureLogLevel = LogLevel.Fatal });
+        var server = pair.Server;
+        var client = pair.Client;
+        var map = await pair.CreateTestMap();
+        var inventory = server.System<InventorySystem>();
+        var container = server.System<SharedContainerSystem>();
+        var storage = server.System<Content.Server.Storage.EntitySystems.EntityStorageSystem>();
+        var appearance = server.System<Robust.Server.GameObjects.AppearanceSystem>();
+        var music = client.System<ExpeditionMusicSystem>();
+
+        EntityUid mob = default, pod = default;
+        await server.WaitPost(() =>
+        {
+            mob = server.EntMan.SpawnEntity("MobHuman", map.GridCoords);
+            var headset = server.EntMan.SpawnEntity("ClothingHeadsetGrey", map.GridCoords);
+            var key = server.EntMan.SpawnEntity("StarHorizonExpeditionMusicKey", map.GridCoords);
+            Assert.That(inventory.TryEquip(mob, headset, "ears", force: true));
+            Assert.That(container.TryGetContainer(headset, EncryptionKeyHolderComponent.KeyContainerName, out var keys));
+            Assert.That(container.Insert(key, keys!));
+            pod = server.EntMan.SpawnEntity("StarHorizonDropPod", map.GridCoords);
+            storage.OpenStorage(pod);
+            storage.Insert(mob, pod);
+            storage.CloseStorage(pod);
+            server.PlayerMan.SetAttachedEntity(server.PlayerMan.Sessions.First(), mob, out _, true);
+        });
+
+        async Task SetState(Content.Shared._StarHorizon.DropPod.DropPodState state)
+        {
+            await server.WaitPost(() => appearance.SetData(pod, Content.Shared._StarHorizon.DropPod.DropPodVisuals.State, state));
+            await pair.RunSeconds(1.5f);
+        }
+
+        await SetState(Content.Shared._StarHorizon.DropPod.DropPodState.ZoomingOut);
+        Assert.That(music.CurrentScene, Is.EqualTo("None"), "на взлёте музыки полёта нет");
+
+        await SetState(Content.Shared._StarHorizon.DropPod.DropPodState.InBluespace);
+        Assert.That(music.CurrentScene, Is.EqualTo("Pod"), "в БСС играет музыка полёта");
+
+        await pair.CleanReturnAsync();
+    }
 }

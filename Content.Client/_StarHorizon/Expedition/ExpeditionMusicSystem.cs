@@ -42,6 +42,7 @@ public sealed class ExpeditionMusicSystem : EntitySystem
     [Dependency] private readonly ContentAudioSystem _contentAudio = default!;
     [Dependency] private readonly InventorySystem _inventory = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
 
     private const float FadeTime = 2f;
@@ -91,6 +92,9 @@ public sealed class ExpeditionMusicSystem : EntitySystem
 
     /// <summary>У локального игрока в гарнитуре стоит ключ музыки экспедиции.</summary>
     public bool LocalHasKey => _hasKey;
+
+    /// <summary>Текущая сцена музыки (для тестов и отладки).</summary>
+    public string CurrentScene => _scene.ToString();
 
     /// <summary>Файл уже загружен и декодирован заранее (переход на него не будет тормозить).</summary>
     public bool IsPreloaded(string path) => _loaded.Contains(path);
@@ -194,9 +198,26 @@ public sealed class ExpeditionMusicSystem : EntitySystem
             return Scene.Win;
         }
 
-        // Летит в дроп-поде: ожидание посадки.
-        if (HasComp<DropPodVignetteComponent>(player))
-            return Scene.Pod;
+        // Игрок в дроп-поде: музыка полёта играет только в БСС (не на взлёте); когда камера переключилась на место
+        // посадки (Arriving и дальше), включается стингер и фон.
+        if (_container.TryGetContainingContainer((player, null, null), out var podContainer)
+            && HasComp<DropPodComponent>(podContainer.Owner)
+            && _appearance.TryGetData<DropPodState>(podContainer.Owner, DropPodVisuals.State, out var podState))
+        {
+            switch (podState)
+            {
+                case DropPodState.InBluespace:
+                    return Scene.Pod;
+
+                case DropPodState.Countdown:
+                case DropPodState.ZoomingOut:
+                    return Scene.None;
+
+                default:
+                    // Arriving / Landing / посадка: экран переключён на место посадки.
+                    return xform.MapUid is { } podMap && HasComp<SalvageExpeditionComponent>(podMap) ? Scene.Ambient : Scene.None;
+            }
+        }
 
         if (xform.MapUid is not { } map || !HasComp<SalvageExpeditionComponent>(map))
             return Scene.None;
