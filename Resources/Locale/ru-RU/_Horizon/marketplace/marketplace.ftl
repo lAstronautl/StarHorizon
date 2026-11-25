@@ -157,3 +157,6 @@ marketplace-offer-popup-paid = Ваше предложение по запрос
 marketplace-offer-popup-paid-pending = Ваше предложение по запросу «{$title}» принято! {$payout} ожидает выплаты на консоли торговой площадки.
 marketplace-offer-popup-rejected = Предложение «{$item}» отклонено.
 marketplace-offer-popup-withdrawn = {$item} возвращён вам.
+
+marketplace-error-contraband = Контрабанду 2-го класса и выше нельзя продавать на торговой площадке.
+marketplace-error-contraband-inside = Внутри предмета контрабанда 2-го класса или выше — выньте её, прежде чем продавать.

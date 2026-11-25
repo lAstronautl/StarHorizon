@@ -1,8 +1,10 @@
 using Content.Shared._NF.Bank.Components;
 using Content.Shared.Containers.ItemSlots;
+using Content.Shared.Contraband;
 using Content.Shared.Whitelist;
 using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
+using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Horizon.Marketplace;
 
@@ -63,6 +65,25 @@ public sealed partial class MarketplaceConsoleComponent : Component
     public const int MaxTitleLength = 64;
     public const int MaxDescriptionLength = 500;
     public const int MaxRequestQuantity = 10_000;
+
+    /// <summary>
+    /// Contraband severities that can't be traded (class 2 and class 3), including when inside the item.
+    /// </summary>
+    [DataField]
+    public HashSet<ProtoId<ContrabandSeverityPrototype>> ForbiddenContraband = new()
+    {
+        "Class2",
+        "Class2Expedition",
+        "Class3General",
+        "Class3Cult",
+        "Class3Pirate",
+        "Class3Syndicate",
+        "Class3Wizard",
+        "Class3Expedition",
+        "Class3MobHuman",
+        "Class3MobCreature",
+        "Class3MobConstruct",
+    };
 
     /// <summary>
     /// Items matching this can never be listed, nor can items containing them.

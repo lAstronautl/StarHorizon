@@ -11,6 +11,7 @@ using Content.Shared._NF.Bank.BUI;
 using Content.Shared._NF.Bank.Components;
 using Content.Shared.Access.Systems;
 using Content.Shared.Containers.ItemSlots;
+using Content.Shared.Contraband;
 using Content.Shared.Database;
 using Content.Shared.GameTicking;
 using Content.Shared.Hands.EntitySystems;
@@ -400,35 +401,44 @@ public sealed partial class MarketplaceSystem : SharedMarketplaceSystem
         if (HasComp<MarketplaceListedItemComponent>(item))
             return "marketplace-error-forbidden";
 
-        return IsForbidden(console.Comp, item, 0) ? "marketplace-error-forbidden" : null;
+        return CheckItem(console.Comp, item, 0);
     }
 
-    private bool IsForbidden(MarketplaceConsoleComponent comp, EntityUid uid, int depth)
+    /// <summary>
+    /// Checks the item and everything inside it. Returns a locale id explaining the refusal, or null if allowed.
+    /// </summary>
+    private string? CheckItem(MarketplaceConsoleComponent comp, EntityUid uid, int depth)
     {
         // Something absurdly nested is not worth the risk.
         if (depth > 16)
-            return true;
+            return "marketplace-error-forbidden";
+
+        if (TryComp<ContrabandComponent>(uid, out var contraband)
+            && comp.ForbiddenContraband.Contains(contraband.Severity))
+        {
+            return depth == 0 ? "marketplace-error-contraband" : "marketplace-error-contraband-inside";
+        }
 
         if (_whitelist.IsBlacklistPass(comp.Blacklist, uid)
             || HasComp<MobStateComponent>(uid)
             || TryComp<MindContainerComponent>(uid, out var mind) && mind.HasMind)
         {
-            return true;
+            return "marketplace-error-forbidden";
         }
 
         if (!TryComp<ContainerManagerComponent>(uid, out var manager))
-            return false;
+            return null;
 
         foreach (var container in manager.Containers.Values)
         {
             foreach (var contained in container.ContainedEntities)
             {
-                if (IsForbidden(comp, contained, depth + 1))
-                    return true;
+                if (CheckItem(comp, contained, depth + 1) is { } reason)
+                    return reason;
             }
         }
 
-        return false;
+        return null;
     }
 
     private void OnEject(Entity<MarketplaceConsoleComponent> ent, ref MarketplaceEjectMessage args)

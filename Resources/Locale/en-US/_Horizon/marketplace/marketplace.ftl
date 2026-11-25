@@ -150,3 +150,6 @@ marketplace-offer-popup-paid = Your offer for "{$title}" was accepted! Received 
 marketplace-offer-popup-paid-pending = Your offer for "{$title}" was accepted! {$payout} is waiting for you at any marketplace console.
 marketplace-offer-popup-rejected = Offer "{$item}" rejected.
 marketplace-offer-popup-withdrawn = {$item} returned to you.
+
+marketplace-error-contraband = Class 2 and higher contraband can't be traded on the marketplace.
+marketplace-error-contraband-inside = There is class 2 or higher contraband inside this item - take it out before selling.
