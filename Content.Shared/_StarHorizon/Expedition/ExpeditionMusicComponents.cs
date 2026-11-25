@@ -12,6 +12,9 @@ namespace Content.Shared._StarHorizon.Expedition;
 [RegisterComponent, NetworkedComponent]
 public sealed partial class ExpeditionMusicKeyComponent : Component
 {
+    /// <summary>Слот гарнитуры (ItemSlots), в который вставляется ключ музыки: он один, поэтому двух ключей не бывает.</summary>
+    public const string SlotId = "expedition_music_key";
+
     /// <summary>Игрок летит в БСС в дроп-поде (один трек по кругу).</summary>
     [DataField] public SoundSpecifier? Rig;
 

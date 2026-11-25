@@ -15,6 +15,14 @@
   - type: Headset
   - type: EncryptionKeyHolder
     keySlots: 10 # Frontier 4<10
+  # StarHorizon: отдельный слот под ключ музыки экспедиции (ExpeditionMusicKey), он один на гарнитуру.
+  - type: ItemSlots
+    slots:
+      expedition_music_key:
+        name: item-slot-expedition-music-key
+        whitelist:
+          components:
+          - ExpeditionMusicKey
   - type: Sprite
     state: icon
   - type: Item

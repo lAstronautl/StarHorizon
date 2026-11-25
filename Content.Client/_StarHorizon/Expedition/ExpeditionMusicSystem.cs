@@ -3,6 +3,7 @@ using Content.Client.Salvage;
 using Content.Shared._NF.CCVar;
 using Content.Shared._StarHorizon.DropPod;
 using Content.Shared._StarHorizon.Expedition;
+using Content.Shared.Containers.ItemSlots;
 using Content.Shared.Inventory;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
@@ -42,6 +43,7 @@ public sealed class ExpeditionMusicSystem : EntitySystem
     [Dependency] private readonly ContentAudioSystem _contentAudio = default!;
     [Dependency] private readonly InventorySystem _inventory = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
 
@@ -201,23 +203,21 @@ public sealed class ExpeditionMusicSystem : EntitySystem
 
     #region Detection
 
-    /// <summary>Ключ музыки экспедиции в гарнитуре игрока (с его музыкой в прототипе), если он вставлен.</summary>
+    /// <summary>
+    /// Ключ музыки экспедиции в слоте гарнитуры игрока (с его музыкой в прототипе). Слот один, поэтому ключ тоже один.
+    /// </summary>
     private EntityUid? FindKey()
     {
         if (_player.LocalEntity is not { } player
             || !_inventory.TryGetSlotEntity(player, "ears", out var headset)
-            || !_container.TryGetContainer(headset.Value, EncryptionKeyHolderComponent.KeyContainerName, out var container))
+            || !_itemSlots.TryGetSlot(headset.Value, ExpeditionMusicKeyComponent.SlotId, out var slot)
+            || slot.Item is not { } key
+            || !HasComp<ExpeditionMusicKeyComponent>(key))
         {
             return null;
         }
 
-        foreach (var key in container.ContainedEntities)
-        {
-            if (HasComp<ExpeditionMusicKeyComponent>(key))
-                return key;
-        }
-
-        return null;
+        return key;
     }
 
     private Scene ComputeScene()

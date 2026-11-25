@@ -2,6 +2,7 @@ using System.Linq;
 using Content.Client._StarHorizon.Expedition;
 using Content.Server.Radio.EntitySystems;
 using Content.Shared._StarHorizon.Expedition;
+using Content.Shared.Containers.ItemSlots;
 using Content.Shared.Inventory;
 using Content.Shared.Radio.Components;
 using Robust.Client.Player;
@@ -91,7 +92,7 @@ public sealed class ExpeditionMusicTest
         var client = pair.Client;
         var map = await pair.CreateTestMap();
         var inventory = server.System<InventorySystem>();
-        var container = server.System<SharedContainerSystem>();
+        var itemSlots = server.System<ItemSlotsSystem>();
         var music = client.System<ExpeditionMusicSystem>();
 
         EntityUid mob = default, headset = default, key = default, mapEntity = default;
@@ -101,8 +102,13 @@ public sealed class ExpeditionMusicTest
             headset = server.EntMan.SpawnEntity("ClothingHeadsetGrey", map.GridCoords);
             key = server.EntMan.SpawnEntity("StarHorizonExpeditionMusicKey", map.GridCoords);
             Assert.That(inventory.TryEquip(mob, headset, "ears", force: true));
-            Assert.That(container.TryGetContainer(headset, EncryptionKeyHolderComponent.KeyContainerName, out var keys));
-            Assert.That(container.Insert(key, keys!), "ключ вставлен в гарнитуру");
+            Assert.That(itemSlots.TryInsert(headset, ExpeditionMusicKeyComponent.SlotId, key, null), "ключ вставлен в слот гарнитуры");
+
+            // Слот один: второй ключ музыки не лезет, а обычный ключ шифрования в слот музыки не подходит.
+            var secondKey = server.EntMan.SpawnEntity("StarHorizonExpeditionMusicKey", map.GridCoords);
+            Assert.That(itemSlots.TryInsert(headset, ExpeditionMusicKeyComponent.SlotId, secondKey, null), Is.False, "два ключа музыки не вставить");
+            var radioKey = server.EntMan.SpawnEntity("EncryptionKeyCommon", map.GridCoords);
+            Assert.That(itemSlots.TryInsert(headset, ExpeditionMusicKeyComponent.SlotId, radioKey, null), Is.False, "обычный ключ в слот музыки не подходит");
             server.PlayerMan.SetAttachedEntity(server.PlayerMan.Sessions.First(), mob, out _, true);
 
             // Сетевые состояния попадают на клиент.
@@ -126,7 +132,7 @@ public sealed class ExpeditionMusicTest
         Assert.That(client.EntMan.GetComponent<ExpeditionExtractionStateComponent>(clientMap).Active, "клиент знает про эвакуацию");
 
         // Ключ вынули: музыка выключена.
-        await server.WaitPost(() => container.Remove(key, container.GetContainer(headset, EncryptionKeyHolderComponent.KeyContainerName)));
+        await server.WaitPost(() => Assert.That(itemSlots.TryEject(headset, ExpeditionMusicKeyComponent.SlotId, null, out _), "ключ вынут из слота"));
         await pair.RunSeconds(1.5f);
         Assert.That(music.LocalHasKey, Is.False, "ключ вынут: музыка выключена");
 
@@ -142,7 +148,7 @@ public sealed class ExpeditionMusicTest
         var client = pair.Client;
         var map = await pair.CreateTestMap();
         var inventory = server.System<InventorySystem>();
-        var container = server.System<SharedContainerSystem>();
+        var itemSlots = server.System<ItemSlotsSystem>();
         var storage = server.System<Content.Server.Storage.EntitySystems.EntityStorageSystem>();
         var appearance = server.System<Robust.Server.GameObjects.AppearanceSystem>();
         var music = client.System<ExpeditionMusicSystem>();
@@ -154,8 +160,7 @@ public sealed class ExpeditionMusicTest
             var headset = server.EntMan.SpawnEntity("ClothingHeadsetGrey", map.GridCoords);
             var key = server.EntMan.SpawnEntity("StarHorizonExpeditionMusicKey", map.GridCoords);
             Assert.That(inventory.TryEquip(mob, headset, "ears", force: true));
-            Assert.That(container.TryGetContainer(headset, EncryptionKeyHolderComponent.KeyContainerName, out var keys));
-            Assert.That(container.Insert(key, keys!));
+            Assert.That(itemSlots.TryInsert(headset, ExpeditionMusicKeyComponent.SlotId, key, null));
             pod = server.EntMan.SpawnEntity("StarHorizonDropPod", map.GridCoords);
             storage.OpenStorage(pod);
             storage.Insert(mob, pod);
