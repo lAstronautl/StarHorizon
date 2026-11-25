@@ -58,7 +58,7 @@ public sealed partial class MarketplaceConsoleWindow : FancyWindow
     /// </summary>
     private readonly Dictionary<int, int> _offerAmounts = new();
 
-    private int _requestQuantity = 1;
+    private MarketplaceRequestForm? _requestForm;
 
     public MarketplaceConsoleWindow()
     {
@@ -102,7 +102,8 @@ public sealed partial class MarketplaceConsoleWindow : FancyWindow
                 OnList?.Invoke(_sellAmount, price);
         };
 
-        SetupRequestForm();
+        RequestSearch.OnTextChanged += _ => RebuildRequests();
+        OnlyMyRequests.OnToggled += _ => RebuildRequests();
 
     }
 
@@ -142,8 +143,13 @@ public sealed partial class MarketplaceConsoleWindow : FancyWindow
         SlotPanel.PanelOverride = panelStyle;
         SellPanel.PanelOverride = panelStyle;
         CreateRequestPanel.PanelOverride = panelStyle;
-        RequestSummaryPanel.PanelOverride = theme.MakeInset();
-        RequestDescriptionFrame.PanelOverride = theme.MakeInset();
+
+        // The form takes its colours on creation, so rebuild it for the new theme.
+        RequestFormBox.RemoveAllChildren();
+        _requestForm = new MarketplaceRequestForm(theme);
+        _requestForm.OnCreate += (title, description, quantity, reward) =>
+            OnCreateRequest?.Invoke(title, description, quantity, reward);
+        RequestFormBox.AddChild(_requestForm);
         SummaryPanel.PanelOverride = theme.MakeInset();
         SummaryDivider.PanelOverride = new StyleBoxFlat { BackgroundColor = theme.CardBorder };
 
@@ -207,7 +213,7 @@ public sealed partial class MarketplaceConsoleWindow : FancyWindow
         UpdateSlot();
         RebuildRequests();
         RebuildMyOffers();
-        UpdateRequestSummary();
+        UpdateRequestForm();
     }
 
     private int GetTaxPercent()
@@ -398,76 +404,16 @@ public sealed partial class MarketplaceConsoleWindow : FancyWindow
 
     #region Requests
 
-    private void SetupRequestForm()
+    private void UpdateRequestForm()
     {
-        RequestQuantityBox.AddChild(CreateRequestQuantitySpinBox());
+        if (_state == null || _requestForm == null)
+            return;
 
-        RequestTitleEdit.IsValid = text => text.Length <= MarketplaceConsoleComponent.MaxTitleLength;
-        RequestTitleEdit.OnTextChanged += _ => UpdateRequestSummary();
-        RequestRewardEdit.IsValid = text => text.Length == 0 || text.Length <= 9 && text.All(char.IsDigit);
-        RequestRewardEdit.OnTextChanged += _ => UpdateRequestSummary();
-
-        RequestSearch.OnTextChanged += _ => RebuildRequests();
-        OnlyMyRequests.OnToggled += _ => RebuildRequests();
-
-        CreateRequestButton.OnPressed += _ =>
-        {
-            if (!int.TryParse(RequestRewardEdit.Text, out var reward) || reward <= 0)
-                return;
-
-            var description = Rope.Collapse(RequestDescriptionEdit.TextRope).Trim();
-            if (description.Length > MarketplaceConsoleComponent.MaxDescriptionLength)
-                description = description[..MarketplaceConsoleComponent.MaxDescriptionLength];
-
-            OnCreateRequest?.Invoke(RequestTitleEdit.Text.Trim(), description, _requestQuantity, reward);
-
-            RequestTitleEdit.Text = string.Empty;
-            RequestDescriptionEdit.TextRope = new Rope.Leaf(string.Empty);
-            RequestRewardEdit.Text = string.Empty;
-            UpdateRequestSummary();
-        };
-    }
-
-    private Control CreateRequestQuantitySpinBox()
-    {
-        var spin = MarketplaceListingCard.CreateAmountSpinBox(MarketplaceConsoleComponent.MaxRequestQuantity, _requestQuantity, value =>
-        {
-            _requestQuantity = value;
-            UpdateRequestSummary();
-        });
-        spin.HorizontalExpand = true;
-        return spin;
-    }
-
-    private void UpdateRequestSummary()
-    {
-        var hasReward = int.TryParse(RequestRewardEdit.Text, out var reward) && reward > 0;
-        var taxRate = _state?.TaxRate ?? 0f;
-        var tax = hasReward ? SharedMarketplaceSystem.GetTax(reward, taxRate) : 0;
-
-        var summary = new FormattedMessage();
-        summary.AddMarkupPermissive(Loc.GetString("marketplace-request-summary-held",
-            ("reward", BankSystemExtensions.ToSpesoString(hasReward ? reward : 0)),
-            ("mutedColor", MutedColor)));
-        summary.PushNewline();
-        summary.AddMarkupPermissive(Loc.GetString("marketplace-request-summary-payout",
-            ("payout", BankSystemExtensions.ToSpesoString(hasReward ? reward - tax : 0)),
-            ("tax", GetTaxPercent()),
-            ("mutedColor", MutedColor),
-            ("priceColor", PriceColor)));
-        RequestSummaryLabel.SetMessage(summary);
-
-        RequestNoteLabel.SetMessage(FormattedMessage.FromMarkupPermissive(Loc.GetString("marketplace-request-note",
-            ("mutedColor", MutedColor))));
-
-        var ownRequests = _state?.Requests.Count(r => r.IsOwn) ?? 0;
-        CreateRequestButton.Disabled = _state == null
-                                       || !_state.HasAccount
-                                       || RequestTitleEdit.Text.Trim().Length == 0
-                                       || !hasReward
-                                       || reward > _state.MaxUnitPrice
-                                       || reward > _state.Balance
-                                       || ownRequests >= _state.MaxRequestsPerPlayer;
+        _requestForm.SetLimits(_state.TaxRate,
+            _state.Balance,
+            _state.HasAccount,
+            _state.MaxUnitPrice,
+            _state.Requests.Count(r => r.IsOwn) >= _state.MaxRequestsPerPlayer);
     }
 
     private void RebuildRequests()

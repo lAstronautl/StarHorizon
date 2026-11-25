@@ -161,3 +161,14 @@ marketplace-black-header-title = [font size=16][bold][color=#FF4D57]BLACK[/color
 marketplace-anon-name = Anonymous {$code}
 marketplace-anon-id = [encrypted]
 marketplace-anon-grid = Cipher {$code}
+
+## PDA programs
+
+marketplace-pda-program-name = Marketplace
+marketplace-black-pda-program-name = Black Market
+marketplace-pda-tab-new-request = New request
+marketplace-pda-subtitle = [color={$mutedColor}]Tax[/color] {$tax}%  [color={$mutedColor}]· Listings[/color] {$listings}  [color={$mutedColor}]· Requests[/color] {$requests}  [color={$mutedColor}]· Balance[/color] [color={$priceColor}]{$balance}[/color]
+marketplace-pda-request-note = [color={$mutedColor}]The reward is held right away. Buying, offering and accepting offers happen at a marketplace terminal.[/color]
+marketplace-card-total-all = [color={$mutedColor}]For all:[/color] [bold][color={$priceColor}]{$total}[/color][/bold]  [color={$mutedColor}]· buy at a terminal[/color]
+marketplace-request-card-own-pda = [color={$accentColor}]Your request.[/color] Offers: {$count} [color={$mutedColor}]- accept them at a terminal.[/color]
+marketplace-request-card-offer-pda = [color={$mutedColor}]Offer an item at a marketplace terminal.[/color]

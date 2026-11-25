@@ -19,21 +19,21 @@ public sealed partial class MarketplaceSystem
         return $"{text[..4]}-{text[4..6]}";
     }
 
-    private string DisplayName(MarketplaceConsoleComponent console, MarketplaceStorageComponent storage, NetUserId userId, string characterName)
+    private string DisplayName(bool anonymous, MarketplaceStorageComponent storage, NetUserId userId, string characterName)
     {
-        return console.Anonymous
+        return anonymous
             ? Loc.GetString("marketplace-anon-name", ("code", GetCode(storage, $"trader|{userId}|{characterName}")))
             : characterName;
     }
 
-    private string DisplayIdName(MarketplaceConsoleComponent console, string idName)
+    private string DisplayIdName(bool anonymous, string idName)
     {
-        return console.Anonymous ? Loc.GetString("marketplace-anon-id") : idName;
+        return anonymous ? Loc.GetString("marketplace-anon-id") : idName;
     }
 
-    private string DisplayGrid(MarketplaceConsoleComponent console, MarketplaceStorageComponent storage, string gridName)
+    private string DisplayGrid(bool anonymous, MarketplaceStorageComponent storage, string gridName)
     {
-        return console.Anonymous
+        return anonymous
             ? Loc.GetString("marketplace-anon-grid", ("code", GetCode(storage, $"grid|{gridName}")))
             : gridName;
     }

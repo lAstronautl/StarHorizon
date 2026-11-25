@@ -173,3 +173,19 @@ ent-ComputerMarketplaceBlackMarket = терминал чёрного рынка
     .desc = Зашифрованный торговый терминал. Ни имён, ни вопросов — только товар и кредиты.
 ent-MarketplaceBlackMarketComputerCircuitboard = плата терминала чёрного рынка
     .desc = Печатная плата терминала чёрного рынка. Маркировка старательно счищена.
+
+## Программы КПК
+
+marketplace-pda-program-name = Торговая площадка
+marketplace-black-pda-program-name = Чёрный рынок
+marketplace-pda-tab-new-request = Новый запрос
+marketplace-pda-subtitle = [color={$mutedColor}]Налог[/color] {$tax}%  [color={$mutedColor}]· Лотов[/color] {$listings}  [color={$mutedColor}]· Запросов[/color] {$requests}  [color={$mutedColor}]· Баланс[/color] [color={$priceColor}]{$balance}[/color]
+marketplace-pda-request-note = [color={$mutedColor}]Награда списывается сразу. Покупки, предложения и их принятие — только в терминале торговой площадки.[/color]
+marketplace-card-total-all = [color={$mutedColor}]За всё:[/color] [bold][color={$priceColor}]{$total}[/color][/bold]  [color={$mutedColor}]· купить в терминале[/color]
+marketplace-request-card-own-pda = [color={$accentColor}]Ваш запрос.[/color] Предложений: {$count} [color={$mutedColor}]— принять можно в терминале.[/color]
+marketplace-request-card-offer-pda = [color={$mutedColor}]Предложить предмет можно в терминале торговой площадки.[/color]
+
+ent-MarketplaceViewerCartridge = картридж «ТоргЛинк»
+    .desc = Программа для КПК: просмотр торговой площадки сектора и размещение запросов на ходу.
+ent-BlackMarketViewerCartridge = картридж «ТёмныйЛинк»
+    .desc = Картридж без маркировки с зашифрованным подключением к чёрному рынку.

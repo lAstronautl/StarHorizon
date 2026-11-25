@@ -39,7 +39,6 @@ public sealed class MarketplaceItemIcon : PanelContainer
 
         SetSize = new Vector2(size, size);
         MouseFilter = MouseFilterMode.Stop;
-        ToolTip = Loc.GetString("marketplace-examine-hint");
 
         _style = new StyleBoxFlat
         {
@@ -108,6 +107,7 @@ public sealed class MarketplaceItemIcon : PanelContainer
             return;
 
         _entity = null;
+        ToolTip = null;
         if (_netEntity is not { } net || !_entMan.TryGetEntity(net, out var uid) || !_entMan.EntityExists(uid))
         {
             _spriteView.Visible = false;
@@ -116,6 +116,8 @@ public sealed class MarketplaceItemIcon : PanelContainer
         }
 
         _entity = uid;
+        // Only real entities can be examined; prototype previews (e.g. on the PDA) can't.
+        ToolTip = Loc.GetString("marketplace-examine-hint");
         _spriteView.SetEntity(uid);
         _spriteView.Visible = true;
         _protoView.Visible = false;

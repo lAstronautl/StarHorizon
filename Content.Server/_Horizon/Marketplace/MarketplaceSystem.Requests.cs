@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Content.Server.GameTicking;
 using Content.Shared._Horizon.Marketplace;
@@ -32,49 +33,83 @@ public sealed partial class MarketplaceSystem
         var user = args.Actor;
         var comp = ent.Comp;
 
-        if (!TryGetSeller(user, out var session, out var profile))
+        if (!TryCreateRequest(user,
+                comp.Network,
+                comp.MaxUnitPrice,
+                comp.MaxRequestsPerRequester,
+                GetGridName(ent),
+                args.Title,
+                args.Description,
+                args.Quantity,
+                args.Reward,
+                out var error))
         {
-            Deny(ent, user, "marketplace-error-no-account");
+            Deny(ent, user, error.Value.Message, error.Value.Args);
             return;
         }
 
-        var title = args.Title.Trim();
-        var description = args.Description.Trim();
+        _audio.PlayPvs(comp.ConfirmSound, ent);
+    }
+
+    /// <summary>
+    /// Creates a request and holds its reward. Shared by terminals and PDA programs.
+    /// </summary>
+    private bool TryCreateRequest(EntityUid user,
+        string network,
+        int maxReward,
+        int maxRequests,
+        string gridName,
+        string title,
+        string description,
+        int quantity,
+        int reward,
+        [NotNullWhen(false)] out (string Message, (string, object)[] Args)? error)
+    {
+        error = null;
+
+        if (!TryGetSeller(user, out var session, out var profile))
+        {
+            error = ("marketplace-error-no-account", []);
+            return false;
+        }
+
+        title = title.Trim();
+        description = description.Trim();
         if (title.Length == 0 || title.Length > MarketplaceConsoleComponent.MaxTitleLength)
         {
-            Deny(ent, user, "marketplace-request-error-title", ("max", MarketplaceConsoleComponent.MaxTitleLength));
-            return;
+            error = ("marketplace-request-error-title", [("max", MarketplaceConsoleComponent.MaxTitleLength)]);
+            return false;
         }
 
         if (description.Length > MarketplaceConsoleComponent.MaxDescriptionLength)
             description = description[..MarketplaceConsoleComponent.MaxDescriptionLength];
 
-        if (args.Quantity <= 0 || args.Quantity > MarketplaceConsoleComponent.MaxRequestQuantity)
+        if (quantity <= 0 || quantity > MarketplaceConsoleComponent.MaxRequestQuantity)
         {
-            Deny(ent, user, "marketplace-request-error-quantity", ("max", MarketplaceConsoleComponent.MaxRequestQuantity));
-            return;
+            error = ("marketplace-request-error-quantity", [("max", MarketplaceConsoleComponent.MaxRequestQuantity)]);
+            return false;
         }
 
-        if (args.Reward <= 0 || args.Reward > comp.MaxUnitPrice)
+        if (reward <= 0 || reward > maxReward)
         {
-            Deny(ent, user, "marketplace-error-bad-price", ("max", comp.MaxUnitPrice));
-            return;
+            error = ("marketplace-error-bad-price", [("max", maxReward)]);
+            return false;
         }
 
-        var storage = GetStorage(ent.Comp.Network);
+        var storage = GetStorage(network);
         var openRequests = storage.Comp.Requests.Values.Count(r =>
             r.RequesterUserId == session.UserId && r.RequesterCharacterName == profile.Name);
-        if (openRequests >= comp.MaxRequestsPerRequester)
+        if (openRequests >= maxRequests)
         {
-            Deny(ent, user, "marketplace-request-error-too-many", ("max", comp.MaxRequestsPerRequester));
-            return;
+            error = ("marketplace-request-error-too-many", [("max", maxRequests)]);
+            return false;
         }
 
         // The reward is held until the request is fulfilled or cancelled.
-        if (!_bank.TryBankWithdraw(user, args.Reward))
+        if (!_bank.TryBankWithdraw(user, reward))
         {
-            Deny(ent, user, "marketplace-error-insufficient-funds", ("amount", args.Reward));
-            return;
+            error = ("marketplace-error-insufficient-funds", [("amount", reward)]);
+            return false;
         }
 
         var request = new MarketplaceRequest
@@ -82,23 +117,23 @@ public sealed partial class MarketplaceSystem
             Id = storage.Comp.NextRequestId++,
             Title = title,
             Description = description,
-            Quantity = args.Quantity,
-            Reward = args.Reward,
+            Quantity = quantity,
+            Reward = reward,
             RequesterUserId = session.UserId,
             RequesterCharacterName = profile.Name,
             RequesterIdName = GetIdName(user, profile),
-            GridName = GetGridName(ent),
+            GridName = gridName,
             CreatedAt = _timing.CurTime,
         };
         storage.Comp.Requests[request.Id] = request;
 
-        _audio.PlayPvs(comp.ConfirmSound, ent);
-        _popup.PopupEntity(Loc.GetString("marketplace-request-popup-created", ("title", title), ("reward", args.Reward)), ent, user);
+        _popup.PopupEntity(Loc.GetString("marketplace-request-popup-created", ("title", title), ("reward", reward)), user, user);
         _adminLog.Add(LogType.ATMUsage,
             LogImpact.Low,
-            $"{ToPrettyString(user):actor} created marketplace request #{request.Id} \"{title}\" x{args.Quantity} for {args.Reward} via {ToPrettyString(ent):entity}");
+            $"{ToPrettyString(user):actor} created marketplace request #{request.Id} \"{title}\" x{quantity} for {reward} on the {network} network");
 
-        UpdateAllUis(ent.Comp.Network);
+        UpdateAllUis(network);
+        return true;
     }
 
     private void OnCancelRequest(Entity<MarketplaceConsoleComponent> ent, ref MarketplaceCancelRequestMessage args)
@@ -475,9 +510,9 @@ public sealed partial class MarketplaceSystem
                 Description = request.Description,
                 Quantity = request.Quantity,
                 Reward = request.Reward,
-                RequesterName = DisplayName(console, storage, request.RequesterUserId, request.RequesterCharacterName),
-                RequesterIdName = DisplayIdName(console, request.RequesterIdName),
-                GridName = DisplayGrid(console, storage, request.GridName),
+                RequesterName = DisplayName(console.Anonymous, storage, request.RequesterUserId, request.RequesterCharacterName),
+                RequesterIdName = DisplayIdName(console.Anonymous, request.RequesterIdName),
+                GridName = DisplayGrid(console.Anonymous, storage, request.GridName),
                 CreatedAt = request.CreatedAt,
                 IsOwn = isOwn,
                 OfferCount = offers?.Count ?? 0,
@@ -510,9 +545,9 @@ public sealed partial class MarketplaceSystem
             DisplayEntity = exists ? GetNetEntity(offer.Item) : null,
             Stackable = offer.Stackable,
             Count = exists && offer.Stackable ? _stack.GetCount(offer.Item) : 1,
-            OffererName = DisplayName(console, storage, offer.OffererUserId, offer.OffererCharacterName),
-            OffererIdName = DisplayIdName(console, offer.OffererIdName),
-            GridName = DisplayGrid(console, storage, offer.GridName),
+            OffererName = DisplayName(console.Anonymous, storage, offer.OffererUserId, offer.OffererCharacterName),
+            OffererIdName = DisplayIdName(console.Anonymous, offer.OffererIdName),
+            GridName = DisplayGrid(console.Anonymous, storage, offer.GridName),
             Status = offer.Status,
         };
     }

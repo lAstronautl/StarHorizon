@@ -95,6 +95,8 @@ public sealed partial class MarketplaceSystem : SharedMarketplaceSystem
         });
 
         SubscribeLocalEvent<GameRunLevelChangedEvent>(OnRunLevelChanged);
+
+        InitializeCartridge();
     }
 
     #region Storage
@@ -740,6 +742,33 @@ public sealed partial class MarketplaceSystem : SharedMarketplaceSystem
             if (comp.Network == network && _ui.IsUiOpen(uid, MarketplaceConsoleUiKey.Key))
                 UpdateUi((uid, comp));
         }
+
+        UpdateCartridges(network);
+    }
+
+    private MarketplaceListingData ToData(MarketplaceListing listing,
+        MarketplaceStorageComponent storage,
+        bool anonymous,
+        bool isOwn,
+        bool includeEntity)
+    {
+        var display = listing.Items.FirstOrDefault(e => !TerminatingOrDeleted(e));
+        return new MarketplaceListingData
+        {
+            Id = listing.Id,
+            Name = listing.Name,
+            ProtoId = listing.ProtoId,
+            DisplayEntity = includeEntity && display.Valid ? GetNetEntity(display) : null,
+            Stackable = listing.StackType != null,
+            StackType = listing.StackType,
+            Count = GetListingCount(listing),
+            UnitPrice = listing.UnitPrice,
+            SellerName = DisplayName(anonymous, storage, listing.SellerUserId, listing.SellerCharacterName),
+            SellerIdName = DisplayIdName(anonymous, listing.SellerIdName),
+            GridName = DisplayGrid(anonymous, storage, listing.GridName),
+            IsOwn = isOwn,
+            ListedAt = listing.ListedAt,
+        };
     }
 
     private void UpdateUi(Entity<MarketplaceConsoleComponent> ent)
@@ -792,23 +821,11 @@ public sealed partial class MarketplaceSystem : SharedMarketplaceSystem
             {
                 foreach (var listing in storage.Listings.Values)
                 {
-                    var display = listing.Items.FirstOrDefault(e => !TerminatingOrDeleted(e));
-                    listings.Add(new MarketplaceListingData
-                    {
-                        Id = listing.Id,
-                        Name = listing.Name,
-                        ProtoId = listing.ProtoId,
-                        DisplayEntity = display.Valid ? GetNetEntity(display) : null,
-                        Stackable = listing.StackType != null,
-                        StackType = listing.StackType,
-                        Count = GetListingCount(listing),
-                        UnitPrice = listing.UnitPrice,
-                        SellerName = DisplayName(ent.Comp, storage, listing.SellerUserId, listing.SellerCharacterName),
-                        SellerIdName = DisplayIdName(ent.Comp, listing.SellerIdName),
-                        GridName = DisplayGrid(ent.Comp, storage, listing.GridName),
-                        IsOwn = viewerId == listing.SellerUserId && viewerName == listing.SellerCharacterName,
-                        ListedAt = listing.ListedAt,
-                    });
+                    listings.Add(ToData(listing,
+                        storage,
+                        ent.Comp.Anonymous,
+                        viewerId == listing.SellerUserId && viewerName == listing.SellerCharacterName,
+                        includeEntity: true));
                 }
             }
 

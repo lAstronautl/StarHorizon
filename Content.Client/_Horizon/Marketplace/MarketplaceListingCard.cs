@@ -27,13 +27,20 @@ public sealed class MarketplaceListingCard : PanelContainer
 
     private readonly MarketplaceListingData _data;
     private readonly RichTextLabel _totalLabel;
-    private readonly Button _actionButton;
+    private readonly Button? _actionButton;
+    private readonly bool _readOnly;
     private readonly int _balance;
     private int _amount = 1;
 
-    public MarketplaceListingCard(MarketplaceTheme theme, MarketplaceListingData data, int balance, bool hasAccount, int initialAmount = 1)
+    public MarketplaceListingCard(MarketplaceTheme theme,
+        MarketplaceListingData data,
+        int balance,
+        bool hasAccount,
+        int initialAmount = 1,
+        bool readOnly = false)
     {
         _theme = theme;
+        _readOnly = readOnly;
         _data = data;
         _amount = Math.Clamp(initialAmount, 1, Math.Max(1, data.Count));
         _balance = balance;
@@ -111,7 +118,7 @@ public sealed class MarketplaceListingCard : PanelContainer
         root.AddChild(info);
 
         // Controls
-        if (data.Stackable && !data.IsOwn && data.Count > 1)
+        if (data.Stackable && !data.IsOwn && data.Count > 1 && !readOnly)
         {
             var amountRow = new BoxContainer
             {
@@ -146,28 +153,43 @@ public sealed class MarketplaceListingCard : PanelContainer
         _totalLabel = new RichTextLabel { HorizontalExpand = true, VerticalAlignment = VAlignment.Center };
         bottom.AddChild(_totalLabel);
 
-        _actionButton = new Button { MinWidth = 96 };
-        if (data.IsOwn)
+        if (!readOnly)
         {
-            _actionButton.Text = Loc.GetString("marketplace-card-withdraw");
-            _actionButton.AddStyleClass(StyleNano.StyleClassButtonColorRed);
-            _actionButton.OnPressed += _ => OnWithdraw?.Invoke(_data.Id);
-        }
-        else
-        {
-            _actionButton.Text = Loc.GetString("marketplace-card-buy");
-            _actionButton.AddStyleClass(StyleNano.StyleClassButtonColorGreen);
-            _actionButton.OnPressed += _ => OnBuy?.Invoke(_data.Id, _data.Stackable ? _amount : 1, _data.UnitPrice);
-            if (!hasAccount)
-                _actionButton.Disabled = true;
+            _actionButton = new Button { MinWidth = 96 };
+            if (data.IsOwn)
+            {
+                _actionButton.Text = Loc.GetString("marketplace-card-withdraw");
+                _actionButton.AddStyleClass(StyleNano.StyleClassButtonColorRed);
+                _actionButton.OnPressed += _ => OnWithdraw?.Invoke(_data.Id);
+            }
+            else
+            {
+                _actionButton.Text = Loc.GetString("marketplace-card-buy");
+                _actionButton.AddStyleClass(StyleNano.StyleClassButtonColorGreen);
+                _actionButton.OnPressed += _ => OnBuy?.Invoke(_data.Id, _data.Stackable ? _amount : 1, _data.UnitPrice);
+                if (!hasAccount)
+                    _actionButton.Disabled = true;
+            }
+
+            bottom.AddChild(_actionButton);
         }
 
-        bottom.AddChild(_actionButton);
         UpdateTotal();
     }
 
     private void UpdateTotal()
     {
+        if (_readOnly && !_data.IsOwn)
+        {
+            // Without a quantity picker, show what the whole listing costs.
+            var whole = (long) _data.UnitPrice * Math.Max(1, _data.Count);
+            _totalLabel.SetMessage(FormattedMessage.FromMarkupPermissive(Loc.GetString("marketplace-card-total-all",
+                ("total", BankSystemExtensions.ToSpesoString((int) Math.Min(whole, int.MaxValue))),
+                ("mutedColor", MutedColor),
+                ("priceColor", PriceColor))));
+            return;
+        }
+
         if (_data.IsOwn)
         {
             _totalLabel.SetMessage(FormattedMessage.FromMarkupPermissive(Loc.GetString("marketplace-card-own",

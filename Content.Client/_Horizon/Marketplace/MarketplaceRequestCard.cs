@@ -35,7 +35,8 @@ public sealed class MarketplaceRequestCard : PanelContainer
         string? slotName,
         int slotCount,
         string? slotDeny,
-        int offerAmount)
+        int offerAmount,
+        bool readOnly = false)
     {
         _theme = theme;
         HorizontalExpand = true;
@@ -114,10 +115,27 @@ public sealed class MarketplaceRequestCard : PanelContainer
 
         root.AddChild(_theme.MakeDivider());
 
-        if (data.IsOwn)
+        if (readOnly)
+            BuildReadOnlyFooter(root, data);
+        else if (data.IsOwn)
             BuildOwnerControls(root, data);
         else
             BuildOfferControls(root, data, slotName, slotCount, slotDeny, offerAmount);
+    }
+
+    /// <summary>
+    /// PDA view: offers are made and accepted at a terminal, so only say so.
+    /// </summary>
+    private void BuildReadOnlyFooter(BoxContainer root, MarketplaceRequestData data)
+    {
+        var label = new RichTextLabel { HorizontalExpand = true };
+        label.SetMessage(FormattedMessage.FromMarkupPermissive(data.IsOwn
+            ? Loc.GetString("marketplace-request-card-own-pda",
+                ("count", data.OfferCount),
+                ("accentColor", OwnBorder.ToHex()),
+                ("mutedColor", MutedColor))
+            : Loc.GetString("marketplace-request-card-offer-pda", ("mutedColor", MutedColor))));
+        root.AddChild(label);
     }
 
     private void BuildOwnerControls(BoxContainer root, MarketplaceRequestData data)

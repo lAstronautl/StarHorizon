@@ -53,26 +53,7 @@
             <!-- Requests -->
             <BoxContainer Orientation="Horizontal" Margin="6" SeparationOverride="8">
                 <PanelContainer Name="CreateRequestPanel" SetWidth="340" VerticalExpand="True">
-                    <BoxContainer Orientation="Vertical" Margin="12" SeparationOverride="6">
-                        <Label Text="{Loc 'marketplace-request-create-title'}" StyleClasses="LabelHeading"/>
-                        <Label Text="{Loc 'marketplace-request-field-title'}" StyleClasses="LabelSubText"/>
-                        <LineEdit Name="RequestTitleEdit" PlaceHolder="{Loc 'marketplace-request-field-title-placeholder'}"/>
-                        <Label Text="{Loc 'marketplace-request-field-description'}" StyleClasses="LabelSubText"/>
-                        <PanelContainer Name="RequestDescriptionFrame">
-                            <TextEdit Name="RequestDescriptionEdit" MinHeight="90" HorizontalExpand="True"/>
-                        </PanelContainer>
-                        <Label Text="{Loc 'marketplace-request-field-quantity'}" StyleClasses="LabelSubText"/>
-                        <BoxContainer Name="RequestQuantityBox" HorizontalExpand="True"/>
-                        <Label Text="{Loc 'marketplace-request-field-reward'}" StyleClasses="LabelSubText"/>
-                        <LineEdit Name="RequestRewardEdit" PlaceHolder="0"/>
-                        <PanelContainer Name="RequestSummaryPanel">
-                            <RichTextLabel Name="RequestSummaryLabel" Margin="8 6 8 6"/>
-                        </PanelContainer>
-                        <Control VerticalExpand="True"/>
-                        <Button Name="CreateRequestButton" Text="{Loc 'marketplace-request-create-button'}" MinHeight="36"
-                                StyleClasses="ButtonColorGreen" HorizontalExpand="True"/>
-                        <RichTextLabel Name="RequestNoteLabel"/>
-                    </BoxContainer>
+                    <BoxContainer Name="RequestFormBox" Orientation="Vertical" Margin="12"/>
                 </PanelContainer>
 
                 <BoxContainer Orientation="Vertical" HorizontalExpand="True" SeparationOverride="6">
