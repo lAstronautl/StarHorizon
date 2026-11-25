@@ -1,0 +1,67 @@
+- type: entity
+  id: ComputerMarketplace
+  parent: BaseComputer
+  name: marketplace console
+  description: Connects to the sector-wide trading network. Put an item inside to sell it to other spacers, or browse goods listed from any station.
+  components:
+  - type: Sprite
+    layers:
+    - map: ["computerLayerBody"]
+      state: computer
+    - map: ["computerLayerKeyboard"]
+      state: generic_keyboard
+    - map: ["computerLayerScreen"]
+      state: request
+    - map: ["computerLayerKeys"]
+      state: generic_keys
+    - map: [ "enum.WiresVisualLayers.MaintenancePanel" ]
+      state: generic_panel_open
+  - type: MarketplaceConsole
+    taxRate: 0.1
+    taxAccount: Frontier
+    itemSlot:
+      name: marketplace-item-slot-name
+      insertSound: /Audio/Machines/scanning.ogg
+      ejectSound: /Audio/Machines/tray_eject.ogg
+      ejectOnBreak: true
+      ejectOnDeconstruct: true
+      swap: false
+      whitelist:
+        components:
+        - Item
+    blacklist:
+      components:
+      - Cash
+      - MobState
+      - MindContainer
+      - NukeDisk
+  - type: ActivatableUI
+    key: enum.MarketplaceConsoleUiKey.Key
+  - type: UserInterface
+    interfaces:
+      enum.MarketplaceConsoleUiKey.Key:
+        type: MarketplaceConsoleBoundUserInterface
+      enum.WiresUiKey.Key:
+        type: WiresBoundUserInterface
+  - type: ItemSlots
+  - type: ContainerContainer
+    containers:
+      board: !type:Container
+      marketplace-item: !type:ContainerSlot
+  - type: Computer
+    board: MarketplaceComputerCircuitboard
+  - type: PointLight
+    radius: 1.5
+    energy: 4.0
+    color: "#3c9be0"
+
+- type: entity
+  id: MarketplaceComputerCircuitboard
+  parent: BaseComputerCircuitboard
+  name: marketplace console board
+  description: A computer printed circuit board for a marketplace console.
+  components:
+  - type: Sprite
+    state: cpu_supply
+  - type: ComputerBoard
+    prototype: ComputerMarketplace
