@@ -22,6 +22,28 @@ public sealed class DropPodTest
 {
     [TestPrototypes]
     private const string Prototypes = @"
+# Лёгкий пассажир, которого можно сбить с ног (вместо MobHuman: его органы иногда не вычищаются между тестами пула).
+- type: entity
+  id: DropPodTestKnockableMob
+  components:
+  - type: StatusEffectContainer
+  - type: StandingState
+  - type: Crawler
+  - type: MobState
+  - type: Physics
+    bodyType: Dynamic
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeCircle
+          radius: 0.35
+        density: 50
+        mask:
+        - MobMask
+        layer:
+        - MobLayer
+
 - type: entity
   id: DropPodTestPassenger
   components:
@@ -381,7 +403,7 @@ public sealed class DropPodTest
         await server.WaitPost(() =>
         {
             console = server.EntMan.SpawnEntity("StarHorizonDropPodConsole", map.GridCoords);
-            human = server.EntMan.SpawnEntity("MobHuman", map.GridCoords.Offset(new Vector2(2, 0)));
+            human = server.EntMan.SpawnEntity("DropPodTestKnockableMob", map.GridCoords.Offset(new Vector2(2, 0)));
             pod = server.EntMan.SpawnEntity("StarHorizonDropPod", map.GridCoords);
             var comp = server.EntMan.GetComponent<DropPodComponent>(pod);
             comp.CountdownTime = TimeSpan.FromSeconds(1);
@@ -414,7 +436,7 @@ public sealed class DropPodTest
         for (var i = 0; i < 40 && podComp.State == DropPodState.InBluespace; i++)
             await pair.RunSeconds(0.25f);
         await pair.RunSeconds(0.5f);
-        Assert.That(server.EntMan.HasComponent<Content.Shared.Stunnable.KnockedDownComponent>(human), "вышли из БСС: пассажир сбит с ног");
+        Assert.That(server.EntMan.HasComponent<Content.Shared.Stunnable.StunnedComponent>(human), "вышли из БСС: пассажир оглушён и сбит с ног");
 
         // Прилетела: скорость снята, капсула садится.
         for (var i = 0; i < 40 && podComp.State != DropPodState.Idle; i++)
@@ -429,7 +451,7 @@ public sealed class DropPodTest
         Assert.That(server.EntMan.GetComponent<EntityStorageComponent>(pod).Open, Is.False, "после посадки капсула закрыта");
         await pair.RunSeconds(3.5f);
         Assert.That(server.EntMan.GetComponent<EntityStorageComponent>(pod).Open, "через 3 с открылась");
-        Assert.That(server.EntMan.HasComponent<Content.Shared.Stunnable.KnockedDownComponent>(human), Is.False, "стан уже прошёл, человек выбирается на ногах");
+        Assert.That(server.EntMan.HasComponent<Content.Shared.Stunnable.StunnedComponent>(human), Is.False, "стан уже прошёл к открытию капсулы");
 
         await pair.CleanReturnAsync();
     }

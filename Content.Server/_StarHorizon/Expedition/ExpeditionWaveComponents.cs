@@ -59,4 +59,17 @@ public sealed partial class ExpeditionWavesComponent : Component
 public sealed partial class PursuePlayerComponent : Component
 {
     [ViewVariables] public EntityUid? Target;
+
+    /// <summary>Если моб волны не двигается дольше этого (застрял в щели, за камнем) и игроков рядом нет, он удаляется.</summary>
+    [DataField] public TimeSpan StuckTime = TimeSpan.FromSeconds(30);
+
+    /// <summary>Сдвиг меньше этого за проверку считается стоянием на месте, метры.</summary>
+    [DataField] public float StuckDistance = 0.5f;
+
+    /// <summary>Игрок ближе этого (дальше дальности стрельбы 10 м): моб дерётся или стреляет, на месте стоять ему можно.</summary>
+    [DataField] public float PlayerNearDistance = 15f;
+
+    [ViewVariables] public System.Numerics.Vector2? LastPosition;
+
+    [ViewVariables] public TimeSpan StillSince;
 }

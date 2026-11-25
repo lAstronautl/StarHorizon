@@ -978,8 +978,10 @@ public sealed class DropPodSystem : EntitySystem
         // Карта экспедиции создаётся на паузе; с прилётом капсулы она оживает для всех.
         _map.SetPaused(map, false);
 
-        // Каждой капсуле своя точка рядом с площадкой посадки, чтобы не садились друг на друга.
-        coords = new EntityCoordinates(map, expedition.LandingCoordinates + _random.NextVector2(0.5f, 3f));
+        // Каждой капсуле своя точка рядом с площадкой посадки, чтобы не садились друг на друга; не в камень и не в
+        // замурованную щель. Если места нет, садимся как раньше.
+        coords = _rocks.FindDropTile(map, expedition.LandingCoordinates, 0.5f, 6f, _random, minRegion: 25)
+                 ?? new EntityCoordinates(map, expedition.LandingCoordinates + _random.NextVector2(0.5f, 3f));
         return true;
     }
 
@@ -1033,9 +1035,6 @@ public sealed class DropPodSystem : EntitySystem
         SetFlightPhysics(ent, false);
         // Обычный спрайт остаётся скрытым (InFlight), вместо него рисуется упавшая капсула.
         _appearance.SetData(ent, DropPodVisuals.Landed, true);
-
-        // Капсула не сажает игрока в камень: порода вокруг расчищается.
-        _rocks.ClearRocks(Transform(ent).Coordinates, ent.Comp.ClearRadius);
 
         // Одноразовая: больше не запускается. В прототипе капсула прикручена, при взлёте движок её
         // откручивает (перемещение снимает крепление), а после посадки прикручиваем обратно.

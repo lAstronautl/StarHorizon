@@ -252,36 +252,86 @@ public sealed class ExpeditionWaveTest
         await pair.CleanReturnAsync();
     }
 
-    /// <summary>Дроп-под расчищает породу вокруг, остальные стены остаются.</summary>
+    /// <summary>Замурованная породой щель не годится для падения подов, открытое место годится.</summary>
     [Test]
-    public async Task RocksAroundAreCleared()
+    public async Task ClosedPocketsAreNotDropSites()
     {
         await using var pair = await PoolManager.GetServerClient(new PoolSettings { FailureLogLevel = LogLevel.Fatal });
         var server = pair.Server;
         var map = await pair.CreateTestMap();
         var rocks = server.System<RockClearSystem>();
 
-        EntityUid near = default, far = default, wall = default;
         await server.WaitPost(() =>
         {
             var mapSys = server.System<SharedMapSystem>();
             var gridUid = map.Grid.Owner;
-            for (var x = -2; x <= 4; x++)
+            for (var x = -8; x <= 8; x++)
             {
-                for (var y = -2; y <= 4; y++)
+                for (var y = -8; y <= 8; y++)
                     mapSys.SetTile(gridUid, map.Grid.Comp, new EntityCoordinates(gridUid, x + 0.5f, y + 0.5f), map.Tile.Tile);
             }
 
-            near = server.EntMan.SpawnEntity("WallRockBasalt", map.GridCoords.Offset(new Vector2(1.5f, 0.5f)));
-            far = server.EntMan.SpawnEntity("WallRockBasalt", map.GridCoords.Offset(new Vector2(2.5f, 0.5f)));
-            wall = server.EntMan.SpawnEntity("WallSolid", map.GridCoords.Offset(new Vector2(0.5f, 1.5f)));
-            Assert.That(rocks.ClearRocks(map.GridCoords.Offset(new Vector2(0.5f, 0.5f)), 1f), Is.EqualTo(1));
+            // Тайл (0,0) со всех восьми сторон закрыт породой.
+            for (var dx = -1; dx <= 1; dx++)
+            {
+                for (var dy = -1; dy <= 1; dy++)
+                {
+                    if (dx != 0 || dy != 0)
+                        server.EntMan.SpawnEntity("WallRockBasalt", new EntityCoordinates(gridUid, dx + 0.5f, dy + 0.5f));
+                }
+            }
         });
         await pair.RunSeconds(0.5f);
 
-        Assert.That(server.EntMan.Deleted(near), "порода у капсулы расчищена");
-        Assert.That(server.EntMan.Deleted(far), Is.False, "дальняя порода осталась");
-        Assert.That(server.EntMan.Deleted(wall), Is.False, "обычная стена осталась");
+        var grid = map.Grid.Comp;
+        var gridEnt = map.Grid.Owner;
+        Assert.That(rocks.IsOpen(gridEnt, grid, new Vector2i(0, 0)), "сам тайл пуст");
+        Assert.That(rocks.IsOpen(gridEnt, grid, new Vector2i(1, 0)), Is.False, "в тайле породы нельзя");
+        Assert.That(rocks.IsOpenRegion(gridEnt, grid, new Vector2i(0, 0), 20), Is.False, "замурованная щель: выхода нет");
+        Assert.That(rocks.IsOpenRegion(gridEnt, grid, new Vector2i(5, 5), 20), "открытое место годится");
+
+        // Кольцо вокруг щели никогда не отдаёт тайл в камне или в щели.
+        await server.WaitPost(() =>
+        {
+            var random = server.Resolve<Robust.Shared.Random.IRobustRandom>();
+            for (var i = 0; i < 40; i++)
+            {
+                var coords = rocks.FindDropTile(gridEnt, new Vector2(0.5f, 0.5f), 0f, 3f, random, minRegion: 20);
+                Assert.That(coords, Is.Not.Null);
+                var tile = server.System<SharedMapSystem>().TileIndicesFor(gridEnt, grid, coords!.Value);
+                Assert.That(tile, Is.Not.EqualTo(new Vector2i(0, 0)), "в щель не садимся");
+                Assert.That(rocks.IsOpen(gridEnt, grid, tile), "и не в камень");
+            }
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
+    /// <summary>Моб волны, который слишком долго стоит на месте и рядом нет игроков, удаляется; в контейнере (в поде) нет.</summary>
+    [Test]
+    public async Task StuckWaveMobsAreRemoved()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { FailureLogLevel = LogLevel.Fatal });
+        var server = pair.Server;
+        var map = await pair.CreateTestMap();
+
+        EntityUid stuck = default, patient = default;
+        await server.WaitPost(() =>
+        {
+            stuck = server.EntMan.SpawnEntity("PursueTestMelee", map.GridCoords);
+            var comp = server.EntMan.AddComponent<PursuePlayerComponent>(stuck);
+            comp.StuckTime = TimeSpan.FromSeconds(3);
+
+            // У этого терпение не кончается (как будто игрок рядом).
+            patient = server.EntMan.SpawnEntity("PursueTestMelee", map.GridCoords.Offset(new Vector2(0.5f, 0.5f)));
+            var comp2 = server.EntMan.AddComponent<PursuePlayerComponent>(patient);
+            comp2.StuckTime = TimeSpan.FromSeconds(3);
+            comp2.PlayerNearDistance = float.PositiveInfinity;
+        });
+
+        await pair.RunSeconds(8f);
+        Assert.That(server.EntMan.Deleted(stuck), "застрявший моб без игроков рядом удалён");
+        Assert.That(server.EntMan.Deleted(patient), Is.False, "моб рядом с игроком остаётся");
 
         await pair.CleanReturnAsync();
     }

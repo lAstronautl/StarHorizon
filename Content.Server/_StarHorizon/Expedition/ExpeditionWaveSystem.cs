@@ -295,23 +295,7 @@ public sealed class ExpeditionWaveSystem : EntitySystem
 
     private EntityCoordinates? TryRingTile(Entity<ExpeditionWavesComponent> ent, Entity<MapGridComponent> grid, Vector2 center)
     {
-        // Чем дольше ищем, тем шире кольцо: в густой породе или лесу свободное место может быть дальше.
-        for (var attempt = 0; attempt < 80; attempt++)
-        {
-            var spread = attempt / 20f * 3f;
-            var pos = center + _random.NextAngle().ToVec() * _random.NextFloat(ent.Comp.DropRingMin, ent.Comp.DropRingMax + spread);
-            var coords = new EntityCoordinates(grid, pos);
-
-            if (!_map.TryGetTileRef(grid, grid.Comp, coords, out var tile) || tile.Tile.IsEmpty)
-                continue;
-
-            // Не на камень и не в стену.
-            if (!_rocks.TileClear(grid, grid.Comp, tile.GridIndices))
-                continue;
-
-            return _map.GridTileToLocal(grid, grid.Comp, tile.GridIndices);
-        }
-
-        return null;
+        // Свободный тайл без породы из открытой области: не в замурованной щели.
+        return _rocks.FindDropTile(grid, center, ent.Comp.DropRingMin, ent.Comp.DropRingMax, _random);
     }
 }

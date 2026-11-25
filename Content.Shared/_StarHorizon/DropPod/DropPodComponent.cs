@@ -22,10 +22,6 @@ public sealed partial class DropPodComponent : Component
     [ViewVariables]
     public bool Used;
 
-    /// <summary>Радиус (в тайлах) вокруг приземлившейся капсулы, где расчищается порода.</summary>
-    [DataField]
-    public float ClearRadius = 3f;
-
     /// <summary>Через сколько после посадки дверца сама открывается.</summary>
     [DataField]
     public TimeSpan AutoOpenDelay = TimeSpan.FromSeconds(3);

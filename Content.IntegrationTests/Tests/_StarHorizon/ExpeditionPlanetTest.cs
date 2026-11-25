@@ -229,6 +229,7 @@ public sealed class ExpeditionPlanetTest
         });
         await pair.RunSeconds(1f);
 
+        var baselineMaps = CountExpeditionMaps(server); // карты от предыдущих тестов пула не считаем
         var comp = server.EntMan.GetComponent<ExpeditionPlanetComponent>(planet);
         var duration = MissionDuration(server, salvage, comp.Mission!);
         Assert.That(salvage.GetPlanetInfos(), Has.Count.EqualTo(1));
@@ -252,7 +253,7 @@ public sealed class ExpeditionPlanetTest
         var newDuration = MissionDuration(server, salvage, comp.Mission!);
         Assert.That(comp.EndTime - timing.CurTime, Is.GreaterThan(newDuration - TimeSpan.FromMinutes(1)), "у нового задания время уже идёт");
         Assert.That(comp.Status, Is.EqualTo(PlanetExpeditionStatus.Idle));
-        Assert.That(CountExpeditionMaps(server), Is.EqualTo(0));
+        Assert.That(CountExpeditionMaps(server), Is.EqualTo(baselineMaps));
 
         await pair.CleanReturnAsync();
     }
