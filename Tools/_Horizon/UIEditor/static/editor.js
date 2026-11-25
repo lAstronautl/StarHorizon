@@ -183,10 +183,15 @@ function restore(snap) {
 function undo() { if (history.pos > 0) restore(history.stack[--history.pos]); }
 function redo() { if (history.pos < history.stack.length - 1) restore(history.stack[++history.pos]); }
 
-function loadDocument(text, path) {
+function loadDocument(text, path, opts = {}) {
     byId.clear();
     doc.root = parseXaml(text);
     doc.path = path || null;
+    doc.csInfo = null;
+    doc.hadLogic = false;
+    UIBlocks.setProgram(opts.blocks || null);
+    if (doc.path && serverMode && !opts.blocks) loadLogicFor(doc.path);
+    else if (doc.path && serverMode) loadCsInfo(doc.path);
     selectedId = doc.root.id;
     history.stack = []; history.pos = -1;
     tabView.clear();
@@ -1257,6 +1262,7 @@ function generateCs() {
         o += "\n";
     }
     o += `    public ${cls}()\n    {\n        RobustXamlLoader.Load(this);\n`;
+    if (typeof UIBlocks !== "undefined" && !UIBlocks.isEmpty()) o += `        InitializeLogic(); // логика из блоков: ${cls}.logic.cs\n`;
     if (evs.length) {
         o += "\n";
         for (const e of evs) o += `        ${e.name}.${e.ev} += _ => ${e.name}${e.ev.replace(/^On/, "")}?.Invoke();\n`;
@@ -1445,6 +1451,7 @@ async function openRepoDialog() {
         fileListCache = fileListCache || (await api("/api/files")).files;
     } catch (e) { list.innerHTML = `<li class='err'>${escText(e.message)}</li>`; return; }
     const draw = () => {
+        if (!fileListCache) return; // список ещё грузится
         const f = $("#openFilter").value.toLowerCase();
         list.innerHTML = "";
         const items = fileListCache.filter(p => p.toLowerCase().includes(f)).slice(0, 400);
@@ -1487,13 +1494,51 @@ async function save(asNew) {
     }
     await doSave(false);
 }
+const logicPathOf = p => p.replace(/\.xaml$/, ".logic.cs");
+async function loadCsInfo(path) {
+    try { doc.csInfo = await api("/api/csinfo?path=" + encodeURIComponent(path + ".cs")); } catch (e) { doc.csInfo = null; }
+    if (doc.csInfo && !doc.csInfo.exists) doc.csInfo = null;
+}
+async function loadLogicFor(path) {
+    await loadCsInfo(path);
+    try {
+        const j = await api("/api/file?path=" + encodeURIComponent(logicPathOf(path)));
+        const p = UIBlocks.parseLogicFile(j.content);
+        if (p && doc.path === path) { UIBlocks.setProgram(p); doc.hadLogic = true; }
+    } catch (e) { /* логики ещё нет */ }
+}
+function blocksMeta() {
+    const ci = doc.csInfo || {};
+    const s = doc.root ? schemaOf(doc.root) : null;
+    return {
+        ns: ci.namespace || $("#csNamespace").value.trim() || "Content.Client",
+        cls: ci.className || $("#csClass").value.trim() || "MyWindow",
+        isWindow: !!(s && s.root),
+    };
+}
+const post = (url, body) => api(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
 async function doSave(withCs) {
     try {
-        await api("/api/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path: doc.path, content: serializeDoc() }) });
+        await post("/api/save", { path: doc.path, content: serializeDoc() });
         let msg = "Сохранено: " + doc.path;
         if (withCs) {
-            const r = await api("/api/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path: doc.path + ".cs", content: generateCs(), overwrite: false }) });
+            const r = await post("/api/save", { path: doc.path + ".cs", content: generateCs(), overwrite: false });
             msg += r.skipped ? " (.xaml.cs уже существует — не трогал)" : " + .xaml.cs";
+        }
+        if (!UIBlocks.isEmpty() || doc.hadLogic) {
+            await loadCsInfo(doc.path);
+            if (!doc.csInfo) {
+                msg += ". ⚠ Нет .xaml.cs — логика не сохранена (сохраните с галочкой «Создать .xaml.cs»)";
+            } else {
+                const gen = UIBlocks.generate(blocksMeta());
+                await post("/api/save", { path: logicPathOf(doc.path), content: gen.code });
+                doc.hadLogic = true;
+                const r = await post("/api/ensure-logic-call", { path: doc.path + ".cs" });
+                msg += " + логика (.logic.cs)";
+                if (r.result === "added") msg += ", в конструктор добавлен InitializeLogic()";
+                if (r.result === "no-anchor") msg += ". ⚠ Добавьте вызов InitializeLogic(); в конструктор вручную";
+                if (gen.warnings.length) msg += `. ⚠ Пропущено блоков: ${gen.warnings.length}`;
+            }
         }
         $("#fileName").textContent = doc.path;
         fileListCache = null;
@@ -1511,15 +1556,16 @@ function download() {
     };
     dl(serializeDoc(), name);
     setTimeout(() => dl(generateCs(), name + ".cs"), 300);
+    if (!UIBlocks.isEmpty()) setTimeout(() => dl(UIBlocks.generate(blocksMeta()).code, name.replace(/\.xaml$/, ".logic.cs")), 600);
 }
 
 function saveDraft() {
-    try { localStorage.setItem("ss14-ui-editor-draft", JSON.stringify({ xaml: serializeDoc(), path: doc.path })); } catch (e) { /* нет хранилища */ }
+    try { localStorage.setItem("ss14-ui-editor-draft", JSON.stringify({ xaml: serializeDoc(), path: doc.path, blocks: UIBlocks.program })); } catch (e) { /* нет хранилища */ }
 }
 function loadDraft() {
     try {
         const d = JSON.parse(localStorage.getItem("ss14-ui-editor-draft") || "null");
-        if (d && d.xaml) { loadDocument(d.xaml, d.path); return true; }
+        if (d && d.xaml) { loadDocument(d.xaml, d.path, { blocks: d.blocks && d.blocks.scripts ? d.blocks : null }); return true; }
     } catch (e) { /* ignore */ }
     return false;
 }
@@ -1544,6 +1590,8 @@ function setView(v) {
     $("#xamlError").textContent = "";
     if (v === "xaml") $("#xamlSrc").value = serializeDoc();
     if (v === "cs") $("#csSrc").value = generateCs();
+    $("#layout").classList.toggle("logic-mode", v === "logic");
+    if (v === "logic") UIBlocks.refresh();
 }
 function applyXaml() {
     let newRoot;
@@ -1637,6 +1685,12 @@ function setupUi() {
         if (ctrl && e.key.toLowerCase() === "s") { e.preventDefault(); save(false); return; }
         if (ctrl && e.key.toLowerCase() === "o") { e.preventDefault(); openRepoDialog(); return; }
         if (typing || document.querySelector("dialog[open]")) return;
+        if (currentView() === "logic") {
+            const k = e.key.toLowerCase();
+            if (ctrl && k === "z" && !e.shiftKey) { e.preventDefault(); UIBlocks.undo(); }
+            else if (ctrl && (k === "y" || (k === "z" && e.shiftKey))) { e.preventDefault(); UIBlocks.redo(); }
+            return;
+        }
         if (currentView() !== "design") return;
         const k = e.key.toLowerCase();
         if (ctrl && k === "z" && !e.shiftKey) { e.preventDefault(); undo(); }
@@ -1659,6 +1713,27 @@ function setupUi() {
     });
 }
 
+// Модули блоков: список берём у сервера (можно просто положить новый .js в blocks/modules)
+const DEFAULT_BLOCK_MODULES = ["events.js", "looks.js", "control.js", "operators.js", "variables.js", "myblocks.js"];
+async function loadBlockModules() {
+    let list = DEFAULT_BLOCK_MODULES;
+    if (serverMode) {
+        try {
+            const found = (await api("/api/blockmodules")).modules;
+            list = [...DEFAULT_BLOCK_MODULES.filter(m => found.includes(m)), ...found.filter(m => !DEFAULT_BLOCK_MODULES.includes(m))];
+        } catch (e) { /* по умолчанию */ }
+    }
+    for (const m of list) {
+        await new Promise(res => {
+            const sc = document.createElement("script");
+            sc.src = "blocks/modules/" + m;
+            sc.onload = res;
+            sc.onerror = () => { console.warn("не загрузился модуль", m); res(); };
+            document.body.appendChild(sc);
+        });
+    }
+}
+
 // ===================================================================
 //  Старт
 // ===================================================================
@@ -1676,6 +1751,24 @@ function setupUi() {
         $("#btnOpenLocal").hidden = true;
         toast("Автономный режим: запустите ui_editor.py, чтобы открывать/сохранять файлы репозитория");
     }
+    await loadBlockModules();
+    UIBlocks.init({
+        getControls: () => {
+            const out = [];
+            const walk = n => {
+                if (n.kind !== "el" || isPropElem(n)) return;
+                const nm = getAttr(n, "Name");
+                if (nm && n !== doc.root) out.push({ name: nm, type: localName(n.tag) });
+                n.children.forEach(walk);
+            };
+            if (doc.root) walk(doc.root);
+            return out;
+        },
+        isWindow: () => blocksMeta().isWindow,
+        getMeta: blocksMeta,
+        onChange: saveDraft,
+        toast,
+    });
     if (!loadDraft()) loadDocument(TEMPLATES[1].xaml, null);
     if (serverMode) await loadLocale();
 })();

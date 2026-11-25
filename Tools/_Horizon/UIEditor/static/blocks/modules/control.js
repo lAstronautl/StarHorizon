@@ -1,0 +1,33 @@
+// Модуль «Управление»: ожидание, циклы, условия.
+"use strict";
+UIBlocks.registerModule({
+    id: "control", name: "Управление", color: "#e08a1e",
+    blocks: [
+        { id: "wait", shape: "cmd", text: "ждать {N} сек.", async: true,
+          args: { N: { type: "num", def: 1 } },
+          gen: (ctx, a) => `await Robust.Shared.Timing.Timer.Delay(TimeSpan.FromSeconds(Math.Max(0, ${a.N.code})));` },
+        { id: "repeat", shape: "c", text: "повторить {N} раз",
+          args: { N: { type: "num", def: 10 } },
+          gen: (ctx, a) => { const i = ctx.loopVar(); return `for (var ${i} = 0; ${i} < (int) Math.Round(${a.N.code}); ${i}++)\n{\n${a.SUB}\n}`; } },
+        { id: "forever", shape: "c", text: "повторять всегда", async: true,
+          help: "Повторяется раз в ~30 мс, пока окно открыто",
+          gen: (ctx, a) => `while (!_uiStopped)\n{\n${a.SUB}\n    await Robust.Shared.Timing.Timer.Delay(30);\n}` },
+        { id: "while", shape: "c", text: "повторять пока {B}", async: true,
+          args: { B: { type: "bool" } },
+          gen: (ctx, a) => `while (!_uiStopped && ${a.B.code})\n{\n${a.SUB}\n    await Robust.Shared.Timing.Timer.Delay(30);\n}` },
+        { id: "wait_until", shape: "cmd", text: "ждать до {B}", async: true,
+          args: { B: { type: "bool" } },
+          gen: (ctx, a) => `while (!_uiStopped && !${a.B.code})\n    await Robust.Shared.Timing.Timer.Delay(50);` },
+        { id: "if", shape: "c", text: "если {B} то",
+          args: { B: { type: "bool" } },
+          gen: (ctx, a) => `if (${a.B.code})\n{\n${a.SUB}\n}` },
+        { id: "ifelse", shape: "c2", text: "если {B} то", text2: "иначе",
+          args: { B: { type: "bool" } },
+          gen: (ctx, a) => `if (${a.B.code})\n{\n${a.SUB}\n}\nelse\n{\n${a.SUB2}\n}` },
+        { id: "stop", shape: "cap", text: "остановить скрипт", gen: () => "return;" },
+        { id: "log", shape: "cmd", text: "записать в лог {T}",
+          help: "Сообщение появится в консоли клиента (F2/логи) с меткой ui.blocks",
+          args: { T: { type: "text", def: "отладка" } },
+          gen: (ctx, a) => `UiLog(${a.T.code});` },
+    ],
+});

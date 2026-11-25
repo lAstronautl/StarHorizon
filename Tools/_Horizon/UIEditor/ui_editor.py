@@ -31,6 +31,43 @@ REPO = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
 
 SKIP_DIRS = {".git", "bin", "obj", "node_modules", "RobustToolbox", ".vs", ".idea"}
 WRITE_ROOTS = ("Content.Client", "Content.Replay", "Content.Shared", "Content.Server")
+ALLOWED_EXT = (".xaml", ".xaml.cs", ".logic.cs")
+LOAD_ANCHOR = "RobustXamlLoader.Load(this);"
+
+
+def cs_info(full):
+    """Namespace, имя класса и наличие вызова InitializeLogic() в .xaml.cs."""
+    with open(full, encoding="utf-8-sig") as fh:
+        text = fh.read()
+    ns = re.search(r"^\s*namespace\s+([\w.]+)", text, re.M)
+    cls = re.search(r"partial\s+class\s+(\w+)", text)
+    return {
+        "exists": True,
+        "namespace": ns.group(1) if ns else None,
+        "className": cls.group(1) if cls else None,
+        "hasCall": "InitializeLogic();" in text,
+        "hasAnchor": LOAD_ANCHOR in text,
+    }
+
+
+def ensure_logic_call(full):
+    """Вставляет InitializeLogic(); сразу после RobustXamlLoader.Load(this); если его ещё нет."""
+    with open(full, encoding="utf-8-sig", newline="") as fh:
+        text = fh.read()
+    if "InitializeLogic();" in text:
+        return "present"
+    idx = text.find(LOAD_ANCHOR)
+    if idx < 0:
+        return "no-anchor"
+    line_start = text.rfind("\n", 0, idx) + 1
+    indent = re.match(r"[ \t]*", text[line_start:]).group(0)
+    nl = "\r\n" if "\r\n" in text else "\n"
+    end = idx + len(LOAD_ANCHOR)
+    logic_name = os.path.basename(full)[: -len(".xaml.cs")] + ".logic.cs"
+    text = text[:end] + nl + indent + "InitializeLogic(); // логика из блоков: " + logic_name + text[end:]
+    with open(full, "w", encoding="utf-8", newline="") as fh:
+        fh.write(text)
+    return "added"
 
 _loc_cache = {}
 
@@ -158,7 +195,7 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/file":
             rel = q.get("path", [""])[0]
             full = os.path.join(REPO, rel)
-            if not rel.endswith((".xaml", ".xaml.cs")) or not is_inside(REPO, full):
+            if not rel.endswith(ALLOWED_EXT) or not is_inside(REPO, full):
                 return self._error(400, "bad path")
             if not os.path.isfile(full):
                 return self._error(404, "not found")
@@ -170,6 +207,20 @@ class Handler(BaseHTTPRequestHandler):
             if not re.fullmatch(r"[A-Za-z\-]+", lang):
                 return self._error(400, "bad lang")
             return self._json(load_locale(lang))
+
+        if path == "/api/csinfo":
+            rel = q.get("path", [""])[0]
+            full = os.path.join(REPO, rel)
+            if not rel.endswith(".xaml.cs") or not is_inside(REPO, full):
+                return self._error(400, "bad path")
+            if not os.path.isfile(full):
+                return self._json({"exists": False})
+            return self._json(cs_info(full))
+
+        if path == "/api/blockmodules":
+            mdir = os.path.join(STATIC, "blocks", "modules")
+            names = sorted(f for f in os.listdir(mdir) if f.endswith(".js")) if os.path.isdir(mdir) else []
+            return self._json({"modules": names})
 
         if path.startswith("/tex/"):
             rel = path[len("/tex/"):].lstrip("/")
@@ -201,7 +252,7 @@ class Handler(BaseHTTPRequestHandler):
         if not self._check_origin():
             return self._error(403, "bad origin")
         url = urlparse(self.path)
-        if url.path != "/api/save":
+        if url.path not in ("/api/save", "/api/ensure-logic-call"):
             return self._error(404, "not found")
         length = int(self.headers.get("Content-Length", "0"))
         if length > 8 * 1024 * 1024:
@@ -212,12 +263,19 @@ class Handler(BaseHTTPRequestHandler):
             return self._error(400, "bad json")
 
         rel = str(data.get("path", "")).replace("\\", "/").lstrip("/")
+        if url.path == "/api/ensure-logic-call":
+            full = os.path.join(REPO, rel)
+            if not rel.endswith(".xaml.cs") or rel.split("/")[0] not in WRITE_ROOTS or not is_inside(REPO, full):
+                return self._error(400, "bad path")
+            if not os.path.isfile(full):
+                return self._json({"result": "missing"})
+            return self._json({"result": ensure_logic_call(full)})
         content = data.get("content")
         overwrite = bool(data.get("overwrite", True))
         if not isinstance(content, str):
             return self._error(400, "no content")
-        if not rel.endswith((".xaml", ".xaml.cs")):
-            return self._error(400, "можно сохранять только .xaml и .xaml.cs")
+        if not rel.endswith(ALLOWED_EXT):
+            return self._error(400, "можно сохранять только .xaml, .xaml.cs и .logic.cs")
         if not rel.split("/")[0] in WRITE_ROOTS:
             return self._error(400, "сохранять можно только внутри " + ", ".join(WRITE_ROOTS))
         full = os.path.join(REPO, rel)

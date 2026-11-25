@@ -16,6 +16,7 @@ public sealed partial class ShuttleStatusWindow : FancyWindow
     public ShuttleStatusWindow()
     {
         RobustXamlLoader.Load(this);
+        InitializeLogic(); // логика из блоков: ShuttleStatusWindow.logic.cs
 
         EngineButton.OnPressed += _ => EngineButtonPressed?.Invoke();
         EmergencyStopButton.OnPressed += _ => EmergencyStopButtonPressed?.Invoke();

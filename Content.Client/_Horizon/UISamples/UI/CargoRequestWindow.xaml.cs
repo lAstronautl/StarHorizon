@@ -19,6 +19,7 @@ public sealed partial class CargoRequestWindow : FancyWindow
     public CargoRequestWindow()
     {
         RobustXamlLoader.Load(this);
+        InitializeLogic(); // логика из блоков: CargoRequestWindow.logic.cs
 
         SearchBar.OnTextEntered += _ => SearchBarTextEntered?.Invoke();
         ProductList.OnItemSelected += _ => ProductListItemSelected?.Invoke();

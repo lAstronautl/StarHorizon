@@ -18,6 +18,7 @@ public sealed partial class CrewNotesWindow : FancyWindow
     public CrewNotesWindow()
     {
         RobustXamlLoader.Load(this);
+        InitializeLogic(); // логика из блоков: CrewNotesWindow.logic.cs
 
         SaveNotesButton.OnPressed += _ => SaveNotesButtonPressed?.Invoke();
         AutoSaveCheck.OnToggled += _ => AutoSaveCheckToggled?.Invoke();

@@ -240,3 +240,68 @@ dialog::backdrop { background: rgba(0, 0, 0, .55); }
 .sc-WindowHeadingBackground { background: #1b1b1e; }
 .stripeback { background: #1b1b1e; padding: 5px 0; box-shadow: inset 0 2px 0 #3e3e46, inset 0 -2px 0 #3e3e46; }
 .containerbutton { background: rgba(70, 75, 70, .35); }
+
+/* ===================================================================
+   Блочный редактор логики
+   =================================================================== */
+#logicView.active { flex-direction: row; }
+#blkPaletteWrap { width: 290px; flex: 0 0 290px; display: flex; background: var(--panel); border-right: 1px solid var(--border); min-height: 0; }
+#blkCats { width: 74px; flex: 0 0 74px; display: flex; flex-direction: column; gap: 2px; padding: 4px 2px; border-right: 1px solid var(--border); overflow: auto; }
+.blk-cat { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 10px; padding: 5px 2px; border: none; background: transparent; }
+.blk-cat .dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(255,255,255,.25); }
+.blk-cat.active { background: #2b2b35; color: #fff; }
+#blkPalette { flex: 1; overflow: auto; padding: 6px 8px 60px; }
+.blk-pal-head { font-weight: 700; margin: 10px 0 6px; font-size: 13px; }
+.blk-pal-item { margin: 0 0 7px; display: flex; }
+.blk-pal-btn { width: 100%; margin: 2px 0 8px; }
+.blk-var-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--dim); padding: 1px 4px; }
+.blk-var-row b { cursor: pointer; }
+.blk-var-row b:hover { color: var(--danger); }
+#blkMain { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+#blkScroll { flex: 1; overflow: auto; position: relative; background-color: #15151a;
+    background-image: radial-gradient(#2a2a33 1px, transparent 1px); background-size: 20px 20px; }
+#blkWorkspace { position: relative; }
+#blkWarnings { padding: 2px 8px; font-size: 12px; max-height: 60px; overflow: auto; background: var(--panel); }
+#blkWarnings:empty { display: none; }
+#blkCodeWrap { width: 380px; flex: 0 0 380px; display: flex; flex-direction: column; border-left: 1px solid var(--border); }
+#blkCode { flex: 1; resize: none; border: none; border-radius: 0; padding: 8px; font: 11.5px/1.4 Consolas, monospace; background: #121216; white-space: pre; }
+.blk-empty-hint { position: absolute; left: 40px; top: 40px; color: var(--dim); line-height: 1.6; pointer-events: none; }
+.bscript { position: absolute; display: flex; flex-direction: column; align-items: flex-start; }
+.drag-float { position: fixed; z-index: 500; pointer-events: none; opacity: .9; filter: drop-shadow(0 6px 10px rgba(0,0,0,.5)); }
+.blk-indicator { position: absolute; width: 120px; height: 5px; border-radius: 3px; background: #fff; box-shadow: 0 0 6px #fff; pointer-events: none; z-index: 20; }
+.blk-indicator[hidden] { display: none; }
+
+.blk { --c: #888; background: var(--c); color: #fff; border: 1px solid rgba(0,0,0,.25); border-radius: 5px;
+    font: 600 12px/1 "Segoe UI", system-ui, sans-serif; cursor: grab; user-select: none; position: relative; min-width: 60px;
+    box-shadow: inset 0 -2px 0 rgba(0,0,0,.18); }
+.blk-row { display: flex; align-items: center; gap: 5px; padding: 6px 9px; min-height: 32px; flex-wrap: wrap; }
+.blk-txt { white-space: nowrap; text-shadow: 0 1px 0 rgba(0,0,0,.25); }
+/* выступ-«зубчик» как в Scratch */
+.shape-cmd::after, .shape-c::after, .shape-c2::after, .shape-hat::after { content: ""; position: absolute; left: 14px; bottom: -6px; width: 18px; height: 6px; background: var(--c); border-radius: 0 0 4px 4px; z-index: 1; }
+.shape-hat { border-radius: 16px 16px 5px 5px; }
+.shape-hat > .blk-row:first-child { padding-top: 12px; }
+.shape-cap { border-bottom-left-radius: 2px; border-bottom-right-radius: 2px; }
+.shape-c, .shape-c2 { min-width: 140px; }
+.blk-sub { margin-left: 14px; min-height: 22px; padding: 2px 0 6px; display: flex; flex-direction: column; align-items: flex-start;
+    background: #15151a; border-radius: 0 4px 4px 0; padding-left: 0; }
+#blkPalette .blk-sub { background: rgba(0,0,0,.25); }
+.blk-foot { height: 14px; }
+.blk.rep { border-radius: 14px; min-width: 0; box-shadow: none; }
+.blk.rep > .blk-row { padding: 3px 8px; min-height: 24px; }
+.blk.shape-bool { border-radius: 4px; clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 10px 100%, 0 50%); padding: 0 6px; }
+.blk-warn { outline: 2px dashed #ff5050; outline-offset: 1px; }
+.blk-missing { --c: #555; }
+
+.slot { display: inline-flex; align-items: center; }
+.slot input, .slot select { font: 12px "Segoe UI", sans-serif; color: #222; background: #fff; border: 1px solid rgba(0,0,0,.2); border-radius: 12px; padding: 2px 7px; min-width: 22px; text-align: center; }
+.slot select { border-radius: 4px; text-align: left; max-width: 170px; background: rgba(0,0,0,.18); color: #fff; border-color: rgba(0,0,0,.3); }
+.slot select option { color: #000; }
+.slot input[type=color] { width: 30px; height: 20px; padding: 0 2px; border-radius: 4px; }
+.slot-bool { width: 34px; height: 20px; background: rgba(0,0,0,.25); clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%); }
+.slot-bool.filled { width: auto; height: auto; background: none; clip-path: none; }
+.slot.drop-ok { box-shadow: 0 0 0 3px #fff; border-radius: 12px; }
+.slot.filled > .blk { cursor: grab; }
+#layout.logic-mode { grid-template-columns: 1fr; }
+#layout.logic-mode > #left, #layout.logic-mode > #right { display: none; }
+#logicView { user-select: none; }
+#logicView input, #logicView textarea { user-select: text; }

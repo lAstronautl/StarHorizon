@@ -54,6 +54,7 @@
     <section id="center">
         <nav class="tabs" id="viewTabs">
             <button data-view="design" class="active">Дизайн</button>
+            <button data-view="logic">Логика (блоки)</button>
             <button data-view="xaml">XAML</button>
             <button data-view="cs">C# (code-behind)</button>
         </nav>
@@ -62,6 +63,25 @@
                 <div id="canvasHost"></div>
             </div>
             <div id="statusBar"></div>
+        </div>
+        <div id="logicView" class="view">
+            <div id="blkPaletteWrap">
+                <div id="blkCats"></div>
+                <div id="blkPalette"></div>
+            </div>
+            <div id="blkMain">
+                <div class="srcbar">
+                    <button id="blkTidy" title="Выстроить скрипты в столбик">Упорядочить</button>
+                    <button id="blkClear">Очистить</button>
+                    <span class="hint">Тяните блоки из палитры. Блок в палитру — удалить. ПКМ — меню. Ctrl+Z — отменить.</span>
+                </div>
+                <div id="blkScroll"><div id="blkWorkspace"></div></div>
+                <div id="blkWarnings" class="err"></div>
+            </div>
+            <div id="blkCodeWrap">
+                <div class="srcbar"><b>C# → &lt;Класс&gt;.logic.cs</b><button id="blkCopy">Копировать</button></div>
+                <textarea id="blkCode" spellcheck="false" readonly></textarea>
+            </div>
         </div>
         <div id="xamlView" class="view">
             <div class="srcbar">
@@ -121,6 +141,7 @@
 <div id="toast"></div>
 
 <script src="schema.js"></script>
+<script src="blocks/engine.js"></script>
 <script src="editor.js"></script>
 </body>
 </html>
