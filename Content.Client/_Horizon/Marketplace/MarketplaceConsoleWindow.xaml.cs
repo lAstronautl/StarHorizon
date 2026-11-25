@@ -157,8 +157,6 @@ public sealed partial class MarketplaceConsoleWindow : FancyWindow
         _slotIcon = new MarketplaceItemIcon(128, theme);
         SlotIconBox.AddChild(_slotIcon);
 
-        SlotHintLabel.SetMessage(FormattedMessage.FromMarkupPermissive(Loc.GetString("marketplace-sell-slot-hint",
-            ("mutedColor", MutedColor))));
 
         if (_state != null)
             UpdateState(_state);
@@ -204,9 +202,6 @@ public sealed partial class MarketplaceConsoleWindow : FancyWindow
             ("mutedColor", MutedColor))));
 
         TaxRowLabel.Text = Loc.GetString("marketplace-sell-tax", ("tax", GetTaxPercent()));
-        SellNoteLabel.SetMessage(FormattedMessage.FromMarkupPermissive(Loc.GetString("marketplace-sell-note",
-            ("tax", GetTaxPercent()),
-            ("mutedColor", MutedColor))));
 
         RebuildListings();
         RebuildOwnListings();

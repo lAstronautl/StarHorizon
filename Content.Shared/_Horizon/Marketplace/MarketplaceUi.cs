@@ -141,3 +141,19 @@ public sealed class MarketplaceWithdrawMessage(int listingId) : BoundUserInterfa
 
 [Serializable, NetSerializable]
 public sealed class MarketplaceEjectMessage : BoundUserInterfaceMessage;
+
+/// <summary>
+/// Asks the server for the full examine text of an item shown in the UI (for the hover tooltip).
+/// </summary>
+[Serializable, NetSerializable]
+public sealed class MarketplaceExamineRequestMessage(NetEntity item) : BoundUserInterfaceMessage
+{
+    public readonly NetEntity Item = item;
+}
+
+[Serializable, NetSerializable]
+public sealed class MarketplaceExamineResponseMessage(NetEntity item, Robust.Shared.Utility.FormattedMessage text) : BoundUserInterfaceMessage
+{
+    public readonly NetEntity Item = item;
+    public readonly Robust.Shared.Utility.FormattedMessage Text = text;
+}

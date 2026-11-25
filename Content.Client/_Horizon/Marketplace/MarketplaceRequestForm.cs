@@ -30,7 +30,7 @@ public sealed class MarketplaceRequestForm : BoxContainer
     private int _maxReward = int.MaxValue;
     private bool _limitReached;
 
-    public MarketplaceRequestForm(MarketplaceTheme theme, string noteKey = "marketplace-request-note", float descriptionHeight = 90)
+    public MarketplaceRequestForm(MarketplaceTheme theme, string? noteKey = null, float descriptionHeight = 90)
     {
         _theme = theme;
         Orientation = LayoutOrientation.Vertical;
@@ -89,9 +89,12 @@ public sealed class MarketplaceRequestForm : BoxContainer
         _create.OnPressed += _ => Submit();
         AddChild(_create);
 
-        var note = new RichTextLabel();
-        note.SetMessage(FormattedMessage.FromMarkupPermissive(Loc.GetString(noteKey, ("mutedColor", theme.Muted))));
-        AddChild(note);
+        if (noteKey != null)
+        {
+            var note = new RichTextLabel();
+            note.SetMessage(FormattedMessage.FromMarkupPermissive(Loc.GetString(noteKey, ("mutedColor", theme.Muted))));
+            AddChild(note);
+        }
 
         UpdateSummary();
     }
@@ -143,7 +146,8 @@ public sealed class MarketplaceRequestForm : BoxContainer
         summary.PushNewline();
         summary.AddMarkupPermissive(Loc.GetString("marketplace-request-summary-payout",
             ("payout", BankSystemExtensions.ToSpesoString(hasReward ? reward - tax : 0)),
-            ("tax", (int) MathF.Round(_taxRate * 100f)),
+            // What the supplier keeps after tax, e.g. 90%.
+            ("share", 100 - (int) MathF.Round(_taxRate * 100f)),
             ("mutedColor", _theme.Muted),
             ("priceColor", _theme.Price)));
         _summary.SetMessage(summary);

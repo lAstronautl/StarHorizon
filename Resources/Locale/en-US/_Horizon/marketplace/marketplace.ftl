@@ -4,7 +4,7 @@ marketplace-item-slot-name = Pickup point tray
 
 marketplace-window-title = StarOZON Pickup Point
 marketplace-header-title = [font size=16][bold][color=#7CC4FF]Star[/color][color=#E8EEF7]OZON[/color][/bold][/font]  [color=#8391A5]· pickup point · returns cost your oxygen[/color]
-marketplace-header-terminal = [color={$mutedColor}]Terminal:[/color] [color={$accentColor}]{$grid}[/color]  [color={$mutedColor}]· Right click or Shift+click an item to examine it[/color]
+marketplace-header-terminal = [color={$mutedColor}]Terminal:[/color] [color={$accentColor}]{$grid}[/color]  [color={$mutedColor}]· Hover over an item to examine it[/color]
 
 marketplace-stat-balance = [color={$mutedColor}]Balance[/color]  [bold][color={$priceColor}]{$balance}[/color][/bold]
 marketplace-stat-no-account = [color=#FF6B6B]No bank account[/color]
@@ -47,7 +47,6 @@ marketplace-card-withdraw = Withdraw
 
 marketplace-sell-slot-title = Item in terminal
 marketplace-sell-slot-empty = [color={$mutedColor}]The tray is empty[/color]
-marketplace-sell-slot-hint = [color={$mutedColor}]Put an item into the console to list it. Stackable resources can be sold in parts.[/color]
 marketplace-sell-available = [color={$mutedColor}]Available:[/color] {$count}
 marketplace-sell-eject = Eject item
 marketplace-sell-title = New listing
@@ -60,7 +59,6 @@ marketplace-sell-tax = Tax ({$tax}%)
 marketplace-sell-receive = You receive
 marketplace-sell-merge = [color={$accentColor}]Will be merged into your listing #{$id} (currently {$count}) - same resource and price.[/color]
 marketplace-sell-button = List on the market
-marketplace-sell-note = [color={$mutedColor}]The {$tax}% tax is only taken when the item sells. Listings can be withdrawn at any time and are cleared at the end of the shift.[/color]
 
 ## Messages
 
@@ -103,9 +101,8 @@ marketplace-request-field-description = Description
 marketplace-request-field-quantity = Quantity
 marketplace-request-field-reward = Reward for the whole order
 marketplace-request-summary-held = [color={$mutedColor}]Held from your account:[/color] [bold]{$reward}[/bold]
-marketplace-request-summary-payout = [color={$mutedColor}]Supplier receives:[/color] [bold][color={$priceColor}]{$payout}[/color][/bold] [color={$mutedColor}]({$tax}% tax)[/color]
+marketplace-request-summary-payout = [color={$mutedColor}]Supplier receives:[/color] [bold][color={$priceColor}]{$payout}[/color][/bold] [color={$mutedColor}]({$share}%)[/color]
 marketplace-request-create-button = Post request
-marketplace-request-note = [color={$mutedColor}]The reward is withdrawn now and held until the order is fulfilled. It is refunded if you cancel or the shift ends.[/color]
 
 marketplace-request-card-meta = [color={$mutedColor}]Wanted:[/color] {$quantity}  [color={$mutedColor}]· Offers:[/color] {$offers}  [color={$mutedColor}]· Request #{$id}[/color]
 marketplace-request-card-reward = [color={$mutedColor}]reward[/color]
@@ -172,3 +169,4 @@ marketplace-pda-request-note = [color={$mutedColor}]The reward is held right awa
 marketplace-card-total-all = [color={$mutedColor}]For all:[/color] [bold][color={$priceColor}]{$total}[/color][/bold]  [color={$mutedColor}]· buy at a pickup point[/color]
 marketplace-request-card-own-pda = [color={$accentColor}]Your request.[/color] Offers: {$count} [color={$mutedColor}]- accept them at a pickup point.[/color]
 marketplace-request-card-offer-pda = [color={$mutedColor}]Offer an item at a pickup point.[/color]
+marketplace-examine-more = Right click or Shift+click for the full examine with actions

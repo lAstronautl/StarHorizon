@@ -81,7 +81,6 @@
                         <RichTextLabel Name="SlotCountLabel" HorizontalAlignment="Center"/>
                         <RichTextLabel Name="SlotDenyLabel" HorizontalAlignment="Center" Visible="False"/>
                         <Control VerticalExpand="True"/>
-                        <RichTextLabel Name="SlotHintLabel"/>
                         <Button Name="EjectButton" Text="{Loc 'marketplace-sell-eject'}" HorizontalExpand="True"/>
                     </BoxContainer>
                 </PanelContainer>
@@ -123,7 +122,6 @@
                         <Control VerticalExpand="True"/>
                         <Button Name="ListButton" Text="{Loc 'marketplace-sell-button'}" MinHeight="40"
                                 StyleClasses="ButtonColorGreen" HorizontalExpand="True"/>
-                        <RichTextLabel Name="SellNoteLabel"/>
                     </BoxContainer>
                 </PanelContainer>
             </BoxContainer>

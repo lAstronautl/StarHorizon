@@ -4,7 +4,7 @@ marketplace-item-slot-name = Лоток пункта выдачи
 
 marketplace-window-title = Пункт выдачи StarOZON
 marketplace-header-title = [font size=16][bold][color=#7CC4FF]Star[/color][color=#E8EEF7]OZON[/color][/bold][/font]  [color=#8391A5]· пункт выдачи · возврат за ваш кислород[/color]
-marketplace-header-terminal = [color={$mutedColor}]Терминал:[/color] [color={$accentColor}]{$grid}[/color]  [color={$mutedColor}]· ПКМ или Shift+ЛКМ по предмету — осмотреть[/color]
+marketplace-header-terminal = [color={$mutedColor}]Терминал:[/color] [color={$accentColor}]{$grid}[/color]  [color={$mutedColor}]· наведите на предмет, чтобы осмотреть[/color]
 
 marketplace-stat-balance = [color={$mutedColor}]Баланс[/color]  [bold][color={$priceColor}]{$balance}[/color][/bold]
 marketplace-stat-no-account = [color=#FF6B6B]Нет банковского счёта[/color]
@@ -47,7 +47,6 @@ marketplace-card-withdraw = Снять
 
 marketplace-sell-slot-title = Предмет в терминале
 marketplace-sell-slot-empty = [color={$mutedColor}]Лоток пуст[/color]
-marketplace-sell-slot-hint = [color={$mutedColor}]Положите предмет в консоль, чтобы выставить его на продажу. Стакаемые ресурсы можно продавать частями.[/color]
 marketplace-sell-available = [color={$mutedColor}]В наличии:[/color] {$count} шт.
 marketplace-sell-eject = Извлечь предмет
 marketplace-sell-title = Новый лот
@@ -60,7 +59,6 @@ marketplace-sell-tax = Налог ({$tax}%)
 marketplace-sell-receive = Вы получите
 marketplace-sell-merge = [color={$accentColor}]Будет объединено с вашим лотом #{$id} (сейчас {$count} шт.) — та же цена и тот же ресурс.[/color]
 marketplace-sell-button = Выставить на рынок
-marketplace-sell-note = [color={$mutedColor}]Налог {$tax}% удерживается только при продаже. Лот можно снять в любой момент; все лоты сбрасываются в конце смены.[/color]
 
 ## Сообщения
 
@@ -110,9 +108,8 @@ marketplace-request-field-description = Описание
 marketplace-request-field-quantity = Количество
 marketplace-request-field-reward = Награда за весь заказ
 marketplace-request-summary-held = [color={$mutedColor}]Будет заморожено на счёте:[/color] [bold]{$reward}[/bold]
-marketplace-request-summary-payout = [color={$mutedColor}]Исполнитель получит:[/color] [bold][color={$priceColor}]{$payout}[/color][/bold] [color={$mutedColor}](налог {$tax}%)[/color]
+marketplace-request-summary-payout = [color={$mutedColor}]Исполнитель получит:[/color] [bold][color={$priceColor}]{$payout}[/color][/bold] [color={$mutedColor}]({$share}%)[/color]
 marketplace-request-create-button = Разместить запрос
-marketplace-request-note = [color={$mutedColor}]Награда списывается сразу и хранится до выполнения. При отмене или в конце смены деньги возвращаются.[/color]
 
 marketplace-request-card-meta = [color={$mutedColor}]Нужно:[/color] {$quantity} шт.  [color={$mutedColor}]· Предложений:[/color] {$offers}  [color={$mutedColor}]· Запрос #{$id}[/color]
 marketplace-request-card-reward = [color={$mutedColor}]награда[/color]
@@ -189,3 +186,4 @@ ent-MarketplaceViewerCartridge = картридж «StarOZON»
     .desc = Приложение StarOZON для КПК: смотрите товары и оставляйте заявки, не вставая с кресла пилота.
 ent-BlackMarketViewerCartridge = картридж «ТёмныйЛинк»
     .desc = Картридж без маркировки с зашифрованным подключением к чёрному рынку.
+marketplace-examine-more = ПКМ или Shift+ЛКМ — полный осмотр с действиями

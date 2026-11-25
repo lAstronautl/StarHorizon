@@ -24,6 +24,8 @@ public sealed class MarketplaceConsoleBoundUserInterface : BoundUserInterface
         _window.OnBuy += (id, amount, price) => SendMessage(new MarketplaceBuyMessage(id, amount, price));
         _window.OnWithdraw += id => SendMessage(new MarketplaceWithdrawMessage(id));
         _window.OnEject += () => SendMessage(new MarketplaceEjectMessage());
+        MarketplaceExamineHub.Clear();
+        MarketplaceExamineHub.Requester = item => SendMessage(new MarketplaceExamineRequestMessage(item));
         _window.OnCreateRequest += (title, description, quantity, reward) =>
             SendMessage(new MarketplaceCreateRequestMessage(title, description, quantity, reward));
         _window.OnCancelRequest += id => SendMessage(new MarketplaceCancelRequestMessage(id));
@@ -33,11 +35,26 @@ public sealed class MarketplaceConsoleBoundUserInterface : BoundUserInterface
         _window.OnWithdrawOffer += id => SendMessage(new MarketplaceWithdrawOfferMessage(id));
     }
 
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+        MarketplaceExamineHub.Requester = null;
+        MarketplaceExamineHub.Clear();
+    }
+
     protected override void ReceiveMessage(BoundUserInterfaceMessage message)
     {
         base.ReceiveMessage(message);
 
-        if (message is MarketplaceConsoleState state)
-            _window?.UpdateState(state);
+        switch (message)
+        {
+            case MarketplaceConsoleState state:
+                MarketplaceExamineHub.Clear();
+                _window?.UpdateState(state);
+                break;
+            case MarketplaceExamineResponseMessage examine:
+                MarketplaceExamineHub.OnResponse(examine.Item, examine.Text);
+                break;
+        }
     }
 }

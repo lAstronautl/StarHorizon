@@ -13,6 +13,7 @@ using Content.Shared.Access.Systems;
 using Content.Shared.Containers.ItemSlots;
 using Content.Shared.Contraband;
 using Content.Shared.Database;
+using Content.Shared.Examine;
 using Content.Shared.GameTicking;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Mind.Components;
@@ -46,6 +47,7 @@ public sealed partial class MarketplaceSystem : SharedMarketplaceSystem
     [Dependency] private readonly ISharedPlayerManager _player = default!;
     [Dependency] private readonly BankSystem _bank = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
+    [Dependency] private readonly ExamineSystemShared _examine = default!;
     [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
     [Dependency] private readonly MetaDataSystem _metaData = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
@@ -86,6 +88,7 @@ public sealed partial class MarketplaceSystem : SharedMarketplaceSystem
             subs.Event<MarketplaceBuyMessage>(OnBuy);
             subs.Event<MarketplaceWithdrawMessage>(OnWithdraw);
             subs.Event<MarketplaceEjectMessage>(OnEject);
+            subs.Event<MarketplaceExamineRequestMessage>(OnExamineRequest);
             subs.Event<MarketplaceCreateRequestMessage>(OnCreateRequest);
             subs.Event<MarketplaceCancelRequestMessage>(OnCancelRequest);
             subs.Event<MarketplaceMakeOfferMessage>(OnMakeOffer);
@@ -471,6 +474,31 @@ public sealed partial class MarketplaceSystem : SharedMarketplaceSystem
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Full examine text for the hover tooltip. Only for items stored on this console's network or in its tray.
+    /// </summary>
+    private void OnExamineRequest(Entity<MarketplaceConsoleComponent> ent, ref MarketplaceExamineRequestMessage args)
+    {
+        if (!TryGetEntity(args.Item, out var item) || TerminatingOrDeleted(item))
+            return;
+
+        var allowed = item == ent.Comp.ItemSlot.Item;
+        if (!allowed
+            && HasComp<MarketplaceListedItemComponent>(item)
+            && _storages.TryGetValue(ent.Comp.Network, out var storage)
+            && _container.TryGetContainingContainer(item.Value, out var container)
+            && container.Owner == storage)
+        {
+            allowed = true;
+        }
+
+        if (!allowed)
+            return;
+
+        var text = _examine.GetExamineText(item.Value, args.Actor);
+        _ui.ServerSendUiMessage(ent.Owner, MarketplaceConsoleUiKey.Key, new MarketplaceExamineResponseMessage(args.Item, text), args.Actor);
     }
 
     private void OnEject(Entity<MarketplaceConsoleComponent> ent, ref MarketplaceEjectMessage args)
