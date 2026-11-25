@@ -1,0 +1,15 @@
+<BoxContainer xmlns="https://spacestation14.io"
+              Orientation="Horizontal"
+              HorizontalExpand="True"
+              Margin="2"
+              SeparationOverride="6">
+    <TextureRect Name="JobIcon"
+                 TexturePath="/Textures/Interface/Nano/gear.svg.192dpi.png"
+                 SetSize="24 24"
+                 Stretch="KeepAspectCentered"/>
+    <BoxContainer Orientation="Vertical" HorizontalExpand="True">
+        <Label Name="NameLabel" Text="John Doe" StyleClasses="LabelKeyText"/>
+        <Label Name="JobLabel" Text="Assistant" StyleClasses="LabelSubText"/>
+    </BoxContainer>
+    <Button Name="SelectButton" Text="{Loc 'ui-samples-entry-select'}" VerticalAlignment="Center"/>
+</BoxContainer>

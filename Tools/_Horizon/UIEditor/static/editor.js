@@ -289,18 +289,22 @@ function renderRoot(n) {
     const frame = h("div", "root-frame");
     const ms = parseVec2(getAttr(n, "MinSize")) || [num(getAttr(n, "MinWidth")) || 0, num(getAttr(n, "MinHeight")) || 0];
     const ss = parseVec2(getAttr(n, "SetSize")) || [num(getAttr(n, "SetWidth")), num(getAttr(n, "SetHeight"))];
-    const w = rootSize.w || ss[0] || Math.max(ms[0], 400);
-    const hgt = rootSize.h || ss[1] || Math.max(ms[1], 300);
+    const isWindow = !!(s && s.root);
+    const w = rootSize.w || ss[0] || Math.max(ms[0], isWindow ? 400 : 360);
+    // окно — фиксированного размера; обычный контрол — по высоте содержимого, пока его не растянули
+    const hgt = rootSize.h || ss[1] || (isWindow ? Math.max(ms[1], 300) : null);
     frame.style.width = w + "px";
-    frame.style.height = hgt + "px";
+    if (hgt) frame.style.height = hgt + "px";
     frame.style.minWidth = (ms[0] || 50) + "px";
     frame.style.minHeight = (ms[1] || 30) + "px";
     if (rootObserver) rootObserver.disconnect();
     rootObserver = new ResizeObserver(() => {
         if (!frame.isConnected) return;
-        rootSize = { w: frame.offsetWidth, h: frame.offsetHeight };
+        // запоминаем размер, только если пользователь его поменял (тянул за угол)
+        if (frame.style.height || isWindow) rootSize = { w: frame.offsetWidth, h: frame.offsetHeight };
+        else if (frame.offsetWidth !== w) rootSize = { w: frame.offsetWidth, h: 0 };
         const st = document.getElementById("statusSize");
-        if (st) st.textContent = `${rootSize.w}×${rootSize.h}`;
+        if (st) st.textContent = `${frame.offsetWidth}×${frame.offsetHeight}`;
     });
     rootObserver.observe(frame);
 
@@ -428,7 +432,8 @@ function renderNode(n, parentLayout, index) {
             const bar = h("div", "tab-bar");
             const cur = tabView.has(n.id) ? tabView.get(n.id) : (num(getAttr(n, "CurrentTab")) || 0);
             elChildren(n).forEach((c, i) => {
-                const t = h("span", "tab" + (i === cur ? " cur" : ""), getAttr(c, "Name") || `Tab ${i + 1}`);
+                const title = getAttr(c, "TabContainer.TabTitle");
+                const t = h("span", "tab" + (i === cur ? " cur" : ""), (title && resolveText(title)) || getAttr(c, "Name") || `Tab ${i + 1}`);
                 t.addEventListener("click", ev => { ev.stopPropagation(); tabView.set(n.id, i); renderCanvas(); });
                 bar.appendChild(t);
             });
@@ -973,6 +978,8 @@ function renderProps() {
     const groups = {};
     const specific = (s && s.props) || [];
     for (const p of specific) (groups[localName(n.tag)] = groups[localName(n.tag)] || []).push(p);
+    if (n.parent && localName(n.parent.tag) === "TabContainer")
+        groups["Вкладка"] = [{ name: "TabContainer.TabTitle", type: "loc", hint: "заголовок вкладки" }, { name: "TabContainer.TabVisible", type: "bool" }];
     for (const p of COMMON_PROPS) (groups[p.group] = groups[p.group] || []).push(p);
 
     for (const [g, props] of Object.entries(groups)) {
@@ -1216,7 +1223,8 @@ function updateCsMeta() {
 const EVENTS = {
     Button: ["OnPressed"], ConfirmButton: ["OnPressed"], TextureButton: ["OnPressed"], ContainerButton: ["OnPressed"],
     CheckBox: ["OnToggled"], LineEdit: ["OnTextEntered"], OptionButton: ["OnItemSelected"],
-    Slider: ["OnValueChanged"], SpinBox: ["OnValueChanged"], FloatSpinBox: ["OnValueChanged"], ItemList: ["OnItemSelected"],
+    Slider: ["OnValueChanged"], SpinBox: ["ValueChanged"], FloatSpinBox: ["OnValueChanged"], ItemList: ["OnItemSelected"],
+    TextEdit: ["OnTextChanged"],
 };
 function generateCs() {
     if (!doc.root) return "";

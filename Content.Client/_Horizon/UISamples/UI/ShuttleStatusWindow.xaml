@@ -1,0 +1,46 @@
+<controls:FancyWindow xmlns="https://spacestation14.io"
+                      xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
+                      Title="{Loc 'ui-samples-shuttle-title'}"
+                      MinSize="420 300"
+                      SetSize="440 320">
+    <BoxContainer Orientation="Vertical" Margin="8" SeparationOverride="6">
+        <BoxContainer Orientation="Horizontal">
+            <Label Text="{Loc 'ui-samples-shuttle-header'}" StyleClasses="LabelHeading"/>
+            <Control HorizontalExpand="True"/>
+            <Label Name="StatusLabel" Text="{Loc 'ui-samples-shuttle-status-ok'}" FontColorOverride="#31843E"/>
+        </BoxContainer>
+        <PanelContainer StyleClasses="LowDivider"/>
+        <GridContainer Columns="2" HSeparationOverride="8" VSeparationOverride="6">
+            <Label Text="{Loc 'ui-samples-shuttle-speed'}"/>
+            <Label Name="SpeedLabel" Text="0 m/s" HorizontalExpand="True"/>
+            <Label Text="{Loc 'ui-samples-shuttle-fuel'}"/>
+            <ProgressBar Name="FuelBar"
+                         MinValue="0"
+                         MaxValue="1"
+                         Value="0.75"
+                         MinHeight="16"
+                         HorizontalExpand="True"/>
+            <Label Text="{Loc 'ui-samples-shuttle-hull'}"/>
+            <ProgressBar Name="HullBar"
+                         MinValue="0"
+                         MaxValue="1"
+                         Value="1"
+                         MinHeight="16"
+                         HorizontalExpand="True"/>
+        </GridContainer>
+        <Control VerticalExpand="True"/>
+        <BoxContainer Orientation="Horizontal" SeparationOverride="4">
+            <Button Name="EngineButton"
+                    Text="{Loc 'ui-samples-shuttle-engines'}"
+                    ToggleMode="True"
+                    HorizontalExpand="True"/>
+            <controls:ConfirmButton Name="EmergencyStopButton"
+                                    Text="{Loc 'ui-samples-shuttle-emergency-stop'}"
+                                    StyleClasses="Caution"
+                                    HorizontalExpand="True"/>
+        </BoxContainer>
+        <controls:StripeBack>
+            <Label Text="{Loc 'ui-samples-footer'}" StyleClasses="WindowFooterText" Align="Center"/>
+        </controls:StripeBack>
+    </BoxContainer>
+</controls:FancyWindow>

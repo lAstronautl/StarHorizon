@@ -53,13 +53,29 @@ def list_xaml():
     return result
 
 
+def _locale_stamp(base):
+    """Количество и максимальное время изменения .ftl — чтобы подхватывать новые ключи без перезапуска."""
+    count, latest = 0, 0.0
+    for root, _dirs, files in os.walk(base):
+        for f in files:
+            if f.endswith(".ftl"):
+                count += 1
+                try:
+                    latest = max(latest, os.path.getmtime(os.path.join(root, f)))
+                except OSError:
+                    pass
+    return count, latest
+
+
 def load_locale(lang):
-    if lang in _loc_cache:
-        return _loc_cache[lang]
     base = os.path.join(REPO, "Resources", "Locale", lang)
+    stamp = _locale_stamp(base) if os.path.isdir(base) else None
+    cached = _loc_cache.get(lang)
+    if cached and cached[0] == stamp:
+        return cached[1]
     data = {}
     if not os.path.isdir(base):
-        _loc_cache[lang] = data
+        _loc_cache[lang] = (stamp, data)
         return data
     key_re = re.compile(r"^([A-Za-z0-9_\-]+)\s*=\s*(.*)$")
     for root, _dirs, files in os.walk(base):
@@ -91,7 +107,7 @@ def load_locale(lang):
                             cur_key = None
             except OSError:
                 pass
-    _loc_cache[lang] = data
+    _loc_cache[lang] = (stamp, data)
     return data
 
 
