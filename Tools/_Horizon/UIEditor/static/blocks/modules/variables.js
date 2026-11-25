@@ -3,7 +3,7 @@
 (() => {
     const TYPES = { num: "число", text: "текст", bool: "да/нет" };
     UIBlocks.registerModule({
-        id: "variables", name: "Переменные", color: "#ff7a1a",
+        id: "variables", name: "Переменные", color: "#ff7a1a", scope: "both",
         paletteTop(pal, api) {
             const btn = document.createElement("button");
             btn.className = "blk-pal-btn";
@@ -30,7 +30,7 @@
         blocks: [
             { id: "var_get", shape: "reporter", text: "{V}",
               args: { V: { type: "var" } },
-              out: (b, api) => (api.program.vars.find(v => v.name === b.args.V) || {}).type || "text",
+              out: (b, api, prog) => ((prog || api.program).vars.find(v => v.name === b.args.V) || {}).type || "text",
               paletteIf: api => api.program.vars.length > 0,
               gen: (ctx, a) => ctx.varField(a.V.raw) },
             { id: "var_set", shape: "cmd", text: "задать {V} = {X}",

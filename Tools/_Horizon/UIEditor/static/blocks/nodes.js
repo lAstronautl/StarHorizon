@@ -339,7 +339,7 @@ const UINodes = (() => {
             if (spec.type === "control") opts = B.controlsOf(spec).map(c => [c.name, c.name]);
             else if (spec.type === "var") opts = B.program.vars.filter(v => !spec.vtypes || spec.vtypes.includes(v.type)).map(v => [v.name, v.name]);
             else if (spec.type === "proc") opts = B.program.procs.map(x => [x, x]);
-            else opts = spec.options || [];
+            else opts = (typeof spec.options === "function" ? spec.options(B) : spec.options) || [];
             const v = b.args[name];
             if (v && !opts.some(o => o[1] === v)) opts = [[v + " (?)", v], ...opts];
             if (!opts.length) opts = [["—", ""]];
@@ -578,14 +578,14 @@ const UINodes = (() => {
     // ---------------------------------------------------------------
     function palette(pal) {
         const isWin = B.host() && B.host().isWindow();
-        for (const m of B.modules) {
+        for (const m of B.visibleModules()) {
             const head = el("div", "blk-pal-head", m.name);
             head.id = "pal-" + m.id;
             head.style.color = m.color;
             pal.appendChild(head);
             if (m.paletteTop) m.paletteTop(pal, B);
             for (const d of m.blocks) {
-                if (d.hidden || (d.windowOnly && !isWin) || (d.paletteIf && !d.paletteIf(B))) continue;
+                if (d.hidden || !B.blockInScope(d) || (d.windowOnly && !isWin) || (d.paletteIf && !d.paletteIf(B))) continue;
                 const it = el("div", "node-pal-item", /^[…\s]*$/.test(title(d)) ? (d.id === "var_get" ? "переменная" : m.name) : title(d));
                 it.style.setProperty("--c", d.color || m.color);
                 it.dataset.op = d.id;

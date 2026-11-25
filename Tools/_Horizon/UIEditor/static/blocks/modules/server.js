@@ -1,0 +1,46 @@
+// Модуль «Предмет» (сервер): события и действия серверной части предмета.
+// Код выполняется на сервере: переменные предмета общие для всех игроков, у каждого экземпляра свои.
+"use strict";
+UIBlocks.registerModule({
+    id: "server", name: "Предмет", color: "#1f9bd1", scope: "server",
+    blocks: [
+        { id: "sv_action", shape: "hat", text: "когда пришло действие {A}", serverEvent: "message",
+          help: "Срабатывает, когда окно делает «отправить на сервер <действие>»",
+          args: { A: { type: "text", def: "действие" } },
+          serverCall: (ctx, a, m) => `if (msg.Action == ${a.A.code})\n    ${m}(ent, user, value);` },
+        { id: "sv_opened", shape: "hat", text: "когда игрок открыл окно", serverEvent: "opened" },
+        { id: "sv_init", shape: "hat", text: "когда предмет появился", serverEvent: "init",
+          help: "Один раз при появлении предмета в мире; игрока здесь нет" },
+
+        { id: "sv_popup_user", shape: "cmd", text: "сообщение игроку {T}",
+          args: { T: { type: "text", def: "Готово!" } },
+          gen: (ctx, a) => `if (user.Valid)\n    _popup.PopupEntity(${a.T.code}, ent, user);` },
+        { id: "sv_popup_all", shape: "cmd", text: "сообщение всем рядом {T}",
+          args: { T: { type: "text", def: "Пип!" } },
+          gen: (ctx, a) => `_popup.PopupEntity(${a.T.code}, ent);` },
+        { id: "sv_sound", shape: "cmd", text: "звук {P}",
+          args: { P: { type: "choice", options: [["пип", "/Audio/Machines/beep.ogg"], ["дзынь", "/Audio/Machines/ding.ogg"], ["короткий пип", "/Audio/Machines/quickbeep.ogg"]] } },
+          gen: (ctx, a) => `_audio.PlayPvs(new SoundPathSpecifier(${ctx.str(a.P.raw)}), ent);` },
+        { id: "sv_spawn", shape: "cmd", text: "создать {P} рядом",
+          help: "ID прототипа, например Crowbar или FoodApple",
+          args: { P: { type: "text", def: "FoodApple" } },
+          gen: (ctx, a) => `Spawn(${a.P.code}, Transform(ent).Coordinates);` },
+        { id: "sv_give", shape: "cmd", text: "создать {P} и дать игроку",
+          args: { P: { type: "text", def: "FoodApple" } },
+          gen: (ctx, a) => `_hands.PickupOrDrop(user.Valid ? user : null, Spawn(${a.P.code}, Transform(ent).Coordinates));` },
+        { id: "sv_close", shape: "cmd", text: "закрыть окно у игрока",
+          gen: ctx => `_ui.CloseUi(ent.Owner, ${ctx.uiKey}, user);` },
+        { id: "sv_update", shape: "cmd", text: "обновить окно",
+          help: "Обычно не нужно: окно обновляется само после каждого действия",
+          gen: () => "UpdateUi(ent);" },
+        { id: "sv_delete", shape: "cap", text: "удалить этот предмет",
+          gen: () => "QueueDel(ent);\nreturn;" },
+
+        { id: "sv_value", shape: "reporter", text: "значение из окна", out: "text",
+          help: "Значение, отправленное вместе с действием", gen: () => "value" },
+        { id: "sv_user_name", shape: "reporter", text: "имя игрока", out: "text",
+          gen: () => `user.Valid ? Name(user) : ""` },
+        { id: "sv_item_name", shape: "reporter", text: "имя предмета", out: "text",
+          gen: () => "Name(ent)" },
+    ],
+});

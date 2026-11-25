@@ -71,6 +71,11 @@
             </div>
             <div id="blkMain">
                 <div class="srcbar">
+                    <span class="seg scope-seg">
+                        <button id="blkScopeClient" title="Логика окна: выполняется у игрока">Окно</button>
+                        <button id="blkScopeServer" title="Логика предмета: выполняется на сервере">Сервер (предмет)</button>
+                    </span>
+                    <button id="itemSettings" title="Предмет, к которому привязано окно">Предмет…</button>
                     <span class="seg">
                         <button id="blkModeBlocks" title="Блоки как в Scratch">Блоки</button>
                         <button id="blkModeNodes" title="Узлы со стрелками, как в Blender">Узлы</button>
@@ -87,7 +92,7 @@
                 <div id="blkWarnings" class="err"></div>
             </div>
             <div id="blkCodeWrap">
-                <div class="srcbar"><b>C# → &lt;Класс&gt;.logic.cs</b><button id="blkCopy">Копировать</button></div>
+                <div class="srcbar"><b id="blkCodeTitle">C# → &lt;Класс&gt;.logic.cs</b><button id="blkCopy">Копировать</button></div>
                 <textarea id="blkCode" spellcheck="false" readonly></textarea>
             </div>
         </div>
@@ -145,12 +150,41 @@
     </form>
 </dialog>
 
+<dialog id="itemDlg">
+    <form method="dialog" class="dlg">
+        <h3>Предмет с этим окном</h3>
+        <p class="dim">Редактор создаст прототип предмета, BoundUserInterface, общий код и серверную систему.
+            Предмет открывает окно при использовании (в руке — клавиша Z, или клик по нему).</p>
+        <label>ID прототипа (латиница, с заглавной: HorizonCargoTerminal)
+            <input id="itemId" pattern="[A-Z][A-Za-z0-9]*" required>
+        </label>
+        <label>Название <input id="itemName"></label>
+        <label>Описание <input id="itemDesc"></label>
+        <label>Родитель (прототип) <input id="itemParent" placeholder="BaseItem"></label>
+        <div class="item-sprite">
+            <label>Спрайт (RSI в Resources/Textures)
+                <input id="itemSprite" list="rsiList" placeholder="Objects/Devices/gps.rsi">
+            </label>
+            <label>Состояние <select id="itemState"></select></label>
+            <img id="itemPreview" alt="">
+        </div>
+        <datalist id="rsiList"></datalist>
+        <span id="itemErr" class="err"></span>
+        <menu>
+            <button value="unlink" id="itemUnlink" formnovalidate>Отвязать предмет</button>
+            <button value="cancel" formnovalidate>Отмена</button>
+            <button value="ok" id="itemOk">Сохранить</button>
+        </menu>
+    </form>
+</dialog>
+
 <div id="ctxMenu" class="ctx" hidden></div>
 <div id="toast"></div>
 
 <script src="schema.js"></script>
 <script src="blocks/engine.js"></script>
 <script src="blocks/nodes.js"></script>
+<script src="blocks/item.js"></script>
 <script src="editor.js"></script>
 </body>
 </html>

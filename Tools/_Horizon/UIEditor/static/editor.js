@@ -1514,6 +1514,7 @@ function blocksMeta() {
         ns: ci.namespace || $("#csNamespace").value.trim() || "Content.Client",
         cls: ci.className || $("#csClass").value.trim() || "MyWindow",
         isWindow: !!(s && s.root),
+        dir: doc.path ? doc.path.replace(/\/[^/]*$/, "") : "Content.Client",
     };
 }
 const post = (url, body) => api(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
@@ -1538,6 +1539,16 @@ async function doSave(withCs) {
                 if (r.result === "added") msg += ", в конструктор добавлен InitializeLogic()";
                 if (r.result === "no-anchor") msg += ". ⚠ Добавьте вызов InitializeLogic(); в конструктор вручную";
                 if (gen.warnings.length) msg += `. ⚠ Пропущено блоков: ${gen.warnings.length}`;
+                if (UIBlocks.root.item) {
+                    const item = UIBlocks.generateItem(blocksMeta());
+                    const errs = [];
+                    for (const f of item.files) {
+                        try { await post("/api/save", { path: f.path, content: f.content }); }
+                        catch (e) { errs.push(`${f.path}: ${e.message}`); }
+                    }
+                    msg += errs.length ? `. ⚠ Предмет: ${errs.join("; ")}` : ` + предмет ${UIBlocks.root.item.id} (прототип, сервер, BUI)`;
+                    if (item.warnings.length) msg += `. ⚠ Серверных блоков пропущено: ${item.warnings.length}`;
+                }
             }
         }
         $("#fileName").textContent = doc.path;
@@ -1560,7 +1571,7 @@ function download() {
 }
 
 function saveDraft() {
-    try { localStorage.setItem("ss14-ui-editor-draft", JSON.stringify({ xaml: serializeDoc(), path: doc.path, blocks: UIBlocks.program })); } catch (e) { /* нет хранилища */ }
+    try { localStorage.setItem("ss14-ui-editor-draft", JSON.stringify({ xaml: serializeDoc(), path: doc.path, blocks: UIBlocks.root })); } catch (e) { /* нет хранилища */ }
 }
 function loadDraft() {
     try {
@@ -1714,7 +1725,7 @@ function setupUi() {
 }
 
 // Модули блоков: список берём у сервера (можно просто положить новый .js в blocks/modules)
-const DEFAULT_BLOCK_MODULES = ["events.js", "looks.js", "control.js", "operators.js", "variables.js", "myblocks.js"];
+const DEFAULT_BLOCK_MODULES = ["events.js", "looks.js", "link.js", "server.js", "control.js", "operators.js", "variables.js", "myblocks.js"];
 async function loadBlockModules() {
     let list = DEFAULT_BLOCK_MODULES;
     if (serverMode) {
@@ -1770,6 +1781,13 @@ async function loadBlockModules() {
         toast,
     });
     UINodes.init({ toast });
+    UIItem.init({
+        isWindow: () => blocksMeta().isWindow,
+        getMeta: blocksMeta,
+        getPath: () => doc.path,
+        serverMode: () => serverMode,
+        toast,
+    });
     if (!loadDraft()) loadDocument(TEMPLATES[1].xaml, null);
     if (serverMode) await loadLocale();
 })();

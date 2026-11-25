@@ -1,21 +1,21 @@
 // Модуль «Управление»: ожидание, циклы, условия.
 "use strict";
 UIBlocks.registerModule({
-    id: "control", name: "Управление", color: "#e08a1e",
+    id: "control", name: "Управление", color: "#e08a1e", scope: "both",
     blocks: [
-        { id: "wait", shape: "cmd", text: "ждать {N} сек.", async: true,
+        { id: "wait", shape: "cmd", text: "ждать {N} сек.", async: true, scopes: ["client"],
           args: { N: { type: "num", def: 1 } },
           gen: (ctx, a) => `await Robust.Shared.Timing.Timer.Delay(TimeSpan.FromSeconds(Math.Max(0, ${a.N.code})));` },
         { id: "repeat", shape: "c", text: "повторить {N} раз",
           args: { N: { type: "num", def: 10 } },
           gen: (ctx, a) => { const i = ctx.loopVar(); return `for (var ${i} = 0; ${i} < (int) Math.Round(${a.N.code}); ${i}++)\n{\n${a.SUB}\n}`; } },
-        { id: "forever", shape: "c", text: "повторять всегда", async: true,
+        { id: "forever", shape: "c", text: "повторять всегда", async: true, scopes: ["client"],
           help: "Повторяется раз в ~30 мс, пока окно открыто",
           gen: (ctx, a) => `while (!_uiStopped)\n{\n${a.SUB}\n    await Robust.Shared.Timing.Timer.Delay(30);\n}` },
-        { id: "while", shape: "c", text: "повторять пока {B}", async: true,
+        { id: "while", shape: "c", text: "повторять пока {B}", async: true, scopes: ["client"],
           args: { B: { type: "bool" } },
           gen: (ctx, a) => `while (!_uiStopped && ${a.B.code})\n{\n${a.SUB}\n    await Robust.Shared.Timing.Timer.Delay(30);\n}` },
-        { id: "wait_until", shape: "cmd", text: "ждать до {B}", async: true,
+        { id: "wait_until", shape: "cmd", text: "ждать до {B}", async: true, scopes: ["client"],
           args: { B: { type: "bool" } },
           gen: (ctx, a) => `while (!_uiStopped && !${a.B.code})\n    await Robust.Shared.Timing.Timer.Delay(50);` },
         { id: "if", shape: "c", text: "если {B} то",

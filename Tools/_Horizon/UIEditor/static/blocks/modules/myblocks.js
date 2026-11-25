@@ -1,7 +1,7 @@
 // Модуль «Мои блоки»: свои подпрограммы. «определить» задаёт тело, «выполнить» вызывает его.
 "use strict";
 UIBlocks.registerModule({
-    id: "myblocks", name: "Мои блоки", color: "#e0457b",
+    id: "myblocks", name: "Мои блоки", color: "#e0457b", scope: "both",
     paletteTop(pal, api) {
         const btn = document.createElement("button");
         btn.className = "blk-pal-btn";
@@ -20,6 +20,6 @@ UIBlocks.registerModule({
         { id: "proc_call", shape: "cmd", text: "выполнить {P}",
           args: { P: { type: "proc" } },
           paletteIf: api => api.program.procs.length > 0,
-          gen: (ctx, a) => ctx.procAsync(a.P.raw) ? `await ${ctx.procMethod(a.P.raw)}();` : `${ctx.procMethod(a.P.raw)}();` },
+          gen: (ctx, a) => `${ctx.procCall(a.P.raw)};` },
     ],
 });

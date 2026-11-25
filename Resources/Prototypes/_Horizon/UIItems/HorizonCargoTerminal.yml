@@ -1,0 +1,19 @@
+# Сгенерировано SS14 UI Editor (предмет «грузовой терминал»). Не редактируйте вручную: файл перезаписывается при сохранении.
+- type: entity
+  parent: BaseItem
+  id: HorizonCargoTerminal
+  name: "грузовой терминал"
+  description: "Карманный терминал заказа грузов. Собран в UI Editor."
+  components:
+  - type: Sprite
+    sprite: Objects/Devices/gps.rsi
+    state: icon
+  - type: Item
+    sprite: Objects/Devices/gps.rsi
+  - type: ActivatableUI
+    key: enum.HorizonCargoTerminalUiKey.Key
+  - type: UserInterface
+    interfaces:
+      enum.HorizonCargoTerminalUiKey.Key:
+        type: HorizonCargoTerminalBoundUserInterface
+  - type: HorizonCargoTerminalItem

@@ -7,7 +7,7 @@
         gen: (ctx, a) => `${a.A.code} ${sym === "×" ? "*" : sym === "÷" ? "/" : sym === "≠" ? "!=" : sym} ${a.B.code}`,
     });
     UIBlocks.registerModule({
-        id: "operators", name: "Операторы", color: "#4caf50",
+        id: "operators", name: "Операторы", color: "#4caf50", scope: "both",
         blocks: [
             bin("op_add", "+"), bin("op_sub", "-"), bin("op_mul", "×"), bin("op_div", "÷"),
             { id: "op_mod", shape: "reporter", text: "остаток {A} / {B}", out: "num",

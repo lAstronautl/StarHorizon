@@ -33,6 +33,29 @@ SKIP_DIRS = {".git", "bin", "obj", "node_modules", "RobustToolbox", ".vs", ".ide
 WRITE_ROOTS = ("Content.Client", "Content.Replay", "Content.Shared", "Content.Server")
 ALLOWED_EXT = (".xaml", ".xaml.cs", ".logic.cs")
 LOAD_ANCHOR = "RobustXamlLoader.Load(this);"
+GEN_MARK = "Сгенерировано SS14 UI Editor"
+# Файлы предмета, которые генерирует редактор (перезаписываются, только если созданы им же)
+ITEM_PATTERNS = (
+    re.compile(r"^Content\.Shared/_Horizon/UIItems/\w+\.cs$"),
+    re.compile(r"^Content\.Server/_Horizon/UIItems/\w+\.cs$"),
+    re.compile(r"^Content\.Client/[\w./]+BoundUserInterface\.cs$"),
+    re.compile(r"^Resources/Prototypes/_Horizon/UIItems/\w+\.yml$"),
+)
+_rsi_cache = None
+
+
+def list_rsi():
+    global _rsi_cache
+    if _rsi_cache is None:
+        base = os.path.join(REPO, "Resources", "Textures")
+        out = []
+        for root, dirs, _files in os.walk(base):
+            for d in list(dirs):
+                if d.endswith(".rsi"):
+                    out.append(os.path.relpath(os.path.join(root, d), base).replace(os.sep, "/"))
+                    dirs.remove(d)
+        _rsi_cache = sorted(out)
+    return _rsi_cache
 
 
 def cs_info(full):
@@ -217,6 +240,18 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json({"exists": False})
             return self._json(cs_info(full))
 
+        if path == "/api/rsi":
+            rel = q.get("path", [""])[0]
+            if not rel:
+                return self._json({"rsi": list_rsi()})
+            base = os.path.join(REPO, "Resources", "Textures")
+            meta = os.path.join(base, rel, "meta.json")
+            if not rel.endswith(".rsi") or not is_inside(base, meta) or not os.path.isfile(meta):
+                return self._error(404, "not found")
+            with open(meta, encoding="utf-8-sig") as fh:
+                data = json.load(fh)
+            return self._json({"states": [st.get("name") for st in data.get("states", [])]})
+
         if path == "/api/blockmodules":
             mdir = os.path.join(STATIC, "blocks", "modules")
             names = sorted(f for f in os.listdir(mdir) if f.endswith(".js")) if os.path.isdir(mdir) else []
@@ -274,11 +309,20 @@ class Handler(BaseHTTPRequestHandler):
         overwrite = bool(data.get("overwrite", True))
         if not isinstance(content, str):
             return self._error(400, "no content")
-        if not rel.endswith(ALLOWED_EXT):
-            return self._error(400, "можно сохранять только .xaml, .xaml.cs и .logic.cs")
-        if not rel.split("/")[0] in WRITE_ROOTS:
-            return self._error(400, "сохранять можно только внутри " + ", ".join(WRITE_ROOTS))
         full = os.path.join(REPO, rel)
+        if any(p.match(rel) for p in ITEM_PATTERNS):
+            # сгенерированный файл предмета: не трогаем то, что написано руками
+            if GEN_MARK not in content[:300]:
+                return self._error(400, "файл предмета должен быть сгенерирован редактором")
+            if os.path.isfile(full):
+                with open(full, encoding="utf-8-sig") as fh:
+                    if GEN_MARK not in fh.read(400):
+                        return self._error(409, "файл " + rel + " написан вручную — не перезаписываю")
+        else:
+            if not rel.endswith(ALLOWED_EXT):
+                return self._error(400, "можно сохранять только .xaml, .xaml.cs и .logic.cs")
+            if not rel.split("/")[0] in WRITE_ROOTS:
+                return self._error(400, "сохранять можно только внутри " + ", ".join(WRITE_ROOTS))
         if not is_inside(REPO, full):
             return self._error(400, "bad path")
         if os.path.exists(full) and not overwrite:

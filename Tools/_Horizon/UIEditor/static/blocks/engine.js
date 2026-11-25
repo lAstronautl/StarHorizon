@@ -9,7 +9,9 @@
 const UIBlocks = (() => {
     const modules = [];
     const defs = {};
-    let program = emptyProgram();
+    let root = emptyProgram();     // программа окна (в ней же root.item — предмет и его серверная программа)
+    let program = root;            // текущая редактируемая программа (окно или сервер)
+    let scope = "client";
     let host = null; // доступ к редактору интерфейса (getControls, isWindow, getMeta, onChange)
     let activeModule = null;
     let uidCounter = 1;
@@ -43,7 +45,7 @@ const UIBlocks = (() => {
             else if (s.type === "control") b.args[k] = firstControl(s) || "";
             else if (s.type === "var") b.args[k] = (filteredVars(s)[0] || {}).name || "";
             else if (s.type === "proc") b.args[k] = program.procs[0] || "";
-            else if (s.type === "choice") b.args[k] = s.options[0][1];
+            else if (s.type === "choice") { const o = typeof s.options === "function" ? s.options(api) : s.options; b.args[k] = o.length ? o[0][1] : ""; }
             else if (s.type === "color") b.args[k] = "#FFFFFF";
             else if (s.type === "bool") { /* пустой слот */ }
             else b.args[k] = "";
@@ -62,10 +64,10 @@ const UIBlocks = (() => {
     const shapeOf = b => defs[b.op] ? defs[b.op].shape : "cmd";
     const isReporter = b => ["reporter", "bool"].includes(shapeOf(b));
 
-    function outType(b) {
+    function outType(b, prog = program) {
         const d = defs[b.op];
         if (!d) return "text";
-        if (typeof d.out === "function") return d.out(b, api);
+        if (typeof d.out === "function") return d.out(b, api, prog);
         return d.out || (d.shape === "bool" ? "bool" : "text");
     }
 
@@ -77,18 +79,26 @@ const UIBlocks = (() => {
         if (undoStack.length > 100) undoStack.shift();
         redoStack.length = 0;
     }
+    function assignCurrent(p) {
+        if (scope === "server") { root.item.server = p; program = p; }
+        else { root = p; program = p; }
+    }
     function undo() {
         if (!undoStack.length) return;
         redoStack.push(JSON.stringify(program));
-        program = JSON.parse(undoStack.pop());
+        assignCurrent(JSON.parse(undoStack.pop()));
         changed();
     }
     function redo() {
         if (!redoStack.length) return;
         undoStack.push(JSON.stringify(program));
-        program = JSON.parse(redoStack.pop());
+        assignCurrent(JSON.parse(redoStack.pop()));
         changed();
     }
+    // модули и блоки текущей области (окно/сервер)
+    const blockInScope = (d, sc) => !d.scopes || d.scopes.includes(sc);
+    const moduleInScope = (m, sc) => (m.scope || "client") === sc || m.scope === "both";
+    const visibleModules = () => modules.filter(m => moduleInScope(m, scope));
     let genTimer = null;
     function changed(rerender = true) {
         if (rerender) {
@@ -192,7 +202,7 @@ const UIBlocks = (() => {
                 if (spec.type === "control") opts = controlsOf(spec).map(c => [c.name, c.name]);
                 else if (spec.type === "var") opts = filteredVars(spec).map(x => [x.name, x.name]);
                 else if (spec.type === "proc") opts = program.procs.map(x => [x, x]);
-                else opts = spec.options;
+                else opts = typeof spec.options === "function" ? spec.options(api) : spec.options;
                 if (v && !opts.some(o => o[1] === v)) opts = [[v + " (?)", v], ...opts];
                 if (!opts.length) opts = [["—", ""]];
                 for (const [label, val] of opts) { const o = el("option", "", label); o.value = val; inp.appendChild(o); }
@@ -251,7 +261,9 @@ const UIBlocks = (() => {
         const pal = document.getElementById("blkPalette");
         if (!cats || !pal) return;
         cats.innerHTML = "";
-        for (const m of modules) {
+        const vis = visibleModules();
+        if (!vis.some(m => m.id === activeModule) && vis[0]) activeModule = vis[0].id;
+        for (const m of vis) {
             const c = el("button", "blk-cat" + (m.id === activeModule ? " active" : ""));
             const dot = el("span", "dot"); dot.style.background = m.color;
             c.append(dot, el("span", "", m.name));
@@ -266,14 +278,14 @@ const UIBlocks = (() => {
         pal.innerHTML = "";
         if (api.paletteOverride) { api.paletteOverride(pal); return; }
         const isWin = host && host.isWindow();
-        for (const m of modules) {
+        for (const m of vis) {
             const head = el("div", "blk-pal-head", m.name);
             head.id = "pal-" + m.id;
             head.style.color = m.color;
             pal.appendChild(head);
             if (m.paletteTop) m.paletteTop(pal, api);
             for (const d of m.blocks) {
-                if (d.hidden) continue;
+                if (d.hidden || !blockInScope(d, scope)) continue;
                 if (d.windowOnly && !isWin) continue;
                 if (d.paletteIf && !d.paletteIf(api)) continue;
                 const proto = makeBlock(d.id);
@@ -549,9 +561,13 @@ const UIBlocks = (() => {
         return code;
     }
 
-    function validateBlock(b) {
+    const scopeOfProg = prog => (prog === root ? "client" : "server");
+
+    function validateBlock(b, prog = program) {
         const d = defs[b.op];
         if (!d) return "Неизвестный блок";
+        const sc = scopeOfProg(prog);
+        if (!blockInScope(d, sc)) return sc === "server" ? "Этот блок работает только в окне (клиент)" : "Этот блок работает только на сервере";
         if (d.windowOnly && host && !host.isWindow()) return "Блок работает только в окнах";
         for (const [k, spec] of Object.entries(d.args)) {
             const v = b.args[k];
@@ -561,20 +577,27 @@ const UIBlocks = (() => {
                 if (!c) return `Элемент «${v}» не найден`;
                 if (spec.of && !spec.of.includes(c.type)) return `Элемент «${v}» (${c.type}) не подходит`;
             }
-            if (spec.type === "var" && !program.vars.some(x => x.name === v)) return v ? `Нет переменной «${v}»` : "Не выбрана переменная";
-            if (spec.type === "proc" && !program.procs.includes(v)) return "Не выбран блок";
+            if (spec.type === "var" && !prog.vars.some(x => x.name === v)) return v ? `Нет переменной «${v}»` : "Не выбрана переменная";
+            if (spec.type === "proc" && !prog.procs.includes(v)) return "Не выбран блок";
+            if (spec.type === "choice" && spec.required && !v) return "Не выбрано значение";
         }
         return null;
     }
 
-    function generate(meta) {
+    // Транслитерация для серверных идентификаторов (поля компонента, ключи YAML)
+    const TR = { а: "a", б: "b", в: "v", г: "g", д: "d", е: "e", ё: "e", ж: "zh", з: "z", и: "i", й: "y", к: "k", л: "l", м: "m", н: "n", о: "o", п: "p", р: "r", с: "s", т: "t", у: "u", ф: "f", х: "h", ц: "ts", ч: "ch", ш: "sh", щ: "sch", ъ: "", ы: "y", ь: "", э: "e", ю: "yu", я: "ya" };
+    const translit = s => String(s).toLowerCase().split("").map(c => (TR[c] !== undefined ? TR[c] : c)).join("").replace(/[^a-z0-9_]/g, "_").replace(/^(\d)/, "_$1");
+    const svField = name => "V_" + translit(name);
+
+    // Общий компилятор блоков. mode: "client" (окно) или "server" (система предмета).
+    function compile(prog, mode, meta) {
         const uses = new Set();
         const warnings = [];
         let loopN = 0;
         const controls = new Map((host ? host.getControls() : []).map(c => [c.name, c.type]));
         const procAsync = {};
         const procBodies = {};
-        for (const s of program.scripts) {
+        for (const s of prog.scripts) {
             const top = s.blocks[0];
             if (top && top.op === "proc_def" && top.args.P) procBodies[top.args.P] = s.blocks.slice(1);
         }
@@ -585,33 +608,41 @@ const UIBlocks = (() => {
             if (b.op === "proc_call" && procAsync[b.args.P]) return true;
             return containsAwait(b.sub || []) || containsAwait(b.sub2 || []);
         });
-        // распространение async по вызовам «моих блоков»
         for (let i = 0; i < 10; i++) {
             let ch = false;
             for (const [p, body] of Object.entries(procBodies)) {
-                const a = containsAwait(body);
-                if (a && !procAsync[p]) { procAsync[p] = true; ch = true; }
+                if (containsAwait(body) && !procAsync[p]) { procAsync[p] = true; ch = true; }
             }
             if (!ch) break;
         }
-
+        const server = mode === "server";
         const ctx = {
+            mode,
             isWindow: meta.isWindow,
             use: f => uses.add(f),
             typeOf: name => controls.get(name),
-            varField: name => "_v_" + ident(name),
-            varType: name => (program.vars.find(v => v.name === name) || {}).type || "text",
-            procMethod: name => "Blk_" + ident(name),
-            procAsync: name => !!procAsync[name],
+            varField: name => (server ? "ent.Comp." + svField(name) : "_v_" + ident(name)),
+            varType: name => (prog.vars.find(v => v.name === name) || {}).type || "text",
+            procMethod: name => "Blk_" + (server ? translit(name) : ident(name)),
+            procAsync: name => !server && !!procAsync[name],
+            procCall: name => {
+                const m = "Blk_" + (server ? translit(name) : ident(name));
+                if (server) return `${m}(ent, user, value)`;
+                return procAsync[name] ? `await ${m}()` : `${m}()`;
+            },
             loopVar: () => "i" + (++loopN),
-            stopCheck: "if (_uiStopped) return;",
+            stopCheck: server ? "" : "if (_uiStopped) return;",
             str: csString,
             num: csNumber,
+            uiKey: root.item ? `${root.item.id}UiKey.Key` : "default!",
+            serverVarType: name => {
+                const it = root.item;
+                const v = it && it.server.vars.find(x => x.name === name);
+                return v ? v.type : "text";
+            },
         };
-
         function arg(b, name) {
-            const d = defs[b.op];
-            const spec = d.args[name];
+            const spec = defs[b.op].args[name];
             const v = b.args[name];
             if (isBlock(v)) {
                 const r = expr(v);
@@ -630,7 +661,7 @@ const UIBlocks = (() => {
             }
         }
         function args(b) {
-            const w = validateBlock(b);
+            const w = validateBlock(b, prog);
             if (w) throw new Skip(w);
             const a = {};
             for (const k of Object.keys(defs[b.op].args)) a[k] = arg(b, k);
@@ -640,8 +671,9 @@ const UIBlocks = (() => {
             const d = defs[b.op];
             if (!d) throw new Skip("неизвестный блок " + b.op);
             const code = d.gen(ctx, args(b), b);
-            return { code: `(${code})`, type: outType(b) };
+            return { code: `(${code})`, type: outType(b, prog) };
         }
+        const label = d => (d ? d.text.replace(/\{\w+\}/g, "…") : "?");
         function stmts(list) {
             const out = [];
             for (const b of list) {
@@ -654,53 +686,82 @@ const UIBlocks = (() => {
                         a.SUB2 = indent(stmts(b.sub2 || []));
                     }
                     out.push(d.gen(ctx, a, b));
-                    if (d.async) out.push(ctx.stopCheck);
+                    if (d.async && ctx.stopCheck) out.push(ctx.stopCheck);
                 } catch (e) {
                     if (!(e instanceof Skip)) throw e;
-                    warnings.push(`${d ? d.text.replace(/\{\w+\}/g, "…") : b.op}: ${e.message}`);
+                    warnings.push(`${label(d)}: ${e.message}`);
                     out.push(`// ⚠ блок пропущен: ${e.message}`);
                 }
             }
             return out.join("\n");
         }
+        function hatArgs(top) {
+            try { return args(top); }
+            catch (e) {
+                if (!(e instanceof Skip)) throw e;
+                warnings.push(`${label(defs[top.op])}: ${e.message}`);
+                return null;
+            }
+        }
+        return { ctx, stmts, hatArgs, containsAwait, procAsync, warnings, uses };
+    }
 
+    const COMMON_HELPERS = [
+`private static double UiNum(string? s) =>
+    double.TryParse((s ?? "").Trim().Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out var v) ? v : 0;`,
+`private static string UiText(double v) => v.ToString("0.######", CultureInfo.InvariantCulture);`,
+`private static string UiText(bool v) => v ? "true" : "false";`,
+`private static bool UiBool(string s) => s.Trim().ToLowerInvariant() is "true" or "1" or "да";`,
+`private static bool UiEq(string a, string b)
+{
+    if (double.TryParse(a.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out var x) &&
+        double.TryParse(b.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out var y))
+        return Math.Abs(x - y) < 1e-9;
+    return string.Equals(a, b, StringComparison.OrdinalIgnoreCase);
+}`];
+    const RANDOM_HELPER =
+`private double UiRandom(double a, double b)
+{
+    if (a > b)
+        (a, b) = (b, a);
+    if (a == Math.Floor(a) && b == Math.Floor(b))
+        return _uiRandom.Next((int) a, (int) b + 1);
+    return a + _uiRandom.NextDouble() * (b - a);
+}`;
+    const GEN_MARK = "Сгенерировано SS14 UI Editor";
+
+    function generate(meta) {
+        const c = compile(root, "client", meta);
+        const { ctx, stmts, containsAwait, procAsync, warnings, uses } = c;
         const init = [];
         const methods = [];
-        for (const s of program.scripts) {
+        for (const s of root.scripts) {
             const top = s.blocks[0];
-            if (!top) continue;
-            const d = defs[top.op];
+            const d = top && defs[top.op];
             if (!d || d.shape !== "hat") continue;
             const body = s.blocks.slice(1);
-            try {
-                if (top.op === "proc_def") {
-                    const name = top.args.P;
-                    if (!name) throw new Skip("не задано имя блока");
-                    const asy = procAsync[name];
-                    methods.push(`private ${asy ? "async Task" : "void"} ${ctx.procMethod(name)}()\n{\n${indent(stmts(body))}\n}`);
-                    continue;
-                }
-                const a = args(top);
-                const asy = containsAwait(body);
-                const inner = indent(stmts(body));
-                const run = asy ? `UiRunAsync(async () =>\n{\n${inner}\n})` : `UiRun(() =>\n{\n${inner}\n})`;
-                init.push(d.gen(ctx, a, run, top));
-            } catch (e) {
-                if (!(e instanceof Skip)) throw e;
-                warnings.push(`${d.text.replace(/\{\w+\}/g, "…")}: ${e.message}`);
-                init.push(`// ⚠ скрипт пропущен: ${e.message}`);
+            if (top.op === "proc_def") {
+                const name = top.args.P;
+                if (!name) continue;
+                methods.push(`private ${procAsync[name] ? "async Task" : "void"} ${ctx.procMethod(name)}()\n{\n${indent(stmts(body))}\n}`);
+                continue;
             }
+            const a = c.hatArgs(top);
+            if (!a) { init.push(`// ⚠ скрипт «${d.text.replace(/\{\w+\}/g, "…")}» пропущен`); continue; }
+            const inner = indent(stmts(body));
+            const run = containsAwait(body) ? `UiRunAsync(async () =>\n{\n${inner}\n})` : `UiRun(() =>\n{\n${inner}\n})`;
+            init.push(d.gen(ctx, a, run, top));
         }
         if (meta.isWindow) init.push("OnClose += () =>\n{\n    _uiStopped = true;\n    _uiCts.Cancel();\n};");
 
-        const usings = ["System", "System.Globalization", "System.Threading", "System.Threading.Tasks",
+        const usings = ["System", "System.Collections.Generic", "System.Globalization", "System.Threading", "System.Threading.Tasks",
             "Robust.Client.UserInterface.Controls", "Robust.Shared.Maths"];
         if (uses.has("linq")) usings.push("System.Linq");
         if (uses.has("rope")) usings.push("Robust.Shared.Utility");
         usings.sort();
 
         const fields = [];
-        for (const v of program.vars) {
+        for (const v of root.vars) {
             const f = ctx.varField(v.name);
             if (v.type === "num") fields.push(`private double ${f};`);
             else if (v.type === "bool") fields.push(`private bool ${f};`);
@@ -709,6 +770,22 @@ const UIBlocks = (() => {
         fields.push("private bool _uiStopped;");
         fields.push("private readonly CancellationTokenSource _uiCts = new();");
         if (uses.has("random")) fields.push("private readonly Random _uiRandom = new();");
+
+        // связь с сервером (используется BoundUserInterface предмета)
+        const link = [
+`/// <summary>Отправка действия на сервер. Назначается BoundUserInterface предмета.</summary>
+public Action<string, string>? ServerSend;`,
+`private readonly Dictionary<string, string> _uiServerVars = new();`,
+`private event Action? UiServerStateChanged;`,
+`/// <summary>Новое состояние от сервера (переменные предмета).</summary>
+public void ApplyServerState(Dictionary<string, string> vars)
+{
+    _uiServerVars.Clear();
+    foreach (var (k, v) in vars)
+        _uiServerVars[k] = v;
+    UiServerStateChanged?.Invoke();
+}`,
+`private string UiServerVar(string name) => _uiServerVars.TryGetValue(name, out var v) ? v : "";`];
 
         const helpers = [
 `private void UiRun(Action action)
@@ -725,72 +802,238 @@ const UIBlocks = (() => {
     Robust.Shared.IoC.IoCManager.Resolve<Robust.Shared.Log.ILogManager>().GetSawmill("ui.blocks");`,
 `private static void UiLogError(Exception e) => UiSawmill.Error(e.ToString());`,
 `private static void UiLog(string text) => UiSawmill.Info(text);`,
-`private static double UiNum(string? s) =>
-    double.TryParse((s ?? "").Trim().Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out var v) ? v : 0;`,
-`private static string UiText(double v) => v.ToString("0.######", CultureInfo.InvariantCulture);`,
-`private static string UiText(bool v) => v ? "true" : "false";`,
-`private static bool UiBool(string s) => s.Trim().ToLowerInvariant() is "true" or "1" or "да";`,
-`private static bool UiEq(string a, string b)
-{
-    if (double.TryParse(a.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out var x) &&
-        double.TryParse(b.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out var y))
-        return Math.Abs(x - y) < 1e-9;
-    return string.Equals(a, b, StringComparison.OrdinalIgnoreCase);
-}`,
-        ];
-        if (uses.has("random")) helpers.push(
-`private double UiRandom(double a, double b)
-{
-    if (a > b)
-        (a, b) = (b, a);
-    if (a == Math.Floor(a) && b == Math.Floor(b))
-        return _uiRandom.Next((int) a, (int) b + 1);
-    return a + _uiRandom.NextDouble() * (b - a);
-}`);
+            ...COMMON_HELPERS];
+        if (uses.has("random")) helpers.push(RANDOM_HELPER);
 
-        let o = "// Сгенерировано SS14 UI Editor из блоков (вкладка «Логика»).\n";
+        let o = `// ${GEN_MARK} из блоков (вкладка «Логика»).\n`;
         o += "// Не редактируйте вручную: файл перезаписывается при сохранении. Свой код пишите в .xaml.cs.\n";
-        o += "#pragma warning disable CS0414 // служебные поля могут не использоваться\n";
+        o += "#pragma warning disable CS0414, CS0067 // служебные поля/события могут не использоваться\n";
         o += usings.map(u => `using ${u};`).join("\n") + "\n\n";
         o += `namespace ${meta.ns};\n\n`;
         o += `partial class ${meta.cls}\n{\n`;
         o += indent(fields.join("\n")) + "\n\n";
         o += indent(`private void InitializeLogic()\n{\n${indent(init.join("\n\n"))}\n}`) + "\n";
         for (const m of methods) o += "\n" + indent(m) + "\n";
+        o += "\n    // --- связь с сервером ---\n\n" + indent(link.join("\n\n")) + "\n";
         o += "\n    // --- вспомогательные методы ---\n\n" + indent(helpers.join("\n\n")) + "\n";
         o += "}\n";
-        o += "\n/* ui-blocks\n" + JSON.stringify(program, null, 1).replace(/\*\//g, "*\\/") + "\n*/\n";
+        o += "\n/* ui-blocks\n" + JSON.stringify(root, null, 1).replace(/\*\//g, "*\\/") + "\n*/\n";
         return { code: o.replace(/[ \t]+\n/g, "\n"), warnings };
+    }
+
+    // ---------------------------------------------------------------
+    //  Предмет: прототип + общий код + серверная система + BoundUserInterface
+    // ---------------------------------------------------------------
+    const yamlStr = s => '"' + String(s ?? "").replace(/\\/g, "\\\\").replace(/"/g, '\\"') + '"';
+
+    function generateItem(meta) {
+        const it = root.item;
+        if (!it) return null;
+        const N = it.id;
+        const comp = `${N}ItemComponent`;
+        const sp = it.server;
+        const c = compile(sp, "server", meta);
+        const { stmts, warnings, uses } = c;
+
+        // --- Shared: ключ, сообщение, состояние, компонент
+        let sh = `// ${GEN_MARK} (предмет «${it.name}»). Не редактируйте вручную.\n`;
+        sh += "using System;\nusing System.Collections.Generic;\nusing Robust.Shared.GameObjects;\nusing Robust.Shared.Serialization;\nusing Robust.Shared.Serialization.Manager.Attributes;\n\n";
+        sh += "namespace Content.Shared._Horizon.UIItems;\n\n";
+        sh += `[Serializable, NetSerializable]\npublic enum ${N}UiKey : byte\n{\n    Key,\n}\n\n`;
+        sh += `/// <summary>Действие из окна: имя действия и значение.</summary>\n[Serializable, NetSerializable]\npublic sealed class ${N}UiMessage : BoundUserInterfaceMessage\n{\n    public readonly string Action;\n    public readonly string Value;\n\n    public ${N}UiMessage(string action, string value)\n    {\n        Action = action;\n        Value = value;\n    }\n}\n\n`;
+        sh += `/// <summary>Переменные предмета, которые сервер отправляет окну.</summary>\n[Serializable, NetSerializable]\npublic sealed class ${N}UiState : BoundUserInterfaceState\n{\n    public readonly Dictionary<string, string> Values;\n\n    public ${N}UiState(Dictionary<string, string> values)\n    {\n        Values = values;\n    }\n}\n\n`;
+        sh += `/// <summary>Переменные предмета «${it.name}» (хранятся на сервере, у каждого экземпляра свои).</summary>\n[RegisterComponent]\npublic sealed partial class ${comp} : Component\n{\n`;
+        for (const v of sp.vars) {
+            const f = svField(v.name), key = translit(v.name).replace(/^_+/, "") || "var";
+            const t = v.type === "num" ? "double" : v.type === "bool" ? "bool" : "string";
+            const init = v.type === "text" ? ` = "";` : ";";
+            sh += `    /// <summary>${v.name}</summary>\n    [DataField("${key}")]\n    public ${t} ${f}${init}\n\n`;
+        }
+        sh = sh.replace(/\n\n$/, "\n") + "}\n";
+
+        // --- Server: система
+        const handlers = { message: [], opened: [], init: [] };
+        const methods = [];
+        let k = 0;
+        const sig = `Entity<${comp}> ent, EntityUid user, string value`;
+        for (const s of sp.scripts) {
+            const top = s.blocks[0];
+            const d = top && defs[top.op];
+            if (!d || d.shape !== "hat") continue;
+            const body = s.blocks.slice(1);
+            if (top.op === "proc_def") {
+                if (!top.args.P) continue;
+                methods.push(`private void ${c.ctx.procMethod(top.args.P)}(${sig})\n{\n${indent(stmts(body))}\n}`);
+                continue;
+            }
+            if (!d.serverEvent) continue;
+            const a = c.hatArgs(top);
+            if (!a) continue;
+            const m = `Script${++k}`;
+            methods.push(`// ${d.text.replace(/\{(\w+)\}/g, (_, x) => (a[x] ? a[x].code : x))}\nprivate void ${m}(${sig})\n{\n${indent(stmts(body))}\n}`);
+            handlers[d.serverEvent].push(d.serverCall ? d.serverCall(c.ctx, a, m) : `${m}(ent, user, value);`);
+        }
+        const dict = sp.vars.map(v => `["${v.name.replace(/"/g, '\\"')}"] = ${v.type === "text" ? "ent.Comp." + svField(v.name) : "UiText(ent.Comp." + svField(v.name) + ")"},`);
+        let sv = `// ${GEN_MARK} (предмет «${it.name}»). Не редактируйте вручную: файл перезаписывается при сохранении.\n`;
+        sv += "#pragma warning disable CS0414\n";
+        sv += ["System", "System.Collections.Generic", "System.Globalization", "Content.Shared._Horizon.UIItems",
+            "Content.Shared.Hands.EntitySystems", "Content.Shared.Popups", "Robust.Server.GameObjects",
+            "Robust.Shared.Audio", "Robust.Shared.Audio.Systems", "Robust.Shared.GameObjects", "Robust.Shared.IoC"].map(u => `using ${u};`).join("\n") + "\n\n";
+        sv += "namespace Content.Server._Horizon.UIItems;\n\n";
+        sv += `/// <summary>Серверная логика предмета «${it.name}», собранная из блоков.</summary>\npublic sealed class ${N}ItemSystem : EntitySystem\n{\n`;
+        sv += indent(["[Dependency] private readonly UserInterfaceSystem _ui = default!;",
+            "[Dependency] private readonly SharedPopupSystem _popup = default!;",
+            "[Dependency] private readonly SharedAudioSystem _audio = default!;",
+            "[Dependency] private readonly SharedHandsSystem _hands = default!;",
+            ...(uses.has("random") ? ["private readonly Random _uiRandom = new();"] : [])].join("\n")) + "\n\n";
+        sv += indent(`public override void Initialize()
+{
+    base.Initialize();
+    SubscribeLocalEvent<${comp}, MapInitEvent>(OnMapInit);
+    Subs.BuiEvents<${comp}>(${N}UiKey.Key, subs =>
+    {
+        subs.Event<BoundUIOpenedEvent>(OnOpened);
+        subs.Event<${N}UiMessage>(OnMessage);
+    });
+}
+
+private void OnMapInit(Entity<${comp}> ent, ref MapInitEvent args)
+{
+    var user = EntityUid.Invalid;
+    var value = "";
+${indent(handlers.init.join("\n"))}
+}
+
+private void OnOpened(Entity<${comp}> ent, ref BoundUIOpenedEvent args)
+{
+    var user = args.Actor;
+    var value = "";
+${indent(handlers.opened.join("\n"))}
+    UpdateUi(ent);
+}
+
+private void OnMessage(Entity<${comp}> ent, ref ${N}UiMessage msg)
+{
+    var user = msg.Actor;
+    var value = msg.Value;
+${indent(handlers.message.join("\n"))}
+    UpdateUi(ent);
+}
+
+/// <summary>Отправляет окну текущие переменные предмета.</summary>
+public void UpdateUi(Entity<${comp}> ent)
+{
+    var vars = new Dictionary<string, string>
+    {
+${indent(dict.join("\n"), 2)}
+    };
+    _ui.SetUiState(ent.Owner, ${N}UiKey.Key, new ${N}UiState(vars));
+}`) + "\n";
+        for (const m of methods) sv += "\n" + indent(m) + "\n";
+        const svHelpers = [...COMMON_HELPERS, `private void UiLog(string text) => Log.Info(text);`];
+        if (uses.has("random")) svHelpers.push(RANDOM_HELPER);
+        sv += "\n    // --- вспомогательные методы ---\n\n" + indent(svHelpers.join("\n\n")) + "\n}\n";
+
+        // --- Client: BoundUserInterface
+        let bui = `// ${GEN_MARK} (предмет «${it.name}»). Не редактируйте вручную.\n`;
+        bui += "using System;\nusing Content.Shared._Horizon.UIItems;\nusing Robust.Client.GameObjects;\nusing Robust.Client.UserInterface;\nusing Robust.Shared.GameObjects;\n\n";
+        bui += `namespace ${meta.ns};\n\n`;
+        bui += `/// <summary>Связывает предмет ${N} с окном ${meta.cls}.</summary>\npublic sealed class ${N}BoundUserInterface : BoundUserInterface\n{\n    private ${meta.cls}? _window;\n\n`;
+        bui += `    public ${N}BoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)\n    {\n    }\n\n`;
+        bui += `    protected override void Open()\n    {\n        base.Open();\n        _window = this.CreateWindow<${meta.cls}>();\n        _window.ServerSend = (action, value) => SendMessage(new ${N}UiMessage(action, value));\n    }\n\n`;
+        bui += `    protected override void UpdateState(BoundUserInterfaceState state)\n    {\n        base.UpdateState(state);\n        if (state is ${N}UiState s)\n            _window?.ApplyServerState(s.Values);\n    }\n}\n`;
+
+        // --- Прототип
+        let y = `# ${GEN_MARK} (предмет «${it.name}»). Не редактируйте вручную: файл перезаписывается при сохранении.\n`;
+        y += `- type: entity\n  parent: ${it.parent || "BaseItem"}\n  id: ${N}\n  name: ${yamlStr(it.name)}\n  description: ${yamlStr(it.desc)}\n  components:\n`;
+        y += `  - type: Sprite\n    sprite: ${it.sprite}\n    state: ${it.state || "icon"}\n`;
+        if ((it.parent || "BaseItem") === "BaseItem") y += `  - type: Item\n    sprite: ${it.sprite}\n`;
+        y += `  - type: ActivatableUI\n    key: enum.${N}UiKey.Key\n`;
+        y += `  - type: UserInterface\n    interfaces:\n      enum.${N}UiKey.Key:\n        type: ${N}BoundUserInterface\n`;
+        y += `  - type: ${N}Item\n`;
+
+        const clean = s => s.replace(/[ \t]+\n/g, "\n");
+        return {
+            warnings,
+            files: [
+                { path: `Content.Shared/_Horizon/UIItems/${N}.cs`, content: clean(sh), kind: "shared" },
+                { path: `Content.Server/_Horizon/UIItems/${N}ItemSystem.cs`, content: clean(sv), kind: "server" },
+                { path: `${meta.dir}/${N}BoundUserInterface.cs`, content: clean(bui), kind: "bui" },
+                { path: `Resources/Prototypes/_Horizon/UIItems/${N}.yml`, content: y, kind: "proto" },
+            ],
+        };
     }
 
     function updateCodePreview() {
         const pre = document.getElementById("blkCode");
         if (!pre || !host) return;
-        const r = generate(host.getMeta());
+        const meta = host.getMeta();
+        let r;
+        if (scope === "server" && root.item) {
+            const g = generateItem(meta);
+            r = { code: g.files.find(f => f.kind === "server").content, warnings: g.warnings };
+        } else r = generate(meta);
         pre.value = r.code;
+        const head = document.getElementById("blkCodeTitle");
+        if (head) head.textContent = scope === "server" ? `C# → ${root.item.id}ItemSystem.cs (сервер)` : "C# → <Класс>.logic.cs (окно)";
         const w = document.getElementById("blkWarnings");
         w.textContent = r.warnings.length ? `⚠ ${r.warnings.length}: ` + r.warnings.join("; ") : "";
     }
 
     // ---------------------------------------------------------------
-    //  Загрузка / сохранение
+    //  Загрузка / сохранение / область (окно или сервер)
     // ---------------------------------------------------------------
     function parseLogicFile(text) {
         const m = text && text.match(/\/\* ui-blocks\n([\s\S]*?)\n\*\//);
         if (!m) return null;
         try { return JSON.parse(m[1]); } catch (e) { return null; }
     }
+    function normProg(p) {
+        p = p && p.scripts ? p : emptyProgram();
+        p.vars = p.vars || [];
+        p.procs = p.procs || [];
+        return p;
+    }
     function setProgram(p) {
-        program = p && p.scripts ? p : emptyProgram();
-        program.vars = program.vars || [];
-        program.procs = program.procs || [];
+        root = normProg(p);
+        if (root.item) root.item.server = normProg(root.item.server);
+        scope = "client";
+        program = root;
         undoStack.length = 0; redoStack.length = 0;
         const walk = b => { if (!isBlock(b)) return; uidCounter++; Object.values(b.args || {}).forEach(walk); (b.sub || []).forEach(walk); (b.sub2 || []).forEach(walk); };
-        program.scripts.forEach(s => s.blocks.forEach(walk));
+        root.scripts.forEach(s => s.blocks.forEach(walk));
+        if (root.item) root.item.server.scripts.forEach(s => s.blocks.forEach(walk));
         renderPalette();
         changed();
+        if (api.onScopeChange) api.onScopeChange(scope);
     }
-    const isEmpty = () => !program.scripts.length && !program.vars.length;
+    function setScope(s) {
+        if (s === "server" && !root.item) return false;
+        scope = s;
+        program = s === "server" ? root.item.server : root;
+        undoStack.length = 0; redoStack.length = 0;
+        activeModule = null;
+        renderPalette();
+        changed();
+        if (api.onScopeChange) api.onScopeChange(scope);
+        return true;
+    }
+    function setItem(item) {
+        snapshot();
+        if (item) {
+            const prev = root.item;
+            root.item = Object.assign({}, prev || {}, item);
+            root.item.server = normProg(prev ? prev.server : null);
+        } else {
+            delete root.item;
+            if (scope === "server") { scope = "client"; program = root; }
+        }
+        undoStack.length = 0; redoStack.length = 0;
+        renderPalette();
+        changed();
+        if (api.onScopeChange) api.onScopeChange(scope);
+    }
+    const isEmpty = () => !root.scripts.length && !root.vars.length && !root.item;
 
     function init(h) {
         host = h;
@@ -812,7 +1055,10 @@ const UIBlocks = (() => {
     const api = {
         registerModule, init, defs, modules,
         get program() { return program; },
-        setProgram, parseLogicFile, generate, isEmpty,
+        get root() { return root; },
+        get scope() { return scope; },
+        setProgram, parseLogicFile, generate, generateItem, isEmpty, setScope, setItem, visibleModules,
+        blockInScope: d => blockInScope(d, scope), GEN_MARK, onScopeChange: null,
         refresh() { renderPalette(); renderWorkspace(); updateCodePreview(); },
         undo, redo, addVariable, removeVariable, addProc,
         controlsOf, host: () => host,
