@@ -17,7 +17,7 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.Configuration;
 using Robust.Shared.Maths;
 using Robust.Shared.Containers;
-using Robust.Shared.ContentPack;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Player;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
@@ -35,7 +35,7 @@ public sealed class ExpeditionMusicSystem : EntitySystem
     [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly IResourceManager _resources = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly IResourceCache _cache = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
     [Dependency] private readonly AudioSystem _audio = default!;
@@ -99,7 +99,22 @@ public sealed class ExpeditionMusicSystem : EntitySystem
     /// <summary>Файл уже загружен и декодирован заранее (переход на него не будет тормозить).</summary>
     public bool IsPreloaded(string path) => _loaded.Contains(path);
 
-    private ExpeditionMusicLibrary Library => _library ??= ExpeditionMusicLibrary.Load(_resources);
+    private EntityUid? _keyEntity;
+
+    /// <summary>Музыка текущего ключа: берётся из его прототипа, у разных ключей может быть разной.</summary>
+    private ExpeditionMusicLibrary Library
+    {
+        get
+        {
+            if (_library != null)
+                return _library;
+
+            _library = _keyEntity is { } key && TryComp<ExpeditionMusicKeyComponent>(key, out var comp)
+                ? ExpeditionMusicLibrary.FromKey(comp, _proto)
+                : new ExpeditionMusicLibrary();
+            return _library;
+        }
+    }
 
     public override void Initialize()
     {
@@ -127,7 +142,26 @@ public sealed class ExpeditionMusicSystem : EntitySystem
         _nextCheck = _timing.CurTime + CheckInterval;
 
         var hadKey = _hasKey;
-        _hasKey = DetectKey();
+        var key = FindKey();
+        _hasKey = key != null;
+
+        // Другой ключ: у него своя музыка (из его прототипа), начинаем сцену заново.
+        if (key != _keyEntity)
+        {
+            _keyEntity = key;
+            _library = null;
+            _pre.Clear();
+
+            if (hadKey && _hasKey)
+            {
+                _contentAudio.FadeOut(_stream, duration: KeyOffFadeTime);
+                _stream = null;
+                _queue.Clear();
+                _refill = null;
+                _scene = Scene.None;
+                PreloadAhead();
+            }
+        }
 
         if (!_hasKey)
         {
@@ -167,22 +201,23 @@ public sealed class ExpeditionMusicSystem : EntitySystem
 
     #region Detection
 
-    private bool DetectKey()
+    /// <summary>Ключ музыки экспедиции в гарнитуре игрока (с его музыкой в прототипе), если он вставлен.</summary>
+    private EntityUid? FindKey()
     {
         if (_player.LocalEntity is not { } player
             || !_inventory.TryGetSlotEntity(player, "ears", out var headset)
             || !_container.TryGetContainer(headset.Value, EncryptionKeyHolderComponent.KeyContainerName, out var container))
         {
-            return false;
+            return null;
         }
 
         foreach (var key in container.ContainedEntities)
         {
             if (HasComp<ExpeditionMusicKeyComponent>(key))
-                return true;
+                return key;
         }
 
-        return false;
+        return null;
     }
 
     private Scene ComputeScene()
@@ -250,8 +285,8 @@ public sealed class ExpeditionMusicSystem : EntitySystem
         switch (scene)
         {
             case Scene.Pod:
-                if (lib.Rig != null)
-                    _queue.Enqueue(new Track(lib.Rig, true));
+                if (lib.Rig.Count > 0)
+                    _queue.Enqueue(new Track(Take("rig", lib.Rig)!, true));
                 break;
 
             case Scene.Ambient:
@@ -379,7 +414,8 @@ public sealed class ExpeditionMusicSystem : EntitySystem
     private void PreloadAhead()
     {
         var lib = Library;
-        Preload(lib.Rig);
+        if (lib.Rig.Count > 0)
+            Preload(_random.Pick(lib.Rig));
 
         foreach (var (kind, list) in new[] { ("tittle", lib.Tittle), ("wave", lib.Wave), ("win", lib.Win) })
         {
@@ -449,6 +485,8 @@ public sealed class ExpeditionMusicSystem : EntitySystem
         _queue.Clear();
         _refill = null;
         _scene = Scene.None;
+        _keyEntity = null;
+        _library = null;
         _dim = 1f;
         _dimTarget = 1f;
         _wasDead = false;

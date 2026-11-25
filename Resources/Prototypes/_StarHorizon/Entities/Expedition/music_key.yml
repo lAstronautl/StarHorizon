@@ -6,6 +6,22 @@
   description: Encryption key tuned to expedition music. Insert into a headset to hear the expedition soundtrack, take it out to switch it off.
   components:
   - type: ExpeditionMusicKey
+    # Музыку каждой сцены можно задать одним файлом (!type:SoundPathSpecifier) или набором
+    # (!type:SoundCollectionSpecifier). Свой ключ: наследуйтесь от этого и подмените нужные поля.
+    rig: !type:SoundCollectionSpecifier
+      collection: StarHorizonExpeditionRig
+    tittle: !type:SoundCollectionSpecifier
+      collection: StarHorizonExpeditionTittle
+    ambiance: !type:SoundCollectionSpecifier
+      collection: StarHorizonExpeditionAmbiance
+    wave: !type:SoundCollectionSpecifier
+      collection: StarHorizonExpeditionWave
+    extraction: !type:SoundCollectionSpecifier
+      collection: StarHorizonExpeditionExtraction
+    win: !type:SoundCollectionSpecifier
+      collection: StarHorizonExpeditionWin
+    loss: !type:SoundCollectionSpecifier
+      collection: StarHorizonExpeditionLoss
   - type: Item
     sprite: _NF/Objects/Devices/encryption_keys.rsi
   - type: Sprite

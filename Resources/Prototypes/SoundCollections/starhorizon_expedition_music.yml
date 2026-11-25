@@ -1,0 +1,104 @@
+# Музыка экспедиции (Pizza Tower). Коллекции подключаются к ключу шифрования в его прототипе (ExpeditionMusicKey),
+# чтобы можно было делать свои ключи с другой музыкой. _CI_ пока не используется в волнах.
+
+- type: soundCollection
+  id: StarHorizonExpeditionRig
+  files:
+  - /Audio/_Horizon/PizzaTower/_RIG_MoveItBoy_.ogg
+
+- type: soundCollection
+  id: StarHorizonExpeditionAmbiance
+  files:
+  - /Audio/_Horizon/PizzaTower/_Ambiance_Pizza_Tower_OST_-_Bite_The_Crust.ogg
+  - /Audio/_Horizon/PizzaTower/_Ambiance_Pizza_Tower_OST_-_Delivery_for_the_City__Unused_.ogg
+  - /Audio/_Horizon/PizzaTower/_Ambiance_Pizza_Tower_OST_-_Don_t_Preheat_Your_Oven_Because_If_You_Do_The_Song_Won_t_Play.ogg
+  - /Audio/_Horizon/PizzaTower/_Ambiance_Pizza_Tower_OST_-_Fridays.ogg
+  - /Audio/_Horizon/PizzaTower/_Ambiance_Pizza_Tower_OST_-_Good_Eatin_.ogg
+  - /Audio/_Horizon/PizzaTower/_Ambiance_Pizza_Tower_OST_-_Mondays.ogg
+  - /Audio/_Horizon/PizzaTower/_Ambiance_Pizza_Tower_OST_-_Oregano_UFO.ogg
+  - /Audio/_Horizon/PizzaTower/_Ambiance_Pizza_Tower_OST_-_Put_On_A_Show__.ogg
+  - /Audio/_Horizon/PizzaTower/_Ambiance_Pizza_Tower_OST_-_The_Tower_s_Ultimatum.ogg
+  - /Audio/_Horizon/PizzaTower/_Ambiance_Pizza_Tower_OST_-_Theatrical_Shenanigans.ogg
+  - /Audio/_Horizon/PizzaTower/_Ambiance_Pizza_Tower_OST_-_Thursdays.ogg
+  - /Audio/_Horizon/PizzaTower/_Ambiance_Pizza_Tower_OST_-_Tuesdays.ogg
+  - /Audio/_Horizon/PizzaTower/_Ambiance_Pizza_Tower_OST_-_Tunnely_Shimbers.ogg
+  - /Audio/_Horizon/PizzaTower/_Ambiance_Pizza_Tower_OST_-_Unearthly_Blues.ogg
+  - /Audio/_Horizon/PizzaTower/_Ambiance_Pizza_Tower_OST_-_mmm_yess_put_the_tree_on_my_pizzA.ogg
+
+- type: soundCollection
+  id: StarHorizonExpeditionTittle
+  files:
+  - /Audio/_Horizon/PizzaTower/AncientCheese_Tittle.ogg
+  - /Audio/_Horizon/PizzaTower/BloodSauceDungeon_Tittle.ogg
+  - /Audio/_Horizon/PizzaTower/CrustCove_Tittle.ogg
+  - /Audio/_Horizon/PizzaTower/Deep-Dish9_Tittle.ogg
+  - /Audio/_Horizon/PizzaTower/Don_tMakeASound_Tittle.ogg
+  - /Audio/_Horizon/PizzaTower/FastFoodSaloon_Tittle.ogg
+  - /Audio/_Horizon/PizzaTower/FunFarm_Tittle.ogg
+  - /Audio/_Horizon/PizzaTower/GnomeForest_Tittle.ogg
+  - /Audio/_Horizon/PizzaTower/Golf_Tittle.ogg
+  - /Audio/_Horizon/PizzaTower/JohnGutter_Tittle.ogg
+  - /Audio/_Horizon/PizzaTower/OhShit__Tittle.ogg
+  - /Audio/_Horizon/PizzaTower/OreganoDessert_Tittle.ogg
+  - /Audio/_Horizon/PizzaTower/PeppibotFactory_Tittle.ogg
+  - /Audio/_Horizon/PizzaTower/PizzaEscape_Tittle.ogg
+  - /Audio/_Horizon/PizzaTower/PizzaScare_Tittle.ogg
+  - /Audio/_Horizon/PizzaTower/Refrigerator_Tittle.ogg
+  - /Audio/_Horizon/PizzaTower/ThePigCity_Tittle.ogg
+  - /Audio/_Horizon/PizzaTower/WAR_Tittle.ogg
+  - /Audio/_Horizon/PizzaTower/Wasteyard_Tittle.ogg
+
+- type: soundCollection
+  id: StarHorizonExpeditionWave
+  files:
+  - /Audio/_Horizon/PizzaTower/_WD_Pizza_Tower_OST_-_Cold_Spaghetti.ogg
+  - /Audio/_Horizon/PizzaTower/_WD_Pizza_Tower_OST_-_Dungeon_Freakshow.ogg
+  - /Audio/_Horizon/PizzaTower/_WD_Pizza_Tower_OST_-_Dungeon_Ultimatum.ogg
+  - /Audio/_Horizon/PizzaTower/_WD_Pizza_Tower_OST_-_Extraterrestrial_Wahwahs.ogg
+  - /Audio/_Horizon/PizzaTower/_WD_Pizza_Tower_OST_-_Hot_Spaghetti.ogg
+  - /Audio/_Horizon/PizzaTower/_WD_Pizza_Tower_OST_-_Oregano.ogg
+  - /Audio/_Horizon/PizzaTower/_WD_Pizza_Tower_OST_-_PIZZA_TIME_NEVER_ENDS.ogg
+  - /Audio/_Horizon/PizzaTower/_WD_Pizza_Tower_OST_-_Pizza_Engineer.ogg
+  - /Audio/_Horizon/PizzaTower/_WD_Pizza_Tower_OST_-_The_Noise_s_Jam_Packed_Radical_Anthem.ogg
+  - /Audio/_Horizon/PizzaTower/_WD_Pizza_Tower_OST_-_The_Phantom_Tower.ogg
+  - /Audio/_Horizon/PizzaTower/_WD_Pizza_Tower_OST_-_There_s_a_Bone_in_My_Spaghetti_.ogg
+  - /Audio/_Horizon/PizzaTower/_WD_Pizza_Tower_OST_-_Tropical_Crust.ogg
+  - /Audio/_Horizon/PizzaTower/_WD_Pizza_Tower_OST_-_Tubular_Trash_Zone.ogg
+
+- type: soundCollection
+  id: StarHorizonExpeditionCi
+  files:
+  - /Audio/_Horizon/PizzaTower/_CI_ClascyJitto_-_World_Wide_Noise__Pizza_Tower_OST_.ogg
+  - /Audio/_Horizon/PizzaTower/_CI_Pizza_Tower_OST_-_Celsius_Troubles.ogg
+  - /Audio/_Horizon/PizzaTower/_CI_Pizza_Tower_OST_-_Collapse___Unused_.ogg
+  - /Audio/_Horizon/PizzaTower/_CI_Pizza_Tower_OST_-_Freezer_Draft_1.ogg
+  - /Audio/_Horizon/PizzaTower/_CI_Pizza_Tower_OST_-_On_the_Rocks.ogg
+  - /Audio/_Horizon/PizzaTower/_CI_Pizza_Tower_OST_-_Peppino_s_Sauce_Machine.ogg
+  - /Audio/_Horizon/PizzaTower/_CI_Pizza_Tower_OST_-_Pesto_Anchovi__Unused_.ogg
+  - /Audio/_Horizon/PizzaTower/_CI_Pizza_Tower_OST_-_Tarragon_Pizza__Unused_.ogg
+  - /Audio/_Horizon/PizzaTower/_CI_Pizza_Tower_OST_-_Way_Of_The_Pig.ogg
+  - /Audio/_Horizon/PizzaTower/_CI_Pizza_Tower_OST_-_What_s_on_the_Kids_Menu.ogg
+  - /Audio/_Horizon/PizzaTower/_CI_Pizza_Tower_OST_-_Yeehaw_DeliveryBoy.ogg
+  - /Audio/_Horizon/PizzaTower/_CI_The_Runner_-_Pizza_Tower_Halloween_Update_OST.ogg
+
+- type: soundCollection
+  id: StarHorizonExpeditionExtraction
+  files:
+  - /Audio/_Horizon/PizzaTower/_EXTRACTION_ClascyJitto_-_Distasteful_Anchovi__JC_RE-EDIT___Pizza_Tower_OST_.ogg
+  - /Audio/_Horizon/PizzaTower/_EXTRACTION_Pizza_Tower_OST_-_Bye_Bye_There_.ogg
+  - /Audio/_Horizon/PizzaTower/_EXTRACTION_Pizza_Tower_OST_-_I_Need_A_Noise.ogg
+  - /Audio/_Horizon/PizzaTower/_EXTRACTION_Pizza_Tower_OST_-_It_s_Pizza_Time_.ogg
+  - /Audio/_Horizon/PizzaTower/_EXTRACTION_Pizza_Tower_OST_-_The_Death_That_I_Deservioli.ogg
+  - /Audio/_Horizon/PizzaTower/_EXTRACTION_Pizza_Tower_OST_-_Thousand_March__WAR_.ogg
+  - /Audio/_Horizon/PizzaTower/_EXTRACTION_Pizza_Tower_OST_-_Tombstone_Arizona.ogg
+
+- type: soundCollection
+  id: StarHorizonExpeditionWin
+  files:
+  - /Audio/_Horizon/PizzaTower/_WINSCREEN_Pizza_Tower_OST_-_Victorious_Degenerate_Rank_P.ogg
+  - /Audio/_Horizon/PizzaTower/_WINSCREEN_Pizza_Tower_OST_-_Victorious_Degenerate_Rank_S.ogg
+
+- type: soundCollection
+  id: StarHorizonExpeditionLoss
+  files:
+  - /Audio/_Horizon/PizzaTower/_LOSSSCREEN_Pizza_Tower_OST_-_Your_Fat_Ass_Slows_You_Down.ogg

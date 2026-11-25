@@ -1,77 +1,49 @@
-using Robust.Shared.ContentPack;
-using Robust.Shared.Utility;
+using Content.Shared._StarHorizon.Expedition;
+using Robust.Shared.Audio;
+using Robust.Shared.Prototypes;
 
 namespace Content.Client._StarHorizon.Expedition;
 
 /// <summary>
-/// Треки музыки экспедиции, разложенные по назначению. Группируются по имени файла в
-/// <c>/Audio/_Horizon/PizzaTower</c>, поэтому новые файлы подхватываются без правки списков.
+/// Треки музыки экспедиции одного ключа: списки файлов по сценам, развёрнутые из прототипа ключа
+/// (<see cref="ExpeditionMusicKeyComponent"/>): отдельный файл или все файлы коллекции звуков.
 /// </summary>
 public sealed class ExpeditionMusicLibrary
 {
-    public static readonly ResPath Folder = new("/Audio/_Horizon/PizzaTower");
-
-    public const string RigFile = "_RIG_MoveItBoy_.ogg";
-    public const string IntroFile = "_WD-INTRONOISE_.ogg";
-    public const string LoopFile = "_WD-NOISEANTHEM-LOOP_.ogg";
-
-    /// <summary>Фон на экспедиции, когда нет волны.</summary>
-    public readonly List<string> Ambiance = new();
-
-    /// <summary>Стингер при приземлении дроп-пода.</summary>
+    public readonly List<string> Rig = new();
     public readonly List<string> Tittle = new();
-
-    /// <summary>Музыка волны (пока только <c>_WD_*</c>).</summary>
+    public readonly List<string> Ambiance = new();
     public readonly List<string> Wave = new();
-
-    /// <summary><c>_CI_*</c>: пока не используются в волнах (отключены по просьбе), список оставлен для возврата.</summary>
-    public readonly List<string> Ci = new();
-
     public readonly List<string> Extraction = new();
     public readonly List<string> Win = new();
     public readonly List<string> Loss = new();
 
-    public string? Rig;
-    public string? Intro;
-    public string? Loop;
-
-    public static ExpeditionMusicLibrary Load(IResourceManager resources)
-    {
-        return Group(resources.ContentFindFiles(Folder));
-    }
-
-    public static ExpeditionMusicLibrary Group(IEnumerable<ResPath> files)
+    public static ExpeditionMusicLibrary FromKey(ExpeditionMusicKeyComponent key, IPrototypeManager proto)
     {
         var library = new ExpeditionMusicLibrary();
-        foreach (var file in files)
-        {
-            var name = file.Filename;
-            if (!name.EndsWith(".ogg", StringComparison.OrdinalIgnoreCase))
-                continue;
-
-            var path = file.ToString();
-            if (name == RigFile)
-                library.Rig = path;
-            else if (name == IntroFile)
-                library.Intro = path;
-            else if (name == LoopFile)
-                library.Loop = path;
-            else if (name.StartsWith("_Ambiance_"))
-                library.Ambiance.Add(path);
-            else if (name.EndsWith("_Tittle.ogg"))
-                library.Tittle.Add(path);
-            else if (name.StartsWith("_CI_"))
-                library.Ci.Add(path);
-            else if (name.StartsWith("_WD_"))
-                library.Wave.Add(path);
-            else if (name.StartsWith("_EXTRACTION_"))
-                library.Extraction.Add(path);
-            else if (name.StartsWith("_WINSCREEN_"))
-                library.Win.Add(path);
-            else if (name.StartsWith("_LOSSSCREEN_"))
-                library.Loss.Add(path);
-        }
-
+        Fill(library.Rig, key.Rig, proto);
+        Fill(library.Tittle, key.Tittle, proto);
+        Fill(library.Ambiance, key.Ambiance, proto);
+        Fill(library.Wave, key.Wave, proto);
+        Fill(library.Extraction, key.Extraction, proto);
+        Fill(library.Win, key.Win, proto);
+        Fill(library.Loss, key.Loss, proto);
         return library;
+    }
+
+    private static void Fill(List<string> list, SoundSpecifier? specifier, IPrototypeManager proto)
+    {
+        switch (specifier)
+        {
+            case SoundPathSpecifier path:
+                list.Add(path.Path.ToString());
+                break;
+
+            case SoundCollectionSpecifier { Collection: { } id }
+                when proto.TryIndex<SoundCollectionPrototype>(id, out var collection):
+                foreach (var file in collection.PickFiles)
+                    list.Add(file.ToString());
+                break;
+        }
     }
 }
