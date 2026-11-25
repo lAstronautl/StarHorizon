@@ -153,8 +153,8 @@ marketplace-error-contraband-inside = There is class 2 or higher contraband insi
 
 ## Black market
 
-marketplace-black-window-title = Black Market
-marketplace-black-header-title = [font size=16][bold][color=#FF4D57]BLACK[/color] [color=#F2E4E6]MARKET[/color][/bold][/font]  [color=#A38A8E]· encrypted channel[/color]
+marketplace-black-window-title = StarBerries
+marketplace-black-header-title = [font size=16][bold][color=#FF4D57]Star[/color][color=#F2E4E6]Berries[/color][/bold][/font]  [color=#A38A8E]· encrypted channel · no receipts, no questions[/color]
 marketplace-anon-name = Anonymous {$code}
 marketplace-anon-id = [encrypted]
 marketplace-anon-grid = Cipher {$code}
@@ -162,7 +162,7 @@ marketplace-anon-grid = Cipher {$code}
 ## PDA programs
 
 marketplace-pda-program-name = StarOZON
-marketplace-black-pda-program-name = Black Market
+marketplace-black-pda-program-name = StarBerries
 marketplace-pda-tab-new-request = New request
 marketplace-pda-subtitle = [color={$mutedColor}]Tax[/color] {$tax}%  [color={$mutedColor}]· Listings[/color] {$listings}  [color={$mutedColor}]· Requests[/color] {$requests}  [color={$mutedColor}]· Balance[/color] [color={$priceColor}]{$balance}[/color]
 marketplace-pda-request-note = [color={$mutedColor}]The reward is held right away. Buying, offering and accepting offers happen at a pickup point or terminal.[/color]

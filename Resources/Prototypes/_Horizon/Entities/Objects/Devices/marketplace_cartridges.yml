@@ -25,8 +25,8 @@
 - type: entity
   parent: NFBasePDACartridge
   id: BlackMarketViewerCartridge
-  name: DarkLink cartridge
-  description: An unlabelled PDA program with an encrypted connection to the black market.
+  name: StarBerries cartridge
+  description: An unlabelled PDA program with an encrypted connection to StarBerries.
   components:
   - type: Sprite
     sprite: Objects/Devices/cartridge.rsi

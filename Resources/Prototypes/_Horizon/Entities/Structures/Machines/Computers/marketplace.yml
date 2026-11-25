@@ -69,8 +69,8 @@
 - type: entity
   id: ComputerMarketplaceBlackMarket
   parent: ComputerMarketplace
-  name: black market terminal
-  description: An encrypted trading terminal. No names, no questions - only goods and credits.
+  name: StarBerries terminal
+  description: An encrypted StarBerries terminal. No names, no questions, no refunds - only goods and credits.
   components:
   - type: Sprite
     sprite: _NF/Structures/Machines/computers.rsi
@@ -118,8 +118,8 @@
 - type: entity
   id: MarketplaceBlackMarketComputerCircuitboard
   parent: BaseComputerCircuitboard
-  name: black market terminal board
-  description: A computer printed circuit board for a black market terminal. The traces are deliberately scratched off.
+  name: StarBerries terminal board
+  description: A computer printed circuit board for a StarBerries terminal. The traces are deliberately scratched off.
   components:
   - type: Sprite
     state: cpu_syndicate

@@ -160,21 +160,21 @@ marketplace-error-contraband-inside = Внутри предмета контра
 
 ## Чёрный рынок
 
-marketplace-black-window-title = Чёрный рынок
-marketplace-black-header-title = [font size=16][bold][color=#FF4D57]ЧЁРНЫЙ[/color] [color=#F2E4E6]РЫНОК[/color][/bold][/font]  [color=#A38A8E]· зашифрованный канал[/color]
+marketplace-black-window-title = StarBerries
+marketplace-black-header-title = [font size=16][bold][color=#FF4D57]Star[/color][color=#F2E4E6]Berries[/color][/bold][/font]  [color=#A38A8E]· зашифрованный канал · без чека и без вопросов[/color]
 marketplace-anon-name = Аноним {$code}
 marketplace-anon-id = [зашифровано]
 marketplace-anon-grid = Шифр {$code}
 
-ent-ComputerMarketplaceBlackMarket = терминал чёрного рынка
-    .desc = Зашифрованный торговый терминал. Ни имён, ни вопросов — только товар и кредиты.
-ent-MarketplaceBlackMarketComputerCircuitboard = плата терминала чёрного рынка
-    .desc = Печатная плата терминала чёрного рынка. Маркировка старательно счищена.
+ent-ComputerMarketplaceBlackMarket = терминал StarBerries
+    .desc = Зашифрованный терминал StarBerries. Ни имён, ни вопросов, ни возврата — только товар и кредиты.
+ent-MarketplaceBlackMarketComputerCircuitboard = плата терминала StarBerries
+    .desc = Печатная плата терминала StarBerries. Маркировка старательно счищена.
 
 ## Программы КПК
 
 marketplace-pda-program-name = StarOZON
-marketplace-black-pda-program-name = Чёрный рынок
+marketplace-black-pda-program-name = StarBerries
 marketplace-pda-tab-new-request = Новый запрос
 marketplace-pda-subtitle = [color={$mutedColor}]Налог[/color] {$tax}%  [color={$mutedColor}]· Лотов[/color] {$listings}  [color={$mutedColor}]· Запросов[/color] {$requests}  [color={$mutedColor}]· Баланс[/color] [color={$priceColor}]{$balance}[/color]
 marketplace-pda-request-note = [color={$mutedColor}]Награда списывается сразу. Покупки, предложения и их принятие — только в пункте выдачи или терминале.[/color]
@@ -184,8 +184,8 @@ marketplace-request-card-offer-pda = [color={$mutedColor}]Предложить �
 
 ent-MarketplaceViewerCartridge = картридж «StarOZON»
     .desc = Приложение StarOZON для КПК: смотрите товары и оставляйте заявки, не вставая с кресла пилота.
-ent-BlackMarketViewerCartridge = картридж «ТёмныйЛинк»
-    .desc = Картридж без маркировки с зашифрованным подключением к чёрному рынку.
+ent-BlackMarketViewerCartridge = картридж «StarBerries»
+    .desc = Картридж без маркировки с зашифрованным подключением к StarBerries.
 marketplace-examine-more = ПКМ или Shift+ЛКМ — полный осмотр с действиями
 
 ## Доставка телепортом
