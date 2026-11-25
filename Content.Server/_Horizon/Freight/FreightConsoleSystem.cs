@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Text;
 using Content.Server._NF.Bank;
 using Content.Server._NF.Trade;
@@ -336,12 +337,13 @@ public sealed class FreightConsoleSystem : EntitySystem
         sb.AppendLine(Loc.GetString("freight-manifest-source", ("source", DestinationName(offer.Source))));
         sb.AppendLine(Loc.GetString("freight-manifest-to"));
 
-        foreach (var e in offer.Entries)
+        // Delivery addresses are not printed: each crate carries its own address.
+        foreach (var group in offer.Entries.GroupBy(e => e.Crate))
         {
-            var crateName = _proto.TryIndex(e.Crate, out var crate) ? crate.Name : e.Crate.Id;
+            var crateName = _proto.TryIndex(group.Key, out var crate) ? crate.Name : group.Key.Id;
             sb.AppendLine(Loc.GetString("freight-manifest-line",
-                ("name", crateName), ("count", e.Count), ("destination", DestinationName(e.Destination)),
-                ("credits", e.Credits), ("tokens", e.Tokens)));
+                ("name", crateName), ("count", group.Sum(e => e.Count)),
+                ("credits", group.Sum(e => e.Credits * e.Count)), ("tokens", group.Sum(e => e.Tokens * e.Count))));
         }
 
         sb.AppendLine();

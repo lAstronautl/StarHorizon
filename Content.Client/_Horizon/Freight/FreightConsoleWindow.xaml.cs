@@ -72,7 +72,8 @@ public sealed partial class FreightConsoleWindow : FancyWindow
     }
 
     /// <summary>
-    /// "Откуда: X / Куда: • address — crates — reward", one line per delivery address.
+    /// "Откуда: X / Груз: • crate ×N — reward". Delivery addresses are intentionally hidden:
+    /// they are only shown on the crates themselves.
     /// </summary>
     private string BuildRoute(ProtoId<FreightDestinationPrototype>? source, List<FreightResolvedEntry> entries,
         string? sourceSuffix = null)
@@ -84,20 +85,13 @@ public sealed partial class FreightConsoleWindow : FancyWindow
 
         sb.Append('\n').Append($"[color={KeyColor}]{Loc.GetString("freight-console-to")}[/color]");
 
-        foreach (var group in entries.GroupBy(e => e.Destination))
+        foreach (var group in entries.GroupBy(e => e.Crate))
         {
-            // Same crate kind may appear in several entries - merge them.
-            var crates = string.Join(", ", group
-                .GroupBy(e => e.Crate)
-                .Select(c => $"{CrateName(c.Key)}\u00A0×{c.Sum(e => e.Count)}"));
-            var credits = group.Sum(e => e.Credits * e.Count);
-            var tokens = group.Sum(e => e.Tokens * e.Count);
-
             sb.Append('\n').Append(Loc.GetString("freight-console-route-line",
-                ("destination", DestinationName(group.Key)),
-                ("crates", crates),
-                ("credits", Num(credits)),
-                ("tokens", tokens)));
+                ("crate", CrateName(group.Key)),
+                ("count", group.Sum(e => e.Count)),
+                ("credits", Num(group.Sum(e => e.Credits * e.Count))),
+                ("tokens", group.Sum(e => e.Tokens * e.Count))));
         }
 
         return sb.ToString();
