@@ -4,7 +4,7 @@ marketplace-item-slot-name = Лоток пункта выдачи
 
 marketplace-window-title = Пункт выдачи StarOZON
 marketplace-header-title = [font size=16][bold][color=#7CC4FF]Star[/color][color=#E8EEF7]OZON[/color][/bold][/font]  [color=#8391A5]· пункт выдачи · возврат за ваш кислород[/color]
-marketplace-header-terminal = [color={$mutedColor}]Терминал:[/color] [color={$accentColor}]{$grid}[/color]  [color={$mutedColor}]· наведите на предмет, чтобы осмотреть[/color]
+marketplace-header-terminal = [color={$mutedColor}]Терминал:[/color] [color={$accentColor}]{$grid}[/color]
 
 marketplace-stat-balance = [color={$mutedColor}]Баланс[/color]  [bold][color={$priceColor}]{$balance}[/color][/bold]
 marketplace-stat-no-account = [color=#FF6B6B]Нет банковского счёта[/color]
@@ -161,7 +161,7 @@ marketplace-error-contraband-inside = Внутри предмета контра
 ## Чёрный рынок
 
 marketplace-black-window-title = StarBerries
-marketplace-black-header-title = [font size=16][bold][color=#FF4D57]Star[/color][color=#F2E4E6]Berries[/color][/bold][/font]  [color=#A38A8E]· зашифрованный канал · без чека и без вопросов[/color]
+marketplace-black-header-title = [font size=16][bold][color=#FF4D57]Star[/color][color=#F2E4E6]Berries[/color][/bold][/font]  [color=#A38A8E]· тёмная сторона Star маркета[/color]
 marketplace-anon-name = Аноним {$code}
 marketplace-anon-id = [зашифровано]
 marketplace-anon-grid = Шифр {$code}

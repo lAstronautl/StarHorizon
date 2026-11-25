@@ -4,7 +4,7 @@ marketplace-item-slot-name = Pickup point tray
 
 marketplace-window-title = StarOZON Pickup Point
 marketplace-header-title = [font size=16][bold][color=#7CC4FF]Star[/color][color=#E8EEF7]OZON[/color][/bold][/font]  [color=#8391A5]· pickup point · returns cost your oxygen[/color]
-marketplace-header-terminal = [color={$mutedColor}]Terminal:[/color] [color={$accentColor}]{$grid}[/color]  [color={$mutedColor}]· Hover over an item to examine it[/color]
+marketplace-header-terminal = [color={$mutedColor}]Terminal:[/color] [color={$accentColor}]{$grid}[/color]
 
 marketplace-stat-balance = [color={$mutedColor}]Balance[/color]  [bold][color={$priceColor}]{$balance}[/color][/bold]
 marketplace-stat-no-account = [color=#FF6B6B]No bank account[/color]
@@ -154,7 +154,7 @@ marketplace-error-contraband-inside = There is class 2 or higher contraband insi
 ## Black market
 
 marketplace-black-window-title = StarBerries
-marketplace-black-header-title = [font size=16][bold][color=#FF4D57]Star[/color][color=#F2E4E6]Berries[/color][/bold][/font]  [color=#A38A8E]· encrypted channel · no receipts, no questions[/color]
+marketplace-black-header-title = [font size=16][bold][color=#FF4D57]Star[/color][color=#F2E4E6]Berries[/color][/bold][/font]  [color=#A38A8E]· the dark side of the Star market[/color]
 marketplace-anon-name = Anonymous {$code}
 marketplace-anon-id = [encrypted]
 marketplace-anon-grid = Cipher {$code}
