@@ -1,23 +1,52 @@
 <controls:FancyWindow xmlns="https://spacestation14.io"
+                      xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
                       xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
                       Title="{Loc 'freight-console-window-title'}"
-                      MinSize="760 520"
-                      SetSize="820 600">
-    <BoxContainer Orientation="Vertical" Margin="10" VerticalExpand="True" HorizontalExpand="True">
-        <BoxContainer Orientation="Horizontal">
-            <Label Name="HereLabel" HorizontalExpand="True"/>
-            <Label Name="RefreshLabel" StyleClasses="LabelSubText"/>
+                      MinSize="480 400"
+                      SetSize="560 520">
+    <BoxContainer Orientation="Vertical" Margin="8" VerticalExpand="True" HorizontalExpand="True">
+        <!-- Header -->
+        <BoxContainer Orientation="Horizontal" Margin="0 0 0 6">
+            <RichTextLabel Name="HereLabel" HorizontalExpand="True" VerticalAlignment="Center"/>
+            <Label Name="RefreshLabel" StyleClasses="LabelSubText" VerticalAlignment="Center"/>
         </BoxContainer>
-        <Label Text="{Loc 'freight-console-offers-header'}" HorizontalAlignment="Center" Margin="0 5 0 5"/>
-        <!-- Order cards, like the expedition console -->
-        <BoxContainer Name="OffersContainer" Orientation="Horizontal" MinHeight="250" VerticalExpand="True"/>
-        <Label Name="NoOffersLabel" Text="{Loc 'freight-console-no-offers'}" HorizontalAlignment="Center" Visible="False"/>
-        <controls:HLine Color="#404040" Margin="0 5 0 5"/>
-        <Label Text="{Loc 'freight-console-manifest-header'}" HorizontalAlignment="Center"/>
-        <Label Name="ManifestSourceLabel"/>
-        <BoxContainer Name="ManifestEntriesContainer" Orientation="Vertical"/>
-        <Button Name="SpawnButton" Text="{Loc 'freight-console-spawn-button'}"/>
-        <Label Name="SellStatusLabel" Margin="0 5 0 0"/>
-        <Button Name="SellButton" Text="{Loc 'freight-console-sell-button'}"/>
+
+        <TabContainer Name="Tabs" VerticalExpand="True" HorizontalExpand="True">
+            <!-- Tab 1: orders -->
+            <BoxContainer Name="OrdersTab" Orientation="Vertical" Margin="4">
+                <ScrollContainer VerticalExpand="True" HScrollEnabled="False">
+                    <BoxContainer Name="OffersContainer" Orientation="Vertical" Margin="0 0 4 0"/>
+                </ScrollContainer>
+                <Label Name="NoOffersLabel" Text="{Loc 'freight-console-no-offers'}"
+                       StyleClasses="LabelSubText" HorizontalAlignment="Center" VerticalAlignment="Center"
+                       VerticalExpand="True" Visible="False"/>
+            </BoxContainer>
+
+            <!-- Tab 2: manifest + selling -->
+            <BoxContainer Name="ManifestTab" Orientation="Vertical" Margin="4">
+                <PanelContainer VerticalExpand="True">
+                    <PanelContainer.PanelOverride>
+                        <gfx:StyleBoxFlat BackgroundColor="#1B1B1E" BorderColor="#3A3A42" BorderThickness="1"/>
+                    </PanelContainer.PanelOverride>
+                    <BoxContainer Orientation="Vertical" Margin="8 6">
+                        <Label Text="{Loc 'freight-console-manifest-header'}" StyleClasses="LabelHeading"/>
+                        <ScrollContainer VerticalExpand="True" HScrollEnabled="False" Margin="0 4">
+                            <RichTextLabel Name="ManifestLabel" HorizontalExpand="True"/>
+                        </ScrollContainer>
+                        <Button Name="SpawnButton" Text="{Loc 'freight-console-spawn-button'}"/>
+                    </BoxContainer>
+                </PanelContainer>
+                <PanelContainer Margin="0 6 0 0">
+                    <PanelContainer.PanelOverride>
+                        <gfx:StyleBoxFlat BackgroundColor="#1B1B1E" BorderColor="#3A3A42" BorderThickness="1"/>
+                    </PanelContainer.PanelOverride>
+                    <BoxContainer Orientation="Vertical" Margin="8 6">
+                        <Label Text="{Loc 'freight-console-sell-header'}" StyleClasses="LabelHeading"/>
+                        <RichTextLabel Name="SellStatusLabel" Margin="0 4"/>
+                        <Button Name="SellButton" Text="{Loc 'freight-console-sell-button'}"/>
+                    </BoxContainer>
+                </PanelContainer>
+            </BoxContainer>
+        </TabContainer>
     </BoxContainer>
 </controls:FancyWindow>

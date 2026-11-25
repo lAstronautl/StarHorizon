@@ -1,0 +1,26 @@
+<PanelContainer xmlns="https://spacestation14.io"
+                xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
+                HorizontalExpand="True"
+                Margin="0 0 0 6">
+    <PanelContainer.PanelOverride>
+        <gfx:StyleBoxFlat BackgroundColor="#1B1B1E" BorderColor="#3A3A42" BorderThickness="1"/>
+    </PanelContainer.PanelOverride>
+    <BoxContainer Orientation="Vertical" Margin="8 6">
+        <!-- Header: name, total reward, take button -->
+        <BoxContainer Orientation="Horizontal">
+            <BoxContainer Orientation="Vertical" HorizontalExpand="True">
+                <Label Name="NameLabel" StyleClasses="LabelHeading"/>
+                <Label Name="DescriptionLabel" StyleClasses="LabelSubText"/>
+            </BoxContainer>
+            <Label Name="TotalLabel" StyleClasses="LabelKeyText" VerticalAlignment="Center" Margin="8 0"/>
+            <Button Name="TakeButton" Text="{Loc 'freight-console-take-button'}" MinWidth="80" VerticalAlignment="Center"/>
+        </BoxContainer>
+        <PanelContainer Margin="0 4" MinHeight="1">
+            <PanelContainer.PanelOverride>
+                <gfx:StyleBoxFlat BackgroundColor="#3A3A42"/>
+            </PanelContainer.PanelOverride>
+        </PanelContainer>
+        <!-- Route: from / to (wraps instead of stretching the window) -->
+        <RichTextLabel Name="RouteLabel" HorizontalExpand="True"/>
+    </BoxContainer>
+</PanelContainer>

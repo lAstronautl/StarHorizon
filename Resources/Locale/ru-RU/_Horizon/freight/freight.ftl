@@ -1,16 +1,24 @@
 freight-console-window-title = Консоль перевозок
-freight-console-here = Этот адрес: { $destination }
-freight-console-refresh-in = Обновление заказов через { $time }
-freight-console-offers-header = Доступные заказы на перевозку
+freight-console-here = Этот адрес:
+freight-console-refresh-in = Новые заказы через { $time }
+freight-console-tab-orders = Заказы
+freight-console-tab-manifest = Накладная и продажа
 freight-console-no-offers = Сейчас нет доступных заказов. Список обновится позже.
-freight-console-offer-source = Загрузка: { $source }
-freight-console-entry = { $name } ×{ $count } → { $destination } ({ $credits } спесо, { $tokens } ток.)
-freight-console-manifest-header = Накладная в консоли
-freight-console-manifest-source = Адрес загрузки: { $source }
-freight-console-no-manifest = Накладная не вставлена
-freight-console-spawn-button = Внести накладную: выдать грузы
+freight-console-from = Откуда:
+freight-console-to = Куда:
+freight-console-route-line = • [bold]{ $destination }[/bold] — { $crates } — [color=#ffd966]{ $credits } сп.[/color], { $tokens } ток.
+freight-console-total = { $credits } сп. · { $tokens } ток.
+freight-console-total-line = Итого: [color=#ffd966]{ $total }[/color]
+freight-console-take-button = Взять
+freight-console-manifest-header = Накладная
+freight-console-insert-hint = Вставьте накладную в слот консоли. Накладная принимается только на её адресе «Откуда».
+freight-console-here-ok = (вы на месте)
+freight-console-here-wrong = (внесите накладную там)
+freight-console-spawn-button = Выдать грузы
+freight-console-no-manifest = Накладная не вставлена.
+freight-console-sell-header = Продажа
+freight-console-pallets-status = На поддонах: подходит [bold]{ $sellable }[/bold] на [color=#ffd966]{ $value } сп.[/color], [color={ $wrongColor }]не по адресу: { $wrong }[/color]
 freight-console-sell-button = Продать грузы на поддонах
-freight-console-sell-status = Подходит: { $sellable } (на { $value } спесо), не тому адресату: { $wrong }
 freight-console-spawned = Накладная принята, грузы выданы.
 freight-console-nothing-to-sell = На поддонах нет грузов для этого адреса.
 freight-console-offer-gone = Этот заказ уже недоступен.
@@ -21,8 +29,9 @@ freight-no-destination = не определён
 freight-crate-description = Груз по накладной «{ $addressee }». Доставить: { $destination }.
 freight-manifest-name = накладная: { $order }
 freight-manifest-title = НАКЛАДНАЯ НА ПЕРЕВОЗКУ — { $order }
-freight-manifest-source = Адрес загрузки: { $source }
-freight-manifest-line = • { $name } ×{ $count } → { $destination } ({ $credits } спесо, { $tokens } ток. за ящик)
+freight-manifest-source = Откуда: { $source }
+freight-manifest-to = Куда:
+freight-manifest-line = • { $destination }: { $name } ×{ $count } ({ $credits } сп., { $tokens } ток. за ящик)
 freight-manifest-footer = Внесите накладную в консоль перевозок на адресе «{ $source }», затем доставьте каждый ящик по указанному адресу и продайте его на поддоне.
 freight-destination-cargo-a = Точка Продажи A
 freight-destination-cargo-b = Точка Продажи B

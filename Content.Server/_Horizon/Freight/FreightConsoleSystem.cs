@@ -334,7 +334,7 @@ public sealed class FreightConsoleSystem : EntitySystem
         var sb = new StringBuilder();
         sb.AppendLine(Loc.GetString("freight-manifest-title", ("order", offer.Name)));
         sb.AppendLine(Loc.GetString("freight-manifest-source", ("source", DestinationName(offer.Source))));
-        sb.AppendLine();
+        sb.AppendLine(Loc.GetString("freight-manifest-to"));
 
         foreach (var e in offer.Entries)
         {
