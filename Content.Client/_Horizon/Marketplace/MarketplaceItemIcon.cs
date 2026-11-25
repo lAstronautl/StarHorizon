@@ -47,10 +47,14 @@ public sealed class MarketplaceItemIcon : PanelContainer
         };
         PanelOverride = _style;
 
+        // Item sprites are 32px; scale them up by a whole factor so pixel art stays crisp.
+        var scale = Math.Max(1f, MathF.Floor((size - 8) / 32f));
+
         _spriteView = new SpriteView
         {
             OverrideDirection = Direction.South,
             SetSize = new Vector2(size - 8, size - 8),
+            Scale = new Vector2(scale, scale),
             HorizontalAlignment = HAlignment.Center,
             VerticalAlignment = VAlignment.Center,
             Visible = false,
@@ -59,6 +63,7 @@ public sealed class MarketplaceItemIcon : PanelContainer
         {
             OverrideDirection = Direction.South,
             SetSize = new Vector2(size - 8, size - 8),
+            Scale = new Vector2(scale, scale),
             HorizontalAlignment = HAlignment.Center,
             VerticalAlignment = VAlignment.Center,
             Visible = false,

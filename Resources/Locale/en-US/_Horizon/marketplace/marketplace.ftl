@@ -39,6 +39,7 @@ marketplace-card-id = [color={$mutedColor}]ID card:[/color] {$idName}
 marketplace-card-station = [color={$mutedColor}]Station:[/color] [color={$accentColor}]{$grid}[/color]  [color={$mutedColor}]· Listing #{$id}[/color]
 marketplace-card-total = [color={$mutedColor}]Total:[/color] [bold][color={$color}]{$total}[/color][/bold]
 marketplace-card-own = [color={$accentColor}]Your listing[/color]
+marketplace-card-amount = Qty:
 marketplace-card-buy = Buy
 marketplace-card-withdraw = Withdraw
 

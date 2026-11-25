@@ -39,6 +39,7 @@ marketplace-card-id = [color={$mutedColor}]ID-карта:[/color] {$idName}
 marketplace-card-station = [color={$mutedColor}]Станция:[/color] [color={$accentColor}]{$grid}[/color]  [color={$mutedColor}]· Лот #{$id}[/color]
 marketplace-card-total = [color={$mutedColor}]Итого:[/color] [bold][color={$color}]{$total}[/color][/bold]
 marketplace-card-own = [color={$accentColor}]Ваш лот[/color]
+marketplace-card-amount = Кол-во:
 marketplace-card-buy = Купить
 marketplace-card-withdraw = Снять
 

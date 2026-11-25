@@ -18,18 +18,22 @@
                     <RichTextLabel Name="HeaderTitle"/>
                     <RichTextLabel Name="HeaderTerminal"/>
                 </BoxContainer>
-                <PanelContainer Name="BalanceChip" VerticalAlignment="Center">
-                    <RichTextLabel Name="BalanceLabel" Margin="10 4 10 4"/>
-                </PanelContainer>
-                <PanelContainer Name="TaxChip" VerticalAlignment="Center">
-                    <RichTextLabel Name="TaxLabel" Margin="10 4 10 4"/>
-                </PanelContainer>
-                <PanelContainer Name="CountChip" VerticalAlignment="Center">
-                    <RichTextLabel Name="CountLabel" Margin="10 4 10 4"/>
-                </PanelContainer>
-                <PanelContainer Name="PendingChip" VerticalAlignment="Center" Visible="False">
-                    <RichTextLabel Name="PendingLabel" Margin="10 4 10 4"/>
-                </PanelContainer>
+                <BoxContainer Orientation="Vertical" SeparationOverride="4" VerticalAlignment="Center">
+                    <BoxContainer Orientation="Horizontal" SeparationOverride="6" HorizontalAlignment="Right">
+                        <PanelContainer Name="BalanceChip">
+                            <RichTextLabel Name="BalanceLabel" Margin="10 3 10 3"/>
+                        </PanelContainer>
+                        <PanelContainer Name="TaxChip">
+                            <RichTextLabel Name="TaxLabel" Margin="10 3 10 3"/>
+                        </PanelContainer>
+                        <PanelContainer Name="CountChip">
+                            <RichTextLabel Name="CountLabel" Margin="10 3 10 3"/>
+                        </PanelContainer>
+                    </BoxContainer>
+                    <PanelContainer Name="PendingChip" HorizontalAlignment="Right" Visible="False">
+                        <RichTextLabel Name="PendingLabel" Margin="10 3 10 3"/>
+                    </PanelContainer>
+                </BoxContainer>
             </BoxContainer>
         </PanelContainer>
 
@@ -53,7 +57,7 @@
 
             <!-- Sell -->
             <BoxContainer Orientation="Horizontal" Margin="6" SeparationOverride="8">
-                <PanelContainer Name="SlotPanel" MinWidth="330" VerticalExpand="True">
+                <PanelContainer Name="SlotPanel" SetWidth="340" VerticalExpand="True">
                     <BoxContainer Orientation="Vertical" Margin="12" SeparationOverride="8">
                         <Label Text="{Loc 'marketplace-sell-slot-title'}" StyleClasses="LabelHeading"/>
                         <BoxContainer Name="SlotIconBox" HorizontalAlignment="Center" Margin="0 8 0 8"/>
@@ -71,13 +75,13 @@
                         <Label Text="{Loc 'marketplace-sell-title'}" StyleClasses="LabelHeading"/>
 
                         <BoxContainer Name="AmountRow" Orientation="Horizontal" SeparationOverride="8">
-                            <Label Text="{Loc 'marketplace-sell-amount'}" MinWidth="170" VerticalAlignment="Center"/>
+                            <Label Text="{Loc 'marketplace-sell-amount'}" MinWidth="150" VerticalAlignment="Center"/>
                             <BoxContainer Name="AmountSpinBox" HorizontalExpand="True"/>
                             <Button Name="AmountAllButton" Text="{Loc 'marketplace-sell-all'}"/>
                         </BoxContainer>
 
                         <BoxContainer Orientation="Horizontal" SeparationOverride="8">
-                            <Label Name="PriceLabel" Text="{Loc 'marketplace-sell-price-unit'}" MinWidth="170" VerticalAlignment="Center"/>
+                            <Label Name="PriceLabel" Text="{Loc 'marketplace-sell-price-unit'}" MinWidth="150" VerticalAlignment="Center"/>
                             <LineEdit Name="PriceEdit" HorizontalExpand="True" PlaceHolder="0"/>
                         </BoxContainer>
 

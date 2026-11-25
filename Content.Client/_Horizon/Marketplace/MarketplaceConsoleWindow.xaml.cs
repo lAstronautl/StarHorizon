@@ -193,7 +193,7 @@ public sealed partial class MarketplaceConsoleWindow : FancyWindow
         {
             SortMode.PriceAscending => listings.OrderBy(l => l.UnitPrice).ThenBy(l => l.Name),
             SortMode.PriceDescending => listings.OrderByDescending(l => l.UnitPrice).ThenBy(l => l.Name),
-            SortMode.Name => listings.OrderBy(l => l.Name, StringComparer.CurrentCultureIgnoreCase).ThenBy(l => l.UnitPrice),
+            SortMode.Name => listings.OrderBy(l => l.Name.ToLowerInvariant()).ThenBy(l => l.UnitPrice),
             SortMode.Count => listings.OrderByDescending(l => l.Count).ThenBy(l => l.UnitPrice),
             _ => listings.OrderByDescending(l => l.ListedAt).ThenByDescending(l => l.Id),
         };

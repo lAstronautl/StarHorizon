@@ -109,6 +109,30 @@ public sealed class MarketplaceListingCard : PanelContainer
         root.AddChild(info);
 
         // Controls
+        if (data.Stackable && !data.IsOwn && data.Count > 1)
+        {
+            var amountRow = new BoxContainer
+            {
+                Orientation = BoxContainer.LayoutOrientation.Horizontal,
+                SeparationOverride = 6,
+            };
+            amountRow.AddChild(new Label
+            {
+                Text = Loc.GetString("marketplace-card-amount"),
+                VerticalAlignment = VAlignment.Center,
+                FontColorOverride = Color.FromHex(MutedColor),
+            });
+            var spin = CreateAmountSpinBox(data.Count, _amount, value =>
+            {
+                _amount = value;
+                OnAmountChanged?.Invoke(_data.Id, value);
+                UpdateTotal();
+            });
+            spin.HorizontalExpand = true;
+            amountRow.AddChild(spin);
+            root.AddChild(amountRow);
+        }
+
         var bottom = new BoxContainer
         {
             Orientation = BoxContainer.LayoutOrientation.Horizontal,
@@ -116,17 +140,6 @@ public sealed class MarketplaceListingCard : PanelContainer
             Margin = new Thickness(0, 2, 0, 0),
         };
         root.AddChild(bottom);
-
-        if (data.Stackable && !data.IsOwn && data.Count > 1)
-        {
-            var spin = CreateAmountSpinBox(data.Count, _amount, value =>
-            {
-                _amount = value;
-                OnAmountChanged?.Invoke(_data.Id, value);
-                UpdateTotal();
-            });
-            bottom.AddChild(spin);
-        }
 
         _totalLabel = new RichTextLabel { HorizontalExpand = true, VerticalAlignment = VAlignment.Center };
         bottom.AddChild(_totalLabel);
