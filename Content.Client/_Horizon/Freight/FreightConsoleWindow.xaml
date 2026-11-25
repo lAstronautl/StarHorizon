@@ -15,7 +15,7 @@
             <!-- Tab 1: orders -->
             <BoxContainer Name="OrdersTab" Orientation="Vertical" Margin="4">
                 <ScrollContainer VerticalExpand="True" HScrollEnabled="False">
-                    <BoxContainer Name="OffersContainer" Orientation="Vertical" Margin="0 0 4 0"/>
+                    <BoxContainer Name="OffersContainer" Orientation="Vertical" Margin="0 0 12 0"/>
                 </ScrollContainer>
                 <Label Name="NoOffersLabel" Text="{Loc 'freight-console-no-offers'}"
                        StyleClasses="LabelSubText" HorizontalAlignment="Center" VerticalAlignment="Center"

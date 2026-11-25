@@ -33,7 +33,7 @@ public sealed partial class FreightConsoleWindow : FancyWindow
     private TimeSpan _nextRefresh;
     private bool _hadManifest;
 
-    private static readonly NumberFormatInfo Numbers = new() { NumberGroupSeparator = " ", NumberDecimalDigits = 0 };
+    private static readonly NumberFormatInfo Numbers = new() { NumberGroupSeparator = "\u00A0", NumberDecimalDigits = 0 };
 
     public FreightConsoleWindow()
     {
@@ -86,7 +86,10 @@ public sealed partial class FreightConsoleWindow : FancyWindow
 
         foreach (var group in entries.GroupBy(e => e.Destination))
         {
-            var crates = string.Join(", ", group.Select(e => $"{CrateName(e.Crate)} ×{e.Count}"));
+            // Same crate kind may appear in several entries - merge them.
+            var crates = string.Join(", ", group
+                .GroupBy(e => e.Crate)
+                .Select(c => $"{CrateName(c.Key)}\u00A0×{c.Sum(e => e.Count)}"));
             var credits = group.Sum(e => e.Credits * e.Count);
             var tokens = group.Sum(e => e.Tokens * e.Count);
 

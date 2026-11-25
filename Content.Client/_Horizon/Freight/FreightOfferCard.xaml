@@ -11,8 +11,8 @@
             <BoxContainer Orientation="Vertical" HorizontalExpand="True">
                 <Label Name="NameLabel" StyleClasses="LabelHeading"/>
                 <Label Name="DescriptionLabel" StyleClasses="LabelSubText"/>
+                <Label Name="TotalLabel" StyleClasses="LabelKeyText"/>
             </BoxContainer>
-            <Label Name="TotalLabel" StyleClasses="LabelKeyText" VerticalAlignment="Center" Margin="8 0"/>
             <Button Name="TakeButton" Text="{Loc 'freight-console-take-button'}" MinWidth="80" VerticalAlignment="Center"/>
         </BoxContainer>
         <PanelContainer Margin="0 4" MinHeight="1">

@@ -6,8 +6,8 @@ freight-console-tab-manifest = Накладная и продажа
 freight-console-no-offers = Сейчас нет доступных заказов. Список обновится позже.
 freight-console-from = Откуда:
 freight-console-to = Куда:
-freight-console-route-line = • [bold]{ $destination }[/bold] — { $crates } — [color=#ffd966]{ $credits } сп.[/color], { $tokens } ток.
-freight-console-total = { $credits } сп. · { $tokens } ток.
+freight-console-route-line = • [bold]{ $destination }[/bold] — { $crates } — [color=#ffd966]{ $credits } сп.[/color], { $tokens } ток.
+freight-console-total = { $credits } сп. · { $tokens } ток.
 freight-console-total-line = Итого: [color=#ffd966]{ $total }[/color]
 freight-console-take-button = Взять
 freight-console-manifest-header = Накладная
@@ -17,7 +17,7 @@ freight-console-here-wrong = (внесите накладную там)
 freight-console-spawn-button = Выдать грузы
 freight-console-no-manifest = Накладная не вставлена.
 freight-console-sell-header = Продажа
-freight-console-pallets-status = На поддонах: подходит [bold]{ $sellable }[/bold] на [color=#ffd966]{ $value } сп.[/color], [color={ $wrongColor }]не по адресу: { $wrong }[/color]
+freight-console-pallets-status = На поддонах: подходит [bold]{ $sellable }[/bold] на [color=#ffd966]{ $value } сп.[/color], [color={ $wrongColor }]не по адресу: { $wrong }[/color]
 freight-console-sell-button = Продать грузы на поддонах
 freight-console-spawned = Накладная принята, грузы выданы.
 freight-console-nothing-to-sell = На поддонах нет грузов для этого адреса.
@@ -31,7 +31,7 @@ freight-manifest-name = накладная: { $order }
 freight-manifest-title = НАКЛАДНАЯ НА ПЕРЕВОЗКУ — { $order }
 freight-manifest-source = Откуда: { $source }
 freight-manifest-to = Куда:
-freight-manifest-line = • { $destination }: { $name } ×{ $count } ({ $credits } сп., { $tokens } ток. за ящик)
+freight-manifest-line = • { $destination }: { $name } ×{ $count } ({ $credits } сп., { $tokens } ток. за ящик)
 freight-manifest-footer = Внесите накладную в консоль перевозок на адресе «{ $source }», затем доставьте каждый ящик по указанному адресу и продайте его на поддоне.
 freight-destination-cargo-a = Точка Продажи A
 freight-destination-cargo-b = Точка Продажи B
