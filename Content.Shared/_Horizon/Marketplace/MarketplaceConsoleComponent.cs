@@ -18,6 +18,24 @@ public sealed partial class MarketplaceConsoleComponent : Component
     public const string ItemSlotId = "marketplace-item";
 
     /// <summary>
+    /// Consoles only see listings and requests of their own network, e.g. the legal sector market or the black market.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public string Network = "Sector";
+
+    /// <summary>
+    /// Hide who is trading: names, ID cards and stations are replaced by codes before being sent to clients.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public bool Anonymous;
+
+    /// <summary>
+    /// Use the black market look for the UI.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public bool BlackMarket;
+
+    /// <summary>
     /// The slot an item is placed in before being listed.
     /// </summary>
     [DataField]
@@ -29,6 +47,9 @@ public sealed partial class MarketplaceConsoleComponent : Component
     [DataField, AutoNetworkedField]
     public float TaxRate = 0.1f;
 
+    /// <summary>
+    /// Where the tax goes. <see cref="SectorBankAccount.Invalid"/> takes it out of the economy, like other black market taxes.
+    /// </summary>
     [DataField]
     public SectorBankAccount TaxAccount = SectorBankAccount.Frontier;
 

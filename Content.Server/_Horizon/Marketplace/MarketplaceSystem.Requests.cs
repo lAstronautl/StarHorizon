@@ -61,7 +61,7 @@ public sealed partial class MarketplaceSystem
             return;
         }
 
-        var storage = GetStorage();
+        var storage = GetStorage(ent.Comp.Network);
         var openRequests = storage.Comp.Requests.Values.Count(r =>
             r.RequesterUserId == session.UserId && r.RequesterCharacterName == profile.Name);
         if (openRequests >= comp.MaxRequestsPerRequester)
@@ -98,13 +98,13 @@ public sealed partial class MarketplaceSystem
             LogImpact.Low,
             $"{ToPrettyString(user):actor} created marketplace request #{request.Id} \"{title}\" x{args.Quantity} for {args.Reward} via {ToPrettyString(ent):entity}");
 
-        UpdateAllUis();
+        UpdateAllUis(ent.Comp.Network);
     }
 
     private void OnCancelRequest(Entity<MarketplaceConsoleComponent> ent, ref MarketplaceCancelRequestMessage args)
     {
         var user = args.Actor;
-        var storage = GetStorage();
+        var storage = GetStorage(ent.Comp.Network);
 
         if (!storage.Comp.Requests.TryGetValue(args.RequestId, out var request))
         {
@@ -132,7 +132,7 @@ public sealed partial class MarketplaceSystem
             LogImpact.Low,
             $"{ToPrettyString(user):actor} cancelled marketplace request #{request.Id} and got {request.Reward} back");
 
-        UpdateAllUis();
+        UpdateAllUis(ent.Comp.Network);
     }
 
     /// <summary>
@@ -163,9 +163,15 @@ public sealed partial class MarketplaceSystem
     /// </summary>
     private void RefundAll()
     {
-        if (_storage is not { } storageUid || !TryComp<MarketplaceStorageComponent>(storageUid, out var storage))
-            return;
+        foreach (var storageUid in _storages.Values)
+        {
+            if (TryComp<MarketplaceStorageComponent>(storageUid, out var storage))
+                RefundStorage(storage);
+        }
+    }
 
+    private void RefundStorage(MarketplaceStorageComponent storage)
+    {
         foreach (var request in storage.Requests.Values.ToList())
         {
             if (TryDepositToSeller(request.RequesterUserId, request.RequesterCharacterName, request.Reward))
@@ -193,7 +199,7 @@ public sealed partial class MarketplaceSystem
     {
         var user = args.Actor;
         var comp = ent.Comp;
-        var storage = GetStorage();
+        var storage = GetStorage(ent.Comp.Network);
 
         if (!storage.Comp.Requests.TryGetValue(args.RequestId, out var request))
         {
@@ -305,13 +311,13 @@ public sealed partial class MarketplaceSystem
             LogImpact.Low,
             $"{ToPrettyString(user):actor} offered {ToPrettyString(toOffer):item} for marketplace request #{request.Id} (offer #{newOffer.Id})");
 
-        UpdateAllUis();
+        UpdateAllUis(ent.Comp.Network);
     }
 
     private void OnAcceptOffer(Entity<MarketplaceConsoleComponent> ent, ref MarketplaceAcceptOfferMessage args)
     {
         var user = args.Actor;
-        var storage = GetStorage();
+        var storage = GetStorage(ent.Comp.Network);
 
         if (!storage.Comp.Offers.TryGetValue(args.OfferId, out var offer)
             || offer.Status != MarketplaceOfferStatus.Pending
@@ -331,7 +337,7 @@ public sealed partial class MarketplaceSystem
         {
             storage.Comp.Offers.Remove(offer.Id);
             Deny(ent, user, "marketplace-offer-error-missing");
-            UpdateAllUis();
+            UpdateAllUis(ent.Comp.Network);
             return;
         }
 
@@ -346,7 +352,7 @@ public sealed partial class MarketplaceSystem
             storage.Comp.PendingPayouts[key] = storage.Comp.PendingPayouts.GetValueOrDefault(key) + payout;
         }
 
-        if (tax > 0)
+        if (tax > 0 && ent.Comp.TaxAccount != SectorBankAccount.Invalid)
             _bank.TrySectorDeposit(ent.Comp.TaxAccount, tax, LedgerEntryType.MarketplaceTax);
 
         storage.Comp.Offers.Remove(offer.Id);
@@ -372,13 +378,13 @@ public sealed partial class MarketplaceSystem
             LogImpact.Low,
             $"{ToPrettyString(user):actor} accepted offer #{offer.Id} from {offer.OffererCharacterName} for marketplace request #{request.Id}, paying {request.Reward} (tax {tax}){(paidDirectly ? "" : ", payout is pending")}");
 
-        UpdateAllUis();
+        UpdateAllUis(ent.Comp.Network);
     }
 
     private void OnRejectOffer(Entity<MarketplaceConsoleComponent> ent, ref MarketplaceRejectOfferMessage args)
     {
         var user = args.Actor;
-        var storage = GetStorage();
+        var storage = GetStorage(ent.Comp.Network);
 
         if (!storage.Comp.Offers.TryGetValue(args.OfferId, out var offer)
             || offer.Status != MarketplaceOfferStatus.Pending
@@ -396,13 +402,13 @@ public sealed partial class MarketplaceSystem
 
         offer.Status = MarketplaceOfferStatus.Returned;
         _popup.PopupEntity(Loc.GetString("marketplace-offer-popup-rejected", ("item", offer.Name)), ent, user);
-        UpdateAllUis();
+        UpdateAllUis(ent.Comp.Network);
     }
 
     private void OnWithdrawOffer(Entity<MarketplaceConsoleComponent> ent, ref MarketplaceWithdrawOfferMessage args)
     {
         var user = args.Actor;
-        var storage = GetStorage();
+        var storage = GetStorage(ent.Comp.Network);
 
         if (!storage.Comp.Offers.TryGetValue(args.OfferId, out var offer))
         {
@@ -422,7 +428,7 @@ public sealed partial class MarketplaceSystem
 
         _audio.PlayPvs(ent.Comp.ConfirmSound, ent);
         _popup.PopupEntity(Loc.GetString("marketplace-offer-popup-withdrawn", ("item", offer.Name)), ent, user);
-        UpdateAllUis();
+        UpdateAllUis(ent.Comp.Network);
     }
 
     /// <summary>
@@ -439,7 +445,11 @@ public sealed partial class MarketplaceSystem
 
     #region UI
 
-    private void FillRequests(MarketplaceConsoleState state, MarketplaceStorageComponent storage, NetUserId? viewerId, string? viewerName)
+    private void FillRequests(MarketplaceConsoleComponent console,
+        MarketplaceConsoleState state,
+        MarketplaceStorageComponent storage,
+        NetUserId? viewerId,
+        string? viewerName)
     {
         bool IsViewer(NetUserId id, string name) => viewerId == id && viewerName == name;
 
@@ -447,7 +457,7 @@ public sealed partial class MarketplaceSystem
         foreach (var offer in storage.Offers.Values)
         {
             if (IsViewer(offer.OffererUserId, offer.OffererCharacterName))
-                state.MyOffers.Add(ToData(offer));
+                state.MyOffers.Add(ToData(console, storage, offer));
 
             if (offer.Status == MarketplaceOfferStatus.Pending)
                 offersByRequest.GetOrNew(offer.RequestId).Add(offer);
@@ -465,9 +475,9 @@ public sealed partial class MarketplaceSystem
                 Description = request.Description,
                 Quantity = request.Quantity,
                 Reward = request.Reward,
-                RequesterName = request.RequesterCharacterName,
-                RequesterIdName = request.RequesterIdName,
-                GridName = request.GridName,
+                RequesterName = DisplayName(console, storage, request.RequesterUserId, request.RequesterCharacterName),
+                RequesterIdName = DisplayIdName(console, request.RequesterIdName),
+                GridName = DisplayGrid(console, storage, request.GridName),
                 CreatedAt = request.CreatedAt,
                 IsOwn = isOwn,
                 OfferCount = offers?.Count ?? 0,
@@ -478,7 +488,7 @@ public sealed partial class MarketplaceSystem
             {
                 foreach (var offer in offers)
                 {
-                    data.Offers.Add(ToData(offer));
+                    data.Offers.Add(ToData(console, storage, offer));
                 }
             }
 
@@ -486,7 +496,7 @@ public sealed partial class MarketplaceSystem
         }
     }
 
-    private MarketplaceOfferData ToData(MarketplaceOffer offer)
+    private MarketplaceOfferData ToData(MarketplaceConsoleComponent console, MarketplaceStorageComponent storage, MarketplaceOffer offer)
     {
         var exists = !TerminatingOrDeleted(offer.Item);
         return new MarketplaceOfferData
@@ -500,9 +510,9 @@ public sealed partial class MarketplaceSystem
             DisplayEntity = exists ? GetNetEntity(offer.Item) : null,
             Stackable = offer.Stackable,
             Count = exists && offer.Stackable ? _stack.GetCount(offer.Item) : 1,
-            OffererName = offer.OffererCharacterName,
-            OffererIdName = offer.OffererIdName,
-            GridName = offer.GridName,
+            OffererName = DisplayName(console, storage, offer.OffererUserId, offer.OffererCharacterName),
+            OffererIdName = DisplayIdName(console, offer.OffererIdName),
+            GridName = DisplayGrid(console, storage, offer.GridName),
             Status = offer.Status,
         };
     }

@@ -27,6 +27,7 @@ using Robust.Shared.Containers;
 using Robust.Shared.Map;
 using Robust.Shared.Network;
 using Robust.Shared.Player;
+using Robust.Shared.Random;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 
@@ -49,6 +50,7 @@ public sealed partial class MarketplaceSystem : SharedMarketplaceSystem
     [Dependency] private readonly MetaDataSystem _metaData = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
     [Dependency] private readonly PvsOverrideSystem _pvsOverride = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
@@ -56,7 +58,10 @@ public sealed partial class MarketplaceSystem : SharedMarketplaceSystem
     [Dependency] private readonly StackSystem _stack = default!;
     [Dependency] private readonly UserInterfaceSystem _ui = default!;
 
-    private EntityUid? _storage;
+    /// <summary>
+    /// Storage entity of each marketplace network.
+    /// </summary>
+    private readonly Dictionary<string, EntityUid> _storages = new();
 
     /// <summary>
     /// Which marketplace consoles each player currently has open. Used for PVS overrides and remote examining.
@@ -99,32 +104,49 @@ public sealed partial class MarketplaceSystem : SharedMarketplaceSystem
         // Normally done when the round ends, this catches restarts that skip the post-round stage.
         RefundAll();
 
-        if (_storage is { } storage && !TerminatingOrDeleted(storage))
-            QueueDel(storage);
+        foreach (var storage in _storages.Values)
+        {
+            if (!TerminatingOrDeleted(storage))
+                QueueDel(storage);
+        }
 
-        _storage = null;
+        _storages.Clear();
         _viewers.Clear();
     }
 
-    private Entity<MarketplaceStorageComponent> GetStorage()
+    private Entity<MarketplaceStorageComponent> GetStorage(string network)
     {
-        if (_storage is { } existing && TryComp<MarketplaceStorageComponent>(existing, out var existingComp))
+        if (_storages.TryGetValue(network, out var existing)
+            && TryComp<MarketplaceStorageComponent>(existing, out var existingComp))
+        {
             return (existing, existingComp);
+        }
 
         var uid = Spawn(null, MapCoordinates.Nullspace);
-        _metaData.SetEntityName(uid, "marketplace storage");
+        _metaData.SetEntityName(uid, $"marketplace storage ({network})");
         var comp = EnsureComp<MarketplaceStorageComponent>(uid);
+        comp.Network = network;
+        comp.Salt = _random.Next();
         _container.EnsureContainer<Container>(uid, MarketplaceStorageComponent.ContainerId);
-        _storage = uid;
+        _storages[network] = uid;
 
-        // Players already browsing need to see the new storage.
-        foreach (var actor in _viewers.Keys)
+        // Players already browsing this network need to see the new storage.
+        foreach (var (actor, consoles) in _viewers)
         {
+            if (!consoles.Any(c => TryComp<MarketplaceConsoleComponent>(c, out var console) && console.Network == network))
+                continue;
+
             if (TryComp<ActorComponent>(actor, out var actorComp))
                 _pvsOverride.AddSessionOverride(uid, actorComp.PlayerSession);
         }
 
         return (uid, comp);
+    }
+
+    private bool TryGetExistingStorage(string network, [NotNullWhen(true)] out MarketplaceStorageComponent? storage)
+    {
+        storage = null;
+        return _storages.TryGetValue(network, out var uid) && TryComp(uid, out storage);
     }
 
     private BaseContainer GetStorageContainer(EntityUid storage)
@@ -215,9 +237,9 @@ public sealed partial class MarketplaceSystem : SharedMarketplaceSystem
         _viewers.GetOrNew(actor).Add(ent);
 
         if (TryComp<ActorComponent>(actor, out var actorComp))
-            _pvsOverride.AddSessionOverride(GetStorage(), actorComp.PlayerSession);
+            _pvsOverride.AddSessionOverride(GetStorage(ent.Comp.Network), actorComp.PlayerSession);
 
-        TryPayPending(actor);
+        TryPayPending(actor, ent.Comp.Network);
         UpdateUi(ent);
     }
 
@@ -240,16 +262,24 @@ public sealed partial class MarketplaceSystem : SharedMarketplaceSystem
             return;
 
         consoles.Remove(console);
-        if (consoles.Count > 0)
+        if (consoles.Count == 0)
+            _viewers.Remove(actor);
+
+        if (!TryComp<ActorComponent>(actor, out var actorComp))
             return;
 
-        _viewers.Remove(actor);
-
-        if (_storage is { } storage
-            && !TerminatingOrDeleted(storage)
-            && TryComp<ActorComponent>(actor, out var actorComp))
+        // Stop sending the storages of networks the player no longer has a console open for.
+        var stillOpen = new HashSet<string>();
+        foreach (var open in consoles)
         {
-            _pvsOverride.RemoveSessionOverride(storage, actorComp.PlayerSession);
+            if (TryComp<MarketplaceConsoleComponent>(open, out var openComp))
+                stillOpen.Add(openComp.Network);
+        }
+
+        foreach (var (network, storage) in _storages)
+        {
+            if (!stillOpen.Contains(network) && !TerminatingOrDeleted(storage))
+                _pvsOverride.RemoveSessionOverride(storage, actorComp.PlayerSession);
         }
     }
 
@@ -298,7 +328,7 @@ public sealed partial class MarketplaceSystem : SharedMarketplaceSystem
             return;
         }
 
-        var storage = GetStorage();
+        var storage = GetStorage(ent.Comp.Network);
         var sellerKey = (session.UserId, profile.Name);
 
         TryComp<StackComponent>(item, out var stack);
@@ -390,7 +420,7 @@ public sealed partial class MarketplaceSystem : SharedMarketplaceSystem
             LogImpact.Low,
             $"{ToPrettyString(user):actor} listed {amount}x {listing.Name} for {args.UnitPrice} per unit on the marketplace (listing #{listing.Id}) via {ToPrettyString(ent):entity}");
 
-        UpdateAllUis();
+        UpdateAllUis(ent.Comp.Network);
     }
 
     /// <summary>
@@ -449,7 +479,7 @@ public sealed partial class MarketplaceSystem : SharedMarketplaceSystem
     private void OnWithdraw(Entity<MarketplaceConsoleComponent> ent, ref MarketplaceWithdrawMessage args)
     {
         var user = args.Actor;
-        var storage = GetStorage();
+        var storage = GetStorage(ent.Comp.Network);
 
         if (!storage.Comp.Listings.TryGetValue(args.ListingId, out var listing))
         {
@@ -478,7 +508,7 @@ public sealed partial class MarketplaceSystem : SharedMarketplaceSystem
             LogImpact.Low,
             $"{ToPrettyString(user):actor} withdrew {count}x {listing.Name} (listing #{listing.Id}) from the marketplace via {ToPrettyString(ent):entity}");
 
-        UpdateAllUis();
+        UpdateAllUis(ent.Comp.Network);
     }
 
     #endregion
@@ -489,7 +519,7 @@ public sealed partial class MarketplaceSystem : SharedMarketplaceSystem
     {
         var user = args.Actor;
         var comp = ent.Comp;
-        var storage = GetStorage();
+        var storage = GetStorage(ent.Comp.Network);
 
         if (!storage.Comp.Listings.TryGetValue(args.ListingId, out var listing))
         {
@@ -549,7 +579,7 @@ public sealed partial class MarketplaceSystem : SharedMarketplaceSystem
             storage.Comp.PendingPayouts[key] = storage.Comp.PendingPayouts.GetValueOrDefault(key) + payout;
         }
 
-        if (tax > 0)
+        if (tax > 0 && comp.TaxAccount != SectorBankAccount.Invalid)
             _bank.TrySectorDeposit(comp.TaxAccount, tax, LedgerEntryType.MarketplaceTax);
 
         var items = TakeFromListing(storage, listing, amount, Transform(ent).Coordinates);
@@ -578,16 +608,15 @@ public sealed partial class MarketplaceSystem : SharedMarketplaceSystem
             LogImpact.Low,
             $"{ToPrettyString(user):actor} bought {amount}x {listing.Name} for {total} (tax {tax}) from {listing.SellerCharacterName} on the marketplace (listing #{listing.Id}) via {ToPrettyString(ent):entity}{(paidDirectly ? "" : ", payout is pending")}");
 
-        UpdateAllUis();
+        UpdateAllUis(ent.Comp.Network);
     }
 
     /// <summary>
     /// Pays out any earnings that were held back because the seller was offline.
     /// </summary>
-    private void TryPayPending(EntityUid user)
+    private void TryPayPending(EntityUid user, string network)
     {
-        if (_storage is not { } storageUid
-            || !TryComp<MarketplaceStorageComponent>(storageUid, out var storage)
+        if (!TryGetExistingStorage(network, out var storage)
             || !TryGetSeller(user, out var session, out var profile))
         {
             return;
@@ -703,12 +732,12 @@ public sealed partial class MarketplaceSystem : SharedMarketplaceSystem
         _popup.PopupEntity(Loc.GetString(message, args), console, user);
     }
 
-    private void UpdateAllUis()
+    private void UpdateAllUis(string network)
     {
         var query = EntityQueryEnumerator<MarketplaceConsoleComponent>();
         while (query.MoveNext(out var uid, out var comp))
         {
-            if (_ui.IsUiOpen(uid, MarketplaceConsoleUiKey.Key))
+            if (comp.Network == network && _ui.IsUiOpen(uid, MarketplaceConsoleUiKey.Key))
                 UpdateUi((uid, comp));
         }
     }
@@ -718,9 +747,7 @@ public sealed partial class MarketplaceSystem : SharedMarketplaceSystem
         if (!_ui.IsUiOpen(ent.Owner, MarketplaceConsoleUiKey.Key))
             return;
 
-        var storage = _storage is { } storageUid && TryComp<MarketplaceStorageComponent>(storageUid, out var storageComp)
-            ? storageComp
-            : null;
+        TryGetExistingStorage(ent.Comp.Network, out var storage);
 
         var gridName = GetGridName(ent);
 
@@ -776,9 +803,9 @@ public sealed partial class MarketplaceSystem : SharedMarketplaceSystem
                         StackType = listing.StackType,
                         Count = GetListingCount(listing),
                         UnitPrice = listing.UnitPrice,
-                        SellerName = listing.SellerCharacterName,
-                        SellerIdName = listing.SellerIdName,
-                        GridName = listing.GridName,
+                        SellerName = DisplayName(ent.Comp, storage, listing.SellerUserId, listing.SellerCharacterName),
+                        SellerIdName = DisplayIdName(ent.Comp, listing.SellerIdName),
+                        GridName = DisplayGrid(ent.Comp, storage, listing.GridName),
                         IsOwn = viewerId == listing.SellerUserId && viewerName == listing.SellerCharacterName,
                         ListedAt = listing.ListedAt,
                     });
@@ -806,7 +833,7 @@ public sealed partial class MarketplaceSystem : SharedMarketplaceSystem
 
             state.MaxRequestsPerPlayer = ent.Comp.MaxRequestsPerRequester;
             if (storage != null)
-                FillRequests(state, storage, viewerId, viewerName);
+                FillRequests(ent.Comp, state, storage, viewerId, viewerName);
 
             _ui.ServerSendUiMessage(ent.Owner, MarketplaceConsoleUiKey.Key, state, actor);
         }

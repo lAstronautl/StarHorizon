@@ -7,12 +7,7 @@
     <BoxContainer Orientation="Vertical" Margin="8" SeparationOverride="8">
 
         <!-- Header -->
-        <PanelContainer HorizontalExpand="True">
-            <PanelContainer.PanelOverride>
-                <gfx:StyleBoxFlat BackgroundColor="#0D1520" BorderColor="#2E5D86" BorderThickness="0 0 0 2"
-                                  ContentMarginLeftOverride="12" ContentMarginRightOverride="12"
-                                  ContentMarginTopOverride="8" ContentMarginBottomOverride="8"/>
-            </PanelContainer.PanelOverride>
+        <PanelContainer Name="HeaderPanel" HorizontalExpand="True">
             <BoxContainer Orientation="Horizontal" SeparationOverride="10">
                 <BoxContainer Orientation="Vertical" HorizontalExpand="True" VerticalAlignment="Center">
                     <RichTextLabel Name="HeaderTitle"/>

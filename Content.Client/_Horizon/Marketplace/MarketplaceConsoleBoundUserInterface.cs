@@ -17,6 +17,9 @@ public sealed class MarketplaceConsoleBoundUserInterface : BoundUserInterface
         base.Open();
 
         _window = this.CreateWindow<MarketplaceConsoleWindow>();
+        if (EntMan.TryGetComponent<MarketplaceConsoleComponent>(Owner, out var console) && console.BlackMarket)
+            _window.ApplyTheme(MarketplaceTheme.BlackMarket);
+
         _window.OnList += (amount, price) => SendMessage(new MarketplaceListItemMessage(amount, price));
         _window.OnBuy += (id, amount, price) => SendMessage(new MarketplaceBuyMessage(id, amount, price));
         _window.OnWithdraw += id => SendMessage(new MarketplaceWithdrawMessage(id));

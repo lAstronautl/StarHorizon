@@ -24,9 +24,10 @@ public sealed partial class MarketplaceConsoleWindow : FancyWindow
         Count,
     }
 
-    private const string MutedColor = MarketplaceListingCard.MutedColor;
-    private const string PriceColor = MarketplaceListingCard.PriceColor;
-    private const string AccentColor = MarketplaceListingCard.AccentColor;
+    private MarketplaceTheme _theme = MarketplaceTheme.Sector;
+    private string MutedColor => _theme.Muted;
+    private string PriceColor => _theme.Price;
+    private string AccentColor => _theme.Accent;
 
     public event Action<int, int>? OnList;
     public event Action<int, int, int>? OnBuy;
@@ -42,7 +43,7 @@ public sealed partial class MarketplaceConsoleWindow : FancyWindow
     private MarketplaceConsoleState? _state;
     private SortMode _sort = SortMode.Newest;
 
-    private readonly MarketplaceItemIcon _slotIcon = new(128);
+    private MarketplaceItemIcon _slotIcon = new(128);
     private NetEntity? _slotEntity;
     private int _slotCount;
     private int _sellAmount = 1;
@@ -68,45 +69,7 @@ public sealed partial class MarketplaceConsoleWindow : FancyWindow
         Tabs.SetTabTitle(2, Loc.GetString("marketplace-tab-sell"));
         Tabs.SetTabTitle(3, Loc.GetString("marketplace-tab-mine"));
 
-        HeaderTitle.SetMessage(FormattedMessage.FromMarkupPermissive(Loc.GetString("marketplace-header-title")));
-
-        foreach (var chip in new[] { BalanceChip, TaxChip, CountChip })
-        {
-            chip.PanelOverride = MakeChipStyle("#2E5D86");
-        }
-
-        PendingChip.PanelOverride = MakeChipStyle("#B8892B");
-
-        var panelStyle = new StyleBoxFlat
-        {
-            BackgroundColor = MarketplaceListingCard.CardBackground,
-            BorderColor = MarketplaceListingCard.CardBorder,
-            BorderThickness = new Thickness(1),
-        };
-        SlotPanel.PanelOverride = panelStyle;
-        SellPanel.PanelOverride = panelStyle;
-        CreateRequestPanel.PanelOverride = panelStyle;
-        RequestSummaryPanel.PanelOverride = new StyleBoxFlat
-        {
-            BackgroundColor = Color.FromHex("#0B0F16"),
-            BorderColor = MarketplaceListingCard.CardBorder,
-            BorderThickness = new Thickness(1),
-        };
-        RequestDescriptionFrame.PanelOverride = new StyleBoxFlat
-        {
-            BackgroundColor = Color.FromHex("#0B0F16"),
-            BorderColor = MarketplaceListingCard.CardBorder,
-            BorderThickness = new Thickness(1),
-        };
-        SummaryPanel.PanelOverride = new StyleBoxFlat
-        {
-            BackgroundColor = Color.FromHex("#0B0F16"),
-            BorderColor = MarketplaceListingCard.CardBorder,
-            BorderThickness = new Thickness(1),
-        };
-        SummaryDivider.PanelOverride = new StyleBoxFlat { BackgroundColor = MarketplaceListingCard.CardBorder };
-
-        SlotIconBox.AddChild(_slotIcon);
+        ApplyTheme(MarketplaceTheme.Sector);
 
         SortButton.AddItem(Loc.GetString("marketplace-sort-newest"), (int) SortMode.Newest);
         SortButton.AddItem(Loc.GetString("marketplace-sort-price-asc"), (int) SortMode.PriceAscending);
@@ -141,16 +104,66 @@ public sealed partial class MarketplaceConsoleWindow : FancyWindow
 
         SetupRequestForm();
 
-        SlotHintLabel.SetMessage(FormattedMessage.FromMarkupPermissive(Loc.GetString("marketplace-sell-slot-hint",
-            ("mutedColor", MutedColor))));
     }
 
-    private static StyleBoxFlat MakeChipStyle(string border)
+    /// <summary>
+    /// Recolours the window, e.g. red for the black market. Call before the first state arrives.
+    /// </summary>
+    public void ApplyTheme(MarketplaceTheme theme)
+    {
+        _theme = theme;
+
+        Title = Loc.GetString(theme.WindowTitleKey);
+        HeaderTitle.SetMessage(FormattedMessage.FromMarkupPermissive(Loc.GetString(theme.HeaderTitleKey)));
+        HeaderPanel.PanelOverride = new StyleBoxFlat
+        {
+            BackgroundColor = theme.HeaderBackground,
+            BorderColor = theme.HeaderBorder,
+            BorderThickness = new Thickness(0, 0, 0, 2),
+            ContentMarginLeftOverride = 12,
+            ContentMarginRightOverride = 12,
+            ContentMarginTopOverride = 8,
+            ContentMarginBottomOverride = 8,
+        };
+
+        foreach (var chip in new[] { BalanceChip, TaxChip, CountChip })
+        {
+            chip.PanelOverride = MakeChipStyle(theme.ChipBorder);
+        }
+
+        PendingChip.PanelOverride = MakeChipStyle(theme.OwnBorder);
+
+        var panelStyle = new StyleBoxFlat
+        {
+            BackgroundColor = theme.CardBackground,
+            BorderColor = theme.CardBorder,
+            BorderThickness = new Thickness(1),
+        };
+        SlotPanel.PanelOverride = panelStyle;
+        SellPanel.PanelOverride = panelStyle;
+        CreateRequestPanel.PanelOverride = panelStyle;
+        RequestSummaryPanel.PanelOverride = theme.MakeInset();
+        RequestDescriptionFrame.PanelOverride = theme.MakeInset();
+        SummaryPanel.PanelOverride = theme.MakeInset();
+        SummaryDivider.PanelOverride = new StyleBoxFlat { BackgroundColor = theme.CardBorder };
+
+        SlotIconBox.RemoveAllChildren();
+        _slotIcon = new MarketplaceItemIcon(128, theme);
+        SlotIconBox.AddChild(_slotIcon);
+
+        SlotHintLabel.SetMessage(FormattedMessage.FromMarkupPermissive(Loc.GetString("marketplace-sell-slot-hint",
+            ("mutedColor", MutedColor))));
+
+        if (_state != null)
+            UpdateState(_state);
+    }
+
+    private StyleBoxFlat MakeChipStyle(Color border)
     {
         return new StyleBoxFlat
         {
-            BackgroundColor = Color.FromHex("#142031"),
-            BorderColor = Color.FromHex(border),
+            BackgroundColor = _theme.ChipBackground,
+            BorderColor = border,
             BorderThickness = new Thickness(1),
         };
     }
@@ -261,7 +274,8 @@ public sealed partial class MarketplaceConsoleWindow : FancyWindow
 
     private MarketplaceListingCard CreateCard(MarketplaceListingData listing)
     {
-        var card = new MarketplaceListingCard(listing,
+        var card = new MarketplaceListingCard(_theme,
+            listing,
             _state?.Balance ?? 0,
             _state?.HasAccount ?? false,
             _buyAmounts.GetValueOrDefault(listing.Id, 1));
@@ -304,7 +318,7 @@ public sealed partial class MarketplaceConsoleWindow : FancyWindow
                 ("mutedColor", MutedColor))));
             SlotDenyLabel.Visible = _state.SlotDenyReason != null;
             SlotDenyLabel.SetMessage(FormattedMessage.FromMarkupPermissive(
-                $"[color=#FF6B6B]{FormattedMessage.EscapeText(_state.SlotDenyReason ?? string.Empty)}[/color]"));
+                $"[color={_theme.Danger}]{FormattedMessage.EscapeText(_state.SlotDenyReason ?? string.Empty)}[/color]"));
             EjectButton.Disabled = false;
         }
 
@@ -490,7 +504,8 @@ public sealed partial class MarketplaceConsoleWindow : FancyWindow
         var any = false;
         foreach (var request in requests)
         {
-            var card = new MarketplaceRequestCard(request,
+            var card = new MarketplaceRequestCard(_theme,
+                request,
                 slotName,
                 slotCount,
                 _state.SlotDenyReason,
@@ -516,7 +531,7 @@ public sealed partial class MarketplaceConsoleWindow : FancyWindow
 
         foreach (var offer in _state.MyOffers.OrderBy(o => o.Status).ThenByDescending(o => o.Id))
         {
-            var row = MarketplaceRequestCard.CreateOfferRow(offer, showRequest: true);
+            var row = MarketplaceRequestCard.CreateOfferRow(_theme, offer, showRequest: true);
             var button = new Button
             {
                 Text = Loc.GetString(offer.Status == MarketplaceOfferStatus.Pending

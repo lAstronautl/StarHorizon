@@ -13,12 +13,13 @@ namespace Content.Client._Horizon.Marketplace;
 /// </summary>
 public sealed class MarketplaceListingCard : PanelContainer
 {
-    public static readonly Color CardBackground = Color.FromHex("#121823");
-    public static readonly Color CardBorder = Color.FromHex("#23344A");
-    public static readonly Color OwnBorder = Color.FromHex("#B8892B");
-    public const string MutedColor = "#8391A5";
-    public const string PriceColor = "#6EE7A0";
-    public const string AccentColor = "#7CC4FF";
+    private readonly MarketplaceTheme _theme;
+    private Color CardBackground => _theme.CardBackground;
+    private Color CardBorder => _theme.CardBorder;
+    private Color OwnBorder => _theme.OwnBorder;
+    private string MutedColor => _theme.Muted;
+    private string PriceColor => _theme.Price;
+    private string AccentColor => _theme.Accent;
 
     public event Action<int, int, int>? OnBuy;
     public event Action<int>? OnWithdraw;
@@ -30,8 +31,9 @@ public sealed class MarketplaceListingCard : PanelContainer
     private readonly int _balance;
     private int _amount = 1;
 
-    public MarketplaceListingCard(MarketplaceListingData data, int balance, bool hasAccount, int initialAmount = 1)
+    public MarketplaceListingCard(MarketplaceTheme theme, MarketplaceListingData data, int balance, bool hasAccount, int initialAmount = 1)
     {
+        _theme = theme;
         _data = data;
         _amount = Math.Clamp(initialAmount, 1, Math.Max(1, data.Count));
         _balance = balance;
@@ -56,7 +58,7 @@ public sealed class MarketplaceListingCard : PanelContainer
         var top = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Horizontal, SeparationOverride = 10 };
         root.AddChild(top);
 
-        var icon = new MarketplaceItemIcon(72);
+        var icon = new MarketplaceItemIcon(72, theme);
         icon.SetItem(data.DisplayEntity, data.ProtoId, data.Stackable ? data.Count : null);
         top.AddChild(icon);
 
@@ -87,7 +89,7 @@ public sealed class MarketplaceListingCard : PanelContainer
             ("mutedColor", MutedColor))));
         titleBox.AddChild(stock);
 
-        root.AddChild(MakeDivider());
+        root.AddChild(_theme.MakeDivider());
 
         // Seller details
         var info = new RichTextLabel { HorizontalExpand = true };
@@ -177,18 +179,8 @@ public sealed class MarketplaceListingCard : PanelContainer
         var affordable = total <= _balance;
         _totalLabel.SetMessage(FormattedMessage.FromMarkupPermissive(Loc.GetString("marketplace-card-total",
             ("total", BankSystemExtensions.ToSpesoString((int) Math.Min(total, int.MaxValue))),
-            ("color", affordable ? PriceColor : "#FF6B6B"),
+            ("color", affordable ? PriceColor : _theme.Danger),
             ("mutedColor", MutedColor))));
-    }
-
-    public static PanelContainer MakeDivider()
-    {
-        return new PanelContainer
-        {
-            MinSize = new Vector2(0, 1),
-            HorizontalExpand = true,
-            PanelOverride = new StyleBoxFlat { BackgroundColor = CardBorder },
-        };
     }
 
     /// <summary>

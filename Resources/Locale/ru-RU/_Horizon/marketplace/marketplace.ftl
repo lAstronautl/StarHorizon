@@ -56,7 +56,7 @@ marketplace-sell-all = Всё
 marketplace-sell-price-unit = Цена за штуку
 marketplace-sell-price-single = Цена
 marketplace-sell-sum = Сумма продажи
-marketplace-sell-tax = Налог сектора ({$tax}%)
+marketplace-sell-tax = Налог ({$tax}%)
 marketplace-sell-receive = Вы получите
 marketplace-sell-merge = [color={$accentColor}]Будет объединено с вашим лотом #{$id} (сейчас {$count} шт.) — та же цена и тот же ресурс.[/color]
 marketplace-sell-button = Выставить на рынок
@@ -160,3 +160,16 @@ marketplace-offer-popup-withdrawn = {$item} возвращён вам.
 
 marketplace-error-contraband = Контрабанду 2-го класса и выше нельзя продавать на торговой площадке.
 marketplace-error-contraband-inside = Внутри предмета контрабанда 2-го класса или выше — выньте её, прежде чем продавать.
+
+## Чёрный рынок
+
+marketplace-black-window-title = Чёрный рынок
+marketplace-black-header-title = [font size=16][bold][color=#FF4D57]ЧЁРНЫЙ[/color] [color=#F2E4E6]РЫНОК[/color][/bold][/font]  [color=#A38A8E]· зашифрованный канал[/color]
+marketplace-anon-name = Аноним {$code}
+marketplace-anon-id = [зашифровано]
+marketplace-anon-grid = Шифр {$code}
+
+ent-ComputerMarketplaceBlackMarket = терминал чёрного рынка
+    .desc = Зашифрованный торговый терминал. Ни имён, ни вопросов — только товар и кредиты.
+ent-MarketplaceBlackMarketComputerCircuitboard = плата терминала чёрного рынка
+    .desc = Печатная плата терминала чёрного рынка. Маркировка старательно счищена.

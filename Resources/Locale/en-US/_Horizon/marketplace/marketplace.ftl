@@ -56,7 +56,7 @@ marketplace-sell-all = All
 marketplace-sell-price-unit = Price per unit
 marketplace-sell-price-single = Price
 marketplace-sell-sum = Sale total
-marketplace-sell-tax = Sector tax ({$tax}%)
+marketplace-sell-tax = Tax ({$tax}%)
 marketplace-sell-receive = You receive
 marketplace-sell-merge = [color={$accentColor}]Will be merged into your listing #{$id} (currently {$count}) - same resource and price.[/color]
 marketplace-sell-button = List on the market
@@ -153,3 +153,11 @@ marketplace-offer-popup-withdrawn = {$item} returned to you.
 
 marketplace-error-contraband = Class 2 and higher contraband can't be traded on the marketplace.
 marketplace-error-contraband-inside = There is class 2 or higher contraband inside this item - take it out before selling.
+
+## Black market
+
+marketplace-black-window-title = Black Market
+marketplace-black-header-title = [font size=16][bold][color=#FF4D57]BLACK[/color] [color=#F2E4E6]MARKET[/color][/bold][/font]  [color=#A38A8E]· encrypted channel[/color]
+marketplace-anon-name = Anonymous {$code}
+marketplace-anon-id = [encrypted]
+marketplace-anon-grid = Cipher {$code}

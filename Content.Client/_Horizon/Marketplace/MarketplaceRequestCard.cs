@@ -4,7 +4,6 @@ using Content.Shared._NF.Bank;
 using Robust.Client.Graphics;
 using Robust.Client.UserInterface.Controls;
 using Robust.Shared.Utility;
-using static Content.Client._Horizon.Marketplace.MarketplaceListingCard;
 
 namespace Content.Client._Horizon.Marketplace;
 
@@ -14,7 +13,13 @@ namespace Content.Client._Horizon.Marketplace;
 /// </summary>
 public sealed class MarketplaceRequestCard : PanelContainer
 {
-    private static readonly Color RequestBorder = Color.FromHex("#3A5E3F");
+    private readonly MarketplaceTheme _theme;
+    private Color CardBackground => _theme.CardBackground;
+    private Color CardBorder => _theme.CardBorder;
+    private Color OwnBorder => _theme.OwnBorder;
+    private string MutedColor => _theme.Muted;
+    private string PriceColor => _theme.Price;
+    private string AccentColor => _theme.Accent;
 
     public event Action<int>? OnCancel;
     public event Action<int, int>? OnOffer;
@@ -25,19 +30,21 @@ public sealed class MarketplaceRequestCard : PanelContainer
     /// <param name="slotName">Name of the item in the console tray, if any.</param>
     /// <param name="slotCount">Size of the stack in the tray, or 0 if it isn't stackable.</param>
     /// <param name="slotDeny">Why the tray item can't be offered, if it can't.</param>
-    public MarketplaceRequestCard(MarketplaceRequestData data,
+    public MarketplaceRequestCard(MarketplaceTheme theme,
+        MarketplaceRequestData data,
         string? slotName,
         int slotCount,
         string? slotDeny,
         int offerAmount)
     {
+        _theme = theme;
         HorizontalExpand = true;
         Margin = new Thickness(0, 0, 0, 8);
 
         PanelOverride = new StyleBoxFlat
         {
             BackgroundColor = CardBackground,
-            BorderColor = data.IsOwn ? OwnBorder : RequestBorder,
+            BorderColor = data.IsOwn ? OwnBorder : _theme.RequestBorder,
             BorderThickness = new Thickness(3, 1, 1, 1),
         };
 
@@ -105,7 +112,7 @@ public sealed class MarketplaceRequestCard : PanelContainer
             ("accentColor", AccentColor))));
         root.AddChild(requester);
 
-        root.AddChild(MakeDivider());
+        root.AddChild(_theme.MakeDivider());
 
         if (data.IsOwn)
             BuildOwnerControls(root, data);
@@ -133,7 +140,7 @@ public sealed class MarketplaceRequestCard : PanelContainer
 
         foreach (var offer in data.Offers)
         {
-            var row = CreateOfferRow(offer, showRequest: false);
+            var row = CreateOfferRow(_theme, offer, showRequest: false);
 
             var accept = new Button { Text = Loc.GetString("marketplace-offer-accept"), VerticalAlignment = VAlignment.Center };
             accept.AddStyleClass(StyleNano.StyleClassButtonColorGreen);
@@ -164,7 +171,7 @@ public sealed class MarketplaceRequestCard : PanelContainer
         var amount = Math.Clamp(offerAmount > 0 ? offerAmount : Math.Min(slotCount, data.Quantity), 1, Math.Max(1, slotCount));
         if (slotName != null && slotDeny == null && slotCount > 1)
         {
-            var spin = CreateAmountSpinBox(slotCount, amount, value =>
+            var spin = MarketplaceListingCard.CreateAmountSpinBox(slotCount, amount, value =>
             {
                 amount = value;
                 OnOfferAmountChanged?.Invoke(data.Id, value);
@@ -188,7 +195,7 @@ public sealed class MarketplaceRequestCard : PanelContainer
         else if (slotDeny != null)
         {
             offerButton.Disabled = true;
-            statusText = $"[color=#FF6B6B]{FormattedMessage.EscapeText(slotDeny)}[/color]";
+            statusText = $"[color={_theme.Danger}]{FormattedMessage.EscapeText(slotDeny)}[/color]";
         }
         else
         {
@@ -207,22 +214,25 @@ public sealed class MarketplaceRequestCard : PanelContainer
     /// <summary>
     /// A compact row describing an offered item, with room for buttons on the right.
     /// </summary>
-    public static OfferRow CreateOfferRow(MarketplaceOfferData offer, bool showRequest)
+    public static OfferRow CreateOfferRow(MarketplaceTheme theme, MarketplaceOfferData offer, bool showRequest)
     {
-        return new OfferRow(offer, showRequest);
+        return new OfferRow(theme, offer, showRequest);
     }
 
     public sealed class OfferRow : PanelContainer
     {
         public readonly BoxContainer Buttons;
 
-        public OfferRow(MarketplaceOfferData offer, bool showRequest)
+        public OfferRow(MarketplaceTheme theme, MarketplaceOfferData offer, bool showRequest)
         {
+            var MutedColor = theme.Muted;
+            var PriceColor = theme.Price;
+            var AccentColor = theme.Accent;
             HorizontalExpand = true;
             PanelOverride = new StyleBoxFlat
             {
-                BackgroundColor = Color.FromHex("#0E131C"),
-                BorderColor = CardBorder,
+                BackgroundColor = theme.RowBackground,
+                BorderColor = theme.CardBorder,
                 BorderThickness = new Thickness(1),
             };
 
@@ -234,7 +244,7 @@ public sealed class MarketplaceRequestCard : PanelContainer
             };
             AddChild(box);
 
-            var icon = new MarketplaceItemIcon(48);
+            var icon = new MarketplaceItemIcon(48, theme);
             icon.SetItem(offer.DisplayEntity, offer.ProtoId, offer.Stackable ? offer.Count : null);
             box.AddChild(icon);
 

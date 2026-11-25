@@ -18,9 +18,8 @@ public sealed class MarketplaceItemIcon : PanelContainer
 {
     [Dependency] private readonly IEntityManager _entMan = default!;
 
-    private static readonly Color Background = Color.FromHex("#0B0F16");
-    private static readonly Color Border = Color.FromHex("#2E5D86");
-    private static readonly Color BorderHover = Color.FromHex("#5FB4FF");
+    private readonly Color _border;
+    private readonly Color _borderHover;
 
     private readonly StyleBoxFlat _style;
     private readonly SpriteView _spriteView;
@@ -31,9 +30,12 @@ public sealed class MarketplaceItemIcon : PanelContainer
     private bool _hasPrototype;
     private EntityUid? _entity;
 
-    public MarketplaceItemIcon(float size)
+    public MarketplaceItemIcon(float size, MarketplaceTheme? theme = null)
     {
         IoCManager.InjectDependencies(this);
+        theme ??= MarketplaceTheme.Sector;
+        _border = theme.IconBorder;
+        _borderHover = theme.IconBorderHover;
 
         SetSize = new Vector2(size, size);
         MouseFilter = MouseFilterMode.Stop;
@@ -41,8 +43,8 @@ public sealed class MarketplaceItemIcon : PanelContainer
 
         _style = new StyleBoxFlat
         {
-            BackgroundColor = Background,
-            BorderColor = Border,
+            BackgroundColor = theme.Inset,
+            BorderColor = _border,
             BorderThickness = new Thickness(1),
         };
         PanelOverride = _style;
@@ -131,13 +133,13 @@ public sealed class MarketplaceItemIcon : PanelContainer
     protected override void MouseEntered()
     {
         base.MouseEntered();
-        _style.BorderColor = BorderHover;
+        _style.BorderColor = _borderHover;
     }
 
     protected override void MouseExited()
     {
         base.MouseExited();
-        _style.BorderColor = Border;
+        _style.BorderColor = _border;
     }
 
     private void HandleKeyBind(GUIBoundKeyEventArgs args)

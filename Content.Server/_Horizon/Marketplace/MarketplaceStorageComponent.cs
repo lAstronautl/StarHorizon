@@ -10,6 +10,18 @@ public sealed partial class MarketplaceStorageComponent : Component
 {
     public const string ContainerId = "marketplace_storage";
 
+    /// <summary>
+    /// Which marketplace network this storage belongs to.
+    /// </summary>
+    [ViewVariables]
+    public string Network = string.Empty;
+
+    /// <summary>
+    /// Random per-round value used to derive the codes shown instead of names on anonymous networks.
+    /// </summary>
+    [ViewVariables]
+    public int Salt;
+
     [ViewVariables]
     public Dictionary<int, MarketplaceListing> Listings = new();
 
