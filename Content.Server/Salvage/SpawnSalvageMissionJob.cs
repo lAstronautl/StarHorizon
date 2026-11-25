@@ -185,9 +185,12 @@ public sealed class SpawnSalvageMissionJob : Job<bool>
             destComp.RequireCoordinateDisk = true;
             destComp.Enabled = true;
         }
+        // Карта планетной экспедиции носит имя планеты: его показывает название при посадке капсулы.
         _metaData.SetEntityName(
             mapUid,
-            _entManager.System<SharedSalvageSystem>().GetFTLName(_prototypeManager.Index(SalvageSystem.PlanetNames), _missionParams.Seed));
+            Planet.IsValid() && _entManager.TryGetComponent(Planet, out MetaDataComponent? planetMeta)
+                ? planetMeta.EntityName
+                : _entManager.System<SharedSalvageSystem>().GetFTLName(_prototypeManager.Index(SalvageSystem.PlanetNames), _missionParams.Seed));
         if (!Planet.IsValid())
             _entManager.AddComponent<FTLBeaconComponent>(mapUid);
         _entManager.EnsureComponent<AtmosDisabledMapComponent>(mapUid); // Frontier: disable atmos devices on exped map

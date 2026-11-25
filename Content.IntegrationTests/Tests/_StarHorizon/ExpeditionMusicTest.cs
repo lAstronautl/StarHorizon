@@ -24,6 +24,28 @@ public sealed class ExpeditionMusicTest
 {
     [TestPrototypes]
     private const string Prototypes = @"
+# Лёгкий игрок вместо MobHuman (его органы иногда не вычищаются между тестами пула).
+- type: entity
+  id: MusicTestMob
+  components:
+  - type: Inventory
+    templateId: human
+  - type: MobState
+  - type: Eye
+  - type: Physics
+    bodyType: Dynamic
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeCircle
+          radius: 0.35
+        density: 50
+        mask:
+        - MobMask
+        layer:
+        - MobLayer
+
 - type: entity
   parent: StarHorizonExpeditionMusicKey
   id: ExpeditionMusicTestCustomKey
@@ -98,7 +120,7 @@ public sealed class ExpeditionMusicTest
         EntityUid mob = default, headset = default, key = default, mapEntity = default;
         await server.WaitPost(() =>
         {
-            mob = server.EntMan.SpawnEntity("MobHuman", map.GridCoords);
+            mob = server.EntMan.SpawnEntity("MusicTestMob", map.GridCoords);
             headset = server.EntMan.SpawnEntity("ClothingHeadsetGrey", map.GridCoords);
             key = server.EntMan.SpawnEntity("StarHorizonExpeditionMusicKey", map.GridCoords);
             Assert.That(inventory.TryEquip(mob, headset, "ears", force: true));
@@ -156,7 +178,7 @@ public sealed class ExpeditionMusicTest
         EntityUid mob = default, pod = default;
         await server.WaitPost(() =>
         {
-            mob = server.EntMan.SpawnEntity("MobHuman", map.GridCoords);
+            mob = server.EntMan.SpawnEntity("MusicTestMob", map.GridCoords);
             var headset = server.EntMan.SpawnEntity("ClothingHeadsetGrey", map.GridCoords);
             var key = server.EntMan.SpawnEntity("StarHorizonExpeditionMusicKey", map.GridCoords);
             Assert.That(inventory.TryEquip(mob, headset, "ears", force: true));
@@ -179,6 +201,45 @@ public sealed class ExpeditionMusicTest
 
         await SetState(Content.Shared._StarHorizon.DropPod.DropPodState.InBluespace);
         Assert.That(music.CurrentScene, Is.EqualTo("Pod"), "в БСС играет музыка полёта");
+
+        await pair.CleanReturnAsync();
+    }
+
+    /// <summary>При переключении экрана капсулы на место посадки пишется только название планеты (без фона), со звуком печати.</summary>
+    [Test]
+    public async Task PlanetNameIsShownWhenTheScreenSwitches()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Connected = true, FailureLogLevel = LogLevel.Fatal });
+        var server = pair.Server;
+        var client = pair.Client;
+        var map = await pair.CreateTestMap();
+        var storage = server.System<Content.Server.Storage.EntitySystems.EntityStorageSystem>();
+        var appearance = server.System<Robust.Server.GameObjects.AppearanceSystem>();
+        var title = client.System<Content.Client._StarHorizon.DropPod.PlanetTitleSystem>();
+
+        EntityUid mob = default, pod = default;
+        await server.WaitPost(() =>
+        {
+            // Карта посадки: экспедиция, её имя - имя планеты.
+            var expedition = server.EntMan.AddComponent<Content.Server.Salvage.Expeditions.SalvageExpeditionComponent>(map.MapUid);
+            expedition.SelectedSong = new Robust.Shared.Audio.ResolvedPathSpecifier("/Audio/Expedition/deadline.ogg");
+            expedition.MissionParams = new Content.Shared.Salvage.Expeditions.SalvageMissionParams();
+            expedition.EndTime = server.Resolve<Robust.Shared.Timing.IGameTiming>().CurTime + TimeSpan.FromHours(1);
+            server.System<MetaDataSystem>().SetEntityName(map.MapUid, "Тестовая-7");
+
+            mob = server.EntMan.SpawnEntity("MusicTestMob", map.GridCoords);
+            pod = server.EntMan.SpawnEntity("StarHorizonDropPod", map.GridCoords);
+            storage.OpenStorage(pod);
+            storage.Insert(mob, pod);
+            storage.CloseStorage(pod);
+            server.PlayerMan.SetAttachedEntity(server.PlayerMan.Sessions.First(), mob, out _, true);
+        });
+        await pair.RunSeconds(1f);
+        Assert.That(title.CurrentTitle, Is.Null, "пока капсула не прилетела, названия нет");
+
+        await server.WaitPost(() => appearance.SetData(pod, Content.Shared._StarHorizon.DropPod.DropPodVisuals.State, Content.Shared._StarHorizon.DropPod.DropPodState.Arriving));
+        await pair.RunSeconds(1f);
+        Assert.That(title.CurrentTitle, Is.EqualTo("ТЕСТОВАЯ-7"), "экран переключён на место посадки: название планеты");
 
         await pair.CleanReturnAsync();
     }
