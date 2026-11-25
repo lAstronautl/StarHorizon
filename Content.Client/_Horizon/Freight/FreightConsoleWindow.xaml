@@ -1,22 +1,23 @@
 <controls:FancyWindow xmlns="https://spacestation14.io"
                       xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
                       Title="{Loc 'freight-console-window-title'}"
-                      MinSize="450 400"
-                      SetSize="500 500">
+                      MinSize="760 520"
+                      SetSize="820 600">
     <BoxContainer Orientation="Vertical" Margin="10" VerticalExpand="True" HorizontalExpand="True">
-        <Label Name="DestinationLabel"/>
-        <Label Name="AddresseeLabel"/>
-        <BoxContainer Orientation="Vertical" VerticalExpand="True" Margin="0 5 0 5">
-            <Label Text="{Loc 'freight-console-manifest-header'}" HorizontalAlignment="Center"/>
-            <ScrollContainer VerticalExpand="True" HScrollEnabled="False">
-                <BoxContainer Name="EntriesContainer" Orientation="Vertical"/>
-            </ScrollContainer>
+        <BoxContainer Orientation="Horizontal">
+            <Label Name="HereLabel" HorizontalExpand="True"/>
+            <Label Name="RefreshLabel" StyleClasses="LabelSubText"/>
         </BoxContainer>
+        <Label Text="{Loc 'freight-console-offers-header'}" HorizontalAlignment="Center" Margin="0 5 0 5"/>
+        <!-- Order cards, like the expedition console -->
+        <BoxContainer Name="OffersContainer" Orientation="Horizontal" MinHeight="250" VerticalExpand="True"/>
+        <Label Name="NoOffersLabel" Text="{Loc 'freight-console-no-offers'}" HorizontalAlignment="Center" Visible="False"/>
+        <controls:HLine Color="#404040" Margin="0 5 0 5"/>
+        <Label Text="{Loc 'freight-console-manifest-header'}" HorizontalAlignment="Center"/>
+        <Label Name="ManifestSourceLabel"/>
+        <BoxContainer Name="ManifestEntriesContainer" Orientation="Vertical"/>
         <Button Name="SpawnButton" Text="{Loc 'freight-console-spawn-button'}"/>
         <Label Name="SellStatusLabel" Margin="0 5 0 0"/>
-        <BoxContainer Orientation="Horizontal">
-            <Button Name="SellButton" Text="{Loc 'freight-console-sell-button'}" HorizontalExpand="True"/>
-            <Button Name="RefreshButton" Text="{Loc 'freight-console-refresh-button'}"/>
-        </BoxContainer>
+        <Button Name="SellButton" Text="{Loc 'freight-console-sell-button'}"/>
     </BoxContainer>
 </controls:FancyWindow>

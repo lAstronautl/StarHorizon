@@ -1,25 +1,8 @@
+# Накладная, печатается консолью перевозок (содержимое и адрес загрузки задаются при печати).
 - type: entity
-  id: FreightManifestBase
-  parent: Paper
-  abstract: true
+  id: PaperFreightManifest
+  parent: PaperCargoInvoice
   name: накладная на перевозку
-  description: Бумага с перечнем грузов, адресатами и расценками. Вставьте её в консоль перевозок.
+  description: Накладная с перечнем грузов и адресов. Внесите её в консоль перевозок на пункте загрузки, чтобы получить ящики.
   components:
   - type: FreightManifest
-
-# Пример накладной: инженерные грузы разным адресатам.
-- type: entity
-  id: FreightManifestExample
-  parent: FreightManifestBase
-  suffix: Example
-  components:
-  - type: FreightManifest
-    addressee: Склад NT
-    entries:
-    - crate: TradeGoodsEngineerTools
-      count: 2
-      pool: FreightPoolDeports
-      price: 3000
-    - crate: TradeGoodsMedChem
-      count: 1
-      pool: FreightPoolAnywhere

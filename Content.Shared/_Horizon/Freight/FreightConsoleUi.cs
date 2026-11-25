@@ -1,3 +1,4 @@
+using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared._Horizon.Freight;
@@ -9,37 +10,60 @@ public enum FreightConsoleUiKey : byte
 }
 
 [Serializable, NetSerializable]
-public readonly record struct FreightManifestUiEntry(string CrateName, int Count, int Price, string Destinations);
-
-[Serializable, NetSerializable]
 public sealed class FreightConsoleBuiState : BoundUserInterfaceState
 {
-    public readonly string Destination;
+    /// <summary>Address of this console's grid (null if undefined).</summary>
+    public readonly ProtoId<FreightDestinationPrototype>? Here;
+
+    public readonly List<FreightOffer> Offers;
+
+    /// <summary>Server CurTime at which the offers are regenerated.</summary>
+    public readonly TimeSpan NextRefresh;
+
+    /// <summary>Manifest currently in the slot (null if none).</summary>
+    public readonly ProtoId<FreightDestinationPrototype>? ManifestSource;
     public readonly bool HasManifest;
-    public readonly string Addressee;
-    public readonly List<FreightManifestUiEntry> Entries;
+    public readonly List<FreightResolvedEntry> ManifestEntries;
+
     public readonly int SellableCrates;
     public readonly int WrongDestinationCrates;
     public readonly int SellValue;
 
-    public FreightConsoleBuiState(string destination, bool hasManifest, string addressee,
-        List<FreightManifestUiEntry> entries, int sellableCrates, int wrongDestinationCrates, int sellValue)
+    public FreightConsoleBuiState(ProtoId<FreightDestinationPrototype>? here, List<FreightOffer> offers,
+        TimeSpan nextRefresh, bool hasManifest, ProtoId<FreightDestinationPrototype>? manifestSource,
+        List<FreightResolvedEntry> manifestEntries, int sellableCrates, int wrongDestinationCrates, int sellValue)
     {
-        Destination = destination;
+        Here = here;
+        Offers = offers;
+        NextRefresh = nextRefresh;
         HasManifest = hasManifest;
-        Addressee = addressee;
-        Entries = entries;
+        ManifestSource = manifestSource;
+        ManifestEntries = manifestEntries;
         SellableCrates = sellableCrates;
         WrongDestinationCrates = wrongDestinationCrates;
         SellValue = sellValue;
     }
 }
 
+/// <summary>Take an offered order: prints its manifest.</summary>
+[Serializable, NetSerializable]
+public sealed class FreightTakeOfferMessage : BoundUserInterfaceMessage
+{
+    public int Index;
+
+    public FreightTakeOfferMessage()
+    {
+    }
+
+    public FreightTakeOfferMessage(int index)
+    {
+        Index = index;
+    }
+}
+
+/// <summary>Release the crates of the manifest in the slot (must be at its loading point).</summary>
 [Serializable, NetSerializable]
 public sealed class FreightSpawnMessage : BoundUserInterfaceMessage;
 
 [Serializable, NetSerializable]
 public sealed class FreightSellMessage : BoundUserInterfaceMessage;
-
-[Serializable, NetSerializable]
-public sealed class FreightRefreshMessage : BoundUserInterfaceMessage;

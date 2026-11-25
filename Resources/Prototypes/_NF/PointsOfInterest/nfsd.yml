@@ -34,6 +34,8 @@
       components:
         - type: StationNameSetup
           mapNameTemplate: 'Аванпост ДШНФ'
+        - type: FreightDestination
+          id: Nfsd
         - type: ExtraStationInformation
           iconPath: /Textures/_NF/Interface/StationIcons/nfsd-banner.png
           stationSubtext: 'frontier-lobby-nfsd-subtext'

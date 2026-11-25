@@ -1,3 +1,48 @@
+# Адреса перевозок. id CargoA.. совпадают с NF-направлениями депо (буква выдаётся при генерации POI).
+- type: freightDestination
+  id: CargoA
+  name: freight-destination-cargo-a
+
+- type: freightDestination
+  id: CargoB
+  name: freight-destination-cargo-b
+
+- type: freightDestination
+  id: CargoC
+  name: freight-destination-cargo-c
+
+- type: freightDestination
+  id: CargoD
+  name: freight-destination-cargo-d
+
+- type: freightDestination
+  id: CargoE
+  name: freight-destination-cargo-e
+
+- type: freightDestination
+  id: CargoF
+  name: freight-destination-cargo-f
+
+- type: freightDestination
+  id: CargoG
+  name: freight-destination-cargo-g
+
+- type: freightDestination
+  id: CargoH
+  name: freight-destination-cargo-h
+
+- type: freightDestination
+  id: Edison
+  name: freight-destination-edison
+
+- type: freightDestination
+  id: Nfsd
+  name: freight-destination-nfsd
+
+- type: freightDestination
+  id: Frontier
+  name: freight-destination-frontier
+
 - type: freightDestination
   id: NTDeport
   name: freight-destination-nt-deport
@@ -7,8 +52,8 @@
   name: freight-destination-pirate-deport
 
 - type: freightDestination
-  id: SindiDeport
-  name: freight-destination-sindi-deport
+  id: SyndicateDeport
+  name: freight-destination-syndicate-deport
 
 - type: freightDestination
   id: GSecDeport

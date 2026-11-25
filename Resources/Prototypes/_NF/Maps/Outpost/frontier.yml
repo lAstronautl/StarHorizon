@@ -12,6 +12,8 @@
       components:
         - type: StationNameSetup
           mapNameTemplate: 'Аванпост Фронтира'
+        - type: FreightDestination
+          id: Frontier
 #          nameGenerator:
 #            !type:NanotrasenNameGenerator
 #            prefixCreator: '14'

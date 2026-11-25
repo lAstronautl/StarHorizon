@@ -17,9 +17,9 @@ public sealed class FreightConsoleBoundUserInterface : BoundUserInterface
         base.Open();
 
         _window = this.CreateWindow<FreightConsoleWindow>();
+        _window.OnTakeOfferPressed += index => SendMessage(new FreightTakeOfferMessage(index));
         _window.OnSpawnPressed += () => SendMessage(new FreightSpawnMessage());
         _window.OnSellPressed += () => SendMessage(new FreightSellMessage());
-        _window.OnRefreshPressed += () => SendMessage(new FreightRefreshMessage());
     }
 
     protected override void UpdateState(BoundUserInterfaceState state)

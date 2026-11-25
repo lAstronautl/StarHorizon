@@ -35,6 +35,8 @@
       components:
         - type: StationNameSetup
           mapNameTemplate: 'Электростанция Эдисона'
+        - type: FreightDestination
+          id: Edison
         - type: ExtraStationInformation
           iconPath: /Textures/_NF/Interface/StationIcons/banner_engineering.png
           stationSubtext: frontier-lobby-edison-subtext

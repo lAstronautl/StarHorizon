@@ -37,4 +37,4 @@
         - type: HorizonStationFaction
           faction: Syndicate
         - type: FreightDestination
-          id: SindiDeport
+          id: SyndicateDeport

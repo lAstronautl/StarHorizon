@@ -1,26 +1,42 @@
-# Пул адресатов: выбирается по весу на каждый ящик. destination не указан = любой грид с консолью перевозок.
-# credits / tokens - оплата продавцу, bankPayout - перевод на аккаунт ATM банка грида (если он там есть).
+# Пулы адресатов: на каждый ящик по весу выбирается один получатель из тех, чей адрес реально есть в секторе
+# (и не совпадает с адресом загрузки). credits/tokens - оплата продавцу за ящик, bankPayout - перевод на аккаунт
+# ATM банка грида доставки (если он там есть).
 - type: freightRecipientPool
-  id: FreightPoolDeports
+  id: FreightPoolMarket
   recipients:
-  - destination: NTDeport
-    weight: 4
-    credits: 2500
-    tokens: 2
-    bankPayout: 500
-  - destination: SindiDeport
-    weight: 2
-    credits: 3500
-    tokens: 3
-  - destination: PirateDeport
-    weight: 1
-    credits: 4500
-    tokens: 4
+  - { destination: CargoA, weight: 1, credits: 1800, tokens: 1, bankPayout: 200 }
+  - { destination: CargoB, weight: 1, credits: 1800, tokens: 1, bankPayout: 200 }
+  - { destination: CargoC, weight: 1, credits: 1800, tokens: 1, bankPayout: 200 }
+  - { destination: CargoD, weight: 1, credits: 1800, tokens: 1, bankPayout: 200 }
+  - { destination: CargoE, weight: 1, credits: 1800, tokens: 1, bankPayout: 200 }
+  - { destination: CargoF, weight: 1, credits: 1800, tokens: 1, bankPayout: 200 }
+  - { destination: CargoG, weight: 1, credits: 1800, tokens: 1, bankPayout: 200 }
+  - { destination: CargoH, weight: 1, credits: 1800, tokens: 1, bankPayout: 200 }
 
 - type: freightRecipientPool
-  id: FreightPoolAnywhere
+  id: FreightPoolCivil
   recipients:
-  - weight: 1
-    credits: 1500
-    tokens: 1
-    bankPayout: 250
+  - { destination: Frontier, weight: 3, credits: 2200, tokens: 1, bankPayout: 400 }
+  - { destination: Edison, weight: 2, credits: 2600, tokens: 2, bankPayout: 400 }
+  - { destination: Nfsd, weight: 1, credits: 2600, tokens: 2, bankPayout: 400 }
+
+- type: freightRecipientPool
+  id: FreightPoolCorp
+  recipients:
+  - { destination: NTDeport, weight: 3, credits: 3000, tokens: 2, bankPayout: 500 }
+  - { destination: GSecDeport, weight: 2, credits: 3200, tokens: 2, bankPayout: 500 }
+  - { destination: Edison, weight: 1, credits: 2600, tokens: 2, bankPayout: 400 }
+
+- type: freightRecipientPool
+  id: FreightPoolBlack
+  recipients:
+  - { destination: PirateDeport, weight: 2, credits: 4500, tokens: 4 }
+  - { destination: SyndicateDeport, weight: 2, credits: 4200, tokens: 4 }
+
+- type: freightRecipientPool
+  id: FreightPoolArms
+  recipients:
+  - { destination: Nfsd, weight: 2, credits: 3400, tokens: 3, bankPayout: 600 }
+  - { destination: GSecDeport, weight: 2, credits: 3600, tokens: 3, bankPayout: 600 }
+  - { destination: SyndicateDeport, weight: 1, credits: 4600, tokens: 4 }
+  - { destination: PirateDeport, weight: 1, credits: 4800, tokens: 4 }

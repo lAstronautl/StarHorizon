@@ -1,0 +1,58 @@
+# Заказы на перевозку. Консоль предлагает несколько случайных вариантов; пункт загрузки выбирается среди
+# существующих адресов (sources - необязательное ограничение), адреса доставки - из пулов.
+- type: freightOrder
+  id: FreightOrderEngineering
+  name: freight-order-engineering
+  description: freight-order-engineering-desc
+  weight: 3
+  entries:
+  - { crate: TradeGoodsEngineerTools, count: 2, pool: FreightPoolMarket }
+  - { crate: TradeGoodsEngineerFuel, count: 1, pool: FreightPoolCivil }
+
+- type: freightOrder
+  id: FreightOrderMedical
+  name: freight-order-medical
+  description: freight-order-medical-desc
+  weight: 3
+  entries:
+  - { crate: TradeGoodsMedBase, count: 2, pool: FreightPoolCivil }
+  - { crate: TradeGoodsMedChem, count: 1, pool: FreightPoolCorp }
+
+- type: freightOrder
+  id: FreightOrderScience
+  name: freight-order-science
+  description: freight-order-science-desc
+  weight: 2
+  entries:
+  - { crate: TradeGoodsSciBase, count: 1, pool: FreightPoolCorp }
+  - { crate: TradeGoodsSciArtifacts, count: 1, pool: FreightPoolCorp }
+
+- type: freightOrder
+  id: FreightOrderSupplies
+  name: freight-order-supplies
+  description: freight-order-supplies-desc
+  weight: 4
+  entries:
+  - { crate: TradeGoodsGeneralSupplies, count: 3, pool: FreightPoolMarket }
+  - { crate: TradeGoodsServiceFood, count: 2, pool: FreightPoolCivil }
+
+- type: freightOrder
+  id: FreightOrderArms
+  name: freight-order-arms
+  description: freight-order-arms-desc
+  weight: 2
+  entries:
+  - { crate: TradeGoodAmmo, count: 2, pool: FreightPoolArms }
+  - { crate: TradeGoodGunparts, count: 1, pool: FreightPoolArms }
+
+- type: freightOrder
+  id: FreightOrderBlackMarket
+  name: freight-order-black-market
+  description: freight-order-black-market-desc
+  weight: 1
+  sources:
+  - PirateDeport
+  - SyndicateDeport
+  entries:
+  - { crate: TradeGoodPirateNarc, count: 2, pool: FreightPoolBlack }
+  - { crate: TradeGoodSyndicateSubs, count: 1, pool: FreightPoolBlack }
