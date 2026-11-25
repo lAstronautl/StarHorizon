@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Content.Server._NF.Bank;
 using Content.Server.Administration.Logs;
+using Content.Server.GameTicking;
 using Content.Server.Popups;
 using Content.Server.Preferences.Managers;
 using Content.Server.Stack;
@@ -35,7 +36,7 @@ namespace Content.Server._Horizon.Marketplace;
 /// at whichever console the purchase is made from. The seller receives the price minus the sector tax.
 /// Listings only last for the current round.
 /// </summary>
-public sealed class MarketplaceSystem : SharedMarketplaceSystem
+public sealed partial class MarketplaceSystem : SharedMarketplaceSystem
 {
     [Dependency] private readonly IAdminLogManager _adminLog = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
@@ -79,13 +80,24 @@ public sealed class MarketplaceSystem : SharedMarketplaceSystem
             subs.Event<MarketplaceBuyMessage>(OnBuy);
             subs.Event<MarketplaceWithdrawMessage>(OnWithdraw);
             subs.Event<MarketplaceEjectMessage>(OnEject);
+            subs.Event<MarketplaceCreateRequestMessage>(OnCreateRequest);
+            subs.Event<MarketplaceCancelRequestMessage>(OnCancelRequest);
+            subs.Event<MarketplaceMakeOfferMessage>(OnMakeOffer);
+            subs.Event<MarketplaceAcceptOfferMessage>(OnAcceptOffer);
+            subs.Event<MarketplaceRejectOfferMessage>(OnRejectOffer);
+            subs.Event<MarketplaceWithdrawOfferMessage>(OnWithdrawOffer);
         });
+
+        SubscribeLocalEvent<GameRunLevelChangedEvent>(OnRunLevelChanged);
     }
 
     #region Storage
 
     private void OnRoundRestart(RoundRestartCleanupEvent ev)
     {
+        // Normally done when the round ends, this catches restarts that skip the post-round stage.
+        RefundAll();
+
         if (_storage is { } storage && !TerminatingOrDeleted(storage))
             QueueDel(storage);
 
@@ -781,6 +793,10 @@ public sealed class MarketplaceSystem : SharedMarketplaceSystem
                 slotStackType,
                 slotCount,
                 slotDeny);
+
+            state.MaxRequestsPerPlayer = ent.Comp.MaxRequestsPerRequester;
+            if (storage != null)
+                FillRequests(state, storage, viewerId, viewerName);
 
             _ui.ServerSendUiMessage(ent.Owner, MarketplaceConsoleUiKey.Key, state, actor);
         }

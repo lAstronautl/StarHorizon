@@ -7,6 +7,8 @@ using Robust.Client.Graphics;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Utility;
+using Robust.Client.UserInterface;
+using Content.Client.Stylesheets;
 
 namespace Content.Client._Horizon.Marketplace;
 
@@ -30,6 +32,12 @@ public sealed partial class MarketplaceConsoleWindow : FancyWindow
     public event Action<int, int, int>? OnBuy;
     public event Action<int>? OnWithdraw;
     public event Action? OnEject;
+    public event Action<string, string, int, int>? OnCreateRequest;
+    public event Action<int>? OnCancelRequest;
+    public event Action<int, int>? OnMakeOffer;
+    public event Action<int>? OnAcceptOffer;
+    public event Action<int>? OnRejectOffer;
+    public event Action<int>? OnWithdrawOffer;
 
     private MarketplaceConsoleState? _state;
     private SortMode _sort = SortMode.Newest;
@@ -44,13 +52,21 @@ public sealed partial class MarketplaceConsoleWindow : FancyWindow
     /// </summary>
     private readonly Dictionary<int, int> _buyAmounts = new();
 
+    /// <summary>
+    /// Amounts picked for offers on request cards, kept across refreshes.
+    /// </summary>
+    private readonly Dictionary<int, int> _offerAmounts = new();
+
+    private int _requestQuantity = 1;
+
     public MarketplaceConsoleWindow()
     {
         RobustXamlLoader.Load(this);
 
         Tabs.SetTabTitle(0, Loc.GetString("marketplace-tab-market"));
-        Tabs.SetTabTitle(1, Loc.GetString("marketplace-tab-sell"));
-        Tabs.SetTabTitle(2, Loc.GetString("marketplace-tab-mine"));
+        Tabs.SetTabTitle(1, Loc.GetString("marketplace-tab-requests"));
+        Tabs.SetTabTitle(2, Loc.GetString("marketplace-tab-sell"));
+        Tabs.SetTabTitle(3, Loc.GetString("marketplace-tab-mine"));
 
         HeaderTitle.SetMessage(FormattedMessage.FromMarkupPermissive(Loc.GetString("marketplace-header-title")));
 
@@ -69,6 +85,19 @@ public sealed partial class MarketplaceConsoleWindow : FancyWindow
         };
         SlotPanel.PanelOverride = panelStyle;
         SellPanel.PanelOverride = panelStyle;
+        CreateRequestPanel.PanelOverride = panelStyle;
+        RequestSummaryPanel.PanelOverride = new StyleBoxFlat
+        {
+            BackgroundColor = Color.FromHex("#0B0F16"),
+            BorderColor = MarketplaceListingCard.CardBorder,
+            BorderThickness = new Thickness(1),
+        };
+        RequestDescriptionFrame.PanelOverride = new StyleBoxFlat
+        {
+            BackgroundColor = Color.FromHex("#0B0F16"),
+            BorderColor = MarketplaceListingCard.CardBorder,
+            BorderThickness = new Thickness(1),
+        };
         SummaryPanel.PanelOverride = new StyleBoxFlat
         {
             BackgroundColor = Color.FromHex("#0B0F16"),
@@ -109,6 +138,8 @@ public sealed partial class MarketplaceConsoleWindow : FancyWindow
             if (TryGetPrice(out var price))
                 OnList?.Invoke(_sellAmount, price);
         };
+
+        SetupRequestForm();
 
         SlotHintLabel.SetMessage(FormattedMessage.FromMarkupPermissive(Loc.GetString("marketplace-sell-slot-hint",
             ("mutedColor", MutedColor))));
@@ -161,6 +192,9 @@ public sealed partial class MarketplaceConsoleWindow : FancyWindow
         RebuildListings();
         RebuildOwnListings();
         UpdateSlot();
+        RebuildRequests();
+        RebuildMyOffers();
+        UpdateRequestSummary();
     }
 
     private int GetTaxPercent()
@@ -344,6 +378,160 @@ public sealed partial class MarketplaceConsoleWindow : FancyWindow
                               || _state.SlotDenyReason != null
                               || !_state.HasAccount
                               || !priceValid;
+    }
+
+    #endregion
+
+    #region Requests
+
+    private void SetupRequestForm()
+    {
+        RequestQuantityBox.AddChild(CreateRequestQuantitySpinBox());
+
+        RequestTitleEdit.IsValid = text => text.Length <= MarketplaceConsoleComponent.MaxTitleLength;
+        RequestTitleEdit.OnTextChanged += _ => UpdateRequestSummary();
+        RequestRewardEdit.IsValid = text => text.Length == 0 || text.Length <= 9 && text.All(char.IsDigit);
+        RequestRewardEdit.OnTextChanged += _ => UpdateRequestSummary();
+
+        RequestSearch.OnTextChanged += _ => RebuildRequests();
+        OnlyMyRequests.OnToggled += _ => RebuildRequests();
+
+        CreateRequestButton.OnPressed += _ =>
+        {
+            if (!int.TryParse(RequestRewardEdit.Text, out var reward) || reward <= 0)
+                return;
+
+            var description = Rope.Collapse(RequestDescriptionEdit.TextRope).Trim();
+            if (description.Length > MarketplaceConsoleComponent.MaxDescriptionLength)
+                description = description[..MarketplaceConsoleComponent.MaxDescriptionLength];
+
+            OnCreateRequest?.Invoke(RequestTitleEdit.Text.Trim(), description, _requestQuantity, reward);
+
+            RequestTitleEdit.Text = string.Empty;
+            RequestDescriptionEdit.TextRope = new Rope.Leaf(string.Empty);
+            RequestRewardEdit.Text = string.Empty;
+            UpdateRequestSummary();
+        };
+    }
+
+    private Control CreateRequestQuantitySpinBox()
+    {
+        var spin = MarketplaceListingCard.CreateAmountSpinBox(MarketplaceConsoleComponent.MaxRequestQuantity, _requestQuantity, value =>
+        {
+            _requestQuantity = value;
+            UpdateRequestSummary();
+        });
+        spin.HorizontalExpand = true;
+        return spin;
+    }
+
+    private void UpdateRequestSummary()
+    {
+        var hasReward = int.TryParse(RequestRewardEdit.Text, out var reward) && reward > 0;
+        var taxRate = _state?.TaxRate ?? 0f;
+        var tax = hasReward ? SharedMarketplaceSystem.GetTax(reward, taxRate) : 0;
+
+        var summary = new FormattedMessage();
+        summary.AddMarkupPermissive(Loc.GetString("marketplace-request-summary-held",
+            ("reward", BankSystemExtensions.ToSpesoString(hasReward ? reward : 0)),
+            ("mutedColor", MutedColor)));
+        summary.PushNewline();
+        summary.AddMarkupPermissive(Loc.GetString("marketplace-request-summary-payout",
+            ("payout", BankSystemExtensions.ToSpesoString(hasReward ? reward - tax : 0)),
+            ("tax", GetTaxPercent()),
+            ("mutedColor", MutedColor),
+            ("priceColor", PriceColor)));
+        RequestSummaryLabel.SetMessage(summary);
+
+        RequestNoteLabel.SetMessage(FormattedMessage.FromMarkupPermissive(Loc.GetString("marketplace-request-note",
+            ("mutedColor", MutedColor))));
+
+        var ownRequests = _state?.Requests.Count(r => r.IsOwn) ?? 0;
+        CreateRequestButton.Disabled = _state == null
+                                       || !_state.HasAccount
+                                       || RequestTitleEdit.Text.Trim().Length == 0
+                                       || !hasReward
+                                       || reward > _state.MaxUnitPrice
+                                       || reward > _state.Balance
+                                       || ownRequests >= _state.MaxRequestsPerPlayer;
+    }
+
+    private void RebuildRequests()
+    {
+        RequestsList.RemoveAllChildren();
+        if (_state == null)
+            return;
+
+        var search = RequestSearch.Text.Trim();
+        IEnumerable<MarketplaceRequestData> requests = _state.Requests;
+
+        if (OnlyMyRequests.Pressed)
+            requests = requests.Where(r => r.IsOwn);
+
+        if (search.Length > 0)
+        {
+            requests = requests.Where(r =>
+                r.Title.Contains(search, StringComparison.CurrentCultureIgnoreCase)
+                || r.Description.Contains(search, StringComparison.CurrentCultureIgnoreCase)
+                || r.RequesterName.Contains(search, StringComparison.CurrentCultureIgnoreCase)
+                || r.GridName.Contains(search, StringComparison.CurrentCultureIgnoreCase)
+                || int.TryParse(search.TrimStart('#'), out var id) && r.Id == id);
+        }
+
+        // The viewer's own requests with offers waiting come first, then the newest.
+        requests = requests
+            .OrderByDescending(r => r.IsOwn && r.Offers.Count > 0)
+            .ThenByDescending(r => r.CreatedAt)
+            .ThenByDescending(r => r.Id);
+
+        var slotName = _state.SlotEntity != null ? _state.SlotName : null;
+        var slotCount = _state.SlotStackable ? _state.SlotCount : 0;
+
+        var any = false;
+        foreach (var request in requests)
+        {
+            var card = new MarketplaceRequestCard(request,
+                slotName,
+                slotCount,
+                _state.SlotDenyReason,
+                _offerAmounts.GetValueOrDefault(request.Id));
+            card.OnCancel += id => OnCancelRequest?.Invoke(id);
+            card.OnOffer += (id, amount) => OnMakeOffer?.Invoke(id, amount);
+            card.OnAccept += id => OnAcceptOffer?.Invoke(id);
+            card.OnReject += id => OnRejectOffer?.Invoke(id);
+            card.OnOfferAmountChanged += (id, amount) => _offerAmounts[id] = amount;
+            RequestsList.AddChild(card);
+            any = true;
+        }
+
+        RequestsEmpty.Visible = !any;
+        RequestsEmpty.Text = Loc.GetString(_state.Requests.Count == 0 ? "marketplace-request-empty" : "marketplace-empty-search");
+    }
+
+    private void RebuildMyOffers()
+    {
+        MyOffersList.RemoveAllChildren();
+        if (_state == null)
+            return;
+
+        foreach (var offer in _state.MyOffers.OrderBy(o => o.Status).ThenByDescending(o => o.Id))
+        {
+            var row = MarketplaceRequestCard.CreateOfferRow(offer, showRequest: true);
+            var button = new Button
+            {
+                Text = Loc.GetString(offer.Status == MarketplaceOfferStatus.Pending
+                    ? "marketplace-offer-withdraw"
+                    : "marketplace-offer-take-back"),
+            };
+            if (offer.Status == MarketplaceOfferStatus.Returned)
+                button.AddStyleClass(StyleNano.StyleClassButtonColorGreen);
+
+            button.OnPressed += _ => OnWithdrawOffer?.Invoke(offer.Id);
+            row.Buttons.AddChild(button);
+            MyOffersList.AddChild(row);
+        }
+
+        MyOffersEmpty.Visible = _state.MyOffers.Count == 0;
     }
 
     #endregion

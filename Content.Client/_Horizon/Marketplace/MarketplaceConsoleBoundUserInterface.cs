@@ -21,6 +21,13 @@ public sealed class MarketplaceConsoleBoundUserInterface : BoundUserInterface
         _window.OnBuy += (id, amount, price) => SendMessage(new MarketplaceBuyMessage(id, amount, price));
         _window.OnWithdraw += id => SendMessage(new MarketplaceWithdrawMessage(id));
         _window.OnEject += () => SendMessage(new MarketplaceEjectMessage());
+        _window.OnCreateRequest += (title, description, quantity, reward) =>
+            SendMessage(new MarketplaceCreateRequestMessage(title, description, quantity, reward));
+        _window.OnCancelRequest += id => SendMessage(new MarketplaceCancelRequestMessage(id));
+        _window.OnMakeOffer += (id, amount) => SendMessage(new MarketplaceMakeOfferMessage(id, amount));
+        _window.OnAcceptOffer += id => SendMessage(new MarketplaceAcceptOfferMessage(id));
+        _window.OnRejectOffer += id => SendMessage(new MarketplaceRejectOfferMessage(id));
+        _window.OnWithdrawOffer += id => SendMessage(new MarketplaceWithdrawOfferMessage(id));
     }
 
     protected override void ReceiveMessage(BoundUserInterfaceMessage message)

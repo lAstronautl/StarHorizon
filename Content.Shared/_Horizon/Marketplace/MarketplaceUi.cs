@@ -68,6 +68,18 @@ public sealed class MarketplaceConsoleState : BoundUserInterfaceMessage
     public int SlotCount;
     public string? SlotDenyReason;
 
+    /// <summary>
+    /// Open requests. Offers are only filled in for the viewer's own requests.
+    /// </summary>
+    public List<MarketplaceRequestData> Requests = new();
+
+    /// <summary>
+    /// Offers the viewer made, including returned ones waiting to be taken back.
+    /// </summary>
+    public List<MarketplaceOfferData> MyOffers = new();
+
+    public int MaxRequestsPerPlayer;
+
     public MarketplaceConsoleState(
         List<MarketplaceListingData> listings,
         int balance,

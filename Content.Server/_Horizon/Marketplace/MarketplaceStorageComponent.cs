@@ -21,6 +21,55 @@ public sealed partial class MarketplaceStorageComponent : Component
     /// </summary>
     [ViewVariables]
     public Dictionary<(NetUserId UserId, string CharacterName), int> PendingPayouts = new();
+
+    [ViewVariables]
+    public Dictionary<int, MarketplaceRequest> Requests = new();
+
+    [ViewVariables]
+    public int NextRequestId = 1;
+
+    [ViewVariables]
+    public Dictionary<int, MarketplaceOffer> Offers = new();
+
+    [ViewVariables]
+    public int NextOfferId = 1;
+}
+
+/// <summary>
+/// Someone looking for an item. The reward is already withdrawn from the requester and held here.
+/// </summary>
+public sealed class MarketplaceRequest
+{
+    [ViewVariables] public int Id;
+    [ViewVariables] public string Title = string.Empty;
+    [ViewVariables] public string Description = string.Empty;
+    [ViewVariables] public int Quantity;
+    [ViewVariables] public int Reward;
+    [ViewVariables] public NetUserId RequesterUserId;
+    [ViewVariables] public string RequesterCharacterName = string.Empty;
+    [ViewVariables] public string RequesterIdName = string.Empty;
+    [ViewVariables] public string GridName = string.Empty;
+    [ViewVariables] public TimeSpan CreatedAt;
+}
+
+/// <summary>
+/// An item offered for a request. The item is held in the marketplace storage until accepted or taken back.
+/// </summary>
+public sealed class MarketplaceOffer
+{
+    [ViewVariables] public int Id;
+    [ViewVariables] public int RequestId;
+    [ViewVariables] public string RequestTitle = string.Empty;
+    [ViewVariables] public int RequestReward;
+    [ViewVariables] public EntityUid Item;
+    [ViewVariables] public string Name = string.Empty;
+    [ViewVariables] public string? ProtoId;
+    [ViewVariables] public bool Stackable;
+    [ViewVariables] public NetUserId OffererUserId;
+    [ViewVariables] public string OffererCharacterName = string.Empty;
+    [ViewVariables] public string OffererIdName = string.Empty;
+    [ViewVariables] public string GridName = string.Empty;
+    [ViewVariables] public Content.Shared._Horizon.Marketplace.MarketplaceOfferStatus Status;
 }
 
 public sealed class MarketplaceListing

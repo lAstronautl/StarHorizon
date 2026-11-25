@@ -55,6 +55,46 @@
                 </ScrollContainer>
             </BoxContainer>
 
+            <!-- Requests -->
+            <BoxContainer Orientation="Horizontal" Margin="6" SeparationOverride="8">
+                <PanelContainer Name="CreateRequestPanel" SetWidth="340" VerticalExpand="True">
+                    <BoxContainer Orientation="Vertical" Margin="12" SeparationOverride="6">
+                        <Label Text="{Loc 'marketplace-request-create-title'}" StyleClasses="LabelHeading"/>
+                        <Label Text="{Loc 'marketplace-request-field-title'}" StyleClasses="LabelSubText"/>
+                        <LineEdit Name="RequestTitleEdit" PlaceHolder="{Loc 'marketplace-request-field-title-placeholder'}"/>
+                        <Label Text="{Loc 'marketplace-request-field-description'}" StyleClasses="LabelSubText"/>
+                        <PanelContainer Name="RequestDescriptionFrame">
+                            <TextEdit Name="RequestDescriptionEdit" MinHeight="90" HorizontalExpand="True"/>
+                        </PanelContainer>
+                        <Label Text="{Loc 'marketplace-request-field-quantity'}" StyleClasses="LabelSubText"/>
+                        <BoxContainer Name="RequestQuantityBox" HorizontalExpand="True"/>
+                        <Label Text="{Loc 'marketplace-request-field-reward'}" StyleClasses="LabelSubText"/>
+                        <LineEdit Name="RequestRewardEdit" PlaceHolder="0"/>
+                        <PanelContainer Name="RequestSummaryPanel">
+                            <RichTextLabel Name="RequestSummaryLabel" Margin="8 6 8 6"/>
+                        </PanelContainer>
+                        <Control VerticalExpand="True"/>
+                        <Button Name="CreateRequestButton" Text="{Loc 'marketplace-request-create-button'}" MinHeight="36"
+                                StyleClasses="ButtonColorGreen" HorizontalExpand="True"/>
+                        <RichTextLabel Name="RequestNoteLabel"/>
+                    </BoxContainer>
+                </PanelContainer>
+
+                <BoxContainer Orientation="Vertical" HorizontalExpand="True" SeparationOverride="6">
+                    <BoxContainer Orientation="Horizontal" SeparationOverride="6">
+                        <LineEdit Name="RequestSearch" HorizontalExpand="True" PlaceHolder="{Loc 'marketplace-request-search-placeholder'}"/>
+                        <CheckBox Name="OnlyMyRequests" Text="{Loc 'marketplace-request-only-mine'}"/>
+                    </BoxContainer>
+                    <ScrollContainer HScrollEnabled="False" VerticalExpand="True" HorizontalExpand="True">
+                        <BoxContainer Orientation="Vertical" HorizontalExpand="True" Margin="0 0 6 0">
+                            <BoxContainer Name="RequestsList" Orientation="Vertical" HorizontalExpand="True"/>
+                            <Label Name="RequestsEmpty" Text="{Loc 'marketplace-request-empty'}" HorizontalAlignment="Center"
+                                   Margin="0 40 0 40" StyleClasses="LabelSubText" Visible="False"/>
+                        </BoxContainer>
+                    </ScrollContainer>
+                </BoxContainer>
+            </BoxContainer>
+
             <!-- Sell -->
             <BoxContainer Orientation="Horizontal" Margin="6" SeparationOverride="8">
                 <PanelContainer Name="SlotPanel" SetWidth="340" VerticalExpand="True">
@@ -118,7 +158,11 @@
                     <BoxContainer Orientation="Vertical" HorizontalExpand="True">
                         <GridContainer Name="OwnGrid" Columns="3" HorizontalExpand="True"/>
                         <Label Name="OwnEmpty" Text="{Loc 'marketplace-mine-empty'}" HorizontalAlignment="Center"
-                               Margin="0 40 0 40" StyleClasses="LabelSubText" Visible="False"/>
+                               Margin="0 20 0 20" StyleClasses="LabelSubText" Visible="False"/>
+                        <Label Text="{Loc 'marketplace-my-offers-title'}" StyleClasses="LabelHeading" Margin="4 12 4 4"/>
+                        <BoxContainer Name="MyOffersList" Orientation="Vertical" HorizontalExpand="True" SeparationOverride="4" Margin="4 0 4 0"/>
+                        <Label Name="MyOffersEmpty" Text="{Loc 'marketplace-my-offers-empty'}" HorizontalAlignment="Center"
+                               Margin="0 20 0 20" StyleClasses="LabelSubText" Visible="False"/>
                     </BoxContainer>
                 </ScrollContainer>
             </BoxContainer>

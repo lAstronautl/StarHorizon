@@ -43,6 +43,28 @@ public sealed partial class MarketplaceConsoleComponent : Component
     public int MaxListingsPerSeller = 30;
 
     /// <summary>
+    /// How many open requests a single character may have at once.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public int MaxRequestsPerRequester = 10;
+
+    /// <summary>
+    /// How many pending offers a single request may receive.
+    /// </summary>
+    [DataField]
+    public int MaxOffersPerRequest = 20;
+
+    /// <summary>
+    /// How many offers (pending or returned) a single character may have at once.
+    /// </summary>
+    [DataField]
+    public int MaxOffersPerOfferer = 20;
+
+    public const int MaxTitleLength = 64;
+    public const int MaxDescriptionLength = 500;
+    public const int MaxRequestQuantity = 10_000;
+
+    /// <summary>
     /// Items matching this can never be listed, nor can items containing them.
     /// </summary>
     [DataField]

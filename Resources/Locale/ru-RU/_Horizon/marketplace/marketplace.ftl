@@ -95,3 +95,65 @@ ent-ComputerMarketplace = консоль торговой площадки
     .desc = Подключена к торговой сети сектора. Положите предмет внутрь, чтобы продать его другим космонавтам, или купите товары, выставленные на любой станции.
 ent-MarketplaceComputerCircuitboard = плата консоли торговой площадки
     .desc = Печатная плата для консоли торговой площадки.
+
+## Запросы
+
+marketplace-tab-requests = Запросы
+marketplace-request-search-placeholder = Поиск: что ищут, заказчик, станция или #номер запроса
+marketplace-request-only-mine = Только мои
+marketplace-request-empty = Пока никто ничего не ищет. Разместите первый запрос!
+
+marketplace-request-create-title = Новый запрос
+marketplace-request-field-title = Что нужно
+marketplace-request-field-title-placeholder = Например: пласталь для обшивки
+marketplace-request-field-description = Описание
+marketplace-request-field-quantity = Количество
+marketplace-request-field-reward = Награда за весь заказ
+marketplace-request-summary-held = [color={$mutedColor}]Будет заморожено на счёте:[/color] [bold]{$reward}[/bold]
+marketplace-request-summary-payout = [color={$mutedColor}]Исполнитель получит:[/color] [bold][color={$priceColor}]{$payout}[/color][/bold] [color={$mutedColor}](налог {$tax}%)[/color]
+marketplace-request-create-button = Разместить запрос
+marketplace-request-note = [color={$mutedColor}]Награда списывается сразу и хранится до выполнения. При отмене или в конце смены деньги возвращаются.[/color]
+
+marketplace-request-card-meta = [color={$mutedColor}]Нужно:[/color] {$quantity} шт.  [color={$mutedColor}]· Предложений:[/color] {$offers}  [color={$mutedColor}]· Запрос #{$id}[/color]
+marketplace-request-card-reward = [color={$mutedColor}]награда[/color]
+marketplace-request-card-requester = [color={$mutedColor}]Заказчик:[/color] {$name}  [color={$mutedColor}]· ID:[/color] {$idName}  [color={$mutedColor}]· Станция:[/color] [color={$accentColor}]{$grid}[/color]
+marketplace-request-card-no-offers = [color={$mutedColor}]Ваш запрос. Предложений пока нет.[/color]
+marketplace-request-card-offers-header = [color={$accentColor}]Ваш запрос.[/color] Предложения ({$count}) — примите подходящее:
+marketplace-request-cancel = Отменить запрос
+
+marketplace-offer-button = Предложить
+marketplace-offer-accept = Принять
+marketplace-offer-reject = Отклонить
+marketplace-offer-withdraw = Отозвать
+marketplace-offer-take-back = Забрать
+marketplace-offer-hint-empty = [color={$mutedColor}]Положите предмет в лоток консоли, чтобы предложить его.[/color]
+marketplace-offer-hint-item = [color={$mutedColor}]В лотке:[/color] [color={$accentColor}]{$item}[/color]
+marketplace-offer-hint-already = [color={$accentColor}]Вы уже сделали предложение по этому запросу.[/color]
+marketplace-offer-row-offerer = [color={$mutedColor}]От:[/color] {$name}  [color={$mutedColor}]· ID:[/color] {$idName}  [color={$mutedColor}]· Станция:[/color] [color={$accentColor}]{$grid}[/color]
+marketplace-offer-row-request = [color={$mutedColor}]К запросу:[/color] {$title}  [color={$mutedColor}]· награда[/color] [color={$priceColor}]{$reward}[/color]
+marketplace-offer-status-pending = [color=#FFD866]Ожидает решения заказчика[/color]
+marketplace-offer-status-returned = [color=#FF8A6B]Отклонено — заберите предмет[/color]
+
+marketplace-my-offers-title = Мои предложения
+marketplace-my-offers-empty = Вы ещё ничего не предлагали.
+
+marketplace-request-error-title = Название запроса должно быть от 1 до {$max} символов.
+marketplace-request-error-quantity = Количество должно быть от 1 до {$max}.
+marketplace-request-error-too-many = Нельзя иметь больше {$max} открытых запросов.
+marketplace-request-error-missing = Этот запрос больше не существует.
+marketplace-request-error-not-owner = Это не ваш запрос.
+marketplace-request-error-own = Нельзя предложить предмет на собственный запрос.
+marketplace-request-error-too-many-offers = У этого запроса уже {$max} предложений.
+marketplace-request-error-too-many-own-offers = Нельзя иметь больше {$max} предложений одновременно.
+marketplace-offer-error-missing = Это предложение больше недоступно.
+marketplace-offer-error-not-owner = Это не ваше предложение.
+
+marketplace-request-popup-created = Запрос «{$title}» размещён, {$reward} заморожено.
+marketplace-request-popup-cancelled = Запрос «{$title}» отменён, {$reward} возвращено.
+marketplace-offer-popup-made = {$item} предложен на запрос «{$title}».
+marketplace-offer-popup-received = Новое предложение на ваш запрос «{$title}»: {$item}.
+marketplace-offer-popup-accepted = Сделка состоялась: вы получили {$item} по запросу «{$title}».
+marketplace-offer-popup-paid = Ваше предложение по запросу «{$title}» принято! Зачислено {$payout} (налог {$tax}).
+marketplace-offer-popup-paid-pending = Ваше предложение по запросу «{$title}» принято! {$payout} ожидает выплаты на консоли торговой площадки.
+marketplace-offer-popup-rejected = Предложение «{$item}» отклонено.
+marketplace-offer-popup-withdrawn = {$item} возвращён вам.

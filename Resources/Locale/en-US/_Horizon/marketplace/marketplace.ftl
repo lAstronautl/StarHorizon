@@ -88,3 +88,65 @@ marketplace-popup-bought = Bought {$item} ×{$amount} for {$total}.
 marketplace-popup-sold = Sold {$item} ×{$amount}. Received {$payout} (tax {$tax}).
 marketplace-popup-sold-pending = Sold {$item} ×{$amount}. {$payout} is waiting for you at any marketplace console.
 marketplace-popup-pending-paid = Marketplace earnings received: {$amount}.
+
+## Requests
+
+marketplace-tab-requests = Requests
+marketplace-request-search-placeholder = Search: wanted item, requester, station or #request
+marketplace-request-only-mine = Only mine
+marketplace-request-empty = Nobody is looking for anything yet. Post the first request!
+
+marketplace-request-create-title = New request
+marketplace-request-field-title = What you need
+marketplace-request-field-title-placeholder = For example: plasteel for plating
+marketplace-request-field-description = Description
+marketplace-request-field-quantity = Quantity
+marketplace-request-field-reward = Reward for the whole order
+marketplace-request-summary-held = [color={$mutedColor}]Held from your account:[/color] [bold]{$reward}[/bold]
+marketplace-request-summary-payout = [color={$mutedColor}]Supplier receives:[/color] [bold][color={$priceColor}]{$payout}[/color][/bold] [color={$mutedColor}]({$tax}% tax)[/color]
+marketplace-request-create-button = Post request
+marketplace-request-note = [color={$mutedColor}]The reward is withdrawn now and held until the order is fulfilled. It is refunded if you cancel or the shift ends.[/color]
+
+marketplace-request-card-meta = [color={$mutedColor}]Wanted:[/color] {$quantity}  [color={$mutedColor}]· Offers:[/color] {$offers}  [color={$mutedColor}]· Request #{$id}[/color]
+marketplace-request-card-reward = [color={$mutedColor}]reward[/color]
+marketplace-request-card-requester = [color={$mutedColor}]Requester:[/color] {$name}  [color={$mutedColor}]· ID:[/color] {$idName}  [color={$mutedColor}]· Station:[/color] [color={$accentColor}]{$grid}[/color]
+marketplace-request-card-no-offers = [color={$mutedColor}]Your request. No offers yet.[/color]
+marketplace-request-card-offers-header = [color={$accentColor}]Your request.[/color] Offers ({$count}) - accept the one you like:
+marketplace-request-cancel = Cancel request
+
+marketplace-offer-button = Offer
+marketplace-offer-accept = Accept
+marketplace-offer-reject = Reject
+marketplace-offer-withdraw = Withdraw
+marketplace-offer-take-back = Take back
+marketplace-offer-hint-empty = [color={$mutedColor}]Put an item into the console tray to offer it.[/color]
+marketplace-offer-hint-item = [color={$mutedColor}]In tray:[/color] [color={$accentColor}]{$item}[/color]
+marketplace-offer-hint-already = [color={$accentColor}]You already made an offer on this request.[/color]
+marketplace-offer-row-offerer = [color={$mutedColor}]From:[/color] {$name}  [color={$mutedColor}]· ID:[/color] {$idName}  [color={$mutedColor}]· Station:[/color] [color={$accentColor}]{$grid}[/color]
+marketplace-offer-row-request = [color={$mutedColor}]For request:[/color] {$title}  [color={$mutedColor}]· reward[/color] [color={$priceColor}]{$reward}[/color]
+marketplace-offer-status-pending = [color=#FFD866]Waiting for the requester[/color]
+marketplace-offer-status-returned = [color=#FF8A6B]Rejected - take your item back[/color]
+
+marketplace-my-offers-title = My offers
+marketplace-my-offers-empty = You haven't offered anything yet.
+
+marketplace-request-error-title = The request title must be between 1 and {$max} characters.
+marketplace-request-error-quantity = The quantity must be between 1 and {$max}.
+marketplace-request-error-too-many = You can't have more than {$max} open requests.
+marketplace-request-error-missing = This request no longer exists.
+marketplace-request-error-not-owner = This is not your request.
+marketplace-request-error-own = You can't make an offer on your own request.
+marketplace-request-error-too-many-offers = This request already has {$max} offers.
+marketplace-request-error-too-many-own-offers = You can't have more than {$max} offers at once.
+marketplace-offer-error-missing = This offer is no longer available.
+marketplace-offer-error-not-owner = This is not your offer.
+
+marketplace-request-popup-created = Request "{$title}" posted, {$reward} held.
+marketplace-request-popup-cancelled = Request "{$title}" cancelled, {$reward} refunded.
+marketplace-offer-popup-made = {$item} offered for "{$title}".
+marketplace-offer-popup-received = New offer on your request "{$title}": {$item}.
+marketplace-offer-popup-accepted = Deal done: you received {$item} for "{$title}".
+marketplace-offer-popup-paid = Your offer for "{$title}" was accepted! Received {$payout} (tax {$tax}).
+marketplace-offer-popup-paid-pending = Your offer for "{$title}" was accepted! {$payout} is waiting for you at any marketplace console.
+marketplace-offer-popup-rejected = Offer "{$item}" rejected.
+marketplace-offer-popup-withdrawn = {$item} returned to you.
