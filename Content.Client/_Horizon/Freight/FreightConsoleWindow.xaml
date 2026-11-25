@@ -2,8 +2,8 @@
                       xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
                       xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
                       Title="{Loc 'freight-console-window-title'}"
-                      MinSize="480 400"
-                      SetSize="560 520">
+                      MinSize="960 400"
+                      SetSize="1120 520">
     <BoxContainer Orientation="Vertical" Margin="8" VerticalExpand="True" HorizontalExpand="True">
         <!-- Header -->
         <BoxContainer Orientation="Horizontal" Margin="0 0 0 6">
