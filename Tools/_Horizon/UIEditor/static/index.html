@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SS14 UI Editor</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header id="toolbar">
+    <div class="brand">SS14 UI Editor</div>
+    <div class="group">
+        <button id="btnNew" title="Новый интерфейс (Ctrl+N)">Новый</button>
+        <button id="btnOpen" title="Открыть XAML из репозитория (Ctrl+O)">Открыть</button>
+        <button id="btnOpenLocal" title="Открыть .xaml с диска">Файл…</button>
+        <input type="file" id="fileInput" accept=".xaml,.xml" hidden>
+        <button id="btnSave" title="Сохранить в репозиторий (Ctrl+S)">Сохранить</button>
+        <button id="btnSaveAs" title="Сохранить как…">Сохранить как</button>
+        <button id="btnDownload" title="Скачать .xaml и .xaml.cs">Скачать</button>
+    </div>
+    <div class="group">
+        <button id="btnUndo" title="Отменить (Ctrl+Z)">↶</button>
+        <button id="btnRedo" title="Повторить (Ctrl+Y)">↷</button>
+    </div>
+    <div class="group">
+        <label>Масштаб
+            <select id="zoom">
+                <option value="0.5">50%</option><option value="0.75">75%</option>
+                <option value="1" selected>100%</option><option value="1.5">150%</option>
+                <option value="2">200%</option>
+            </select>
+        </label>
+        <label>Язык
+            <select id="lang"><option>ru-RU</option><option>en-US</option><option value="">ключи</option></select>
+        </label>
+        <label class="chk"><input type="checkbox" id="showBounds" checked> Рамки</label>
+    </div>
+    <div class="spacer"></div>
+    <div id="fileName" class="file-name">без имени</div>
+</header>
+
+<main id="layout">
+    <aside id="left">
+        <section class="panel" id="paletteWrap">
+            <h3>Элементы <input id="paletteFilter" placeholder="поиск…"></h3>
+            <div id="palette"></div>
+        </section>
+        <section class="panel grow" id="treeWrap">
+            <h3>Иерархия</h3>
+            <div id="tree" tabindex="0"></div>
+        </section>
+    </aside>
+
+    <section id="center">
+        <nav class="tabs" id="viewTabs">
+            <button data-view="design" class="active">Дизайн</button>
+            <button data-view="xaml">XAML</button>
+            <button data-view="cs">C# (code-behind)</button>
+        </nav>
+        <div id="designView" class="view active">
+            <div id="canvasScroll">
+                <div id="canvasHost"></div>
+            </div>
+            <div id="statusBar"></div>
+        </div>
+        <div id="xamlView" class="view">
+            <div class="srcbar">
+                <button id="btnApplyXaml">Применить изменения</button>
+                <span id="xamlError" class="err"></span>
+            </div>
+            <textarea id="xamlSrc" spellcheck="false"></textarea>
+        </div>
+        <div id="csView" class="view">
+            <div class="srcbar">
+                <label>Namespace <input id="csNamespace" size="40"></label>
+                <label>Класс <input id="csClass" size="20"></label>
+                <button id="btnCopyCs">Копировать</button>
+                <span class="hint">Логика кнопок — позже; здесь только каркас с полями и подписками.</span>
+            </div>
+            <textarea id="csSrc" spellcheck="false" readonly></textarea>
+        </div>
+    </section>
+
+    <aside id="right">
+        <section class="panel grow">
+            <h3>Свойства <span id="propType" class="dim"></span></h3>
+            <div id="props"></div>
+        </section>
+    </aside>
+</main>
+
+<dialog id="openDlg">
+    <form method="dialog" class="dlg">
+        <h3>Открыть XAML из репозитория</h3>
+        <input id="openFilter" placeholder="фильтр, например: _Horizon или Shipyard" autofocus>
+        <ul id="openList"></ul>
+        <menu><button value="cancel">Отмена</button></menu>
+    </form>
+</dialog>
+
+<dialog id="newDlg">
+    <form method="dialog" class="dlg">
+        <h3>Новый интерфейс</h3>
+        <div id="templateList" class="templates"></div>
+        <menu><button value="cancel">Отмена</button></menu>
+    </form>
+</dialog>
+
+<dialog id="saveDlg">
+    <form method="dialog" class="dlg">
+        <h3>Сохранить как</h3>
+        <label>Путь к .xaml относительно репозитория
+            <input id="savePath" size="70" placeholder="Content.Client/_Horizon/MyFeature/UI/MyWindow.xaml">
+        </label>
+        <label class="chk"><input type="checkbox" id="saveCs" checked> Создать .xaml.cs, если его ещё нет</label>
+        <menu><button value="cancel">Отмена</button><button value="ok" id="saveOk">Сохранить</button></menu>
+    </form>
+</dialog>
+
+<div id="ctxMenu" class="ctx" hidden></div>
+<div id="toast"></div>
+
+<script src="schema.js"></script>
+<script src="editor.js"></script>
+</body>
+</html>
