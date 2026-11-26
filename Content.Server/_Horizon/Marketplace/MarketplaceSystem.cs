@@ -100,6 +100,7 @@ public sealed partial class MarketplaceSystem : SharedMarketplaceSystem
         SubscribeLocalEvent<GameRunLevelChangedEvent>(OnRunLevelChanged);
 
         InitializeCartridge();
+        InitializeDelivery();
     }
 
     #region Storage

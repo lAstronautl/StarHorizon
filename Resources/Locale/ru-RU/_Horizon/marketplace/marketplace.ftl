@@ -4,7 +4,7 @@ marketplace-item-slot-name = Лоток пункта выдачи
 
 marketplace-window-title = Пункт выдачи StarOZON
 marketplace-header-title = [font size=16][bold][color=#7CC4FF]Star[/color][color=#E8EEF7]OZON[/color][/bold][/font]  [color=#8391A5]· пункт выдачи · возврат за ваш кислород[/color]
-marketplace-header-terminal = [color={$mutedColor}]Терминал:[/color] [color={$accentColor}]{$grid}[/color]  [color={$mutedColor}]· наведите на предмет, чтобы осмотреть[/color]
+marketplace-header-terminal = [color={$mutedColor}]Терминал:[/color] [color={$accentColor}]{$grid}[/color]
 
 marketplace-stat-balance = [color={$mutedColor}]Баланс[/color]  [bold][color={$priceColor}]{$balance}[/color][/bold]
 marketplace-stat-no-account = [color=#FF6B6B]Нет банковского счёта[/color]
@@ -160,30 +160,47 @@ marketplace-error-contraband-inside = Внутри предмета контра
 
 ## Чёрный рынок
 
-marketplace-black-window-title = Чёрный рынок
-marketplace-black-header-title = [font size=16][bold][color=#FF4D57]ЧЁРНЫЙ[/color] [color=#F2E4E6]РЫНОК[/color][/bold][/font]  [color=#A38A8E]· зашифрованный канал[/color]
+marketplace-black-window-title = StarBerries
+marketplace-black-header-title = [font size=16][bold][color=#FF4D57]Star[/color][color=#F2E4E6]Berries[/color][/bold][/font]  [color=#A38A8E]· тёмная сторона Star маркета[/color]
 marketplace-anon-name = Аноним {$code}
 marketplace-anon-id = [зашифровано]
 marketplace-anon-grid = Шифр {$code}
 
-ent-ComputerMarketplaceBlackMarket = терминал чёрного рынка
-    .desc = Зашифрованный торговый терминал. Ни имён, ни вопросов — только товар и кредиты.
-ent-MarketplaceBlackMarketComputerCircuitboard = плата терминала чёрного рынка
-    .desc = Печатная плата терминала чёрного рынка. Маркировка старательно счищена.
+ent-ComputerMarketplaceBlackMarket = терминал StarBerries
+    .desc = Зашифрованный терминал StarBerries. Ни имён, ни вопросов, ни возврата — только товар и кредиты.
+ent-MarketplaceBlackMarketComputerCircuitboard = плата терминала StarBerries
+    .desc = Печатная плата терминала StarBerries. Маркировка старательно счищена.
 
 ## Программы КПК
 
 marketplace-pda-program-name = StarOZON
-marketplace-black-pda-program-name = Чёрный рынок
+marketplace-black-pda-program-name = StarBerries
 marketplace-pda-tab-new-request = Новый запрос
 marketplace-pda-subtitle = [color={$mutedColor}]Налог[/color] {$tax}%  [color={$mutedColor}]· Лотов[/color] {$listings}  [color={$mutedColor}]· Запросов[/color] {$requests}  [color={$mutedColor}]· Баланс[/color] [color={$priceColor}]{$balance}[/color]
 marketplace-pda-request-note = [color={$mutedColor}]Награда списывается сразу. Покупки, предложения и их принятие — только в пункте выдачи или терминале.[/color]
 marketplace-card-total-all = [color={$mutedColor}]За всё:[/color] [bold][color={$priceColor}]{$total}[/color][/bold]  [color={$mutedColor}]· купить в пункте выдачи[/color]
-marketplace-request-card-own-pda = [color={$accentColor}]Ваш запрос.[/color] Предложений: {$count} [color={$mutedColor}]— принять можно в пункте выдачи.[/color]
+marketplace-request-card-own-pda = [color={$accentColor}]Ваш запрос.[/color] Предложений: {$count} [color={$mutedColor}]— примите здесь с доставкой телепортом или в пункте выдачи.[/color]
 marketplace-request-card-offer-pda = [color={$mutedColor}]Предложить предмет можно в пункте выдачи.[/color]
 
 ent-MarketplaceViewerCartridge = картридж «StarOZON»
     .desc = Приложение StarOZON для КПК: смотрите товары и оставляйте заявки, не вставая с кресла пилота.
-ent-BlackMarketViewerCartridge = картридж «ТёмныйЛинк»
-    .desc = Картридж без маркировки с зашифрованным подключением к чёрному рынку.
+ent-BlackMarketViewerCartridge = картридж «StarBerries»
+    .desc = Картридж без маркировки с зашифрованным подключением к StarBerries.
 marketplace-examine-more = ПКМ или Shift+ЛКМ — полный осмотр с действиями
+
+## Доставка телепортом
+
+marketplace-crystal-slot-name = Блюспейс-кристаллы
+marketplace-delivery-accept = Принять и доставить
+marketplace-delivery-title = [bold]Доставка через секторный телепорт[/bold]
+marketplace-delivery-item = [color={$mutedColor}]Посылка:[/color] {$item} ×{$count}
+marketplace-delivery-crystals = [color={$mutedColor}]Блюспейс-кристаллов в КПК:[/color] [color={$accentColor}]{$count}[/color] [color={$mutedColor}]· за доставку спишется {$cost}[/color]
+marketplace-delivery-crystals-missing = [color=#FF6B6B]Нужен {$cost} блюспейс-кристалл в КПК (сейчас {$count}).[/color] [color={$mutedColor}]Вставьте кристаллы в КПК.[/color]
+marketplace-delivery-no-teleporters = В секторе нет секторных телепортов.
+marketplace-delivery-unpowered = нет питания
+marketplace-delivery-send = Доставить сюда
+marketplace-delivery-cancel = Отмена
+marketplace-delivery-error-teleporter = Этот телепорт недоступен.
+marketplace-delivery-error-unpowered = У телепорта нет питания.
+marketplace-delivery-error-crystals = Для доставки нужен {$cost} блюспейс-кристалл в КПК.
+marketplace-delivery-popup-sent = {$item} отправлен через телепорт: {$destination}.

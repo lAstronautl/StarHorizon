@@ -4,7 +4,7 @@ marketplace-item-slot-name = Pickup point tray
 
 marketplace-window-title = StarOZON Pickup Point
 marketplace-header-title = [font size=16][bold][color=#7CC4FF]Star[/color][color=#E8EEF7]OZON[/color][/bold][/font]  [color=#8391A5]· pickup point · returns cost your oxygen[/color]
-marketplace-header-terminal = [color={$mutedColor}]Terminal:[/color] [color={$accentColor}]{$grid}[/color]  [color={$mutedColor}]· Hover over an item to examine it[/color]
+marketplace-header-terminal = [color={$mutedColor}]Terminal:[/color] [color={$accentColor}]{$grid}[/color]
 
 marketplace-stat-balance = [color={$mutedColor}]Balance[/color]  [bold][color={$priceColor}]{$balance}[/color][/bold]
 marketplace-stat-no-account = [color=#FF6B6B]No bank account[/color]
@@ -153,8 +153,8 @@ marketplace-error-contraband-inside = There is class 2 or higher contraband insi
 
 ## Black market
 
-marketplace-black-window-title = Black Market
-marketplace-black-header-title = [font size=16][bold][color=#FF4D57]BLACK[/color] [color=#F2E4E6]MARKET[/color][/bold][/font]  [color=#A38A8E]· encrypted channel[/color]
+marketplace-black-window-title = StarBerries
+marketplace-black-header-title = [font size=16][bold][color=#FF4D57]Star[/color][color=#F2E4E6]Berries[/color][/bold][/font]  [color=#A38A8E]· the dark side of the Star market[/color]
 marketplace-anon-name = Anonymous {$code}
 marketplace-anon-id = [encrypted]
 marketplace-anon-grid = Cipher {$code}
@@ -162,11 +162,28 @@ marketplace-anon-grid = Cipher {$code}
 ## PDA programs
 
 marketplace-pda-program-name = StarOZON
-marketplace-black-pda-program-name = Black Market
+marketplace-black-pda-program-name = StarBerries
 marketplace-pda-tab-new-request = New request
 marketplace-pda-subtitle = [color={$mutedColor}]Tax[/color] {$tax}%  [color={$mutedColor}]· Listings[/color] {$listings}  [color={$mutedColor}]· Requests[/color] {$requests}  [color={$mutedColor}]· Balance[/color] [color={$priceColor}]{$balance}[/color]
 marketplace-pda-request-note = [color={$mutedColor}]The reward is held right away. Buying, offering and accepting offers happen at a pickup point or terminal.[/color]
 marketplace-card-total-all = [color={$mutedColor}]For all:[/color] [bold][color={$priceColor}]{$total}[/color][/bold]  [color={$mutedColor}]· buy at a pickup point[/color]
-marketplace-request-card-own-pda = [color={$accentColor}]Your request.[/color] Offers: {$count} [color={$mutedColor}]- accept them at a pickup point.[/color]
+marketplace-request-card-own-pda = [color={$accentColor}]Your request.[/color] Offers: {$count} [color={$mutedColor}]- accept here with teleport delivery, or at a pickup point.[/color]
 marketplace-request-card-offer-pda = [color={$mutedColor}]Offer an item at a pickup point.[/color]
 marketplace-examine-more = Right click or Shift+click for the full examine with actions
+
+## Teleport delivery
+
+marketplace-crystal-slot-name = Bluespace crystals
+marketplace-delivery-accept = Accept and deliver
+marketplace-delivery-title = [bold]Delivery via sector teleporter[/bold]
+marketplace-delivery-item = [color={$mutedColor}]Parcel:[/color] {$item} ×{$count}
+marketplace-delivery-crystals = [color={$mutedColor}]Bluespace crystals in PDA:[/color] [color={$accentColor}]{$count}[/color] [color={$mutedColor}]· a delivery uses {$cost}[/color]
+marketplace-delivery-crystals-missing = [color=#FF6B6B]You need {$cost} bluespace crystal in your PDA (now {$count}).[/color] [color={$mutedColor}]Insert crystals into the PDA.[/color]
+marketplace-delivery-no-teleporters = There are no sector teleporters in the sector.
+marketplace-delivery-unpowered = no power
+marketplace-delivery-send = Deliver here
+marketplace-delivery-cancel = Cancel
+marketplace-delivery-error-teleporter = That teleporter is unavailable.
+marketplace-delivery-error-unpowered = The teleporter has no power.
+marketplace-delivery-error-crystals = A delivery needs {$cost} bluespace crystal in your PDA.
+marketplace-delivery-popup-sent = {$item} sent through the teleporter: {$destination}.

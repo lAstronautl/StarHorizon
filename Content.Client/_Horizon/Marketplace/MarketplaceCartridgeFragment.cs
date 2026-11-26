@@ -13,6 +13,7 @@ namespace Content.Client._Horizon.Marketplace;
 public sealed class MarketplaceCartridgeFragment : BoxContainer
 {
     public event Action<string, string, int, int>? OnCreateRequest;
+    public event Action<int, NetEntity>? OnAcceptOffer;
 
     private readonly MarketplaceTheme _theme;
     private readonly RichTextLabel _header;
@@ -23,6 +24,13 @@ public sealed class MarketplaceCartridgeFragment : BoxContainer
     private readonly BoxContainer _requests;
     private readonly Label _requestsEmpty;
     private readonly MarketplaceRequestForm _form;
+    private readonly TabContainer _tabs;
+    private readonly BoxContainer _picker;
+
+    /// <summary>
+    /// Offer being delivered while the teleporter picker is open.
+    /// </summary>
+    private MarketplaceOfferData? _pickingFor;
 
     private MarketplaceCartridgeState? _state;
 
@@ -49,7 +57,19 @@ public sealed class MarketplaceCartridgeFragment : BoxContainer
         AddChild(headerPanel);
 
         var tabs = new TabContainer { HorizontalExpand = true, VerticalExpand = true };
+        _tabs = tabs;
         AddChild(tabs);
+
+        // Shown instead of the tabs while choosing where a parcel goes.
+        _picker = new BoxContainer
+        {
+            Orientation = LayoutOrientation.Vertical,
+            HorizontalExpand = true,
+            VerticalExpand = true,
+            SeparationOverride = 6,
+            Visible = false,
+        };
+        AddChild(_picker);
 
         (_listingSearch, _listings, _listingsEmpty) = AddListTab(tabs, "marketplace-search-placeholder", "marketplace-empty");
         _listingSearch.OnTextChanged += _ => RebuildListings();
@@ -115,6 +135,16 @@ public sealed class MarketplaceCartridgeFragment : BoxContainer
         UpdateHeader();
         RebuildListings();
         RebuildRequests();
+        // Keep the picker in sync (crystal count, teleporters), or close it if the offer is gone.
+        if (_pickingFor != null)
+        {
+            var offer = state.Requests.SelectMany(r => r.Offers).FirstOrDefault(o => o.Id == _pickingFor.Id);
+            if (offer == null)
+                ClosePicker();
+            else
+                OpenPicker(offer);
+        }
+
         _form.SetLimits(state.TaxRate,
             state.Balance,
             state.HasAccount,
@@ -177,11 +207,138 @@ public sealed class MarketplaceCartridgeFragment : BoxContainer
                      .ThenByDescending(r => r.CreatedAt)
                      .ThenByDescending(r => r.Id))
         {
-            _requests.AddChild(new MarketplaceRequestCard(_theme, request, null, 0, null, 0, readOnly: true));
+            var card = new MarketplaceRequestCard(_theme, request, null, 0, null, 0, readOnly: true);
+            card.OnAccept += offerId =>
+            {
+                var offer = request.Offers.FirstOrDefault(o => o.Id == offerId);
+                if (offer != null)
+                    OpenPicker(offer);
+            };
+            _requests.AddChild(card);
             any = true;
         }
 
         _requestsEmpty.Visible = !any;
         _requestsEmpty.Text = Loc.GetString(_state.Requests.Count == 0 ? "marketplace-request-empty" : "marketplace-empty-search");
     }
+
+    #region Teleport delivery
+
+    private void OpenPicker(MarketplaceOfferData offer)
+    {
+        _pickingFor = offer;
+        _tabs.Visible = false;
+        _picker.Visible = true;
+        _picker.RemoveAllChildren();
+
+        var crystals = _state?.Crystals ?? 0;
+        var cost = _state?.DeliveryCost ?? 1;
+        var enoughCrystals = crystals >= cost;
+
+        var panel = new PanelContainer
+        {
+            HorizontalExpand = true,
+            VerticalExpand = true,
+            PanelOverride = new StyleBoxFlat
+            {
+                BackgroundColor = _theme.CardBackground,
+                BorderColor = _theme.CardBorder,
+                BorderThickness = new Thickness(1),
+            },
+        };
+        _picker.AddChild(panel);
+
+        var box = new BoxContainer
+        {
+            Orientation = LayoutOrientation.Vertical,
+            SeparationOverride = 6,
+            Margin = new Thickness(10, 8, 10, 8),
+        };
+        panel.AddChild(box);
+
+        var header = new BoxContainer { Orientation = LayoutOrientation.Horizontal, SeparationOverride = 8 };
+        var icon = new MarketplaceItemIcon(48, _theme);
+        icon.SetItem(null, offer.ProtoId, offer.Stackable ? offer.Count : null);
+        header.AddChild(icon);
+
+        var title = new RichTextLabel { HorizontalExpand = true, VerticalAlignment = VAlignment.Center };
+        var titleMessage = new FormattedMessage();
+        titleMessage.AddMarkupPermissive(Loc.GetString("marketplace-delivery-title"));
+        titleMessage.PushNewline();
+        titleMessage.AddMarkupPermissive(Loc.GetString("marketplace-delivery-item",
+            ("item", FormattedMessage.EscapeText(offer.Name)),
+            ("count", offer.Stackable ? offer.Count : 1),
+            ("mutedColor", _theme.Muted)));
+        title.SetMessage(titleMessage);
+        header.AddChild(title);
+        box.AddChild(header);
+
+        var crystalLabel = new RichTextLabel();
+        crystalLabel.SetMessage(FormattedMessage.FromMarkupPermissive(Loc.GetString(
+            enoughCrystals ? "marketplace-delivery-crystals" : "marketplace-delivery-crystals-missing",
+            ("count", crystals),
+            ("cost", cost),
+            ("mutedColor", _theme.Muted),
+            ("accentColor", _theme.Accent))));
+        box.AddChild(crystalLabel);
+
+        box.AddChild(_theme.MakeDivider());
+
+        var scroll = new ScrollContainer { HScrollEnabled = false, VerticalExpand = true, HorizontalExpand = true };
+        var list = new BoxContainer { Orientation = LayoutOrientation.Vertical, SeparationOverride = 4, Margin = new Thickness(0, 0, 6, 0) };
+        scroll.AddChild(list);
+        box.AddChild(scroll);
+
+        var points = _state?.DeliveryPoints ?? new List<MarketplaceDeliveryPoint>();
+        if (points.Count == 0)
+        {
+            list.AddChild(new Label
+            {
+                Text = Loc.GetString("marketplace-delivery-no-teleporters"),
+                StyleClasses = { "LabelSubText" },
+                HorizontalAlignment = HAlignment.Center,
+                Margin = new Thickness(0, 20, 0, 20),
+            });
+        }
+
+        foreach (var point in points)
+        {
+            var row = new BoxContainer { Orientation = LayoutOrientation.Horizontal, SeparationOverride = 6 };
+            var name = new RichTextLabel { HorizontalExpand = true, VerticalAlignment = VAlignment.Center };
+            name.SetMessage(FormattedMessage.FromMarkupPermissive(point.Powered
+                ? $"[color={_theme.Accent}]•[/color] {FormattedMessage.EscapeText(point.Name)}"
+                : $"[color={_theme.Danger}]•[/color] [color={_theme.Muted}]{FormattedMessage.EscapeText(point.Name)} · {Loc.GetString("marketplace-delivery-unpowered")}[/color]"));
+            row.AddChild(name);
+
+            var send = new Button
+            {
+                Text = Loc.GetString("marketplace-delivery-send"),
+                Disabled = !point.Powered || !enoughCrystals,
+                MinWidth = 110,
+            };
+            send.AddStyleClass(Content.Client.Stylesheets.StyleNano.StyleClassButtonColorGreen);
+            var target = point.Teleporter;
+            send.OnPressed += _ =>
+            {
+                OnAcceptOffer?.Invoke(offer.Id, target);
+                ClosePicker();
+            };
+            row.AddChild(send);
+            list.AddChild(row);
+        }
+
+        var cancel = new Button { Text = Loc.GetString("marketplace-delivery-cancel"), HorizontalExpand = true };
+        cancel.OnPressed += _ => ClosePicker();
+        box.AddChild(cancel);
+    }
+
+    private void ClosePicker()
+    {
+        _pickingFor = null;
+        _picker.Visible = false;
+        _picker.RemoveAllChildren();
+        _tabs.Visible = true;
+    }
+
+    #endregion
 }

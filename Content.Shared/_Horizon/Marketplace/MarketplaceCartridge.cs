@@ -27,6 +27,16 @@ public sealed partial class MarketplaceCartridgeComponent : Component
     public float TaxRate = 0.1f;
 
     [DataField]
+    public Content.Shared._NF.Bank.Components.SectorBankAccount TaxAccount =
+        Content.Shared._NF.Bank.Components.SectorBankAccount.Frontier;
+
+    /// <summary>
+    /// Bluespace crystals used up per teleport delivery.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public int DeliveryCost = 1;
+
+    [DataField]
     public int MaxReward = 10_000_000;
 
     [DataField]
@@ -43,6 +53,17 @@ public sealed class MarketplaceCartridgeState : BoundUserInterfaceState
     public float TaxRate;
     public int MaxReward;
     public int MaxRequestsPerPlayer;
+
+    /// <summary>
+    /// Sector teleporters parcels can be delivered to.
+    /// </summary>
+    public List<MarketplaceDeliveryPoint> DeliveryPoints = new();
+
+    /// <summary>
+    /// Bluespace crystals in the PDA's tray, and how many a delivery takes.
+    /// </summary>
+    public int Crystals;
+    public int DeliveryCost;
 }
 
 [Serializable, NetSerializable]
