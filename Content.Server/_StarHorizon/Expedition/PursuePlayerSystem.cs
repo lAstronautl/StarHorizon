@@ -1,5 +1,6 @@
 using System.Numerics;
 using Content.Server.NPC;
+using Content.Server.NPC.Components;
 using Content.Server.NPC.HTN;
 using Content.Server.NPC.Systems;
 using Content.Shared.Ghost;
@@ -84,7 +85,14 @@ public sealed class PursuePlayerSystem : EntitySystem
         }
 
         var now = _timing.CurTime;
-        if (pursue.Waypoint is { } current
+
+        // К выбранной ножке пути нет (A* сдался): в следующий раз пробуем другой угол.
+        var noPath = TryComp<NPCSteeringComponent>(uid, out var steering) && steering.Status == SteeringStatus.NoPath;
+        if (noPath)
+            pursue.AngleStart++;
+
+        if (!noPath
+            && pursue.Waypoint is { } current
             && Vector2.DistanceSquared(current, pos) > 9f
             && now - pursue.WaypointSet < TimeSpan.FromSeconds(8))
         {
@@ -92,8 +100,10 @@ public sealed class PursuePlayerSystem : EntitySystem
         }
 
         var dir = Vector2.Normalize(toPlayer);
-        foreach (var degrees in new[] { 0f, 35f, -35f, 70f, -70f, 105f, -105f })
+        var angles = new[] { 0f, 35f, -35f, 70f, -70f, 105f, -105f };
+        for (var n = 0; n < angles.Length; n++)
         {
+            var degrees = angles[(n + pursue.AngleStart) % angles.Length];
             var rotated = new Angle(Angle.FromDegrees(degrees).Theta + dir.ToAngle().Theta).ToVec();
             if (_rocks.FindOpenNear(grid, pos + rotated * pursue.LegLength) is { } open)
             {
@@ -125,6 +135,7 @@ public sealed class PursuePlayerSystem : EntitySystem
         if (now - pursue.StillSince < pursue.StuckTime)
             return false;
 
+        Log.Info($"Removing stuck wave mob {ToPrettyString(uid)} at {pos}, nearest player {MathF.Sqrt(nearestPlayerSquared):F0} m");
         QueueDel(uid);
         return true;
     }

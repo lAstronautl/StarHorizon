@@ -365,14 +365,23 @@ public sealed class ExpeditionWaveTest
             for (var y = -6; y <= 4; y++)
                 server.EntMan.SpawnEntity("WallRockBasalt", new EntityCoordinates(gridUid, 40.5f, y + 0.5f));
 
+        });
+
+        // Граф путей у ИИ строится несколько тиков после изменения тайлов: даём ему достроиться до появления моба.
+        await pair.RunSeconds(4f);
+
+        await server.WaitPost(() =>
+        {
+            var gridUid = map.Grid.Owner;
             mob = server.EntMan.SpawnEntity(proto, new EntityCoordinates(gridUid, 0.5f, 0.5f));
-            server.EntMan.AddComponent<PursuePlayerComponent>(mob);
+            // Пути у ИИ считаются по бюджету реального времени (в холодном процессе медленно): удаление застрявших не мешает тесту.
+            server.EntMan.AddComponent<PursuePlayerComponent>(mob).StuckTime = TimeSpan.FromMinutes(10);
             player = server.EntMan.SpawnEntity("WaveTestPlayer", new EntityCoordinates(gridUid, 80.5f, 0.5f));
             server.PlayerMan.SetAttachedEntity(server.PlayerMan.Sessions.First(), player, out _, true);
         });
 
         var reached = false;
-        for (var i = 0; i < 40 && !reached; i++)
+        for (var i = 0; i < 90 && !reached; i++)
         {
             await pair.RunSeconds(1f);
             Assert.That(server.EntMan.Deleted(mob), Is.False, "моб не пропадает, пока идёт к игроку");

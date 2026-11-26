@@ -61,7 +61,7 @@ public sealed partial class PursuePlayerComponent : Component
     [ViewVariables] public EntityUid? Target;
 
     /// <summary>Если моб волны не двигается дольше этого (застрял в щели, за камнем) и игроков рядом нет, он удаляется.</summary>
-    [DataField] public TimeSpan StuckTime = TimeSpan.FromSeconds(30);
+    [DataField] public TimeSpan StuckTime = TimeSpan.FromSeconds(60);
 
     /// <summary>Сдвиг меньше этого за проверку считается стоянием на месте, метры.</summary>
     [DataField] public float StuckDistance = 0.5f;
@@ -82,6 +82,9 @@ public sealed partial class PursuePlayerComponent : Component
     [ViewVariables] public System.Numerics.Vector2? Waypoint;
 
     [ViewVariables] public TimeSpan WaypointSet;
+
+    /// <summary>С какого угла пробовать ножку: растёт, когда к выбранной цели пути нет (NoPath), чтобы пойти в обход.</summary>
+    [ViewVariables] public int AngleStart;
 
     /// <summary>Какая цель сейчас стоит в блэкборде моба (чтобы перепланировать только при смене).</summary>
     [ViewVariables] public (EntityUid? Player, System.Numerics.Vector2? Waypoint) Followed;
