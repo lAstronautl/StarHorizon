@@ -224,6 +224,12 @@ public sealed class ExpeditionWaveTest
         await pair.RunSeconds(2f);
         Assert.That(Pursuers(server).Count, Is.LessThanOrEqualTo(countBefore), "новых мобов нет");
 
+        // 7. Консольная команда принудительно спавнит волну (даже в последние секунды, мимо таймера).
+        var beforeForce = Pursuers(server).Count;
+        await server.WaitPost(() => server.ConsoleHost.ExecuteCommand($"expeditionwave {server.EntMan.GetNetEntity(expeditionMap)}"));
+        await pair.RunSeconds(1f);
+        Assert.That(Pursuers(server).Count, Is.GreaterThan(beforeForce), "команда expeditionwave: волна упала");
+
         await pair.CleanReturnAsync();
     }
 

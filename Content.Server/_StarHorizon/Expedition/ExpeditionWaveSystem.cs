@@ -90,19 +90,7 @@ public sealed class ExpeditionWaveSystem : EntitySystem
             return;
         }
 
-        // Место падения: где начал первый игрок.
-        if (ent.Comp.DropAnchor == null)
-        {
-            ent.Comp.DropAnchor = _players[0].Pos;
-
-            // Земля вокруг места падения остаётся подгруженной, даже когда игроки ушли далеко.
-            if (TryComp<MapGridComponent>(ent, out _))
-            {
-                var loader = Spawn(null, new EntityCoordinates(ent.Owner, _players[0].Pos));
-                AddComp<Content.Server.Parallax.BiomeForceLoadComponent>(loader);
-                ent.Comp.AnchorLoader = loader;
-            }
-        }
+        EnsureDropAnchor(ent);
 
         if (ent.Comp.NextWave is not { } next)
         {
@@ -115,6 +103,43 @@ public sealed class ExpeditionWaveSystem : EntitySystem
 
         ent.Comp.NextWave = now + Delay(ent.Comp.IntervalMin, ent.Comp.IntervalMax);
         SpawnWave(ent, expedition);
+    }
+
+    /// <summary>Место падения: где начал первый игрок. Запоминается один раз.</summary>
+    private void EnsureDropAnchor(Entity<ExpeditionWavesComponent> ent)
+    {
+        if (ent.Comp.DropAnchor != null || _players.Count == 0)
+            return;
+
+        ent.Comp.DropAnchor = _players[0].Pos;
+
+        // Земля вокруг места падения остаётся подгруженной, даже когда игроки ушли далеко.
+        if (TryComp<MapGridComponent>(ent, out _))
+        {
+            var loader = Spawn(null, new EntityCoordinates(ent.Owner, _players[0].Pos));
+            AddComp<Content.Server.Parallax.BiomeForceLoadComponent>(loader);
+            ent.Comp.AnchorLoader = loader;
+        }
+    }
+
+    /// <summary>
+    /// Принудительно спавнит волну на карте экспедиции прямо сейчас (команда expeditionwave). Следующая волна по таймеру
+    /// отсчитывается заново.
+    /// </summary>
+    /// <returns>Сколько мобов упало; отрицательное число: это не карта планетной экспедиции; 0: волна не вышла (нет игроков и т. п.).</returns>
+    public int ForceWave(EntityUid map)
+    {
+        if (!TryComp<SalvageExpeditionComponent>(map, out var expedition) || !expedition.Planet.IsValid())
+            return -1;
+
+        var waves = EnsureComp<ExpeditionWavesComponent>(map);
+        _pursue.GetAlivePlayers(map, _players);
+        if (_players.Count == 0)
+            return 0;
+
+        EnsureDropAnchor((map, waves));
+        waves.NextWave = _timing.CurTime + Delay(waves.IntervalMin, waves.IntervalMax);
+        return SpawnWave((map, waves), expedition);
     }
 
     private TimeSpan Delay(float min, float max) => TimeSpan.FromSeconds(_random.NextFloat(min, max));
