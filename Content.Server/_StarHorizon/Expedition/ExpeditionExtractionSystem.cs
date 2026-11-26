@@ -25,7 +25,7 @@ using Robust.Shared.Utility;
 namespace Content.Server._StarHorizon.Expedition;
 
 /// <summary>
-/// Эвакуация с планетной экспедиции: маяк с крюками, alleycat, игроки висят снаружи корабля и остаются в космосе
+/// Эвакуация с планетной экспедиции: маяк с крюками, эвакуационный шаттл (Bus/expedition), игроки висят снаружи корабля и остаются в космосе
 /// у планеты, когда корабль удаляется (как при событии с шаттлом синдиката).
 /// </summary>
 public sealed class ExpeditionExtractionSystem : EntitySystem
@@ -42,7 +42,7 @@ public sealed class ExpeditionExtractionSystem : EntitySystem
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly LinkedLifecycleGridSystem _linkedLifecycle = default!;
 
-    public static readonly ResPath ShuttlePath = new("/Maps/_NF/Shuttles/Bus/alleycat.yml");
+    public static readonly ResPath ShuttlePath = new("/Maps/_Horizon/Shuttles/Bus/expedition.yml");
 
     private TimeSpan _nextUpdate;
 

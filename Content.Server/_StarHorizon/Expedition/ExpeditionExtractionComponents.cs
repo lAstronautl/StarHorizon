@@ -9,7 +9,7 @@ public enum ExtractionStage : byte
 
 /// <summary>
 /// Эвакуация с планетной экспедиции. Висит на карте экспедиции: за <see cref="ArriveBefore"/> до конца прилетает
-/// alleycat, за ~5 секунд до конца (как экспедиционный шаттл: старт FTL с запасом <see cref="DepartMargin"/>) он улетает в космос у планеты с теми, кто стоит на борту.
+/// эвакуационный шаттл (Bus/expedition), за ~5 секунд до конца (как экспедиционный шаттл: старт FTL с запасом <see cref="DepartMargin"/>) он улетает в космос у планеты с теми, кто стоит на борту.
 /// </summary>
 [RegisterComponent]
 public sealed partial class ExpeditionExtractionComponent : Component
@@ -36,7 +36,7 @@ public sealed partial class ExpeditionExtractionComponent : Component
     [DataField] public float PlanetDistance = 300f;
 }
 
-/// <summary>Эвакуационный шаттл (alleycat).</summary>
+/// <summary>Эвакуационный шаттл (эвакуационный шаттл (Bus/expedition)).</summary>
 [RegisterComponent]
 public sealed partial class ExtractionShuttleComponent : Component
 {
