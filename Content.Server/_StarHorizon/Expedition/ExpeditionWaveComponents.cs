@@ -69,6 +69,23 @@ public sealed partial class PursuePlayerComponent : Component
     /// <summary>Игрок ближе этого (дальше дальности стрельбы 10 м): моб дерётся или стреляет, на месте стоять ему можно.</summary>
     [DataField] public float PlayerNearDistance = 15f;
 
+    /// <summary>
+    /// Дальше этого моб идёт к игроку по «ножкам»: A* у ИИ ограничен 512 узлами и до далёкой цели путь не находит (моб
+    /// стоит на месте), поэтому цель ставится на <see cref="LegLength"/> метров вперёд по открытой земле.
+    /// </summary>
+    [DataField] public float DirectRange = 25f;
+
+    /// <summary>Длина одной ножки пути к далёкому игроку, метры.</summary>
+    [DataField] public float LegLength = 18f;
+
+    /// <summary>Цель текущей ножки (в координатах карты) и когда выбрана.</summary>
+    [ViewVariables] public System.Numerics.Vector2? Waypoint;
+
+    [ViewVariables] public TimeSpan WaypointSet;
+
+    /// <summary>Какая цель сейчас стоит в блэкборде моба (чтобы перепланировать только при смене).</summary>
+    [ViewVariables] public (EntityUid? Player, System.Numerics.Vector2? Waypoint) Followed;
+
     [ViewVariables] public System.Numerics.Vector2? LastPosition;
 
     [ViewVariables] public TimeSpan StillSince;

@@ -92,4 +92,33 @@ public sealed class RockClearSystem : EntitySystem
 
         return null;
     }
+
+    /// <summary>Ближайший к точке свободный тайл из открытой области (центр тайла в координатах карты-грида), если есть.</summary>
+    public Vector2? FindOpenNear(EntityUid gridUid, Vector2 point, int radius = 3, int minRegion = 12)
+    {
+        if (!TryComp<MapGridComponent>(gridUid, out var grid))
+            return null;
+
+        var center = _map.TileIndicesFor(gridUid, grid, new EntityCoordinates(gridUid, point));
+        Vector2i? best = null;
+        var bestDist = float.MaxValue;
+        for (var dx = -radius; dx <= radius; dx++)
+        {
+            for (var dy = -radius; dy <= radius; dy++)
+            {
+                var d = dx * dx + dy * dy;
+                if (d >= bestDist)
+                    continue;
+
+                var tile = new Vector2i(center.X + dx, center.Y + dy);
+                if (!IsOpenRegion(gridUid, grid, tile, minRegion))
+                    continue;
+
+                best = tile;
+                bestDist = d;
+            }
+        }
+
+        return best is { } found ? _map.GridTileToLocal(gridUid, grid, found).Position : null;
+    }
 }

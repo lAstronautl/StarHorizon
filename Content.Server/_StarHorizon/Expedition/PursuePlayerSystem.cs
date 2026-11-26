@@ -23,6 +23,7 @@ public sealed class PursuePlayerSystem : EntitySystem
     [Dependency] private readonly HTNSystem _htn = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly TransformSystem _xform = default!;
+    [Dependency] private readonly RockClearSystem _rocks = default!;
     [Dependency] private readonly Robust.Shared.Containers.SharedContainerSystem _container = default!;
 
     private const string MeleeRoot = "PursueMeleeCompound";
@@ -67,6 +68,43 @@ public sealed class PursuePlayerSystem : EntitySystem
 
             result.Add((uid, _xform.GetWorldPosition(xform)));
         }
+    }
+
+    /// <summary>
+    /// Цель ближайшей ножки пути к далёкому игроку: открытая земля на <see cref="PursuePlayerComponent.LegLength"/> метров
+    /// вперёд (с обходом вправо и влево, если прямо порода). Null: игрок близко или ножку выбрать не вышло, тогда идём к игроку.
+    /// </summary>
+    private Vector2? ChooseWaypoint(EntityUid uid, PursuePlayerComponent pursue, TransformComponent xform, Vector2 pos, Vector2 playerPos)
+    {
+        var toPlayer = playerPos - pos;
+        if (toPlayer.Length() <= pursue.DirectRange || xform.GridUid is not { } grid || xform.GridUid != xform.MapUid)
+        {
+            pursue.Waypoint = null;
+            return null;
+        }
+
+        var now = _timing.CurTime;
+        if (pursue.Waypoint is { } current
+            && Vector2.DistanceSquared(current, pos) > 9f
+            && now - pursue.WaypointSet < TimeSpan.FromSeconds(8))
+        {
+            return current;
+        }
+
+        var dir = Vector2.Normalize(toPlayer);
+        foreach (var degrees in new[] { 0f, 35f, -35f, 70f, -70f, 105f, -105f })
+        {
+            var rotated = new Angle(Angle.FromDegrees(degrees).Theta + dir.ToAngle().Theta).ToVec();
+            if (_rocks.FindOpenNear(grid, pos + rotated * pursue.LegLength) is { } open)
+            {
+                pursue.Waypoint = open;
+                pursue.WaypointSet = now;
+                return open;
+            }
+        }
+
+        pursue.Waypoint = null;
+        return null;
     }
 
     /// <returns>True, если моб удалён как застрявший.</returns>
@@ -133,11 +171,19 @@ public sealed class PursuePlayerSystem : EntitySystem
             if (!_container.IsEntityInContainer(uid) && CheckStuck(uid, pursue, pos, bestDist))
                 continue;
 
-            if (best == pursue.Target)
+            // Далёкого игрока A* не находит (стоят на месте), поэтому к далёкому идём по ножкам.
+            Vector2? waypoint = null;
+            if (best is { } far && !_container.IsEntityInContainer(uid))
+                waypoint = ChooseWaypoint(uid, pursue, xform, pos, _xform.GetWorldPosition(far));
+
+            if (best == pursue.Followed.Player && waypoint == pursue.Followed.Waypoint)
                 continue;
 
             pursue.Target = best;
-            if (best is { } target)
+            pursue.Followed = (best, waypoint);
+            if (waypoint is { } leg && xform.MapUid is { } mapUid)
+                _npc.SetBlackboard(uid, NPCBlackboard.FollowTarget, new EntityCoordinates(mapUid, leg), htn);
+            else if (best is { } target)
                 _npc.SetBlackboard(uid, NPCBlackboard.FollowTarget, new EntityCoordinates(target, Vector2.Zero), htn);
             else
                 htn.Blackboard.Remove<EntityCoordinates>(NPCBlackboard.FollowTarget);

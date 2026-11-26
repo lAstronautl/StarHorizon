@@ -335,4 +335,51 @@ public sealed class ExpeditionWaveTest
 
         await pair.CleanReturnAsync();
     }
+
+    /// <summary>
+    /// Моб волны находит дорогу к далёкому игроку в обход преграды: раньше A* у ИИ до далёкой цели путь не находил (NoPath),
+    /// моб стоял на месте и через 30 с удалялся как застрявший.
+    /// </summary>
+    [TestCase("MobDinosaurKentroExpeditions")]
+    [TestCase("NFMobXeno")]
+    public async Task FarWaveMobsWalkAroundObstaclesToThePlayer(string proto)
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Connected = true, FailureLogLevel = LogLevel.Fatal });
+        var server = pair.Server;
+        var map = await pair.CreateTestMap();
+        var xform = server.System<SharedTransformSystem>();
+
+        EntityUid mob = default, player = default;
+        await server.WaitPost(() =>
+        {
+            var mapSys = server.System<SharedMapSystem>();
+            var gridUid = map.Grid.Owner;
+            for (var x = -5; x <= 130; x++)
+            {
+                for (var y = -6; y <= 6; y++)
+                    mapSys.SetTile(gridUid, map.Grid.Comp, new EntityCoordinates(gridUid, x + 0.5f, y + 0.5f), map.Tile.Tile);
+            }
+
+            // Стена из породы поперёк коридора на x=40 с проходом сверху: надо обойти.
+            for (var y = -6; y <= 4; y++)
+                server.EntMan.SpawnEntity("WallRockBasalt", new EntityCoordinates(gridUid, 40.5f, y + 0.5f));
+
+            mob = server.EntMan.SpawnEntity(proto, new EntityCoordinates(gridUid, 0.5f, 0.5f));
+            server.EntMan.AddComponent<PursuePlayerComponent>(mob);
+            player = server.EntMan.SpawnEntity("WaveTestPlayer", new EntityCoordinates(gridUid, 80.5f, 0.5f));
+            server.PlayerMan.SetAttachedEntity(server.PlayerMan.Sessions.First(), player, out _, true);
+        });
+
+        var reached = false;
+        for (var i = 0; i < 40 && !reached; i++)
+        {
+            await pair.RunSeconds(1f);
+            Assert.That(server.EntMan.Deleted(mob), Is.False, "моб не пропадает, пока идёт к игроку");
+            reached = (xform.GetWorldPosition(mob) - xform.GetWorldPosition(player)).Length() < 8f;
+        }
+
+        Assert.That(reached, "моб дошёл до далёкого игрока в обход стены");
+
+        await pair.CleanReturnAsync();
+    }
 }
