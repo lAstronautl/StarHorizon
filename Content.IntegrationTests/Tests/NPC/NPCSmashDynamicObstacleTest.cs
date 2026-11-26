@@ -1,8 +1,12 @@
 using System.Numerics;
-using Content.Server.NPC.HTN;
+using Content.Server.Atmos.Components;
+using Content.Server.Body.Components;
 using Content.Server.NPC.Systems;
+using Content.Shared._Horizon.CCVar;
 using Content.Shared.Damage;
+using Content.Shared.Damage.Prototypes;
 using Content.Shared.NPC.Systems;
+using Content.Shared.Weapons.Melee;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
@@ -27,9 +31,12 @@ public sealed class NPCSmashDynamicObstacleTest
         var pair = await PoolManager.GetServerClient();
         var server = pair.Server;
         var entMan = server.EntMan;
+
+        // There are no players on the test server, so NPCs would be put to sleep by the distance pause.
+        await server.WaitPost(() => server.CfgMan.SetCVar(HorizonCCVars.NpcPauseWhenNoPlayersInRange, false));
+
         var map = await pair.CreateTestMap();
 
-        EntityUid target = default;
         EntityUid obstacle = default;
         EntityUid npc = default;
 
@@ -49,43 +56,41 @@ public sealed class NPCSmashDynamicObstacleTest
 
             EntityCoordinates Coords(int x, int y) => new(grid.Owner, new Vector2(x + 0.5f, y + 0.5f));
 
-            // Target is boxed in by walls on three sides and an obstacle on the fourth.
-            foreach (var pos in new[] { (-1, -1), (0, -1), (1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1) })
+            // Target is boxed in by walls on three sides and the obstacle on the fourth:
+            //   W W W
+            //   W T O . . . . X
+            //   W W W
+            foreach (var (x, y) in new[] { (-1, -1), (0, -1), (1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1) })
             {
-                entMan.SpawnEntity("WallSolid", Coords(pos.Item1, pos.Item2));
+                entMan.SpawnEntity("WallSolid", Coords(x, y));
             }
 
-            target = entMan.SpawnEntity("MobHuman", Coords(0, 0));
+            var target = entMan.SpawnEntity("MobHuman", Coords(0, 0));
             var factions = entMan.System<NpcFactionSystem>();
             factions.ClearFactions(target);
             factions.AddFaction(target, "NanoTrasen");
+            // The test map is a vacuum: keep the target alive.
+            entMan.RemoveComponent<BarotraumaComponent>(target);
+            entMan.RemoveComponent<RespiratorComponent>(target);
 
             obstacle = entMan.SpawnEntity(obstacleProto, Coords(1, 0));
             Assert.That(entMan.GetComponent<TransformComponent>(obstacle).Anchored, Is.False,
                 "Test expects the obstacle to be a dynamic (unanchored) entity");
 
             npc = entMan.SpawnEntity("MobXeno", Coords(6, 0));
+            // This test is about the AI, not balance: make sure each hit actually gets through the
+            // locker's flat damage reduction (StructuralMetallic eats 10 of each brute type per hit).
+            entMan.GetComponent<MeleeWeaponComponent>(npc).Damage =
+                new DamageSpecifier(server.ProtoMan.Index<DamageTypePrototype>("Blunt"), 40);
             entMan.System<NPCSystem>().WakeNPC(npc);
         });
 
-        var damageable = entMan.GetComponent<DamageableComponent>(target);
-        await server.WaitRunTicks(5);
-        var baseBrute = Brute(damageable);
-        var ticks = MaxSeconds * 30;
         var broken = false;
 
-        for (var i = 0; i < ticks; i += 30)
+        for (var i = 0; i < MaxSeconds && !broken; i++)
         {
             await server.WaitRunTicks(30);
-
-            var oDmg = entMan.Deleted(obstacle) ? "deleted" : entMan.GetComponent<DamageableComponent>(obstacle).TotalDamage.ToString();
-            var oPos = entMan.Deleted(obstacle) ? "-" : entMan.GetComponent<TransformComponent>(obstacle).Coordinates.Position.ToString();
-            TestContext.Out.WriteLine($"t={i / 30}s npc={entMan.GetComponent<TransformComponent>(npc).Coordinates.Position} obstacle={oPos} obstacleDmg={oDmg} targetBrute={Brute(damageable)} targetPos={entMan.GetComponent<TransformComponent>(target).Coordinates.Position}");
-            if (entMan.Deleted(obstacle) || Brute(damageable) > baseBrute)
-            {
-                broken = true;
-                break;
-            }
+            broken = entMan.Deleted(obstacle);
         }
 
         await server.WaitAssertion(() =>
@@ -95,22 +100,7 @@ public sealed class NPCSmashDynamicObstacleTest
                 $"Hostile NPC did not break the {obstacleProto} barricade in {MaxSeconds}s (npc at {npcPos})");
         });
 
+        await server.WaitPost(() => server.CfgMan.SetCVar(HorizonCCVars.NpcPauseWhenNoPlayersInRange, true));
         await pair.CleanReturnAsync();
-    }
-
-    /// <summary>
-    /// Only melee-style damage counts: the test map has no atmosphere so the target also takes asphyxiation.
-    /// </summary>
-    private static float Brute(DamageableComponent damageable)
-    {
-        var total = 0f;
-
-        foreach (var type in new[] { "Blunt", "Slash", "Piercing" })
-        {
-            if (damageable.Damage.DamageDict.TryGetValue(type, out var value))
-                total += value.Float();
-        }
-
-        return total;
     }
 }

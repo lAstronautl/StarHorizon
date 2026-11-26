@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Numerics;
 using Content.Server.Examine;
@@ -61,7 +62,8 @@ public sealed partial class NPCSteeringSystem
 
         // TODO: Ideally for "FreeSpace" we check all entities on the tile and build flags dynamically (pathfinder refactor in future).
         var ents = _entSetPool.Get();
-        _lookup.GetLocalEntitiesIntersecting(node.GraphUid, node.Box.Enlarged(-0.04f), ents, flags: LookupFlags.Static);
+        // Horizon: also check dynamic bodies (lockers, crates...), otherwise NPCs try to walk through them instead of smashing.
+        _lookup.GetLocalEntitiesIntersecting(node.GraphUid, node.Box.Enlarged(-0.04f), ents, flags: LookupFlags.Static | LookupFlags.Dynamic);
         var result = true;
 
         if (ents.Count > 0)
@@ -71,6 +73,10 @@ public sealed partial class NPCSteeringSystem
 
             foreach (var intersecting in ents)
             {
+                // Horizon: other mobs are handled by avoidance, not as obstacles.
+                if (intersecting == uid || _mobStateQuery.HasComponent(intersecting))
+                    continue;
+
                 if (!_physics.IsCurrentlyHardCollidable((uid, fixtures, physics), intersecting))
                 {
                     continue;
@@ -83,6 +89,21 @@ public sealed partial class NPCSteeringSystem
 
         _entSetPool.Return(ents);
         return result;
+    }
+
+    // Horizon
+    private static bool TryPeekSecond(Queue<PathPoly> path, [NotNullWhen(true)] out PathPoly? second)
+    {
+        second = null;
+
+        if (path.Count < 2)
+            return false;
+
+        using var enumerator = path.GetEnumerator();
+        enumerator.MoveNext();
+        enumerator.MoveNext();
+        second = enumerator.Current;
+        return true;
     }
 
     /// <summary>
@@ -209,6 +230,17 @@ public sealed partial class NPCSteeringSystem
         else if (steering.CurrentPath.TryPeek(out var node) && IsFreeSpace(uid, steering, node))
         {
             arrived = node.Box.Contains(ourCoordinates.Position);
+
+            // Horizon-Start: a free sliver right in front of an obstacle (e.g. the gap between a locker and the tile edge)
+            // can be thinner than our body, so we'd never get our centre inside it and would stand there forever
+            // instead of handling the obstacle. Count it as reached once we're touching it.
+            if (!arrived &&
+                TryPeekSecond(steering.CurrentPath, out var nextNode) &&
+                !IsFreeSpace(uid, steering, nextNode))
+            {
+                arrived = node.Box.Enlarged(steering.Radius).Contains(ourCoordinates.Position);
+            }
+            // Horizon-End
         }
         // Try getting into blocked range I guess?
         // TODO: Consider melee range or the likes.
@@ -231,7 +263,11 @@ public sealed partial class NPCSteeringSystem
                 lock (_obstacles)
                 {
                     // We're still coming to a stop so wait for the do_after.
-                    if (body.LinearVelocity.LengthSquared() > 0.01f)
+                    // Horizon: smashing has no do_after, so don't wait. Otherwise an NPC that keeps getting
+                    // nudged around (repaths, collisions with the obstacle) almost never gets to swing.
+                    var needsDoAfter = (node.Data.Flags & (PathfindingBreadcrumbFlag.Door | PathfindingBreadcrumbFlag.Climb)) != 0x0;
+
+                    if (needsDoAfter && body.LinearVelocity.LengthSquared() > 0.01f)
                     {
                         return true;
                     }

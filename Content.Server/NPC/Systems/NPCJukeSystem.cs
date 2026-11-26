@@ -147,6 +147,11 @@ public sealed class NPCJukeSystem : EntitySystem
                 if (!HasComp<TransformComponent>(melee.Target))
                     return;
 
+                // Horizon: we're smashing through an obstacle (e.g. a locker barricade), the cooldown is from hitting it
+                // and not the target. Backing off here makes the NPC run back and forth without ever finishing the job.
+                if (args.Steering.CurrentPath.TryPeek(out var nextNode) && !nextNode.Data.IsFreeSpace)
+                    return;
+
                 var cdRemaining = weapon.NextAttack - _timing.CurTime;
                 var attackCooldown = TimeSpan.FromSeconds(1f / _melee.GetAttackRate(weaponUid, uid, weapon));
 

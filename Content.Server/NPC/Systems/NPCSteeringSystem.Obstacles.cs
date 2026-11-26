@@ -5,6 +5,7 @@ using Content.Shared.Climbing;
 using Content.Shared.CombatMode;
 using Content.Shared.DoAfter;
 using Content.Shared.Doors.Components;
+using Content.Shared.Mobs.Components;
 using Content.Shared.NPC;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Physics;
@@ -17,6 +18,10 @@ namespace Content.Server.NPC.Systems;
 
 public sealed partial class NPCSteeringSystem
 {
+    // Horizon: reused under the _obstacles lock.
+    private readonly HashSet<EntityUid> _obstacleLookup = new();
+    private EntityQuery<MobStateComponent> _mobStateQuery;
+
     /*
      * For any custom path handlers, e.g. destroying walls, opening airlocks, etc.
      * Putting it onto steering seemed easier than trying to make a custom compound task for it.
@@ -75,7 +80,7 @@ public sealed partial class NPCSteeringSystem
 
             var obstacleEnts = new List<EntityUid>();
 
-            GetObstacleEntities(poly, mask, layer, obstacleEnts);
+            GetObstacleEntities(uid, poly, mask, layer, obstacleEnts);
             var isDoor = (poly.Data.Flags & PathfindingBreadcrumbFlag.Door) != 0x0;
             var isAccessRequired = (poly.Data.Flags & PathfindingBreadcrumbFlag.Access) != 0x0;
             var isClimbable = (poly.Data.Flags & PathfindingBreadcrumbFlag.Climb) != 0x0;
@@ -161,38 +166,47 @@ public sealed partial class NPCSteeringSystem
             // Try smashing obstacles.
             else if ((component.Flags & PathFlags.Smashing) != 0x0)
             {
-                if (_melee.TryGetWeapon(uid, out _, out var meleeWeapon) && meleeWeapon.NextAttack <= _timing.CurTime && TryComp<CombatModeComponent>(uid, out var combatMode))
+                // Horizon-Start: obstacle is already gone (destroyed or pushed away) so just keep walking.
+                if (obstacleEnts.Count == 0)
+                    return SteeringObstacleStatus.Completed;
+
+                if (!_melee.TryGetWeapon(uid, out _, out var meleeWeapon) ||
+                    !TryComp<CombatModeComponent>(uid, out var combatMode))
                 {
-                    _combat.SetInCombatMode(uid, true, combatMode);
-                    var destructibleQuery = GetEntityQuery<DestructibleComponent>();
-
-                    // TODO: This is a hack around grilles and windows.
-                    // Horizon-Start
-                    System.Random.Shared.Shuffle(System.Runtime.InteropServices.CollectionsMarshal.AsSpan(obstacleEnts));
-                    // Horizon-End
-                    var attackResult = false;
-
-                    foreach (var ent in obstacleEnts)
-                    {
-                        // TODO: Validate we can damage it
-                        if (destructibleQuery.HasComponent(ent))
-                        {
-                            attackResult = _melee.AttemptLightAttack(uid, uid, meleeWeapon, ent);
-                            break;
-                        }
-                    }
-
-                    _combat.SetInCombatMode(uid, false, combatMode);
-
-                    // Blocked or the likes?
-                    if (!attackResult)
-                        return SteeringObstacleStatus.Failed;
-
-                    if (obstacleEnts.Count == 0)
-                        return SteeringObstacleStatus.Completed;
-
-                    return SteeringObstacleStatus.Continuing;
+                    return SteeringObstacleStatus.Failed;
                 }
+
+                // Weapon is still on cooldown between swings: keep smashing instead of giving up on the path.
+                if (meleeWeapon.NextAttack > _timing.CurTime)
+                    return SteeringObstacleStatus.Continuing;
+                // Horizon-End
+
+                _combat.SetInCombatMode(uid, true, combatMode);
+                var destructibleQuery = GetEntityQuery<DestructibleComponent>();
+
+                // TODO: This is a hack around grilles and windows.
+                // Horizon-Start
+                System.Random.Shared.Shuffle(System.Runtime.InteropServices.CollectionsMarshal.AsSpan(obstacleEnts));
+                // Horizon-End
+                var attackResult = false;
+
+                foreach (var ent in obstacleEnts)
+                {
+                    // TODO: Validate we can damage it
+                    if (destructibleQuery.HasComponent(ent))
+                    {
+                        attackResult = _melee.AttemptLightAttack(uid, uid, meleeWeapon, ent);
+                        break;
+                    }
+                }
+
+                _combat.SetInCombatMode(uid, false, combatMode);
+
+                // Blocked or the likes?
+                if (!attackResult)
+                    return SteeringObstacleStatus.Failed;
+
+                return SteeringObstacleStatus.Continuing;
             }
 
             return SteeringObstacleStatus.Failed;
@@ -201,7 +215,7 @@ public sealed partial class NPCSteeringSystem
         return SteeringObstacleStatus.Completed;
     }
 
-    private void GetObstacleEntities(PathPoly poly, int mask, int layer, List<EntityUid> ents)
+    private void GetObstacleEntities(EntityUid uid, PathPoly poly, int mask, int layer, List<EntityUid> ents)
     {
         // TODO: Can probably re-use this from pathfinding or something
         if (!TryComp<MapGridComponent>(poly.GraphUid, out var grid))
@@ -211,16 +225,40 @@ public sealed partial class NPCSteeringSystem
 
         foreach (var ent in _mapSystem.GetLocalAnchoredEntities(poly.GraphUid, grid, poly.Box))
         {
-            if (!_physicsQuery.TryGetComponent(ent, out var body) ||
-                !body.Hard ||
-                !body.CanCollide ||
-                (body.CollisionMask & layer) == 0x0 && (body.CollisionLayer & mask) == 0x0)
+            if (!IsObstacle(ent, mask, layer))
+                continue;
+
+            ents.Add(ent);
+        }
+
+        // Horizon-Start: the pathfinder also marks polys blocked by dynamic (unanchored) bodies such as
+        // lockers and crates, so look those up too. Otherwise NPCs walk up to a closet and just stand there,
+        // letting players barricade themselves completely safely.
+        _obstacleLookup.Clear();
+        _lookup.GetLocalEntitiesIntersecting(poly.GraphUid, poly.Box, _obstacleLookup, LookupFlags.Dynamic);
+
+        foreach (var ent in _obstacleLookup)
+        {
+            if (ent == uid ||
+                ents.Contains(ent) ||
+                _mobStateQuery.HasComponent(ent) ||
+                Transform(ent).ParentUid != poly.GraphUid ||
+                !IsObstacle(ent, mask, layer))
             {
                 continue;
             }
 
             ents.Add(ent);
         }
+        // Horizon-End
+    }
+
+    private bool IsObstacle(EntityUid ent, int mask, int layer)
+    {
+        return _physicsQuery.TryGetComponent(ent, out var body) &&
+               body.Hard &&
+               body.CanCollide &&
+               ((body.CollisionMask & layer) != 0x0 || (body.CollisionLayer & mask) != 0x0);
     }
 
     private enum SteeringObstacleStatus : byte

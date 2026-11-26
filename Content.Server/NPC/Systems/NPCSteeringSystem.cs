@@ -14,6 +14,7 @@ using Content.Shared.Interaction;
 using Content.Shared.Movement.Components;
 using Content.Shared.Movement.Events;
 using Content.Shared.Movement.Systems;
+using Content.Shared.Mobs.Components;
 using Content.Shared.NPC;
 using Content.Shared.NPC.Components;
 using Content.Shared.NPC.Systems;
@@ -105,6 +106,7 @@ public sealed partial class NPCSteeringSystem : SharedNPCSteeringSystem
         _modifierQuery = GetEntityQuery<MovementSpeedModifierComponent>();
         _factionQuery = GetEntityQuery<NpcFactionMemberComponent>();
         _physicsQuery = GetEntityQuery<PhysicsComponent>();
+        _mobStateQuery = GetEntityQuery<MobStateComponent>(); // Horizon
         _xformQuery = GetEntityQuery<TransformComponent>();
 
         for (var i = 0; i < InterestDirections; i++)
