@@ -117,7 +117,7 @@ public sealed class OrganSystem : EntitySystem
     private void OnTongueExtracted(Entity<OrganTongueComponent> ent, ref OrganRemovedFromBodyEvent args)
     {
         ent.Comp.IsMuted = true;
-        if (HasComp<MutedComponent>(args.OldBody))
+        if (TerminatingOrDeleted(args.OldBody) || HasComp<MutedComponent>(args.OldBody))
             return;
 
         AddComp<MutedComponent>(args.OldBody);
