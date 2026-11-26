@@ -40,6 +40,8 @@ public sealed class ExpeditionWaveSystem : EntitySystem
     [Dependency] private readonly TriggerSystem _trigger = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly RockClearSystem _rocks = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly TransformSystem _xform = default!;
 
     public const string PodProto = "DropPodspawner";
     public const string PodContainer = "clowncar_container";
@@ -269,17 +271,49 @@ public sealed class ExpeditionWaveSystem : EntitySystem
         var fighters = 0;
         foreach (var proto in mobs)
         {
-            var mob = SpawnAtPosition(proto, coords);
-            if (HasComp<MobStateComponent>(mob))
-                fighters++;
-            RemComp<GhostRoleComponent>(mob);
-            RemComp<GhostTakeoverAvailableComponent>(mob);
-            EnsureComp<PursuePlayerComponent>(mob);
-            _container.Insert(mob, container);
+            foreach (var mob in SpawnWaveMobs(proto, coords))
+            {
+                if (HasComp<MobStateComponent>(mob))
+                    fighters++;
+
+                RemComp<GhostRoleComponent>(mob);
+                RemComp<GhostTakeoverAvailableComponent>(mob);
+                EnsureComp<PursuePlayerComponent>(mob);
+                _container.Insert(mob, container);
+            }
         }
 
         _trigger.Trigger(pod);
         return fighters;
+    }
+
+    /// <summary>
+    /// Спавнит запись фракции и возвращает настоящих мобов. Многие записи фракций (SpawnMobSyndicate..., SpawnMob...)
+    /// не мобы, а спавнеры: при создании они сами порождают моба и удаляются. Раньше волна вешала погоню на спавнер,
+    /// и настоящие мобы появлялись сразу, без погони и не в поде.
+    /// </summary>
+    public List<EntityUid> SpawnWaveMobs(string proto, EntityCoordinates coords)
+    {
+        var mapPos = _xform.ToMapCoordinates(coords);
+        var before = new HashSet<EntityUid>(_lookup.GetEntitiesInRange<MobStateComponent>(mapPos, 4f).Select(e => e.Owner));
+
+        var spawned = SpawnAtPosition(proto, coords);
+        if (HasComp<MobStateComponent>(spawned))
+            return new List<EntityUid> { spawned };
+
+        // Спавнер: настоящие мобы появились рядом за время создания.
+        var result = new List<EntityUid>();
+        foreach (var mob in _lookup.GetEntitiesInRange<MobStateComponent>(mapPos, 4f))
+        {
+            if (!before.Contains(mob.Owner) && !TerminatingOrDeleted(mob.Owner))
+                result.Add(mob.Owner);
+        }
+
+        // Ничего не появилось: сама запись остаётся (строение, турель), чтобы не терять её из волны.
+        if (result.Count == 0 && !TerminatingOrDeleted(spawned))
+            result.Add(spawned);
+
+        return result;
     }
 
     /// <summary>Свободный тайл в кольце вокруг якоря; нет подгруженной земли у якоря: в кольце вокруг ближайшего игрока.</summary>

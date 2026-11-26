@@ -149,7 +149,8 @@ public sealed class ExpeditionWaveTest
         await server.WaitPost(() => waves.NextWave = timing.CurTime);
         await pair.RunSeconds(1.5f);
         var mobs = Pursuers(server);
-        Assert.That(mobs, Is.Not.Empty, "волна пришла");
+        var podCount = server.EntMan.AllEntities<MetaDataComponent>().Count(e => e.Comp.EntityPrototype?.ID == ExpeditionWaveSystem.PodProto);
+        Assert.That(mobs, Is.Not.Empty, $"волна пришла (подов {podCount}, всего PursuePlayer {server.EntMan.Count<PursuePlayerComponent>()}, NextWave {waves.NextWave}, якорь {waves.DropAnchor})");
         Assert.That(mobs.Count, Is.LessThanOrEqualTo(waves.MaxAliveWaveMobs));
         var pods = server.EntMan.AllEntities<MetaDataComponent>()
             .Count(e => e.Comp.EntityPrototype?.ID == ExpeditionWaveSystem.PodProto);
@@ -379,6 +380,38 @@ public sealed class ExpeditionWaveTest
         }
 
         Assert.That(reached, "моб дошёл до далёкого игрока в обход стены");
+
+        await pair.CleanReturnAsync();
+    }
+
+    /// <summary>
+    /// Записи фракций вроде SpawnMobSyndicate... это спавнеры, а не мобы: волна должна получить настоящих мобов, а не вешать
+    /// погоню на спавнер, который тут же исчезает.
+    /// </summary>
+    [Test]
+    public async Task SpawnerEntriesGiveRealMobs()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { FailureLogLevel = LogLevel.Fatal });
+        var server = pair.Server;
+        var map = await pair.CreateTestMap();
+        var waves = server.System<ExpeditionWaveSystem>();
+
+        await server.WaitPost(() =>
+        {
+            var direct = waves.SpawnWaveMobs("PursueTestMelee", map.GridCoords);
+            Assert.That(direct, Has.Count.EqualTo(1), "обычная запись: сам моб");
+
+            foreach (var spawner in new[] { "SpawnMobSyndicateNavalDeckhand", "SpawnMobSyndicateNavalEngineer", "MobDinosaurKentroExpeditions" })
+            {
+                var mobs = waves.SpawnWaveMobs(spawner, map.GridCoords.Offset(new Vector2(0.5f, 0.5f)));
+                Assert.That(mobs, Is.Not.Empty, $"{spawner}: получен настоящий моб");
+                foreach (var mob in mobs)
+                {
+                    Assert.That(server.EntMan.HasComponent<Content.Shared.Mobs.Components.MobStateComponent>(mob), $"{spawner}: это моб, а не спавнер");
+                    Assert.That(server.EntMan.Deleted(mob), Is.False);
+                }
+            }
+        });
 
         await pair.CleanReturnAsync();
     }
