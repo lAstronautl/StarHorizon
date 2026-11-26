@@ -15,6 +15,63 @@ namespace Content.Server._StarHorizon.Expedition;
 public sealed class RockClearSystem : EntitySystem
 {
     [Dependency] private readonly MapSystem _map = default!;
+    [Dependency] private readonly Content.Shared.Parallax.Biomes.SharedBiomeSystem _biome = default!;
+
+    /// <summary>
+    /// Тайл пола данжа: на нём лежит настоящий тайл, и он не тот, что сгенерировал бы биом планеты (данж кладёт свой пол).
+    /// Без биома (не планета) любой тайл считается полом.
+    /// </summary>
+    public bool IsDungeonFloor(EntityUid gridUid, MapGridComponent grid, Vector2i tile)
+    {
+        var tileRef = _map.GetTileRef(gridUid, grid, tile);
+        if (tileRef.Tile.IsEmpty)
+            return false;
+
+        if (!TryComp<Content.Shared.Parallax.Biomes.BiomeComponent>(gridUid, out var biome))
+            return true;
+
+        if (!_biome.TryGetTile(tile, biome.Layers, biome.Seed, (gridUid, grid), out var natural))
+            return true;
+
+        return natural.Value.TypeId != tileRef.Tile.TypeId;
+    }
+
+    /// <summary>
+    /// Место посадки на полу данжа в кольце вокруг точки: свободный тайл пола данжа из открытой области (комната или
+    /// коридор, а не замурованная щель). Проверяются все тайлы кольца, выбирается случайный подходящий.
+    /// </summary>
+    public EntityCoordinates? FindDungeonDropTile(EntityUid gridUid, Vector2 center, float minRing, float maxRing,
+        Robust.Shared.Random.IRobustRandom random, int minRegion = 12, int maxChecks = 40)
+    {
+        if (!TryComp<MapGridComponent>(gridUid, out var grid))
+            return null;
+
+        var centerTile = _map.TileIndicesFor(gridUid, grid, new EntityCoordinates(gridUid, center));
+        var radius = (int) MathF.Ceiling(maxRing);
+        var candidates = new List<Vector2i>();
+        for (var dx = -radius; dx <= radius; dx++)
+        {
+            for (var dy = -radius; dy <= radius; dy++)
+            {
+                var dist = MathF.Sqrt(dx * dx + dy * dy);
+                if (dist < minRing || dist > maxRing)
+                    continue;
+
+                var tile = new Vector2i(centerTile.X + dx, centerTile.Y + dy);
+                if (IsDungeonFloor(gridUid, grid, tile) && TileClear(gridUid, grid, tile))
+                    candidates.Add(tile);
+            }
+        }
+
+        random.Shuffle(candidates);
+        for (var i = 0; i < candidates.Count && i < maxChecks; i++)
+        {
+            if (IsOpenRegion(gridUid, grid, candidates[i], minRegion))
+                return _map.GridTileToLocal(gridUid, grid, candidates[i]);
+        }
+
+        return null;
+    }
 
     /// <summary>На тайле нет ни породы, ни других твёрдых объектов: сюда можно садиться (поды с мобами в камень не падают).</summary>
     public bool TileClear(EntityUid gridUid, MapGridComponent grid, Vector2i tile)

@@ -90,8 +90,6 @@ public sealed class ExpeditionWaveSystem : EntitySystem
             return;
         }
 
-        EnsureDropAnchor(ent);
-
         if (ent.Comp.NextWave is not { } next)
         {
             ent.Comp.NextWave = now + Delay(ent.Comp.FirstWaveMin, ent.Comp.FirstWaveMax);
@@ -103,23 +101,6 @@ public sealed class ExpeditionWaveSystem : EntitySystem
 
         ent.Comp.NextWave = now + Delay(ent.Comp.IntervalMin, ent.Comp.IntervalMax);
         SpawnWave(ent, expedition);
-    }
-
-    /// <summary>Место падения: где начал первый игрок. Запоминается один раз.</summary>
-    private void EnsureDropAnchor(Entity<ExpeditionWavesComponent> ent)
-    {
-        if (ent.Comp.DropAnchor != null || _players.Count == 0)
-            return;
-
-        ent.Comp.DropAnchor = _players[0].Pos;
-
-        // Земля вокруг места падения остаётся подгруженной, даже когда игроки ушли далеко.
-        if (TryComp<MapGridComponent>(ent, out _))
-        {
-            var loader = Spawn(null, new EntityCoordinates(ent.Owner, _players[0].Pos));
-            AddComp<Content.Server.Parallax.BiomeForceLoadComponent>(loader);
-            ent.Comp.AnchorLoader = loader;
-        }
     }
 
     /// <summary>
@@ -137,7 +118,6 @@ public sealed class ExpeditionWaveSystem : EntitySystem
         if (_players.Count == 0)
             return 0;
 
-        EnsureDropAnchor((map, waves));
         waves.NextWave = _timing.CurTime + Delay(waves.IntervalMin, waves.IntervalMax);
         return SpawnWave((map, waves), expedition);
     }
@@ -275,7 +255,7 @@ public sealed class ExpeditionWaveSystem : EntitySystem
         return spawned;
     }
 
-    /// <summary>Один дроп-под с группой мобов: падает у якоря, мобы выходят из него на земле.</summary>
+    /// <summary>Один дроп-под с группой мобов: падает рядом с игроком, мобы выходят из него на земле.</summary>
     /// <returns>Сколько в поде мобов, которых можно убить (с MobState); null, если под не упал.</returns>
     private int? DropPod(Entity<ExpeditionWavesComponent> ent, Entity<MapGridComponent> grid, List<string> mobs)
     {
@@ -341,20 +321,14 @@ public sealed class ExpeditionWaveSystem : EntitySystem
         return result;
     }
 
-    /// <summary>Свободный тайл в кольце вокруг якоря; нет подгруженной земли у якоря: в кольце вокруг ближайшего игрока.</summary>
+    /// <summary>
+    /// Место падения пода: пол данжа рядом со случайным живым игроком. Если рядом данжа нет (игрок снаружи), любой
+    /// свободный тайл из открытой области рядом с ним.
+    /// </summary>
     private EntityCoordinates? FindDropTile(Entity<ExpeditionWavesComponent> ent, Entity<MapGridComponent> grid)
     {
-        if (ent.Comp.DropAnchor is { } anchor && TryRingTile(ent, grid, anchor) is { } near)
-            return near;
-
-        // Запасной вариант: игрок рядом, значит земля вокруг него подгружена.
         var center = _random.Pick(_players).Pos;
-        return TryRingTile(ent, grid, center);
-    }
-
-    private EntityCoordinates? TryRingTile(Entity<ExpeditionWavesComponent> ent, Entity<MapGridComponent> grid, Vector2 center)
-    {
-        // Свободный тайл без породы из открытой области: не в замурованной щели.
-        return _rocks.FindDropTile(grid, center, ent.Comp.DropRingMin, ent.Comp.DropRingMax, _random);
+        return _rocks.FindDungeonDropTile(grid, center, ent.Comp.DropRingMin, ent.Comp.DropRingMax, _random)
+               ?? _rocks.FindDropTile(grid, center, ent.Comp.DropRingMin, ent.Comp.DropRingMax, _random);
     }
 }

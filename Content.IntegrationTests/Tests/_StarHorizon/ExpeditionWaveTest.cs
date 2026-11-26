@@ -142,23 +142,24 @@ public sealed class ExpeditionWaveTest
         Assert.That(Pursuers(server), Is.Empty);
 
         // 3. Волна приходит: мобы фракции в дроп-подах DropPodspawner, у каждого маркер погони.
-        Assert.That(waves.DropAnchor, Is.Not.Null, "место падения запомнено: где начал первый игрок");
-        var anchor = waves.DropAnchor!.Value;
-        Assert.That((anchor - xform.GetWorldPosition(player)).Length(), Is.LessThan(2f));
-
         await server.WaitPost(() => waves.NextWave = timing.CurTime);
         await pair.RunSeconds(1.5f);
         var mobs = Pursuers(server);
         var podCount = server.EntMan.AllEntities<MetaDataComponent>().Count(e => e.Comp.EntityPrototype?.ID == ExpeditionWaveSystem.PodProto);
-        Assert.That(mobs, Is.Not.Empty, $"волна пришла (подов {podCount}, всего PursuePlayer {server.EntMan.Count<PursuePlayerComponent>()}, NextWave {waves.NextWave}, якорь {waves.DropAnchor})");
+        Assert.That(mobs, Is.Not.Empty, $"волна пришла (подов {podCount}, всего PursuePlayer {server.EntMan.Count<PursuePlayerComponent>()}, NextWave {waves.NextWave})");
         Assert.That(mobs.Count, Is.LessThanOrEqualTo(waves.MaxAliveWaveMobs));
         var pods = server.EntMan.AllEntities<MetaDataComponent>()
             .Count(e => e.Comp.EntityPrototype?.ID == ExpeditionWaveSystem.PodProto);
         Assert.That(pods, Is.GreaterThan(0), "мобы падают в дроп-подах");
+        foreach (var pod in server.EntMan.AllEntities<MetaDataComponent>().Where(e => e.Comp.EntityPrototype?.ID == ExpeditionWaveSystem.PodProto))
+        {
+            var podDist = (xform.GetWorldPosition(pod.Owner) - xform.GetWorldPosition(player)).Length();
+            Assert.That(podDist, Is.LessThanOrEqualTo(waves.DropRingMax + 4f), "поды падают рядом с игроком");
+        }
         Assert.That(pods, Is.GreaterThanOrEqualTo((int) Math.Ceiling(mobs.Count / (double) waves.MobsPerPod)), "по MobsPerPod мобов в поде");
         Assert.That(server.EntMan.GetComponent<Content.Shared._StarHorizon.Expedition.ExpeditionWaveStateComponent>(expeditionMap).Active, "волна идёт");
 
-        // Дроп-под падает и открывается: мобы выходят у якоря (не там, где игрок сейчас).
+        // Дроп-под падает и открывается: мобы выходят рядом с игроком.
         await pair.RunSeconds(14f);
         var container = server.System<Robust.Shared.Containers.SharedContainerSystem>();
         foreach (var mob in mobs)
@@ -234,6 +235,89 @@ public sealed class ExpeditionWaveTest
     }
 
     /// <summary>Дальники остаются дальниками: у стрелков корень погони с дальним боем, а не только ближним.</summary>
+    /// <summary>Игрок в данже: поды с волной садятся на пол данжа рядом с ним (не на землю биома и не в стены).</summary>
+    [Test]
+    public async Task PodsLandOnDungeonFloorNearPlayer()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { FailureLogLevel = LogLevel.Fatal, Connected = true, Dirty = true });
+        var server = pair.Server;
+        var map = await pair.CreateTestMap();
+        var salvage = server.System<SalvageSystem>();
+        var xform = server.System<SharedTransformSystem>();
+        var mapSys = server.System<SharedMapSystem>();
+        var rocks = server.System<RockClearSystem>();
+
+        EntityUid planet = default;
+        await server.WaitPost(() =>
+        {
+            planet = server.EntMan.SpawnEntity("ExpeditionPlanet", new MapCoordinates(new Vector2(3000, 0), map.MapId));
+            var planetComp = server.EntMan.GetComponent<ExpeditionPlanetComponent>(planet);
+            server.System<ExpeditionPlanetSystem>().SetupPlanet(planet, planetComp, "Grasslands", 0.5f);
+            salvage.StartPlanetExpedition((planet, planetComp));
+        });
+
+        var planetComp1 = server.EntMan.GetComponent<ExpeditionPlanetComponent>(planet);
+        for (var attempt = 0; attempt < 3 && planetComp1.Status != PlanetExpeditionStatus.Active; attempt++)
+        {
+            if (planetComp1.Status == PlanetExpeditionStatus.Idle && attempt > 0)
+                await server.WaitPost(() => salvage.StartPlanetExpedition((planet, planetComp1)));
+
+            for (var i = 0; i < 60 && planetComp1.Status == PlanetExpeditionStatus.Generating; i++)
+                await pair.RunSeconds(2f);
+        }
+        Assert.That(planetComp1.Status, Is.EqualTo(PlanetExpeditionStatus.Active));
+        var expeditionMap = planetComp1.ExpeditionMap!.Value;
+        await server.WaitPost(() => mapSys.SetPaused(expeditionMap, false));
+
+        // Тайл пола данжа в комнате: туда ставим игрока.
+        Vector2i? dungeonTile = null;
+        await server.WaitPost(() =>
+        {
+            var grid = server.EntMan.GetComponent<MapGridComponent>(expeditionMap);
+            foreach (var tileRef in mapSys.GetAllTiles(expeditionMap, grid))
+            {
+                if (rocks.IsDungeonFloor(expeditionMap, grid, tileRef.GridIndices) &&
+                    rocks.IsOpenRegion(expeditionMap, grid, tileRef.GridIndices, 60))
+                {
+                    dungeonTile = tileRef.GridIndices;
+                    break;
+                }
+            }
+        });
+        Assert.That(dungeonTile, Is.Not.Null, "на планете есть данж");
+
+        EntityUid player = default;
+        await server.WaitPost(() =>
+        {
+            var grid = server.EntMan.GetComponent<MapGridComponent>(expeditionMap);
+            player = server.EntMan.SpawnEntity("WaveTestPlayer", mapSys.GridTileToLocal(expeditionMap, grid, dungeonTile!.Value));
+            server.PlayerMan.SetAttachedEntity(server.PlayerMan.Sessions.First(), player, out _, true);
+        });
+        await pair.RunSeconds(3f);
+
+        await server.WaitAssertion(() =>
+        {
+            var grid = server.EntMan.GetComponent<MapGridComponent>(expeditionMap);
+            var waves = server.System<ExpeditionWaveSystem>();
+            Assert.That(waves.ForceWave(expeditionMap), Is.GreaterThan(0), "волна вышла");
+
+            var ring = server.EntMan.GetComponent<ExpeditionWavesComponent>(expeditionMap).DropRingMax;
+            var pods = server.EntMan.AllEntities<MetaDataComponent>()
+                .Where(e => e.Comp.EntityPrototype?.ID == ExpeditionWaveSystem.PodProto).ToList();
+            Assert.That(pods, Is.Not.Empty);
+            foreach (var pod in pods)
+            {
+                var coords = server.EntMan.GetComponent<TransformComponent>(pod.Owner).Coordinates;
+                var tile = mapSys.TileIndicesFor(expeditionMap, grid, coords);
+                Assert.That(rocks.IsDungeonFloor(expeditionMap, grid, tile), $"под {tile} на полу данжа");
+                Assert.That(rocks.TileClear(expeditionMap, grid, tile), "под не в стене");
+                Assert.That((xform.GetWorldPosition(pod.Owner) - xform.GetWorldPosition(player)).Length(), Is.LessThanOrEqualTo(ring + 1f));
+            }
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
     [Test]
     public async Task PursueRootKeepsCombatStyle()
     {
