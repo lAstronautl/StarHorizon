@@ -1,0 +1,15 @@
+<controls:FancyWindow xmlns="https://spacestation14.io"
+                      xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
+                      xmlns:cc="clr-namespace:Content.Client.Administration.UI.CustomControls"
+                      Title="{Loc 'Доска объявлений'}"
+                      MinSize="380 240">
+    <BoxContainer Orientation="Vertical" Margin="8" SeparationOverride="6">
+        <Label Text="Последнее объявление:" StyleClasses="LabelHeading"/>
+        <Label Name="NoticeLabel" Text="—"/>
+        <Label Name="AuthorLabel" StyleClasses="LabelSubText"/>
+        <cc:HSeparator/>
+        <Control VerticalExpand="True"/>
+        <LineEdit Name="NewNoticeEdit" HorizontalExpand="True" PlaceHolder="текст объявления"/>
+        <Button Name="PostButton" Text="Опубликовать" StyleClasses="ButtonColorGreen"/>
+    </BoxContainer>
+</controls:FancyWindow>

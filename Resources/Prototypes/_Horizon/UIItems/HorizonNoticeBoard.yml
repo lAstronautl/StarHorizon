@@ -1,0 +1,19 @@
+# Сгенерировано SS14 UI Editor (предмет «доска объявлений»). Не редактируйте вручную: файл перезаписывается при сохранении.
+- type: entity
+  parent: BaseItem
+  id: HorizonNoticeBoard
+  name: "доска объявлений"
+  description: "Планшет с объявлениями. Новое объявление видят все."
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/clipboard.rsi
+    state: icon
+  - type: Item
+    sprite: Objects/Misc/clipboard.rsi
+  - type: ActivatableUI
+    key: enum.HorizonNoticeBoardUiKey.Key
+  - type: UserInterface
+    interfaces:
+      enum.HorizonNoticeBoardUiKey.Key:
+        type: HorizonNoticeBoardBoundUserInterface
+  - type: HorizonNoticeBoardItem

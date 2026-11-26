@@ -374,11 +374,10 @@ const UIBlocks = (() => {
             if (d < bestD) { bestD = d; best = t; }
         };
         if (isReporter(first)) {
-            const fromType = outType(first);
             ws.querySelectorAll(".slot").forEach(s => {
                 const info = s._slot;
                 if (!info || s.closest(".drag-float")) return;
-                if (info.spec.type === "bool" && fromType !== "bool") return;
+                // в условие можно вставить любое значение: оно приводится к «да/нет»
                 if (!["num", "text", "any", "bool"].includes(info.spec.type)) return;
                 if (isBlock(info.block.args[info.name])) return;
                 const r = s.getBoundingClientRect();

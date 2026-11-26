@@ -1,0 +1,19 @@
+# Сгенерировано SS14 UI Editor (предмет «кодовый сейф»). Не редактируйте вручную: файл перезаписывается при сохранении.
+- type: entity
+  parent: BaseItem
+  id: HorizonCodeSafe
+  name: "кодовый сейф"
+  description: "Маленький сейф с кодовым замком. После трёх ошибок блокируется."
+  components:
+  - type: Sprite
+    sprite: Objects/Devices/forensic_scanner.rsi
+    state: icon
+  - type: Item
+    sprite: Objects/Devices/forensic_scanner.rsi
+  - type: ActivatableUI
+    key: enum.HorizonCodeSafeUiKey.Key
+  - type: UserInterface
+    interfaces:
+      enum.HorizonCodeSafeUiKey.Key:
+        type: HorizonCodeSafeBoundUserInterface
+  - type: HorizonCodeSafeItem

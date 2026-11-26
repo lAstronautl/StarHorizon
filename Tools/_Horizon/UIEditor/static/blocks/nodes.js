@@ -102,7 +102,6 @@ const UINodes = (() => {
     function connectValue(r, owner, name) {
         const spec = defOf(owner).args[name];
         if (!spec || !isValueArg(spec)) return false;
-        if (spec.type === "bool" && B.outType(r) !== "bool") return false;
         if (contains(r, owner)) return false;
         B.snapshot();
         const old = owner.args[name];
@@ -508,10 +507,8 @@ const UINodes = (() => {
         const isExec = p.dataset.type === "exec";
         if (isExec !== (wire.type === "exec")) return false;
         if (isExec) return true;
-        // значение: выход «условие» подходит ко всем, остальные — не к полям-условиям
-        const outT = wire.fromDir === "out" ? wire.type : p.dataset.type;
-        const inT = wire.fromDir === "out" ? p.dataset.type : wire.type;
-        return !(inT === "bool" && outT !== "bool");
+        // любое значение подходит к любому полю: типы приводятся автоматически
+        return true;
     }
 
     function onUp(ev) {
