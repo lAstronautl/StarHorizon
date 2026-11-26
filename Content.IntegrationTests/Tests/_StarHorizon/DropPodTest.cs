@@ -26,6 +26,7 @@ public sealed class DropPodTest
 - type: entity
   id: DropPodTestKnockableMob
   components:
+  - type: InputMover
   - type: StatusEffectContainer
   - type: StandingState
   - type: Crawler
@@ -404,6 +405,8 @@ public sealed class DropPodTest
         {
             console = server.EntMan.SpawnEntity("StarHorizonDropPodConsole", map.GridCoords);
             human = server.EntMan.SpawnEntity("DropPodTestKnockableMob", map.GridCoords.Offset(new Vector2(2, 0)));
+            // Камера пассажира повёрнута (как на FTL-карте): после переключения на планету она выравнивается, как по Numpad 8.
+            server.EntMan.GetComponent<Content.Shared.Movement.Components.InputMoverComponent>(human).TargetRelativeRotation = Robust.Shared.Maths.Angle.FromDegrees(90);
             pod = server.EntMan.SpawnEntity("StarHorizonDropPod", map.GridCoords);
             var comp = server.EntMan.GetComponent<DropPodComponent>(pod);
             comp.CountdownTime = TimeSpan.FromSeconds(1);
@@ -436,6 +439,8 @@ public sealed class DropPodTest
         for (var i = 0; i < 40 && podComp.State == DropPodState.InBluespace; i++)
             await pair.RunSeconds(0.25f);
         await pair.RunSeconds(0.5f);
+        Assert.That(server.EntMan.GetComponent<Content.Shared.Movement.Components.InputMoverComponent>(human).TargetRelativeRotation,
+            Is.EqualTo(Robust.Shared.Maths.Angle.Zero), "камера выровнена, как по Numpad 8");
         Assert.That(server.EntMan.HasComponent<Content.Shared.Stunnable.StunnedComponent>(human), "вышли из БСС: пассажир оглушён и сбит с ног");
 
         // Прилетела: скорость снята, капсула садится.

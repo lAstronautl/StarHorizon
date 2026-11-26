@@ -58,6 +58,7 @@ public sealed class DropPodSystem : EntitySystem
     [Dependency] private readonly SharedEntityStorageSystem _storage = default!;
     [Dependency] private readonly StunSystem _stuns = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly SharedMoverController _mover = default!;
     [Dependency] private readonly Content.Server._StarHorizon.Expedition.RockClearSystem _rocks = default!;
 
     /// <summary>Меньше этого времени до закрытия экспедиции сбрасываться на неё уже поздно.</summary>
@@ -927,6 +928,14 @@ public sealed class DropPodSystem : EntitySystem
         // Капсула ещё не приземлилась: скрыта и без коллизий, метка остаётся на месте.
         _xform.SetCoordinates(ent.Owner, coords);
         _xform.AttachToGridOrMap(ent.Owner);
+
+        // Камера пассажиров после переключения на планету выравнивается, как по Numpad 8 (сброс камеры): иначе она
+        // остаётся повёрнутой, как была на FTL-карте / корабле.
+        if (TryComp(ent, out EntityStorageComponent? occupants))
+        {
+            foreach (var occupant in occupants.Contents.ContainedEntities.ToArray())
+                _mover.ResetCamera(occupant);
+        }
 
         _appearance.SetData(ent, DropPodVisuals.InFlight, true);
         _light.SetEnabled(ent, false);
