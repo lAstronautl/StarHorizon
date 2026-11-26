@@ -25,7 +25,6 @@ public sealed class PursuePlayerSystem : EntitySystem
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly TransformSystem _xform = default!;
     [Dependency] private readonly RockClearSystem _rocks = default!;
-    [Dependency] private readonly PursueFlowFieldSystem _flow = default!;
     [Dependency] private readonly Robust.Shared.Containers.SharedContainerSystem _container = default!;
 
     private const string MeleeRoot = "PursueMeleeCompound";
@@ -34,8 +33,6 @@ public sealed class PursuePlayerSystem : EntitySystem
 
     private TimeSpan _nextUpdate;
     private readonly List<(EntityUid Uid, MapId Map, Vector2 Pos)> _players = new();
-    private readonly HashSet<EntityUid> _fieldMaps = new();
-    private readonly List<Vector2> _fieldPlayers = new();
 
     public override void Initialize()
     {
@@ -81,16 +78,11 @@ public sealed class PursuePlayerSystem : EntitySystem
     private Vector2? ChooseWaypoint(EntityUid uid, PursuePlayerComponent pursue, TransformComponent xform, Vector2 pos, Vector2 playerPos)
     {
         var toPlayer = playerPos - pos;
-        if (toPlayer.Length() <= pursue.DirectRange || xform.GridUid is not { } grid)
+        if (toPlayer.Length() <= pursue.DirectRange || xform.GridUid is not { } grid || xform.GridUid != xform.MapUid)
         {
             pursue.Waypoint = null;
             return null;
         }
-
-        // Дальше всё в координатах грида (карта экспедиции сама грид, но корабли и тестовые гриды могут быть смещены).
-        var inv = _xform.GetInvWorldMatrix(grid);
-        pos = Vector2.Transform(pos, inv);
-        toPlayer = Vector2.Transform(playerPos, inv) - pos;
 
         var now = _timing.CurTime;
 
@@ -101,18 +93,10 @@ public sealed class PursuePlayerSystem : EntitySystem
 
         if (!noPath
             && pursue.Waypoint is { } current
-            && Vector2.DistanceSquared(current, pos) > 4f
-            && now - pursue.WaypointSet < TimeSpan.FromSeconds(4))
+            && Vector2.DistanceSquared(current, pos) > 9f
+            && now - pursue.WaypointSet < TimeSpan.FromSeconds(8))
         {
             return current;
-        }
-
-        // Есть проход по полю: следующая ножка вдоль него (через двери и коридоры, а не по прямой в стену).
-        if (_flow.TryGetLegTarget(grid, pos, pursue.LegTiles, out var leg))
-        {
-            pursue.Waypoint = leg;
-            pursue.WaypointSet = now;
-            return leg;
         }
 
         var dir = Vector2.Normalize(toPlayer);
@@ -172,31 +156,6 @@ public sealed class PursuePlayerSystem : EntitySystem
             _players.Add((uid, xform.MapID, _xform.GetWorldPosition(xform)));
         }
 
-        // Поле расстояний до игроков на каждой карте-гриде, где есть мобы волны: по нему они идут через двери и коридоры.
-        _flow.Prune();
-        _fieldMaps.Clear();
-        var mapsQuery = EntityQueryEnumerator<PursuePlayerComponent, TransformComponent>();
-        while (mapsQuery.MoveNext(out _, out _, out var mobXform))
-        {
-            if (mobXform.GridUid is { } mobGrid)
-                _fieldMaps.Add(mobGrid);
-        }
-
-        foreach (var fieldGrid in _fieldMaps)
-        {
-            var gridXform = Transform(fieldGrid);
-            var inv = _xform.GetInvWorldMatrix(gridXform);
-            _fieldPlayers.Clear();
-            foreach (var (_, playerMap, playerPos) in _players)
-            {
-                if (playerMap == gridXform.MapID)
-                    _fieldPlayers.Add(Vector2.Transform(playerPos, inv));
-            }
-
-            if (_fieldPlayers.Count > 0)
-                _flow.EnsureField(fieldGrid, _fieldPlayers);
-        }
-
         var query = EntityQueryEnumerator<PursuePlayerComponent, HTNComponent, TransformComponent>();
         while (query.MoveNext(out var uid, out var pursue, out var htn, out var xform))
         {
@@ -233,8 +192,8 @@ public sealed class PursuePlayerSystem : EntitySystem
 
             pursue.Target = best;
             pursue.Followed = (best, waypoint);
-            if (waypoint is { } leg && xform.GridUid is { } legGrid)
-                _npc.SetBlackboard(uid, NPCBlackboard.FollowTarget, new EntityCoordinates(legGrid, leg), htn);
+            if (waypoint is { } leg && xform.MapUid is { } mapUid)
+                _npc.SetBlackboard(uid, NPCBlackboard.FollowTarget, new EntityCoordinates(mapUid, leg), htn);
             else if (best is { } target)
                 _npc.SetBlackboard(uid, NPCBlackboard.FollowTarget, new EntityCoordinates(target, Vector2.Zero), htn);
             else

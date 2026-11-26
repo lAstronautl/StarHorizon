@@ -70,13 +70,10 @@ public sealed partial class PursuePlayerComponent : Component
     [DataField] public float PlayerNearDistance = 15f;
 
     /// <summary>
-    /// Дальше этого моб идёт к игроку по «ножкам» вдоль поля расстояний (через двери и коридоры): A* у ИИ ограничен 512 узлами и до далёкой цели путь не находит (моб
+    /// Дальше этого моб идёт к игроку по «ножкам»: A* у ИИ ограничен 512 узлами и до далёкой цели путь не находит (моб
     /// стоит на месте), поэтому цель ставится на <see cref="LegLength"/> метров вперёд по открытой земле.
     /// </summary>
-    [DataField] public float DirectRange = 8f;
-
-    /// <summary>Длина ножки по полю расстояний до игроков, тайлы.</summary>
-    [DataField] public int LegTiles = 12;
+    [DataField] public float DirectRange = 25f;
 
     /// <summary>Длина одной ножки пути к далёкому игроку, метры.</summary>
     [DataField] public float LegLength = 18f;
