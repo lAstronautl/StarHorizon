@@ -176,7 +176,8 @@ public sealed class ExpeditionWaveTest
             var htn = server.EntMan.GetComponent<HTNComponent>(mob);
             Assert.That(htn.RootTask.Task, Does.StartWith("Pursue"));
             Assert.That(htn.Blackboard.TryGetValue<EntityCoordinates>(NPCBlackboard.FollowTarget, out var target, server.EntMan), "знает цель");
-            Assert.That(target.EntityId, Is.EqualTo(player));
+            // Рядом: цель сам игрок; дальше: ножка пути к нему по карте (через двери и коридоры).
+            Assert.That(target.EntityId == player || target.EntityId == expeditionMap, $"цель: игрок или ножка к нему, а не {target.EntityId}");
         }
 
         // 5. Мобы идут к игроку: ближайший заметно приблизился.
@@ -427,6 +428,65 @@ public sealed class ExpeditionWaveTest
                 }
             }
         });
+
+        await pair.CleanReturnAsync();
+    }
+
+    /// <summary>
+    /// Змейка из стен (комплекс с комнатами и коридорами): по прямой к игроку не пройти, моб идёт по полю расстояний
+    /// через проходы и доходит, а не упирается в стену и не пропадает.
+    /// </summary>
+    [Test]
+    public async Task WaveMobsFollowCorridorsToThePlayer()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Connected = true, FailureLogLevel = LogLevel.Fatal });
+        var server = pair.Server;
+        var map = await pair.CreateTestMap();
+        var xform = server.System<SharedTransformSystem>();
+
+        await server.WaitPost(() =>
+        {
+            var mapSys = server.System<SharedMapSystem>();
+            var gridUid = map.Grid.Owner;
+            for (var x = -2; x <= 42; x++)
+            {
+                for (var y = -13; y <= 13; y++)
+                    mapSys.SetTile(gridUid, map.Grid.Comp, new EntityCoordinates(gridUid, x + 0.5f, y + 0.5f), map.Tile.Tile);
+            }
+
+            // Стены поперёк с проходами то сверху, то снизу.
+            void Wall(int x, int from, int to)
+            {
+                for (var y = from; y <= to; y++)
+                    server.EntMan.SpawnEntity("WallSolid", new EntityCoordinates(gridUid, x + 0.5f, y + 0.5f));
+            }
+
+            Wall(10, -13, 10);
+            Wall(20, -10, 13);
+            Wall(30, -13, 10);
+        });
+
+        await pair.RunSeconds(4f);
+
+        EntityUid mob = default, player = default;
+        await server.WaitPost(() =>
+        {
+            var gridUid = map.Grid.Owner;
+            mob = server.EntMan.SpawnEntity("NFMobXeno", new EntityCoordinates(gridUid, 2.5f, 0.5f));
+            server.EntMan.AddComponent<PursuePlayerComponent>(mob).StuckTime = TimeSpan.FromMinutes(10);
+            player = server.EntMan.SpawnEntity("WaveTestPlayer", new EntityCoordinates(gridUid, 38.5f, 0.5f));
+            server.PlayerMan.SetAttachedEntity(server.PlayerMan.Sessions.First(), player, out _, true);
+        });
+
+        var reached = false;
+        for (var i = 0; i < 150 && !reached; i++)
+        {
+            await pair.RunSeconds(1f);
+            Assert.That(server.EntMan.Deleted(mob), Is.False);
+            reached = (xform.GetWorldPosition(mob) - xform.GetWorldPosition(player)).Length() < 6f;
+        }
+
+        Assert.That(reached, $"моб прошёл змейку коридоров до игрока (стоит на {xform.GetWorldPosition(mob)})");
 
         await pair.CleanReturnAsync();
     }
