@@ -102,7 +102,8 @@ public sealed class ExpeditionHudTest
             Assert.That(hudSystem.TryGetView(out var view), "игрок на экспедиции: интерфейс виден");
             Assert.That(view.Phase, Is.EqualTo(ExpeditionHudPhase.Countdown));
             Assert.That(view.Objectives, Has.Count.EqualTo(hud.Objectives.Count));
-            Assert.That(view.Objectives.All(o => o.Total > 0 && o.Done == 0 && !o.Finished));
+            Assert.That(view.Objectives.All(o => o.Total > 0 && o.Done == 0 && !o.Finished),
+                string.Join("; ", view.Objectives.Select(o => $"{o.Text} {o.Done}/{o.Total} {o.Finished}")));
             Assert.That(view.Timer.TotalSeconds, Is.GreaterThan(60));
         });
 

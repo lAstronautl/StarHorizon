@@ -126,7 +126,7 @@ public sealed class ExpeditionObjectivesTest
         // Не руда не принимается; стак руды засчитывается целиком.
         await server.WaitPost(() =>
         {
-            var junk = server.EntMan.SpawnEntity("ExpeditionBlackBox", server.EntMan.GetComponent<TransformComponent>(player).Coordinates);
+            var junk = server.EntMan.SpawnEntity("ExpeditionSample", server.EntMan.GetComponent<TransformComponent>(player).Coordinates);
             var ev = new InteractUsingEvent(player, junk, depot, server.EntMan.GetComponent<TransformComponent>(depot).Coordinates);
             server.EntMan.EventBus.RaiseLocalEvent(depot, ev);
             Assert.That(ev.Handled, Is.False, "не руда");

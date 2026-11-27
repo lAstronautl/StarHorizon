@@ -1,10 +1,11 @@
+expedition-blackbox-announcement = Objective: find the black box deep in the complex, activate it and download its data. Stay close to the box while it downloads: its signal will draw enemies.
+expedition-blackbox-started = Data download started ({$seconds} s). Stay within {$radius} m of the box: the download stops without you. The signal was picked up, enemies are coming!
+expedition-blackbox-busy = The box is already transmitting.
+expedition-blackbox-done = Black box data downloaded. Objective complete!
+expedition-hud-objective-activate = Activate: {$name}
+expedition-hud-objective-download = Download data
+expedition-hud-paused = (zone empty)
 salvage-expedition-type-Retrieval = Black Box
-expedition-blackbox-announcement = Objective: find the black box deep in the complex and bring it aboard the extraction shuttle. Careful: the box is transmitting.
-expedition-blackbox-found = You have the black box! Its signal was picked up: enemies are inbound.
-expedition-blackbox-delivered = The black box is aboard the shuttle. Objective complete!
-expedition-blackbox-lost = The black box was destroyed. Objective failed.
-expedition-hud-objective-find = Find: {$name}
-expedition-hud-objective-deliver = Bring to the shuttle: {$name}
 
 salvage-expedition-type-Mining = Mining Quota
 salvage-expedition-type-Repair = Shuttle Repair

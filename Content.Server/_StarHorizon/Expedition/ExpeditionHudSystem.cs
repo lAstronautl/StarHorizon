@@ -72,16 +72,18 @@ public sealed class ExpeditionHudSystem : EntitySystem
         if (TryComp<SalvageRetrievalExpeditionComponent>(map, out var retrieval))
         {
             var name = _proto.Index<Robust.Shared.Prototypes.EntityPrototype>(ExpeditionBlackBoxSystem.BlackBoxProto).Name;
-            if (retrieval.Box is { } box && TryComp(box, out MetaDataComponent? boxMeta))
-                name = boxMeta.EntityName;
-
             objectives.Add(new ExpeditionObjective
             {
-                Kind = ExpeditionObjectiveKind.Find, Name = name, Total = 1, Done = retrieval.Found ? 1 : 0,
+                Kind = ExpeditionObjectiveKind.Activate, Name = name, Total = 1, Done = retrieval.Started ? 1 : 0,
             });
+
+            var percent = retrieval.Done
+                ? 100
+                : (int) Math.Clamp(retrieval.Progress.TotalSeconds / retrieval.Duration.TotalSeconds * 100, 0, 99);
             objectives.Add(new ExpeditionObjective
             {
-                Kind = ExpeditionObjectiveKind.Deliver, Name = name, Total = 1, Done = retrieval.Delivered ? 1 : 0,
+                Kind = ExpeditionObjectiveKind.Download, Name = name, Total = 100, Done = percent,
+                Paused = retrieval.Started && !retrieval.Done && retrieval.Paused,
             });
         }
 

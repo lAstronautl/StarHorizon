@@ -1,7 +1,7 @@
 {
   "version": 1,
   "license": "CC-BY-SA-3.0",
-  "copyright": "icon and light by StarHorizon; inhands recolored from toolbox_yellow (Baystation12 commit a929584d9db319eb7484113221be25cfa1d5dc09, held sprites redone by Alekshhh)",
+  "copyright": "Created for StarHorizon",
   "size": {
     "x": 32,
     "y": 32
@@ -18,14 +18,6 @@
           0.5
         ]
       ]
-    },
-    {
-      "name": "inhand-left",
-      "directions": 4
-    },
-    {
-      "name": "inhand-right",
-      "directions": 4
     }
   ]
 }

@@ -6,7 +6,7 @@ using Content.Server.Salvage;
 using Content.Server.Salvage.Expeditions;
 using Content.Shared._Horizon.SpaceHazards;
 using Content.Shared._StarHorizon.Expedition;
-using Content.Shared.Hands.EntitySystems;
+using Content.Shared.Interaction;
 using Content.Shared.Salvage;
 using Content.Shared.Salvage.Expeditions;
 using Robust.Shared.GameObjects;
@@ -17,8 +17,8 @@ using Robust.Shared.Timing;
 namespace Content.IntegrationTests.Tests._StarHorizon;
 
 /// <summary>
-/// Задание «Чёрный ящик»: ящик лежит в дальней комнате данжа, подбор вызывает волну врагов, доставка на эвакуационный
-/// шаттл выполняет задание; интерфейс показывает «найти» и «доставить».
+/// Задание «Чёрный ящик»: ящик стоит в дальней комнате данжа, активация вызывает волну, данные качаются, только пока
+/// игрок в зоне ящика; интерфейс показывает «активировать» и процент скачивания с паузой.
 /// </summary>
 [TestFixture]
 public sealed class ExpeditionBlackBoxTest
@@ -57,14 +57,13 @@ public sealed class ExpeditionBlackBoxTest
 ";
 
     [Test]
-    public async Task BlackBoxIsFoundAndDelivered()
+    public async Task BlackBoxDataIsDownloadedInTheZone()
     {
         await using var pair = await PoolManager.GetServerClient(new PoolSettings { FailureLogLevel = LogLevel.Fatal, Connected = true, Dirty = true });
         var server = pair.Server;
         var map = await pair.CreateTestMap();
         var salvage = server.System<SalvageSystem>();
-        var timing = server.Resolve<IGameTiming>();
-        var xform = server.System<SharedTransformSystem>();
+                var xform = server.System<SharedTransformSystem>();
 
         EntityUid planet = default;
         await server.WaitPost(() =>
@@ -90,15 +89,18 @@ public sealed class ExpeditionBlackBoxTest
         var expedition = server.EntMan.GetComponent<SalvageExpeditionComponent>(expeditionMap);
         await server.WaitPost(() => server.System<SharedMapSystem>().SetPaused(expeditionMap, false));
 
-        // 1. Ящик в данже, далеко от посадки.
+        // 1. Ящик стоит в данже (закреплён), далеко от посадки; зона ещё не активна.
         var retrieval = server.EntMan.GetComponent<SalvageRetrievalExpeditionComponent>(expeditionMap);
-        Assert.That(retrieval.Box, Is.Not.Null, "ящик положен");
+        Assert.That(retrieval.Box, Is.Not.Null, "ящик поставлен");
         var box = retrieval.Box!.Value;
-        Assert.That(server.EntMan.GetComponent<TransformComponent>(box).MapUid, Is.EqualTo(expeditionMap));
-        var boxDistance = (xform.GetWorldPosition(box) - expedition.LandingCoordinates).Length();
-        Assert.That(boxDistance, Is.GreaterThan(10f), "ящик в глубине данжа, не у посадки");
+        var boxXform = server.EntMan.GetComponent<TransformComponent>(box);
+        Assert.That(boxXform.MapUid, Is.EqualTo(expeditionMap));
+        Assert.That(boxXform.Anchored, "ящик: структура, закреплён");
+        var boxPos = xform.GetWorldPosition(box);
+        Assert.That((boxPos - expedition.LandingCoordinates).Length(), Is.GreaterThan(10f), "ящик в глубине данжа, не у посадки");
+        var zone = server.EntMan.GetComponent<ExpeditionBlackBoxZoneComponent>(box);
+        Assert.That(zone.Active, Is.False);
 
-        // Игрок на месте посадки, интерфейс: найти и доставить.
         EntityUid player = default;
         await server.WaitPost(() =>
         {
@@ -107,37 +109,45 @@ public sealed class ExpeditionBlackBoxTest
         });
         await pair.RunSeconds(2f);
         var hud = server.EntMan.GetComponent<ExpeditionHudComponent>(expeditionMap);
-        Assert.That(hud.Objectives.Select(o => o.Kind), Is.EqualTo(new[] { ExpeditionObjectiveKind.Find, ExpeditionObjectiveKind.Deliver }));
+        Assert.That(hud.Objectives.Select(o => o.Kind), Is.EqualTo(new[] { ExpeditionObjectiveKind.Activate, ExpeditionObjectiveKind.Download }));
         Assert.That(hud.Objectives.All(o => o.Done == 0));
 
-        // 2. Ящик подобран: найден, сразу пришла волна.
+        // 2. Игрок рядом активирует ящик: зона включилась, сразу пришла волна, данные качаются.
         await server.WaitPost(() =>
         {
-            xform.SetCoordinates(player, server.EntMan.GetComponent<TransformComponent>(box).Coordinates);
-            Assert.That(server.System<SharedHandsSystem>().TryPickupAnyHand(player, box, checkActionBlocker: false), "ящик в руках");
+            xform.SetWorldPosition(player, boxPos + new Vector2(1f, 0));
+            server.EntMan.EventBus.RaiseLocalEvent(box, new InteractHandEvent(player, box));
         });
-        await pair.RunSeconds(2f);
-        Assert.That(retrieval.Found, "ящик найден");
+        await pair.RunSeconds(3f);
+        Assert.That(retrieval.Started, "ящик активирован");
+        Assert.That(zone.Active, "зона включена");
+        Assert.That(zone.Occupied, "игрок в зоне");
         Assert.That(server.EntMan.Count<PursuePlayerComponent>(), Is.GreaterThan(0), "сигнал засекли: пришла волна");
-        Assert.That(hud.Objectives[0].Done, Is.EqualTo(1));
-        Assert.That(retrieval.Delivered, Is.False);
+        Assert.That(retrieval.Progress, Is.GreaterThan(TimeSpan.Zero), "данные качаются");
+        Assert.That(hud.Objectives[0].Finished);
+        Assert.That(hud.Objectives[1].Done, Is.GreaterThan(0));
 
-        // 3. Шаттл сел, игрок с ящиком на борту: задание выполнено.
-        await server.WaitPost(() => expedition.EndTime = timing.CurTime + TimeSpan.FromSeconds(150));
-        for (var i = 0; i < 45 && !hud.ShuttleLanded; i++)
-            await pair.RunSeconds(1f);
-        Assert.That(hud.ShuttleLanded, "эвакуационный шаттл сел");
+        // 3. Игрок ушёл из зоны: пауза, прогресс стоит.
+        await server.WaitPost(() => xform.SetWorldPosition(player, boxPos + new Vector2(zone.Radius + 4f, 0)));
+        await pair.RunSeconds(1.5f);
+        var paused = retrieval.Progress;
+        await pair.RunSeconds(3f);
+        Assert.That(retrieval.Paused, "в зоне никого: пауза");
+        Assert.That(retrieval.Progress, Is.EqualTo(paused), "прогресс стоит");
+        Assert.That(hud.Objectives[1].Paused, "интерфейс показывает паузу");
+        Assert.That(zone.Occupied, Is.False);
 
+        // 4. Вернулся: скачивание продолжается и заканчивается, задание выполнено.
         await server.WaitPost(() =>
         {
-            var shuttle = server.EntMan.GetEntity(hud.Shuttle!.Value);
-            xform.SetCoordinates(player, new EntityCoordinates(shuttle, Vector2.Zero));
+            xform.SetWorldPosition(player, boxPos + new Vector2(1f, 0));
+            retrieval.Progress = retrieval.Duration - TimeSpan.FromSeconds(1);
         });
-        await pair.RunSeconds(2f);
-        Assert.That(retrieval.Delivered, "ящик на борту");
+        await pair.RunSeconds(3f);
+        Assert.That(retrieval.Done, "данные скачаны");
         Assert.That(expedition.Completed, "задание выполнено");
+        Assert.That(zone.Active, Is.False, "зона выключена");
         Assert.That(hud.Objectives.All(o => o.Finished), "в интерфейсе обе задачи выполнены");
-        Assert.That(hud.Completed);
 
         await pair.CleanReturnAsync();
     }

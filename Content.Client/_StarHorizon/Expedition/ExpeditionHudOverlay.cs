@@ -104,7 +104,7 @@ public sealed class ExpeditionHudOverlay : Overlay
             else
                 h.DrawRect(check, Muted, filled: false);
 
-            var color = o.Finished ? Done : Color.White;
+            var color = o.Finished ? Done : o.Paused ? Danger : Color.White;
             h.DrawString(_text, new Vector2(x + box + 6 * scale, y), $"{o.Text}  {o.Progress}", color);
             y += line;
         }

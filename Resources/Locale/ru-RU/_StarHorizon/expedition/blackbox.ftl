@@ -1,12 +1,13 @@
-salvage-expedition-type-Retrieval = Чёрный ящик
-expedition-blackbox-announcement = Задача: найдите чёрный ящик в глубине комплекса и доставьте его на эвакуационный шаттл. Осторожно: ящик подаёт сигнал.
-expedition-blackbox-found = Чёрный ящик у вас! Его сигнал засекли: враги уже летят.
-expedition-blackbox-delivered = Чёрный ящик на борту шаттла. Задача выполнена!
-expedition-blackbox-lost = Чёрный ящик уничтожен. Задача провалена.
-expedition-hud-objective-find = Найти: {$name}
-expedition-hud-objective-deliver = Доставить на шаттл: {$name}
+expedition-blackbox-announcement = Задача: найдите чёрный ящик в глубине комплекса, активируйте его и скачайте данные. Пока данные качаются, оставайтесь рядом с ящиком: его сигнал привлечёт врагов.
+expedition-blackbox-started = Скачивание данных началось ({$seconds} с). Оставайтесь в зоне {$radius} м вокруг ящика: без вас скачивание встаёт. Сигнал засекли, враги идут!
+expedition-blackbox-busy = Ящик уже передаёт данные.
+expedition-blackbox-done = Данные чёрного ящика скачаны. Задача выполнена!
+expedition-hud-objective-activate = Активировать: {$name}
+expedition-hud-objective-download = Скачать данные
+expedition-hud-paused = (зона пуста)
 ent-ExpeditionBlackBox = чёрный ящик
-    .desc = Бортовой самописец пропавшего корабля. Мигающий маяк на нём не единственный сигнал, который он подаёт.
+    .desc = Бортовой самописец пропавшего корабля, всё ещё подключённый к обломкам. Скачать данные получится не сразу, и его сигнал не останется незамеченным.
+salvage-expedition-type-Retrieval = Чёрный ящик
 
 salvage-expedition-type-Mining = Квота добычи
 salvage-expedition-type-Repair = Ремонт шаттла

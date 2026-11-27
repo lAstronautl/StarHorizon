@@ -24,7 +24,7 @@ public enum ExpeditionHudPhase : byte
 }
 
 /// <summary>Строка задачи интерфейса.</summary>
-public readonly record struct ExpeditionHudObjectiveLine(string Text, int Done, int Total, bool Finished, string Progress);
+public readonly record struct ExpeditionHudObjectiveLine(string Text, int Done, int Total, bool Finished, string Progress, bool Paused = false);
 
 /// <summary>Всё, что рисует интерфейс экспедиции в этот кадр.</summary>
 public sealed class ExpeditionHudView
@@ -52,18 +52,23 @@ public sealed class ExpeditionHudSystem : EntitySystem
     [Dependency] private readonly SharedTransformSystem _xform = default!;
 
     private ExpeditionHudOverlay? _overlay;
+    private ExpeditionBlackBoxZoneOverlay? _zone;
     private readonly ExpeditionHudView _view = new();
 
     public override void Initialize()
     {
         _overlay = new ExpeditionHudOverlay(this);
         _overlays.AddOverlay(_overlay);
+        _zone = new ExpeditionBlackBoxZoneOverlay();
+        _overlays.AddOverlay(_zone);
     }
 
     public override void Shutdown()
     {
         if (_overlay != null)
             _overlays.RemoveOverlay(_overlay);
+        if (_zone != null)
+            _overlays.RemoveOverlay(_zone);
     }
 
     /// <summary>Собирает то, что сейчас надо показать. false: интерфейс не виден.</summary>
@@ -93,8 +98,8 @@ public sealed class ExpeditionHudSystem : EntitySystem
             {
                 ExpeditionObjectiveKind.Destroy => "expedition-hud-objective-destroy",
                 ExpeditionObjectiveKind.Eliminate => "expedition-hud-objective-eliminate",
-                ExpeditionObjectiveKind.Find => "expedition-hud-objective-find",
-                ExpeditionObjectiveKind.Deliver => "expedition-hud-objective-deliver",
+                ExpeditionObjectiveKind.Activate => "expedition-hud-objective-activate",
+                ExpeditionObjectiveKind.Download => "expedition-hud-objective-download",
                 ExpeditionObjectiveKind.Quota => "expedition-hud-objective-quota",
                 ExpeditionObjectiveKind.Samples => "expedition-hud-objective-samples",
                 ExpeditionObjectiveKind.Repair => "expedition-hud-objective-repair",
@@ -108,13 +113,19 @@ public sealed class ExpeditionHudSystem : EntitySystem
                 var left = Math.Max(0, objective.Total - objective.Done);
                 progress = $"{left / 60}:{left % 60:00}";
             }
+            else if (objective.Kind == ExpeditionObjectiveKind.Download)
+            {
+                progress = $"{objective.Done}%";
+                if (objective.Paused)
+                    progress += " " + Loc.GetString("expedition-hud-paused");
+            }
             else
             {
                 progress = $"{objective.Done}/{objective.Total}";
             }
 
             view.Objectives.Add(new ExpeditionHudObjectiveLine(Loc.GetString(key, ("name", objective.Name)),
-                objective.Done, objective.Total, objective.Finished, progress));
+                objective.Done, objective.Total, objective.Finished, progress, objective.Paused));
         }
 
         view.Completed = hud.Completed;

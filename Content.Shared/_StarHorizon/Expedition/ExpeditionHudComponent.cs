@@ -55,11 +55,11 @@ public enum ExpeditionObjectiveKind : byte
     /// <summary>Убить мегафауну.</summary>
     Eliminate,
 
-    /// <summary>Найти (поднять) чёрный ящик.</summary>
-    Find,
+    /// <summary>Активировать чёрный ящик.</summary>
+    Activate,
 
-    /// <summary>Доставить чёрный ящик на эвакуационный шаттл.</summary>
-    Deliver,
+    /// <summary>Скачать данные чёрного ящика: Done/Total в процентах, <see cref="ExpeditionObjective.Paused"/> если в зоне никого.</summary>
+    Download,
 
     /// <summary>Квота добычи: сдано руды в приёмник.</summary>
     Quota,
@@ -93,14 +93,35 @@ public sealed partial class ExpeditionObjective : IEquatable<ExpeditionObjective
 
     [DataField] public int Done;
 
+    /// <summary>Прогресс стоит (скачивание: в зоне ящика никого нет).</summary>
+    [DataField] public bool Paused;
+
     public bool Finished => Total > 0 && Done >= Total;
 
     public bool Equals(ExpeditionObjective? other)
     {
-        return other != null && Kind == other.Kind && Name == other.Name && Total == other.Total && Done == other.Done;
+        return other != null && Kind == other.Kind && Name == other.Name && Total == other.Total && Done == other.Done && Paused == other.Paused;
     }
 
     public override bool Equals(object? obj) => Equals(obj as ExpeditionObjective);
 
-    public override int GetHashCode() => HashCode.Combine(Kind, Name, Total, Done);
+    public override int GetHashCode() => HashCode.Combine(Kind, Name, Total, Done, Paused);
+}
+
+/// <summary>
+/// Зона чёрного ящика: пока идёт скачивание данных, клиент рисует вокруг ящика круг радиуса <see cref="Radius"/>.
+/// Данные качаются, только пока в круге есть живой игрок.
+/// </summary>
+[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+public sealed partial class ExpeditionBlackBoxZoneComponent : Component
+{
+    [DataField, AutoNetworkedField]
+    public bool Active;
+
+    [DataField, AutoNetworkedField]
+    public float Radius = 5f;
+
+    /// <summary>В зоне есть живой игрок (скачивание идёт).</summary>
+    [DataField, AutoNetworkedField]
+    public bool Occupied;
 }

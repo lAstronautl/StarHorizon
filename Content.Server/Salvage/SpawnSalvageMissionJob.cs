@@ -356,7 +356,7 @@ public sealed class SpawnSalvageMissionJob : Job<bool>
                 await SetupElimination(mission, dungeon, grid, random);
                 break;
             case SalvageMissionType.Retrieval: // StarHorizon
-                await SetupRetrieval(dungeon, grid, random, expedition.LandingCoordinates);
+                await SetupRetrieval(mission, dungeon, grid, random, expedition.LandingCoordinates);
                 break;
             case SalvageMissionType.Mining: // StarHorizon
                 SetupMining(mission);
@@ -629,13 +629,16 @@ public sealed class SpawnSalvageMissionJob : Job<bool>
     // End Frontier: mission-specific setup functions
 
     /// <summary>
-    /// StarHorizon: чёрный ящик лежит в комнате данжа, самой дальней от места посадки, чтобы до него пришлось пробиваться.
+    /// StarHorizon: чёрный ящик стоит в комнате данжа, самой дальней от места посадки, чтобы до него пришлось пробиваться.
     /// </summary>
-    private async Task SetupRetrieval(Dungeon dungeon, MapGridComponent grid, Random random, Vector2 landing)
+    private async Task SetupRetrieval(SalvageMission mission, Dungeon dungeon, MapGridComponent grid, Random random, Vector2 landing)
     {
         await SuspendIfOutOfTime();
 
         var retrieval = _entManager.EnsureComponent<Content.Server._StarHorizon.Expedition.SalvageRetrievalExpeditionComponent>(mapUid);
+        // Скачивание тем дольше, чем сложнее задание: от ~2 минут до 3 на Inferno.
+        var difficulty = _prototypeManager.Index(mission.Difficulty);
+        retrieval.Duration = TimeSpan.FromSeconds(Math.Clamp(90 + difficulty.DestructionStructures * 5, 90, 180));
         var rooms = dungeon.Rooms.OrderByDescending(r => (r.Center - landing).LengthSquared()).ToList();
         var tiles = new List<Vector2i>();
 

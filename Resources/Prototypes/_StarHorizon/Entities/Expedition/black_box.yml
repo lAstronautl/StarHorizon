@@ -1,23 +1,36 @@
-# Чёрный ящик задания «Чёрный ящик» (Retrieval) планетной экспедиции: лежит в самой дальней комнате данжа, мигает
-# красным, тяжёлый (замедляет того, кто несёт) и большой (в рюкзак не влезает, нести в руках).
+# Чёрный ящик задания «Чёрный ящик» (Retrieval) планетной экспедиции: стоит в самой дальней комнате данжа и мигает
+# красным. Его активируют руками, затем качают данные, оставаясь в зоне вокруг него, пока идут волны.
 - type: entity
-  parent: BaseItem
   id: ExpeditionBlackBox
   name: black box
-  description: A flight recorder from a lost vessel. The blinking beacon on it is not the only signal it sends.
+  description: The flight recorder of a lost vessel, still wired into the wreck. Downloading its data takes a while, and its signal will not go unnoticed.
+  placement:
+    mode: SnapgridCenter
   components:
+  - type: Transform
+    anchored: true
   - type: Sprite
     sprite: _StarHorizon/Objects/Expedition/black_box.rsi
     layers:
     - state: icon
     - state: light
       shader: unshaded
-  - type: Item
-    sprite: _StarHorizon/Objects/Expedition/black_box.rsi
-    size: Huge
-  - type: HeldSpeedModifier
-    walkModifier: 0.85
-    sprintModifier: 0.85
+  - type: Clickable
+  - type: InteractionOutline
+  - type: Physics
+    bodyType: Static
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.35,-0.35,0.35,0.35"
+        density: 200
+        mask:
+        - MachineMask
+        layer:
+        - MachineLayer
+  - type: ExpeditionBlackBoxZone
   - type: PointLight
     color: "#FF3030"
     radius: 2.5
