@@ -124,7 +124,18 @@ public abstract partial class SharedSalvageSystem : EntitySystem
         if (duration < TimeSpan.FromMinutes(5))
             duration = TimeSpan.FromMinutes(5);
 
-        return new SalvageMission(seed, dungeon.ID, faction.ID, biome.ID, air.ID, temp.Temperature, light.Color, duration, mods, difficulty.ID, config);
+        // StarHorizon: погода (порт с Monolith). Бросок последним, чтобы не менять остальные результаты по сиду.
+        // В вакууме и на биомах без погоды её нет.
+        string? weatherId = null;
+        if (biome.Weather && !air.Space)
+        {
+            var weather = GetBiomeMod<SalvageWeatherMod>(biome.ID, rand, ref modifierBudget);
+            weatherId = weather.ID;
+            if (weather.Description != string.Empty)
+                mods.Add(Loc.GetString(weather.Description));
+        }
+
+        return new SalvageMission(seed, dungeon.ID, faction.ID, biome.ID, air.ID, temp.Temperature, light.Color, duration, mods, difficulty.ID, config, weatherId);
     }
 
     public T GetBiomeMod<T>(string biome, System.Random rand, ref float rating) where T : class, IPrototype, IBiomeSpecificMod

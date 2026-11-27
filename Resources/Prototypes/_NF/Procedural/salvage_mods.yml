@@ -119,17 +119,7 @@
   factions:
     - NFSyndicate
 
-# Weather mods
-- type: salvageWeatherMod
-  id: SnowfallHeavy
-  desc: salvage-weather-mod-heavy-snowfall
-  weather: SnowfallHeavy
-  cost: 1
-
-- type: salvageWeatherMod
-  id: Rain
-  desc: salvage-weather-mod-rain
-  weather: Rain
+# Weather mods: см. Resources/Prototypes/_StarHorizon/Expedition/salvage_weather_mods.yml (порт с Monolith)
 
 # Air mixtures
 - type: salvageAirMod

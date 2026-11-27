@@ -237,6 +237,15 @@ public sealed class SpawnSalvageMissionJob : Job<bool>
             _entManager.System<AtmosphereSystem>().SetMapSpace(mapUid, air.Space, atmos);
             _entManager.System<AtmosphereSystem>().SetMapGasMixture(mapUid, new GasMixture(moles, mission.Temperature), atmos);
 
+            // StarHorizon: погода планеты (порт с Monolith).
+            if (mission.Weather != null && !air.Space
+                && _prototypeManager.TryIndex<SalvageWeatherMod>(mission.Weather, out var weatherMod)
+                && _prototypeManager.TryIndex<Content.Shared.Weather.WeatherPrototype>(weatherMod.WeatherPrototype, out var weatherProto))
+            {
+                _entManager.EnsureComponent<Content.Shared.Weather.WeatherComponent>(mapUid);
+                _entManager.System<Content.Shared.Weather.SharedWeatherSystem>().SetWeather(mapId, weatherProto, null);
+            }
+
             if (mission.Color != null)
             {
                 var lighting = _entManager.EnsureComponent<MapLightComponent>(mapUid);

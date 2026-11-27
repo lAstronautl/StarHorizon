@@ -153,7 +153,8 @@ public sealed record SalvageMission(
     TimeSpan Duration,
     List<string> Modifiers,
     ProtoId<SalvageDifficultyPrototype> Difficulty, // Frontier
-    SalvageMissionType MissionType) // Frontier
+    SalvageMissionType MissionType, // Frontier
+    string? Weather = null) // StarHorizon: погода (порт с Monolith)
 {
     /// <summary>
     /// Seed used for the mission.
@@ -210,6 +211,11 @@ public sealed record SalvageMission(
     /// </summary>
     public readonly SalvageMissionType MissionType = MissionType;
     // End Frontier: additional parameters
+
+    /// <summary>
+    /// StarHorizon: <see cref="Modifiers.SalvageWeatherMod"/> планеты (null: без погоды, например в вакууме).
+    /// </summary>
+    public readonly string? Weather = Weather;
 }
 
 [Serializable, NetSerializable]
