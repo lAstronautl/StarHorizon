@@ -207,7 +207,50 @@ public static class PixelPlanetBiomeLooks
         presets["Lavalight"] = presets["Lava"];
         presets["ArdoniumWastes"] = presets["GateInferno"];
         presets["Caves"] = presets["LowDesert"];
+
+        // StarHorizon: биомы Monolith. Пустыня как LowDesert; Крокус: луга с хвоей и красной травой; океан: синяя вода
+        // с редкими песчаными континентами.
+        presets["Desert"] = presets["LowDesert"];
+        presets["Crocus"] = Recolor(presets["Grasslands"],
+            [
+                H("#4fa4b8"),
+                H("#4fa4b8"),
+                H("#283540"),
+                H("#6b8f3a"),
+                H("#3f6b2e"),
+                H("#9c3b3b"),
+                H("#6e2a2f"),
+                H("#dfe0e8"),
+                H("#686f99"),
+                H("#404973"),
+            ]);
+        presets["Ocean"] = Recolor(presets["LowDesert"],
+            [
+                H("#3f7fbf"),
+                H("#2f5f9f"),
+                H("#1f3f6f"),
+                H("#ceb37d"),
+                H("#947c60"),
+                H("#a16c48"),
+                H("#9c5541"),
+                H("#dae8e7"),
+                H("#b6cad0"),
+                H("#908b8e"),
+            ],
+            new Dictionary<string, float> { ["land_cutoff"] = 0.62f });
         return presets;
+    }
+
+    private static PixelPlanetLook Recolor(PixelPlanetLook look, Vector3[] palette, Dictionary<string, float>? overrides = null)
+    {
+        var merged = new Dictionary<string, float>(look.Overrides);
+        if (overrides != null)
+        {
+            foreach (var (key, value) in overrides)
+                merged[key] = value;
+        }
+
+        return look with { Palette = palette, Overrides = merged };
     }
 
     private static readonly (string Token, string Preset)[] Tokens =
@@ -222,6 +265,8 @@ public static class PixelPlanetBiomeLooks
         ("savanna", "LowDesert"),
         ("shadow", "Shadow"),
         ("cave", "Caves"),
+        ("crocus", "Crocus"),
+        ("ocean", "Ocean"),
         ("jungle", "Grasslands"),
         ("bioluminescent", "Grasslands"),
     ];

@@ -1,0 +1,34 @@
+# Биомы экспедиций с Monolith (Monolith-Station/Monolith): пустыня, лес Крокус, океан (континенты пустыни среди
+# воды). Свет, погода и данжи для них настроены в salvage_weather_mods.yml и _NF/Procedural/salvage_mods.yml.
+
+- type: salvageBiomeMod
+  id: Desert
+  desc: salvage-biome-mod-mono-desert
+  cost: 1
+  biome: MonoDesert
+
+- type: salvageBiomeMod
+  id: Crocus
+  desc: salvage-biome-mod-crocus
+  biome: MonoCrocus
+
+- type: salvageBiomeMod
+  id: Ocean
+  desc: salvage-biome-mod-ocean
+  cost: 1
+  biome: MonoContinentalDesertOcean
+
+- type: salvageLightMod
+  id: MonoDesertDaylight
+  desc: salvage-light-mod-daylight
+  color: "#FFFFFF"
+  biomes:
+  - Desert
+  - Ocean
+
+- type: salvageLightMod
+  id: CrocusDaylight
+  desc: salvage-light-mod-daylight
+  color: "#B8C8A0"
+  biomes:
+  - Crocus

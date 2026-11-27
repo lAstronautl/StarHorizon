@@ -14,6 +14,7 @@
     - Caves
     - Grasslands
     - Shadow
+    - Crocus # StarHorizon: биомы Monolith
 
 - type: salvageDungeonMod
   id: NFMedSci
@@ -24,6 +25,9 @@
     - Grasslands
     - Snow
     - Shadow
+    - Crocus # StarHorizon: биомы Monolith
+    - Desert # StarHorizon: биомы Monolith
+    - Ocean # StarHorizon: биомы Monolith
 
 - type: salvageDungeonMod
   id: NFFactoryDorms
@@ -34,6 +38,9 @@
     - Grasslands
     - Lava
     - Shadow
+    - Crocus # StarHorizon: биомы Monolith
+    - Desert # StarHorizon: биомы Monolith
+    - Ocean # StarHorizon: биомы Monolith
 
 - type: salvageDungeonMod
   id: NFLavaMercenary
@@ -56,6 +63,9 @@
     - Lava
     - Snow
     - Shadow
+    - Crocus # StarHorizon: биомы Monolith
+    - Desert # StarHorizon: биомы Monolith
+    - Ocean # StarHorizon: биомы Monolith
 
 - type: salvageDungeonMod
   id: NFSalvageOutpost
@@ -67,6 +77,9 @@
     - Lava
     - Snow
     - Shadow
+    - Crocus # StarHorizon: биомы Monolith
+    - Desert # StarHorizon: биомы Monolith
+    - Ocean # StarHorizon: биомы Monolith
   factions:
     - NFExplorers
 
@@ -116,6 +129,9 @@
     - Snow
     - Caves
     - Grasslands
+    - Crocus # StarHorizon: биомы Monolith
+    - Desert # StarHorizon: биомы Monolith
+    - Ocean # StarHorizon: биомы Monolith
   factions:
     - NFSyndicate
 

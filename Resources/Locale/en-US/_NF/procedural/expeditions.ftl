@@ -35,6 +35,9 @@ salvage-weather-mod-storm = Storm
 salvage-weather-mod-none = Clear Weather
 
 salvage-biome-mod-shadow = Shadow
+salvage-biome-mod-mono-desert = Desert
+salvage-biome-mod-crocus = Crocus Forest
+salvage-biome-mod-ocean = Ocean
 
 salvage-dungeon-mod-cave-factory = Cave Factory
 salvage-dungeon-mod-med-sci = Medical Science Base

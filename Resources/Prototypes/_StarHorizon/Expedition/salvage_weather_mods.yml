@@ -26,6 +26,7 @@
   biomes:
   - Grasslands
   - Snow
+  - Crocus
 
 - type: salvageWeatherMod
   id: SnowfallLight
@@ -35,6 +36,7 @@
   biomes:
   - Grasslands
   - Snow
+  - Crocus
 
 - type: salvageWeatherMod
   id: AshfallHeavy
@@ -62,6 +64,7 @@
   - Lava
   - Shadow
   - Caves
+  - Desert
 
 - type: salvageWeatherMod
   id: Fallout
@@ -79,6 +82,8 @@
   cost: 1
   biomes:
   - Caves
+  - Desert
+  - Ocean
 
 - type: salvageWeatherMod
   id: Sandstorm
@@ -87,6 +92,8 @@
   biomes:
   - Caves
   - Lava
+  - Desert
+  - Ocean
 
 - type: salvageWeatherMod
   id: LightRain
@@ -95,6 +102,8 @@
   biomes:
   - Grasslands
   - Lava # primordial planet or something idk
+  - Crocus
+  - Ocean
 
 - type: salvageWeatherMod
   id: Rain
@@ -102,6 +111,8 @@
   weather: MonoRain
   biomes:
   - Grasslands
+  - Crocus
+  - Ocean
 
 - type: salvageWeatherMod
   id: Storm
@@ -109,6 +120,8 @@
   weather: MonoStorm
   biomes:
   - Grasslands
+  - Crocus
+  - Ocean
 
 - type: salvageWeatherMod
   id: ClearWeather
