@@ -1,0 +1,11 @@
+expedition-hud-objectives = OBJECTIVES
+expedition-hud-objectives-done = OBJECTIVES COMPLETE
+expedition-hud-objective-destroy = Destroy: {$name}
+expedition-hud-objective-eliminate = Eliminate: {$name}
+expedition-hud-wave = Enemy wave! Still fighting: {$count}
+expedition-hud-extraction-in = EXTRACTION IN
+expedition-hud-shuttle-incoming = EXTRACTION SHUTTLE INBOUND
+expedition-hud-return = RETURN TO THE SHUTTLE
+expedition-hud-aboard = YOU ARE ON BOARD
+expedition-hud-departed = THE SHUTTLE HAS LEFT
+expedition-hud-distance = {$meters} m

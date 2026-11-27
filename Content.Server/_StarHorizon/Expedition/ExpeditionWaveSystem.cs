@@ -125,7 +125,7 @@ public sealed class ExpeditionWaveSystem : EntitySystem
     private TimeSpan Delay(float min, float max) => TimeSpan.FromSeconds(_random.NextFloat(min, max));
 
     /// <summary>Мобы волны, которые ещё в строю: не убиты и не в крите (для музыки, 90% выбыло: волна закончилась).</summary>
-    private int CountFightingWaveMobs(EntityUid map)
+    public int CountFightingWaveMobs(EntityUid map)
     {
         var fighting = 0;
         var query = EntityQueryEnumerator<PursuePlayerComponent, TransformComponent>();

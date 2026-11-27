@@ -1,0 +1,11 @@
+expedition-hud-objectives = ЗАДАЧИ
+expedition-hud-objectives-done = ЗАДАЧИ ВЫПОЛНЕНЫ
+expedition-hud-objective-destroy = Уничтожить: {$name}
+expedition-hud-objective-eliminate = Устранить: {$name}
+expedition-hud-wave = Волна врагов! В строю: {$count}
+expedition-hud-extraction-in = ЭВАКУАЦИЯ ЧЕРЕЗ
+expedition-hud-shuttle-incoming = ШАТТЛ ЭВАКУАЦИИ НА ПОДЛЁТЕ
+expedition-hud-return = ВОЗВРАЩАЙТЕСЬ К ШАТТЛУ
+expedition-hud-aboard = ВЫ НА БОРТУ
+expedition-hud-departed = ШАТТЛ УЛЕТЕЛ
+expedition-hud-distance = {$meters} м
