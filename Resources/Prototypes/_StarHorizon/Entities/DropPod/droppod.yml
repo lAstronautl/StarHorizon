@@ -1,5 +1,5 @@
 # Дроп-под. Спрайты: свои (Xigovir), четыре вида: экспедиционный (по умолчанию), NanoTrasen, Синдикат, AnRox.
-# Видимость слоёв (стоит / в полёте скрыт / упал набок, дверь, воронка) задаёт DropPodVisualizerSystem.
+# Видимость слоёв (стоит / в полёте скрыт / после падения, дверь, воронка) задаёт DropPodVisualizerSystem.
 - type: entity
   abstract: true
   parent: BaseStructureDynamic
@@ -26,11 +26,11 @@
       map: ["droppodBase"]
     - state: door-close
       map: ["droppodDoor"]
-    # Капсула упала и лежит набок: корпус и дверца.
-    - state: base-down-open
+    # Капсула после падения (стоит в воронке): корпус и дверца, открывается после посадки.
+    - state: base-fall-open
       map: ["droppodLanded"]
       visible: false
-    - state: down-door-close
+    - state: fall-door-close
       map: ["droppodLandedDoor"]
       visible: false
   - type: InteractionOutline

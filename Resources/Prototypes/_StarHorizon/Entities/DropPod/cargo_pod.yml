@@ -1,5 +1,5 @@
 # Синдикатская капсула с грузом: в ней падают волны врагов и приёмник экспедиции (ExpeditionCargoPodSystem).
-# Пока падает, её не видно (летит анимация StarHorizonDropPodLandingAnimationSyndicate), потом лежит набок на воронке,
+# Пока падает, её не видно (летит анимация StarHorizonDropPodLandingAnimationSyndicate), потом стоит в воронке,
 # открывается и выпускает груз.
 - type: entity
   id: ExpeditionCargoPod
@@ -17,10 +17,10 @@
     - state: ground
       map: [ "ground" ]
       visible: false
-    - state: base-down-open
+    - state: base-fall-open
       map: [ "pod" ]
       visible: false
-    - state: down-door-close
+    - state: fall-door-close
       map: [ "door" ]
       visible: false
   - type: Appearance

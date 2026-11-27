@@ -10,7 +10,7 @@ namespace Content.Client._StarHorizon.DropPod;
 /// <summary>
 /// Анимации капсулы: тряска и уход вниз перед БСС. Падение при приземлении здесь не анимируется:
 /// его показывает отдельная сущность с вертикальным падением (см. <c>StarHorizonDropPodLandingAnimation</c>).
-/// Видимость слоёв (стоит / упала / дверца / воронка) тоже здесь.
+/// Видимость слоёв (стоит / после падения / дверца / воронка) тоже здесь.
 /// </summary>
 public sealed class DropPodVisualizerSystem : VisualizerSystem<DropPodComponent>
 {
@@ -51,7 +51,7 @@ public sealed class DropPodVisualizerSystem : VisualizerSystem<DropPodComponent>
     }
 
     /// <summary>
-    /// Слои капсулы: стоит (корпус и дверца, если закрыта), в полёте скрыта, упала (лежит набок на воронке, дверца,
+    /// Слои капсулы: стоит (корпус и дверца, если закрыта), в полёте скрыта, после падения (стоит в воронке, дверца,
     /// если закрыта). Всё в одном месте, чтобы разные визуализаторы не спорили за одни и те же слои.
     /// </summary>
     private void UpdateLayers(Entity<SpriteComponent> sprite, AppearanceComponent appearance)
