@@ -44,6 +44,33 @@ public sealed partial class ExpeditionHudComponent : Component
     /// <summary>Центр шаттла в координатах карты (шаттл может быть вне PVS игрока, поэтому позиция передаётся явно).</summary>
     [DataField, AutoNetworkedField]
     public Vector2 ShuttlePosition;
+
+    /// <summary>Куда показывает компас (координаты карты экспедиции) и что там.</summary>
+    [DataField, AutoNetworkedField]
+    public Vector2 CompassTarget;
+
+    [DataField, AutoNetworkedField]
+    public ExpeditionCompassTarget CompassKind;
+}
+
+/// <summary>На что указывает компас интерфейса экспедиции.</summary>
+[Serializable, NetSerializable]
+public enum ExpeditionCompassTarget : byte
+{
+    /// <summary>Цели нет: компас показывает только стороны света.</summary>
+    None,
+
+    /// <summary>Данж: цели задания надо найти в нём.</summary>
+    Dungeon,
+
+    /// <summary>Место задания, которое не надо искать (разбитый шаттл, активированный чёрный ящик).</summary>
+    Objective,
+
+    /// <summary>Приёмник руды и образцов.</summary>
+    Depot,
+
+    /// <summary>Эвакуационный шаттл (летит или сел).</summary>
+    Shuttle,
 }
 
 [Serializable, NetSerializable]

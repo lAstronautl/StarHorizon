@@ -22,6 +22,10 @@ public sealed partial class SalvageExpeditionComponent : SharedSalvageExpedition
     [DataField("dungeonLocation")]
     public Vector2 DungeonLocation = Vector2.Zero;
 
+    /// <summary>StarHorizon: центр данжа (по всем его тайлам), на него указывает компас интерфейса.</summary>
+    [ViewVariables]
+    public Vector2? DungeonCenter;
+
     /// <summary>
     /// When the expeditions ends.
     /// </summary>

@@ -1,4 +1,5 @@
 using System.Numerics;
+using Content.Shared._StarHorizon.Expedition;
 using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
@@ -67,7 +68,8 @@ public sealed class ExpeditionHudOverlay : Overlay
         var bounds = args.ViewportBounds;
 
         DrawObjectives(h, view, new Vector2(bounds.Left + 16 * scale, bounds.Top + 70 * scale), scale);
-        DrawTimer(h, view, new Vector2((bounds.Left + bounds.Right) / 2f, bounds.Top + 12 * scale), scale);
+        var timerBottom = DrawTimer(h, view, new Vector2((bounds.Left + bounds.Right) / 2f, bounds.Top + 12 * scale), scale);
+        DrawCompass(h, view, new Vector2((bounds.Left + bounds.Right) / 2f, timerBottom + 10 * scale), scale);
     }
 
     private void DrawObjectives(DrawingHandleScreen h, ExpeditionHudView view, Vector2 origin, float scale)
@@ -116,7 +118,8 @@ public sealed class ExpeditionHudOverlay : Overlay
         }
     }
 
-    private void DrawTimer(DrawingHandleScreen h, ExpeditionHudView view, Vector2 top, float scale)
+    /// <returns>Нижний край плашки таймера.</returns>
+    private float DrawTimer(DrawingHandleScreen h, ExpeditionHudView view, Vector2 top, float scale)
     {
         var (label, color) = view.Phase switch
         {
@@ -139,16 +142,11 @@ public sealed class ExpeditionHudOverlay : Overlay
             timerColor = Danger.WithAlpha(pulse);
         }
 
-        string? distance = null;
-        if (view.ToShuttle is { } delta)
-            distance = Loc.GetString("expedition-hud-distance", ("meters", (int) MathF.Round(delta.Length())));
-
         var labelSize = h.GetDimensions(_header, labelText, 1f);
         var timerSize = view.Phase == ExpeditionHudPhase.Departed ? Vector2.Zero : h.GetDimensions(_timer, timerText, 1f);
-        var distSize = distance != null ? h.GetDimensions(_text, distance, 1f) + new Vector2(18 * scale, 0) : Vector2.Zero;
         var pad = 8 * scale;
-        var width = MathF.Max(labelSize.X, MathF.Max(timerSize.X, distSize.X)) + pad * 4;
-        var height = pad * 2 + labelSize.Y + timerSize.Y + distSize.Y;
+        var width = MathF.Max(labelSize.X, timerSize.X) + pad * 4;
+        var height = pad * 2 + labelSize.Y + timerSize.Y;
         var origin = new Vector2(top.X - width / 2f, top.Y);
 
         h.DrawRect(UIBox2.FromDimensions(origin, new Vector2(width, height)), Panel);
@@ -164,26 +162,83 @@ public sealed class ExpeditionHudOverlay : Overlay
             y += timerSize.Y;
         }
 
-        if (distance != null && view.ToShuttle is { } toShuttle)
-        {
-            var textX = top.X - distSize.X / 2f + 18 * scale;
-            DrawArrow(h, new Vector2(top.X - distSize.X / 2f + 6 * scale, y + distSize.Y / 2f), toShuttle, 6 * scale, Accent);
-            h.DrawString(_text, new Vector2(textX, y), distance, Color.White);
-        }
+        return origin.Y + height;
     }
 
-    /// <summary>Треугольная стрелка в сторону цели с учётом поворота камеры.</summary>
-    private void DrawArrow(DrawingHandleScreen h, Vector2 center, Vector2 worldDelta, float size, Color color)
+    /// <summary>
+    /// Компас под таймером: стороны света и стрелка к цели (данж, место задания, приёмник или шаттл) с расстоянием.
+    /// Всё поворачивается вместе с камерой: «С» показывает туда, где на экране север.
+    /// </summary>
+    private void DrawCompass(DrawingHandleScreen h, ExpeditionHudView view, Vector2 top, float scale)
     {
-        if (worldDelta.LengthSquared() < 0.01f)
+        var radius = 30 * scale;
+        var center = top + new Vector2(0, radius);
+        h.DrawCircle(center, radius, Panel);
+        h.DrawCircle(center, radius, Accent.WithAlpha(0.5f), filled: false);
+
+        // Стороны света с учётом поворота камеры.
+        var letters = new (Vector2 Dir, string Key)[]
+        {
+            (new Vector2(0, 1), "expedition-hud-compass-n"),
+            (new Vector2(1, 0), "expedition-hud-compass-e"),
+            (new Vector2(0, -1), "expedition-hud-compass-s"),
+            (new Vector2(-1, 0), "expedition-hud-compass-w"),
+        };
+        foreach (var (dir, key) in letters)
+        {
+            var letter = Loc.GetString(key);
+            var size = h.GetDimensions(_text, letter, 1f);
+            var pos = center + ToScreen(dir) * (radius - 9 * scale) - size / 2f;
+            h.DrawString(_text, pos, letter, key == "expedition-hud-compass-n" ? Danger : Muted);
+        }
+
+        if (view.ToCompassTarget is not { } delta)
             return;
 
-        var view = (-_eye.CurrentEye.Rotation).RotateVec(worldDelta);
-        var dir = Vector2.Normalize(new Vector2(view.X, -view.Y));
-        var side = new Vector2(-dir.Y, dir.X);
-        var tip = center + dir * size;
-        var left = center - dir * size * 0.7f + side * size * 0.75f;
-        var right = center - dir * size * 0.7f - side * size * 0.75f;
-        h.DrawPrimitives(DrawPrimitiveTopology.TriangleList, new[] { tip, left, right }, color);
+        var color = view.CompassKind switch
+        {
+            ExpeditionCompassTarget.Shuttle => Accent,
+            ExpeditionCompassTarget.Objective => Done,
+            ExpeditionCompassTarget.Depot => Color.FromHex("#5AC8FF"),
+            _ => Color.White,
+        };
+
+        // Стрелка от центра к краю и метка цели на ободе. Рядом с целью вместо стрелки точка в центре.
+        var distance = delta.Length();
+        if (distance > 1.5f)
+        {
+            var dir = ToScreen(Vector2.Normalize(delta));
+            var side = new Vector2(-dir.Y, dir.X);
+            var tip = center + dir * (radius - 2 * scale);
+            var baseCenter = center + dir * (radius - 16 * scale);
+            h.DrawPrimitives(DrawPrimitiveTopology.TriangleList,
+                new[] { tip, baseCenter + side * 6 * scale, baseCenter - side * 6 * scale }, color);
+            h.DrawLine(center, baseCenter, color.WithAlpha(0.8f));
+        }
+
+        h.DrawCircle(center, 3 * scale, color);
+
+        var label = Loc.GetString("expedition-hud-compass-target-" + view.CompassKind.ToString().ToLowerInvariant(),
+            ("meters", (int) MathF.Round(distance)));
+        var labelSize = h.GetDimensions(_text, label, 1f);
+        var labelPos = new Vector2(center.X - labelSize.X / 2f, center.Y + radius + 4 * scale);
+        h.DrawRect(UIBox2.FromDimensions(labelPos - new Vector2(4 * scale, 1 * scale), labelSize + new Vector2(8 * scale, 2 * scale)), Panel);
+        h.DrawString(_text, labelPos, label, color);
+    }
+
+    /// <summary>
+    /// Направление в мире в направление на экране с учётом поворота камеры (как у пинпоинтера: угол камеры
+    /// прибавляется), Y экрана вниз.
+    /// </summary>
+    private Vector2 ToScreen(Vector2 worldDir)
+    {
+        return WorldToScreenDirection(_eye.CurrentEye.Rotation, worldDir);
+    }
+
+    /// <summary>Направление в мире при повороте камеры <paramref name="eyeRotation"/> в направление на экране (Y вниз).</summary>
+    public static Vector2 WorldToScreenDirection(Angle eyeRotation, Vector2 worldDir)
+    {
+        var view = eyeRotation.RotateVec(worldDir);
+        return new Vector2(view.X, -view.Y);
     }
 }

@@ -159,6 +159,7 @@ public sealed class ExpeditionExtractionSystem : EntitySystem
         shuttleComp.DeleteAfter = ent.Comp.DeleteAfter;
 
         var landing = expedition.LandingCoordinates + new Vector2(ent.Comp.LandingOffset * side, 0);
+        ent.Comp.LandingPosition = landing;
         TryComp<ShuttleComponent>(shuttle, out var shuttleData);
         _shuttle.FTLToCoordinates(shuttle, shuttleData, new EntityCoordinates(ent.Owner, landing), Angle.Zero,
             _shuttle.DefaultStartupTime, _shuttle.DefaultTravelTime);

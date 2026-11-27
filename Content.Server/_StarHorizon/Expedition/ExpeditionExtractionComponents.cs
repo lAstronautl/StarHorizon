@@ -17,6 +17,9 @@ public sealed partial class ExpeditionExtractionComponent : Component
     [ViewVariables] public ExtractionStage Stage;
     [ViewVariables] public EntityUid? Shuttle;
 
+    /// <summary>Куда садится текущий шаттл (координаты карты экспедиции): компас показывает сюда, пока он летит.</summary>
+    [ViewVariables] public System.Numerics.Vector2? LandingPosition;
+
     /// <summary>Эвакуация объявлена (за <see cref="ArriveBefore"/> до конца).</summary>
     [ViewVariables] public bool Called;
 

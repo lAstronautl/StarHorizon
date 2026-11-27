@@ -121,6 +121,8 @@ public sealed class ExpeditionObjectivesTest
         await pair.RunSeconds(14f);
         var depot = holder.Depot!.Value;
         Assert.That(server.EntMan.GetComponent<TransformComponent>(depot).MapUid, Is.EqualTo(map));
+        Assert.That(server.EntMan.GetComponent<ExpeditionHudComponent>(map).CompassKind, Is.EqualTo(ExpeditionCompassTarget.Depot),
+            "квота: компас на приёмник");
         Assert.That(server.System<Robust.Shared.Containers.SharedContainerSystem>().IsEntityInContainer(depot), Is.False, "вышел из капсулы");
 
         // Не руда не принимается; стак руды засчитывается целиком.
@@ -201,6 +203,9 @@ public sealed class ExpeditionObjectivesTest
         Assert.That(repair.Points.All(p => server.EntMan.GetComponent<TransformComponent>(p).GridUid == shuttle), "узлы на шаттле");
         Assert.That(server.EntMan.TryGetComponent<ExpeditionExtractionStateComponent>(map, out var earlyState) && earlyState.Active,
             Is.False, "эвакуация ещё не объявлена");
+        await pair.RunSeconds(1f);
+        Assert.That(server.EntMan.GetComponent<ExpeditionHudComponent>(map).CompassKind, Is.EqualTo(ExpeditionCompassTarget.Objective),
+            "компас на разбитый шаттл: его не надо искать");
 
         // 2. Первый узел чинится руками (несколько секунд), остальные сразу.
         var first = repair.Points[0];

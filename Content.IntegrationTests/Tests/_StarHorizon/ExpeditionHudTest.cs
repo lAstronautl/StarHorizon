@@ -105,7 +105,11 @@ public sealed class ExpeditionHudTest
             Assert.That(view.Objectives.All(o => o.Total > 0 && o.Done == 0 && !o.Finished),
                 string.Join("; ", view.Objectives.Select(o => $"{o.Text} {o.Done}/{o.Total} {o.Finished}")));
             Assert.That(view.Timer.TotalSeconds, Is.GreaterThan(60));
+            Assert.That(view.CompassKind, Is.EqualTo(ExpeditionCompassTarget.Dungeon), "компас: на комплекс");
+            Assert.That(view.ToCompassTarget, Is.Not.Null);
         });
+        Assert.That(expedition.DungeonCenter, Is.Not.Null, "центр данжа известен");
+        Assert.That(hud.CompassTarget, Is.EqualTo(expedition.DungeonCenter!.Value));
 
         // 2. Одна цель уничтожена: прогресс растёт.
         var kind = hud.Objectives[0].Kind;
@@ -130,6 +134,7 @@ public sealed class ExpeditionHudTest
         {
             Assert.That(hudSystem.TryGetView(out var view));
             Assert.That(view.Phase, Is.EqualTo(ExpeditionHudPhase.ShuttleIncoming).Or.EqualTo(ExpeditionHudPhase.Return));
+            Assert.That(view.CompassKind, Is.EqualTo(ExpeditionCompassTarget.Shuttle), "эвакуация: компас на шаттл");
         });
 
         for (var i = 0; i < 40 && !hud.ShuttleLanded; i++)
@@ -142,6 +147,8 @@ public sealed class ExpeditionHudTest
             Assert.That(view.Phase, Is.EqualTo(ExpeditionHudPhase.Return));
             Assert.That(view.ToShuttle, Is.Not.Null, "известно, где шаттл");
             Assert.That(view.ToShuttle!.Value.Length(), Is.GreaterThan(3f));
+            Assert.That(view.CompassKind, Is.EqualTo(ExpeditionCompassTarget.Shuttle));
+            Assert.That((view.ToCompassTarget!.Value - view.ToShuttle!.Value).Length(), Is.LessThan(0.5f), "компас на севший шаттл");
         });
 
         // 4. Игрок на борту.

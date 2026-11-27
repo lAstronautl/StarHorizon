@@ -36,6 +36,10 @@ public sealed class ExpeditionHudView
     public string? WaveLine;
     /// <summary>До шаттла (мировые координаты, от игрока), когда он сел.</summary>
     public Vector2? ToShuttle;
+
+    /// <summary>На что указывает компас и где это относительно игрока (мировые координаты). Null: только стороны света.</summary>
+    public ExpeditionCompassTarget CompassKind;
+    public Vector2? ToCompassTarget;
 }
 
 /// <summary>
@@ -160,6 +164,11 @@ public sealed class ExpeditionHudSystem : EntitySystem
             view.Phase = ExpeditionHudPhase.ShuttleIncoming;
             view.Timer = hud.EndTime - now;
         }
+
+        view.CompassKind = hud.CompassKind;
+        view.ToCompassTarget = hud.CompassKind == ExpeditionCompassTarget.None || view.Phase == ExpeditionHudPhase.Aboard
+            ? null
+            : hud.CompassTarget - _xform.GetWorldPosition(xform);
 
         // Шаттл на карте (эвакуационный или разбитый в задании ремонта): расстояние и стрелка к нему.
         if (hud.ShuttleLanded && view.Phase != ExpeditionHudPhase.Aboard && now < hud.EndTime)

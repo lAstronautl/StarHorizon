@@ -160,15 +160,68 @@ public sealed class ExpeditionHudSystem : EntitySystem
             landed = xform.MapUid == map
                      && (!TryComp<FTLComponent>(shuttle, out var ftl) || ftl.State is FTLState.Cooldown or FTLState.Available);
             if (landed)
-                position = _xform.GetWorldPosition(xform);
+                position = GridCenter(shuttle);
         }
 
         Set(ref hud.Shuttle, shuttleNet);
         Set(ref hud.ShuttleLanded, landed);
         Set(ref hud.ShuttlePosition, position);
 
+        // Компас: во время эвакуации на шаттл, иначе на место задания, если его не надо искать, иначе на данж.
+        var (kind, target) = ChooseCompassTarget(map, expedition, extraction, landed, position);
+        Set(ref hud.CompassKind, kind);
+        Set(ref hud.CompassTarget, target);
+
         if (dirty)
             Dirty(map, hud);
+    }
+
+    private (ExpeditionCompassTarget Kind, System.Numerics.Vector2 Target) ChooseCompassTarget(EntityUid map,
+        SalvageExpeditionComponent expedition, ExpeditionExtractionComponent? extraction, bool shuttleLanded,
+        System.Numerics.Vector2 shuttlePosition)
+    {
+        // Где шаттл: сел (центр грида) или куда садится.
+        System.Numerics.Vector2? shuttleTarget = shuttleLanded ? shuttlePosition : extraction?.LandingPosition;
+
+        // Эвакуация объявлена: на эвакуационный шаттл.
+        if (extraction is { Called: true } && extraction.Shuttle != null && shuttleTarget is { } evac)
+            return (ExpeditionCompassTarget.Shuttle, evac);
+
+        // Ремонт: разбитый шаттл известно где.
+        if (TryComp<SalvageRepairExpeditionComponent>(map, out var repair) && repair.Stage != ExpeditionRepairStage.Done
+            && shuttleTarget is { } crashed)
+        {
+            return (ExpeditionCompassTarget.Objective, crashed);
+        }
+
+        // Чёрный ящик активирован: держаться у него.
+        if (TryComp<SalvageRetrievalExpeditionComponent>(map, out var retrieval) && retrieval.Started && !retrieval.Done
+            && retrieval.Box is { } box && Exists(box))
+        {
+            return (ExpeditionCompassTarget.Objective, _xform.GetWorldPosition(box));
+        }
+
+        // Квота добычи: руда везде, сдавать в приёмник.
+        if (HasComp<SalvageMiningExpeditionComponent>(map) && TryComp<ExpeditionDepotHolderComponent>(map, out var holder)
+            && !holder.Done && holder.Depot is { } depot && Exists(depot) && Transform(depot).MapUid == map)
+        {
+            return (ExpeditionCompassTarget.Depot, _xform.GetWorldPosition(depot));
+        }
+
+        // Остальное надо искать в данже, пока задание не выполнено.
+        if (!expedition.Completed && expedition.DungeonCenter is { } dungeon)
+            return (ExpeditionCompassTarget.Dungeon, dungeon);
+
+        return (ExpeditionCompassTarget.None, System.Numerics.Vector2.Zero);
+    }
+
+    /// <summary>Центр грида шаттла в координатах карты (позиция грида: его начало координат, а не середина).</summary>
+    private System.Numerics.Vector2 GridCenter(EntityUid grid)
+    {
+        if (!TryComp<Robust.Shared.Map.Components.MapGridComponent>(grid, out var gridComp))
+            return _xform.GetWorldPosition(grid);
+
+        return System.Numerics.Vector2.Transform(gridComp.LocalAABB.Center, _xform.GetWorldMatrix(grid));
     }
 
     private ExpeditionObjective Objective(ExpeditionHudComponent hud, ExpeditionObjectiveKind kind, List<EntityUid> targets)
