@@ -1,7 +1,9 @@
-# Дроп-под. Спрайты и идея - tgstation (supply pods), CC-BY-SA 3.0.
+# Дроп-под. Спрайты: свои (Xigovir), четыре вида: экспедиционный (по умолчанию), NanoTrasen, Синдикат, AnRox.
+# Видимость слоёв (стоит / в полёте скрыт / упал набок, дверь, воронка) задаёт DropPodVisualizerSystem.
 - type: entity
+  abstract: true
   parent: BaseStructureDynamic
-  id: StarHorizonDropPod
+  id: BaseStarHorizonDropPod
   name: drop pod
   description: A bluespace drop pod. Load it with cargo or climb in yourself, link it to a drop pod console with a multitool (device linking) and launch.
   components:
@@ -9,34 +11,28 @@
     anchored: true
     noRot: true
   - type: Icon
-    sprite: _StarHorizon/Structures/Misc/droppod.rsi
+    sprite: _StarHorizon/Structures/DropPod/expedition.rsi
     state: icon
   - type: Sprite
     noRot: true
-    sprite: _StarHorizon/Structures/Misc/droppod.rsi
-    scale: 0.75, 0.75
-    # Капсула стоит носом вверх: спрайт повёрнут на 180° (клиентская анимация взлёта это учитывает).
-    rotation: 180
+    sprite: _StarHorizon/Structures/DropPod/expedition.rsi
     layers:
-    - state: base
-      map: ["enum.StorageVisualLayers.Base"]
-    - state: closed
-      map: ["enum.StorageVisualLayers.Door"]
-    - state: bluespace
-      map: ["droppodDecal"]
-    - state: glow_yellow
-      map: ["droppodGlow"]
+    # Воронка под упавшей капсулой.
+    - state: ground
+      map: ["droppodGround"]
       visible: false
-      shader: unshaded
-    # Упавшая капсула: спрайт и вид как у дроп-пода Goobstation (наклонённая, закрытая/открытая).
-    # Родительский поворот спрайта (180) и масштаб (0.75) компенсируются, смещение пересчитано под них.
-    - sprite: _Goobstation/Objects/Specific/DropPod/supplypod.rsi
-      state: landed
+    # Капсула стоит: корпус и дверца.
+    - state: base-open
+      map: ["droppodBase"]
+    - state: door-close
+      map: ["droppodDoor"]
+    # Капсула упала и лежит набок: корпус и дверца.
+    - state: base-down-open
       map: ["droppodLanded"]
       visible: false
-      rotation: -180
-      scale: 1.3333, 1.3333
-      offset: 0, -0.3333
+    - state: down-door-close
+      map: ["droppodLandedDoor"]
+      visible: false
   - type: InteractionOutline
   - type: Physics
     bodyType: Dynamic
@@ -57,37 +53,6 @@
     containers:
       entity_storage: !type:Container
   - type: Appearance
-  - type: EntityStorageVisuals
-    stateDoorOpen: open
-    stateDoorClosed: closed
-  - type: GenericVisualizer
-    visuals:
-      enum.DropPodVisuals.InFlight:
-        enum.StorageVisualLayers.Base:
-          True: { visible: false }
-          False: { visible: true }
-        enum.StorageVisualLayers.Door:
-          True: { visible: false }
-          False: { visible: true }
-        droppodDecal:
-          True: { visible: false }
-          False: { visible: true }
-      enum.DropPodVisuals.Landed:
-        droppodLanded:
-          True: { visible: true }
-          False: { visible: false }
-      enum.StorageVisuals.Open:
-        droppodLanded:
-          True: { state: landed-opened }
-          False: { state: landed }
-      enum.DropPodVisuals.State:
-        droppodGlow:
-          Idle: { visible: false }
-          Countdown: { visible: true, state: glow_yellow }
-          ZoomingOut: { visible: true, state: glow_blue }
-          InBluespace: { visible: true, state: glow_blue }
-          Arriving: { visible: false }
-          Landing: { visible: false }
   - type: Damageable
     damageContainer: StructuralInorganic
     damageModifierSet: Metallic
@@ -118,6 +83,47 @@
       types:
         Blunt: 25
 
+# Экспедиционная капсула (вид по умолчанию).
+- type: entity
+  parent: BaseStarHorizonDropPod
+  id: StarHorizonDropPod
+
+- type: entity
+  parent: BaseStarHorizonDropPod
+  id: StarHorizonDropPodNanotrasen
+  suffix: NanoTrasen
+  components:
+  - type: Icon
+    sprite: _StarHorizon/Structures/DropPod/nanotrasen.rsi
+  - type: Sprite
+    sprite: _StarHorizon/Structures/DropPod/nanotrasen.rsi
+  - type: DropPod
+    landingAnimationEffect: StarHorizonDropPodLandingAnimationNanotrasen
+
+- type: entity
+  parent: BaseStarHorizonDropPod
+  id: StarHorizonDropPodSyndicate
+  suffix: Syndicate
+  components:
+  - type: Icon
+    sprite: _StarHorizon/Structures/DropPod/syndicate.rsi
+  - type: Sprite
+    sprite: _StarHorizon/Structures/DropPod/syndicate.rsi
+  - type: DropPod
+    landingAnimationEffect: StarHorizonDropPodLandingAnimationSyndicate
+
+- type: entity
+  parent: BaseStarHorizonDropPod
+  id: StarHorizonDropPodAnrox
+  suffix: AnRox
+  components:
+  - type: Icon
+    sprite: _StarHorizon/Structures/DropPod/anrox.rsi
+  - type: Sprite
+    sprite: _StarHorizon/Structures/DropPod/anrox.rsi
+  - type: DropPod
+    landingAnimationEffect: StarHorizonDropPodLandingAnimationAnrox
+
 - type: entity
   id: StarHorizonDropPodMarker
   name: drop pod landing zone
@@ -128,14 +134,12 @@
     noRot: true
   - type: Sprite
     drawdepth: FloorObjects
-    sprite: _StarHorizon/Effects/droppod_marker.rsi
+    sprite: _StarHorizon/Effects/DropPod/marker.rsi
     noRot: true
     layers:
-    - state: lz
+    - state: marker
       shader: unshaded
-    - state: ring
-      shader: unshaded
-    - state: ring_pulse
+    - state: marker_ping
       shader: unshaded
   - type: PointLight
     radius: 2.5
@@ -145,44 +149,27 @@
     tags:
     - HideContextMenu
 
-- type: entity
-  id: StarHorizonDropPodSmoke
-  name: debris
-  categories: [ HideSpawnMenu ]
-  components:
-  - type: Transform
-    noRot: true
-  - type: Sprite
-    drawdepth: FloorObjects
-    sprite: _StarHorizon/Effects/droppod_marker.rsi
-    noRot: true
-    layers:
-    - state: rubble
-  - type: TimedDespawn
-    lifetime: 12
-  - type: Tag
-    tags:
-    - HideContextMenu
-
-# Падающая капсула: анимированный диагональный спрайт (механика посадки из Goobstation/tgstation).
-# Настоящая капсула в это время скрыта, по окончании анимации она появляется на месте.
 - type: sourcePort
   id: DropPodLaunch
   name: signal-port-name-droppod-launch
   description: signal-port-description-droppod-launch
   defaultLinks: [ Trigger ]
 
+# Падающая капсула: вертикальное падение (кадр 140x320, капсула касается земли в точке сущности). Настоящая
+# капсула в это время скрыта, по окончании анимации она появляется на месте. По виду на каждую капсулу.
 - type: entity
-  id: StarHorizonDropPodLandingAnimation
+  abstract: true
+  id: BaseStarHorizonDropPodLandingAnimation
   name: falling drop pod
   categories: [ HideSpawnMenu ]
   components:
   - type: Transform
     noRot: true
   - type: Sprite
-    sprite: _Goobstation/Objects/Specific/DropPod/landingpod.rsi
-    state: landing
-    offset: -1.7, 4.3
+    sprite: _StarHorizon/Effects/DropPod/landingpod.rsi
+    state: expedition-landing
+    # Центр кадра на 4.06 тайла выше и 1/16 тайла левее капсулы в последнем кадре (см. DropPodLandingGeometry).
+    offset: -0.0625, 4.0625
     drawdepth: Objects
     noRot: true
   - type: TimedDespawn
@@ -190,6 +177,31 @@
   - type: Tag
     tags:
     - HideContextMenu
+
+- type: entity
+  parent: BaseStarHorizonDropPodLandingAnimation
+  id: StarHorizonDropPodLandingAnimation
+
+- type: entity
+  parent: BaseStarHorizonDropPodLandingAnimation
+  id: StarHorizonDropPodLandingAnimationNanotrasen
+  components:
+  - type: Sprite
+    state: nanotrasen-landing
+
+- type: entity
+  parent: BaseStarHorizonDropPodLandingAnimation
+  id: StarHorizonDropPodLandingAnimationSyndicate
+  components:
+  - type: Sprite
+    state: syndicate-landing
+
+- type: entity
+  parent: BaseStarHorizonDropPodLandingAnimation
+  id: StarHorizonDropPodLandingAnimationAnrox
+  components:
+  - type: Sprite
+    state: anrox-landing
 
 # Клуб дыма по траектории падения и при ударе; растёт и тает (DropPodTrailSystem).
 - type: entity
@@ -209,32 +221,6 @@
     lifetime: 2.5
   - type: TimedDespawn
     lifetime: 2.5
-  - type: Tag
-    tags:
-    - HideContextMenu
-
-- type: entity
-  id: StarHorizonDropPodTrail
-  name: drop pod trail
-  categories: [ HideSpawnMenu ]
-  components:
-  - type: Transform
-    noRot: true
-  - type: Sprite
-    # Длина, положение и прозрачность задаются клиентской анимацией (DropPodTrailSystem):
-    # полоса в 3 тайла постепенно вырастает позади падающей капсулы, начиная с момента её падения.
-    drawdepth: HighFloorObjects
-    sprite: _StarHorizon/Effects/droppod_marker.rsi
-    noRot: true
-    # Шлейф лежит вдоль диагональной траектории падения (см. DropPodLandingGeometry): ~22.4° против часовой.
-    rotation: 22.4
-    color: "#ffffff00"
-    layers:
-    - state: smoke
-  - type: DropPodTrail
-    lifetime: 3.6
-  - type: TimedDespawn
-    lifetime: 3.6
   - type: Tag
     tags:
     - HideContextMenu

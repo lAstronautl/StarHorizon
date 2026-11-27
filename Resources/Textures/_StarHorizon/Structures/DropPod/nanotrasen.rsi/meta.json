@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "license": "CLA with hosting restrictions",
+  "copyright": "Sprited by Xigovir DS:623559319543349268",
+  "size": {
+    "x": 32,
+    "y": 32
+  },
+    "states": [
+		{
+            "name": "base-down-open"
+        },
+		{
+            "name": "base-fall-open"
+        },
+        {
+            "name": "base-open"
+        },
+		{
+            "name": "door-close"
+        },
+		{
+            "name": "down-door-close"
+        },
+        {
+            "name": "fall-door-close"
+        },
+		{
+            "name": "icon"
+        },
+		{
+            "name": "icon-down"
+        },
+        {
+            "name": "icon-fall"
+        },
+        {
+            "name": "ground"
+        }
+    ]
+}

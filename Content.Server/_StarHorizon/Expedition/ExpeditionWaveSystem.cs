@@ -36,15 +36,14 @@ public sealed class ExpeditionWaveSystem : EntitySystem
     [Dependency] private readonly AnchorableSystem _anchorable = default!;
     [Dependency] private readonly PursuePlayerSystem _pursue = default!;
     [Dependency] private readonly MapSystem _map = default!;
-    [Dependency] private readonly SharedContainerSystem _container = default!;
-    [Dependency] private readonly TriggerSystem _trigger = default!;
+    [Dependency] private readonly Content.Server._StarHorizon.DropPod.ExpeditionCargoPodSystem _cargoPods = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly RockClearSystem _rocks = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly TransformSystem _xform = default!;
 
-    public const string PodProto = "DropPodspawner";
-    public const string PodContainer = "clowncar_container";
+    /// <summary>Капсула, в которой падают волны и приёмник: наша синдикатская.</summary>
+    public const string PodProto = Content.Server._StarHorizon.DropPod.ExpeditionCargoPodSystem.PodProto;
 
     private TimeSpan _nextUpdate;
     private readonly List<(EntityUid Uid, Vector2 Pos)> _players = new();
@@ -165,15 +164,7 @@ public sealed class ExpeditionWaveSystem : EntitySystem
     public bool DropCargo(EntityUid map, Vector2 near, EntityUid cargo)
     {
         var coords = _rocks.FindDropTile(map, near, 3f, 7f, _random) ?? new EntityCoordinates(map, near);
-        var pod = Spawn(PodProto, coords);
-        if (!_container.TryGetContainer(pod, PodContainer, out var container) || !_container.Insert(cargo, container))
-        {
-            QueueDel(pod);
-            _xform.SetCoordinates(cargo, coords);
-            return false;
-        }
-
-        _trigger.Trigger(pod);
+        _cargoPods.Drop(coords, new[] { cargo });
         return true;
     }
 
@@ -215,7 +206,7 @@ public sealed class ExpeditionWaveSystem : EntitySystem
     }
 
     /// <summary>
-    /// Спавнит волну: тратит бюджет сложности целиком, мобы падают группами в дроп-подах Goobstation (DropPodspawner)
+    /// Спавнит волну: тратит бюджет сложности целиком, мобы падают группами в наших синдикатских капсулах (ExpeditionCargoPodSystem)
     /// у места, где начал первый игрок. Возвращает число мобов.
     /// </summary>
     /// <param name="budgetFraction">Доля mobBudget; null: обычная случайная (<see cref="ExpeditionWavesComponent.BudgetFractionMin"/>..Max).</param>
@@ -320,15 +311,8 @@ public sealed class ExpeditionWaveSystem : EntitySystem
             return null;
         }
 
-        var pod = Spawn(PodProto, coords);
-        if (!_container.TryGetContainer(pod, PodContainer, out var container))
-        {
-            Log.Warning($"Expedition wave: drop pod {ToPrettyString(pod)} has no container {PodContainer}");
-            QueueDel(pod);
-            return null;
-        }
-
         var fighters = 0;
+        var cargo = new List<EntityUid>();
         foreach (var proto in mobs)
         {
             foreach (var mob in SpawnWaveMobs(proto, coords))
@@ -339,11 +323,11 @@ public sealed class ExpeditionWaveSystem : EntitySystem
                 RemComp<GhostRoleComponent>(mob);
                 RemComp<GhostTakeoverAvailableComponent>(mob);
                 EnsureComp<PursuePlayerComponent>(mob);
-                _container.Insert(mob, container);
+                cargo.Add(mob);
             }
         }
 
-        _trigger.Trigger(pod);
+        _cargoPods.Drop(coords, cargo);
         return fighters;
     }
 

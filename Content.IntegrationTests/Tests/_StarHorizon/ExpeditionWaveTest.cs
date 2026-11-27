@@ -281,14 +281,17 @@ public sealed class ExpeditionWaveTest
             foreach (var tileRef in mapSys.GetAllTiles(expeditionMap, grid))
             {
                 if (rocks.IsDungeonFloor(expeditionMap, grid, tileRef.GridIndices) &&
-                    rocks.IsOpenRegion(expeditionMap, grid, tileRef.GridIndices, 60))
+                    rocks.IsOpenRegion(expeditionMap, grid, tileRef.GridIndices, 30))
                 {
                     dungeonTile = tileRef.GridIndices;
                     break;
                 }
             }
         });
-        Assert.That(dungeonTile, Is.Not.Null, "на планете есть данж");
+        var missionParams = server.EntMan.GetComponent<SalvageExpeditionComponent>(expeditionMap).MissionParams;
+        var dungeonMod = salvage.GetMission(missionParams.MissionType, server.ProtoMan.Index<Content.Shared.Procedural.SalvageDifficultyPrototype>(missionParams.Difficulty),
+            missionParams.Seed, missionParams.Biome).Dungeon;
+        Assert.That(dungeonTile, Is.Not.Null, $"на планете есть данж (данж {dungeonMod})");
 
         EntityUid player = default;
         await server.WaitPost(() =>

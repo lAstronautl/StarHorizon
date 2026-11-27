@@ -111,7 +111,7 @@ public sealed partial class DropPodComponent : Component
     public TimeSpan ArrivalViewTime = TimeSpan.FromSeconds(5 - DropPodLandingGeometry.TotalTime);
 
     /// <summary>
-    /// Падение: анимация-сущность (диагональный спрайт Goobstation) и шлейф дыма, капсула в это время скрыта.
+    /// Падение: анимация-сущность (вертикальное падение, спрайт landingpod.rsi) и клубы дыма, капсула в это время скрыта.
     /// Когда падение закончено, капсула появляется и приземляется. По умолчанию - длина спрайта.
     /// </summary>
     [DataField]
@@ -120,6 +120,14 @@ public sealed partial class DropPodComponent : Component
     /// <summary>Максимальное отдаление камеры перед уходом в блюспейс.</summary>
     [DataField]
     public float PeakZoom = 1.5f;
+
+    /// <summary>Свет капсулы на обратном отсчёте (вместо слоя-индикатора).</summary>
+    [DataField]
+    public Color CountdownLightColor = Color.FromHex("#ffc83a");
+
+    /// <summary>Свет капсулы на взлёте и в блюспейсе.</summary>
+    [DataField]
+    public Color BluespaceLightColor = Color.FromHex("#4aa8ff");
 
     /// <summary>Радиус удара при приземлении.</summary>
     [DataField]
@@ -135,14 +143,18 @@ public sealed partial class DropPodComponent : Component
     [DataField]
     public EntProtoId LaunchEffect = "EffectFlashBluespace";
 
+    /// <summary>Что остаётся на месте удара (сверх воронки на спрайте капсулы). Null: ничего.</summary>
     [DataField]
-    public EntProtoId LandingEffect = "StarHorizonDropPodSmoke";
+    public EntProtoId? LandingEffect;
 
-    /// <summary>Длинный шлейф позади падающей капсулы.</summary>
+    /// <summary>
+    /// Длинный шлейф позади падающей капсулы (DropPodTrailSystem). Null: без шлейфа: спрайт шлейфа был из tgstation,
+    /// своего пока нет.
+    /// </summary>
     [DataField]
-    public EntProtoId TrailEffect = "StarHorizonDropPodTrail";
+    public EntProtoId? TrailEffect;
 
-    /// <summary>Падающая капсула: анимированный диагональный спрайт, пока настоящая капсула скрыта.</summary>
+    /// <summary>Падающая капсула: анимированный спрайт вертикального падения, пока настоящая капсула скрыта.</summary>
     [DataField]
     public EntProtoId LandingAnimationEffect = "StarHorizonDropPodLandingAnimation";
 

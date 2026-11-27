@@ -540,7 +540,28 @@ public sealed class DropPodSystem : EntitySystem
         ent.Comp.StateStart = _timing.CurTime;
         ent.Comp.StateEnd = _timing.CurTime + duration;
         _appearance.SetData(ent, DropPodVisuals.State, state);
+        UpdateIndicatorLight(ent, state);
         UpdateConsolesFor(ent);
+    }
+
+    /// <summary>Свет капсулы по стадии: жёлтый на отсчёте, синий на взлёте и в блюспейсе, иначе выключен.</summary>
+    private void UpdateIndicatorLight(Entity<DropPodComponent> ent, DropPodState state)
+    {
+        switch (state)
+        {
+            case DropPodState.Countdown:
+                _light.SetColor(ent, ent.Comp.CountdownLightColor);
+                _light.SetEnabled(ent, true);
+                break;
+            case DropPodState.ZoomingOut:
+            case DropPodState.InBluespace:
+                _light.SetColor(ent, ent.Comp.BluespaceLightColor);
+                _light.SetEnabled(ent, true);
+                break;
+            default:
+                _light.SetEnabled(ent, false);
+                break;
+        }
     }
 
     private void StartCountdown(Entity<DropPodComponent> ent, MapCoordinates target, EntityCoordinates? coords = null, TimeSpan delay = default)
@@ -999,7 +1020,7 @@ public sealed class DropPodSystem : EntitySystem
 
     /// <summary>
     /// Виньетка снята: начинается падение. Настоящая капсула остаётся скрытой, вместо неё летит анимированная
-    /// сущность (диагональный спрайт Goobstation), а за ней по траектории остаётся шлейф и клубы дыма.
+    /// сущность (вертикальное падение, спрайт landingpod.rsi), а за ней по траектории остаётся шлейф и клубы дыма.
     /// </summary>
     private void BeginFall(Entity<DropPodComponent> ent)
     {
@@ -1008,7 +1029,8 @@ public sealed class DropPodSystem : EntitySystem
 
         var coords = Transform(ent).Coordinates;
         SpawnAtPosition(ent.Comp.LandingAnimationEffect, coords);
-        SpawnAtPosition(ent.Comp.TrailEffect, coords);
+        if (ent.Comp.TrailEffect is { } trail)
+            SpawnAtPosition(trail, coords);
         _audio.PlayPvs(ent.Comp.LandingAnimationSound, ent);
 
         SetState(ent, DropPodState.Landing, ent.Comp.FallTime);
@@ -1059,7 +1081,8 @@ public sealed class DropPodSystem : EntitySystem
         }
 
         var coords = Transform(ent).Coordinates;
-        SpawnAtPosition(ent.Comp.LandingEffect, coords);
+        if (ent.Comp.LandingEffect is { } landingEffect)
+            SpawnAtPosition(landingEffect, coords);
         _audio.PlayPvs(ent.Comp.LandingSound, ent);
 
         // Удар: облако дыма вокруг капсулы.

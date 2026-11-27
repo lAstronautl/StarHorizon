@@ -226,7 +226,7 @@ public sealed class DropPodTest
         Assert.That(appearance.TryGetData<bool>(pod, DropPodVisuals.InFlight, out hidden) && hidden, "капсула в падении скрыта");
         Assert.That(comp.Used, Is.False, "физически ещё не приземлилась");
         Assert.That(CountEntities(server, "StarHorizonDropPodLandingAnimation"), Is.EqualTo(1), "летит анимация падения");
-        Assert.That(CountEntities(server, "StarHorizonDropPodTrail"), Is.EqualTo(1), "и шлейф");
+        Assert.That(CountEntities(server, "StarHorizonDropPodTrail"), Is.EqualTo(0), "шлейфа нет: его спрайт был из tgstation");
 
         // Падение закончилось (анимация длится 1.81 с): капсула появилась, ударила, поднялся дым.
         await pair.RunSeconds(1.9f);

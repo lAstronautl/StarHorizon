@@ -1,0 +1,51 @@
+# Синдикатская капсула с грузом: в ней падают волны врагов и приёмник экспедиции (ExpeditionCargoPodSystem).
+# Пока падает, её не видно (летит анимация StarHorizonDropPodLandingAnimationSyndicate), потом лежит набок на воронке,
+# открывается и выпускает груз.
+- type: entity
+  id: ExpeditionCargoPod
+  name: syndicate drop pod
+  description: A spent drop pod. Whatever was inside is already out.
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Transform
+    noRot: true
+  - type: Sprite
+    sprite: _StarHorizon/Structures/DropPod/syndicate.rsi
+    noRot: true
+    drawdepth: Objects
+    layers:
+    - state: ground
+      map: [ "ground" ]
+      visible: false
+    - state: base-down-open
+      map: [ "pod" ]
+      visible: false
+    - state: down-door-close
+      map: [ "door" ]
+      visible: false
+  - type: Appearance
+  - type: GenericVisualizer
+    visuals:
+      enum.ExpeditionCargoPodVisuals.Stage:
+        ground:
+          Falling: { visible: false }
+          Landed: { visible: true }
+          Open: { visible: true }
+        pod:
+          Falling: { visible: false }
+          Landed: { visible: true }
+          Open: { visible: true }
+        door:
+          Falling: { visible: false }
+          Landed: { visible: true }
+          Open: { visible: false }
+  - type: Clickable
+  - type: InteractionOutline
+  - type: ContainerContainer
+    containers:
+      cargo: !type:Container
+  - type: PointLight
+    enabled: false
+    color: "#ff3030"
+    radius: 2
+    energy: 1.2

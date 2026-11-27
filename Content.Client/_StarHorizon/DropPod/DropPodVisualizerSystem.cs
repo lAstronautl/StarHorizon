@@ -1,5 +1,6 @@
 using System.Numerics;
 using Content.Shared._StarHorizon.DropPod;
+using Content.Shared.Storage;
 using Robust.Client.Animations;
 using Robust.Client.GameObjects;
 using Robust.Shared.Animations;
@@ -8,22 +9,25 @@ namespace Content.Client._StarHorizon.DropPod;
 
 /// <summary>
 /// Анимации капсулы: тряска и уход вниз перед БСС. Падение при приземлении здесь не анимируется:
-/// его показывает отдельная сущность с диагональным спрайтом (см. <c>StarHorizonDropPodLandingAnimation</c>).
+/// его показывает отдельная сущность с вертикальным падением (см. <c>StarHorizonDropPodLandingAnimation</c>).
+/// Видимость слоёв (стоит / упала / дверца / воронка) тоже здесь.
 /// </summary>
 public sealed class DropPodVisualizerSystem : VisualizerSystem<DropPodComponent>
 {
     private const string AnimationKey = "droppod";
 
-    /// <summary>Масштаб спрайта капсулы из прототипа.</summary>
-    private static readonly Vector2 BaseScale = new(0.75f, 0.75f);
+    /// <summary>Масштаб спрайта капсулы из прототипа (свои спрайты капсул нарисованы в размер).</summary>
+    private static readonly Vector2 BaseScale = Vector2.One;
 
-    /// <summary>Капсула стоит носом вверх: спрайт повёрнут на 180° (как в прототипе).</summary>
-    private static readonly Angle BaseRotation = Angle.FromDegrees(180);
+    /// <summary>Капсула нарисована носом вверх, спрайт не поворачиваем.</summary>
+    private static readonly Angle BaseRotation = Angle.Zero;
 
     protected override void OnAppearanceChange(EntityUid uid, DropPodComponent component, ref AppearanceChangeEvent args)
     {
         if (args.Sprite == null)
             return;
+
+        UpdateLayers((uid, args.Sprite), args.Component);
 
         if (!AppearanceSystem.TryGetData<DropPodState>(uid, DropPodVisuals.State, out var state, args.Component))
             return;
@@ -44,6 +48,30 @@ public sealed class DropPodVisualizerSystem : VisualizerSystem<DropPodComponent>
                 SpriteSystem.SetColor((uid, args.Sprite), Color.White);
                 break;
         }
+    }
+
+    /// <summary>
+    /// Слои капсулы: стоит (корпус и дверца, если закрыта), в полёте скрыта, упала (лежит набок на воронке, дверца,
+    /// если закрыта). Всё в одном месте, чтобы разные визуализаторы не спорили за одни и те же слои.
+    /// </summary>
+    private void UpdateLayers(Entity<SpriteComponent> sprite, AppearanceComponent appearance)
+    {
+        AppearanceSystem.TryGetData<bool>(sprite, DropPodVisuals.InFlight, out var inFlight, appearance);
+        AppearanceSystem.TryGetData<bool>(sprite, DropPodVisuals.Landed, out var landed, appearance);
+        AppearanceSystem.TryGetData<bool>(sprite, StorageVisuals.Open, out var open, appearance);
+
+        var standing = !inFlight && !landed;
+        SetVisible(sprite, "droppodBase", standing);
+        SetVisible(sprite, "droppodDoor", standing && !open);
+        SetVisible(sprite, "droppodGround", landed);
+        SetVisible(sprite, "droppodLanded", landed);
+        SetVisible(sprite, "droppodLandedDoor", landed && !open);
+    }
+
+    private void SetVisible(Entity<SpriteComponent> sprite, string layer, bool visible)
+    {
+        if (SpriteSystem.LayerMapTryGet(sprite.AsNullable(), layer, out var index, false))
+            SpriteSystem.LayerSetVisible(sprite.AsNullable(), index, visible);
     }
 
     /// <summary>Нарастающая тряска, затем капсула взлетает носом вверх: уменьшается и исчезает.</summary>
