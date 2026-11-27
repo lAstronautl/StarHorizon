@@ -1,0 +1,34 @@
+# Чёрный ящик задания «Чёрный ящик» (Retrieval) планетной экспедиции: лежит в самой дальней комнате данжа, мигает
+# красным, тяжёлый (замедляет того, кто несёт) и большой (в рюкзак не влезает, нести в руках).
+- type: entity
+  parent: BaseItem
+  id: ExpeditionBlackBox
+  name: black box
+  description: A flight recorder from a lost vessel. The blinking beacon on it is not the only signal it sends.
+  components:
+  - type: Sprite
+    sprite: _StarHorizon/Objects/Expedition/black_box.rsi
+    layers:
+    - state: icon
+    - state: light
+      shader: unshaded
+  - type: Item
+    sprite: _StarHorizon/Objects/Expedition/black_box.rsi
+    size: Huge
+  - type: HeldSpeedModifier
+    walkModifier: 0.85
+    sprintModifier: 0.85
+  - type: PointLight
+    color: "#FF3030"
+    radius: 2.5
+    energy: 1.5
+  - type: LightBehaviour
+    behaviours:
+    - !type:PulseBehaviour
+      interpolate: Nearest
+      maxDuration: 1.0
+      startValue: 0.2
+      endValue: 1.5
+      isLooped: true
+      property: Energy
+      enabled: true

@@ -17,6 +17,7 @@ namespace Content.Server._StarHorizon.Expedition;
 public sealed class ExpeditionHudSystem : EntitySystem
 {
     [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly Robust.Shared.Prototypes.IPrototypeManager _proto = default!;
     [Dependency] private readonly TransformSystem _xform = default!;
     [Dependency] private readonly ExpeditionWaveSystem _waves = default!;
 
@@ -67,6 +68,22 @@ public sealed class ExpeditionHudSystem : EntitySystem
             objectives.Add(Objective(hud, ExpeditionObjectiveKind.Destroy, destruction.Structures));
         if (TryComp<SalvageEliminationExpeditionComponent>(map, out var elimination))
             objectives.Add(Objective(hud, ExpeditionObjectiveKind.Eliminate, elimination.Megafauna));
+
+        if (TryComp<SalvageRetrievalExpeditionComponent>(map, out var retrieval))
+        {
+            var name = _proto.Index<Robust.Shared.Prototypes.EntityPrototype>(ExpeditionBlackBoxSystem.BlackBoxProto).Name;
+            if (retrieval.Box is { } box && TryComp(box, out MetaDataComponent? boxMeta))
+                name = boxMeta.EntityName;
+
+            objectives.Add(new ExpeditionObjective
+            {
+                Kind = ExpeditionObjectiveKind.Find, Name = name, Total = 1, Done = retrieval.Found ? 1 : 0,
+            });
+            objectives.Add(new ExpeditionObjective
+            {
+                Kind = ExpeditionObjectiveKind.Deliver, Name = name, Total = 1, Done = retrieval.Delivered ? 1 : 0,
+            });
+        }
 
         if (!objectives.SequenceEqual(hud.Objectives))
         {

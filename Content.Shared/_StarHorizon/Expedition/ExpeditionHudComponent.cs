@@ -54,6 +54,12 @@ public enum ExpeditionObjectiveKind : byte
 
     /// <summary>Убить мегафауну.</summary>
     Eliminate,
+
+    /// <summary>Найти (поднять) чёрный ящик.</summary>
+    Find,
+
+    /// <summary>Доставить чёрный ящик на эвакуационный шаттл.</summary>
+    Deliver,
 }
 
 [Serializable, NetSerializable, DataDefinition]

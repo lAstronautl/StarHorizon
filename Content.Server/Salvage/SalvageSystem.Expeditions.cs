@@ -91,6 +91,14 @@ public sealed partial class SalvageSystem
     /// Rolls the planet's single expedition task: a random mission type and a random difficulty that fits the planet's
     /// biome. Called when the planet needs its first task and again as soon as its expedition closes.
     /// </summary>
+    /// <summary>StarHorizon: типы заданий планет (Combined выдаётся отдельно, только на Inferno).</summary>
+    private static readonly SalvageMissionType[] PlanetMissionTypes =
+    {
+        SalvageMissionType.Destruction,
+        SalvageMissionType.Elimination,
+        SalvageMissionType.Retrieval,
+    };
+
     public void RollPlanetMission(Entity<ExpeditionPlanetComponent> planet)
     {
         var pickable = _missionDifficulties.Where(d => BiomeFitsDifficulty(planet.Comp.BiomeId, d.id)).ToList();
@@ -105,7 +113,7 @@ public sealed partial class SalvageSystem
         // For Inferno difficulty, always use Combined mission type
         var missionType = difficulty == "Inferno"
             ? SalvageMissionType.Combined
-            : (SalvageMissionType) _random.NextByte((byte) SalvageMissionType.Max + 1);
+            : PlanetMissionTypes[_random.Next(PlanetMissionTypes.Length)];
 
         planet.Comp.Mission = new SalvageMissionParams
         {

@@ -355,6 +355,9 @@ public sealed class SpawnSalvageMissionJob : Job<bool>
                 await SetupStructure(mission, dungeon, grid, random);
                 await SetupElimination(mission, dungeon, grid, random);
                 break;
+            case SalvageMissionType.Retrieval: // StarHorizon
+                await SetupRetrieval(dungeon, grid, random, expedition.LandingCoordinates);
+                break;
             default:
                 _sawmill.Warning($"No setup function for salvage mission type {_missionParams.MissionType}!");
                 break;
@@ -615,4 +618,37 @@ public sealed class SpawnSalvageMissionJob : Job<bool>
             eliminationComp.Megafauna.Add(uid);
     }
     // End Frontier: mission-specific setup functions
+
+    /// <summary>
+    /// StarHorizon: чёрный ящик лежит в комнате данжа, самой дальней от места посадки, чтобы до него пришлось пробиваться.
+    /// </summary>
+    private async Task SetupRetrieval(Dungeon dungeon, MapGridComponent grid, Random random, Vector2 landing)
+    {
+        await SuspendIfOutOfTime();
+
+        var retrieval = _entManager.EnsureComponent<Content.Server._StarHorizon.Expedition.SalvageRetrievalExpeditionComponent>(mapUid);
+        var rooms = dungeon.Rooms.OrderByDescending(r => (r.Center - landing).LengthSquared()).ToList();
+        var tiles = new List<Vector2i>();
+
+        foreach (var room in rooms)
+        {
+            tiles.Clear();
+            tiles.AddRange(room.Tiles);
+            random.Shuffle(tiles);
+
+            foreach (var tile in tiles)
+            {
+                if (!_anchorable.TileFree(grid, tile, (int) CollisionGroup.MachineLayer, (int) CollisionGroup.MachineLayer))
+                    continue;
+
+                var box = _entManager.SpawnEntity(Content.Server._StarHorizon.Expedition.ExpeditionBlackBoxSystem.BlackBoxProto,
+                    _map.GridTileToLocal(mapUid, grid, tile));
+                retrieval.Box = box;
+                _entManager.EnsureComponent<Content.Server._StarHorizon.Expedition.ExpeditionBlackBoxComponent>(box).Expedition = mapUid;
+                return;
+            }
+        }
+
+        _sawmill.Warning("Retrieval expedition: no free tile in the dungeon for the black box");
+    }
 }

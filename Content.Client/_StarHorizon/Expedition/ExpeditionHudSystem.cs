@@ -89,9 +89,13 @@ public sealed class ExpeditionHudSystem : EntitySystem
         view.Objectives.Clear();
         foreach (var objective in hud.Objectives)
         {
-            var key = objective.Kind == ExpeditionObjectiveKind.Destroy
-                ? "expedition-hud-objective-destroy"
-                : "expedition-hud-objective-eliminate";
+            var key = objective.Kind switch
+            {
+                ExpeditionObjectiveKind.Destroy => "expedition-hud-objective-destroy",
+                ExpeditionObjectiveKind.Eliminate => "expedition-hud-objective-eliminate",
+                ExpeditionObjectiveKind.Find => "expedition-hud-objective-find",
+                _ => "expedition-hud-objective-deliver",
+            };
             view.Objectives.Add(new ExpeditionHudObjectiveLine(Loc.GetString(key, ("name", objective.Name)),
                 objective.Done, objective.Total, objective.Finished));
         }

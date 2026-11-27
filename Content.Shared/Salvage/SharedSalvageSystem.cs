@@ -287,5 +287,11 @@ public enum SalvageMissionType : byte
     /// Used for Inferno difficulty.
     /// </summary>
     Combined = 2,
+
+    /// <summary>
+    /// StarHorizon: найти чёрный ящик в глубине данжа и доставить его на эвакуационный шаттл.
+    /// Только для планетных экспедиций.
+    /// </summary>
+    Retrieval = 3,
 }
 // End Frontier

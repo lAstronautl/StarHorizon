@@ -169,6 +169,9 @@ public sealed partial class SalvageSystem
                     Announce(args.MapUid, Loc.GetString("salvage-expedition-announcement-elimination", ("target", targetName), ("count", combinedElimination.Megafauna.Count)));
                 }
                 break;
+            case SalvageMissionType.Retrieval: // StarHorizon
+                Announce(args.MapUid, Loc.GetString("expedition-blackbox-announcement"));
+                break;
             default:
                 break; // No announcement
         }
