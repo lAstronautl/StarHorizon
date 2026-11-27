@@ -28,7 +28,7 @@
         - !type:HTNCompoundTask
           task: IdleCompound
 
-# Дальники идут к игроку только до дальности стрельбы (RangedRange), а не вплотную: ближний бой у них запасной.
+# Дальники идут к игроку до дальности стрельбы, если его видно, а не видно (за стеной) или идут по ножке пути: вплотную.
 - type: htnCompound
   id: PursuePlayerRangedCompound
   branches:
@@ -39,7 +39,8 @@
               key: FollowTarget
           operator: !type:MoveToOperator
             targetKey: FollowTarget
-            rangeKey: RangedRange
+            # PursueRange ставит PursuePlayerSystem: дальность стрельбы, только если игрок виден; иначе вплотную.
+            rangeKey: PursueRange
             pathfindInPlanning: false
             removeKeyOnFinish: false
 

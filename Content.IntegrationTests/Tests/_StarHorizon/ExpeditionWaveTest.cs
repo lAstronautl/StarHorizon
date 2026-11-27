@@ -181,11 +181,13 @@ public sealed class ExpeditionWaveTest
             Assert.That(target.EntityId, Is.EqualTo(player));
         }
 
-        // 5. Мобы идут к игроку: ближайший заметно приблизился.
+        // 5. Мобы идут к игроку: ближайший заметно приблизился. Неподвижных (турели фракций) не считаем.
+        var movers = mobs.Where(m => server.EntMan.HasComponent<Content.Shared.Movement.Components.InputMoverComponent>(m)).ToList();
+        Assert.That(movers, Is.Not.Empty, "в волне есть подвижные мобы");
         var playerPos = xform.GetWorldPosition(player);
-        var startMin = mobs.Min(m => (xform.GetWorldPosition(m) - playerPos).Length());
+        var startMin = movers.Min(m => (xform.GetWorldPosition(m) - playerPos).Length());
         await pair.RunSeconds(15f);
-        var endMin = mobs.Where(server.EntMan.EntityExists).Min(m => (xform.GetWorldPosition(m) - xform.GetWorldPosition(player)).Length());
+        var endMin = movers.Where(server.EntMan.EntityExists).Min(m => (xform.GetWorldPosition(m) - xform.GetWorldPosition(player)).Length());
         Assert.That(endMin, Is.LessThan(startMin).Or.LessThanOrEqualTo(11f), "мобы подошли к игроку (дальники встают на дальности стрельбы, медленные просто ближе, чем были)");
 
         // 5a. Музыка выключается, когда 90% мобов волны в крите или убиты (остаётся 10% и меньше в строю).

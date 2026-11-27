@@ -27,6 +27,16 @@ public sealed class PursuePlayerSystem : EntitySystem
     [Dependency] private readonly RockClearSystem _rocks = default!;
     [Dependency] private readonly Robust.Shared.Containers.SharedContainerSystem _container = default!;
 
+    /// <summary>
+    /// До какой дистанции дальники идут к цели погони. Если игрок в прямой видимости, это дальность стрельбы
+    /// (RangedRange); если его не видно (за стеной) или впереди промежуточная точка пути, подходят вплотную,
+    /// иначе встали бы в 10 м от игрока за стеной и не стреляли.
+    /// </summary>
+    public const string PursueRangeKey = "PursueRange";
+    private const float ClosingRange = 1.5f;
+
+    [Dependency] private readonly Content.Shared.Examine.ExamineSystemShared _examine = default!;
+
     private const string MeleeRoot = "PursueMeleeCompound";
     private const string RangedRoot = "PursueRangedCompound";
     private const string HumanoidRoot = "PursueHumanoidCompound";
@@ -54,6 +64,9 @@ public sealed class PursuePlayerSystem : EntitySystem
             _ => MeleeRoot,
         };
         htn.RootTask = new HTNCompoundTask { Task = root };
+        htn.Blackboard.SetValue(PursueRangeKey, ClosingRange);
+        // Стены в погоне не ломаем: иначе путь прокладывается сквозь стену, и моб (ксенос) долбит её вместо обхода.
+        htn.Blackboard.SetValue(NPCBlackboard.NavSmash, false);
         _htn.Replan(htn);
     }
 
@@ -187,7 +200,20 @@ public sealed class PursuePlayerSystem : EntitySystem
             if (best is { } far && !_container.IsEntityInContainer(uid))
                 waypoint = ChooseWaypoint(uid, pursue, xform, pos, _xform.GetWorldPosition(far));
 
-            if (best == pursue.Followed.Player && waypoint == pursue.Followed.Waypoint)
+            // Дальники: стрелять с дистанции можно, только видя игрока; иначе идти вплотную.
+            var range = ClosingRange;
+            if (waypoint == null && best is { } seen)
+            {
+                var ranged = htn.Blackboard.GetValueOrDefault<float>("RangedRange", EntityManager);
+                if (ranged > ClosingRange && _examine.InRangeUnOccluded(uid, seen, ranged))
+                    range = ranged;
+            }
+
+            var rangeChanged = !MathHelper.CloseTo(htn.Blackboard.GetValueOrDefault<float>(PursueRangeKey, EntityManager), range);
+            if (rangeChanged)
+                htn.Blackboard.SetValue(PursueRangeKey, range);
+
+            if (best == pursue.Followed.Player && waypoint == pursue.Followed.Waypoint && !rangeChanged)
                 continue;
 
             pursue.Target = best;
