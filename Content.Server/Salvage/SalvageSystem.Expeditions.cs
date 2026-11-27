@@ -97,6 +97,9 @@ public sealed partial class SalvageSystem
         SalvageMissionType.Destruction,
         SalvageMissionType.Elimination,
         SalvageMissionType.Retrieval,
+        SalvageMissionType.Mining,
+        SalvageMissionType.Repair,
+        SalvageMissionType.Sampling,
     };
 
     public void RollPlanetMission(Entity<ExpeditionPlanetComponent> planet)

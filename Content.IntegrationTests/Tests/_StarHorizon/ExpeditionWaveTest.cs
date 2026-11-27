@@ -102,6 +102,7 @@ public sealed class ExpeditionWaveTest
             planet = server.EntMan.SpawnEntity("ExpeditionPlanet", new MapCoordinates(new Vector2(3000, 0), map.MapId));
             var planetComp = server.EntMan.GetComponent<ExpeditionPlanetComponent>(planet);
             server.System<ExpeditionPlanetSystem>().SetupPlanet(planet, planetComp, "Grasslands", 0.5f);
+            salvage.EnsurePlanetMission((planet, planetComp))!.MissionType = Content.Shared.Salvage.SalvageMissionType.Destruction;
             salvage.StartPlanetExpedition((planet, planetComp));
         });
 
@@ -253,6 +254,7 @@ public sealed class ExpeditionWaveTest
             planet = server.EntMan.SpawnEntity("ExpeditionPlanet", new MapCoordinates(new Vector2(3000, 0), map.MapId));
             var planetComp = server.EntMan.GetComponent<ExpeditionPlanetComponent>(planet);
             server.System<ExpeditionPlanetSystem>().SetupPlanet(planet, planetComp, "Grasslands", 0.5f);
+            salvage.EnsurePlanetMission((planet, planetComp))!.MissionType = Content.Shared.Salvage.SalvageMissionType.Destruction;
             salvage.StartPlanetExpedition((planet, planetComp));
         });
 

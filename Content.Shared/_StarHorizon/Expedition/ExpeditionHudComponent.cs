@@ -60,6 +60,25 @@ public enum ExpeditionObjectiveKind : byte
 
     /// <summary>Доставить чёрный ящик на эвакуационный шаттл.</summary>
     Deliver,
+
+    /// <summary>Квота добычи: сдано руды в приёмник.</summary>
+    Quota,
+
+    /// <summary>Сдано образцов в приёмник.</summary>
+    Samples,
+
+    /// <summary>Починено узлов разбитого шаттла.</summary>
+    Repair,
+
+    /// <summary>Оборона шаттла: Done/Total в секундах.</summary>
+    Defend,
+}
+
+/// <summary>Узел разбитого эвакуационного шаттла: починен или нет (экран разбит / работает).</summary>
+[Serializable, NetSerializable]
+public enum ExpeditionRepairVisuals : byte
+{
+    Repaired,
 }
 
 [Serializable, NetSerializable, DataDefinition]

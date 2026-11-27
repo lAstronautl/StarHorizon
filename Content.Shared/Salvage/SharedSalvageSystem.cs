@@ -293,5 +293,14 @@ public enum SalvageMissionType : byte
     /// Только для планетных экспедиций.
     /// </summary>
     Retrieval = 3,
+
+    /// <summary>StarHorizon: квота добычи. Сдать N руды в приёмник, который сбрасывают в капсуле.</summary>
+    Mining = 4,
+
+    /// <summary>StarHorizon: починить узлы разбитого эвакуационного шаттла и удержать его, пока системы запускаются.</summary>
+    Repair = 5,
+
+    /// <summary>StarHorizon: собрать образцы в данже и сдать их в приёмник.</summary>
+    Sampling = 6,
 }
 // End Frontier

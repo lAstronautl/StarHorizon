@@ -44,6 +44,10 @@ public sealed class ExtendedContainerAISystem : EntitySystem
         if (!TryComp<DropPodContainedComponent>(args.Entity, out var contained))
             return;
 
+        // StarHorizon: под удаляется вместе с картой, а мобы внутри уже удаляются: ИИ им не возвращаем.
+        if (TerminatingOrDeleted(args.Entity))
+            return;
+
         if (contained.HadHtn && TryComp<HTNComponent>(args.Entity, out var htn))
             htn.Enabled = contained.HtnWasEnabled;
 

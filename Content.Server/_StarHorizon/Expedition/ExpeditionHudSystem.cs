@@ -85,6 +85,47 @@ public sealed class ExpeditionHudSystem : EntitySystem
             });
         }
 
+        if (TryComp<SalvageMiningExpeditionComponent>(map, out var mining))
+        {
+            objectives.Add(new ExpeditionObjective
+            {
+                Kind = ExpeditionObjectiveKind.Quota, Name = Loc.GetString("expedition-hud-ore"),
+                Total = mining.Quota, Done = Math.Min(mining.Collected, mining.Quota),
+            });
+        }
+
+        if (TryComp<SalvageSamplingExpeditionComponent>(map, out var sampling))
+        {
+            objectives.Add(new ExpeditionObjective
+            {
+                Kind = ExpeditionObjectiveKind.Samples,
+                Name = _proto.Index<Robust.Shared.Prototypes.EntityPrototype>(ExpeditionObjectivesSystem.SampleProto).Name,
+                Total = sampling.Required, Done = Math.Min(sampling.Collected, sampling.Required),
+            });
+        }
+
+        if (TryComp<SalvageRepairExpeditionComponent>(map, out var repair))
+        {
+            var repaired = repair.Points.Count(p => !Exists(p) || Comp<ExpeditionRepairPointComponent>(p).Repaired);
+            objectives.Add(new ExpeditionObjective
+            {
+                Kind = ExpeditionObjectiveKind.Repair, Total = repair.Total,
+                Done = repair.Stage == ExpeditionRepairStage.Repairing ? repaired : repair.Total,
+            });
+
+            var defenseTotal = (int) repair.DefenseDuration.TotalSeconds;
+            var defenseDone = repair.Stage switch
+            {
+                ExpeditionRepairStage.Repairing => 0,
+                ExpeditionRepairStage.Defending => Math.Clamp((int) (_timing.CurTime - repair.DefenseStart).TotalSeconds, 0, defenseTotal),
+                _ => defenseTotal,
+            };
+            objectives.Add(new ExpeditionObjective
+            {
+                Kind = ExpeditionObjectiveKind.Defend, Total = defenseTotal, Done = defenseDone,
+            });
+        }
+
         if (!objectives.SequenceEqual(hud.Objectives))
         {
             hud.Objectives = objectives;

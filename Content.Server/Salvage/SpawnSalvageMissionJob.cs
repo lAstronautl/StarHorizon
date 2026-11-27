@@ -358,6 +358,15 @@ public sealed class SpawnSalvageMissionJob : Job<bool>
             case SalvageMissionType.Retrieval: // StarHorizon
                 await SetupRetrieval(dungeon, grid, random, expedition.LandingCoordinates);
                 break;
+            case SalvageMissionType.Mining: // StarHorizon
+                SetupMining(mission);
+                break;
+            case SalvageMissionType.Sampling: // StarHorizon
+                await SetupSampling(mission, dungeon, grid, random);
+                break;
+            case SalvageMissionType.Repair: // StarHorizon
+                SetupRepair(mission);
+                break;
             default:
                 _sawmill.Warning($"No setup function for salvage mission type {_missionParams.MissionType}!");
                 break;
@@ -650,5 +659,58 @@ public sealed class SpawnSalvageMissionJob : Job<bool>
         }
 
         _sawmill.Warning("Retrieval expedition: no free tile in the dungeon for the black box");
+    }
+
+    /// <summary>StarHorizon: квота добычи растёт со сложностью (по числу целей уничтожения).</summary>
+    private void SetupMining(SalvageMission mission)
+    {
+        var difficulty = _prototypeManager.Index(mission.Difficulty);
+        var mining = _entManager.EnsureComponent<Content.Server._StarHorizon.Expedition.SalvageMiningExpeditionComponent>(mapUid);
+        mining.Quota = Math.Max(20, difficulty.DestructionStructures * 6);
+        _entManager.EnsureComponent<Content.Server._StarHorizon.Expedition.ExpeditionDepotHolderComponent>(mapUid);
+    }
+
+    /// <summary>StarHorizon: образцы по разным комнатам данжа, с запасом в 3 штуки сверх нужного.</summary>
+    private async Task SetupSampling(SalvageMission mission, Dungeon dungeon, MapGridComponent grid, Random random)
+    {
+        await SuspendIfOutOfTime();
+
+        var difficulty = _prototypeManager.Index(mission.Difficulty);
+        var sampling = _entManager.EnsureComponent<Content.Server._StarHorizon.Expedition.SalvageSamplingExpeditionComponent>(mapUid);
+        _entManager.EnsureComponent<Content.Server._StarHorizon.Expedition.ExpeditionDepotHolderComponent>(mapUid);
+        sampling.Required = Math.Clamp(difficulty.DestructionStructures / 2 + 2, 3, 8);
+        var toSpawn = sampling.Required + 3;
+
+        var rooms = dungeon.Rooms.ToList();
+        random.Shuffle(rooms);
+        var tiles = new List<Vector2i>();
+        for (var i = 0; sampling.Samples.Count < toSpawn && i < rooms.Count * 2; i++)
+        {
+            tiles.Clear();
+            tiles.AddRange(rooms[i % rooms.Count].Tiles);
+            random.Shuffle(tiles);
+            foreach (var tile in tiles)
+            {
+                if (!_anchorable.TileFree(grid, tile, (int) CollisionGroup.MachineLayer, (int) CollisionGroup.MachineLayer))
+                    continue;
+
+                var sample = _entManager.SpawnEntity(Content.Server._StarHorizon.Expedition.ExpeditionObjectivesSystem.SampleProto,
+                    _map.GridTileToLocal(mapUid, grid, tile));
+                _entManager.EnsureComponent<Content.Server._StarHorizon.Expedition.ExpeditionSampleComponent>(sample);
+                sampling.Samples.Add(sample);
+                break;
+            }
+        }
+
+        if (sampling.Samples.Count < sampling.Required)
+            sampling.Required = Math.Max(1, sampling.Samples.Count);
+    }
+
+    /// <summary>StarHorizon: сколько узлов чинить на разбитом шаттле (сам шаттл садится в начале, узлы появляются на нём).</summary>
+    private void SetupRepair(SalvageMission mission)
+    {
+        var difficulty = _prototypeManager.Index(mission.Difficulty);
+        var repair = _entManager.EnsureComponent<Content.Server._StarHorizon.Expedition.SalvageRepairExpeditionComponent>(mapUid);
+        repair.Total = Math.Clamp(difficulty.DestructionStructures / 2, 3, 6);
     }
 }

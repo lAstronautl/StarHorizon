@@ -17,6 +17,9 @@ public sealed partial class ExpeditionExtractionComponent : Component
     [ViewVariables] public ExtractionStage Stage;
     [ViewVariables] public EntityUid? Shuttle;
 
+    /// <summary>Эвакуация объявлена (за <see cref="ArriveBefore"/> до конца).</summary>
+    [ViewVariables] public bool Called;
+
     /// <summary>За сколько до конца экспедиции шаттл летит на карту.</summary>
     [DataField] public TimeSpan ArriveBefore = TimeSpan.FromMinutes(3);
 

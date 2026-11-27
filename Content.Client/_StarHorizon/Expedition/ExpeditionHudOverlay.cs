@@ -80,7 +80,7 @@ public sealed class ExpeditionHudOverlay : Overlay
         // Ширина плашки по самой длинной строке.
         var width = h.GetDimensions(_header, header, 1f).X;
         foreach (var o in view.Objectives)
-            width = MathF.Max(width, box + 6 * scale + h.GetDimensions(_text, $"{o.Text}  {o.Done}/{o.Total}", 1f).X);
+            width = MathF.Max(width, box + 6 * scale + h.GetDimensions(_text, $"{o.Text}  {o.Progress}", 1f).X);
         if (view.WaveLine != null)
             width = MathF.Max(width, h.GetDimensions(_text, view.WaveLine, 1f).X);
         width += pad * 2 + 4 * scale;
@@ -105,7 +105,7 @@ public sealed class ExpeditionHudOverlay : Overlay
                 h.DrawRect(check, Muted, filled: false);
 
             var color = o.Finished ? Done : Color.White;
-            h.DrawString(_text, new Vector2(x + box + 6 * scale, y), $"{o.Text}  {o.Done}/{o.Total}", color);
+            h.DrawString(_text, new Vector2(x + box + 6 * scale, y), $"{o.Text}  {o.Progress}", color);
             y += line;
         }
 

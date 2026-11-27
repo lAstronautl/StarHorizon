@@ -84,14 +84,40 @@ public sealed class ExpeditionExtractionSystem : EntitySystem
         var remaining = expedition.EndTime - _timing.CurTime;
         var comp = ent.Comp;
 
-        if (comp.Stage == ExtractionStage.None && remaining < comp.ArriveBefore)
-            SendShuttle(ent, expedition);
+        // Задание «Ремонт шаттла»: шаттл разбитым садится сразу, в начале задания.
+        if (comp.Stage == ExtractionStage.None && HasComp<SalvageRepairExpeditionComponent>(ent))
+            SendShuttle(ent, expedition, crashed: true);
+
+        if (!comp.Called && remaining < comp.ArriveBefore)
+        {
+            comp.Called = true;
+            if (comp.Stage == ExtractionStage.None)
+            {
+                SendShuttle(ent, expedition);
+            }
+            else if (comp.Shuttle is { } crashed && HasComp<ExpeditionBrokenShuttleComponent>(crashed))
+            {
+                // Шаттл так и не починили: присылают резервный с другой стороны, задание провалено.
+                _salvage.Announce(ent.Owner, Loc.GetString("expedition-repair-failed"));
+                SendShuttle(ent, expedition, side: -1f);
+            }
+            else
+            {
+                // Починенный шаттл уже на месте: эвакуация с него.
+                var state = EnsureComp<ExpeditionExtractionStateComponent>(ent.Owner);
+                state.Active = true;
+                Dirty(ent.Owner, state);
+                _salvage.Announce(ent.Owner, Loc.GetString("expedition-extraction-ready",
+                    ("minutes", (int) comp.ArriveBefore.TotalMinutes)));
+            }
+        }
 
         if (comp.Stage == ExtractionStage.ShuttleSent
             && remaining < TimeSpan.FromSeconds(_shuttle.DefaultStartupTime) + comp.DepartMargin
             && comp.Shuttle is { } shuttle
             && TryComp<ExtractionShuttleComponent>(shuttle, out var shuttleComp)
             && shuttleComp.Arrived
+            && !HasComp<ExpeditionBrokenShuttleComponent>(shuttle) // разбитый шаттл не улетает
             && !HasComp<FTLComponent>(shuttle)) // после прилёта у корабля ещё идёт перезарядка прыжка
         {
             Depart(ent, expedition, (shuttle, shuttleComp));
@@ -100,7 +126,10 @@ public sealed class ExpeditionExtractionSystem : EntitySystem
 
     #region Shuttle
 
-    private void SendShuttle(Entity<ExpeditionExtractionComponent> ent, SalvageExpeditionComponent expedition)
+    /// <param name="crashed">Задание «Ремонт шаттла»: шаттл садится в начале и разбит, эвакуация ещё не объявлена.</param>
+    /// <param name="side">С какой стороны от места посадки капсул сесть (резервный шаттл садится с другой стороны).</param>
+    private void SendShuttle(Entity<ExpeditionExtractionComponent> ent, SalvageExpeditionComponent expedition,
+        bool crashed = false, float side = 1f)
     {
         // Даже если не получилось, второй раз не пытаемся: экспедиция просто закроется как обычно.
         ent.Comp.Stage = ExtractionStage.ShuttleSent;
@@ -115,17 +144,30 @@ public sealed class ExpeditionExtractionSystem : EntitySystem
         var shuttle = grid.Value.Owner;
         ent.Comp.Shuttle = shuttle;
         EnsureComp<ExtractionShuttleMarkerComponent>(shuttle);
-        var state = EnsureComp<ExpeditionExtractionStateComponent>(ent.Owner);
-        state.Active = true;
-        Dirty(ent.Owner, state);
+        if (crashed)
+        {
+            EnsureComp<ExpeditionBrokenShuttleComponent>(shuttle);
+        }
+        else
+        {
+            var state = EnsureComp<ExpeditionExtractionStateComponent>(ent.Owner);
+            state.Active = true;
+            Dirty(ent.Owner, state);
+        }
         var shuttleComp = EnsureComp<ExtractionShuttleComponent>(shuttle);
         shuttleComp.Expedition = ent.Owner;
         shuttleComp.DeleteAfter = ent.Comp.DeleteAfter;
 
-        var landing = expedition.LandingCoordinates + new Vector2(ent.Comp.LandingOffset, 0);
+        var landing = expedition.LandingCoordinates + new Vector2(ent.Comp.LandingOffset * side, 0);
         TryComp<ShuttleComponent>(shuttle, out var shuttleData);
         _shuttle.FTLToCoordinates(shuttle, shuttleData, new EntityCoordinates(ent.Owner, landing), Angle.Zero,
             _shuttle.DefaultStartupTime, _shuttle.DefaultTravelTime);
+
+        if (crashed)
+        {
+            _salvage.Announce(ent.Owner, Loc.GetString("expedition-repair-incoming", ("x", (int) landing.X), ("y", (int) landing.Y)));
+            return;
+        }
 
         _salvage.Announce(ent.Owner, Loc.GetString("expedition-extraction-arriving",
             ("x", (int) landing.X), ("y", (int) landing.Y), ("minutes", (int) ent.Comp.ArriveBefore.TotalMinutes)));
@@ -156,7 +198,8 @@ public sealed class ExpeditionExtractionSystem : EntitySystem
         if (!shuttle.Departed)
         {
             shuttle.Arrived = true;
-            if (Exists(shuttle.Expedition))
+            // О разбитом шаттле объявляет задание ремонта (сколько узлов чинить).
+            if (Exists(shuttle.Expedition) && !HasComp<ExpeditionBrokenShuttleComponent>(args.Entity))
             {
                 _salvage.Announce(shuttle.Expedition, Loc.GetString("expedition-extraction-arrived"));
             }
@@ -206,7 +249,8 @@ public sealed class ExpeditionExtractionSystem : EntitySystem
 
     private void OnShuttleShutdown(Entity<ExtractionShuttleComponent> ent, ref ComponentShutdown args)
     {
-        if (Exists(ent.Comp.Expedition) && TryComp<ExpeditionExtractionComponent>(ent.Comp.Expedition, out var extraction))
+        if (Exists(ent.Comp.Expedition) && TryComp<ExpeditionExtractionComponent>(ent.Comp.Expedition, out var extraction)
+            && extraction.Shuttle == ent.Owner)
             extraction.Shuttle = null;
     }
 

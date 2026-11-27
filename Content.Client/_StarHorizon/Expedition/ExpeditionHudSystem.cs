@@ -24,7 +24,7 @@ public enum ExpeditionHudPhase : byte
 }
 
 /// <summary>Строка задачи интерфейса.</summary>
-public readonly record struct ExpeditionHudObjectiveLine(string Text, int Done, int Total, bool Finished);
+public readonly record struct ExpeditionHudObjectiveLine(string Text, int Done, int Total, bool Finished, string Progress);
 
 /// <summary>Всё, что рисует интерфейс экспедиции в этот кадр.</summary>
 public sealed class ExpeditionHudView
@@ -94,10 +94,27 @@ public sealed class ExpeditionHudSystem : EntitySystem
                 ExpeditionObjectiveKind.Destroy => "expedition-hud-objective-destroy",
                 ExpeditionObjectiveKind.Eliminate => "expedition-hud-objective-eliminate",
                 ExpeditionObjectiveKind.Find => "expedition-hud-objective-find",
-                _ => "expedition-hud-objective-deliver",
+                ExpeditionObjectiveKind.Deliver => "expedition-hud-objective-deliver",
+                ExpeditionObjectiveKind.Quota => "expedition-hud-objective-quota",
+                ExpeditionObjectiveKind.Samples => "expedition-hud-objective-samples",
+                ExpeditionObjectiveKind.Repair => "expedition-hud-objective-repair",
+                _ => "expedition-hud-objective-defend",
             };
+
+            // Оборона: сколько ещё держаться (мм:сс), остальное: сделано/всего.
+            string progress;
+            if (objective.Kind == ExpeditionObjectiveKind.Defend)
+            {
+                var left = Math.Max(0, objective.Total - objective.Done);
+                progress = $"{left / 60}:{left % 60:00}";
+            }
+            else
+            {
+                progress = $"{objective.Done}/{objective.Total}";
+            }
+
             view.Objectives.Add(new ExpeditionHudObjectiveLine(Loc.GetString(key, ("name", objective.Name)),
-                objective.Done, objective.Total, objective.Finished));
+                objective.Done, objective.Total, objective.Finished, progress));
         }
 
         view.Completed = hud.Completed;
@@ -117,22 +134,25 @@ public sealed class ExpeditionHudSystem : EntitySystem
             view.Phase = ExpeditionHudPhase.Aboard;
             view.Timer = hud.EndTime - now;
         }
-        else if (hud.ShuttleLanded)
-        {
-            view.Phase = ExpeditionHudPhase.Return;
-            view.Timer = hud.EndTime - now;
-            view.ToShuttle = hud.ShuttlePosition - _xform.GetWorldPosition(xform);
-        }
-        else if (now >= hud.ExtractionAt)
-        {
-            view.Phase = ExpeditionHudPhase.ShuttleIncoming;
-            view.Timer = hud.EndTime - now;
-        }
-        else
+        else if (now < hud.ExtractionAt)
         {
             view.Phase = ExpeditionHudPhase.Countdown;
             view.Timer = hud.ExtractionAt - now;
         }
+        else if (hud.ShuttleLanded)
+        {
+            view.Phase = ExpeditionHudPhase.Return;
+            view.Timer = hud.EndTime - now;
+        }
+        else
+        {
+            view.Phase = ExpeditionHudPhase.ShuttleIncoming;
+            view.Timer = hud.EndTime - now;
+        }
+
+        // Шаттл на карте (эвакуационный или разбитый в задании ремонта): расстояние и стрелка к нему.
+        if (hud.ShuttleLanded && view.Phase != ExpeditionHudPhase.Aboard && now < hud.EndTime)
+            view.ToShuttle = hud.ShuttlePosition - _xform.GetWorldPosition(xform);
 
         return true;
     }

@@ -172,6 +172,17 @@ public sealed partial class SalvageSystem
             case SalvageMissionType.Retrieval: // StarHorizon
                 Announce(args.MapUid, Loc.GetString("expedition-blackbox-announcement"));
                 break;
+            case SalvageMissionType.Mining: // StarHorizon
+                if (TryComp<Content.Server._StarHorizon.Expedition.SalvageMiningExpeditionComponent>(args.MapUid, out var miningObjective))
+                    Announce(args.MapUid, Loc.GetString("expedition-quota-announcement", ("count", miningObjective.Quota)));
+                break;
+            case SalvageMissionType.Sampling: // StarHorizon
+                if (TryComp<Content.Server._StarHorizon.Expedition.SalvageSamplingExpeditionComponent>(args.MapUid, out var samplingObjective))
+                    Announce(args.MapUid, Loc.GetString("expedition-samples-announcement", ("count", samplingObjective.Required)));
+                break;
+            case SalvageMissionType.Repair: // StarHorizon
+                Announce(args.MapUid, Loc.GetString("expedition-repair-announcement"));
+                break;
             default:
                 break; // No announcement
         }

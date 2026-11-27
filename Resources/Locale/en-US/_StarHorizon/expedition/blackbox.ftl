@@ -5,3 +5,30 @@ expedition-blackbox-delivered = The black box is aboard the shuttle. Objective c
 expedition-blackbox-lost = The black box was destroyed. Objective failed.
 expedition-hud-objective-find = Find: {$name}
 expedition-hud-objective-deliver = Bring to the shuttle: {$name}
+
+salvage-expedition-type-Mining = Mining Quota
+salvage-expedition-type-Repair = Shuttle Repair
+salvage-expedition-type-Sampling = Sample Collection
+
+expedition-depot-dropped = A depot was dropped next to you. Deposit your haul into it.
+expedition-depot-rejected = The depot does not accept this.
+expedition-depot-accepted = Accepted: {$count}
+expedition-quota-announcement = Objective: mine and deposit {$count} ore into the depot. The depot will be dropped in a pod.
+expedition-quota-done = Mining quota complete!
+expedition-samples-announcement = Objective: find glowing samples in the complex and deposit {$count} into the depot. The depot will be dropped in a pod.
+expedition-samples-done = Samples collected. Objective complete!
+expedition-repair-announcement = Objective: the extraction shuttle crashed on landing. Repair its nodes and hold the shuttle while its systems start up.
+expedition-repair-incoming = The extraction shuttle is losing control and going down near ({$x}, {$y})!
+expedition-repair-crashed = Hard landing. Damaged nodes: {$count}. Repair them.
+expedition-repair-start = You start repairing the node...
+expedition-repair-point-done = Node repaired.
+expedition-repair-defend = Nodes repaired, systems starting. Hold the shuttle for {$seconds} seconds: enemies are coming!
+expedition-repair-done = Shuttle systems are online. The shuttle is ready for extraction!
+expedition-repair-failed = The shuttle was not repaired. Sending a backup shuttle. Objective failed.
+expedition-extraction-ready = Extraction in {$minutes} min from your shuttle. Don't miss it!
+
+expedition-hud-ore = ore
+expedition-hud-objective-quota = Deposit ore
+expedition-hud-objective-samples = Deposit: {$name}
+expedition-hud-objective-repair = Repair shuttle nodes
+expedition-hud-objective-defend = Hold the shuttle

@@ -125,6 +125,25 @@ public sealed class ExpeditionWaveSystem : EntitySystem
     private TimeSpan Delay(float min, float max) => TimeSpan.FromSeconds(_random.NextFloat(min, max));
 
     /// <summary>Мобы волны, которые ещё в строю: не убиты и не в крите (для музыки, 90% выбыло: волна закончилась).</summary>
+    /// <summary>
+    /// Сбросить сущность в дроп-поде (как мобов волны) на свободный открытый тайл рядом с точкой. Сущность выходит из
+    /// пода при посадке. Возвращает false, если места или пода нет (тогда сущность ставится прямо в точку).
+    /// </summary>
+    public bool DropCargo(EntityUid map, Vector2 near, EntityUid cargo)
+    {
+        var coords = _rocks.FindDropTile(map, near, 3f, 7f, _random) ?? new EntityCoordinates(map, near);
+        var pod = Spawn(PodProto, coords);
+        if (!_container.TryGetContainer(pod, PodContainer, out var container) || !_container.Insert(cargo, container))
+        {
+            QueueDel(pod);
+            _xform.SetCoordinates(cargo, coords);
+            return false;
+        }
+
+        _trigger.Trigger(pod);
+        return true;
+    }
+
     public int CountFightingWaveMobs(EntityUid map)
     {
         var fighting = 0;

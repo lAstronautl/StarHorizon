@@ -1,0 +1,96 @@
+# Сущности заданий планетных экспедиций: приёмник (квота добычи, сбор образцов), образец, узел разбитого шаттла.
+
+# Приёмник: сбрасывают в капсуле рядом с первым игроком, руду и образцы сдают в него (руками или сразу из сумки).
+- type: entity
+  id: ExpeditionDepot
+  name: expedition depot
+  description: An automated receiver. Ore and samples put in it are counted and sent to orbit right away.
+  components:
+  - type: Sprite
+    sprite: Structures/Storage/orebox.rsi
+    layers:
+    - state: orebox
+      color: "#E8A040"
+  - type: Clickable
+  - type: InteractionOutline
+  - type: Physics
+    bodyType: Static
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.4,-0.4,0.4,0.4"
+        density: 200
+        mask:
+        - MachineMask
+        layer:
+        - MachineLayer
+  - type: PointLight
+    color: "#F0A030"
+    radius: 3
+    energy: 1.5
+
+# Образец: светящийся кристалл, лежит в комнатах данжа.
+- type: entity
+  parent: BaseItem
+  id: ExpeditionSample
+  name: alien sample
+  description: A glowing crystalline growth. Scientists pay well for these.
+  components:
+  - type: Sprite
+    sprite: Objects/Materials/Shards/crystal.rsi
+    layers:
+    - state: shard1
+      color: "#7CF5FF"
+      shader: unshaded
+  - type: Item
+    size: Small
+  - type: PointLight
+    color: "#7CF5FF"
+    radius: 2
+    energy: 1.2
+
+# Повреждённый узел разбитого эвакуационного шаттла: разбитый экран, после ремонта (руками, несколько секунд) работает.
+- type: entity
+  id: ExpeditionRepairPoint
+  name: damaged shuttle node
+  description: One of the shuttle systems knocked out in the crash. It can be patched up by hand.
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Transform
+    anchored: true
+  - type: Sprite
+    sprite: Structures/Machines/computers.rsi
+    layers:
+    - state: computer
+    - state: screen_broken
+      map: [ "screen" ]
+      shader: unshaded
+  - type: Appearance
+  - type: GenericVisualizer
+    visuals:
+      enum.ExpeditionRepairVisuals.Repaired:
+        screen:
+          True: { state: engine }
+          False: { state: screen_broken }
+  - type: Clickable
+  - type: InteractionOutline
+  - type: Physics
+    bodyType: Static
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.45,-0.45,0.45,0.45"
+        density: 200
+        mask:
+        - MachineMask
+        layer:
+        - MachineLayer
+  - type: PointLight
+    color: "#FF6A30"
+    radius: 1.5
+    energy: 1
