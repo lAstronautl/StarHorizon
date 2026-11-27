@@ -279,6 +279,7 @@ public sealed class ExpeditionMusicSystem : EntitySystem
         _stream = null;
         _queue.Clear();
         _refill = null;
+        _pendingTittle = null;
         _contentAudio.DisableAmbientMusic();
 
         var lib = Library;
@@ -290,9 +291,20 @@ public sealed class ExpeditionMusicSystem : EntitySystem
                 break;
 
             case Scene.Ambient:
-                // После посадки капсулы сначала стингер, потом фон по кругу.
+                // После посадки капсулы сначала стингер, потом фон по кругу. Стингер подогнан так, чтобы закончиться
+                // в момент касания земли: до его старта тишина, фон начнётся после него.
                 if (previous == Scene.Pod && lib.Tittle.Count > 0)
-                    _queue.Enqueue(new Track(Take("tittle", lib.Tittle)!, false));
+                {
+                    var tittle = Take("tittle", lib.Tittle)!;
+                    var length = TrackLength(tittle);
+                    _pendingTittle = tittle;
+                    _pendingTittleAt = TryGetLandAt() is { } landAt
+                        ? landAt - TimeSpan.FromSeconds(length)
+                        : _timing.CurTime;
+                    _refill = () => Shuffled(lib.Ambiance);
+                    return;
+                }
+
                 _refill = () => Shuffled(lib.Ambiance);
                 break;
 
@@ -335,6 +347,18 @@ public sealed class ExpeditionMusicSystem : EntitySystem
         if (!_hasKey || _scene == Scene.None)
             return;
 
+        // Стингер посадки ждёт своего момента, чтобы закончиться ровно при касании земли.
+        if (_pendingTittle is { } tittle)
+        {
+            var now = _timing.CurTime;
+            if (now < _pendingTittleAt)
+                return;
+
+            _pendingTittle = null;
+            PlayTittle(tittle, (float) (now - _pendingTittleAt).TotalSeconds);
+            return;
+        }
+
         if (_stream is { } stream && Exists(stream) && !Terminating(stream))
         {
             // Бесшовный переход: следующий (уже предзагруженный) трек стартует за долю секунды до конца текущего.
@@ -351,6 +375,56 @@ public sealed class ExpeditionMusicSystem : EntitySystem
 
         StartNext(fadeIn: false);
     }
+
+    /// <summary>
+    /// Стингер посадки. Если он длиннее, чем осталось до касания (ключ вставили поздно, сервер запоздал), начало
+    /// пропускается, чтобы конец всё равно пришёлся на касание.
+    /// </summary>
+    private void PlayTittle(string path, float late)
+    {
+        var stream = _audio.PlayGlobal(path, Filter.Local(), false, AudioParams.Default.WithVolume(Volume()));
+        _stream = stream?.Entity;
+        _currentGapless = true;
+        _currentLength = TrackLength(path);
+
+        if (late > 0.05f && late < _currentLength && _stream is { } entity)
+            _audio.SetPlaybackPosition(entity, late);
+
+        if (_queue.Count == 0 && _refill != null)
+        {
+            foreach (var track in _refill())
+                _queue.Enqueue(track);
+        }
+
+        if (_queue.TryPeek(out var next))
+            Preload(next.Path);
+    }
+
+    private float TrackLength(string path)
+    {
+        return (float) _audio.GetAudioLength(new ResolvedPathSpecifier(new ResPath(path))).TotalSeconds;
+    }
+
+    /// <summary>Когда капсула игрока коснётся земли (время сервера), если игрок сейчас в капсуле.</summary>
+    private TimeSpan? TryGetLandAt()
+    {
+        if (_player.LocalEntity is not { } player
+            || !_container.TryGetContainingContainer((player, null, null), out var podContainer)
+            || !HasComp<DropPodComponent>(podContainer.Owner)
+            || !_appearance.TryGetData<double>(podContainer.Owner, DropPodVisuals.LandAt, out var seconds))
+        {
+            return null;
+        }
+
+        return TimeSpan.FromSeconds(seconds);
+    }
+
+    /// <summary>Стингер посадки, который ждёт своего момента, и когда его запустить.</summary>
+    private string? _pendingTittle;
+    private TimeSpan _pendingTittleAt;
+
+    /// <summary>Стингер ждёт запуска (для тестов).</summary>
+    public bool TittlePending => _pendingTittle != null;
 
     private void StartNext(bool fadeIn)
     {
@@ -484,6 +558,7 @@ public sealed class ExpeditionMusicSystem : EntitySystem
         _lossStream = null;
         _queue.Clear();
         _refill = null;
+        _pendingTittle = null;
         _scene = Scene.None;
         _keyEntity = null;
         _library = null;

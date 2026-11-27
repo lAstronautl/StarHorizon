@@ -202,6 +202,23 @@ public sealed class ExpeditionMusicTest
         await SetState(Content.Shared._StarHorizon.DropPod.DropPodState.InBluespace);
         Assert.That(music.CurrentScene, Is.EqualTo("Pod"), "в БСС играет музыка полёта");
 
+        // Экран переключён на место посадки (карта экспедиции): стингер ждёт, чтобы закончиться ровно при касании земли.
+        await server.WaitPost(() =>
+        {
+            var expedition = server.EntMan.AddComponent<Content.Server.Salvage.Expeditions.SalvageExpeditionComponent>(map.MapUid);
+            expedition.SelectedSong = new Robust.Shared.Audio.ResolvedPathSpecifier("/Audio/Expedition/deadline.ogg");
+            expedition.MissionParams = new Content.Shared.Salvage.Expeditions.SalvageMissionParams();
+            expedition.EndTime = server.Resolve<Robust.Shared.Timing.IGameTiming>().CurTime + TimeSpan.FromHours(1);
+            var landAt = server.Resolve<Robust.Shared.Timing.IGameTiming>().CurTime + TimeSpan.FromSeconds(8);
+            appearance.SetData(pod, Content.Shared._StarHorizon.DropPod.DropPodVisuals.LandAt, landAt.TotalSeconds);
+        });
+        await SetState(Content.Shared._StarHorizon.DropPod.DropPodState.Arriving);
+        Assert.That(music.CurrentScene, Is.EqualTo("Ambient"), "экран переключён: сцена посадки");
+        Assert.That(music.TittlePending, "до касания ещё далеко: стингер ждёт своего момента");
+
+        await pair.RunSeconds(8f);
+        Assert.That(music.TittlePending, Is.False, "стингер запущен к моменту касания");
+
         await pair.CleanReturnAsync();
     }
 

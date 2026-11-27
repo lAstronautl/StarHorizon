@@ -945,6 +945,9 @@ public sealed class DropPodSystem : EntitySystem
         // Камера на месте посадки за 5 с до столкновения: виньетка сразу падает до 50% и дальше плавно снимается, зум плавно приближается.
         SetVignette(ent, 0.5f, 0f, ent.Comp.ArrivalViewTime);
         SetState(ent, DropPodState.Arriving, ent.Comp.ArrivalViewTime);
+        // Касание земли: после снятия виньетки (ArrivalViewTime) и анимации падения (FallTime).
+        _appearance.SetData(ent, DropPodVisuals.LandAt,
+            (_timing.CurTime + ent.Comp.ArrivalViewTime + ent.Comp.FallTime).TotalSeconds);
     }
 
     /// <summary>

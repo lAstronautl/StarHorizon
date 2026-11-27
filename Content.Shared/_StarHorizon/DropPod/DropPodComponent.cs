@@ -195,6 +195,11 @@ public enum DropPodVisuals : byte
     State,
     /// <summary>true - капсула приземлилась: вместо обычного спрайта рисуется спрайт упавшей капсулы (как у Goobstation).</summary>
     Landed,
+    /// <summary>
+    /// Когда капсула коснётся земли: <see cref="Robust.Shared.Timing.IGameTiming.CurTime"/> в секундах (double).
+    /// Ставится при переключении камеры на место посадки, по нему клиент подгоняет стингер посадки.
+    /// </summary>
+    LandAt,
 }
 
 /// <summary>Куда и когда должна лететь капсула (задаёт консоль).</summary>
