@@ -79,6 +79,15 @@ public sealed class ExpeditionWaveSystem : EntitySystem
             Dirty(ent.Owner, waveState);
         }
 
+        // Эвакуация: вместо обычных волн частые маленькие без объявления.
+        if (TryComp<ExpeditionExtractionStateComponent>(ent, out var extraction) && extraction.Active)
+        {
+            UpdateExtractionWaves(ent, expedition);
+            return;
+        }
+
+        ent.Comp.NextExtractionWave = null;
+
         if (expedition.EndTime - now < ent.Comp.StopBefore)
             return;
 
@@ -120,6 +129,30 @@ public sealed class ExpeditionWaveSystem : EntitySystem
 
         waves.NextWave = _timing.CurTime + Delay(waves.IntervalMin, waves.IntervalMax);
         return SpawnWave((map, waves), expedition);
+    }
+
+    private void UpdateExtractionWaves(Entity<ExpeditionWavesComponent> ent, SalvageExpeditionComponent expedition)
+    {
+        var now = _timing.CurTime;
+        if (expedition.EndTime - now < ent.Comp.ExtractionStopBefore)
+            return;
+
+        _pursue.GetAlivePlayers(ent.Owner, _players);
+        if (_players.Count == 0)
+            return;
+
+        // Первая эвакуационная волна тоже через 20-40 с после вызова шаттла.
+        if (ent.Comp.NextExtractionWave is not { } next)
+        {
+            ent.Comp.NextExtractionWave = now + Delay(ent.Comp.ExtractionIntervalMin, ent.Comp.ExtractionIntervalMax);
+            return;
+        }
+
+        if (now < next)
+            return;
+
+        ent.Comp.NextExtractionWave = now + Delay(ent.Comp.ExtractionIntervalMin, ent.Comp.ExtractionIntervalMax);
+        SpawnWave(ent, expedition, ent.Comp.ExtractionBudgetFraction, quiet: true);
     }
 
     private TimeSpan Delay(float min, float max) => TimeSpan.FromSeconds(_random.NextFloat(min, max));
@@ -185,7 +218,10 @@ public sealed class ExpeditionWaveSystem : EntitySystem
     /// Спавнит волну: тратит бюджет сложности целиком, мобы падают группами в дроп-подах Goobstation (DropPodspawner)
     /// у места, где начал первый игрок. Возвращает число мобов.
     /// </summary>
-    public int SpawnWave(Entity<ExpeditionWavesComponent> ent, SalvageExpeditionComponent expedition)
+    /// <param name="budgetFraction">Доля mobBudget; null: обычная случайная (<see cref="ExpeditionWavesComponent.BudgetFractionMin"/>..Max).</param>
+    /// <param name="quiet">Без объявления и без боевой музыки (эвакуационные волны).</param>
+    public int SpawnWave(Entity<ExpeditionWavesComponent> ent, SalvageExpeditionComponent expedition,
+        float? budgetFraction = null, bool quiet = false)
     {
         if (!TryComp<MapGridComponent>(ent, out var gridComp) || _players.Count == 0)
         {
@@ -229,7 +265,7 @@ public sealed class ExpeditionWaveSystem : EntitySystem
             budgetEntries.Add(entry);
 
         var budget = MathF.Min(
-            difficulty.MobBudget * _random.NextFloat(ent.Comp.BudgetFractionMin, ent.Comp.BudgetFractionMax),
+            difficulty.MobBudget * (budgetFraction ?? _random.NextFloat(ent.Comp.BudgetFractionMin, ent.Comp.BudgetFractionMax)),
             ent.Comp.MaxWaveBudget);
         var probSum = budgetEntries.Sum(x => x.Prob);
         var random = new Random(_random.Next());
@@ -260,7 +296,7 @@ public sealed class ExpeditionWaveSystem : EntitySystem
             }
         }
 
-        if (spawned > 0)
+        if (spawned > 0 && !quiet)
         {
             ent.Comp.WaveTotal += counted;
             var state = EnsureComp<ExpeditionWaveStateComponent>(ent.Owner);

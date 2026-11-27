@@ -22,6 +22,19 @@ public sealed partial class ExpeditionWavesComponent : Component
     /// <summary>Потолок бюджета одной волны (по умолчанию не ограничен, ограничивает MaxAliveWaveMobs).</summary>
     [DataField] public float MaxWaveBudget = 10000f;
 
+    /// <summary>
+    /// Во время эвакуации (шаттл вызван) обычные волны не идут, вместо них часто и без объявления падают маленькие:
+    /// эта доля mobBudget раз в <see cref="ExtractionIntervalMin"/>..<see cref="ExtractionIntervalMax"/> секунд.
+    /// </summary>
+    [DataField] public float ExtractionBudgetFraction = 0.1f;
+    [DataField] public float ExtractionIntervalMin = 20f;
+    [DataField] public float ExtractionIntervalMax = 40f;
+
+    /// <summary>За сколько до конца эвакуационные волны прекращаются (под падает ~10 с, позже мобы не успеют).</summary>
+    [DataField] public TimeSpan ExtractionStopBefore = TimeSpan.FromSeconds(15);
+
+    [ViewVariables] public TimeSpan? NextExtractionWave;
+
     /// <summary>Сколько мобов падает в одном дроп-поде.</summary>
     [DataField] public int MobsPerPod = 6;
 

@@ -320,6 +320,75 @@ public sealed class ExpeditionWaveTest
         await pair.CleanReturnAsync();
     }
 
+    /// <summary>
+    /// Во время эвакуации обычные волны не идут, а каждые 20-40 с падают маленькие (10% бюджета) без объявления и без
+    /// боевой музыки.
+    /// </summary>
+    [Test]
+    public async Task ExtractionWavesAreSmallFrequentAndQuiet()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { FailureLogLevel = LogLevel.Fatal, Connected = true, Dirty = true });
+        var server = pair.Server;
+        var map = await pair.CreateTestMap();
+        var salvage = server.System<SalvageSystem>();
+        var timing = server.Resolve<IGameTiming>();
+
+        EntityUid planet = default;
+        await server.WaitPost(() =>
+        {
+            planet = server.EntMan.SpawnEntity("ExpeditionPlanet", new MapCoordinates(new Vector2(3000, 0), map.MapId));
+            var planetComp = server.EntMan.GetComponent<ExpeditionPlanetComponent>(planet);
+            server.System<ExpeditionPlanetSystem>().SetupPlanet(planet, planetComp, "Grasslands", 0.5f);
+            salvage.EnsurePlanetMission((planet, planetComp))!.MissionType = Content.Shared.Salvage.SalvageMissionType.Destruction;
+            salvage.StartPlanetExpedition((planet, planetComp));
+        });
+
+        var comp = server.EntMan.GetComponent<ExpeditionPlanetComponent>(planet);
+        for (var attempt = 0; attempt < 3 && comp.Status != PlanetExpeditionStatus.Active; attempt++)
+        {
+            if (comp.Status == PlanetExpeditionStatus.Idle && attempt > 0)
+                await server.WaitPost(() => salvage.StartPlanetExpedition((planet, comp)));
+
+            for (var i = 0; i < 60 && comp.Status == PlanetExpeditionStatus.Generating; i++)
+                await pair.RunSeconds(2f);
+        }
+        Assert.That(comp.Status, Is.EqualTo(PlanetExpeditionStatus.Active));
+        var expeditionMap = comp.ExpeditionMap!.Value;
+        var expedition = server.EntMan.GetComponent<SalvageExpeditionComponent>(expeditionMap);
+
+        await server.WaitPost(() =>
+        {
+            server.System<SharedMapSystem>().SetPaused(expeditionMap, false);
+            var player = server.EntMan.SpawnEntity("WaveTestPlayer", new EntityCoordinates(expeditionMap, expedition.LandingCoordinates));
+            server.PlayerMan.SetAttachedEntity(server.PlayerMan.Sessions.First(), player, out _, true);
+            // Эвакуация: шаттл вызывается сразу. Обычная волна "должна" прийти прямо сейчас.
+            expedition.EndTime = timing.CurTime + TimeSpan.FromSeconds(170);
+        });
+        await pair.RunSeconds(2f);
+        var waves = server.EntMan.GetComponent<ExpeditionWavesComponent>(expeditionMap);
+        Assert.That(server.EntMan.GetComponent<Content.Shared._StarHorizon.Expedition.ExpeditionExtractionStateComponent>(expeditionMap).Active, "эвакуация идёт");
+        await server.WaitPost(() => waves.NextWave = timing.CurTime);
+
+        // Первая эвакуационная волна через 20-40 с, обычная не приходит.
+        Assert.That(waves.NextExtractionWave, Is.Not.Null);
+        var first = waves.NextExtractionWave!.Value - timing.CurTime;
+        Assert.That(first.TotalSeconds, Is.InRange(17, 41));
+        await pair.RunSeconds((float) first.TotalSeconds + 2f);
+
+        var mobs = Pursuers(server);
+        Assert.That(mobs, Is.Not.Empty, "эвакуационная волна пришла");
+        Assert.That(waves.WaveTotal, Is.EqualTo(0), "эвакуационная волна не считается обычной");
+        Assert.That(server.EntMan.TryGetComponent<Content.Shared._StarHorizon.Expedition.ExpeditionWaveStateComponent>(expeditionMap, out var state) && state.Active,
+            Is.False, "без боевой музыки и объявления");
+        var next = waves.NextExtractionWave!.Value - timing.CurTime;
+        Assert.That(next.TotalSeconds, Is.InRange(17, 41), "следующая через 20-40 с");
+
+        await pair.RunSeconds((float) next.TotalSeconds + 2f);
+        Assert.That(Pursuers(server).Count, Is.GreaterThan(mobs.Count), "волны идут часто");
+
+        await pair.CleanReturnAsync();
+    }
+
     [Test]
     public async Task PursueRootKeepsCombatStyle()
     {
