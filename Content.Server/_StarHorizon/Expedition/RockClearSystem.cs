@@ -15,6 +15,8 @@ namespace Content.Server._StarHorizon.Expedition;
 public sealed class RockClearSystem : EntitySystem
 {
     [Dependency] private readonly MapSystem _map = default!;
+    [Dependency] private readonly Robust.Shared.Map.IMapManager _mapManager = default!;
+    [Dependency] private readonly TransformSystem _xform = default!;
     [Dependency] private readonly Content.Shared.Parallax.Biomes.SharedBiomeSystem _biome = default!;
 
     /// <summary>
@@ -148,6 +150,123 @@ public sealed class RockClearSystem : EntitySystem
         }
 
         return null;
+    }
+
+    /// <summary>Клетка проходима: свободна, или единственные твёрдые объекты на ней двери (если двери открываются).</summary>
+    public bool IsPassable(EntityUid gridUid, MapGridComponent grid, Vector2i tile, bool passDoors)
+    {
+        if (_map.GetTileRef(gridUid, grid, tile).Tile.IsEmpty)
+            return false;
+
+        foreach (var anchored in _map.GetAnchoredEntities(gridUid, grid, tile))
+        {
+            if (HasComp<GatherableComponent>(anchored))
+                return false;
+
+            if (TryComp<Robust.Shared.Physics.Components.PhysicsComponent>(anchored, out var body) && body.CanCollide && body.Hard
+                && !(passDoors && HasComp<Content.Shared.Doors.Components.DoorComponent>(anchored)))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Клетки грида <paramref name="gridUid"/> (планеты), закрытые стенами и прочими препятствиями других гридов на той же
+    /// карте (севшие шаттлы) в радиусе <paramref name="radius"/> от точки: для поиска пути по клеткам планеты они тоже стены.
+    /// </summary>
+    public HashSet<Vector2i> BlockedByOtherGrids(EntityUid gridUid, MapGridComponent grid, Vector2 center, float radius, bool passDoors)
+    {
+        var blocked = new HashSet<Vector2i>();
+        var mapId = Transform(gridUid).MapID;
+        var box = new Box2(center - new Vector2(radius, radius), center + new Vector2(radius, radius));
+        var grids = new List<Entity<MapGridComponent>>();
+        _mapManager.FindGridsIntersecting(mapId, box, ref grids);
+
+        foreach (var other in grids)
+        {
+            if (other.Owner == gridUid)
+                continue;
+
+            var matrix = _xform.GetWorldMatrix(other.Owner);
+            foreach (var tileRef in _map.GetAllTiles(other.Owner, other.Comp))
+            {
+                if (IsPassable(other.Owner, other.Comp, tileRef.GridIndices, passDoors))
+                    continue;
+
+                // Клетка другого грида может лечь на две клетки планеты (сдвиг, поворот): закрываем все, что задевает.
+                var local = _map.TileCenterToVector((other.Owner, other.Comp), tileRef.GridIndices);
+                foreach (var corner in new[] { new Vector2(-0.4f, -0.4f), new Vector2(0.4f, -0.4f), new Vector2(-0.4f, 0.4f), new Vector2(0.4f, 0.4f), Vector2.Zero })
+                {
+                    var world = Vector2.Transform(local + corner, matrix);
+                    blocked.Add(_map.TileIndicesFor(gridUid, grid, new EntityCoordinates(gridUid, world)));
+                }
+            }
+        }
+
+        return blocked;
+    }
+
+    /// <summary>
+    /// Поле расстояний: сколько шагов (4 стороны) от <paramref name="start"/> до каждой проходимой клетки, не больше
+    /// <paramref name="maxTiles"/> клеток. По нему мобы идут к игроку «под горку»: такой путь всегда реальный.
+    /// </summary>
+    public Dictionary<Vector2i, int> DistanceField(EntityUid gridUid, MapGridComponent grid, Vector2i start, bool passDoors,
+        int maxTiles = 20000, IReadOnlySet<Vector2i>? blocked = null)
+    {
+        var dist = new Dictionary<Vector2i, int> { [start] = 0 };
+        var queue = new Queue<Vector2i>();
+        queue.Enqueue(start);
+
+        while (queue.Count > 0 && dist.Count < maxTiles)
+        {
+            var tile = queue.Dequeue();
+            var steps = dist[tile] + 1;
+            foreach (var next in new[] { tile + Vector2i.Up, tile + Vector2i.Down, tile + Vector2i.Left, tile + Vector2i.Right })
+            {
+                if (dist.ContainsKey(next) || blocked != null && blocked.Contains(next) || !IsPassable(gridUid, grid, next, passDoors))
+                    continue;
+
+                dist[next] = steps;
+                queue.Enqueue(next);
+            }
+        }
+
+        return dist;
+    }
+
+    /// <summary>
+    /// Клетки, до которых можно дойти от <paramref name="start"/> по свободным тайлам (4 стороны, без породы, стен и
+    /// закрытых дверей), с числом шагов. <paramref name="within"/>: только эти клетки (например, клетки комплекса).
+    /// </summary>
+    public List<(Vector2i Tile, int Steps)> Reachable(EntityUid gridUid, MapGridComponent grid, Vector2i start, int maxSteps,
+        IReadOnlySet<Vector2i>? within = null, int maxTiles = 4000)
+    {
+        var result = new List<(Vector2i, int)> { (start, 0) };
+        var seen = new HashSet<Vector2i> { start };
+        var queue = new Queue<(Vector2i, int)>();
+        queue.Enqueue((start, 0));
+
+        while (queue.Count > 0 && seen.Count < maxTiles)
+        {
+            var (tile, steps) = queue.Dequeue();
+            if (steps >= maxSteps)
+                continue;
+
+            foreach (var next in new[] { tile + Vector2i.Up, tile + Vector2i.Down, tile + Vector2i.Left, tile + Vector2i.Right })
+            {
+                if (seen.Contains(next) || within != null && !within.Contains(next) || !IsOpen(gridUid, grid, next))
+                    continue;
+
+                seen.Add(next);
+                result.Add((next, steps + 1));
+                queue.Enqueue((next, steps + 1));
+            }
+        }
+
+        return result;
     }
 
     /// <summary>Ближайший к точке свободный тайл из открытой области (центр тайла в координатах карты-грида), если есть.</summary>

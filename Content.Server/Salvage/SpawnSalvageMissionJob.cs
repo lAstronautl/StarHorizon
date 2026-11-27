@@ -309,9 +309,15 @@ public sealed class SpawnSalvageMissionJob : Job<bool>
             dungeonBox = dungeonBox.ExtendToContain(tile);
         }
 
-        // StarHorizon: центр данжа для компаса интерфейса.
+        // StarHorizon: центр данжа для компаса интерфейса и клетки комплекса для капсул волн.
         if (dungeon.AllTiles.Count > 0)
+        {
             expedition.DungeonCenter = dungeonBox.Center + new Vector2(0.5f, 0.5f);
+            var dungeonTiles = _entManager.EnsureComponent<Content.Server._StarHorizon.Expedition.ExpeditionDungeonTilesComponent>(mapUid);
+            dungeonTiles.Tiles.UnionWith(dungeon.AllTiles);
+            foreach (var room in dungeon.Rooms)
+                dungeonTiles.Tiles.UnionWith(room.Tiles);
+        }
 
         // Get ship bounding box relative to largest grid coords
         var shuttleUid = Shuttle;

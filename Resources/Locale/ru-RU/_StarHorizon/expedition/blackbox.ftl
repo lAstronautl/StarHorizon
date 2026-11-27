@@ -42,3 +42,6 @@ ent-ExpeditionSample = инопланетный образец
     .desc = Светящийся кристаллический нарост. Учёные хорошо платят за такие.
 ent-ExpeditionRepairPoint = повреждённый узел шаттла
     .desc = Одна из систем шаттла, выбитая при крушении. Её можно залатать руками.
+ent-ExpeditionDropSiteMarker = место падения капсул экспедиции
+    .desc = { ent-MarkerBase.desc }
+    .suffix = Капсулы волн

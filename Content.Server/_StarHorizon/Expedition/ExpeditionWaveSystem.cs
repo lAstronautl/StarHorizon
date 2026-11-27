@@ -163,7 +163,9 @@ public sealed class ExpeditionWaveSystem : EntitySystem
     /// </summary>
     public bool DropCargo(EntityUid map, Vector2 near, EntityUid cargo)
     {
-        var coords = _rocks.FindDropTile(map, near, 3f, 7f, _random) ?? new EntityCoordinates(map, near);
+        var coords = FindReachableDropTile(map, near, minSteps: 3, maxSteps: 7)
+                     ?? _rocks.FindDropTile(map, near, 3f, 7f, _random)
+                     ?? new EntityCoordinates(map, near);
         _cargoPods.Drop(coords, new[] { cargo });
         return true;
     }
@@ -277,10 +279,11 @@ public sealed class ExpeditionWaveSystem : EntitySystem
         Log.Info($"Expedition wave: {protos.Count} mobs from {factionId} (budget fraction {budget})");
         var spawned = 0;
         var counted = 0;
+        var taken = new HashSet<Vector2i>();
         for (var i = 0; i < protos.Count; i += ent.Comp.MobsPerPod)
         {
             var group = protos.GetRange(i, Math.Min(ent.Comp.MobsPerPod, protos.Count - i));
-            if (DropPod(ent, (ent.Owner, gridComp), group) is { } fighters)
+            if (DropPod(ent, (ent.Owner, gridComp), group, taken) is { } fighters)
             {
                 spawned += group.Count;
                 counted += fighters;
@@ -303,9 +306,9 @@ public sealed class ExpeditionWaveSystem : EntitySystem
 
     /// <summary>Один дроп-под с группой мобов: падает рядом с игроком, мобы выходят из него на земле.</summary>
     /// <returns>Сколько в поде мобов, которых можно убить (с MobState); null, если под не упал.</returns>
-    private int? DropPod(Entity<ExpeditionWavesComponent> ent, Entity<MapGridComponent> grid, List<string> mobs)
+    private int? DropPod(Entity<ExpeditionWavesComponent> ent, Entity<MapGridComponent> grid, List<string> mobs, HashSet<Vector2i> taken)
     {
-        if (FindDropTile(ent, grid) is not { } coords)
+        if (FindDropTile(ent, grid, taken) is not { } coords)
         {
             Log.Warning($"Expedition wave: no free tile for a drop pod on {ToPrettyString(ent.Owner)}");
             return null;
@@ -360,14 +363,55 @@ public sealed class ExpeditionWaveSystem : EntitySystem
         return result;
     }
 
-    /// <summary>
-    /// Место падения пода: пол данжа рядом со случайным живым игроком. Если рядом данжа нет (игрок снаружи), любой
-    /// свободный тайл из открытой области рядом с ним.
-    /// </summary>
-    private EntityCoordinates? FindDropTile(Entity<ExpeditionWavesComponent> ent, Entity<MapGridComponent> grid)
+    /// <summary>Место падения капсулы волны: достижимая клетка рядом со случайным живым игроком.</summary>
+    private EntityCoordinates? FindDropTile(Entity<ExpeditionWavesComponent> ent, Entity<MapGridComponent> grid, HashSet<Vector2i> taken)
     {
         var center = _random.Pick(_players).Pos;
-        return _rocks.FindDungeonDropTile(grid, center, ent.Comp.DropRingMin, ent.Comp.DropRingMax, _random)
+        return FindReachableDropTile(ent.Owner, center, taken)
                ?? _rocks.FindDropTile(grid, center, ent.Comp.DropRingMin, ent.Comp.DropRingMax, _random);
+    }
+
+    /// <summary>
+    /// Клетка для капсулы, от которой до точки <paramref name="near"/> (игрока) гарантированно есть путь: поиск в ширину по
+    /// свободным клеткам (без стен, породы и закрытых дверей), 5..14 шагов. Если игрок в комплексе, только клетки
+    /// комплекса. Маркеры мест падения (<see cref="ExpeditionDropSiteMarkerComponent"/>) из атласов в первую очередь.
+    /// </summary>
+    public EntityCoordinates? FindReachableDropTile(EntityUid map, Vector2 near, HashSet<Vector2i>? taken = null,
+        int minSteps = 5, int maxSteps = 14)
+    {
+        if (!TryComp<MapGridComponent>(map, out var grid))
+            return null;
+
+        var start = _map.TileIndicesFor(map, grid, new EntityCoordinates(map, near));
+        IReadOnlySet<Vector2i>? within = null;
+        if (TryComp<ExpeditionDungeonTilesComponent>(map, out var dungeon) && dungeon.Tiles.Contains(start))
+            within = dungeon.Tiles;
+
+        var reach = _rocks.Reachable(map, grid, start, maxSteps + 6, within);
+        if (within != null && reach.Count < 8)
+            reach = _rocks.Reachable(map, grid, start, maxSteps + 6); // тесная комната: допускаем и снаружи
+
+        bool Free(Vector2i tile) => taken == null || !taken.Contains(tile);
+
+        // Маркеры из атласов: если до них можно дойти.
+        var markerTiles = new HashSet<Vector2i>();
+        var markers = EntityQueryEnumerator<ExpeditionDropSiteMarkerComponent, TransformComponent>();
+        while (markers.MoveNext(out _, out _, out var xform))
+        {
+            if (xform.MapUid == map)
+                markerTiles.Add(_map.TileIndicesFor(map, grid, xform.Coordinates));
+        }
+
+        var candidates = reach.Where(r => markerTiles.Contains(r.Tile) && r.Steps >= 2 && Free(r.Tile)).Select(r => r.Tile).ToList();
+        if (candidates.Count == 0)
+            candidates = reach.Where(r => r.Steps >= minSteps && r.Steps <= maxSteps && Free(r.Tile)).Select(r => r.Tile).ToList();
+        if (candidates.Count == 0)
+            candidates = reach.Where(r => r.Steps >= 2 && Free(r.Tile)).Select(r => r.Tile).ToList();
+        if (candidates.Count == 0)
+            return null;
+
+        var pick = _random.Pick(candidates);
+        taken?.Add(pick);
+        return _map.GridTileToLocal(map, grid, pick);
     }
 }

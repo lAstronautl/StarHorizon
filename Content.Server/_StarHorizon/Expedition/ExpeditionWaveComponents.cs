@@ -98,5 +98,31 @@ public sealed partial class PursuePlayerComponent : Component
 
     [ViewVariables] public System.Numerics.Vector2? LastPosition;
 
+    /// <summary>Где моб был, когда последний раз продвинулся (для перестройки пути, если он встал).</summary>
+    [ViewVariables] public System.Numerics.Vector2? ProgressPosition;
+    [ViewVariables] public TimeSpan ProgressSince;
+
+    /// <summary>
+    /// Если моб столько не продвинулся к игроку (а до игрока далеко), путь сбрасывается и строится заново: иначе после
+    /// неудачного поиска пути (дверь, пробка) он так и стоял бы, даже когда путь освободился.
+    /// </summary>
+    [DataField] public TimeSpan RepathAfter = TimeSpan.FromSeconds(4);
+
     [ViewVariables] public TimeSpan StillSince;
+}
+
+/// <summary>Клетки комплекса (данжа) карты экспедиции: если игрок в комплексе, капсулы волн падают только в него.</summary>
+[RegisterComponent]
+public sealed partial class ExpeditionDungeonTilesComponent : Component
+{
+    [ViewVariables] public HashSet<Robust.Shared.Maths.Vector2i> Tiles = new();
+}
+
+/// <summary>
+/// Маркер места падения капсул волн. Ставится в атласах комнат комплекса: если до маркера от игрока можно дойти,
+/// капсулы падают на маркеры в первую очередь.
+/// </summary>
+[RegisterComponent]
+public sealed partial class ExpeditionDropSiteMarkerComponent : Component
+{
 }

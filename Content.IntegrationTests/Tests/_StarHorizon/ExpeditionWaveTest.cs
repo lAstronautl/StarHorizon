@@ -554,7 +554,14 @@ public sealed class ExpeditionWaveTest
             reached = (xform.GetWorldPosition(mob) - xform.GetWorldPosition(player)).Length() < 8f;
         }
 
-        Assert.That(reached, "моб дошёл до далёкого игрока в обход стены");
+        var htnDbg = server.EntMan.GetComponent<HTNComponent>(mob);
+        var steerDbg = server.EntMan.TryGetComponent<Content.Server.NPC.Components.NPCSteeringComponent>(mob, out var sd)
+            ? $"{sd.Status} путь {sd.CurrentPath.Count} к {sd.Coordinates} дальность {sd.Range} считается {sd.Pathfind}" : "нет";
+        htnDbg.Blackboard.TryGetValue<EntityCoordinates>("FollowTarget", out var followDbg, server.EntMan);
+        Assert.That(reached, $"моб дошёл до далёкого игрока в обход стены: позиция {xform.GetWorldPosition(mob)}, " +
+                             $"план {(htnDbg.Plan == null ? "нет" : string.Join(">", htnDbg.Plan.Tasks.Select(t => t.Operator.GetType().Name)))}, " +
+                             $"цель {followDbg}, движение {steerDbg}, корень {htnDbg.RootTask.Task}, активен {server.EntMan.HasComponent<Content.Shared.NPC.ActiveNPCComponent>(mob)}, " +
+                             $"включён {htnDbg.Enabled}, ищет план {htnDbg.PlanningJob != null}");
 
         await pair.CleanReturnAsync();
     }

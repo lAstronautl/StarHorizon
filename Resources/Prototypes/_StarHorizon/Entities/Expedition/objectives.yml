@@ -94,3 +94,17 @@
     color: "#FF6A30"
     radius: 1.5
     energy: 1
+
+# Маркер места падения капсул волн: ставится в атласах комнат комплекса. Если от игрока до маркера можно дойти,
+# капсулы падают на маркеры в первую очередь (ExpeditionWaveSystem.FindReachableDropTile).
+- type: entity
+  parent: MarkerBase
+  id: ExpeditionDropSiteMarker
+  name: expedition drop site
+  suffix: Wave drop pods
+  components:
+  - type: Sprite
+    layers:
+    - sprite: _StarHorizon/Effects/DropPod/marker.rsi
+      state: marker
+  - type: ExpeditionDropSiteMarker

@@ -10,7 +10,8 @@
               key: FollowTarget
           operator: !type:MoveToOperator
             targetKey: FollowTarget
-            rangeKey: MeleeRange
+            # PursueMeleeRange ставит PursuePlayerSystem: ближний бой у игрока, к ножке пути до центра клетки.
+            rangeKey: PursueMeleeRange
             # У A* лимит узлов: длинные пути иначе срывают план. Движение к цели ведёт steering.
             pathfindInPlanning: false
             removeKeyOnFinish: false
