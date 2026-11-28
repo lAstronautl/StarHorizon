@@ -34,9 +34,9 @@
             StyleClasses="LabelSubText"
             MinWidth="130"
             HorizontalAlignment="Right" /> <!-- 130 px: approximate width of "Purchase"-->
-        <Button Name="Guidebook"
+        <Button Name="Preview"
             Access="Public"
-            Text="{Loc 'shipyard-console-guidebook'}"
+            Text="{Loc 'shipyard-console-preview'}"
             StyleClasses="LabelSubText"
             Margin="0 0 12 0"
             HorizontalAlignment="Right" /> <!-- Left margin only -->

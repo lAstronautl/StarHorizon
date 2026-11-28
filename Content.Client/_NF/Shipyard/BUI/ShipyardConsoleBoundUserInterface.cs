@@ -9,12 +9,14 @@ using Content.Shared._NF.Shipyard.Prototypes; // Frontier (#4209)
 using Robust.Shared.Prototypes; // Frontier (#4209)
 using static Robust.Client.UserInterface.Controls.BaseButton;
 using Robust.Client.UserInterface;
+using Content.Client._Horizon.Shipyard; // Horizon
 
 namespace Content.Client._NF.Shipyard.BUI;
 
 public sealed class ShipyardConsoleBoundUserInterface : BoundUserInterface
 {
     private ShipyardConsoleMenu? _menu;
+    private ShipyardPreviewWindow? _previewWindow; // Horizon
     // private ShipyardRulesPopup? _rulesWindow; // Frontier
     public int Balance { get; private set; }
 
@@ -35,6 +37,7 @@ public sealed class ShipyardConsoleBoundUserInterface : BoundUserInterface
             _menu.OnUnassignDeed += UnassignDeed;
             _menu.OnRenameShip += RenameShip;
             _menu.OnDockPortSelected += SelectDockPort;
+            _menu.OnPreviewRequested += OpenPreview; // Horizon
             _menu.TargetIdButton.OnPressed += _ => SendMessage(new ItemSlotButtonPressedEvent(ShipyardConsoleComponent.TargetIdCardSlotId));
             _menu.Owner = Owner;    // Horizon
 
@@ -100,6 +103,44 @@ public sealed class ShipyardConsoleBoundUserInterface : BoundUserInterface
         SendMessage(new ShipyardConsolePurchaseMessage(vesselId, _menu?.SelectedAtmosphere));
         _menu?.ResetAtmosphere();
     }
+    // Horizon start: shuttle preview
+    private void OpenPreview(VesselPrototype vessel)
+    {
+        if (_previewWindow == null)
+        {
+            _previewWindow = new ShipyardPreviewWindow();
+            _previewWindow.OnClose += () => _previewWindow = null;
+            _previewWindow.OpenCentered();
+        }
+        else
+        {
+            _previewWindow.MoveToFront();
+        }
+
+        _previewWindow.SetVessel(vessel);
+        SendMessage(new ShipyardConsolePreviewRequestMessage(vessel.ID));
+    }
+
+    protected override void ReceiveMessage(BoundUserInterfaceMessage message)
+    {
+        base.ReceiveMessage(message);
+
+        if (message is ShipyardConsolePreviewMessage preview && _previewWindow?.Vessel?.ID == preview.Vessel)
+            _previewWindow.SetPreview(preview.Tiles, preview.Colors);
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+
+        if (disposing)
+        {
+            _previewWindow?.Close();
+            _previewWindow = null;
+        }
+    }
+    // Horizon end
+
     private void SellShip(ButtonEventArgs args)
     {
         //reserved for a sanity check, but im not sure what since we check all the important stuffs on server already

@@ -68,6 +68,9 @@ shipyard-console-parking-cryo-pod-aboard = A player cryo-sleep pod is installed 
 shipyard-console-parking-status-parked = Status: parked
 shipyard-console-parking-status-active = Status: active
 shipyard-console-guidebook = Manual
+shipyard-console-preview = Preview
+shipyard-preview-title = Shuttle preview
+shipyard-preview-loading = Loading layout…
 
 # Keep these in enum order for ease of validation.
 shipyard-console-category-All = All

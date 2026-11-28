@@ -34,14 +34,12 @@ public sealed class DerelictYardSystem : EntitySystem
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
-    [Dependency] private readonly MapLoaderSystem _mapLoader = default!;
-    [Dependency] private readonly MapSystem _map = default!;
     [Dependency] private readonly PricingSystem _pricing = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly DockingSystem _docking = default!;
     [Dependency] private readonly ShipyardSystem _shipyard = default!;
     [Dependency] private readonly StationSystem _station = default!;
-    [Dependency] private readonly ITileDefinitionManager _tileDefs = default!;
+    [Dependency] private readonly ShuttlePreviewSystem _preview = default!;
     [Dependency] private readonly UserInterfaceSystem _ui = default!;
 
     private sealed class Job
@@ -57,8 +55,6 @@ public sealed class DerelictYardSystem : EntitySystem
     }
 
     private readonly Dictionary<EntityUid, Job> _jobs = new();
-
-    private readonly Dictionary<string, (Vector2i[] Tiles, Color[] Colors)> _previews = new();
 
     public override void Initialize()
     {
@@ -383,99 +379,10 @@ public sealed class DerelictYardSystem : EntitySystem
         if (!ent.Comp.Vessels.Contains(args.Id) || !_proto.TryIndex<DerelictVesselPrototype>(args.Id, out var vessel))
             return;
 
-        if (!_previews.TryGetValue(vessel.ID, out var preview))
-        {
-            if (!TryBuildPreview(vessel, out preview))
-                return;
-
-            _previews[vessel.ID] = preview;
-        }
+        if (!_preview.TryGetPreview($"derelict:{vessel.ID}", vessel.ShuttlePath, vessel.Minimap, out var preview))
+            return;
 
         _ui.ServerSendUiMessage(ent.Owner, DerelictYardUiKey.Key,
             new DerelictPreviewMessage(vessel.ID, preview.Tiles, preview.Colors), args.Actor);
-    }
-
-    private bool TryBuildPreview(DerelictVesselPrototype vessel, out (Vector2i[] Tiles, Color[] Colors) preview)
-    {
-        preview = default;
-
-        if (!_proto.TryIndex(vessel.Minimap, out var minimap))
-            return false;
-
-        _map.CreateMap(out var mapId, runMapInit: false);
-        try
-        {
-            if (!_mapLoader.TryLoadGrid(mapId, vessel.ShuttlePath, out var grid))
-                return false;
-
-            var tiles = new List<Vector2i>();
-            var colors = new List<Color>();
-
-            foreach (var tile in _map.GetAllTiles(grid.Value.Owner, grid.Value.Comp))
-            {
-                var color = Color.Black;
-
-                var tileId = _tileDefs[tile.Tile.TypeId].ID;
-                foreach (var rule in minimap.Tiles)
-                {
-                    if (rule.Fits(tileId))
-                        color = rule.Color;
-                }
-
-                var best = -1;
-                foreach (var anchored in _map.GetAnchoredEntities(grid.Value.Owner, grid.Value.Comp, tile.GridIndices))
-                {
-                    var rule = LastRule(minimap.Entities, Prototype(anchored));
-                    if (rule > best)
-                        best = rule;
-                }
-
-                if (best >= 0)
-                    color = minimap.Entities[best].Color;
-
-                tiles.Add(tile.GridIndices);
-                colors.Add(color);
-            }
-
-            preview = (tiles.ToArray(), colors.ToArray());
-            return true;
-        }
-        finally
-        {
-            _map.DeleteMap(mapId);
-        }
-    }
-
-    private EntityPrototype? Prototype(EntityUid uid) => MetaData(uid).EntityPrototype;
-
-    private int LastRule(List<ShuttleMinimapRule> rules, EntityPrototype? proto)
-    {
-        if (proto == null)
-            return -1;
-
-        var ids = new HashSet<string>();
-        CollectIds(proto, ids);
-
-        for (var i = rules.Count - 1; i >= 0; i--)
-        {
-            if (ids.Any(rules[i].Fits))
-                return i;
-        }
-
-        return -1;
-    }
-
-    private void CollectIds(EntityPrototype proto, HashSet<string> ids)
-    {
-        if (!ids.Add(proto.ID) || proto.Parents == null)
-            return;
-
-        foreach (var parent in proto.Parents)
-        {
-            if (_proto.TryIndex<EntityPrototype>(parent, out var parentProto))
-                CollectIds(parentProto, ids);
-            else
-                ids.Add(parent);
-        }
     }
 }

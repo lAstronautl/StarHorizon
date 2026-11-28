@@ -41,6 +41,7 @@ public sealed partial class ShipyardConsoleMenu : FancyWindow
     public event Action<ButtonEventArgs>? OnUnassignDeed;
     public event Action<string>? OnRenameShip;
     public event Action<NetEntity?>? OnDockPortSelected;
+    public event Action<VesselPrototype>? OnPreviewRequested; // Horizon: shuttle preview
     private readonly List<VesselSize> _categoryStrings = new();
     private readonly List<VesselClass> _classStrings = new();
     private readonly List<VesselEngine> _engineStrings = new();
@@ -424,9 +425,10 @@ public sealed partial class ShipyardConsoleMenu : FancyWindow
                 ClassIcon = { Texture = _sprite.GetState(classRsi).Frame0 },
                 EngineIcon = { Texture = _sprite.Frame0(_protoManager.Index(engineProtoId)) },
                 Purchase = { Disabled = !canPurchase },
-                Guidebook = { Disabled = prototype.GuidebookPage is null, TooltipDelay = 0.2f, ToolTip = prototype.Description },
+                Preview = { TooltipDelay = 0.2f, ToolTip = prototype.Description }, // Horizon: preview instead of guidebook
                 Price = { Text = priceText },
             };
+            vesselEntry.OnPreviewPressed += vessel => OnPreviewRequested?.Invoke(vessel); // Horizon
             vesselEntry.Purchase.OnConfirming += OnStartConfirmingPurchase;
             vesselEntry.Purchase.OnPressed += (args) => { _currentlyConfirmingButton = null; OnOrderApproved?.Invoke(args); };
             Vessels.AddChild(vesselEntry);

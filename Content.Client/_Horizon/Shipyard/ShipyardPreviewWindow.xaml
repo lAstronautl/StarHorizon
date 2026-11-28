@@ -1,0 +1,24 @@
+<controls:FancyWindow xmlns="https://spacestation14.io"
+                      xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
+                      xmlns:shipyard="clr-namespace:Content.Client._Horizon.Shipyard"
+                      Title="{Loc 'shipyard-preview-title'}"
+                      MinSize="520 500"
+                      SetSize="560 560">
+    <BoxContainer Orientation="Vertical" Margin="6 3">
+        <Label Name="NameLabel" StyleClasses="LabelHeading"/>
+        <RichTextLabel Name="DescriptionLabel" Margin="0 2"/>
+        <PanelContainer VerticalExpand="True" HorizontalExpand="True" MinSize="400 360" Margin="0 4">
+            <shipyard:ShuttlePreviewTextureControl Name="Preview" VerticalExpand="True" HorizontalExpand="True"/>
+            <Label Name="LoadingLabel"
+                   Text="{Loc 'shipyard-preview-loading'}"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   FontColorOverride="Gray"/>
+        </PanelContainer>
+        <BoxContainer Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Name="GuidebookButton"
+                    Text="{Loc 'shipyard-console-guidebook'}"
+                    StyleClasses="LabelSubText"/>
+        </BoxContainer>
+    </BoxContainer>
+</controls:FancyWindow>

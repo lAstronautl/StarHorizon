@@ -58,6 +58,9 @@ shipyard-console-parking-status-parked = Статус: запаркован
 shipyard-console-parking-status-active = Статус: активен
 shipyard-console-deed-label-none = Нет
 shipyard-console-guidebook = Руководство
+shipyard-console-preview = Предпросмотр
+shipyard-preview-title = Предпросмотр шаттла
+shipyard-preview-loading = Загрузка схемы…
 # Keep these in enum order for ease of validation.
 shipyard-console-category-All = ВСЕ
 shipyard-console-category-Micro = Миниатюрные
