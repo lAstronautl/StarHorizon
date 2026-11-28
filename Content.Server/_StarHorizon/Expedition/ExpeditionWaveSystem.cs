@@ -387,11 +387,20 @@ public sealed class ExpeditionWaveSystem : EntitySystem
         if (TryComp<ExpeditionDungeonTilesComponent>(map, out var dungeon) && dungeon.Tiles.Contains(start))
             within = dungeon.Tiles;
 
-        var reach = _rocks.Reachable(map, grid, start, maxSteps + 6, within);
-        if (within != null && reach.Count < 8)
-            reach = _rocks.Reachable(map, grid, start, maxSteps + 6); // тесная комната: допускаем и снаружи
+        // Севшие шаттлы (другие гриды): их стены для поиска стены (шлюзы проходимы), а на сам шаттл капсула не падает,
+        // только возле него.
+        var (covered, blocked) = _rocks.OtherGrids(map, grid, near, maxSteps + 20, passDoors: true);
+        blocked.Remove(start);
 
-        bool Free(Vector2i tile) => taken == null || !taken.Contains(tile);
+        var reach = _rocks.Reachable(map, grid, start, maxSteps + 6, within, blocked: blocked);
+        if (within != null && reach.Count < 8)
+            reach = _rocks.Reachable(map, grid, start, maxSteps + 6, blocked: blocked); // тесная комната: допускаем и снаружи
+
+        // Игрок на шаттле: от него до выхода с шаттла шагов больше, ищем дальше.
+        if (covered.Contains(start))
+            reach = _rocks.Reachable(map, grid, start, maxSteps + 30, within, blocked: blocked);
+
+        bool Free(Vector2i tile) => !covered.Contains(tile) && (taken == null || !taken.Contains(tile));
 
         // Маркеры из атласов: если до них можно дойти.
         var markerTiles = new HashSet<Vector2i>();

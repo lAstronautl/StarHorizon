@@ -277,4 +277,60 @@ public sealed class ExpeditionDropSiteTest
                              $"карта {mapUid}, ножка {pursue.Waypoint}, движение {steer})");
         await pair.CleanReturnAsync();
     }
+    /// <summary>Игрок на севшем шаттле (другом гриде): капсулы врагов падают не на шаттл, а снаружи возле него.</summary>
+    [Test]
+    public async Task PodsLandNextToTheShuttleNotOnIt()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true, FailureLogLevel = LogLevel.Fatal });
+        var server = pair.Server;
+        var xform = server.System<SharedTransformSystem>();
+        var waves = server.System<ExpeditionWaveSystem>();
+
+        EntityUid mapUid = default, shuttle = default;
+        await server.WaitPost(() =>
+        {
+            var mapSys = server.System<SharedMapSystem>();
+            mapUid = mapSys.CreateMap(out var mapId);
+            var grid = server.EntMan.EnsureComponent<MapGridComponent>(mapUid);
+            var tile = new Tile(server.ResolveDependency<ITileDefinitionManager>()["FloorSteel"].TileId);
+            for (var x = -10; x <= 50; x++)
+            {
+                for (var y = -25; y <= 25; y++)
+                    mapSys.SetTile(mapUid, grid, new Vector2i(x, y), tile);
+            }
+
+            // Шаттл 11x11 у (25..36, -5..6), вход с востока.
+            var grid2 = server.ResolveDependency<IMapManager>().CreateGridEntity(mapId);
+            shuttle = grid2.Owner;
+            xform.SetWorldPosition(shuttle, new Vector2(25f, -5f));
+            for (var x = 0; x <= 10; x++)
+            {
+                for (var y = 0; y <= 10; y++)
+                {
+                    mapSys.SetTile(shuttle, grid2.Comp, new Vector2i(x, y), tile);
+                    var border = x == 0 || x == 10 || y == 0 || y == 10;
+                    if (border && !(x == 10 && y >= 4 && y <= 6))
+                        server.EntMan.SpawnEntity("WallSolid", new EntityCoordinates(shuttle, x + 0.5f, y + 0.5f));
+                }
+            }
+        });
+        await pair.RunTicksSync(3);
+
+        await server.WaitAssertion(() =>
+        {
+            var taken = new HashSet<Vector2i>();
+            var shuttleBox = new Box2(25f, -5f, 36f, 6f);
+            for (var i = 0; i < 12; i++)
+            {
+                // Игрок внутри шаттла.
+                var coords = waves.FindReachableDropTile(mapUid, new Vector2(28.5f, 0.5f), taken);
+                Assert.That(coords, Is.Not.Null, "место нашлось");
+                var world = xform.ToMapCoordinates(coords!.Value).Position;
+                Assert.That(shuttleBox.Contains(world), Is.False, $"капсула {world} не на шаттле");
+                Assert.That((world - new Vector2(30.5f, 0.5f)).Length(), Is.LessThan(25f), $"капсула {world} возле шаттла");
+            }
+        });
+
+        await pair.CleanReturnAsync();
+    }
 }

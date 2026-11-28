@@ -179,7 +179,18 @@ public sealed class RockClearSystem : EntitySystem
     /// </summary>
     public HashSet<Vector2i> BlockedByOtherGrids(EntityUid gridUid, MapGridComponent grid, Vector2 center, float radius, bool passDoors)
     {
+        return OtherGrids(gridUid, grid, center, radius, passDoors).Blocked;
+    }
+
+    /// <summary>
+    /// Клетки планеты под другими гридами (севшими шаттлами): <c>Covered</c> все, <c>Blocked</c> только под их стенами
+    /// и прочими препятствиями (двери проходимы, если <paramref name="passDoors"/>).
+    /// </summary>
+    public (HashSet<Vector2i> Covered, HashSet<Vector2i> Blocked) OtherGrids(EntityUid gridUid, MapGridComponent grid, Vector2 center,
+        float radius, bool passDoors)
+    {
         var blocked = new HashSet<Vector2i>();
+        var covered = new HashSet<Vector2i>();
         var mapId = Transform(gridUid).MapID;
         var box = new Box2(center - new Vector2(radius, radius), center + new Vector2(radius, radius));
         var grids = new List<Entity<MapGridComponent>>();
@@ -193,20 +204,22 @@ public sealed class RockClearSystem : EntitySystem
             var matrix = _xform.GetWorldMatrix(other.Owner);
             foreach (var tileRef in _map.GetAllTiles(other.Owner, other.Comp))
             {
-                if (IsPassable(other.Owner, other.Comp, tileRef.GridIndices, passDoors))
-                    continue;
+                var isBlocked = !IsPassable(other.Owner, other.Comp, tileRef.GridIndices, passDoors);
 
                 // Клетка другого грида может лечь на две клетки планеты (сдвиг, поворот): закрываем все, что задевает.
                 var local = _map.TileCenterToVector((other.Owner, other.Comp), tileRef.GridIndices);
                 foreach (var corner in new[] { new Vector2(-0.4f, -0.4f), new Vector2(0.4f, -0.4f), new Vector2(-0.4f, 0.4f), new Vector2(0.4f, 0.4f), Vector2.Zero })
                 {
                     var world = Vector2.Transform(local + corner, matrix);
-                    blocked.Add(_map.TileIndicesFor(gridUid, grid, new EntityCoordinates(gridUid, world)));
+                    var under = _map.TileIndicesFor(gridUid, grid, new EntityCoordinates(gridUid, world));
+                    covered.Add(under);
+                    if (isBlocked)
+                        blocked.Add(under);
                 }
             }
         }
 
-        return blocked;
+        return (covered, blocked);
     }
 
     /// <summary>
@@ -242,7 +255,7 @@ public sealed class RockClearSystem : EntitySystem
     /// закрытых дверей), с числом шагов. <paramref name="within"/>: только эти клетки (например, клетки комплекса).
     /// </summary>
     public List<(Vector2i Tile, int Steps)> Reachable(EntityUid gridUid, MapGridComponent grid, Vector2i start, int maxSteps,
-        IReadOnlySet<Vector2i>? within = null, int maxTiles = 4000)
+        IReadOnlySet<Vector2i>? within = null, int maxTiles = 4000, IReadOnlySet<Vector2i>? blocked = null)
     {
         var result = new List<(Vector2i, int)> { (start, 0) };
         var seen = new HashSet<Vector2i> { start };
@@ -257,7 +270,8 @@ public sealed class RockClearSystem : EntitySystem
 
             foreach (var next in new[] { tile + Vector2i.Up, tile + Vector2i.Down, tile + Vector2i.Left, tile + Vector2i.Right })
             {
-                if (seen.Contains(next) || within != null && !within.Contains(next) || !IsOpen(gridUid, grid, next))
+                if (seen.Contains(next) || within != null && !within.Contains(next) || blocked != null && blocked.Contains(next)
+                    || !IsOpen(gridUid, grid, next))
                     continue;
 
                 seen.Add(next);
