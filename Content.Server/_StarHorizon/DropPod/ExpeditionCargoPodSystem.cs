@@ -13,14 +13,22 @@ using Robust.Shared.Timing;
 namespace Content.Server._StarHorizon.DropPod;
 
 /// <summary>
-/// Капсула с грузом: падает с неба (наша анимация вертикального падения), встаёт в воронке, через
-/// <see cref="OpenDelay"/> открывается и выпускает груз (мобов волны, приёмник). Пока мобы внутри, их ИИ выключен.
+/// Капсула с грузом: <see cref="WarningTime"/> горит метка места посадки, потом капсула падает с неба (наша анимация
+/// вертикального падения), встаёт в воронке, через <see cref="OpenDelay"/> открывается и выпускает груз (мобов волны, приёмник). Пока мобы внутри, их ИИ выключен.
 /// Пустая капсула через <see cref="Lifetime"/> исчезает.
 /// </summary>
 [RegisterComponent]
 public sealed partial class ExpeditionCargoPodComponent : Component
 {
     [ViewVariables] public ExpeditionCargoPodStage Stage;
+
+    /// <summary>Когда начинается падение (до этого на земле горит метка посадки).</summary>
+    [ViewVariables] public TimeSpan FallAt;
+    [ViewVariables] public bool FallStarted;
+
+    /// <summary>Метка места падения: видна, пока капсула не упала.</summary>
+    [ViewVariables] public EntityUid? Marker;
+
     [ViewVariables] public TimeSpan LandAt;
     [ViewVariables] public TimeSpan OpenAt;
     [ViewVariables] public TimeSpan DeleteAt;
@@ -37,8 +45,13 @@ public sealed class ExpeditionCargoPodSystem : EntitySystem
     public const string LandingAnimation = "StarHorizonDropPodLandingAnimationSyndicate";
     public const string SmokePuff = "StarHorizonDropPodSmokePuff";
 
+    public const string MarkerProto = "StarHorizonDropPodMarker";
+
+    /// <summary>Сколько перед падением горит метка места посадки (успеть отбежать или приготовиться).</summary>
+    public static readonly TimeSpan WarningTime = TimeSpan.FromSeconds(5);
+
     /// <summary>Через сколько после касания капсула открывается.</summary>
-    public static readonly TimeSpan OpenDelay = TimeSpan.FromSeconds(1.5);
+    public static readonly TimeSpan OpenDelay = TimeSpan.FromSeconds(3);
 
     /// <summary>Сколько пустая открытая капсула лежит на земле.</summary>
     public static readonly TimeSpan Lifetime = TimeSpan.FromMinutes(2);
@@ -75,16 +88,16 @@ public sealed class ExpeditionCargoPodSystem : EntitySystem
             _container.Insert(item, container);
         }
 
+        // Сначала метка места посадки, потом падение (анимация), удар, через несколько секунд капсула открывается.
         var now = _timing.CurTime;
         comp.Stage = ExpeditionCargoPodStage.Falling;
-        comp.LandAt = now + TimeSpan.FromSeconds(DropPodLandingGeometry.TotalTime);
+        comp.FallAt = now + WarningTime;
+        comp.LandAt = comp.FallAt + TimeSpan.FromSeconds(DropPodLandingGeometry.TotalTime);
         comp.OpenAt = comp.LandAt + OpenDelay;
         comp.DeleteAt = comp.OpenAt + Lifetime;
+        comp.Marker = Spawn(MarkerProto, coords);
         _appearance.SetData(pod, ExpeditionCargoPodVisuals.Stage, ExpeditionCargoPodStage.Falling);
         _light.SetEnabled(pod, false);
-
-        Spawn(LandingAnimation, coords);
-        _audio.PlayPvs(LandingSound, pod);
         return pod;
     }
 
@@ -94,6 +107,13 @@ public sealed class ExpeditionCargoPodSystem : EntitySystem
         var query = EntityQueryEnumerator<ExpeditionCargoPodComponent>();
         while (query.MoveNext(out var uid, out var comp))
         {
+            if (comp.Stage == ExpeditionCargoPodStage.Falling && !comp.FallStarted && now >= comp.FallAt)
+            {
+                comp.FallStarted = true;
+                Spawn(LandingAnimation, Transform(uid).Coordinates);
+                _audio.PlayPvs(LandingSound, uid);
+            }
+
             switch (comp.Stage)
             {
                 case ExpeditionCargoPodStage.Falling when now >= comp.LandAt:
@@ -112,6 +132,8 @@ public sealed class ExpeditionCargoPodSystem : EntitySystem
     private void Land(Entity<ExpeditionCargoPodComponent> ent)
     {
         ent.Comp.Stage = ExpeditionCargoPodStage.Landed;
+        QueueDel(ent.Comp.Marker);
+        ent.Comp.Marker = null;
         _appearance.SetData(ent, ExpeditionCargoPodVisuals.Stage, ExpeditionCargoPodStage.Landed);
         _light.SetEnabled(ent, true);
         _audio.PlayPvs(ImpactSound, ent);

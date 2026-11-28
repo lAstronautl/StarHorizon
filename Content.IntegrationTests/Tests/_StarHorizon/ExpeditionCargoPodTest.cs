@@ -11,7 +11,7 @@ using Robust.Shared.Log;
 namespace Content.IntegrationTests.Tests._StarHorizon;
 
 /// <summary>
-/// Синдикатская капсула с грузом (волны, приёмник): падает с анимацией, ложится, открывается и выпускает груз; ИИ мобов
+/// Синдикатская капсула с грузом (волны, приёмник): метка посадки, падение с анимацией, через 3 с открывается и выпускает груз; ИИ мобов
 /// внутри выключен и включается при выходе; пустая капсула потом исчезает.
 /// </summary>
 [TestFixture]
@@ -37,22 +37,31 @@ public sealed class ExpeditionCargoPodTest
         ExpeditionCargoPodStage Stage() =>
             appearance.TryGetData<ExpeditionCargoPodStage>(pod, ExpeditionCargoPodVisuals.Stage, out var stage) ? stage : default;
 
-        // Падает: капсулы не видно, летит анимация; моб внутри, ИИ выключен.
+        int Count(string proto) => server.EntMan.AllEntities<MetaDataComponent>().Count(e => e.Comp.EntityPrototype?.ID == proto);
+
+        // Сначала горит метка места посадки; капсулы и падения ещё нет; моб внутри, ИИ выключен.
         await pair.RunTicksSync(2);
         Assert.That(Stage(), Is.EqualTo(ExpeditionCargoPodStage.Falling));
-        Assert.That(server.EntMan.AllEntities<MetaDataComponent>()
-            .Count(e => e.Comp.EntityPrototype?.ID == ExpeditionCargoPodSystem.LandingAnimation), Is.EqualTo(1), "анимация падения");
+        Assert.That(Count(ExpeditionCargoPodSystem.MarkerProto), Is.EqualTo(1), "метка места посадки");
+        Assert.That(Count(ExpeditionCargoPodSystem.LandingAnimation), Is.EqualTo(0), "падение ещё не началось");
         Assert.That(container.IsEntityInContainer(mob), "моб в капсуле");
         Assert.That(server.EntMan.GetComponent<HTNComponent>(mob).Enabled, Is.False, "ИИ в капсуле выключен");
         Assert.That(server.EntMan.HasComponent<ActiveNPCComponent>(mob), Is.False);
 
-        // Приземлилась (1.81 с): лежит закрытая.
+        // Через 5 с: падение (анимация).
+        await pair.RunSeconds(5.2f);
+        Assert.That(Count(ExpeditionCargoPodSystem.LandingAnimation), Is.EqualTo(1), "анимация падения");
+
+        // Приземлилась (1.81 с): стоит закрытая, метки больше нет.
         await pair.RunSeconds(2f);
         Assert.That(Stage(), Is.EqualTo(ExpeditionCargoPodStage.Landed));
+        Assert.That(Count(ExpeditionCargoPodSystem.MarkerProto), Is.EqualTo(0), "метка исчезла");
         Assert.That(container.IsEntityInContainer(mob), "ещё закрыта");
 
-        // Открылась: моб вышел, ИИ включён.
-        await pair.RunSeconds(1.7f);
+        // Через 3 с открылась: моб вышел, ИИ включён.
+        await pair.RunSeconds(1.5f);
+        Assert.That(container.IsEntityInContainer(mob), "открывается не сразу");
+        await pair.RunSeconds(2f);
         Assert.That(Stage(), Is.EqualTo(ExpeditionCargoPodStage.Open));
         Assert.That(container.IsEntityInContainer(mob), Is.False, "моб вышел");
         Assert.That(server.EntMan.GetComponent<HTNComponent>(mob).Enabled, "ИИ включён");
