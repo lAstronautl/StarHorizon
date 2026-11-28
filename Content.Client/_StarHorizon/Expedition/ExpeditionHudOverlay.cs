@@ -21,6 +21,11 @@ public sealed class ExpeditionHudOverlay : Overlay
 
     public override OverlaySpace Space => OverlaySpace.ScreenSpace;
 
+    /// <summary>Отступ компаса и задач от левого края (правее панели быстрых слотов) и от верха (ниже кнопок меню).</summary>
+    private const float EdgeLeft = 100f;
+    private const float EdgeTop = 120f;
+    private const float CompassRadius = 30f;
+
     private static readonly Color Accent = Color.FromHex("#A6E35A"); // салатовый
     private static readonly Color Panel = Color.Black.WithAlpha(0.55f);
     private static readonly Color Done = Color.FromHex("#7FD35A");
@@ -67,15 +72,18 @@ public sealed class ExpeditionHudOverlay : Overlay
         var h = args.ScreenHandle;
         var bounds = args.ViewportBounds;
 
-        // Всё по центру сверху: таймер, под ним компас, под ним задачи (слева сверху их закрывали кнопки меню и слоты).
+        // Таймер по центру сверху; компас и задачи у левого края, правее панели быстрых слотов и ниже кнопок меню,
+        // чтобы не закрывать обзор.
         var centerX = (bounds.Left + bounds.Right) / 2f;
-        var timerBottom = DrawTimer(h, view, new Vector2(centerX, bounds.Top + 12 * scale), scale);
-        var compassBottom = DrawCompass(h, view, new Vector2(centerX, timerBottom + 10 * scale), scale);
-        DrawObjectives(h, view, new Vector2(centerX, compassBottom + 10 * scale), scale);
+        DrawTimer(h, view, new Vector2(centerX, bounds.Top + 12 * scale), scale);
+
+        var edgeLeft = bounds.Left + EdgeLeft * scale;
+        var compassBottom = DrawCompass(h, view, new Vector2(edgeLeft + CompassRadius * scale, bounds.Top + EdgeTop * scale), scale);
+        DrawObjectives(h, view, new Vector2(edgeLeft, compassBottom + 10 * scale), scale);
     }
 
-    /// <param name="topCenter">Середина верхнего края плашки.</param>
-    private void DrawObjectives(DrawingHandleScreen h, ExpeditionHudView view, Vector2 topCenter, float scale)
+    /// <param name="topLeft">Левый верхний угол плашки.</param>
+    private void DrawObjectives(DrawingHandleScreen h, ExpeditionHudView view, Vector2 topLeft, float scale)
     {
         var pad = 8 * scale;
         var line = 20 * scale;
@@ -90,8 +98,8 @@ public sealed class ExpeditionHudOverlay : Overlay
             width = MathF.Max(width, h.GetDimensions(_text, view.WaveLine, 1f).X);
         width += pad * 2 + 4 * scale;
         // Ширина не дёргается от смены цифр прогресса: не меньше фиксированной.
-        width = MathF.Max(width, 300 * scale);
-        var origin = new Vector2(topCenter.X - width / 2f, topCenter.Y);
+        width = MathF.Max(width, 260 * scale);
+        var origin = topLeft;
 
         var rows = 1 + view.Objectives.Count + (view.WaveLine != null ? 1 : 0);
         var height = pad * 2 + rows * line;
@@ -202,7 +210,7 @@ public sealed class ExpeditionHudOverlay : Overlay
     /// <returns>Нижний край компаса (с подписью цели).</returns>
     private float DrawCompass(DrawingHandleScreen h, ExpeditionHudView view, Vector2 top, float scale)
     {
-        var radius = 30 * scale;
+        var radius = CompassRadius * scale;
         var center = top + new Vector2(0, radius);
         h.DrawCircle(center, radius, Panel);
         h.DrawCircle(center, radius, Accent.WithAlpha(0.5f), filled: false);
@@ -252,7 +260,8 @@ public sealed class ExpeditionHudOverlay : Overlay
         var label = Loc.GetString("expedition-hud-compass-target-" + view.CompassKind.ToString().ToLowerInvariant(),
             ("meters", (int) MathF.Round(distance)));
         var labelSize = h.GetDimensions(_text, label, 1f);
-        var labelPos = new Vector2(center.X - labelSize.X / 2f, center.Y + radius + 4 * scale);
+        // Подпись шире круга: выравниваем по левому краю компаса, чтобы не залезать на панель слотов.
+        var labelPos = new Vector2(center.X - radius, center.Y + radius + 4 * scale);
         h.DrawRect(UIBox2.FromDimensions(labelPos - new Vector2(4 * scale, 1 * scale), labelSize + new Vector2(8 * scale, 2 * scale)), Panel);
         h.DrawString(_text, labelPos, label, color);
         return labelPos.Y + labelSize.Y;
