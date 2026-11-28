@@ -99,6 +99,9 @@ public enum ExpeditionObjectiveKind : byte
 
     /// <summary>Оборона шаттла: Done/Total в секундах.</summary>
     Defend,
+
+    /// <summary>Отправить приёмник с образцами фултоном.</summary>
+    Fulton,
 }
 
 /// <summary>Узел разбитого эвакуационного шаттла: починен или нет (экран разбит / работает).</summary>

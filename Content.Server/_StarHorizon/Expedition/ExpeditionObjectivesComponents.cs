@@ -33,6 +33,24 @@ public sealed partial class ExpeditionDepotHolderComponent : Component
 
     /// <summary>Задание выполнено и объявлено.</summary>
     [ViewVariables] public bool Done;
+
+    /// <summary>Сбор образцов: всё сдано, приёмник ждёт, когда его привяжут к фултону.</summary>
+    [ViewVariables] public bool FultonReady;
+
+    /// <summary>Фултон привязан (приёмник висит на шаре и скоро улетит).</summary>
+    [ViewVariables] public bool FultonAttached;
+
+    /// <summary>Невидимый маяк далеко за картой, куда фултон уносит приёмник.</summary>
+    [ViewVariables] public EntityUid? FultonBeacon;
+
+    /// <summary>Когда удалить улетевший приёмник и маяк (после анимации подъёма у клиентов).</summary>
+    [ViewVariables] public TimeSpan? CleanupAt;
+
+    /// <summary>Сколько приёмник висит на фултоне до подъёма.</summary>
+    [DataField] public TimeSpan FultonDuration = TimeSpan.FromSeconds(30);
+
+    /// <summary>Сколько занимает привязка фултона.</summary>
+    [DataField] public TimeSpan AttachTime = TimeSpan.FromSeconds(3);
 }
 
 /// <summary>Сам приёмник: к какой карте экспедиции он относится.</summary>

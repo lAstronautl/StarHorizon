@@ -176,9 +176,34 @@ public sealed class ExpeditionObjectivesTest
         });
         await pair.RunSeconds(1.5f);
         Assert.That(sampling.Collected, Is.EqualTo(sampling.Required));
-        Assert.That(expedition.Completed, "образцы собраны");
+        var holder = server.EntMan.GetComponent<ExpeditionDepotHolderComponent>(map);
+        Assert.That(holder.FultonReady, "образцы собраны: приёмник ждёт фултон");
+        Assert.That(expedition.Completed, Is.False, "пока приёмник не улетел, задание не выполнено");
         var hud = server.EntMan.GetComponent<ExpeditionHudComponent>(map);
-        Assert.That(hud.Objectives.Single().Finished);
+        Assert.That(hud.Objectives.Select(o => o.Kind), Is.EqualTo(new[] { ExpeditionObjectiveKind.Samples, ExpeditionObjectiveKind.Fulton }));
+        Assert.That(hud.Objectives[0].Finished && !hud.Objectives[1].Finished);
+
+        // У приёмника появилось действие «Привязать к фултону»; привязка занимает несколько секунд.
+        await server.WaitPost(() => server.System<Robust.Shared.GameObjects.SharedTransformSystem>().SetCoordinates(player,
+            server.EntMan.GetComponent<TransformComponent>(depot).Coordinates.Offset(new Vector2(0.7f, 0))));
+        await pair.RunTicksSync(2);
+        await server.WaitAssertion(() =>
+        {
+            var verbs = server.System<Content.Server.Verbs.VerbSystem>().GetLocalVerbs(depot, player, typeof(Content.Shared.Verbs.InteractionVerb));
+            Assert.That(verbs.Any(v => v.Text == Robust.Shared.Localization.Loc.GetString("expedition-depot-verb-fulton")), "есть действие фултона");
+            verbs.First(v => v.Text == Robust.Shared.Localization.Loc.GetString("expedition-depot-verb-fulton")).Act!.Invoke();
+        });
+        await pair.RunSeconds(4f);
+        Assert.That(holder.FultonAttached, "приёмник на фултоне");
+        Assert.That(server.EntMan.GetComponent<Content.Shared.Salvage.Fulton.FultonedComponent>(depot).Removeable, Is.False, "снять нельзя");
+
+        // Фултон поднимает приёмник: задание выполнено, приёмник убран.
+        await server.WaitPost(() => server.EntMan.GetComponent<Content.Shared.Salvage.Fulton.FultonedComponent>(depot).NextFulton = server.Resolve<IGameTiming>().CurTime);
+        await pair.RunSeconds(2f);
+        Assert.That(expedition.Completed, "приёмник улетел: задание выполнено");
+        Assert.That(hud.Objectives.All(o => o.Finished));
+        await pair.RunSeconds(4f);
+        Assert.That(server.EntMan.Deleted(depot), "улетевший приёмник убран");
 
         await pair.CleanReturnAsync();
     }

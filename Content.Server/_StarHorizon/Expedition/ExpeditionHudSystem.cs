@@ -104,6 +104,11 @@ public sealed class ExpeditionHudSystem : EntitySystem
                 Name = _proto.Index<Robust.Shared.Prototypes.EntityPrototype>(ExpeditionObjectivesSystem.SampleProto).Name,
                 Total = sampling.Required, Done = Math.Min(sampling.Collected, sampling.Required),
             });
+            objectives.Add(new ExpeditionObjective
+            {
+                Kind = ExpeditionObjectiveKind.Fulton, Total = 1,
+                Done = TryComp<ExpeditionDepotHolderComponent>(map, out var holder) && holder.Done ? 1 : 0,
+            });
         }
 
         if (TryComp<SalvageRepairExpeditionComponent>(map, out var repair))

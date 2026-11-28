@@ -17,7 +17,7 @@ expedition-depot-accepted = Accepted: {$count}
 expedition-quota-announcement = Objective: mine and deposit {$count} ore into the depot. The depot will be dropped in a pod.
 expedition-quota-done = Mining quota complete!
 expedition-samples-announcement = Objective: find glowing samples in the complex and deposit {$count} into the depot. The depot will be dropped in a pod.
-expedition-samples-done = Samples collected. Objective complete!
+expedition-samples-done = The depot with the samples is lifted by fulton. Objective complete!
 expedition-repair-announcement = Objective: the extraction shuttle crashed on landing. Repair its nodes and hold the shuttle while its systems start up.
 expedition-repair-incoming = The extraction shuttle is losing control and going down near ({$x}, {$y})!
 expedition-repair-crashed = Hard landing. Damaged nodes: {$count}. Repair them.
@@ -33,3 +33,8 @@ expedition-hud-objective-quota = Deposit ore
 expedition-hud-objective-samples = Deposit: {$name}
 expedition-hud-objective-repair = Repair shuttle nodes
 expedition-hud-objective-defend = Hold the shuttle
+
+expedition-samples-fulton = Samples collected! Attach a fulton to the depot to send them to orbit.
+expedition-samples-fulton-attached = The depot is on the fulton: lift-off in {$seconds} s.
+expedition-depot-verb-fulton = Attach to fulton
+expedition-hud-objective-fulton = Send the depot by fulton

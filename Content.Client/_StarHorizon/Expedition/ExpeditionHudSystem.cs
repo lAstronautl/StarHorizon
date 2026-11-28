@@ -107,6 +107,7 @@ public sealed class ExpeditionHudSystem : EntitySystem
                 ExpeditionObjectiveKind.Quota => "expedition-hud-objective-quota",
                 ExpeditionObjectiveKind.Samples => "expedition-hud-objective-samples",
                 ExpeditionObjectiveKind.Repair => "expedition-hud-objective-repair",
+                ExpeditionObjectiveKind.Fulton => "expedition-hud-objective-fulton",
                 _ => "expedition-hud-objective-defend",
             };
 

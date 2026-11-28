@@ -12,6 +12,11 @@ using Content.Shared.Shuttles.Systems;
 using Content.Shared.Stacks;
 using Content.Shared.Storage;
 using Content.Shared.Tag;
+using Content.Shared.Salvage.Fulton;
+using Content.Shared.Verbs;
+using Robust.Shared.Audio;
+using Robust.Shared.Map;
+using Robust.Shared.Utility;
 using Robust.Server.GameObjects;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Random;
@@ -40,6 +45,8 @@ public sealed class ExpeditionObjectivesSystem : EntitySystem
     [Dependency] private readonly AppearanceSystem _appearance = default!;
     [Dependency] private readonly AnchorableSystem _anchorable = default!;
     [Dependency] private readonly MapSystem _map = default!;
+    [Dependency] private readonly TransformSystem _xform = default!;
+    [Dependency] private readonly Robust.Server.Audio.AudioSystem _audio = default!;
 
     private static readonly Robust.Shared.Prototypes.ProtoId<TagPrototype> OreTag = "Ore";
     private static readonly TimeSpan DepotDelay = TimeSpan.FromSeconds(15);
@@ -50,6 +57,8 @@ public sealed class ExpeditionObjectivesSystem : EntitySystem
     public override void Initialize()
     {
         SubscribeLocalEvent<ExpeditionDepotComponent, InteractUsingEvent>(OnDepotInteractUsing);
+        SubscribeLocalEvent<ExpeditionDepotComponent, GetVerbsEvent<InteractionVerb>>(OnDepotVerbs);
+        SubscribeLocalEvent<ExpeditionDepotComponent, ExpeditionDepotFultonDoAfterEvent>(OnDepotFultonDoAfter);
         SubscribeLocalEvent<ExpeditionRepairPointComponent, InteractHandEvent>(OnRepairInteract);
         SubscribeLocalEvent<ExpeditionRepairPointComponent, ExpeditionRepairDoAfterEvent>(OnRepairDoAfter);
     }
@@ -152,17 +161,118 @@ public sealed class ExpeditionObjectivesSystem : EntitySystem
 
     private void CheckDepotObjective(Entity<ExpeditionDepotHolderComponent> ent, SalvageExpeditionComponent expedition)
     {
+        UpdateFulton(ent, expedition);
         if (ent.Comp.Done)
             return;
 
-        var done = TryComp<SalvageMiningExpeditionComponent>(ent, out var mining) && mining.Collected >= mining.Quota
-                   || TryComp<SalvageSamplingExpeditionComponent>(ent, out var sampling) && sampling.Collected >= sampling.Required;
-        if (!done)
+        // Квота добычи: выполнена, как только руда сдана.
+        if (TryComp<SalvageMiningExpeditionComponent>(ent, out var mining) && mining.Collected >= mining.Quota)
+        {
+            ent.Comp.Done = true;
+            expedition.Completed = true;
+            _salvage.Announce(ent.Owner, Loc.GetString("expedition-quota-done"));
+            return;
+        }
+
+        // Сбор образцов: образцы собраны, теперь приёмник надо отправить фултоном.
+        if (!ent.Comp.FultonReady && TryComp<SalvageSamplingExpeditionComponent>(ent, out var sampling)
+            && sampling.Collected >= sampling.Required)
+        {
+            ent.Comp.FultonReady = true;
+            _salvage.Announce(ent.Owner, Loc.GetString("expedition-samples-fulton"));
+        }
+    }
+
+    /// <summary>Приёмник улетел на фултоне: задание выполнено, приёмник и маяк убираются после анимации.</summary>
+    private void UpdateFulton(Entity<ExpeditionDepotHolderComponent> ent, SalvageExpeditionComponent expedition)
+    {
+        var comp = ent.Comp;
+        if (comp.CleanupAt is { } cleanup)
+        {
+            if (_timing.CurTime < cleanup)
+                return;
+
+            comp.CleanupAt = null;
+            QueueDel(comp.Depot);
+            QueueDel(comp.FultonBeacon);
+            comp.Depot = null;
+            comp.FultonBeacon = null;
+            return;
+        }
+
+        if (!comp.FultonAttached || comp.Done || comp.Depot is not { } depot)
             return;
 
-        ent.Comp.Done = true;
+        // FultonSystem снимает FultonedComponent, когда фултон поднял груз (перенёс к маяку).
+        if (HasComp<FultonedComponent>(depot) && !TerminatingOrDeleted(depot))
+            return;
+
+        comp.Done = true;
         expedition.Completed = true;
-        _salvage.Announce(ent.Owner, Loc.GetString(mining != null ? "expedition-quota-done" : "expedition-samples-done"));
+        comp.CleanupAt = _timing.CurTime + TimeSpan.FromSeconds(3);
+        _salvage.Announce(ent.Owner, Loc.GetString("expedition-samples-done"));
+    }
+
+    private void OnDepotVerbs(Entity<ExpeditionDepotComponent> ent, ref GetVerbsEvent<InteractionVerb> args)
+    {
+        if (!args.CanAccess || !args.CanInteract
+            || !TryComp<ExpeditionDepotHolderComponent>(ent.Comp.Expedition, out var holder)
+            || !holder.FultonReady || holder.FultonAttached)
+        {
+            return;
+        }
+
+        var user = args.User;
+        var depot = ent.Owner;
+        args.Verbs.Add(new InteractionVerb
+        {
+            Text = Loc.GetString("expedition-depot-verb-fulton"),
+            Icon = new SpriteSpecifier.Rsi(new ResPath("Objects/Tools/fulton.rsi"), "extraction_pack"),
+            Act = () => _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager, user, holder.AttachTime,
+                new ExpeditionDepotFultonDoAfterEvent(), depot, target: depot)
+            {
+                BreakOnMove = true,
+                NeedHand = true,
+            }),
+        });
+    }
+
+    private void OnDepotFultonDoAfter(Entity<ExpeditionDepotComponent> ent, ref ExpeditionDepotFultonDoAfterEvent args)
+    {
+        if (args.Cancelled || args.Handled)
+            return;
+
+        args.Handled = true;
+        AttachFulton(ent);
+    }
+
+    /// <summary>
+    /// Привязать приёмник к фултону: настоящий фултон (шар над грузом, звук, анимация подъёма) уносит его к невидимому
+    /// маяку далеко за картой. Снять нельзя.
+    /// </summary>
+    public bool AttachFulton(Entity<ExpeditionDepotComponent> ent)
+    {
+        if (!TryComp<ExpeditionDepotHolderComponent>(ent.Comp.Expedition, out var holder)
+            || !holder.FultonReady || holder.FultonAttached)
+        {
+            return false;
+        }
+
+        holder.FultonAttached = true;
+        var depotPos = _xform.GetWorldPosition(ent.Owner);
+        holder.FultonBeacon = Spawn(null, new EntityCoordinates(ent.Comp.Expedition, depotPos + new System.Numerics.Vector2(0, 3000)));
+
+        var fultoned = EnsureComp<FultonedComponent>(ent);
+        fultoned.Beacon = holder.FultonBeacon;
+        fultoned.FultonDuration = holder.FultonDuration;
+        fultoned.NextFulton = _timing.CurTime + holder.FultonDuration;
+        fultoned.Removeable = false;
+        Dirty(ent.Owner, fultoned);
+        _audio.PlayPvs(new SoundPathSpecifier("/Audio/Items/Mining/fultext_deploy.ogg"), ent);
+
+        _salvage.Announce(ent.Comp.Expedition, Loc.GetString("expedition-samples-fulton-attached",
+            ("seconds", (int) holder.FultonDuration.TotalSeconds)));
+        return true;
     }
 
     #endregion

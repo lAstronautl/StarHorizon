@@ -19,7 +19,7 @@ expedition-depot-accepted = Принято: {$count}
 expedition-quota-announcement = Задача: добудьте и сдайте в приёмник {$count} руды. Приёмник сбросят в капсуле.
 expedition-quota-done = Квота добычи выполнена!
 expedition-samples-announcement = Задача: найдите в комплексе светящиеся образцы и сдайте в приёмник {$count} шт. Приёмник сбросят в капсуле.
-expedition-samples-done = Образцы собраны. Задача выполнена!
+expedition-samples-done = Приёмник с образцами поднят фултоном. Задача выполнена!
 expedition-repair-announcement = Задача: эвакуационный шаттл разбился при посадке. Почините его узлы и удержите шаттл, пока запускаются системы.
 expedition-repair-incoming = Эвакуационный шаттл теряет управление и садится в районе ({$x}, {$y})!
 expedition-repair-crashed = Шаттл сел жёстко. Повреждено узлов: {$count}. Почините их.
@@ -45,3 +45,8 @@ ent-ExpeditionRepairPoint = повреждённый узел шаттла
 ent-ExpeditionDropSiteMarker = место падения капсул экспедиции
     .desc = { ent-MarkerBase.desc }
     .suffix = Капсулы волн
+
+expedition-samples-fulton = Образцы собраны! Привяжите приёмник к фултону, чтобы отправить их на орбиту.
+expedition-samples-fulton-attached = Приёмник привязан к фултону: подъём через {$seconds} с.
+expedition-depot-verb-fulton = Привязать к фултону
+expedition-hud-objective-fulton = Отправить приёмник фултоном
