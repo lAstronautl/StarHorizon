@@ -38,7 +38,7 @@ public sealed class ExpeditionWaveSystem : EntitySystem
     [Dependency] private readonly MapSystem _map = default!;
     [Dependency] private readonly Content.Server._StarHorizon.DropPod.ExpeditionCargoPodSystem _cargoPods = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
-    [Dependency] private readonly RockClearSystem _rocks = default!;
+    [Dependency] private readonly ExpeditionTileSystem _tiles = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly TransformSystem _xform = default!;
 
@@ -163,8 +163,8 @@ public sealed class ExpeditionWaveSystem : EntitySystem
     /// </summary>
     public bool DropCargo(EntityUid map, Vector2 near, EntityUid cargo)
     {
-        var coords = FindReachableDropTile(map, near, minSteps: 3, maxSteps: 7)
-                     ?? _rocks.FindDropTile(map, near, 3f, 7f, _random)
+        var coords = _tiles.FindReachableDropTile(map, near, minSteps: 3, maxSteps: 7)
+                     ?? _tiles.FindLandingTile(map, near, 7f, 12)
                      ?? new EntityCoordinates(map, near);
         _cargoPods.Drop(coords, new[] { cargo });
         return true;
@@ -367,60 +367,8 @@ public sealed class ExpeditionWaveSystem : EntitySystem
     private EntityCoordinates? FindDropTile(Entity<ExpeditionWavesComponent> ent, Entity<MapGridComponent> grid, HashSet<Vector2i> taken)
     {
         var center = _random.Pick(_players).Pos;
-        return FindReachableDropTile(ent.Owner, center, taken)
-               ?? _rocks.FindDropTile(grid, center, ent.Comp.DropRingMin, ent.Comp.DropRingMax, _random);
+        return _tiles.FindReachableDropTile(ent.Owner, center, taken)
+               ?? _tiles.FindLandingTile(ent.Owner, center, ent.Comp.DropRingMax, 12);
     }
 
-    /// <summary>
-    /// Клетка для капсулы, от которой до точки <paramref name="near"/> (игрока) гарантированно есть путь: поиск в ширину по
-    /// свободным клеткам (без стен, породы и закрытых дверей), 5..14 шагов. Если игрок в комплексе, только клетки
-    /// комплекса. Маркеры мест падения (<see cref="ExpeditionDropSiteMarkerComponent"/>) из атласов в первую очередь.
-    /// </summary>
-    public EntityCoordinates? FindReachableDropTile(EntityUid map, Vector2 near, HashSet<Vector2i>? taken = null,
-        int minSteps = 5, int maxSteps = 14)
-    {
-        if (!TryComp<MapGridComponent>(map, out var grid))
-            return null;
-
-        var start = _map.TileIndicesFor(map, grid, new EntityCoordinates(map, near));
-        IReadOnlySet<Vector2i>? within = null;
-        if (TryComp<ExpeditionDungeonTilesComponent>(map, out var dungeon) && dungeon.Tiles.Contains(start))
-            within = dungeon.Tiles;
-
-        // Севшие шаттлы (другие гриды): их стены для поиска стены (шлюзы проходимы), а на сам шаттл капсула не падает,
-        // только возле него.
-        var (covered, blocked) = _rocks.OtherGrids(map, grid, near, maxSteps + 20, passDoors: true);
-        blocked.Remove(start);
-
-        var reach = _rocks.Reachable(map, grid, start, maxSteps + 6, within, blocked: blocked);
-        if (within != null && reach.Count < 8)
-            reach = _rocks.Reachable(map, grid, start, maxSteps + 6, blocked: blocked); // тесная комната: допускаем и снаружи
-
-        // Игрок на шаттле: от него до выхода с шаттла шагов больше, ищем дальше.
-        if (covered.Contains(start))
-            reach = _rocks.Reachable(map, grid, start, maxSteps + 30, within, blocked: blocked);
-
-        bool Free(Vector2i tile) => !covered.Contains(tile) && (taken == null || !taken.Contains(tile));
-
-        // Маркеры из атласов: если до них можно дойти.
-        var markerTiles = new HashSet<Vector2i>();
-        var markers = EntityQueryEnumerator<ExpeditionDropSiteMarkerComponent, TransformComponent>();
-        while (markers.MoveNext(out _, out _, out var xform))
-        {
-            if (xform.MapUid == map)
-                markerTiles.Add(_map.TileIndicesFor(map, grid, xform.Coordinates));
-        }
-
-        var candidates = reach.Where(r => markerTiles.Contains(r.Tile) && r.Steps >= 2 && Free(r.Tile)).Select(r => r.Tile).ToList();
-        if (candidates.Count == 0)
-            candidates = reach.Where(r => r.Steps >= minSteps && r.Steps <= maxSteps && Free(r.Tile)).Select(r => r.Tile).ToList();
-        if (candidates.Count == 0)
-            candidates = reach.Where(r => r.Steps >= 2 && Free(r.Tile)).Select(r => r.Tile).ToList();
-        if (candidates.Count == 0)
-            return null;
-
-        var pick = _random.Pick(candidates);
-        taken?.Add(pick);
-        return _map.GridTileToLocal(map, grid, pick);
-    }
 }

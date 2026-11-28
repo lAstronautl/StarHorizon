@@ -27,7 +27,7 @@ public sealed class PursuePlayerSystem : EntitySystem
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly TransformSystem _xform = default!;
     [Dependency] private readonly MapSystem _map = default!;
-    [Dependency] private readonly RockClearSystem _rocks = default!;
+    [Dependency] private readonly ExpeditionTileSystem _tiles = default!;
     [Dependency] private readonly Robust.Shared.Containers.SharedContainerSystem _container = default!;
 
     /// <summary>
@@ -80,6 +80,24 @@ public sealed class PursuePlayerSystem : EntitySystem
     }
 
     /// <summary>Живые игроки (с сессией) на карте.</summary>
+    /// <summary>
+    /// На карте экспедиции мобы не ломают стены: у всех ИИ на карте выключается NavSmash (иначе путь прокладывается
+    /// сквозь стену, и моб долбит её вместо обхода). Вызывается один раз в конце генерации карты; мобам волн NavSmash
+    /// выключается при появлении (<see cref="PursuePlayerComponent"/>).
+    /// </summary>
+    public void DisableWallSmashing(EntityUid map)
+    {
+        var query = EntityQueryEnumerator<HTNComponent, TransformComponent>();
+        while (query.MoveNext(out _, out var htn, out var xform))
+        {
+            if (xform.MapUid != map)
+                continue;
+
+            if (htn.Blackboard.TryGetValue<bool>(NPCBlackboard.NavSmash, out var smash, EntityManager) && smash)
+                htn.Blackboard.SetValue(NPCBlackboard.NavSmash, false);
+        }
+    }
+
     public void GetAlivePlayers(EntityUid map, List<(EntityUid Uid, Vector2 Pos)> result)
     {
         result.Clear();
@@ -93,10 +111,6 @@ public sealed class PursuePlayerSystem : EntitySystem
         }
     }
 
-    /// <summary>
-    /// Цель ближайшей ножки пути к далёкому игроку: открытая земля на <see cref="PursuePlayerComponent.LegLength"/> метров
-    /// вперёд (с обходом вправо и влево, если прямо порода). Null: игрок близко или ножку выбрать не вышло, тогда идём к игроку.
-    /// </summary>
     /// <summary>Поля расстояний от клеток игроков (по гриду, клетке игрока и тому, открывает ли моб двери).</summary>
     private readonly Dictionary<(EntityUid Grid, Vector2i Tile, bool Doors), (TimeSpan Built, Dictionary<Vector2i, int> Dist)> _fields = new();
     private static readonly TimeSpan FieldLifetime = TimeSpan.FromSeconds(3);
@@ -111,14 +125,14 @@ public sealed class PursuePlayerSystem : EntitySystem
     /// Промежуточная точка погони на планете. Основной способ: поле расстояний от игрока по проходимым клеткам
     /// (стены и порода не проходимы, двери проходимы для тех, кто их открывает или вскрывает); моб получает ножку на
     /// <see cref="LegSteps"/> шагов «под горку». Такой путь всегда реальный: обходит комплекс и ведёт через проходы.
-    /// Если моб с полем не связан (отрезан), запасной способ: ножка в сторону игрока (<see cref="ChooseAngleWaypoint"/>).
-    /// Null: идти к игроку напрямую.
+    /// Null: идти к игроку напрямую (близко, не планета или моб от игрока отрезан).
     /// </summary>
     private Vector2? ChooseWaypoint(EntityUid uid, PursuePlayerComponent pursue, HTNComponent htn, TransformComponent xform,
         Vector2 pos, Vector2 playerPos)
     {
+        // Не планета (карта не грид): идём к игроку напрямую.
         if (xform.GridUid is not { } gridUid || xform.GridUid != xform.MapUid || !TryComp<MapGridComponent>(gridUid, out var grid))
-            return ChooseAngleWaypoint(uid, pursue, xform, pos, playerPos);
+            return null;
 
         var doors = htn.Blackboard.TryGetValue<bool>(NPCBlackboard.NavInteract, out var interact, EntityManager) && interact
                     || htn.Blackboard.TryGetValue<bool>(NPCBlackboard.NavPry, out var pry, EntityManager) && pry;
@@ -126,8 +140,9 @@ public sealed class PursuePlayerSystem : EntitySystem
         var field = GetField(gridUid, grid, playerTile, doors);
 
         var mobTile = _map.TileIndicesFor(gridUid, grid, new EntityCoordinates(gridUid, pos));
+        // Моб отрезан от игрока (поле до него не дошло): идём напрямую, сторож и удаление застрявших разберутся.
         if (!TryNearestInField(field, mobTile, out var current))
-            return ChooseAngleWaypoint(uid, pursue, xform, pos, playerPos);
+            return null;
 
         // Близко: напрямую (короткий путь находит A*).
         if (field[current] <= DirectSteps)
@@ -189,7 +204,7 @@ public sealed class PursuePlayerSystem : EntitySystem
         if (_fields.TryGetValue(key, out var cached) && now - cached.Built < FieldLifetime)
             return cached.Dist;
 
-        var dist = _rocks.DistanceField(gridUid, grid, playerTile, doors);
+        var dist = _tiles.DistanceField(gridUid, grid, playerTile, doors);
         _fields[key] = (now, dist);
         return dist;
     }
@@ -213,72 +228,6 @@ public sealed class PursuePlayerSystem : EntitySystem
         }
 
         return true;
-    }
-
-    /// <summary>Клетка моба в поле или ближайшая к ней (моб может стоять на краю клетки у стены).</summary>
-    private static bool TryNearestInField(Dictionary<Vector2i, int> field, Vector2i tile, out Vector2i found)
-    {
-        found = tile;
-        if (field.ContainsKey(tile))
-            return true;
-
-        var bestDist = int.MaxValue;
-        for (var dx = -1; dx <= 1; dx++)
-        {
-            for (var dy = -1; dy <= 1; dy++)
-            {
-                var near = new Vector2i(tile.X + dx, tile.Y + dy);
-                if (field.TryGetValue(near, out var d) && d < bestDist)
-                {
-                    bestDist = d;
-                    found = near;
-                }
-            }
-        }
-
-        return bestDist != int.MaxValue;
-    }
-
-    private Vector2? ChooseAngleWaypoint(EntityUid uid, PursuePlayerComponent pursue, TransformComponent xform, Vector2 pos, Vector2 playerPos)
-    {
-        var toPlayer = playerPos - pos;
-        if (toPlayer.Length() <= pursue.DirectRange || xform.GridUid is not { } grid || xform.GridUid != xform.MapUid)
-        {
-            pursue.Waypoint = null;
-            return null;
-        }
-
-        var now = _timing.CurTime;
-
-        // К выбранной ножке пути нет (A* сдался): в следующий раз пробуем другой угол.
-        var noPath = TryComp<NPCSteeringComponent>(uid, out var steering) && steering.Status == SteeringStatus.NoPath;
-        if (noPath)
-            pursue.AngleStart++;
-
-        if (!noPath
-            && pursue.Waypoint is { } current
-            && Vector2.DistanceSquared(current, pos) > 9f
-            && now - pursue.WaypointSet < TimeSpan.FromSeconds(8))
-        {
-            return current;
-        }
-
-        var dir = Vector2.Normalize(toPlayer);
-        var angles = new[] { 0f, 35f, -35f, 70f, -70f, 105f, -105f };
-        for (var n = 0; n < angles.Length; n++)
-        {
-            var degrees = angles[(n + pursue.AngleStart) % angles.Length];
-            var rotated = new Angle(Angle.FromDegrees(degrees).Theta + dir.ToAngle().Theta).ToVec();
-            if (_rocks.FindOpenNear(grid, pos + rotated * pursue.LegLength) is { } open)
-            {
-                pursue.Waypoint = open;
-                pursue.WaypointSet = now;
-                return open;
-            }
-        }
-
-        pursue.Waypoint = null;
-        return null;
     }
 
     /// <returns>True, если моб удалён как застрявший.</returns>
@@ -312,9 +261,32 @@ public sealed class PursuePlayerSystem : EntitySystem
 
         pursue.ProgressSince = now;
         pursue.Waypoint = null;
-        pursue.AngleStart++;
         pursue.Followed = (null, null); // цель погони будет выставлена и план перестроен заново
         _steering.Unregister(uid);
+    }
+
+    /// <summary>Клетка моба в поле или ближайшая к ней (моб может стоять на краю клетки у стены).</summary>
+    private static bool TryNearestInField(Dictionary<Vector2i, int> field, Vector2i tile, out Vector2i found)
+    {
+        found = tile;
+        if (field.ContainsKey(tile))
+            return true;
+
+        var bestDist = int.MaxValue;
+        for (var dx = -1; dx <= 1; dx++)
+        {
+            for (var dy = -1; dy <= 1; dy++)
+            {
+                var near = new Vector2i(tile.X + dx, tile.Y + dy);
+                if (field.TryGetValue(near, out var d) && d < bestDist)
+                {
+                    bestDist = d;
+                    found = near;
+                }
+            }
+        }
+
+        return bestDist != int.MaxValue;
     }
 
     private bool CheckStuck(EntityUid uid, PursuePlayerComponent pursue, Vector2 pos, float nearestPlayerSquared)

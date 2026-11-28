@@ -59,7 +59,7 @@ public sealed class DropPodSystem : EntitySystem
     [Dependency] private readonly StunSystem _stuns = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
     [Dependency] private readonly SharedMoverController _mover = default!;
-    [Dependency] private readonly Content.Server._StarHorizon.Expedition.RockClearSystem _rocks = default!;
+    [Dependency] private readonly Content.Server._StarHorizon.Expedition.ExpeditionTileSystem _tiles = default!;
 
     /// <summary>Меньше этого времени до закрытия экспедиции сбрасываться на неё уже поздно.</summary>
     private static readonly TimeSpan PlanetMinTimeLeft = TimeSpan.FromMinutes(5);
@@ -1055,8 +1055,8 @@ public sealed class DropPodSystem : EntitySystem
 
         // Каждой капсуле своя точка рядом с площадкой посадки, чтобы не садились друг на друга; не в камень и не в
         // замурованную щель. Нет места рядом: ищем дальше, и только потом садимся как раньше.
-        coords = _rocks.FindDropTile(map, expedition.LandingCoordinates, 0.5f, 6f, _random, minRegion: 25)
-                 ?? _rocks.FindDropTile(map, expedition.LandingCoordinates, 2f, 14f, _random, attempts: 160, minRegion: 12)
+        coords = _tiles.FindLandingTile(map, expedition.LandingCoordinates, 6f, 25)
+                 ?? _tiles.FindLandingTile(map, expedition.LandingCoordinates, 14f, 12)
                  ?? new EntityCoordinates(map, expedition.LandingCoordinates + _random.NextVector2(0.5f, 3f));
         return true;
     }

@@ -238,7 +238,7 @@ public sealed class ExpeditionWaveTest
     }
 
     /// <summary>Дальники остаются дальниками: у стрелков корень погони с дальним боем, а не только ближним.</summary>
-    /// <summary>Игрок в данже: поды с волной садятся на пол данжа рядом с ним (не на землю биома и не в стены).</summary>
+    /// <summary>Игрок в комплексе: поды с волной садятся в комплекс рядом с ним (не снаружи и не в стены).</summary>
     [Test]
     public async Task PodsLandOnDungeonFloorNearPlayer()
     {
@@ -248,7 +248,7 @@ public sealed class ExpeditionWaveTest
         var salvage = server.System<SalvageSystem>();
         var xform = server.System<SharedTransformSystem>();
         var mapSys = server.System<SharedMapSystem>();
-        var rocks = server.System<RockClearSystem>();
+        var tiles = server.System<ExpeditionTileSystem>();
 
         EntityUid planet = default;
         await server.WaitPost(() =>
@@ -278,12 +278,14 @@ public sealed class ExpeditionWaveTest
         await server.WaitPost(() =>
         {
             var grid = server.EntMan.GetComponent<MapGridComponent>(expeditionMap);
-            foreach (var tileRef in mapSys.GetAllTiles(expeditionMap, grid))
+            var dungeon = server.EntMan.GetComponent<ExpeditionDungeonTilesComponent>(expeditionMap).Tiles;
+            foreach (var tile in dungeon)
             {
-                if (rocks.IsDungeonFloor(expeditionMap, grid, tileRef.GridIndices) &&
-                    rocks.IsOpenRegion(expeditionMap, grid, tileRef.GridIndices, 30))
+                // Свободная клетка комплекса, откуда внутри комплекса можно дойти хотя бы до 30 клеток.
+                if (tiles.IsOpen(expeditionMap, grid, tile)
+                    && tiles.Reachable(expeditionMap, grid, tile, 30, dungeon, maxTiles: 40).Count >= 30)
                 {
-                    dungeonTile = tileRef.GridIndices;
+                    dungeonTile = tile;
                     break;
                 }
             }
@@ -316,8 +318,8 @@ public sealed class ExpeditionWaveTest
             {
                 var coords = server.EntMan.GetComponent<TransformComponent>(pod.Owner).Coordinates;
                 var tile = mapSys.TileIndicesFor(expeditionMap, grid, coords);
-                Assert.That(rocks.IsDungeonFloor(expeditionMap, grid, tile), $"под {tile} на полу данжа");
-                Assert.That(rocks.TileClear(expeditionMap, grid, tile), "под не в стене");
+                Assert.That(server.EntMan.GetComponent<ExpeditionDungeonTilesComponent>(expeditionMap).Tiles.Contains(tile), $"под {tile} в комплексе");
+                Assert.That(tiles.TileClear(expeditionMap, grid, tile), "под не в стене");
                 Assert.That((xform.GetWorldPosition(pod.Owner) - xform.GetWorldPosition(player)).Length(), Is.LessThanOrEqualTo(ring + 1f));
             }
         });
@@ -426,7 +428,7 @@ public sealed class ExpeditionWaveTest
         await using var pair = await PoolManager.GetServerClient(new PoolSettings { FailureLogLevel = LogLevel.Fatal });
         var server = pair.Server;
         var map = await pair.CreateTestMap();
-        var rocks = server.System<RockClearSystem>();
+        var tiles = server.System<ExpeditionTileSystem>();
 
         await server.WaitPost(() =>
         {
@@ -452,22 +454,20 @@ public sealed class ExpeditionWaveTest
 
         var grid = map.Grid.Comp;
         var gridEnt = map.Grid.Owner;
-        Assert.That(rocks.IsOpen(gridEnt, grid, new Vector2i(0, 0)), "сам тайл пуст");
-        Assert.That(rocks.IsOpen(gridEnt, grid, new Vector2i(1, 0)), Is.False, "в тайле породы нельзя");
-        Assert.That(rocks.IsOpenRegion(gridEnt, grid, new Vector2i(0, 0), 20), Is.False, "замурованная щель: выхода нет");
-        Assert.That(rocks.IsOpenRegion(gridEnt, grid, new Vector2i(5, 5), 20), "открытое место годится");
+        Assert.That(tiles.IsOpen(gridEnt, grid, new Vector2i(0, 0)), "сам тайл пуст");
+        Assert.That(tiles.IsOpen(gridEnt, grid, new Vector2i(1, 0)), Is.False, "в тайле породы нельзя");
+        Assert.That(tiles.Reachable(gridEnt, grid, new Vector2i(0, 0), 10).Count, Is.EqualTo(1), "замурованная щель: выхода нет");
 
-        // Кольцо вокруг щели никогда не отдаёт тайл в камне или в щели.
+        // Место посадки у щели никогда не в камне и не в щели.
         await server.WaitPost(() =>
         {
-            var random = server.Resolve<Robust.Shared.Random.IRobustRandom>();
             for (var i = 0; i < 40; i++)
             {
-                var coords = rocks.FindDropTile(gridEnt, new Vector2(0.5f, 0.5f), 0f, 3f, random, minRegion: 20);
+                var coords = tiles.FindLandingTile(gridEnt, new Vector2(0.5f, 0.5f), 3f, 20);
                 Assert.That(coords, Is.Not.Null);
                 var tile = server.System<SharedMapSystem>().TileIndicesFor(gridEnt, grid, coords!.Value);
                 Assert.That(tile, Is.Not.EqualTo(new Vector2i(0, 0)), "в щель не садимся");
-                Assert.That(rocks.IsOpen(gridEnt, grid, tile), "и не в камень");
+                Assert.That(tiles.IsOpen(gridEnt, grid, tile), "и не в камень");
             }
         });
 
@@ -511,26 +511,27 @@ public sealed class ExpeditionWaveTest
     [TestCase("NFMobXeno")]
     public async Task FarWaveMobsWalkAroundObstaclesToThePlayer(string proto)
     {
-        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Connected = true, FailureLogLevel = LogLevel.Fatal });
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Connected = true, Dirty = true, FailureLogLevel = LogLevel.Fatal });
         var server = pair.Server;
-        var map = await pair.CreateTestMap();
         var xform = server.System<SharedTransformSystem>();
 
-        EntityUid mob = default, player = default;
+        // Карта сама является гридом, как у планет экспедиций.
+        EntityUid mapUid = default, mob = default, player = default;
         await server.WaitPost(() =>
         {
             var mapSys = server.System<SharedMapSystem>();
-            var gridUid = map.Grid.Owner;
+            mapUid = mapSys.CreateMap(out _);
+            var grid = server.EntMan.EnsureComponent<MapGridComponent>(mapUid);
+            var tile = new Tile(server.ResolveDependency<ITileDefinitionManager>()["FloorSteel"].TileId);
             for (var x = -5; x <= 130; x++)
             {
                 for (var y = -6; y <= 6; y++)
-                    mapSys.SetTile(gridUid, map.Grid.Comp, new EntityCoordinates(gridUid, x + 0.5f, y + 0.5f), map.Tile.Tile);
+                    mapSys.SetTile(mapUid, grid, new Vector2i(x, y), tile);
             }
 
             // Стена из породы поперёк коридора на x=40 с проходом сверху: надо обойти.
             for (var y = -6; y <= 4; y++)
-                server.EntMan.SpawnEntity("WallRockBasalt", new EntityCoordinates(gridUid, 40.5f, y + 0.5f));
-
+                server.EntMan.SpawnEntity("WallRockBasalt", new EntityCoordinates(mapUid, 40.5f, y + 0.5f));
         });
 
         // Граф путей у ИИ строится несколько тиков после изменения тайлов: даём ему достроиться до появления моба.
@@ -538,11 +539,10 @@ public sealed class ExpeditionWaveTest
 
         await server.WaitPost(() =>
         {
-            var gridUid = map.Grid.Owner;
-            mob = server.EntMan.SpawnEntity(proto, new EntityCoordinates(gridUid, 0.5f, 0.5f));
+            mob = server.EntMan.SpawnEntity(proto, new EntityCoordinates(mapUid, 0.5f, 0.5f));
             // Пути у ИИ считаются по бюджету реального времени (в холодном процессе медленно): удаление застрявших не мешает тесту.
             server.EntMan.AddComponent<PursuePlayerComponent>(mob).StuckTime = TimeSpan.FromMinutes(10);
-            player = server.EntMan.SpawnEntity("WaveTestPlayer", new EntityCoordinates(gridUid, 80.5f, 0.5f));
+            player = server.EntMan.SpawnEntity("WaveTestPlayer", new EntityCoordinates(mapUid, 80.5f, 0.5f));
             server.PlayerMan.SetAttachedEntity(server.PlayerMan.Sessions.First(), player, out _, true);
         });
 

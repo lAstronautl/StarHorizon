@@ -63,7 +63,7 @@ public sealed class ExpeditionFactionPursuitTest
     }
 
     /// <summary>
-    /// На карте экспедиции мобы (и не из волн) не ломают стены: NavSmash выключается; на обычной карте не трогается.
+    /// На карте экспедиции мобы (и не из волн) не ломают стены: NavSmash выключается в конце генерации; на других картах не трогается.
     /// </summary>
     [Test]
     public async Task MobsDoNotSmashWallsOnExpeditions()
@@ -76,9 +76,6 @@ public sealed class ExpeditionFactionPursuitTest
         EntityUid onExpedition = default, elsewhere = default;
         await server.WaitPost(() =>
         {
-            var expedition = server.EntMan.AddComponent<Content.Server.Salvage.Expeditions.SalvageExpeditionComponent>(expeditionMap.MapUid);
-            expedition.MissionParams = new SalvageMissionParams();
-            expedition.EndTime = TimeSpan.FromHours(1);
             onExpedition = server.EntMan.SpawnEntity("NFMobXeno", expeditionMap.GridCoords);
             elsewhere = server.EntMan.SpawnEntity("NFMobXeno", otherMap.GridCoords);
         });
@@ -87,7 +84,8 @@ public sealed class ExpeditionFactionPursuitTest
             server.EntMan.GetComponent<HTNComponent>(uid).Blackboard.TryGetValue<bool>("NavSmash", out var smash, server.EntMan) && smash;
 
         Assert.That(Smash(elsewhere), "у ксеноса ломание стен включено по умолчанию");
-        await pair.RunSeconds(2f);
+        // В конце генерации карты экспедиции ломание выключается всем её мобам.
+        await server.WaitPost(() => server.System<PursuePlayerSystem>().DisableWallSmashing(expeditionMap.MapUid));
         Assert.That(Smash(onExpedition), Is.False, "на экспедиции стены не ломает");
         Assert.That(Smash(elsewhere), "вне экспедиции не трогаем");
 

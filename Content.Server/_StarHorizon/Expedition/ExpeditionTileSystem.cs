@@ -1,79 +1,24 @@
 using System.Linq;
 using System.Numerics;
 using Content.Server.Gatherable.Components;
-using Robust.Shared.Map;
-using Robust.Shared.Maths;
-using Robust.Shared.Map.Components;
 using Robust.Server.GameObjects;
+using Robust.Shared.Map;
+using Robust.Shared.Map.Components;
+using Robust.Shared.Maths;
+using Robust.Shared.Random;
 
 namespace Content.Server._StarHorizon.Expedition;
 
 /// <summary>
-/// Выбор места посадки дроп-подов: тайл без породы (стены, которые добываются киркой: <see cref="GatherableComponent"/>)
-/// и других твёрдых объектов, и не замурованный карман: из него должен быть выход на большое открытое пространство.
+/// Клетки карт экспедиций: какие свободны (без породы, твёрдых объектов, лавы и пропастей), до каких можно дойти,
+/// поле расстояний для погони мобов волн и места падения капсул (волн, приёмника, игроков).
 /// </summary>
-public sealed class RockClearSystem : EntitySystem
+public sealed class ExpeditionTileSystem : EntitySystem
 {
     [Dependency] private readonly MapSystem _map = default!;
-    [Dependency] private readonly Robust.Shared.Map.IMapManager _mapManager = default!;
+    [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly TransformSystem _xform = default!;
-    [Dependency] private readonly Content.Shared.Parallax.Biomes.SharedBiomeSystem _biome = default!;
-
-    /// <summary>
-    /// Тайл пола данжа: на нём лежит настоящий тайл, и он не тот, что сгенерировал бы биом планеты (данж кладёт свой пол).
-    /// Без биома (не планета) любой тайл считается полом.
-    /// </summary>
-    public bool IsDungeonFloor(EntityUid gridUid, MapGridComponent grid, Vector2i tile)
-    {
-        var tileRef = _map.GetTileRef(gridUid, grid, tile);
-        if (tileRef.Tile.IsEmpty)
-            return false;
-
-        if (!TryComp<Content.Shared.Parallax.Biomes.BiomeComponent>(gridUid, out var biome))
-            return true;
-
-        if (!_biome.TryGetTile(tile, biome.Layers, biome.Seed, (gridUid, grid), out var natural))
-            return true;
-
-        return natural.Value.TypeId != tileRef.Tile.TypeId;
-    }
-
-    /// <summary>
-    /// Место посадки на полу данжа в кольце вокруг точки: свободный тайл пола данжа из открытой области (комната или
-    /// коридор, а не замурованная щель). Проверяются все тайлы кольца, выбирается случайный подходящий.
-    /// </summary>
-    public EntityCoordinates? FindDungeonDropTile(EntityUid gridUid, Vector2 center, float minRing, float maxRing,
-        Robust.Shared.Random.IRobustRandom random, int minRegion = 12, int maxChecks = 40)
-    {
-        if (!TryComp<MapGridComponent>(gridUid, out var grid))
-            return null;
-
-        var centerTile = _map.TileIndicesFor(gridUid, grid, new EntityCoordinates(gridUid, center));
-        var radius = (int) MathF.Ceiling(maxRing);
-        var candidates = new List<Vector2i>();
-        for (var dx = -radius; dx <= radius; dx++)
-        {
-            for (var dy = -radius; dy <= radius; dy++)
-            {
-                var dist = MathF.Sqrt(dx * dx + dy * dy);
-                if (dist < minRing || dist > maxRing)
-                    continue;
-
-                var tile = new Vector2i(centerTile.X + dx, centerTile.Y + dy);
-                if (IsDungeonFloor(gridUid, grid, tile) && TileClear(gridUid, grid, tile))
-                    candidates.Add(tile);
-            }
-        }
-
-        random.Shuffle(candidates);
-        for (var i = 0; i < candidates.Count && i < maxChecks; i++)
-        {
-            if (IsOpenRegion(gridUid, grid, candidates[i], minRegion))
-                return _map.GridTileToLocal(gridUid, grid, candidates[i]);
-        }
-
-        return null;
-    }
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     /// <summary>
     /// Опасный пол: пропасть или лава/жидкая плазма (эффект клетки поджигает и т.п.; вода только тушит, она не опасна).
@@ -107,62 +52,6 @@ public sealed class RockClearSystem : EntitySystem
     public bool IsOpen(EntityUid gridUid, MapGridComponent grid, Vector2i tile)
     {
         return !_map.GetTileRef(gridUid, grid, tile).Tile.IsEmpty && TileClear(gridUid, grid, tile);
-    }
-
-    /// <summary>
-    /// Умная проверка: от тайла по свободным соседям (4 стороны) можно дойти минимум до <paramref name="minTiles"/> тайлов.
-    /// Так мобы и капсулы не падают в замурованную породой щель, из которой нет выхода.
-    /// </summary>
-    public bool IsOpenRegion(EntityUid gridUid, MapGridComponent grid, Vector2i start, int minTiles = 40)
-    {
-        if (!IsOpen(gridUid, grid, start))
-            return false;
-
-        var seen = new HashSet<Vector2i> { start };
-        var queue = new Queue<Vector2i>();
-        queue.Enqueue(start);
-
-        while (queue.Count > 0)
-        {
-            var tile = queue.Dequeue();
-            if (seen.Count >= minTiles)
-                return true;
-
-            foreach (var next in new[] { tile + Vector2i.Up, tile + Vector2i.Down, tile + Vector2i.Left, tile + Vector2i.Right })
-            {
-                if (seen.Contains(next) || !IsOpen(gridUid, grid, next))
-                    continue;
-
-                seen.Add(next);
-                queue.Enqueue(next);
-            }
-        }
-
-        return seen.Count >= minTiles;
-    }
-
-    /// <summary>
-    /// Находит место посадки в кольце вокруг точки: свободный тайл из открытой области. Кольцо понемногу расширяется.
-    /// </summary>
-    public EntityCoordinates? FindDropTile(EntityUid gridUid, Vector2 center, float minRing, float maxRing,
-        Robust.Shared.Random.IRobustRandom random, int attempts = 80, int minRegion = 40)
-    {
-        if (!TryComp<MapGridComponent>(gridUid, out var grid))
-            return null;
-
-        for (var attempt = 0; attempt < attempts; attempt++)
-        {
-            var spread = attempt / 20f * 3f;
-            var pos = center + random.NextAngle().ToVec() * random.NextFloat(minRing, maxRing + spread);
-            var tile = _map.TileIndicesFor(gridUid, grid, new EntityCoordinates(gridUid, pos));
-
-            if (!IsOpenRegion(gridUid, grid, tile, minRegion))
-                continue;
-
-            return _map.GridTileToLocal(gridUid, grid, tile);
-        }
-
-        return null;
     }
 
     /// <summary>Клетка проходима: свободна, или единственные твёрдые объекты на ней двери (если двери открываются).</summary>
@@ -287,32 +176,98 @@ public sealed class RockClearSystem : EntitySystem
         return result;
     }
 
-    /// <summary>Ближайший к точке свободный тайл из открытой области (центр тайла в координатах карты-грида), если есть.</summary>
-    public Vector2? FindOpenNear(EntityUid gridUid, Vector2 point, int radius = 3, int minRegion = 12)
+    /// <summary>
+    /// Клетка для капсулы, от которой до точки <paramref name="near"/> (игрока) гарантированно есть путь: поиск в ширину по
+    /// свободным клеткам (без стен, породы и закрытых дверей), 5..14 шагов. Если игрок в комплексе, только клетки
+    /// комплекса. Маркеры мест падения (<see cref="ExpeditionDropSiteMarkerComponent"/>) из атласов в первую очередь.
+    /// </summary>
+    public EntityCoordinates? FindReachableDropTile(EntityUid map, Vector2 near, HashSet<Vector2i>? taken = null,
+        int minSteps = 5, int maxSteps = 14)
     {
-        if (!TryComp<MapGridComponent>(gridUid, out var grid))
+        if (!TryComp<MapGridComponent>(map, out var grid))
             return null;
 
-        var center = _map.TileIndicesFor(gridUid, grid, new EntityCoordinates(gridUid, point));
-        Vector2i? best = null;
-        var bestDist = float.MaxValue;
-        for (var dx = -radius; dx <= radius; dx++)
+        var start = _map.TileIndicesFor(map, grid, new EntityCoordinates(map, near));
+        IReadOnlySet<Vector2i>? within = null;
+        if (TryComp<ExpeditionDungeonTilesComponent>(map, out var dungeon) && dungeon.Tiles.Contains(start))
+            within = dungeon.Tiles;
+
+        // Севшие шаттлы (другие гриды): их стены для поиска стены (шлюзы проходимы), а на сам шаттл капсула не падает,
+        // только возле него.
+        var (covered, blocked) = OtherGrids(map, grid, near, maxSteps + 20, passDoors: true);
+        blocked.Remove(start);
+
+        var reach = Reachable(map, grid, start, maxSteps + 6, within, blocked: blocked);
+        if (within != null && reach.Count < 8)
+            reach = Reachable(map, grid, start, maxSteps + 6, blocked: blocked); // тесная комната: допускаем и снаружи
+
+        // Игрок на шаттле: от него до выхода с шаттла шагов больше, ищем дальше.
+        if (covered.Contains(start))
+            reach = Reachable(map, grid, start, maxSteps + 30, within, blocked: blocked);
+
+        bool Free(Vector2i tile) => !covered.Contains(tile) && (taken == null || !taken.Contains(tile));
+
+        // Маркеры из атласов: если до них можно дойти.
+        var markerTiles = new HashSet<Vector2i>();
+        var markers = EntityQueryEnumerator<ExpeditionDropSiteMarkerComponent, TransformComponent>();
+        while (markers.MoveNext(out _, out _, out var xform))
         {
-            for (var dy = -radius; dy <= radius; dy++)
+            if (xform.MapUid == map)
+                markerTiles.Add(_map.TileIndicesFor(map, grid, xform.Coordinates));
+        }
+
+        var candidates = reach.Where(r => markerTiles.Contains(r.Tile) && r.Steps >= 2 && Free(r.Tile)).Select(r => r.Tile).ToList();
+        if (candidates.Count == 0)
+            candidates = reach.Where(r => r.Steps >= minSteps && r.Steps <= maxSteps && Free(r.Tile)).Select(r => r.Tile).ToList();
+        if (candidates.Count == 0)
+            candidates = reach.Where(r => r.Steps >= 2 && Free(r.Tile)).Select(r => r.Tile).ToList();
+        if (candidates.Count == 0)
+            return null;
+
+        var pick = _random.Pick(candidates);
+        taken?.Add(pick);
+        return _map.GridTileToLocal(map, grid, pick);
+    }
+
+    /// <summary>
+    /// Место посадки капсулы игроков у площадки (рядом с ней нет игроков, поэтому поиска от игрока нет): ближайшая
+    /// к точке свободная клетка из области, в которой не меньше <paramref name="minRegion"/> клеток (не замурованная
+    /// щель), и случайная клетка этой области не дальше <paramref name="radius"/> от точки.
+    /// </summary>
+    public EntityCoordinates? FindLandingTile(EntityUid map, Vector2 near, float radius = 6f, int minRegion = 25)
+    {
+        if (!TryComp<MapGridComponent>(map, out var grid))
+            return null;
+
+        var center = _map.TileIndicesFor(map, grid, new EntityCoordinates(map, near));
+        var r = (int) MathF.Ceiling(radius);
+        var starts = new List<Vector2i>();
+        for (var dx = -r; dx <= r; dx++)
+        {
+            for (var dy = -r; dy <= r; dy++)
             {
-                var d = dx * dx + dy * dy;
-                if (d >= bestDist)
-                    continue;
-
-                var tile = new Vector2i(center.X + dx, center.Y + dy);
-                if (!IsOpenRegion(gridUid, grid, tile, minRegion))
-                    continue;
-
-                best = tile;
-                bestDist = d;
+                if (dx * dx + dy * dy <= radius * radius)
+                    starts.Add(new Vector2i(center.X + dx, center.Y + dy));
             }
         }
 
-        return best is { } found ? _map.GridTileToLocal(gridUid, grid, found).Position : null;
+        starts.Sort((a, b) => (a - center).LengthSquared.CompareTo((b - center).LengthSquared));
+        var tried = new HashSet<Vector2i>();
+        foreach (var start in starts)
+        {
+            if (tried.Contains(start) || !IsOpen(map, grid, start))
+                continue;
+
+            var region = Reachable(map, grid, start, maxSteps: 2 * r + 10, maxTiles: Math.Max(400, minRegion));
+            tried.UnionWith(region.Select(t => t.Tile));
+            if (region.Count < minRegion)
+                continue;
+
+            var near2 = region.Where(t => (t.Tile - center).LengthSquared <= radius * radius).Select(t => t.Tile).ToList();
+            var pick = near2.Count > 0 ? _random.Pick(near2) : start;
+            return _map.GridTileToLocal(map, grid, pick);
+        }
+
+        return null;
     }
 }

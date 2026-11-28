@@ -478,6 +478,9 @@ public sealed class SpawnSalvageMissionJob : Job<bool>
             }
         }
 
+        // StarHorizon: мобы экспедиции не ломают стены (обходят их).
+        _entManager.System<Content.Server._StarHorizon.Expedition.PursuePlayerSystem>().DisableWallSmashing(mapUid);
+
         // Frontier: delay ship FTL
         if (shuttleUid is { Valid: true })
         {

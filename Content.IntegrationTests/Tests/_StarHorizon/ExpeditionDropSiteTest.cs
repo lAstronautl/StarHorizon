@@ -84,7 +84,7 @@ public sealed class ExpeditionDropSiteTest
         await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true, FailureLogLevel = LogLevel.Fatal });
         var server = pair.Server;
         var (map, room) = await BuildRoom(pair);
-        var waves = server.System<ExpeditionWaveSystem>();
+        var waves = server.System<ExpeditionTileSystem>();
 
         await server.WaitAssertion(() =>
         {
@@ -220,7 +220,7 @@ public sealed class ExpeditionDropSiteTest
         await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true, FailureLogLevel = LogLevel.Fatal });
         var server = pair.Server;
         var xform = server.System<SharedTransformSystem>();
-        var waves = server.System<ExpeditionWaveSystem>();
+        var waves = server.System<ExpeditionTileSystem>();
 
         EntityUid mapUid = default, shuttle = default;
         await server.WaitPost(() =>
@@ -276,7 +276,7 @@ public sealed class ExpeditionDropSiteTest
         await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true, FailureLogLevel = LogLevel.Fatal });
         var server = pair.Server;
         var xform = server.System<SharedTransformSystem>();
-        var waves = server.System<ExpeditionWaveSystem>();
+        var waves = server.System<ExpeditionTileSystem>();
 
         EntityUid mapUid = default;
         await server.WaitPost(() =>
