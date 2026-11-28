@@ -55,6 +55,8 @@ public sealed class ExpeditionBlackBoxSystem : EntitySystem
     [Dependency] private readonly PursuePlayerSystem _pursue = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly TransformSystem _xform = default!;
+    [Dependency] private readonly AppearanceSystem _appearance = default!;
+    [Dependency] private readonly PointLightSystem _light = default!;
 
     private static readonly TimeSpan UpdateInterval = TimeSpan.FromSeconds(0.5);
     private readonly List<(EntityUid Uid, Vector2 Pos)> _players = new();
@@ -88,6 +90,8 @@ public sealed class ExpeditionBlackBoxSystem : EntitySystem
         var zone = EnsureComp<ExpeditionBlackBoxZoneComponent>(ent);
         zone.Active = true;
         Dirty(ent, zone);
+        _appearance.SetData(ent, ExpeditionBlackBoxVisuals.State, ExpeditionBlackBoxState.Downloading);
+        _light.SetColor(ent, Color.FromHex("#FF9A2E"));
 
         _salvage.Announce(map, Loc.GetString("expedition-blackbox-started",
             ("seconds", (int) retrieval.Duration.TotalSeconds), ("radius", (int) zone.Radius)));
@@ -138,6 +142,8 @@ public sealed class ExpeditionBlackBoxSystem : EntitySystem
                 expedition.Completed = true;
                 zone.Active = false;
                 Dirty(box, zone);
+                _appearance.SetData(box, ExpeditionBlackBoxVisuals.State, ExpeditionBlackBoxState.Done);
+                _light.SetColor(box, Color.FromHex("#5AE65A"));
                 _salvage.Announce(map, Loc.GetString("expedition-blackbox-done"));
                 continue;
             }

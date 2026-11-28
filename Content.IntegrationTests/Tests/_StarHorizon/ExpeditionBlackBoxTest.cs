@@ -120,6 +120,9 @@ public sealed class ExpeditionBlackBoxTest
         });
         await pair.RunSeconds(3f);
         Assert.That(retrieval.Started, "ящик активирован");
+        var appearance = server.System<SharedAppearanceSystem>();
+        Assert.That(appearance.TryGetData<ExpeditionBlackBoxState>(box, ExpeditionBlackBoxVisuals.State, out var boxState)
+                    && boxState == ExpeditionBlackBoxState.Downloading, "окно ящика: качает");
         Assert.That(zone.Active, "зона включена");
         Assert.That(zone.Occupied, "игрок в зоне");
         Assert.That(server.EntMan.Count<PursuePlayerComponent>(), Is.GreaterThan(0), "сигнал засекли: пришла волна");
@@ -145,6 +148,8 @@ public sealed class ExpeditionBlackBoxTest
         });
         await pair.RunSeconds(3f);
         Assert.That(retrieval.Done, "данные скачаны");
+        Assert.That(appearance.TryGetData(box, ExpeditionBlackBoxVisuals.State, out boxState) && boxState == ExpeditionBlackBoxState.Done,
+            "окно ящика: готово");
         Assert.That(expedition.Completed, "задание выполнено");
         Assert.That(zone.Active, Is.False, "зона выключена");
         Assert.That(hud.Objectives.All(o => o.Finished), "в интерфейсе обе задачи выполнены");

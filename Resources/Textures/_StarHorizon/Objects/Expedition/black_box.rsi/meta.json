@@ -1,7 +1,7 @@
 {
   "version": 1,
   "license": "CC-BY-SA-3.0",
-  "copyright": "Created for StarHorizon",
+  "copyright": "Created for StarHorizon, design after the Deep Rock Galactic black box",
   "size": {
     "x": 32,
     "y": 32
@@ -11,13 +11,30 @@
       "name": "icon"
     },
     {
-      "name": "light",
+      "name": "base"
+    },
+    {
+      "name": "light_idle",
       "delays": [
         [
           0.5,
           0.5
         ]
       ]
+    },
+    {
+      "name": "light_active",
+      "delays": [
+        [
+          0.15,
+          0.15,
+          0.15,
+          0.15
+        ]
+      ]
+    },
+    {
+      "name": "light_done"
     }
   ]
 }

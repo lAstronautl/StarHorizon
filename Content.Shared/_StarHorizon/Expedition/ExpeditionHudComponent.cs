@@ -152,3 +152,18 @@ public sealed partial class ExpeditionBlackBoxZoneComponent : Component
     [DataField, AutoNetworkedField]
     public bool Occupied;
 }
+
+/// <summary>Чёрный ящик: ждёт активации (красный мигает), качает данные (оранжевый), данные скачаны (зелёный).</summary>
+[Serializable, NetSerializable]
+public enum ExpeditionBlackBoxVisuals : byte
+{
+    State,
+}
+
+[Serializable, NetSerializable]
+public enum ExpeditionBlackBoxState : byte
+{
+    Idle,
+    Downloading,
+    Done,
+}

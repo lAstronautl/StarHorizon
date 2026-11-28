@@ -1,5 +1,5 @@
-# Чёрный ящик задания «Чёрный ящик» (Retrieval) планетной экспедиции: стоит в самой дальней комнате данжа и мигает
-# красным. Его активируют руками, затем качают данные, оставаясь в зоне вокруг него, пока идут волны.
+# Чёрный ящик задания «Чёрный ящик» (Retrieval) планетной экспедиции (по мотивам DRG): стоит в самой дальней комнате
+# данжа. Окно мигает красным, пока ждёт активации, оранжевым, пока качаются данные, зелёный - данные скачаны. Его активируют руками, затем качают данные, оставаясь в зоне вокруг него, пока идут волны.
 - type: entity
   id: ExpeditionBlackBox
   name: black box
@@ -12,9 +12,21 @@
   - type: Sprite
     sprite: _StarHorizon/Objects/Expedition/black_box.rsi
     layers:
-    - state: icon
-    - state: light
+    - state: base
+    - state: light_idle
+      map: [ "light" ]
       shader: unshaded
+  - type: Icon
+    sprite: _StarHorizon/Objects/Expedition/black_box.rsi
+    state: icon
+  - type: Appearance
+  - type: GenericVisualizer
+    visuals:
+      enum.ExpeditionBlackBoxVisuals.State:
+        light:
+          Idle: { state: light_idle }
+          Downloading: { state: light_active }
+          Done: { state: light_done }
   - type: Clickable
   - type: InteractionOutline
   - type: Physics
