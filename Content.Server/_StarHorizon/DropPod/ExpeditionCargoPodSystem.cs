@@ -144,3 +144,10 @@ public sealed class ExpeditionCargoPodSystem : EntitySystem
         ent.Comp.SleepingNpcs.Clear();
     }
 }
+
+/// <summary>На карте экспедиции: загрузчик биома на площадке посадки дроп-подов уже стоит.</summary>
+[RegisterComponent]
+public sealed partial class DropPodLandingLoaderComponent : Component
+{
+    [ViewVariables] public EntityUid Loader;
+}

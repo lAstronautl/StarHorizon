@@ -333,4 +333,47 @@ public sealed class ExpeditionDropSiteTest
 
         await pair.CleanReturnAsync();
     }
+    /// <summary>Лава (и пропасть) не место для капсулы: на ней мобы сгорают.</summary>
+    [Test]
+    public async Task PodsDoNotLandOnLava()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true, FailureLogLevel = LogLevel.Fatal });
+        var server = pair.Server;
+        var xform = server.System<SharedTransformSystem>();
+        var waves = server.System<ExpeditionWaveSystem>();
+
+        EntityUid mapUid = default;
+        await server.WaitPost(() =>
+        {
+            var mapSys = server.System<SharedMapSystem>();
+            mapUid = mapSys.CreateMap(out _);
+            var grid = server.EntMan.EnsureComponent<MapGridComponent>(mapUid);
+            var tile = new Tile(server.ResolveDependency<ITileDefinitionManager>()["FloorBasalt"].TileId);
+            for (var x = 0; x <= 30; x++)
+            {
+                for (var y = -15; y <= 15; y++)
+                {
+                    mapSys.SetTile(mapUid, grid, new Vector2i(x, y), tile);
+                    // Лава всюду, кроме узкой полосы x=10..13 вокруг игрока.
+                    if (x < 10 || x > 13)
+                        server.EntMan.SpawnEntity("FloorLavaEntity", new EntityCoordinates(mapUid, x + 0.5f, y + 0.5f));
+                }
+            }
+        });
+        await pair.RunTicksSync(3);
+
+        await server.WaitAssertion(() =>
+        {
+            var taken = new HashSet<Vector2i>();
+            for (var i = 0; i < 15; i++)
+            {
+                var coords = waves.FindReachableDropTile(mapUid, new Vector2(11.5f, 0.5f), taken);
+                Assert.That(coords, Is.Not.Null, "место нашлось");
+                var x = (int) MathF.Floor(xform.ToMapCoordinates(coords!.Value).Position.X);
+                Assert.That(x, Is.InRange(10, 13), $"капсула не на лаве (x={x})");
+            }
+        });
+
+        await pair.CleanReturnAsync();
+    }
 }

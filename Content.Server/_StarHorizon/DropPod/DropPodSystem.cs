@@ -970,6 +970,33 @@ public sealed class DropPodSystem : EntitySystem
             (_timing.CurTime + ent.Comp.ArrivalViewTime + ent.Comp.FallTime).TotalSeconds);
     }
 
+    /// <summary>Загрузчик биома на площадке посадки экспедиции (один на карту).</summary>
+    private void EnsureLandingLoader(EntityUid map, Vector2 landing)
+    {
+        if (HasComp<DropPodLandingLoaderComponent>(map))
+            return;
+
+        var loader = Spawn(null, new EntityCoordinates(map, landing));
+        AddComp<Content.Server.Parallax.BiomeForceLoadComponent>(loader);
+        EnsureComp<DropPodLandingLoaderComponent>(map).Loader = loader;
+    }
+
+    /// <summary>Земля вокруг площадки посадки подгружена (клетки на площадке и вокруг неё уже есть).</summary>
+    private bool LandingLoaded(EntityUid map, Vector2 landing)
+    {
+        if (!TryComp<MapGridComponent>(map, out var grid) || !HasComp<Content.Shared.Parallax.Biomes.BiomeComponent>(map))
+            return true;
+
+        foreach (var offset in new[] { Vector2.Zero, new Vector2(6, 0), new Vector2(-6, 0), new Vector2(0, 6), new Vector2(0, -6) })
+        {
+            var tile = _map.TileIndicesFor(map, grid, new EntityCoordinates(map, landing + offset));
+            if (_map.GetTileRef(map, grid, tile).Tile.IsEmpty)
+                return false;
+        }
+
+        return true;
+    }
+
     /// <summary>
     /// Точка посадки на карте экспедиции планеты. Если карта ещё строится (job работает несколько секунд),
     /// возвращает false: капсула остаётся в БСС и повторит попытку, но не дольше <see cref="DropPodComponent.ExpeditionWaitTime"/>.
@@ -1005,14 +1032,31 @@ public sealed class DropPodSystem : EntitySystem
             return true;
         }
 
-        ent.Comp.WaitingForExpedition = false;
-
         // Карта экспедиции создаётся на паузе; с прилётом капсулы она оживает для всех.
         _map.SetPaused(map, false);
 
+        // Земля у площадки посадки подгружается только рядом с игроками; пока она не подгружена, клетки пусты, и
+        // проверка на породу ничего не видит (капсула садилась прямо в камень, который появлялся потом). Ставим
+        // загрузчик на площадку и ждём в БСС, пока земля не появится.
+        EnsureLandingLoader(map, expedition.LandingCoordinates);
+        if (!LandingLoaded(map, expedition.LandingCoordinates))
+        {
+            if (!ent.Comp.WaitingForExpedition)
+            {
+                ent.Comp.WaitingForExpedition = true;
+                ent.Comp.ExpeditionWaitEnd = _timing.CurTime + ent.Comp.ExpeditionWaitTime;
+            }
+
+            if (_timing.CurTime < ent.Comp.ExpeditionWaitEnd)
+                return false;
+        }
+
+        ent.Comp.WaitingForExpedition = false;
+
         // Каждой капсуле своя точка рядом с площадкой посадки, чтобы не садились друг на друга; не в камень и не в
-        // замурованную щель. Если места нет, садимся как раньше.
+        // замурованную щель. Нет места рядом: ищем дальше, и только потом садимся как раньше.
         coords = _rocks.FindDropTile(map, expedition.LandingCoordinates, 0.5f, 6f, _random, minRegion: 25)
+                 ?? _rocks.FindDropTile(map, expedition.LandingCoordinates, 2f, 14f, _random, attempts: 160, minRegion: 12)
                  ?? new EntityCoordinates(map, expedition.LandingCoordinates + _random.NextVector2(0.5f, 3f));
         return true;
     }

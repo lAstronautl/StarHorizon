@@ -75,12 +75,25 @@ public sealed class RockClearSystem : EntitySystem
         return null;
     }
 
-    /// <summary>На тайле нет ни породы, ни других твёрдых объектов: сюда можно садиться (поды с мобами в камень не падают).</summary>
+    /// <summary>
+    /// Опасный пол: пропасть или лава/жидкая плазма (эффект клетки поджигает и т.п.; вода только тушит, она не опасна).
+    /// Сюда капсулы не падают и мобы погони не идут.
+    /// </summary>
+    public bool IsHazard(EntityUid anchored)
+    {
+        if (HasComp<Content.Shared.Chasm.ChasmComponent>(anchored))
+            return true;
+
+        return TryComp<Content.Server.Tiles.TileEntityEffectComponent>(anchored, out var effect)
+               && effect.Effects.Any(e => e is not Content.Shared.EntityEffects.Effects.ExtinguishReaction);
+    }
+
+    /// <summary>На тайле нет ни породы, ни других твёрдых объектов, ни лавы с пропастью: сюда можно садиться.</summary>
     public bool TileClear(EntityUid gridUid, MapGridComponent grid, Vector2i tile)
     {
         foreach (var anchored in _map.GetAnchoredEntities(gridUid, grid, tile))
         {
-            if (HasComp<GatherableComponent>(anchored))
+            if (HasComp<GatherableComponent>(anchored) || IsHazard(anchored))
                 return false;
 
             if (TryComp<Robust.Shared.Physics.Components.PhysicsComponent>(anchored, out var body) && body.CanCollide && body.Hard)
@@ -160,7 +173,7 @@ public sealed class RockClearSystem : EntitySystem
 
         foreach (var anchored in _map.GetAnchoredEntities(gridUid, grid, tile))
         {
-            if (HasComp<GatherableComponent>(anchored))
+            if (HasComp<GatherableComponent>(anchored) || IsHazard(anchored))
                 return false;
 
             if (TryComp<Robust.Shared.Physics.Components.PhysicsComponent>(anchored, out var body) && body.CanCollide && body.Hard
