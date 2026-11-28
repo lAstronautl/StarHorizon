@@ -290,14 +290,13 @@ public sealed class DropPodSystem : EntitySystem
     }
 
     /// <summary>
-    /// Капсула получила триггер (сигнал DeviceLink через <c>TriggerOnSignal</c> или активация через
-    /// <c>TriggerOnActivate</c>). Стартует, только если консоль уже записала ей план запуска.
+    /// Капсула получила триггер (сигнал DeviceLink через <c>TriggerOnSignal</c>). Стартует, только если консоль уже
+    /// записала ей план запуска.
     /// </summary>
     private void OnTrigger(Entity<DropPodComponent> ent, ref TriggerEvent args)
     {
-        // TriggerOnActivate срабатывает на любое взаимодействие (например, клик, которым открывают дверь).
         // Для TriggerOnSignal пользователь триггера - отправитель сигнала, то есть устройство с DeviceLinkSource.
-        // Запускаем только по сигналу, а обычные клики игнорируем.
+        // Запускаем только по сигналу (триггеры от игроков, если появятся, игнорируем).
         if (args.User is not { } sender || !HasComp<DeviceLinkSourceComponent>(sender))
             return;
 

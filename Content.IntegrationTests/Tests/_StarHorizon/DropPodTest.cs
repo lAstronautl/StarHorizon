@@ -46,6 +46,30 @@ public sealed class DropPodTest
         - MobLayer
 
 - type: entity
+  id: DropPodTestClicker
+  components:
+  - type: Hands
+    hands:
+      hand_right:
+        location: Right
+    sortedHands:
+    - hand_right
+  - type: ComplexInteraction
+  - type: Physics
+    bodyType: Dynamic
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeCircle
+          radius: 0.35
+        density: 50
+        mask:
+        - MobMask
+        layer:
+        - MobLayer
+
+- type: entity
   id: DropPodTestPassenger
   components:
   - type: Eye
@@ -110,6 +134,52 @@ public sealed class DropPodTest
         pod.VignetteDelay = TimeSpan.FromSeconds(0.3);
         pod.FlightTime = Fast;
         pod.ArrivalViewTime = Fast;
+    }
+
+    /// <summary>
+    /// По капсуле можно кликнуть (клиент попадает по её спрайту), и клик (активация) открывает и закрывает дверцу.
+    /// Раньше TriggerOnActivate перехватывал клик, и дверца не открывалась.
+    /// </summary>
+    [Test]
+    public async Task ClickOpensAndClosesThePod()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Connected = true, FailureLogLevel = LogLevel.Fatal });
+        var server = pair.Server;
+        var client = pair.Client;
+        var map = await pair.CreateTestMap();
+
+        EntityUid pod = default, user = default;
+        await server.WaitPost(() =>
+        {
+            pod = server.EntMan.SpawnEntity("StarHorizonDropPod", map.GridCoords);
+            user = server.EntMan.SpawnEntity("DropPodTestClicker", map.GridCoords.Offset(new Vector2(0.8f, 0)));
+        });
+        await pair.RunTicksSync(10);
+
+        // Клиент: клик по центру капсулы попадает в неё.
+        await client.WaitAssertion(() =>
+        {
+            var clientPod = client.EntMan.GetEntity(server.EntMan.GetNetEntity(pod));
+            var sprite = client.EntMan.GetComponent<Robust.Client.GameObjects.SpriteComponent>(clientPod);
+            var pos = client.System<SharedTransformSystem>().GetWorldPosition(clientPod);
+            var eye = client.ResolveDependency<Robust.Client.Graphics.IEyeManager>().CurrentEye;
+            Assert.That(client.System<Content.Client.Clickable.ClickableSystem>().CheckClick((clientPod, null, sprite, null, null), pos, eye, false, out _, out _, out _),
+                "клик по капсуле попадает");
+        });
+
+        // Сервер: активация (клик пустой рукой) открывает, повторная закрывает.
+        await server.WaitAssertion(() =>
+        {
+            var interaction = server.System<SharedInteractionSystem>();
+            var storage = server.EntMan.GetComponent<EntityStorageComponent>(pod);
+            Assert.That(storage.Open, Is.False);
+            interaction.InteractionActivate(user, pod);
+            Assert.That(storage.Open, "клик открыл капсулу");
+            interaction.InteractionActivate(user, pod);
+            Assert.That(storage.Open, Is.False, "повторный клик закрыл");
+        });
+
+        await pair.CleanReturnAsync();
     }
 
     [Test]

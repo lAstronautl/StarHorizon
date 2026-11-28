@@ -73,7 +73,7 @@
     energy: 3
     color: "#4aa8ff"
   # Запуск штатной системой сигналов: консоль (DeviceLinkSource) шлёт сигнал на порт Trigger.
-  - type: TriggerOnActivate
+  # TriggerOnActivate не нужен (запуск только по сигналу) и мешал: перехватывал клик, и дверь не открывалась.
   - type: TriggerOnSignal
   - type: DeviceLinkSink
     ports:
