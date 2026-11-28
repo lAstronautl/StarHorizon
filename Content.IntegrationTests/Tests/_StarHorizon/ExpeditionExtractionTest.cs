@@ -44,6 +44,30 @@ public sealed class ExpeditionExtractionTest
         - MobLayer
 ";
 
+    /// <summary>Эвакуационный шаттл не прыгает в БСС с консоли до конца экспедиции; после своего вылета может.</summary>
+    [Test]
+    public async Task ExtractionShuttleFtlIsLockedUntilItDeparts()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { FailureLogLevel = LogLevel.Fatal });
+        var server = pair.Server;
+        var map = await pair.CreateTestMap();
+        var shuttles = server.System<Content.Server.Shuttles.Systems.ShuttleSystem>();
+
+        await server.WaitAssertion(() =>
+        {
+            var grid = map.Grid.Owner;
+            Assert.That(shuttles.CanFTL(grid, out _), "обычный грид прыгать может");
+
+            var extraction = server.EntMan.AddComponent<ExtractionShuttleComponent>(grid);
+            Assert.That(shuttles.CanFTL(grid, out _), Is.False, "эвакуационный шаттл до вылета прыгать не может");
+
+            extraction.Departed = true;
+            Assert.That(shuttles.CanFTL(grid, out _), "после вылета можно");
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
     [Test]
     public async Task ExtractionFlow()
     {

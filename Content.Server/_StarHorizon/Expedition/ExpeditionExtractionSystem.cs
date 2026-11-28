@@ -52,6 +52,7 @@ public sealed class ExpeditionExtractionSystem : EntitySystem
         SubscribeLocalEvent<FTLCompletedEvent>(OnFTLCompleted);
         SubscribeLocalEvent<FTLStartedEvent>(OnFTLStarted);
         SubscribeLocalEvent<ExtractionShuttleComponent, ComponentShutdown>(OnShuttleShutdown);
+        SubscribeLocalEvent<ExtractionShuttleComponent, ConsoleFTLAttemptEvent>(OnFTLAttempt);
     }
 
     public override void Update(float frameTime)
@@ -246,6 +247,20 @@ public sealed class ExpeditionExtractionSystem : EntitySystem
         // Людей оставляем на карте в космосе, корабль удаляется.
         _linkedLifecycle.UnparentPlayersFromGrid(shuttle, deleteGrid: true);
 
+    }
+
+    /// <summary>
+    /// Пока экспедиция не закончилась, эвакуационный шаттл (и разбитый в задании ремонта) никуда не прыгает с консоли
+    /// или командой: он улетает сам в конце экспедиции (наш вылет идёт мимо этой проверки). После вылета прыгать можно.
+    /// </summary>
+    private void OnFTLAttempt(Entity<ExtractionShuttleComponent> ent, ref ConsoleFTLAttemptEvent args)
+    {
+        if (ent.Comp.Departed || args.Cancelled)
+            return;
+
+        // Просто не даём прыгнуть, без своего сообщения.
+        args.Cancelled = true;
+        args.Reason = string.Empty;
     }
 
     private void OnShuttleShutdown(Entity<ExtractionShuttleComponent> ent, ref ComponentShutdown args)
