@@ -1,0 +1,159 @@
+#!/usr/bin/env python3
+"""
+Renders preview images for every shipyard vessel map.
+
+The shipyard console preview window shows
+  Resources/Textures/_Horizon/Shipyard/Previews/<key>.png
+for a vessel, where <key> is its shuttlePath without the leading "/Maps/" and ".yml", with "/"
+replaced by "_" (e.g. /Maps/_NF/Shuttles/adder.yml -> _NF_Shuttles_adder.png). When no image
+exists the window falls back to a tile layout. Re-run this after adding or changing shuttle maps.
+
+Usage (from the repository root, .NET SDK and Pillow required):
+    python3 Tools/_Horizon/render_shipyard_previews.py [--max-size 512] [map file names...]
+
+Without map file names (e.g. "adder") every vessel map is rendered. Maps that already have a
+preview are skipped unless --force is given (render takes ~1 minute per map). Maps are rendered by Content.MapRenderer,
+then cropped to their content and scaled down so the longest side is at most --max-size.
+"""
+
+import argparse
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+from PIL import Image
+
+ROOT = Path(__file__).resolve().parents[2]
+PROTOTYPES = ROOT / "Resources" / "Prototypes"
+OUTPUT = ROOT / "Resources" / "Textures" / "_Horizon" / "Shipyard" / "Previews"
+BATCH = 20
+
+
+def vessel_maps() -> list[str]:
+    """Returns /Maps/... paths of all non-abstract vessel prototypes (shuttlePath is inherited via parent)."""
+    protos: dict[str, dict] = {}
+    for file in PROTOTYPES.rglob("*.yml"):
+        current = None
+        for line in file.read_text(encoding="utf-8", errors="ignore").splitlines():
+            if line.startswith("- type:"):
+                current = {"type": line.split(":", 1)[1].strip()} 
+                if current["type"] != "vessel":
+                    current = None
+                continue
+            if current is None or not line.startswith("  ") or line.startswith("   "):
+                continue
+            m = re.match(r"\s{2}(id|parent|shuttlePath|abstract):\s*(.+?)\s*(#.*)?$", line)
+            if not m:
+                continue
+            current[m.group(1)] = m.group(2).strip("'\"")
+            if m.group(1) == "id":
+                protos[current["id"]] = current
+
+    def path_of(proto: dict, depth=0):
+        if "shuttlePath" in proto or depth > 10:
+            return proto.get("shuttlePath")
+        parent = protos.get(proto.get("parent", ""))
+        return path_of(parent, depth + 1) if parent else None
+
+    maps = set()
+    for proto in protos.values():
+        if proto.get("abstract") == "true":
+            continue
+        path = path_of(proto)
+        if path and (ROOT / "Resources" / path.lstrip("/")).is_file():
+            maps.add(path)
+    return sorted(maps)
+
+
+def preview_key(path: str) -> str:
+    """Must match ShipyardPreviewWindow.RenderPath on the client."""
+    key = path.removeprefix("/Maps/").removesuffix(".yml")
+    return key.replace("/", "_")
+
+
+def batches(maps: list[str]) -> list[list[str]]:
+    """MapRenderer writes <out>/<file name>/..., so maps sharing a file name must go to different batches."""
+    result: list[list[str]] = []
+    for path in maps:
+        for batch in result:
+            if len(batch) < BATCH and all(Path(p).stem != Path(path).stem for p in batch):
+                batch.append(path)
+                break
+        else:
+            result.append([path])
+    return result
+
+
+def render(batch: list[str], tmp: Path) -> None:
+    files = ["Resources" + path for path in batch]
+    subprocess.run(["dotnet", "run", "--project", "Content.MapRenderer", "-c", "Release", "--no-build", "--",
+                    "-f", *files, "-o", str(tmp), "--format", "png"],
+                   cwd=ROOT, check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
+def shrink(src: Path, dst: Path, max_size: int) -> None:
+    with Image.open(src) as image:
+        image = image.convert("RGBA")
+        box = image.getchannel("A").getbbox()
+        if box:
+            image = image.crop(box)
+        scale = min(1.0, max_size / max(image.size))
+        if scale < 1.0:
+            size = (max(1, round(image.width * scale)), max(1, round(image.height * scale)))
+            image = image.resize(size, Image.LANCZOS)
+        image.save(dst, optimize=True)
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--max-size", type=int, default=512)
+    parser.add_argument("--force", action="store_true", help="re-render maps that already have a preview")
+    parser.add_argument("maps", nargs="*", help="map names (file name without .yml); default: all vessel maps")
+    args = parser.parse_args()
+
+    maps = vessel_maps()
+    if args.maps:
+        wanted = set(args.maps)
+        maps = [m for m in maps if Path(m).stem in wanted]
+    if not maps:
+        print("No vessel maps found")
+        return 1
+    if not args.force:
+        maps = [m for m in maps if not (OUTPUT / f"{preview_key(m)}.png").is_file()]
+        if not maps:
+            print("All previews are up to date (use --force to re-render)")
+            return 0
+
+    OUTPUT.mkdir(parents=True, exist_ok=True)
+    subprocess.run(["dotnet", "build", "Content.MapRenderer", "-c", "Release", "-v", "q", "-nologo"],
+                   cwd=ROOT, check=True)
+
+    missing = []
+    done = 0
+    for batch in batches(maps):
+        tmp = Path(tempfile.mkdtemp(prefix="shipyard-previews-"))
+        try:
+            print(f"Rendering {done + 1}-{done + len(batch)} of {len(maps)}", flush=True)
+            render(batch, tmp)
+            for path in batch:
+                name = Path(path).stem
+                src = tmp / name / f"{name}-0.png"
+                if not src.is_file():
+                    missing.append(path)
+                    continue
+                shrink(src, OUTPUT / f"{preview_key(path)}.png", args.max_size)
+            done += len(batch)
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+
+    print(f"Wrote {len(maps) - len(missing)} previews to {OUTPUT.relative_to(ROOT)}")
+    if missing:
+        print("Not rendered: " + ", ".join(missing))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

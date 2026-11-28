@@ -9,6 +9,13 @@
         <RichTextLabel Name="DescriptionLabel" Margin="0 2"/>
         <PanelContainer VerticalExpand="True" HorizontalExpand="True" MinSize="400 360" Margin="0 4">
             <shipyard:ShuttlePreviewTextureControl Name="Preview" VerticalExpand="True" HorizontalExpand="True"/>
+            <TextureRect Name="RenderRect"
+                         Visible="False"
+                         Stretch="KeepAspectCentered"
+                         CanShrink="True"
+                         VerticalExpand="True"
+                         HorizontalExpand="True"
+                         Margin="8"/>
             <Label Name="LoadingLabel"
                    Text="{Loc 'shipyard-preview-loading'}"
                    HorizontalAlignment="Center"

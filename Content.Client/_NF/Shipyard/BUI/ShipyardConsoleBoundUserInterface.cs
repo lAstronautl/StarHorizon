@@ -117,8 +117,9 @@ public sealed class ShipyardConsoleBoundUserInterface : BoundUserInterface
             _previewWindow.MoveToFront();
         }
 
-        _previewWindow.SetVessel(vessel);
-        SendMessage(new ShipyardConsolePreviewRequestMessage(vessel.ID));
+        // Pre-rendered image available: no need to ask the server for the tile layout.
+        if (!_previewWindow.SetVessel(vessel))
+            SendMessage(new ShipyardConsolePreviewRequestMessage(vessel.ID));
     }
 
     protected override void ReceiveMessage(BoundUserInterfaceMessage message)
