@@ -21,10 +21,11 @@ public sealed class ExpeditionHudOverlay : Overlay
 
     public override OverlaySpace Space => OverlaySpace.ScreenSpace;
 
-    /// <summary>Отступ компаса и задач от левого края (правее панели быстрых слотов) и от верха (ниже кнопок меню).</summary>
-    private const float EdgeLeft = 100f;
-    private const float EdgeTop = 120f;
-    private const float CompassRadius = 30f;
+    /// <summary>Отступ от верхнего и правого края экрана и зазор между таймером, компасом и задачами.</summary>
+    private const float EdgeMargin = 6f;
+    private const float Gap = 10f;
+    private const float CompassRadius = 26f;
+    private const float ObjectivesWidth = 260f;
 
     private static readonly Color Accent = Color.FromHex("#A6E35A"); // салатовый
     private static readonly Color Panel = Color.Black.WithAlpha(0.55f);
@@ -52,9 +53,9 @@ public sealed class ExpeditionHudOverlay : Overlay
         _fontScale = scale;
         var bold = _cache.GetResource<FontResource>("/Fonts/NotoSans/NotoSans-Bold.ttf");
         var regular = _cache.GetResource<FontResource>("/Fonts/NotoSans/NotoSans-Regular.ttf");
-        _header = new VectorFont(bold, (int) MathF.Round(13 * scale));
-        _text = new VectorFont(regular, (int) MathF.Round(12 * scale));
-        _timer = new VectorFont(bold, (int) MathF.Round(26 * scale));
+        _header = new VectorFont(bold, (int) MathF.Round(10 * scale));
+        _text = new VectorFont(regular, (int) MathF.Round(11 * scale));
+        _timer = new VectorFont(bold, (int) MathF.Round(18 * scale));
     }
 
     protected override bool BeforeDraw(in OverlayDrawArgs args)
@@ -72,22 +73,25 @@ public sealed class ExpeditionHudOverlay : Overlay
         var h = args.ScreenHandle;
         var bounds = args.ViewportBounds;
 
-        // Таймер по центру сверху; компас и задачи у левого края, правее панели быстрых слотов и ниже кнопок меню,
-        // чтобы не закрывать обзор.
+        // Всё в верхней полосе экрана, чтобы не закрывать обзор: маленький таймер по центру, компас слева от него
+        // (между кнопками меню и таймером), задачи справа у края экрана.
+        var top = bounds.Top + EdgeMargin * scale;
+        var gap = Gap * scale;
         var centerX = (bounds.Left + bounds.Right) / 2f;
-        DrawTimer(h, view, new Vector2(centerX, bounds.Top + 12 * scale), scale);
+        var (timerLeft, timerRight) = DrawTimer(h, view, new Vector2(centerX, top), scale);
 
-        var edgeLeft = bounds.Left + EdgeLeft * scale;
-        var compassBottom = DrawCompass(h, view, new Vector2(edgeLeft + CompassRadius * scale, bounds.Top + EdgeTop * scale), scale);
-        DrawObjectives(h, view, new Vector2(edgeLeft, compassBottom + 10 * scale), scale);
+        DrawCompass(h, view, new Vector2(timerLeft - gap - CompassRadius * scale, top), scale);
+
+        DrawObjectives(h, view, bounds.Right - EdgeMargin * scale, timerRight + gap, top, scale);
     }
 
-    /// <param name="topLeft">Левый верхний угол плашки.</param>
-    private void DrawObjectives(DrawingHandleScreen h, ExpeditionHudView view, Vector2 topLeft, float scale)
+    /// <param name="right">Правый край плашки (край экрана).</param>
+    /// <param name="minLeft">Левее этого плашка не заходит, чтобы не наезжать на таймер.</param>
+    private void DrawObjectives(DrawingHandleScreen h, ExpeditionHudView view, float right, float minLeft, float top, float scale)
     {
-        var pad = 8 * scale;
-        var line = 20 * scale;
-        var box = 11 * scale;
+        var pad = 6 * scale;
+        var line = 17 * scale;
+        var box = 10 * scale;
         var header = Loc.GetString(view.Completed ? "expedition-hud-objectives-done" : "expedition-hud-objectives");
 
         // Ширина плашки по самой длинной строке.
@@ -98,8 +102,8 @@ public sealed class ExpeditionHudOverlay : Overlay
             width = MathF.Max(width, h.GetDimensions(_text, view.WaveLine, 1f).X);
         width += pad * 2 + 4 * scale;
         // Ширина не дёргается от смены цифр прогресса: не меньше фиксированной.
-        width = MathF.Max(width, 260 * scale);
-        var origin = topLeft;
+        width = MathF.Max(width, ObjectivesWidth * scale);
+        var origin = new Vector2(MathF.Max(minLeft, right - width), top);
 
         var rows = 1 + view.Objectives.Count + (view.WaveLine != null ? 1 : 0);
         var height = pad * 2 + rows * line;
@@ -132,8 +136,8 @@ public sealed class ExpeditionHudOverlay : Overlay
         }
     }
 
-    /// <returns>Нижний край плашки таймера.</returns>
-    private float DrawTimer(DrawingHandleScreen h, ExpeditionHudView view, Vector2 top, float scale)
+    /// <returns>Левый и правый края плашки таймера.</returns>
+    private (float Left, float Right) DrawTimer(DrawingHandleScreen h, ExpeditionHudView view, Vector2 top, float scale)
     {
         var (label, color) = view.Phase switch
         {
@@ -158,14 +162,14 @@ public sealed class ExpeditionHudOverlay : Overlay
 
         var labelSize = h.GetDimensions(_header, labelText, 1f);
         var timerSize = view.Phase == ExpeditionHudPhase.Departed ? Vector2.Zero : h.GetDimensions(_timer, timerText, 1f);
-        var pad = 8 * scale;
+        var pad = 4 * scale;
         // Ширина плашки фиксирована: по самой длинной из надписей таймера, чтобы плашка не меняла размер.
         var width = FixedTimerWidth(h) + pad * 4;
         var height = pad * 2 + labelSize.Y + timerSize.Y;
         var origin = new Vector2(top.X - width / 2f, top.Y);
 
         h.DrawRect(UIBox2.FromDimensions(origin, new Vector2(width, height)), Panel);
-        h.DrawRect(UIBox2.FromDimensions(origin + new Vector2(0, height - 3 * scale), new Vector2(width, 3 * scale)), color);
+        h.DrawRect(UIBox2.FromDimensions(origin + new Vector2(0, height - 2 * scale), new Vector2(width, 2 * scale)), color);
 
         var y = origin.Y + pad;
         h.DrawString(_header, new Vector2(top.X - labelSize.X / 2f, y), labelText, color);
@@ -177,11 +181,11 @@ public sealed class ExpeditionHudOverlay : Overlay
             y += timerSize.Y;
         }
 
-        return origin.Y + height;
+        return (origin.X, origin.X + width);
     }
 
     /// <summary>
-    /// Компас под таймером: стороны света и стрелка к цели (данж, место задания, приёмник или шаттл) с расстоянием.
+    /// Компас слева от таймера: стороны света и стрелка к цели (данж, место задания, приёмник или шаттл) с расстоянием.
     /// Всё поворачивается вместе с камерой: «С» показывает туда, где на экране север.
     /// </summary>
     private static readonly string[] TimerLabels =
@@ -227,7 +231,7 @@ public sealed class ExpeditionHudOverlay : Overlay
         {
             var letter = Loc.GetString(key);
             var size = h.GetDimensions(_text, letter, 1f);
-            var pos = center + ToScreen(dir) * (radius - 9 * scale) - size / 2f;
+            var pos = center + ToScreen(dir) * (radius - 8 * scale) - size / 2f;
             h.DrawString(_text, pos, letter, key == "expedition-hud-compass-n" ? Danger : Muted);
         }
 
@@ -249,9 +253,9 @@ public sealed class ExpeditionHudOverlay : Overlay
             var dir = ToScreen(Vector2.Normalize(delta));
             var side = new Vector2(-dir.Y, dir.X);
             var tip = center + dir * (radius - 2 * scale);
-            var baseCenter = center + dir * (radius - 16 * scale);
+            var baseCenter = center + dir * (radius - 14 * scale);
             h.DrawPrimitives(DrawPrimitiveTopology.TriangleList,
-                new[] { tip, baseCenter + side * 6 * scale, baseCenter - side * 6 * scale }, color);
+                new[] { tip, baseCenter + side * 5 * scale, baseCenter - side * 5 * scale }, color);
             h.DrawLine(center, baseCenter, color.WithAlpha(0.8f));
         }
 
@@ -260,8 +264,8 @@ public sealed class ExpeditionHudOverlay : Overlay
         var label = Loc.GetString("expedition-hud-compass-target-" + view.CompassKind.ToString().ToLowerInvariant(),
             ("meters", (int) MathF.Round(distance)));
         var labelSize = h.GetDimensions(_text, label, 1f);
-        // Подпись шире круга: выравниваем по левому краю компаса, чтобы не залезать на панель слотов.
-        var labelPos = new Vector2(center.X - radius, center.Y + radius + 4 * scale);
+        // Подпись шире круга: выравниваем по правому краю компаса, чтобы не залезать на таймер.
+        var labelPos = new Vector2(center.X + radius - labelSize.X, center.Y + radius + 4 * scale);
         h.DrawRect(UIBox2.FromDimensions(labelPos - new Vector2(4 * scale, 1 * scale), labelSize + new Vector2(8 * scale, 2 * scale)), Panel);
         h.DrawString(_text, labelPos, label, color);
         return labelPos.Y + labelSize.Y;
