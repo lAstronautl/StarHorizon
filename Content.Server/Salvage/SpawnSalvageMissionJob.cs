@@ -375,7 +375,7 @@ public sealed class SpawnSalvageMissionJob : Job<bool>
                 await SetupSampling(mission, dungeon, grid, random);
                 break;
             case SalvageMissionType.Repair: // StarHorizon
-                SetupRepair(mission);
+                await SetupRepair(mission, dungeon, grid, random, expedition.DungeonCenter);
                 break;
             default:
                 _sawmill.Warning($"No setup function for salvage mission type {_missionParams.MissionType}!");
@@ -723,10 +723,45 @@ public sealed class SpawnSalvageMissionJob : Job<bool>
     }
 
     /// <summary>StarHorizon: сколько узлов чинить на разбитом шаттле (сам шаттл садится в начале, узлы появляются на нём).</summary>
-    private void SetupRepair(SalvageMission mission)
+    /// <summary>
+    /// StarHorizon: узлы разбитого шаттла разбросаны по разным комнатам комплекса, не ближе 12 м к его центру (туда падает
+    /// сам шаттл, место под ним расчищается).
+    /// </summary>
+    private async Task SetupRepair(SalvageMission mission, Dungeon dungeon, MapGridComponent grid, Random random, Vector2? center)
     {
+        await SuspendIfOutOfTime();
+
         var difficulty = _prototypeManager.Index(mission.Difficulty);
         var repair = _entManager.EnsureComponent<Content.Server._StarHorizon.Expedition.SalvageRepairExpeditionComponent>(mapUid);
         repair.Total = Math.Clamp(difficulty.DestructionStructures / 2, 3, 6);
+
+        var rooms = dungeon.Rooms
+            .Where(r => center == null || (r.Center - center.Value).Length() > 12f)
+            .ToList();
+        if (rooms.Count == 0)
+            rooms = dungeon.Rooms.ToList();
+        random.Shuffle(rooms);
+
+        var tiles = new List<Vector2i>();
+        for (var i = 0; repair.Points.Count < repair.Total && i < rooms.Count * 2; i++)
+        {
+            tiles.Clear();
+            tiles.AddRange(rooms[i % rooms.Count].Tiles);
+            random.Shuffle(tiles);
+            foreach (var tile in tiles)
+            {
+                if (!_anchorable.TileFree(grid, tile, (int) CollisionGroup.MachineLayer, (int) CollisionGroup.MachineLayer))
+                    continue;
+
+                var point = _entManager.SpawnEntity(Content.Server._StarHorizon.Expedition.ExpeditionObjectivesSystem.RepairPointProto,
+                    _map.GridTileToLocal(mapUid, grid, tile));
+                _entManager.EnsureComponent<Content.Server._StarHorizon.Expedition.ExpeditionRepairPointComponent>(point).Expedition = mapUid;
+                repair.Points.Add(point);
+                break;
+            }
+        }
+
+        repair.Total = Math.Max(1, repair.Points.Count);
+        repair.PointsSpawned = true;
     }
 }

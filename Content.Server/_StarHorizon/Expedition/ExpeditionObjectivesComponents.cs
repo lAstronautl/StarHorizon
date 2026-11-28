@@ -79,8 +79,8 @@ public enum ExpeditionRepairStage : byte
 }
 
 /// <summary>
-/// Задание «Ремонт шаттла»: эвакуационный шаттл в начале задания жёстко садится на планету. Надо починить его узлы,
-/// затем продержаться, пока запускаются системы. Если шаттл к эвакуации не готов, присылают резервный, а задание
+/// Задание «Ремонт шаттла»: эвакуационный шаттл в начале задания падает посреди комплекса. Надо починить узлы, разбросанные
+/// по комнатам комплекса, затем продержаться, пока запускаются системы. Если шаттл к эвакуации не готов, присылают резервный, а задание
 /// проваливается.
 /// </summary>
 [RegisterComponent]
@@ -89,6 +89,9 @@ public sealed partial class SalvageRepairExpeditionComponent : Component
     [ViewVariables] public int Total = 3;
     [ViewVariables] public List<EntityUid> Points = new();
     [ViewVariables] public bool PointsSpawned;
+
+    /// <summary>Объявили, что шаттл рухнул и сколько узлов чинить.</summary>
+    [ViewVariables] public bool CrashAnnounced;
     [ViewVariables] public ExpeditionRepairStage Stage;
 
     [DataField] public TimeSpan DefenseDuration = TimeSpan.FromMinutes(2);
@@ -98,7 +101,7 @@ public sealed partial class SalvageRepairExpeditionComponent : Component
     [ViewVariables] public TimeSpan NextDefenseWave;
 }
 
-/// <summary>Повреждённый узел разбитого эвакуационного шаттла.</summary>
+/// <summary>Повреждённый узел разбитого эвакуационного шаттла (разбросаны по комплексу).</summary>
 [RegisterComponent]
 public sealed partial class ExpeditionRepairPointComponent : Component
 {

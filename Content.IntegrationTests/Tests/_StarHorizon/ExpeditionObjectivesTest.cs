@@ -193,8 +193,10 @@ public sealed class ExpeditionObjectivesTest
             Assert.That(verbs.Any(v => v.Text == Robust.Shared.Localization.Loc.GetString("expedition-depot-verb-fulton")), "есть действие фултона");
             verbs.First(v => v.Text == Robust.Shared.Localization.Loc.GetString("expedition-depot-verb-fulton")).Act!.Invoke();
         });
+        var pursuersBefore = server.EntMan.Count<PursuePlayerComponent>();
         await pair.RunSeconds(4f);
         Assert.That(holder.FultonAttached, "приёмник на фултоне");
+        Assert.That(server.EntMan.Count<PursuePlayerComponent>(), Is.GreaterThan(pursuersBefore), "шар фултона заметили: пришла волна");
         Assert.That(server.EntMan.GetComponent<Content.Shared.Salvage.Fulton.FultonedComponent>(depot).Removeable, Is.False, "снять нельзя");
 
         // Фултон поднимает приёмник: задание выполнено, приёмник убран.
@@ -218,14 +220,47 @@ public sealed class ExpeditionObjectivesTest
         var repair = server.EntMan.GetComponent<SalvageRepairExpeditionComponent>(map);
         var extraction = server.EntMan.GetComponent<ExpeditionExtractionComponent>(map);
 
-        // 1. Разбитый шаттл садится сразу, на нём появляются узлы.
-        for (var i = 0; i < 45 && !repair.PointsSpawned; i++)
+        // 1. Узлы разбросаны по комплексу; разбитый шаттл падает серединой в центр комплекса, место под ним расчищено.
+        Assert.That(repair.PointsSpawned, "узлы расставлены при генерации");
+        Assert.That(repair.Points, Has.Count.EqualTo(repair.Total).And.Count.GreaterThanOrEqualTo(3));
+        var dungeonTiles = server.EntMan.GetComponent<ExpeditionDungeonTilesComponent>(map).Tiles;
+        await server.WaitAssertion(() =>
+        {
+            var grid = server.EntMan.GetComponent<Robust.Shared.Map.Components.MapGridComponent>(map);
+            foreach (var p in repair.Points)
+            {
+                var xform = server.EntMan.GetComponent<TransformComponent>(p);
+                Assert.That(xform.GridUid, Is.EqualTo(map), "узел на планете, не на шаттле");
+                Assert.That(dungeonTiles.Contains(server.System<SharedMapSystem>().TileIndicesFor(map, grid, xform.Coordinates)), "узел в комплексе");
+            }
+        });
+
+        for (var i = 0; i < 45 && !repair.CrashAnnounced; i++)
             await pair.RunSeconds(1f);
-        Assert.That(repair.PointsSpawned, "шаттл сел, узлы на месте");
+        Assert.That(repair.CrashAnnounced, "шаттл рухнул");
         var shuttle = extraction.Shuttle!.Value;
         Assert.That(server.EntMan.HasComponent<ExpeditionBrokenShuttleComponent>(shuttle));
-        Assert.That(repair.Points, Has.Count.EqualTo(repair.Total).And.Count.GreaterThanOrEqualTo(3));
-        Assert.That(repair.Points.All(p => server.EntMan.GetComponent<TransformComponent>(p).GridUid == shuttle), "узлы на шаттле");
+        await server.WaitAssertion(() =>
+        {
+            var shuttleGrid = server.EntMan.GetComponent<Robust.Shared.Map.Components.MapGridComponent>(shuttle);
+            var center = System.Numerics.Vector2.Transform(shuttleGrid.LocalAABB.Center, server.System<SharedTransformSystem>().GetWorldMatrix(shuttle));
+            Assert.That((center - expedition.DungeonCenter!.Value).Length(), Is.LessThan(2f), "шаттл серединой в центре комплекса");
+
+            // Под шаттлом на планете нет стен и прочего твёрдого.
+            var grid = server.EntMan.GetComponent<Robust.Shared.Map.Components.MapGridComponent>(map);
+            var mapSys = server.System<SharedMapSystem>();
+            var box = server.System<SharedTransformSystem>().GetWorldMatrix(shuttle) is var m
+                ? new Robust.Shared.Maths.Box2(System.Numerics.Vector2.Transform(shuttleGrid.LocalAABB.BottomLeft, m), System.Numerics.Vector2.Transform(shuttleGrid.LocalAABB.TopRight, m))
+                : default;
+            foreach (var tile in mapSys.GetTilesIntersecting(map, grid, box, false))
+            {
+                foreach (var anchored in mapSys.GetAnchoredEntities(map, grid, tile.GridIndices))
+                {
+                    Assert.That(server.EntMan.TryGetComponent<Robust.Shared.Physics.Components.PhysicsComponent>(anchored, out var body) && body.Hard && body.CanCollide,
+                        Is.False, $"под шаттлом расчищено ({server.EntMan.ToPrettyString(anchored)})");
+                }
+            }
+        });
         Assert.That(server.EntMan.TryGetComponent<ExpeditionExtractionStateComponent>(map, out var earlyState) && earlyState.Active,
             Is.False, "эвакуация ещё не объявлена");
         await pair.RunSeconds(1f);
@@ -283,7 +318,7 @@ public sealed class ExpeditionObjectivesTest
         var repair = server.EntMan.GetComponent<SalvageRepairExpeditionComponent>(map);
         var extraction = server.EntMan.GetComponent<ExpeditionExtractionComponent>(map);
 
-        for (var i = 0; i < 45 && !repair.PointsSpawned; i++)
+        for (var i = 0; i < 45 && !repair.CrashAnnounced; i++)
             await pair.RunSeconds(1f);
         var crashed = extraction.Shuttle!.Value;
 

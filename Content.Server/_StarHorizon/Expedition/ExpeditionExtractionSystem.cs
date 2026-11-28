@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Numerics;
 using Content.Server.StationEvents.Events;
 using Content.Shared._StarHorizon.Expedition;
@@ -161,18 +162,54 @@ public sealed class ExpeditionExtractionSystem : EntitySystem
 
         var landing = expedition.LandingCoordinates + new Vector2(ent.Comp.LandingOffset * side, 0);
         ent.Comp.LandingPosition = landing;
+
+        // Разбитый шаттл (задание ремонта) падает серединой на центр комплекса; всё твёрдое на месте падения
+        // расчищается заранее (дыра от крушения).
+        if (crashed && expedition.DungeonCenter is { } center && TryComp<MapGridComponent>(shuttle, out var shuttleGrid))
+        {
+            var bounds = shuttleGrid.LocalAABB;
+            landing = center - bounds.Center;
+            ent.Comp.LandingPosition = center;
+            ClearCrashSite(ent.Owner, new Box2(landing + bounds.BottomLeft - Vector2.One, landing + bounds.TopRight + Vector2.One));
+        }
         TryComp<ShuttleComponent>(shuttle, out var shuttleData);
         _shuttle.FTLToCoordinates(shuttle, shuttleData, new EntityCoordinates(ent.Owner, landing), Angle.Zero,
             _shuttle.DefaultStartupTime, _shuttle.DefaultTravelTime);
 
         if (crashed)
         {
-            _salvage.Announce(ent.Owner, Loc.GetString("expedition-repair-incoming", ("x", (int) landing.X), ("y", (int) landing.Y)));
+            var site = ent.Comp.LandingPosition ?? landing;
+            _salvage.Announce(ent.Owner, Loc.GetString("expedition-repair-incoming", ("x", (int) site.X), ("y", (int) site.Y)));
             return;
         }
 
         _salvage.Announce(ent.Owner, Loc.GetString("expedition-extraction-arriving",
             ("x", (int) landing.X), ("y", (int) landing.Y), ("minutes", (int) ent.Comp.ArriveBefore.TotalMinutes)));
+    }
+
+    /// <summary>
+    /// Место падения разбитого шаттла: стены, двери, машины, порода и прочее твёрдое на клетках планеты в этой области
+    /// удаляются (узлы ремонта не трогаем). Земля биома под шаттлом при посадке сама не обрастает породой (FTL её выравнивает).
+    /// </summary>
+    private void ClearCrashSite(EntityUid map, Box2 area)
+    {
+        if (!TryComp<MapGridComponent>(map, out var grid))
+            return;
+
+        foreach (var tile in _map.GetTilesIntersecting(map, grid, area, false))
+        {
+            foreach (var anchored in _map.GetAnchoredEntities(map, grid, tile.GridIndices).ToArray())
+            {
+                if (HasComp<ExpeditionRepairPointComponent>(anchored))
+                    continue;
+
+                if (HasComp<Content.Server.Gatherable.Components.GatherableComponent>(anchored)
+                    || TryComp<PhysicsComponent>(anchored, out var body) && body.CanCollide && body.Hard)
+                {
+                    QueueDel(anchored);
+                }
+            }
+        }
     }
 
     /// <summary>Шаттл ушёл в БСС (после старта FTL): только теперь клиентам играет победная музыка.</summary>

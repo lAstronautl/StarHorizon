@@ -272,6 +272,9 @@ public sealed class ExpeditionObjectivesSystem : EntitySystem
 
         _salvage.Announce(ent.Comp.Expedition, Loc.GetString("expedition-samples-fulton-attached",
             ("seconds", (int) holder.FultonDuration.TotalSeconds)));
+
+        // Шар фултона виден издалека: сразу приходит волна.
+        _waves.ForceWave(ent.Comp.Expedition);
         return true;
     }
 
@@ -283,9 +286,14 @@ public sealed class ExpeditionObjectivesSystem : EntitySystem
     {
         var comp = ent.Comp;
         if (!comp.PointsSpawned)
-        {
-            TrySpawnPoints(ent);
             return;
+
+        // Шаттл рухнул посреди комплекса: объявляем, сколько узлов разбросано.
+        if (!comp.CrashAnnounced && GetShuttle(ent.Owner) is { } crashed && Transform(crashed).MapUid == ent.Owner
+            && (!TryComp<FTLComponent>(crashed, out var crashFtl) || crashFtl.State is FTLState.Cooldown or FTLState.Available))
+        {
+            comp.CrashAnnounced = true;
+            _salvage.Announce(ent.Owner, Loc.GetString("expedition-repair-crashed", ("count", comp.Total)));
         }
 
         var now = _timing.CurTime;
@@ -329,36 +337,6 @@ public sealed class ExpeditionObjectivesSystem : EntitySystem
                                                                                && HasComp<ExpeditionBrokenShuttleComponent>(shuttle)
             ? shuttle
             : null;
-    }
-
-    /// <summary>Шаттл сел: на свободных тайлах его пола появляются повреждённые узлы.</summary>
-    private void TrySpawnPoints(Entity<SalvageRepairExpeditionComponent> ent)
-    {
-        if (GetShuttle(ent.Owner) is not { } shuttle
-            || Transform(shuttle).MapUid != ent.Owner
-            || TryComp<FTLComponent>(shuttle, out var ftl) && ftl.State is not (FTLState.Cooldown or FTLState.Available)
-            || !TryComp<MapGridComponent>(shuttle, out var grid))
-        {
-            return;
-        }
-
-        var tiles = _map.GetAllTiles(shuttle, grid).Select(t => t.GridIndices)
-            .Where(t => _anchorable.TileFree((shuttle, grid), t, (int) (CollisionGroup.Impassable | CollisionGroup.MachineLayer),
-                (int) (CollisionGroup.Impassable | CollisionGroup.MachineLayer)))
-            .ToList();
-        _random.Shuffle(tiles);
-
-        foreach (var tile in tiles.Take(ent.Comp.Total))
-        {
-            var point = Spawn(RepairPointProto, _map.GridTileToLocal(shuttle, grid, tile));
-            EnsureComp<ExpeditionRepairPointComponent>(point).Expedition = ent.Owner;
-            _appearance.SetData(point, ExpeditionRepairVisuals.Repaired, false);
-            ent.Comp.Points.Add(point);
-        }
-
-        ent.Comp.Total = ent.Comp.Points.Count;
-        ent.Comp.PointsSpawned = true;
-        _salvage.Announce(ent.Owner, Loc.GetString("expedition-repair-crashed", ("count", ent.Comp.Total)));
     }
 
     private void OnRepairInteract(Entity<ExpeditionRepairPointComponent> ent, ref InteractHandEvent args)
