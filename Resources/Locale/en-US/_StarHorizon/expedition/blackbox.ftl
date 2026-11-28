@@ -18,20 +18,20 @@ expedition-quota-announcement = Objective: mine and deposit {$count} ore into th
 expedition-quota-done = Mining quota complete!
 expedition-samples-announcement = Objective: find glowing samples in the complex and deposit {$count} into the depot. The depot will be dropped in a pod.
 expedition-samples-done = The depot with the samples is lifted by fulton. Objective complete!
-expedition-repair-announcement = Objective: the extraction shuttle crashed in the middle of the complex. Find and repair its nodes scattered across the complex, then hold the shuttle while its systems start up.
+expedition-repair-announcement = Objective: the extraction shuttle crashed in the middle of the complex and lost its navigation. Download the data from consoles scattered across the complex, then hold the shuttle while its systems start up.
 expedition-repair-incoming = The extraction shuttle is losing control and going down near ({$x}, {$y})!
-expedition-repair-crashed = The shuttle crashed in the middle of the complex. Damaged nodes: {$count}, scattered across the complex. Find and repair them.
-expedition-repair-start = You start repairing the node...
-expedition-repair-point-done = Node repaired.
-expedition-repair-defend = Nodes repaired, systems starting. Hold the shuttle for {$seconds} seconds: enemies are coming!
+expedition-repair-crashed = The shuttle crashed in the middle of the complex. It needs data from {$count} consoles in the complex. Find them and download the data.
+expedition-repair-start = You start downloading data from the console...
+expedition-repair-point-done = Console data downloaded.
+expedition-repair-defend = Data downloaded, shuttle systems starting. Hold the shuttle for {$seconds} seconds: enemies are coming!
 expedition-repair-done = Shuttle systems are online. The shuttle is ready for extraction!
-expedition-repair-failed = The shuttle was not repaired. Sending a backup shuttle. Objective failed.
+expedition-repair-failed = The shuttle is not ready: the data was not collected. Sending a backup shuttle. Objective failed.
 expedition-extraction-ready = Extraction in {$minutes} min from your shuttle. Don't miss it!
 
 expedition-hud-ore = ore
 expedition-hud-objective-quota = Deposit ore
 expedition-hud-objective-samples = Deposit: {$name}
-expedition-hud-objective-repair = Repair shuttle nodes
+expedition-hud-objective-repair = Download data from consoles
 expedition-hud-objective-defend = Hold the shuttle
 
 expedition-samples-fulton = Samples collected! Attach a fulton to the depot to send them to orbit.

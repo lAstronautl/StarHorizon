@@ -51,11 +51,11 @@
     radius: 2
     energy: 1.2
 
-# Повреждённый узел разбитого эвакуационного шаттла: разбитый экран, после ремонта (руками, несколько секунд) работает.
+# Консоль с данными для разбитого эвакуационного шаттла: разбитый экран, после скачивания данных (руками, несколько секунд) работает.
 - type: entity
   id: ExpeditionRepairPoint
-  name: damaged shuttle node
-  description: One of the shuttle systems knocked out in the crash. It can be patched up by hand.
+  name: data console
+  description: A complex console holding the data the crashed shuttle needs to take off. The data can be downloaded by hand.
   placement:
     mode: SnapgridCenter
   components:
