@@ -187,17 +187,8 @@ public sealed class RockClearSystem : EntitySystem
     }
 
     /// <summary>
-    /// Клетки грида <paramref name="gridUid"/> (планеты), закрытые стенами и прочими препятствиями других гридов на той же
-    /// карте (севшие шаттлы) в радиусе <paramref name="radius"/> от точки: для поиска пути по клеткам планеты они тоже стены.
-    /// </summary>
-    public HashSet<Vector2i> BlockedByOtherGrids(EntityUid gridUid, MapGridComponent grid, Vector2 center, float radius, bool passDoors)
-    {
-        return OtherGrids(gridUid, grid, center, radius, passDoors).Blocked;
-    }
-
-    /// <summary>
-    /// Клетки планеты под другими гридами (севшими шаттлами): <c>Covered</c> все, <c>Blocked</c> только под их стенами
-    /// и прочими препятствиями (двери проходимы, если <paramref name="passDoors"/>).
+    /// Клетки планеты под другими гридами (севшими шаттлами), для мест падения капсул: <c>Covered</c> все, <c>Blocked</c>
+    /// только под их стенами и прочими препятствиями (двери проходимы, если <paramref name="passDoors"/>).
     /// </summary>
     public (HashSet<Vector2i> Covered, HashSet<Vector2i> Blocked) OtherGrids(EntityUid gridUid, MapGridComponent grid, Vector2 center,
         float radius, bool passDoors)
@@ -240,7 +231,7 @@ public sealed class RockClearSystem : EntitySystem
     /// <paramref name="maxTiles"/> клеток. По нему мобы идут к игроку «под горку»: такой путь всегда реальный.
     /// </summary>
     public Dictionary<Vector2i, int> DistanceField(EntityUid gridUid, MapGridComponent grid, Vector2i start, bool passDoors,
-        int maxTiles = 20000, IReadOnlySet<Vector2i>? blocked = null)
+        int maxTiles = 20000)
     {
         var dist = new Dictionary<Vector2i, int> { [start] = 0 };
         var queue = new Queue<Vector2i>();
@@ -252,7 +243,7 @@ public sealed class RockClearSystem : EntitySystem
             var steps = dist[tile] + 1;
             foreach (var next in new[] { tile + Vector2i.Up, tile + Vector2i.Down, tile + Vector2i.Left, tile + Vector2i.Right })
             {
-                if (dist.ContainsKey(next) || blocked != null && blocked.Contains(next) || !IsPassable(gridUid, grid, next, passDoors))
+                if (dist.ContainsKey(next) || !IsPassable(gridUid, grid, next, passDoors))
                     continue;
 
                 dist[next] = steps;

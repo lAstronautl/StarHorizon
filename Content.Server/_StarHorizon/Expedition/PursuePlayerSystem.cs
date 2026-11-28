@@ -117,24 +117,20 @@ public sealed class PursuePlayerSystem : EntitySystem
     private Vector2? ChooseWaypoint(EntityUid uid, PursuePlayerComponent pursue, HTNComponent htn, TransformComponent xform,
         Vector2 pos, Vector2 playerPos)
     {
-        // Поиск идёт по клеткам планеты (карта сама грид), даже если моб или игрок стоят на другом гриде (шаттле):
-        // клетки, закрытые стенами других гридов, в поле тоже стены.
-        if (xform.MapUid is not { } gridUid || !TryComp<MapGridComponent>(gridUid, out var grid))
+        if (xform.GridUid is not { } gridUid || xform.GridUid != xform.MapUid || !TryComp<MapGridComponent>(gridUid, out var grid))
             return ChooseAngleWaypoint(uid, pursue, xform, pos, playerPos);
 
         var doors = htn.Blackboard.TryGetValue<bool>(NPCBlackboard.NavInteract, out var interact, EntityManager) && interact
                     || htn.Blackboard.TryGetValue<bool>(NPCBlackboard.NavPry, out var pry, EntityManager) && pry;
         var playerTile = _map.TileIndicesFor(gridUid, grid, new EntityCoordinates(gridUid, playerPos));
-        var field = GetField(gridUid, grid, playerTile, doors, playerPos);
+        var field = GetField(gridUid, grid, playerTile, doors);
 
         var mobTile = _map.TileIndicesFor(gridUid, grid, new EntityCoordinates(gridUid, pos));
         if (!TryNearestInField(field, mobTile, out var current))
             return ChooseAngleWaypoint(uid, pursue, xform, pos, playerPos);
 
-        // Близко и на одном гриде с игроком: напрямую (короткий путь находит A*). На разных гридах A* путь не строит,
-        // поэтому идём по полю, пока не окажемся на гриде игрока.
-        var sameGrid = SameGrid(xform, playerPos);
-        if (field[current] <= DirectSteps && sameGrid)
+        // Близко: напрямую (короткий путь находит A*).
+        if (field[current] <= DirectSteps)
         {
             pursue.Waypoint = null;
             return null;
@@ -186,21 +182,19 @@ public sealed class PursuePlayerSystem : EntitySystem
         return leg;
     }
 
-    private Dictionary<Vector2i, int> GetField(EntityUid gridUid, MapGridComponent grid, Vector2i playerTile, bool doors, Vector2 playerPos)
+    private Dictionary<Vector2i, int> GetField(EntityUid gridUid, MapGridComponent grid, Vector2i playerTile, bool doors)
     {
         var key = (gridUid, playerTile, doors);
         var now = _timing.CurTime;
         if (_fields.TryGetValue(key, out var cached) && now - cached.Built < FieldLifetime)
             return cached.Dist;
 
-        var blocked = _rocks.BlockedByOtherGrids(gridUid, grid, playerPos, 80f, doors);
-        blocked.Remove(playerTile);
-        var dist = _rocks.DistanceField(gridUid, grid, playerTile, doors, blocked: blocked);
+        var dist = _rocks.DistanceField(gridUid, grid, playerTile, doors);
         _fields[key] = (now, dist);
         return dist;
     }
 
-    /// <summary>Прямая от точки до центра клетки проходит только по клеткам поля (без стен любого грида).</summary>
+    /// <summary>Прямая от точки до центра клетки проходит только по клеткам поля (без стен).</summary>
     private bool LineInField(EntityUid gridUid, MapGridComponent grid, Dictionary<Vector2i, int> field, Vector2 from, Vector2i to)
     {
         var end = _map.GridTileToLocal(gridUid, grid, to).Position;
@@ -216,18 +210,6 @@ public sealed class PursuePlayerSystem : EntitySystem
                 if (!field.ContainsKey(t))
                     return false;
             }
-        }
-
-        return true;
-    }
-
-    /// <summary>Моб и игрок на одном гриде (оба на планете или оба на одном шаттле).</summary>
-    private bool SameGrid(TransformComponent mob, Vector2 playerPos)
-    {
-        foreach (var (player, _, pos) in _players)
-        {
-            if (pos == playerPos)
-                return Transform(player).GridUid == mob.GridUid;
         }
 
         return true;
